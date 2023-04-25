@@ -5,64 +5,71 @@ REM 2. OPENTWIN_THIRDPARTY_ROOT
 REM 3. DEVENV_ROOT_2022
 
 REM Ensure that the setup will only be performed once
-if "%OPENTWIN_DEV_ENV_DEFINED%"=="1" (
+IF "%OPENTWIN_DEV_ENV_DEFINED%"=="1" (
 	goto END
 )
 
-SET OPENTWIN_DEV_ENV_DEFINED=1
-
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto END
+	goto PAUSE_END
 )
 
 IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
-	goto END
+	goto PAUSE_END
 )
 
 IF "%DEVENV_ROOT_2022%" == "" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
-	goto END
+	goto PAUSE_END
 )
 
 REM Call third party environment shell
 CALL "%OPENTWIN_THIRDPARTY_ROOT%\SetupEnvironment.bat"
 
-REM ##########################################################################################################
-REM OpenTwin project paths
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_THIRDPARTY_ENV_DEFINED%" == "1" (
+	goto END
+)
+
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
+REM OpenTwin library paths
 REM Call the batch file with the following arguments:
 REM 1: Name of the library in upper case letters and underscores as delimiter (e.g. "TEST_LIB" will result in "TEST_LIB_ROOT"; "TEST_LIB_INCD"; ...)
 REM 2: Name of the library in CamelCase with the same name as the created binaries (<name>.dll) (e.g. "TestLib" will result in debug = "TestLibd.lib" and release = "TestLib.lib")
 REM 3: Path to the library root folder without '\' suffix (e.g. "X:\testlib" will be set as root path)
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_CORE OpenTwinCore %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_SYSTEM OpenTwinSystem %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_GUI OTGui %OPENTWIN_DEV_ROOT%\Libraries\OTGui
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_WIDGETS OTWidgets %OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_COMMUNICATION OpenTwinCommunication %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_FOUNDATION OpenTwinServiceFoundation %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_MODELENTITIES ModelEntities %OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_CADMODELENTITIES CadModelEntities %OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_DATASTORAGE DataStorage %OPENTWIN_DEV_ROOT%\Libraries\DataStorage
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_UIPLUGINAPI UIPluginAPI %OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_UIPLUGINTEMPLATE UIPluginTemplate %OPENTWIN_DEV_ROOT%\Libraries\UIPluginTemplate
+REM See contents of Scripts/SetLibraryEnv.bat for further information
+
 CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_BLOCKEDITOR BlockEditor %OPENTWIN_DEV_ROOT%\Libraries\BlockEditor
 CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_BLOCKEDITORAPI BlockEditorAPI %OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_CADMODELENTITIES CadModelEntities %OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_DATASTORAGE DataStorage %OPENTWIN_DEV_ROOT%\Libraries\DataStorage
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_MODELENTITIES ModelEntities %OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
 
-REM ##########################################################################################################
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_COMMUNICATION OpenTwinCommunication %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_CORE OpenTwinCore %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_FOUNDATION OpenTwinServiceFoundation %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_SYSTEM OpenTwinSystem %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_GUI OTGui %OPENTWIN_DEV_ROOT%\Libraries\OTGui
+REM CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_WIDGETS OTWidgets %OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
+
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_QWTWRAPPER QwtWrapper %OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_RUBBERBANDAPI RubberbandEngineCore %OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_RUBBERBAND RubberbandEngineOsgWrapper %OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineOsgWrapper
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_UICORE uiCore %OPENTWIN_DEV_ROOT%\Libraries\uiCore
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_UIPLUGINAPI UIPluginAPI %OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI
+CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_VIEWER Viewer %OPENTWIN_DEV_ROOT%\Libraries\Viewer
+
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
 REM uiCore and uiWrapper Root Directory
 SET UICORE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\uiCore
 SET UISERVICE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\uiService
 
 REM RelayService Root Directory
-SET RELAYSERVICE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\RelayService
+SET RELAYSERVICE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Services\RelayService
 
-REM Set rubberband directory
-SET RUBBERBAND_ENGINE_CORE=%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore
-SET RUBBERBAND_ENGINE_OSG=%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineOsgWrapper
-
-REM ##########################################################################################################
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
 REM Set UI_CORE Project settings
 
@@ -104,35 +111,57 @@ IF DEFINED OPEN_TWIN_CERTS_PATH (
 	SET OPEN_TWIN_SERVER_CERT=%OPEN_TWIN_CERTS_PATH%\server.pem
 	SET OPEN_TWIN_SERVER_CERT_KEY=%OPEN_TWIN_CERTS_PATH%\server-key.pem
 ) else (
-	SET OPEN_TWIN_CA_CERT=%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\ca.pem
-	SET OPEN_TWIN_SERVER_CERT=%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\server.pem
-	SET OPEN_TWIN_SERVER_CERT_KEY=%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\server-key.pem
+
+
+
+	REM !!!!!!!   Change the Certificates path to the actual path
+
+
+
+	SET OPEN_TWIN_CA_CERT=%OPENTWIN_DEV_ROOT%\Certificates\Generated\Server\ca.pem
+	SET OPEN_TWIN_SERVER_CERT=%OPENTWIN_DEV_ROOT%\Certificates\Generated\Server\server.pem
+	SET OPEN_TWIN_SERVER_CERT_KEY=%OPENTWIN_DEV_ROOT%\Certificates\Generated\Server\server-key.pem
 )
 
-REM ##########################################################################################################
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin default service
 
-SET OT_DEFAULT_SERVICE_INCD=%OT_CORE_ROOT%\include;%OT_SYSTEM_ROOT%\include;%OT_COMMUNICATION_ROOT%\include;%OT_FOUNDATION_ROOT%\include;%OT_MODELENTITIES_ROOT%\include;%OT_DATASTORAGE_ROOT%\include;%OT_UIPLUGINAPI_ROOT%\include;%R_JSON_ROOT%\include;%CURL_INC%;%MONGO_C_ROOT%\Debug\include;%MONGO_CXX_ROOT%\Debug\include;%MONGO_BOOST_ROOT%
-SET OT_DEFAULT_SERVICE_INCR=%OT_CORE_ROOT%\include;%OT_SYSTEM_ROOT%\include;%OT_COMMUNICATION_ROOT%\include;%OT_FOUNDATION_ROOT%\include;%OT_MODELENTITIES_ROOT%\include;%OT_DATASTORAGE_ROOT%\include;%OT_UIPLUGINAPI_ROOT%\include;%R_JSON_ROOT%\include;%CURL_INC%;%MONGO_C_ROOT%\Release\include;%MONGO_CXX_ROOT%\Release\include;%MONGO_BOOST_ROOT%
+REM SET OT_DEFAULT_SERVICE_INCD=%OT_CORE_INCD%;%OT_SYSTEM_INCD%;%OT_COMMUNICATION_INCD%;%OT_FOUNDATION_INCD%;%OT_MODELENTITIES_INCD%;%OT_DATASTORAGE_INCD%;%OT_UIPLUGINAPI_INCD%;%R_JSON_INCD%;%CURL_INCD%;%MONGO_C_ROOT%\Debug\include;%MONGO_CXX_ROOT%\Debug\include;%MONGO_BOOST_ROOT%
+REM SET OT_DEFAULT_SERVICE_INCR=%OT_CORE_INCR%;%OT_SYSTEM_INCR%;%OT_COMMUNICATION_INCR%;%OT_FOUNDATION_INCR%;%OT_MODELENTITIES_INCR%;%OT_DATASTORAGE_INCR%;%OT_UIPLUGINAPI_INCR%;%R_JSON_INCR%;%CURL_INCD%;%MONGO_C_ROOT%\Release\include;%MONGO_CXX_ROOT%\Release\include;%MONGO_BOOST_ROOT%
+SET OT_DEFAULT_SERVICE_INCD=%OT_CORE_INCD%;%OT_SYSTEM_INCD%;%OT_COMMUNICATION_INCD%;%OT_FOUNDATION_INCD%;%OT_MODELENTITIES_INCD%;%OT_DATASTORAGE_INCD%;%OT_UIPLUGINAPI_INCD%;%R_JSON_INCD%;%CURL_INCD%;%MONGO_C_INCD%;%MONGO_CXX_INCD%;%MONGO_BOOST_INCD%
+SET OT_DEFAULT_SERVICE_INCR=%OT_CORE_INCR%;%OT_SYSTEM_INCR%;%OT_COMMUNICATION_INCR%;%OT_FOUNDATION_INCR%;%OT_MODELENTITIES_INCR%;%OT_DATASTORAGE_INCR%;%OT_UIPLUGINAPI_INCR%;%R_JSON_INCR%;%CURL_INCR%;%MONGO_C_INCR%;%MONGO_CXX_INCR%;%MONGO_BOOST_INCR%
 
 REM SET OT_DEFAULT_SERVICE_LIBPATHD=%OT_CORE_ROOT%\x64\Debug;%OT_SYSTEM_ROOT%\x64\Debug;%OT_COMMUNICATION_ROOT%\x64\Debug;%OT_FOUNDATION_ROOT%\x64\Debug;%OT_MODELENTITIES_ROOT%\x64\Debug;%OT_DATASTORAGE_ROOT%\x64\Debug;%OT_UIPLUGINAPI_ROOT%\x64\Debug;%CURL_LIB%;%MONGO_C_ROOT%\Debug\lib;%MONGO_CXX_ROOT%\Debug\lib;%ZLIB_LIB%\Debug\lib
 REM SET OT_DEFAULT_SERVICE_LIBPATHR=%OT_CORE_ROOT%\x64\Release;%OT_SYSTEM_ROOT%\x64\Release;%OT_COMMUNICATION_ROOT%\x64\Release;%OT_FOUNDATION_ROOT%\x64\Release;%OT_MODELENTITIES_ROOT%\x64\Release;%OT_DATASTORAGE_ROOT%\x64\Release;%OT_UIPLUGINAPI_ROOT%\x64\Release;%CURL_LIB%;%MONGO_C_ROOT%\Release\lib;%MONGO_CXX_ROOT%\Release\lib;%ZLIB_LIB%\Release\lib
+SET OT_DEFAULT_SERVICE_LIBPATHD=%OT_CORE_LIBPATHD%;%OT_SYSTEM_LIBPATHD%;%OT_COMMUNICATION_LIBPATHD%;%OT_FOUNDATION_LIBPATHD%;%OT_MODELENTITIES_LIBPATHD%;%OT_DATASTORAGE_LIBPATHD%;%OT_UIPLUGINAPI_LIBPATHD%;%CURL_LIBPATHD%;%MONGO_C_LIBPATHD%;%MONGO_CXX_LIBPATHD%
+SET OT_DEFAULT_SERVICE_LIBPATHR=%OT_CORE_LIBPATHR%;%OT_SYSTEM_LIBPATHR%;%OT_COMMUNICATION_LIBPATHR%;%OT_FOUNDATION_LIBPATHR%;%OT_MODELENTITIES_LIBPATHR%;%OT_DATASTORAGE_LIBPATHR%;%OT_UIPLUGINAPI_LIBPATHR%;%CURL_LIBPATHR%;%MONGO_C_LIBPATHR%;%MONGO_CXX_LIBPATHR%
 
-SET OT_DEFAULT_SERVICE_LIBPATHD=%OT_CORE_ROOT%\x64\Debug;%OT_SYSTEM_ROOT%\x64\Debug;%OT_COMMUNICATION_ROOT%\x64\Debug;%OT_FOUNDATION_ROOT%\x64\Debug;%OT_MODELENTITIES_ROOT%\x64\Debug;%OT_DATASTORAGE_ROOT%\x64\Debug;%OT_UIPLUGINAPI_ROOT%\x64\Debug;%CURL_LIB%;%MONGO_C_ROOT%\Debug\lib;%MONGO_CXX_ROOT%\Debug\lib
-SET OT_DEFAULT_SERVICE_LIBPATHR=%OT_CORE_ROOT%\x64\Release;%OT_SYSTEM_ROOT%\x64\Release;%OT_COMMUNICATION_ROOT%\x64\Release;%OT_FOUNDATION_ROOT%\x64\Release;%OT_MODELENTITIES_ROOT%\x64\Release;%OT_DATASTORAGE_ROOT%\x64\Release;%OT_UIPLUGINAPI_ROOT%\x64\Release;%CURL_LIB%;%MONGO_C_ROOT%\Release\lib;%MONGO_CXX_ROOT%\Release\lib
+REM SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
+REM SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
+SET OT_DEFAULT_SERVICE_LIBD=%OT_CORE_LIBD%;%OT_SYSTEM_LIBD%;%OT_COMMUNICATION_LIBD%;%OT_FOUNDATION_LIBD%;%OT_MODELENTITIES_LIBD%;%OT_DATASTORAGE_LIBD%;%OT_UIPLUGINAPI_LIBD%;%CURL_LIBD%;%MONGO_C_LIBD%;%MONGO_CXX_LIBD%
+SET OT_DEFAULT_SERVICE_LIBD=%OT_CORE_LIBD%;%OT_SYSTEM_LIBD%;%OT_COMMUNICATION_LIBD%;%OT_FOUNDATION_LIBD%;%OT_MODELENTITIES_LIBD%;%OT_DATASTORAGE_LIBD%;%OT_UIPLUGINAPI_LIBD%;%CURL_LIBD%;%MONGO_C_LIBD%;%MONGO_CXX_LIBD%
 
-REM SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;BlockEditorAPI.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib
-REM SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;BlockEditorAPI.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib
+REM SET OT_DEFAULT_SERVICE_DLLD=%OT_CORE_ROOT%\x64\Debug;%OT_SYSTEM_ROOT%\x64\Debug;%OT_COMMUNICATION_ROOT%\x64\Debug;%OT_FOUNDATION_ROOT%\x64\Debug;%OT_MODELENTITIES_ROOT%\x64\Debug;%OT_DATASTORAGE_ROOT%\x64\Debug;%OT_UIPLUGINAPI_ROOT%\x64\Debug;%CURL_DLLD%;%MONGO_C_ROOT%\Debug\bin;%MONGO_CXX_ROOT%\Debug\bin
+REM SET OT_DEFAULT_SERVICE_DLLR=%OT_CORE_ROOT%\x64\Release;%OT_SYSTEM_ROOT%\x64\Release;%OT_COMMUNICATION_ROOT%\x64\Release;%OT_FOUNDATION_ROOT%\x64\Release;%OT_MODELENTITIES_ROOT%\x64\Release;%OT_DATASTORAGE_ROOT%\x64\Release;%OT_UIPLUGINAPI_ROOT%\x64\Release;%CURL_DLL%;%MONGO_C_ROOT%\Release\bin;%MONGO_CXX_ROOT%\Release\bin
+SET OT_DEFAULT_SERVICE_DLLD=%OT_CORE_DLLD%;%OT_SYSTEM_DLLD%;%OT_COMMUNICATION_DLLD%;%OT_FOUNDATION_DLLD%;%OT_MODELENTITIES_DLLD%;%OT_DATASTORAGE_DLLD%;%OT_UIPLUGINAPI_DLLD%;%CURL_DLLD%;%MONGO_C_DLLD%;%MONGO_CXX_DLLD%
+SET OT_DEFAULT_SERVICE_DLLR=%OT_CORE_DLLR%;%OT_SYSTEM_DLLR%;%OT_COMMUNICATION_DLLR%;%OT_FOUNDATION_DLLR%;%OT_MODELENTITIES_DLLR%;%OT_DATASTORAGE_DLLR%;%OT_UIPLUGINAPI_DLLR%;%CURL_DLLR%;%MONGO_C_DLLR%;%MONGO_CXX_DLLR%
 
-SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
-SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
+REM OpenTwin all services path
 
-SET OT_DEFAULT_SERVICE_DLLD=%OT_CORE_ROOT%\x64\Debug;%OT_SYSTEM_ROOT%\x64\Debug;%OT_COMMUNICATION_ROOT%\x64\Debug;%OT_FOUNDATION_ROOT%\x64\Debug;%OT_MODELENTITIES_ROOT%\x64\Debug;%OT_DATASTORAGE_ROOT%\x64\Debug;%OT_UIPLUGINAPI_ROOT%\x64\Debug;%CURL_DLLD%;%MONGO_C_ROOT%\Debug\bin;%MONGO_CXX_ROOT%\Debug\bin
-SET OT_DEFAULT_SERVICE_DLLR=%OT_CORE_ROOT%\x64\Release;%OT_SYSTEM_ROOT%\x64\Release;%OT_COMMUNICATION_ROOT%\x64\Release;%OT_FOUNDATION_ROOT%\x64\Release;%OT_MODELENTITIES_ROOT%\x64\Release;%OT_DATASTORAGE_ROOT%\x64\Release;%OT_UIPLUGINAPI_ROOT%\x64\Release;%CURL_DLL%;%MONGO_C_ROOT%\Release\bin;%MONGO_CXX_ROOT%\Release\bin
+SET OT_ALL_DLLD=%OT_BLOCKEDITOR_DLLD%;%OT_BLOCKEDITORAPI_DLLD%;%OT_CADMODELENTITIES_DLLD%;%OT_DATASTORAGE_DLLD%;%OT_MODELENTITIES_DLLD%;%OT_COMMUNICATION_DLLD%;%OT_CORE_DLLD%;%OT_FOUNDATION_DLLD%;%OT_SYSTEM_DLLD%;%OT_GUI_DLLD%;%OT_WIDGETS_DLLD%;%OT_QWTWRAPPER_DLLD%;%OT_RUBBERBANDAPI_DLLD%;%OT_RUBBERBAND_DLLD%;%OT_UICORE_DLLD%;%OT_UIPLUGINAPI_DLLD%;%OT_VIEWER_DLLD%;
 
-REM ##########################################################################################################
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
+REM Set the env defined at the end to ensure everything else was completed successfully
+SET OPENTWIN_DEV_ENV_DEFINED=1
 ECHO Environment was set up successfully.
 
-:END
+GOTO END
 
+REM In case we want the user to see the messages before closing the window
+:PAUSE_END
+pause
+GOTO END
+
+:END
