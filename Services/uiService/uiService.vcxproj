@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugTest|x64">
+      <Configuration>DebugTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|x64">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c" />
+    <ClCompile Include="src\ContextMenuManager.cpp" />
+    <ClCompile Include="src\debugNotifier.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ExternalServicesComponent.cpp" />
+    <ClCompile Include="src\ControlsManager.cpp" />
+    <ClCompile Include="src\LogInManager.cpp" />
+    <ClCompile Include="src\ManageAccess.cpp" />
+    <ClCompile Include="src\ManageGroups.cpp" />
+    <ClCompile Include="src\ManageOwner.cpp" />
+    <ClCompile Include="src\ShortcutManager.cpp" />
+    <ClCompile Include="src\ProjectManagement.cpp" />
+    <ClCompile Include="src\ToolBar.cpp" />
+    <ClCompile Include="src\AppBase.cpp" />
+    <ClCompile Include="src\UiPluginComponent.cpp" />
+    <ClCompile Include="src\UiPluginManager.cpp" />
+    <ClCompile Include="src\UserManagement.cpp" />
+    <ClCompile Include="src\UserSettings.cpp" />
+    <ClCompile Include="src\ViewerComponent.cpp" />
+    <ClCompile Include="src\WebsocketClient.cpp" />
+    <ClCompile Include="src\welcomeScreen.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Third_Party_Libraries\base64\base64.h" />
+    <ClInclude Include="include\ContextMenuManager.h" />
+    <ClInclude Include="include\debugNotifier.h" />
+    <QtMoc Include="include\WebsocketClient.h" />
+    <ClInclude Include="include\ControlsManager.h" />
+    <QtMoc Include="include\ShortcutManager.h" />
+    <QtMoc Include="include\LogInManager.h" />
+    <QtMoc Include="include\ManageGroups.h" />
+    <QtMoc Include="include\ManageAccess.h" />
+    <QtMoc Include="include\ManageOwner.h" />
+    <ClInclude Include="include\QtMetaTypes.h" />
+    <ClInclude Include="include\ToolBar.h" />
+    <QtMoc Include="include\welcomeScreen.h" />
+    <ClInclude Include="include\ProjectManagement.h" />
+    <ClInclude Include="include\UiPluginComponent.h" />
+    <ClInclude Include="include\UiPluginManager.h" />
+    <ClInclude Include="include\uiServiceTypes.h" />
+    <ClInclude Include="include\UserManagement.h" />
+    <QtMoc Include="include\UserSettings.h" />
+    <ClInclude Include="include\ViewerComponent.h" />
+    <QtMoc Include="include\ExternalServicesComponent.h" />
+    <QtMoc Include="include\AppBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resource.qrc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D080674E-86ED-4CA4-AA4F-3D1D199D4D65}</ProjectGuid>
+    <Keyword>QtVS_v303</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='Release|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <ProjectName>uiService</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetName>uiFrontend</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetName>uiFrontend</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetName>uiFrontend</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetName>uiFrontend</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\ModelEntities\include;$(OT_UIPLUGINAPI_ROOT)\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(UICORE_ENV_LIBD_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\BlockEditor\x64\$(Configuration);$(OT_UIPLUGINAPI_ROOT)\x64\Debug;$(ZLIB_LIB)\Debug\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Debug;$(RUBBERBAND_ENGINE_OSG)\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(UICORE_ENV_LIBD_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\ModelEntities\include;$(OT_UIPLUGINAPI_ROOT)\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(UICORE_ENV_LIBD_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Debug;$(OT_UIPLUGINAPI_ROOT)\x64\Debug;$(MONGO_C_ROOT)\Debug\lib;$(MONGO_CXX_ROOT)\Debug\lib;$(ZLIB_LIB)\Debug\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Debug;$(RUBBERBAND_ENGINE_OSG)\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(UICORE_ENV_LIBD_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;OpenTwinLogger.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);%CURL_LIB%\libCurl.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;$(OT_UIPLUGINAPI_ROOT)\include;$(QWT_LIB_ROOT)\src;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_POLAR_LIB_ROOT)\src;$(Qt_INCLUDEPATH_);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(UICORE_ENV_LIB_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\BlockEditor\x64\$(Configuration);$(OT_UIPLUGINAPI_ROOT)\x64\Release;$(ZLIB_LIB)\Release\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Release;$(RUBBERBAND_ENGINE_OSG)\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(UICORE_ENV_LIB_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release\Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwt.lib;qwtpolar.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;$(OT_UIPLUGINAPI_ROOT)\include;$(QWT_LIB_ROOT)\src;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_POLAR_LIB_ROOT)\src;$(Qt_INCLUDEPATH_);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(UICORE_ENV_LIB_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Release;$(OT_UIPLUGINAPI_ROOT)\x64\Release;$(MONGO_C_ROOT)\Release\lib;$(MONGO_CXX_ROOT)\Release\lib;$(ZLIB_LIB)\Release\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Release;$(RUBBERBAND_ENGINE_OSG)\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(UICORE_ENV_LIB_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release\Viewer.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;OpenTwinLogger.lib;UIPluginAPI.lib;%CURL_LIB%\libCurl.lib;qwt.lib;qwtpolar.lib;$(Qt_LIBS_);DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;network;gui;websockets;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;network;gui;websockets;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;websockets;widgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;websockets;widgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

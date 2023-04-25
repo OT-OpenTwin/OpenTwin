@@ -1,0 +1,7 @@
+
+# Rust build folder
+target
+
+# Build Logs
+buildLog_Debug.txt
+buildLog_Release.txt

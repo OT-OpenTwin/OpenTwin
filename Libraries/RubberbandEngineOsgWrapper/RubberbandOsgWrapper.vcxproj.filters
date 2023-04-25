@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rbeWrapper\RubberbandOsgWrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{dc781e08-fab5-4632-abda-b91ae6477943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{3a2333c6-55c2-41ae-ae35-786e6bac71b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\rbeWrapper">
+      <UniqueIdentifier>{2bbd5c26-3be0-4cc8-8be8-8608a0cc589e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\stdafx.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rbeWrapper\RubberbandOsgWrapper.h">
+      <Filter>include\rbeWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rbeWrapper\rbeOsgWrapperDatatypes.h">
+      <Filter>include\rbeWrapper</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

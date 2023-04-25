@@ -1,0 +1,17 @@
+{
+  "userTitle": "User Actions",
+  "newUser": "Create new User",
+  "changeUsername": "Change Username",
+  "changePassword": "Change Password",
+  "deleteUser": "Delete User",
+  "groupTitle": "Group Actions",
+  "newGroup": "Create new Group",
+  "changeGroupOwner": "Change Group Owner",
+  "changeGroup": "Change Group Name",
+  "deleteGroup": "Delete Group",
+  "projectTitle": "Project Actions",
+  "newProject": "Create new Project",
+  "changeProjectOwner": "Change Project Owner",
+  "changeProject": "Change Project Name",
+  "deleteProject": "Delete Project"
+}

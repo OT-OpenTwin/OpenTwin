@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{08622adf-44a7-4dc5-91a1-7f8ca269c696}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{c324c0a9-dd90-44b7-a7fe-a02e726a6531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\TestFixtures">
+      <UniqueIdentifier>{86aef61b-f0d5-4f40-a288-0165bb6c6747}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\TestFixtures">
+      <UniqueIdentifier>{3f146c7a-ef2f-4f24-aeb9-981896089383}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\TestCases">
+      <UniqueIdentifier>{e660362d-254e-44f0-bb6f-c2943f9e22a1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\MeasuredTargetValues.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureCurlCoefficients3D.h">
+      <Filter>include\TestFixtures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureGrid.h">
+      <Filter>include\TestFixtures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureIntrinsics.h">
+      <Filter>include\TestFixtures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixturePECBoundary.h">
+      <Filter>include\TestFixtures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureSimulation3D.h">
+      <Filter>include\TestFixtures</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\TestParameterInitialization.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestCurlCoefficients.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestGrid3DAlignment.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestIntrinsics.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DExSourceTimeSteps2.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DExSourceTimeSteps3.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DEySourceTimeSteps1.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DEySourceTimeSteps2.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DEySourceTimeSteps4.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DValues.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureCurlCoefficients3D.cpp">
+      <Filter>src\TestFixtures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureGrid.cpp">
+      <Filter>src\TestFixtures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureIntrinsics.cpp">
+      <Filter>src\TestFixtures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixturePECBoundary.cpp">
+      <Filter>src\TestFixtures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSolver3DExSourceTimeSteps1.cpp">
+      <Filter>src\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureSimulation3D.cpp">
+      <Filter>src\TestFixtures</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugTest|x64">
+      <Configuration>DebugTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|x64">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{36E113AE-6F93-42FC-AB88-97721543B1DF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>SessionService</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <OpenMPSupport>false</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;DataStorage.lib;ModelEntities.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="include\ResultFilter\ResultFilterSinkVector.cpp" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\CurlCoefficients\Coefficient3DFactory.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FolderNames.cpp" />
+    <ClCompile Include="src\Grid\EdgeDiscretization.cpp" />
+    <ClCompile Include="src\Grid\GridIteratorSubvolume.cpp" />
+    <ClCompile Include="src\Grid\IGridIteratorVolume.cpp" />
+    <ClCompile Include="src\Grid\IntrinsicMasks.cpp" />
+    <ClCompile Include="src\Grid\SurfaceDiscretization.cpp" />
+    <ClCompile Include="src\MicroServiceInterfaceFITTDSolver.cpp" />
+    <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\MicroServiceSolver.cpp" />
+    <ClCompile Include="src\PerformanceTracker.cpp" />
+    <ClCompile Include="src\Ports\PortFactory.cpp" />
+    <ClCompile Include="src\Ports\Signal.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultContainerScalar.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultContainerVector3DComplex.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultFilterDFT.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultFilterEdgeToNode.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultSinkFilePrinter.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultSinkScalarAccumalating.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultSinkScalarComplexSum.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultSinkVector3DAccumalating.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultSinkVector3DComplexSum.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultSource.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultFilter.cpp" />
+    <ClCompile Include="src\ResultFilter\ResultPipelineProgressUpdater.cpp" />
+    <ClCompile Include="src\ResultHandling\ExecutionBarrierFixedTimesteps.cpp" />
+    <ClCompile Include="src\ResultHandling\ExecutionBarrierFrequencyAndLast.cpp" />
+    <ClCompile Include="src\ResultPipeline\ResultPipeline.cpp" />
+    <ClCompile Include="src\ResultPostProcessors\ResultPostprocessingComplexNormalization.cpp" />
+    <ClCompile Include="src\Simulation\FITTD3DBuilder.cpp" />
+    <ClCompile Include="src\SolverSettings\MonitorSettings.cpp" />
+    <ClCompile Include="src\SolverSettings\PortSettings.cpp" />
+    <ClCompile Include="src\Solver\Solver.cpp" />
+    <ClCompile Include="src\SystemDependencies\SystemProperties.cpp" />
+    <ClCompile Include="src\UiNotifier.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\CurlCoefficients\Coefficient3DFactory.h" />
+    <ClInclude Include="include\CurlCoefficients\CurlCoefficients.h" />
+    <ClInclude Include="include\CurlCoefficients\CurlCoefficients3D.h" />
+    <ClInclude Include="include\CurlCoefficients\CurlCoefficients3D.hpp" />
+    <ClInclude Include="include\FolderNames.h" />
+    <ClInclude Include="include\Grid\DimensionPadding.h" />
+    <ClInclude Include="include\Grid\DimensionPadding.hpp" />
+    <ClInclude Include="include\Grid\EdgeDiscretization.h" />
+    <ClInclude Include="include\Grid\Grid.h" />
+    <ClInclude Include="include\Grid\GridIteratorComponent.h" />
+    <ClInclude Include="include\Grid\GridIteratorComponentSubspace.h" />
+    <ClInclude Include="include\Grid\GridIteratorVolume.h" />
+    <ClInclude Include="include\Grid\GridIteratorSubvolume.h" />
+    <ClInclude Include="include\Grid\IGridIteratorVolume.h" />
+    <ClInclude Include="include\Grid\IntrinsicMasks.h" />
+    <ClInclude Include="include\Grid\MaterialProperties.h" />
+    <ClInclude Include="include\Grid\MeshDiscretization.h" />
+    <ClInclude Include="include\Grid\Point.h" />
+    <ClInclude Include="include\Grid\SurfaceDiscretization.h" />
+    <ClInclude Include="include\MicroServiceInterfaceFITTDSolver.h" />
+    <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\MicroServiceSolver.h" />
+    <ClInclude Include="include\PerformanceTracker.h" />
+    <ClInclude Include="include\PhysicalQuantities.h" />
+    <ClInclude Include="include\Ports\PortFactory.h" />
+    <ClInclude Include="include\Ports\PortGaussian.h" />
+    <ClInclude Include="include\Ports\Port.h" />
+    <ClInclude Include="include\Ports\PortGaussian.hpp" />
+    <ClInclude Include="include\Ports\PortSinusGaussian.h" />
+    <ClInclude Include="include\Ports\PortSinusGaussian.hpp" />
+    <ClInclude Include="include\Ports\Signal.h" />
+    <ClInclude Include="include\Ports\SourceTarget.h" />
+    <ClInclude Include="include\ResultFilter\ResultContainer.h" />
+    <ClInclude Include="include\ResultFilter\ResultContainerScalar.h" />
+    <ClInclude Include="include\ResultFilter\ResultContainerScalarComplex.h" />
+    <ClInclude Include="include\ResultFilter\ResultContainerVector3DComplex.h" />
+    <ClInclude Include="include\ResultFilter\ResultFilterDFT.h" />
+    <ClInclude Include="include\ResultFilter\IResultFilterEdge.h" />
+    <ClInclude Include="include\ResultFilter\ResultFilterEdgeToNode.h" />
+    <ClInclude Include="include\ResultFilter\ResultSinkScalarAccumalating.h" />
+    <ClInclude Include="include\ResultFilter\ResultSinkScalarComplexSum.h" />
+    <ClInclude Include="include\ResultFilter\ResultSinkVector3DAccumalating.h" />
+    <ClInclude Include="include\ResultFilter\ResultSinkVector3DComplexSum.h" />
+    <ClInclude Include="include\ResultFilter\ResultSource.h" />
+    <ClInclude Include="include\ResultFilter\ResultFilter.h" />
+    <ClInclude Include="include\ResultFilter\ResultSink.h" />
+    <ClInclude Include="include\ResultFilter\ResultSourceScalar.h" />
+    <ClInclude Include="include\ResultFilter\ResultSourceScalar.hpp" />
+    <ClInclude Include="include\ResultFilter\ResultPipelineProgressUpdater.h" />
+    <ClInclude Include="include\ResultFilter\ResultSourceScalarComplex.h" />
+    <ClInclude Include="include\ResultFilter\ResultSourceScalarComplex.hpp" />
+    <ClInclude Include="include\ResultFilter\ResultSourceVector3DComplex.h" />
+    <ClInclude Include="include\ResultFilter\ResultSourceVector3DComplex.hpp" />
+    <ClInclude Include="include\ResultHandling\ExecutionBarrier.h" />
+    <ClInclude Include="include\ResultHandling\ExecutionBarrierFixedTimesteps.h" />
+    <ClInclude Include="include\ResultHandling\ExecutionBarrierFrequencyAndLast.h" />
+    <ClInclude Include="include\ResultHandling\ResultSinkFilePrinter.h" />
+    <ClInclude Include="include\ResultPipeline\ResultPipeline.h" />
+    <ClInclude Include="include\ResultPostProcessors\ResultPostProcessingComplexNormalization.h" />
+    <ClInclude Include="include\ResultPostProcessors\ResultPostprocessors.h" />
+    <ClInclude Include="include\Simulation\DegreesOfFreedom3DLoopCPU.h" />
+    <ClInclude Include="include\Simulation\FITTD.h" />
+    <ClInclude Include="include\Simulation\FITTD3DBuilder.h" />
+    <ClInclude Include="include\Simulation\FITTD3DLoop.h" />
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX2.h" />
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX2.hpp" />
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX512Sp.h" />
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX512Sp.hpp" />
+    <ClInclude Include="include\Simulation\FITTD3DLoopNoVectorization.h" />
+    <ClInclude Include="include\Simulation\FITTD3DLoopNoVectorization.hpp" />
+    <ClInclude Include="include\SolverSettings\MonitorSettings.h" />
+    <ClInclude Include="include\SolverSettings\PortSettings.h" />
+    <ClInclude Include="include\SolverSettings\ResultPipelineSettings.h" />
+    <ClInclude Include="include\SolverSettings\SolverSettings.h" />
+    <ClInclude Include="include\SolverSettings\SolverVersion.h" />
+    <ClInclude Include="include\Solver\Solver.h" />
+    <ClInclude Include="include\SystemDependencies\Allignments.h" />
+    <ClInclude Include="include\SystemDependencies\InstructionSet.h" />
+    <ClInclude Include="include\SystemDependencies\SystemDependentDefines.h" />
+    <ClInclude Include="include\SystemDependencies\SystemProperties.h" />
+    <ClInclude Include="include\UiNotifier.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

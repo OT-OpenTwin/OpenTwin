@@ -1,0 +1,1032 @@
+{
+	"info": {
+		"_postman_id": "83ff728c-5481-4b1b-8b24-f5ff29988d16",
+		"name": "OpenTwin - Authorisation Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0) Authenticate Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"LoginAdmin\",\r\n    \"Username\": \"admin\",\r\n    \"Password\": \"admin\",\r\n    \"EncryptedPassword\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1) Authenticate User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"Login\",\r\n    \"Username\": \"bob\",\r\n    \"Password\": \"bob\",\r\n    \"EncryptedPassword\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2) Register User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"Register\",\r\n    \"Username\": \"bob3\",\r\n    \"Password\": \"bob3\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3) Get User Data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetUserData\",\r\n    \"LoggedInUsername\": \"bob\",\r\n    \"LoggedInUserPassword\": \"bob\",\r\n    \"Username\": \"bob2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4) Get All Users",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllUsers\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5) Change User username",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeUserUsername\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"NewUsername\": \"bob2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6) Change User Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeUserPassword\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"Password\": \"bob2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7) Delete User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"DeleteUser\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\",\r\n    \"UsernameToDelete\": \"Test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8) Create Group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"CreateGroup\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Good Group\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9) Get Group Data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetGroupData\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Great Group!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10) Get All User Groups",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllUserGroups\",\r\n    \"LoggedInUsername\": \"bob\",\r\n    \"LoggedInUserPassword\": \"bob\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "11) Change Group Name",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeGroupName\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Great Group\",\r\n    \"NewGroupName\": \"Greater Group\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "12) Change Group Owner",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeGroupOwner\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Great Group!\",\r\n    \"NewGroupOwnerUsername\": \"bob2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "13) Add User to Group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"AddUserToGroup\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Great Group!\",\r\n    \"Username\": \"user1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "14) Remove User from Group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"RemoveUserFromGroup\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Great Group!\",\r\n    \"Username\": \"user1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "15) Remove Group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"RemoveGroup\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Great Group!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "16) Create Project",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"CreateProject\",\r\n    \"LoggedInUsername\": \"bob3\",\r\n    \"LoggedInUserPassword\": \"bob3\",\r\n    \"ProjectName\": \"Project_test1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "17) Get Project Data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetProjectData\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"ProjectName\": \"Project1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "18) Get All User Projects",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllUserProjects\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"ProjectFilter\": \"\",\r\n    \"ProjectLimit\": -1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "19) Get All Group Projects",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllGroupProjects\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Good Group\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "20) Change Project Name",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeProjectName\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"ProjectName\": \"Project1\",\r\n    \"NewProjectName\": \"Project2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "21) Change Project Owner",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeProjectOwner\",\r\n    \"LoggedInUsername\": \"bob3\",\r\n    \"LoggedInUserPassword\": \"bob3\",\r\n    \"ProjectName\": \"Project_test\",\r\n    \"NewProjectOwner\": \"bob1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "22) Add Group to Project",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"AddGroupToProject\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"GroupName\": \"Good Group\",\r\n    \"ProjectName\": \"Project1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "23) Remove Group from Project",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"RemoveGroupFromProject\",\r\n    \"GroupName\": \"group2\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"ProjectName\": \"Great New Project\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "24) Remove Project",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"RemoveProject\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"ProjectName\": \"Great New Project\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "25) Get Project Owners",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllProjectOwners\",\r\n    \"LoggedInUsername\": \"bob1\",\r\n    \"LoggedInUserPassword\": \"bob1\",\r\n    \"ProjectNames\": [\"Project_test\", \"Project_test1\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "26) Get All User Count",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllUserCount\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "27) Get All Group Count",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllGroupCount\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "28) Get All Project Count",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllProjectCount\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "29) Get All Projects",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllProjects\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\",\r\n    \"ProjectFilter\": \"\",\r\n    \"ProjectLimit\": -1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "30) Get All Groups",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"GetAllGroups\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "31) Change Username",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangeUsername\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\",\r\n    \"OldUsername\": \"bob\",\r\n    \"NewUsername\": \"bob2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "32) Change Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"ChangePassword\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\",\r\n    \"Username\": \"bob\",\r\n    \"NewPassword\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

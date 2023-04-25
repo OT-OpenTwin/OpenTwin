@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\qwtw">
+      <UniqueIdentifier>{5a5478be-9817-4efa-a733-89843c69270c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\qwtw">
+      <UniqueIdentifier>{23781f3c-688e-49f7-b12b-be9d9b5181c7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AbstractPlot.cpp">
+      <Filter>Source Files\qwtw</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plot.cpp">
+      <Filter>Source Files\qwtw</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlot.cpp">
+      <Filter>Source Files\qwtw</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XYPlot.cpp">
+      <Filter>Source Files\qwtw</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\qwtw\AbstractPlot.h">
+      <Filter>Header Files\qwtw</Filter>
+    </ClInclude>
+    <ClInclude Include="include\qwtw\PolarPlot.h">
+      <Filter>Header Files\qwtw</Filter>
+    </ClInclude>
+    <ClInclude Include="include\qwtw\XYPlot.h">
+      <Filter>Header Files\qwtw</Filter>
+    </ClInclude>
+    <ClInclude Include="include\qwtw\globalDatatypes.h">
+      <Filter>Header Files\qwtw</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\qwtw\Plot.h">
+      <Filter>Header Files\qwtw</Filter>
+    </QtMoc>
+  </ItemGroup>
+</Project>

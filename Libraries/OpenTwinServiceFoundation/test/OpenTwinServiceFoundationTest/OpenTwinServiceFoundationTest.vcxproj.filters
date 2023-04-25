@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{e6defbce-5a68-42cd-a2eb-6f95de718668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{d82d47e2-eb91-4156-b7b6-6c50f4f89413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Fixture">
+      <UniqueIdentifier>{e43a7f9e-ddb9-4806-abe2-e32c80a902a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Test">
+      <UniqueIdentifier>{56c32a6a-e62a-4120-afd5-9213477f0129}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixtureMatrix.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\FixtureMatrix.cpp">
+      <Filter>src\Fixture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixTest.cpp">
+      <Filter>src\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TypeNameTemplateTest.cpp">
+      <Filter>src\Test</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

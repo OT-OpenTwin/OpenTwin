@@ -1,0 +1,10 @@
+# Build Logs
+buildLog_Release.txt
+buildLog_Debug.txt
+buildLog_Summary.txt
+RUSTbuildLog.txt
+AdminPanel_buildLog.txt
+
+# Report Directory
+Reports
+

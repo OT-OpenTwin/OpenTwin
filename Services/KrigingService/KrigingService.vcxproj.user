@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>$(TargetPath) "" "127.0.0.1:8097" "127.0.0.1:8093" "New:Data-202113-1483-54"</LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLR);%FTP_LIBCURL_ROOT%lib\dll-release-x64;$(FTP_CLIENT_ROOT)Build\bin\Release;$(ZLIB_LIB)\Release\bin;$(EMBREE_BIN);$(GMP_LIB);$(BOOST_LIB);%PATH%</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebug|x64'">
+    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>$(TargetPath) "" "127.0.0.1:8097" "127.0.0.1:8093" "New:Data-202113-1483-54"</LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLD);%FTP_LIBCURL_ROOT%lib\dll-release-x64;$(FTP_CLIENT_ROOT)Build\bin\Release;$(ZLIB_LIB)\Release\bin;$(EMBREE_BIN);$(GMP_LIB);$(BOOST_LIB);%PATH%</LocalDebuggerEnvironment>
+  </PropertyGroup>
+</Project>

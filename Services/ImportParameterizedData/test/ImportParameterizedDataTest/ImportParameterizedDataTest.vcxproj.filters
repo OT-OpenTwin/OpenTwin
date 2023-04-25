@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="Files\WorkingTestTableTab.csv">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="Files\WorkingTestTableComma.csv">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="Files\WorkingTestTableSemicolon.csv">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="Files\WorkingTestTableColumnDelimiterSemicolon.csv">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="Files\WorkingTestTableForAnalytics.csv">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="Files\WorkingTestMaskedDelimitter.csv">
+      <Filter>Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\FixtureTableExtractorCSV.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestParameterInitialization.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestTableExtractorCSV.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureTableStatisticAnalyser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestTableStatisticAnalyser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{0c5c3590-2530-43e9-815c-6a14f773ddf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{41c1260f-606b-4a97-a772-3e634ef67547}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Files">
+      <UniqueIdentifier>{0598e1c5-57ab-4354-927b-9611dfaaf9b0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixtureTableExtractorCSV.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureTableStatisticAnalyser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

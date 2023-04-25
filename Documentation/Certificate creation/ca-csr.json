@@ -1,0 +1,17 @@
+{
+  "CN": "Local Test CA",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C": "DE",
+	  "L": "Hessen",
+	  "ST": "Frankfurt",
+	  "O": "Frankfurt University of Applied Sciences",
+	  "OU": "Computer Science and Engineering (Fb 2)"
+    }
+  ]
+}
+

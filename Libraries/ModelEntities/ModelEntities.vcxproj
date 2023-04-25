@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugTest|x64">
+      <Configuration>DebugTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|x64">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\BoundingBox.h" />
+    <ClInclude Include="include\BsonArrayTypeGetterWrapper.h" />
+    <ClInclude Include="include\BsonArrayTypeGetterWrapper.hpp" />
+    <ClInclude Include="include\EntityMeasurementMetadata.h" />
+    <ClInclude Include="include\EntityResearchMetadata.h" />
+    <ClInclude Include="include\EntitySolverGetDP.h" />
+    <ClInclude Include="include\GenericBsonDocument.h" />
+    <ClInclude Include="include\ClassFactory.h" />
+    <ClInclude Include="include\DataBase.h" />
+    <ClInclude Include="include\EntityAnnotation.h" />
+    <ClInclude Include="include\EntityAnnotationData.h" />
+    <ClInclude Include="include\EntityBase.h" />
+    <ClInclude Include="include\EntityBinaryData.h" />
+    <ClInclude Include="include\EntityCartesianVector.h" />
+    <ClInclude Include="include\EntityContainer.h" />
+    <ClInclude Include="include\EntityCompressedVector.h" />
+    <ClInclude Include="include\EntityFacetData.h" />
+    <ClInclude Include="include\EntityLoadingAPI.h" />
+    <ClInclude Include="include\EntityMaterial.h" />
+    <ClInclude Include="include\EntityMesh.h" />
+    <ClInclude Include="include\EntityMeshCartesian.h" />
+    <ClInclude Include="include\EntityMeshCartesianData.h" />
+    <ClInclude Include="include\EntityMeshCartesianFace.h" />
+    <ClInclude Include="include\EntityMeshCartesianFaceList.h" />
+    <ClInclude Include="include\EntityMeshCartesianItem.h" />
+    <ClInclude Include="include\EntityMeshCartesianNodes.h" />
+    <ClInclude Include="include\EntityMeshTet.h" />
+    <ClInclude Include="include\EntityMeshTetData.h" />
+    <ClInclude Include="include\EntityMeshTetFace.h" />
+    <ClInclude Include="include\EntityMeshTetFaceData.h" />
+    <ClInclude Include="include\EntityMeshTetInfo.h" />
+    <ClInclude Include="include\EntityMeshTetItem.h" />
+    <ClInclude Include="include\EntityMeshTetItemDataFaces.h" />
+    <ClInclude Include="include\EntityMeshTetItemDataTetedges.h" />
+    <ClInclude Include="include\EntityMeshTetItemDataTets.h" />
+    <ClInclude Include="include\EntityMeshTetNodes.h" />
+    <ClInclude Include="include\EntityParameter.h" />
+    <ClInclude Include="include\EntityParameterizedDataCategorization.h" />
+    <ClInclude Include="include\EntityWithDynamicFields.h" />
+    <ClInclude Include="include\EntityParameterizedDataPreviewTable.h" />
+    <ClInclude Include="include\EntityParameterizedDataSource.h" />
+    <ClInclude Include="include\EntityParameterizedDataSourceCSV.h" />
+    <ClInclude Include="include\EntityParameterizedDataTable.h" />
+    <ClInclude Include="include\EntityPlot1D.h" />
+    <ClInclude Include="include\EntityProperties.h" />
+    <ClInclude Include="include\EntityPropertiesItems.h" />
+    <ClInclude Include="include\EntityResult1D.h" />
+    <ClInclude Include="include\EntityResult1DData.h" />
+    <ClInclude Include="include\EntityResult3D.h" />
+    <ClInclude Include="include\EntityResult3DData.h" />
+    <ClInclude Include="include\EntityResultBase.h" />
+    <ClInclude Include="include\EntityResultTable.h" />
+    <ClInclude Include="include\EntityResultTable.hpp" />
+    <ClInclude Include="include\EntityResultTableData.h" />
+    <ClInclude Include="include\EntityResultTableData.hpp" />
+    <ClInclude Include="include\EntityResultText.h" />
+    <ClInclude Include="include\EntityResultTextData.h" />
+    <ClInclude Include="include\EntitySignalType.h" />
+    <ClInclude Include="include\EntitySolver.h" />
+    <ClInclude Include="include\EntitySolverFITTD.h" />
+    <ClInclude Include="include\EntitySolverKriging.h" />
+    <ClInclude Include="include\EntitySolverMonitor.h" />
+    <ClInclude Include="include\EntitySolverPHREEC.h" />
+    <ClInclude Include="include\EntitySolverPort.h" />
+    <ClInclude Include="include\EntityTableSelectedRanges.h" />
+    <ClInclude Include="include\EntityUnits.h" />
+    <ClInclude Include="include\EntityVis2D3D.h" />
+    <ClInclude Include="include\EntityVisCartesianFaceScalar.h" />
+    <ClInclude Include="include\GenericDocument.h" />
+    <ClInclude Include="include\Geometry.h" />
+    <ClInclude Include="include\ModelState.h" />
+    <ClInclude Include="include\PlaneProperties.h" />
+    <ClInclude Include="include\PropertiesComponentSelection.h" />
+    <ClInclude Include="include\PropertiesPointSelection.h" />
+    <ClInclude Include="include\PropertiesVis2D3D.h" />
+    <ClInclude Include="include\PropertyBundle.h" />
+    <ClInclude Include="include\PropertyBundleDataHandlePlane.h" />
+    <ClInclude Include="include\PropertyBundleDataHandleScaling.h" />
+    <ClInclude Include="include\PropertyBundleDataHandleVis2D3D.h" />
+    <ClInclude Include="include\PropertyBundlePlane.h" />
+    <ClInclude Include="include\PropertyBundleScaling.h" />
+    <ClInclude Include="include\PropertyBundleVis2D3D.h" />
+    <ClInclude Include="include\ScalingProperties.h" />
+    <ClInclude Include="include\TemplateDefaultManager.h" />
+    <ClInclude Include="include\Types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\PropertyBundleDataHandle.h" />
+    <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\ClassFactory.cpp" />
+    <ClCompile Include="src\DataBase.cpp" />
+    <ClCompile Include="src\EntityAnnotation.cpp" />
+    <ClCompile Include="src\EntityAnnotationData.cpp" />
+    <ClCompile Include="src\EntityBase.cpp" />
+    <ClCompile Include="src\EntityBinaryData.cpp" />
+    <ClCompile Include="src\EntityCartesianVector.cpp" />
+    <ClCompile Include="src\EntityContainer.cpp" />
+    <ClCompile Include="src\EntityCompressedVector.cpp" />
+    <ClCompile Include="src\EntityFacetData.cpp" />
+    <ClCompile Include="src\EntityMaterial.cpp" />
+    <ClCompile Include="src\EntityMeasurementMetadata.cpp" />
+    <ClCompile Include="src\EntityMeshCartesian.cpp" />
+    <ClCompile Include="src\EntityMeshCartesianData.cpp" />
+    <ClCompile Include="src\EntityMeshCartesianFace.cpp" />
+    <ClCompile Include="src\EntityMeshCartesianFaceList.cpp" />
+    <ClCompile Include="src\EntityMeshCartesianItem.cpp" />
+    <ClCompile Include="src\EntityMeshCartesianNodes.cpp" />
+    <ClCompile Include="src\EntityMeshTet.cpp" />
+    <ClCompile Include="src\EntityMeshTetData.cpp" />
+    <ClCompile Include="src\EntityMeshTetFace.cpp" />
+    <ClCompile Include="src\EntityMeshTetFaceData.cpp" />
+    <ClCompile Include="src\EntityMeshTetInfo.cpp" />
+    <ClCompile Include="src\EntityMeshTetItem.cpp" />
+    <ClCompile Include="src\EntityMeshTetItemDataFaces.cpp" />
+    <ClCompile Include="src\EntityMeshTetItemDataTetedges.cpp" />
+    <ClCompile Include="src\EntityMeshTetItemDataTets.cpp" />
+    <ClCompile Include="src\EntityMeshTetNodes.cpp" />
+    <ClCompile Include="src\EntityParameter.cpp" />
+    <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
+    <ClCompile Include="src\EntityResearchMetadata.cpp" />
+    <ClCompile Include="src\EntityWithDynamicFields.cpp" />
+    <ClCompile Include="src\EntityParameterizedDataPreviewTable.cpp" />
+    <ClCompile Include="src\EntityParameterizedDataSource.cpp" />
+    <ClCompile Include="src\EntityParameterizedDataSourceCSV.cpp" />
+    <ClCompile Include="src\EntityParameterizedDataTable.cpp" />
+    <ClCompile Include="src\EntityPlot1D.cpp" />
+    <ClCompile Include="src\EntityProperties.cpp" />
+    <ClCompile Include="src\EntityPropertiesItems.cpp" />
+    <ClCompile Include="src\EntityResult1D.cpp" />
+    <ClCompile Include="src\EntityResult1DData.cpp" />
+    <ClCompile Include="src\EntityResult3D.cpp" />
+    <ClCompile Include="src\EntityResult3DData.cpp" />
+    <ClCompile Include="src\EntityResultText.cpp" />
+    <ClCompile Include="src\EntityResultTextData.cpp" />
+    <ClCompile Include="src\EntitySignalType.cpp" />
+    <ClCompile Include="src\EntitySolver.cpp" />
+    <ClCompile Include="src\EntitySolverFITTD.cpp" />
+    <ClCompile Include="src\EntitySolverGetDP.cpp" />
+    <ClCompile Include="src\EntitySolverKriging.cpp" />
+    <ClCompile Include="src\EntitySolverMonitor.cpp" />
+    <ClCompile Include="src\EntitySolverPHREEC.cpp" />
+    <ClCompile Include="src\EntitySolverPort.cpp" />
+    <ClCompile Include="src\EntityTableSelectedRanges.cpp" />
+    <ClCompile Include="src\EntityUnits.cpp" />
+    <ClCompile Include="src\EntityVis2D3D.cpp" />
+    <ClCompile Include="src\EntityVisCartesianFaceScalar.cpp" />
+    <ClCompile Include="src\GenericBsonDocument.cpp" />
+    <ClCompile Include="src\GenericDocument.cpp" />
+    <ClCompile Include="src\Geometry.cpp" />
+    <ClCompile Include="src\ModelState.cpp" />
+    <ClCompile Include="src\PropertyBundleDataHandlePlane.cpp" />
+    <ClCompile Include="src\PropertyBundleDataHandleScaling.cpp" />
+    <ClCompile Include="src\PropertyBundleDataHandleVis2D3D.cpp" />
+    <ClCompile Include="src\PropertyBundlePlane.cpp" />
+    <ClCompile Include="src\PropertyBundleScaling.cpp" />
+    <ClCompile Include="src\PropertyBundleVis2D3D.cpp" />
+    <ClCompile Include="src\TemplateDefaultManager.cpp" />
+    <ClCompile Include="src\Types.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>
+    <Keyword>QtVS_v302</Keyword>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ModelEntities</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <TargetExt>.dll</TargetExt>
+    <LibraryPath>%CURL_LIB%;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <TargetExt>.lib</TargetExt>
+    <LibraryPath>%CURL_LIB%;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>
+    </QtModules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules />
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>
+    </QtModules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules />
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <SDLCheck>
+      </SDLCheck>
+      <MinimalRebuild />
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DataStorage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <SDLCheck>
+      </SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug;$(MONGO_C_ROOT)\Debug\lib;$(MONGO_CXX_ROOT)\Debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DataStorage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\Release\include;$(MONGO_CXX_ROOT)\Release\include;$(MONGO_BOOST_ROOT);$(ProjectDir)Include;%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Release;$(MONGO_C_ROOT)\Release\lib;$(MONGO_CXX_ROOT)\Release\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

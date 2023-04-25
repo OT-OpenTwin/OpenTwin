@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/Error.png</file>
+        <file>images/Info.png</file>
+        <file>images/Warning.png</file>
+        <file>OToolkit.ico</file>
+        <file>images/OToolkit.png</file>
+        <file>images/Shutdown.png</file>
+        <file>images/Folder.png</file>
+        <file>images/NewFolder.png</file>
+        <file>images/Run.png</file>
+        <file>images/Remove.png</file>
+        <file>images/Exit.png</file>
+        <file>images/Log.png</file>
+        <file>images/Settings.png</file>
+    </qresource>
+</RCC>

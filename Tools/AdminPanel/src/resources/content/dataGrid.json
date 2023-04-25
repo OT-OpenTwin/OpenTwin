@@ -1,0 +1,7 @@
+{
+  "changeUsernameButton": "Username",
+  "changePasswordButton": "Password",
+  "changeGroupName": "Change Group Name",
+  "changeProjectName": "Change Project Name",
+  "projectLisAlert": "Only the first 10 projects in the table were displayed!"
+}

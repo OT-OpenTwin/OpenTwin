@@ -1,0 +1,17 @@
+{
+  "title": "Project Page",
+  "modalTitle": "Select a user to change the owner",
+  "projectName": "Project Name: ",
+  "changeprojectNameTitle": "Change Project Name",
+  "oldProjectName": "Old Project Name:",
+  "newProjectName": "New Project Name:",
+  "button": "Create",
+  "bckButton": "Back",
+  "changeButton": "Change",
+  "deletePopupTitle": "Would you remove a project?",
+  "deletePopupContent": "Please select a project and then try it again.",
+  "deletePopupButton": "OK",
+  "ownerPopupTitle": "Would you change a project owner?",
+  "ownerPopupContent": "Please select a project and then try it again.",
+  "ownerPopupButton": "OK"
+}

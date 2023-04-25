@@ -1,0 +1,85 @@
+.userUname {
+    display: flex;
+    width: 100%;
+
+    .changeContainer {
+        flex: 6;
+
+        p {
+            color: rgb(255, 1, 1);
+            font-size: 14px;
+        }
+
+        .top {
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+
+            .box {
+                flex: 1;
+                -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.5);
+                box-shadow: 2px 4px 10px 1px rgba(12, 10, 10, 0.47);
+                padding: 20px;
+                position: relative;
+
+                .itemTitle {
+                    margin-bottom: 10px;
+                    color: #555;
+                    font-size: 18px;
+                }
+
+                .item {
+                    display: flex;
+                    gap: 20px;
+
+                    .details {
+
+                        .detailItem {
+                            margin-bottom: 10px;
+                            font-size: 14px;
+
+                            .itemKey {
+                                font-weight: bold;
+                                color: gray;
+                                margin-right: 5px;
+                            }
+
+                            .itemValue {
+                                font-weight: 300px;
+                            }
+                        }
+
+                        input {
+                            width: 100%;
+                            padding: 5px;
+                            border: none;
+                            margin-bottom: 10px;
+                            // background-color: #040352;
+                            -webkit-text-fill-color: #040352;
+                        }
+
+                        .btn-outline-primary {
+                            border-color: #0db8de;
+                            color: #05404e;
+                            border-radius: 10px;
+                            font-weight: bold;
+                            letter-spacing: 1px;
+                            background-color: transparent;
+                        }
+
+                        .btn-outline-primary:hover {
+                            background-color: #0db8de;
+                            right: 0px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .title {
+        font-size: 16px;
+        color: gray;
+        margin-bottom: 20px;
+    }
+}

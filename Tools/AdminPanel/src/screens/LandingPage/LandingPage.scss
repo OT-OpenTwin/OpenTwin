@@ -1,0 +1,31 @@
+.landingPage {
+    display: flex;
+    // background-image: linear-gradient(79deg, #1e1e91, #4845d6 48%, #4b70c2);
+    background-image: url(../../../src/resources/background/BG2.png);
+    background-size: cover;
+    font-family: "Roboto", sans-serif;
+    min-height: 100vh;
+
+    .homeContainer {
+        flex: 3;
+        text-align: center;
+    }
+}
+
+.bg {
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 42px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+}

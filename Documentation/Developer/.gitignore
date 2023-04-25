@@ -1,0 +1,7 @@
+_build
+
+# DrawIO backup file
+*.drawio.bkp
+
+# DrawIO temporary file
+*.drawio.dtmp

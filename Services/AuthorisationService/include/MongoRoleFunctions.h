@@ -1,0 +1,66 @@
+#pragma once
+
+#include <iostream>
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/instance.hpp>
+#include <bsoncxx/builder/stream/helpers.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
+
+#include "MongoConstants.h"
+#include "Group.h"
+
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
+using bsoncxx::document::value;
+using bsoncxx::document::view;
+using bsoncxx::document::element;
+
+
+namespace MongoRoleFunctions
+{
+	// Function that creates the Inital Role. To be used only once!
+	bool createInitialProjectRole(mongocxx::client& adminClient);
+	bool createInitialProjectDbListCollectionsRole(mongocxx::client& adminClient);
+
+	bool createInitialGroupRole(mongocxx::client& adminClient);
+
+	bool createInitialProjectTemplatesRole(mongocxx::client& adminClient);
+	bool createInitialProjectsLargeDataRole(mongocxx::client& adminClient);
+	bool createInitialSystemDbRole(mongocxx::client& adminClient);
+	bool createInitialSettingsDbRole(mongocxx::client& adminClient);
+
+	bool createAllAccessibleRole(std::string dbName, std::string roleName, mongocxx::client& adminClient);
+
+
+	// When a new project (Collection) is created, a role for it must be created, else, nobody can access it.
+	void createProjectRole(std::string roleName, std::string collectionName, mongocxx::client& adminClient);
+
+
+	// Creates a group role which has no privileges at all
+	void createGroupRole(std::string roleName, mongocxx::client& adminClient);
+
+
+	// Adds a role to an already existing group role to inherit 
+	void addRoleToGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);
+
+	void removeRoleFromGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);
+
+	void addRoleToUser(std::string roleName, std::string username, mongocxx::client& adminClient);
+
+	void removeRoleFromUser(std::string roleName, std::string username, mongocxx::client& adminClient);
+
+
+	void removeRole(std::string roleName, mongocxx::client& adminClient);
+}

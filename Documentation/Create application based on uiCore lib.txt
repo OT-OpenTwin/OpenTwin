@@ -1,0 +1,48 @@
+########################################################################
+Create an application based on the uiCore library
+########################################################################
+
+
+
+######################
+Requirements
+######################
+1) Qt must be installed
+2) Create an Environment variable (System settings or batch file) for the %QTDIR%,
+	which should result in something like this: ...\Qt\5.11.2\msvc2017_64
+3) Install the Qt VS Tool Add-on for Visual Studio
+Optional:
+4) In the Qt VS Tool options add a new Qt Version with the name: $(QTDIR)
+	This will disable the path selection and read the path from the environment variable.
+
+
+########################################################################
+Create a new application with the ability to create your own widgets
+########################################################################
+
+1) Create a new Qt Widgets Application (Core, Gui and Widgets must be selected in the dialog)
+2) Create an Evironment variable (System Settings or batch file) for the %UICORE_LIB_ROOT%
+3) Configuration Properties (For a x64 build):
+	Ensure:		C/C++->General->Additional Include Directories contains:	$(Qt_INCLUDEPATH_);
+	Add:		C/C++->General->Additional Include Directories:			%UICORE_LIB_ROOT%\include;
+	Ensure:		Linker->General->Additional Library Directories contains:	$(Qt_LIBPATH_);
+	Add Debug:	Linker->General->Additional Library Directories:		%UICORE_LIB_ROOT%\x64\Debug;
+	Add Release:	Linker->General->Additional Library Directories:		%UICORE_LIB_ROOT%\x64\Release;
+	Ensure:		Linker->Input->Additional Dependencies contains:		$(Qt_LIBS_);
+	Add Debug:	Linker->Input->Additional Dependencies:				%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib;
+	Add Release:	Linker->Input->Additional Dependencies:				%UICORE_LIB_ROOT%\x64\Release\uiCore.lib;
+
+Optional:
+- Go to Configuration Properties->Debugging->Environment and set it to:
+	PATH=$(QtDllPath); ...<other paths>... ;%PATH%
+
+
+########################################################################
+Configuration Properties for all Qt Application (fixes a bug for executing in VS2019)
+########################################################################
+	Add:		Custom Build Step->General->CommandLine:			copy $(MSBuildProjectDirectory)\qt.conf $(OutputPath)
+	Add:		Custom Build Step->General->Outputs:				$(OutputPath)\qt.conf
+	Select:		Custom Build Step->General->Execute After:			ClCompile
+	Select:		Custom Build Step->General->Execute Before:			Link
+This will create a "qt.conf" file which will be placed in the output directory.
+This file must be in the same directory as the executable.

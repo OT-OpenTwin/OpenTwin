@@ -1,0 +1,18 @@
+#pragma once
+
+#include "OpenTwinCore/Flags.h"		// Add flag fuctions
+#include "OpenTwinCore/Logger.h"	// LogFlag type
+
+namespace ot {
+	//! @brief The message types describes how a message should be delivered
+	enum MessageType {
+		QUEUE							= 0x01,
+		EXECUTE							= 0x02,
+		EXECUTE_ONE_WAY_TLS				= 0x04,
+		SECURE_MESSAGE_TYPES			= 0x03,
+		ALL_MESSAGE_TYPES				= 0xFF
+	};
+
+	__declspec(dllexport) ot::LogFlag messageTypeToLogFlag(ot::MessageType _type);
+}
+OT_ADD_FLAG_FUNCTIONS(ot::MessageType);

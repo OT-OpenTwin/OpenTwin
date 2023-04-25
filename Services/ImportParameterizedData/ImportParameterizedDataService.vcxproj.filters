@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelNotifier.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UiNotifier.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataSourceHandler.cpp">
+      <Filter>src\DataSources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableHandler.cpp">
+      <Filter>src\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableExtractorCSV.cpp">
+      <Filter>src\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableStatisticAnalyser.cpp">
+      <Filter>src\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileToTableExtractorFactory.cpp">
+      <Filter>src\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BusinessLogicHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataCategorizationHandler.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PreviewAssembler.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PreviewAssemblerRMD.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CollectionAssembler.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataAssemblyRangeData.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataCollectionCreationHandler.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="include\IndexManager.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Application.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelNotifier.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UiNotifier.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataSourceHandler.h">
+      <Filter>include\DataSources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableHandler.h">
+      <Filter>include\TableHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BusinessLogicHandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableExtractor.h">
+      <Filter>include\TableHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableExtractorCSV.h">
+      <Filter>include\TableHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableStatisticAnalyser.h">
+      <Filter>include\TableHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileToTableExtractorFactory.h">
+      <Filter>include\TableHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileToTableExtractorRegistrar.h">
+      <Filter>include\TableHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataCategorizationHandler.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PreviewAssembler.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PreviewAssemblerRMD.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CollectionAssembler.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataAssemblyData.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataAssemblyRangeData.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataCollectionCreationHandler.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexManager.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataParameter.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataParameterBundle.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BranchSynchronizer.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataQuantity.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{ab4aec8d-2866-43f3-9e75-718e8911efd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{9c006d85-0de7-41d6-9894-747e4337a292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataSources">
+      <UniqueIdentifier>{0d48ac88-117b-4bf0-84d6-327185ad167d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\DataSources">
+      <UniqueIdentifier>{81b27035-6880-48e5-bf87-b8fb39a1b3ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\TableHandler">
+      <UniqueIdentifier>{b3d574d0-c0c9-48f0-9bf8-a4d34cca252e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Table">
+      <UniqueIdentifier>{fb3875a6-1161-4386-ab16-8f4ac57f3570}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ParameterizedDataHandler">
+      <UniqueIdentifier>{acc858a7-fdd1-4aff-8c64-1e786257a3d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ParameterizedDataHandler">
+      <UniqueIdentifier>{59d579b6-6a8b-4fc2-86c4-194da20c19a0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

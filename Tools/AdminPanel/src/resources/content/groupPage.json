@@ -1,0 +1,17 @@
+{
+  "title": "Group Page",
+  "modalTitle": "Select a user to change the owner",
+  "groupName": "Group Name:",
+  "changeGroupNameTitle": "Change Group Name",
+  "oldGroupName": "Old Group Name:",
+  "newGroupName": "New Group Name:",
+  "button": "Create",
+  "bckButton": "Back",
+  "changeButton": "Change",
+  "deletePopupTitle": "Would you remove a group?",
+  "deletePopupContent": "Please select a group and then try it again.",
+  "deletePopupButton": "OK",
+  "ownerPopupTitle": "Would you change a group owner?",
+  "ownerPopupContent": "Please select a group and then try it again.",
+  "ownerPopupButton": "OK"
+}

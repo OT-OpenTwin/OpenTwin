@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Header Files\Flow">
+      <UniqueIdentifier>{19e4ee73-4063-44b5-8c37-10b111afcd39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\General">
+      <UniqueIdentifier>{a27c9e98-1f74-405f-96d9-0f178044643e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Flow">
+      <UniqueIdentifier>{c59c248a-c451-40ac-9460-0936633ff55e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\General">
+      <UniqueIdentifier>{59a5c102-8576-417f-9f87-f668cc42cd7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Custom">
+      <UniqueIdentifier>{12841783-85a2-4917-ae97-81f194d16126}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Widgets">
+      <UniqueIdentifier>{0c74f659-965c-429b-b5fb-b3e120735cd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Widgets">
+      <UniqueIdentifier>{53558a27-6c40-49ab-9557-084c80f32569}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Config_MoveToAPILib">
+      <UniqueIdentifier>{ecad1599-f1e3-4d70-853e-25fef11b7819}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Config_MoveToAPILib">
+      <UniqueIdentifier>{e0e5e56d-c6a6-48d4-aae3-2f40a1bb6689}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Block.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockNetwork.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockNetworkEditor.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FlowBlock.cpp">
+      <Filter>Source Files\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FlowConnector.cpp">
+      <Filter>Source Files\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FlowConnection.cpp">
+      <Filter>Source Files\Flow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockConnection.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockConnector.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicItemPickerWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockConfig.cpp">
+      <Filter>Source Files\Config_MoveToAPILib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\openTwin\BlockEditorSharedDatatypes.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\openTwin\FlowConnector.h">
+      <Filter>Header Files\Flow</Filter>
+    </ClInclude>
+    <ClInclude Include="include\openTwin\FlowConnection.h">
+      <Filter>Header Files\Flow</Filter>
+    </ClInclude>
+    <ClInclude Include="include\openTwin\BlockConnection.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\openTwin\BlockConnector.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\openTwin\BlockConfig.h">
+      <Filter>Header Files\Config_MoveToAPILib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\openTwin\BlockNetwork.h">
+      <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\openTwin\BlockNetworkEditor.h">
+      <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\openTwin\FlowBlock.h">
+      <Filter>Header Files\Flow</Filter>
+    </QtMoc>
+    <QtMoc Include="include\openTwin\Block.h">
+      <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\openTwin\GraphicItemPickerWidget.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+  </ItemGroup>
+</Project>

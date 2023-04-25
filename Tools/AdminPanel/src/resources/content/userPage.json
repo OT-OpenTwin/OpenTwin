@@ -1,0 +1,19 @@
+{
+  "username": "Username: ",
+  "password": "Password: ",
+  "confirmationPassword": "Confirmation password: ",
+  "button": "Create",
+  "bckButton": "Back",
+  "changeUsername": "Change Username",
+  "oldUsername": "Old Username:",
+  "newUsername": "New Username:",
+  "changePassword": "Change Password",
+  "oldPassword": "Old Password:",
+  "newPassword": "New Password:",
+  "submitButton": "Submit",
+  "changeButton": "Change",
+  "editButton": "Edit",
+  "dialogTitle": "Would you remove a user?",
+  "dialogContent": "Please select a user and then try it again.",
+  "dialogButton": "OK"
+}

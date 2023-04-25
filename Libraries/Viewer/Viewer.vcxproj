@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugTest|x64">
+      <Configuration>DebugTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|x64">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AbstractPlot.cpp" />
+    <ClCompile Include="src\AxisCenterCross.cpp" />
+    <ClCompile Include="src\AxisCross.cpp" />
+    <ClCompile Include="src\BlockDiagramEditor.cpp" />
+    <ClCompile Include="src\ClipPlaneManipulator.cpp" />
+    <ClCompile Include="src\HandleArrow.cpp" />
+    <ClCompile Include="src\HandlerBase.cpp" />
+    <ClCompile Include="src\HandlerIntersector.cpp" />
+    <ClCompile Include="src\HandleWheel.cpp" />
+    <ClCompile Include="src\LineIntersector.cpp" />
+    <ClCompile Include="src\ManipulatorBase.cpp" />
+    <ClCompile Include="src\MaterialMetal.cpp" />
+    <ClCompile Include="src\MaterialPlastic.cpp" />
+    <ClCompile Include="src\MaterialPolished.cpp" />
+    <ClCompile Include="src\dllmain.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\MaterialRough.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Notifier.cpp" />
+    <ClCompile Include="src\Plot.cpp" />
+    <ClCompile Include="src\polarPlot.cpp" />
+    <ClCompile Include="src\PolarPlot_BAK.cpp" />
+    <ClCompile Include="src\Rubberband.cpp" />
+    <ClCompile Include="src\SceneNodeAnnotation.cpp" />
+    <ClCompile Include="src\SceneNodeCartesianMesh.cpp" />
+    <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp" />
+    <ClCompile Include="src\SceneNodeContainer.cpp" />
+    <ClCompile Include="src\SceneNodeGeometry.cpp" />
+    <ClCompile Include="src\SceneNodeMaterial.cpp" />
+    <ClCompile Include="src\SceneNodeMaterialFactory.cpp" />
+    <ClCompile Include="src\SceneNodeMesh.cpp" />
+    <ClCompile Include="src\SceneNodeMeshItem.cpp" />
+    <ClCompile Include="src\SceneNodePlot1DItem.cpp" />
+    <ClCompile Include="src\SceneNodeResult1DItem.cpp" />
+    <ClCompile Include="src\SceneNodeTableItem.cpp" />
+    <ClCompile Include="src\SceneNodeTextItem.cpp" />
+    <ClCompile Include="src\SceneNodeVTK.cpp" />
+    <ClCompile Include="src\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\Table.cpp" />
+    <ClCompile Include="src\TableViewer.cpp" />
+    <ClCompile Include="src\TextureMapManager.cpp" />
+    <ClCompile Include="src\TransformManipulator.cpp" />
+    <ClCompile Include="src\VersionGraph.cpp" />
+    <ClCompile Include="src\Viewer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\ViewerAPI.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\ViewerObjectSelectionHandler.cpp" />
+    <ClCompile Include="src\ViewerSettings.cpp" />
+    <ClCompile Include="src\ViewManipulator.cpp" />
+    <ClCompile Include="src\WorkingPlane.cpp" />
+    <ClCompile Include="src\xyPlot.cpp" />
+    <ClCompile Include="src\XYPlot_BAK.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AbstractPlot.h" />
+    <ClInclude Include="include\AxisCenterCross.h" />
+    <ClInclude Include="include\AxisCross.h" />
+    <ClInclude Include="include\BlockDiagramEditor.h" />
+    <ClInclude Include="include\CappingEffect.h" />
+    <ClInclude Include="include\ClipPlaneManipulator.h" />
+    <QtMoc Include="include\DrawingView.h" />
+    <ClInclude Include="include\HandleArrow.h" />
+    <ClInclude Include="include\HandlerBase.h" />
+    <ClInclude Include="include\HandlerIntersector.h" />
+    <ClInclude Include="include\HandleWheel.h" />
+    <ClInclude Include="include\LineIntersector.h" />
+    <ClInclude Include="include\ManipulatorBase.h" />
+    <ClInclude Include="include\MaterialMetal.h" />
+    <ClInclude Include="include\MaterialPlastic.h" />
+    <ClInclude Include="include\MaterialPolished.h" />
+    <ClInclude Include="include\MaterialRough.h" />
+    <ClInclude Include="include\MaterialBase.h" />
+    <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\Notifier.h" />
+    <ClInclude Include="include\Plot.h" />
+    <ClInclude Include="include\polarPlot.h" />
+    <ClInclude Include="include\Rubberband.h" />
+    <ClInclude Include="include\SceneNodeAnnotation.h" />
+    <ClInclude Include="include\SceneNodeBase.h" />
+    <ClInclude Include="include\SceneNodeCartesianMesh.h" />
+    <ClInclude Include="include\SceneNodeCartesianMeshItem.h" />
+    <ClInclude Include="include\SceneNodeContainer.h" />
+    <ClInclude Include="include\SceneNodeGeometry.h" />
+    <ClInclude Include="include\SceneNodeMaterial.h" />
+    <ClInclude Include="include\SceneNodeMaterialFactory.h" />
+    <ClInclude Include="include\SceneNodeMesh.h" />
+    <ClInclude Include="include\SceneNodeMeshItem.h" />
+    <ClInclude Include="include\SceneNodePlot1DItem.h" />
+    <ClInclude Include="include\SceneNodeResult1DItem.h" />
+    <ClInclude Include="include\SceneNodeTableItem.h" />
+    <ClInclude Include="include\SceneNodeTextItem.h" />
+    <ClInclude Include="include\SceneNodeVTK.h" />
+    <ClInclude Include="include\stdafx.h" />
+    <QtMoc Include="include\Table.h" />
+    <ClInclude Include="include\TableViewer.h" />
+    <ClInclude Include="include\TextureMapManager.h" />
+    <ClInclude Include="include\TransformManipulator.h" />
+    <QtMoc Include="include\VersionGraph.h" />
+    <ClInclude Include="include\ViewerSettings.h" />
+    <ClInclude Include="include\WorkingPlane.h" />
+    <ClInclude Include="include\xyPlot.h" />
+    <QtMoc Include="include\Viewer.h" />
+    <ClInclude Include="include\ViewerAPI.h" />
+    <ClInclude Include="include\ViewerObjectSelectionHandler.h" />
+    <ClInclude Include="include\ViewManipulator.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>
+    <Keyword>QtVS_v302</Keyword>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include</IncludePath>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include</IncludePath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include</IncludePath>
+    <TargetExt>.dll</TargetExt>
+    <LibraryPath>%CURL_LIB%;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include</IncludePath>
+    <TargetExt>.lib</TargetExt>
+    <LibraryPath>%CURL_LIB%;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%OSG_ROOT%\include\;%QDIR%\include\;%R_JSON_ROOT%\include\;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\uiCore\include;$(OT_MODELENTITIES_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SDLCheck>
+      </SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(Qt_LIBS_);OpenTwinSystem.lib;OpenTwinCore.lib;%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;libCurl.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;qwtd.lib;qwtpolard.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(RUBBERBAND_ENGINE_OSG)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Debug;$(OT_MODELENTITIES_ROOT)\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%OSG_ROOT%\include\;%QDIR%\include\;%R_JSON_ROOT%\include\;$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\uiCore\include;$(OT_MODELENTITIES_ROOT)\include</AdditionalIncludeDirectories>
+      <SDLCheck>
+      </SDLCheck>
+      <MinimalRebuild />
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(Qt_LIBS_);%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;libCurl.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;qwtd.lib;qwtpolard.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(RUBBERBAND_ENGINE_OSG)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%OSG_ROOT%\include\;%QDIR%\include\;%R_JSON_ROOT%\include\;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\uiCore\include;$(OT_MODELENTITIES_ROOT)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>$(Qt_LIBS_);OpenTwinSystem.lib;OpenTwinCore.lib;%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;qwt.lib;qwtpolar.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(RUBBERBAND_ENGINE_OSG)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Release;$(OT_MODELENTITIES_ROOT)\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%OSG_ROOT%\include\;%QDIR%\include\;%R_JSON_ROOT%\include\;$(MONGO_C_ROOT)\Release\include;$(MONGO_CXX_ROOT)\Release\include;$(MONGO_BOOST_ROOT);$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\uiCore\include;$(OT_MODELENTITIES_ROOT)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>$(Qt_LIBS_);%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;qwt.lib;qwtpolar.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(RUBBERBAND_ENGINE_OSG)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

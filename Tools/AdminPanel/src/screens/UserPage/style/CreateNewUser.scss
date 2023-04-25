@@ -1,0 +1,62 @@
+.newUser {
+    width: 100%;
+    display: flex;
+
+    .newContainer {
+        flex: 6;
+
+        .top,
+        .bottom {
+            -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.5);
+            box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+            padding: 10px;
+            margin: 20px;
+            display: flex;
+
+            h1 {
+                color: gray;
+                font-size: 20px;
+            }
+
+            p {
+                color: rgb(255, 1, 1);
+                font-size: 14px;
+            }
+
+            form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 30px;
+
+                .formInput {
+                    width: 20%;
+
+                    input {
+                        width: 100%;
+                        padding: 5px;
+                        border: none;
+                        margin-bottom: 10px;
+                        // background-color: #040352;
+                        -webkit-text-fill-color: #040352;
+                    }
+
+                    .btn-outline-primary {
+                        border-color: #0db8de;
+                        color: #05404e;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        letter-spacing: 1px;
+                        background-color: transparent;
+                    }
+
+                    .btn-outline-primary:hover {
+                        background-color: #0db8de;
+                        right: 0px;
+                    }
+                }
+
+
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "logoName": "OPEN TWIN",
+  "title": "ADMIN PANEL",
+  "sessionservice": "GLOBAL SESSION SERVICE",
+  "userName": "USERNAME",
+  "password": "PASSWORD",
+  "login": "LOGIN",
+  "logout": "LOGOUT",
+  "serverErrPopupTitle": "Server Error!",
+  "serverErrPopupContent": "Unable to connect to the services. Please check the address.",
+  "serverErrPopupButton": "OK"
+}

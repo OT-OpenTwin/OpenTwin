@@ -1,0 +1,456 @@
+/*
+ * Application.cpp
+ *
+ *  Created on:
+ *	Author:
+ *  Copyright (c)
+ */
+
+ // Service header
+#include "Application.h"
+#include "ModelNotifier.h"
+#include "UiNotifier.h"
+
+// Open twin header
+#include "OpenTwinCore/rJSON.h"				// json convenience functions
+#include "OpenTwinCore/Logger.h"
+#include "OpenTwinCommunication/actionTypes.h"		// action member and types definition
+#include "OpenTwinFoundation/UiComponent.h"
+#include "OpenTwinFoundation/ModelComponent.h"
+
+// Application specific includes
+#include "EntitySolverKriging.h"
+#include "TemplateDefaultManager.h"
+#include "DataBase.h"
+#include "Kriging.h"
+#include "ClassFactory.h"
+
+#include <thread>
+
+#include <map>
+
+// The name of this service
+#define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_KRIGING
+
+// The type of this service
+#define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_KRIGING
+
+Application::Application()
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), krig("run")
+{
+}
+
+Application::~Application()
+{
+
+}
+
+// ##################################################################################################################################
+
+// Required functions
+
+void Application::run(void)
+{
+	// This method is called once the service can start its operation
+	if (EnsureDataBaseConnection())
+	{
+		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
+	}
+	// Add code that should be executed when the service is started and may start its work
+	//krig = new Kriging("run");
+	//krig.initializePython();
+}
+
+std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+{
+	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+	{
+		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+
+		if      (action == "Post Processing:Kriging:Load")			loadDataset();
+		else if (action == "Post Processing:Kriging:Train")			train();
+		else if (action == "Post Processing:Kriging:Predict")		predict();
+		else if (action == "Post Processing:Kriging:Save")			saveKrigingModel();
+		else if (action == "Post Processing:Kriging:Add Params")	addParameters();
+		else if (action == "Post Processing:Data:Import")			importData();
+
+		else {
+			assert(0); // Unhandled button action
+			m_uiComponent->displayMessage("Handler not Implemented.\n");
+
+		}
+	}
+	else if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
+	{
+		selectedEntities = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+		modelSelectionChangedNotification();
+	}
+	else {
+		return OT_ACTION_RETURN_UnknownAction;
+	}
+	return "";
+}
+
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+{
+	return ""; // Return empty string if the request does not expect a return
+}
+
+void Application::uiConnected(ot::components::UiComponent * _ui)
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	enableMessageQueuing("uiService", true);
+	//_ui->registerForModelEvents();
+
+	_ui->addMenuPage("Post Processing");
+
+	_ui->addMenuGroup("Post Processing", "Data");
+	_ui->addMenuGroup("Post Processing", "Kriging");
+
+
+	ot::Flags<ot::ui::lockType> modelWrite;
+	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+
+	_ui->addMenuButton("Post Processing", "Data", "Import", "Import", modelWrite, "Kriging", "Default");
+	_ui->addMenuButton("Post Processing", "Data", "Export", "Export", modelWrite, "Kriging", "Default");
+
+	_ui->addMenuButton("Post Processing", "Kriging", "Add Params", "Add Params", modelWrite, "Kriging", "Default");
+	_ui->addMenuButton("Post Processing", "Kriging", "Load", "Load Dataset", modelWrite, "Kriging", "Default");
+	_ui->addMenuButton("Post Processing", "Kriging", "Train", "Train", modelWrite, "Kriging", "Default");
+	_ui->addMenuButton("Post Processing", "Kriging", "Predict", "Predict", modelWrite, "Kriging", "Default");
+	_ui->addMenuButton("Post Processing", "Kriging", "Save", "Save", modelWrite, "Kriging", "Default");
+
+	modelSelectionChangedNotification();
+
+	enableMessageQueuing("uiService", false);
+}
+
+void Application::uiDisconnected(const ot::components::UiComponent * _ui)
+{
+
+}
+
+void Application::modelConnected(ot::components::ModelComponent * _model)
+{
+
+}
+
+void Application::modelDisconnected(const ot::components::ModelComponent * _model)
+{
+
+}
+
+void Application::serviceConnected(ot::ServiceBase * _service)
+{
+
+}
+
+void Application::serviceDisconnected(const ot::ServiceBase * _service)
+{
+
+}
+
+void Application::preShutdown(void) {
+
+}
+
+void Application::shuttingDown(void)
+{
+
+}
+
+bool Application::startAsRelayService(void) const
+{
+	return false;	// Do not want the service to start a relay service. Otherwise change to true
+}
+
+// ##################################################################################################################################
+
+void Application::modelSelectionChangedNotification(void)
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	if (isUiConnected()) {
+		std::list<std::string> enabled;
+		std::list<std::string> disabled;
+
+		/*
+		Configure your ui disabled / enabled state
+		if (selectedEntities.size() > 0)
+		{
+			enabled.push_back("PHREEC:Solver:Run Solver");
+		}
+		else
+		{
+			disabled.push_back("PHREEC:Solver:Run Solver");
+		}
+		*/
+
+		m_uiComponent->setControlsEnabledState(enabled, disabled);
+	}
+}
+
+void Application::EnsureVisualizationModelIDKnown(void)
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	if (visualizationModelID > 0) return;
+	if (m_modelComponent == nullptr) {
+		assert(0); throw std::exception("Model not connected");
+	}
+
+	// The visualization model isnot known yet -> get it from the model
+	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
+}
+
+KrigingParams* Application::getParams(void) 
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	std::list<std::string> selectedSolvers = getListOfSelectedKrigingSolvers();
+
+	if (selectedSolvers.size() != 1) return nullptr; // Only one solver can be selected at a time
+
+	// Now we retrieve information about the solver items
+	std::list<ot::EntityInformation> solverInfo;
+	m_modelComponent->getEntityInformation(selectedSolvers, solverInfo);
+
+	// Prefetch the solver information
+	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
+
+	for (auto info : solverInfo)
+	{
+		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+	}
+
+	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+
+	// Now read the solver objects for each solver
+	std::map<std::string, EntityBase *> solverMap;
+	ClassFactory classFactory;
+	for (auto info : solverInfo)
+	{
+		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory);
+		solverMap[info.getName()] = entity;
+
+		if (entity == nullptr)
+		{
+			m_uiComponent->displayMessage("ERROR: Unable to read solver information.\n");
+			return NULL;
+		}
+
+		EntityPropertiesDouble *theta = dynamic_cast<EntityPropertiesDouble*>(entity->getProperties().getProperty("Theta"));
+		assert(theta != nullptr);
+		EntityPropertiesDouble *nugget = dynamic_cast<EntityPropertiesDouble*>(entity->getProperties().getProperty("Nugget"));
+		assert(nugget != nullptr);
+		EntityPropertiesSelection *corr = dynamic_cast<EntityPropertiesSelection*>(entity->getProperties().getProperty("Corr"));
+		assert(corr != nullptr);
+		EntityPropertiesSelection *poly = dynamic_cast<EntityPropertiesSelection*>(entity->getProperties().getProperty("Poly"));
+		assert(poly != nullptr);
+
+		KrigingParams params;
+		params.theta = theta->getValue();
+		params.nugget = nugget->getValue();
+		params.corr.assign(corr->getValue());
+		params.poly.assign(poly->getValue());
+
+		cout << "get params: ---------------------------------------" << endl;
+		params.printIt();
+		cout << "get params end: -----------------------------------" << endl;
+
+		return new KrigingParams(params);
+	}
+
+	m_uiComponent->displayMessage("ERROR: Unable to read solver information.\n");
+	return NULL;
+
+	//KrigingParams params;
+	//params.corr = "squar_exp";
+	//params.poly = "linear";
+	//return &params;
+}
+
+void Application::loadDataset(void) 
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	m_uiComponent->displayMessage("loading dataset ...\n");
+	krig.setDataSet(DataSet::prepareDataset());
+	krig.getDataSet().printDataSet();
+	m_uiComponent->displayMessage("loading dataset complete\n");
+}
+
+void Application::train(void) 
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	KrigingParams* params = getParams();
+	if (params == NULL)
+	{
+		m_uiComponent->displayMessage("params not selected.\n");
+		return;
+	}
+
+	//krig.setParameters(params);
+
+	std::array<long, 2> dsSize = krig.getDataSet().getDataSize();
+	m_uiComponent->displayMessage("Training : (" + std::to_string(dsSize[0]) + ", " + std::to_string(dsSize[1]) + ")\n");
+	m_uiComponent->displayMessage(krig.getParameters().toString());
+
+	krig.train();
+
+	m_uiComponent->displayMessage("Training Complete : " + krig.getModelStr().substr(0, 100) + "\n");
+}
+
+void Application::predict(void) 
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	std::list<std::vector<double>> data = DataSet::prepareDataset().getxDataPoints();
+	const std::vector<double> yrow = *data.begin();
+	m_uiComponent->displayMessage("Predicting ...\n(" + std::to_string(data.size()) + ", " + std::to_string(yrow.size()) + ")\n");
+	m_uiComponent->displayMessage(DataSet::toString(data) + "\n");
+
+	krig.predict(data);
+	//krig.predict();
+
+	m_uiComponent->displayMessage("Predicted value size: " + std::to_string(krig.getDataSet().getyPredictionPoints().size()) + "\n");
+	m_uiComponent->displayMessage("Predicted data: \n" + krig.outputs + "\n");
+	//m_uiComponent->displayMessage("Predicted dataset: \n" + DataSet::toString(krig->getDataSet().getyPredictionPoints()) + "\n");
+}
+
+void Application::saveKrigingModel(void) 
+{
+	// todo: add save functionallity
+	assert(0);
+	m_uiComponent->displayMessage("Selected Kriging Model saved.");
+}
+
+void Application::addParameters(void)
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	if (!EnsureDataBaseConnection())
+	{
+		assert(0);  // Data base connection failed
+		return;
+	}
+
+	if (m_modelComponent == nullptr) {
+		assert(0); throw std::exception("Model not connected");
+	}
+
+	// First get a list of all folder items of the Solvers folder
+	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems("Solvers");
+
+	// Now get a new entity ID for creating the new item
+	ot::UID entityID = m_modelComponent->createEntityUID();
+
+	// Create a unique name for the new solver item
+	int count = 1;
+	std::string solverName;
+	do
+	{
+		solverName = "Solvers/kriging" + std::to_string(count);
+		count++;
+	} while (std::find(solverItems.begin(), solverItems.end(), solverName) != solverItems.end());
+
+	// Get information about the available meshes (and the first mesh in particular)
+	//std::string meshFolderName, meshName;
+	//UID meshFolderID{ 0 }, meshID{ 0 };
+
+	//m_modelComponent->getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
+
+	// Create the new solver item and store it in the data base
+	EntitySolverKriging *solverEntity = new EntitySolverKriging(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	solverEntity->setName(solverName);
+	solverEntity->setEditable(true);
+
+	EntityPropertiesDouble::createProperty("Parameters", "Theta", 0.01, "Kriging", solverEntity->getProperties());
+	EntityPropertiesDouble::createProperty("Parameters", "Nugget", 2.220446049250313e-14, "Kriging", solverEntity->getProperties());
+
+	std::list<std::string> corrFunctionType;
+	corrFunctionType.push_back("abs_exp");
+	corrFunctionType.push_back("square_exp");
+	corrFunctionType.push_back("matern52");
+	corrFunctionType.push_back("matern32");
+	EntityPropertiesSelection::createProperty("Parameters", "Corr", corrFunctionType, "square_exp", "Kriging", solverEntity->getProperties());
+
+	std::list<std::string> regressionFunctionType;
+	regressionFunctionType.push_back("constant");
+	regressionFunctionType.push_back("linear");
+	regressionFunctionType.push_back("quadratic");
+	EntityPropertiesSelection::createProperty("Parameters", "Poly", regressionFunctionType, "constant", "Kriging", solverEntity->getProperties());
+
+	solverEntity->StoreToDataBase();
+
+	// Register the new solver item in the model
+
+	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false };
+	std::list<ot::UID> dataEntityIDList;
+	std::list<ot::UID> dataEntityVersionList;
+	std::list<ot::UID> dataEntityParentList;
+
+	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
+										 dataEntityIDList, dataEntityVersionList, dataEntityParentList, "add kriging param");
+}
+
+std::list<std::string> Application::getListOfSelectedKrigingSolvers(void)
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	std::list<std::string> selectedSolverList;
+
+	if (selectedEntities.empty())
+	{
+		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		return selectedSolverList;
+	}
+
+	// We first get a list of all selected entities
+	std::list<ot::EntityInformation> selectedEntityInfo;
+	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
+	m_modelComponent->getEntityInformation(selectedEntities, selectedEntityInfo);
+
+	// Here we first need to check which solvers are selected and then run them one by one.
+	std::map<std::string, bool> solverItemMap;
+	for (auto entity : selectedEntityInfo)
+	{
+		if (entity.getName().substr(0, 8) == "Solvers/" && entity.getType() == "EntitySolverKriging")
+		{
+			size_t index = entity.getName().find('/', 8);
+			if (index != std::string::npos)
+			{
+				solverItemMap[entity.getName().substr(0, index - 1)] = true;
+			}
+			else
+			{
+				solverItemMap[entity.getName()] = true;
+			}
+		}
+	}
+
+	for (auto solver : solverItemMap)
+	{
+		selectedSolverList.push_back(solver.first);
+	}
+
+	return selectedSolverList;
+}
+
+void Application::importData(void)
+{
+	OT_LOG_D("Called..."); // todo: remove debug code
+
+	std::list<std::string> selectedSolvers = getListOfSelectedKrigingSolvers();
+
+	if (selectedSolvers.size() == 1)
+	{
+		std::string itemName = selectedSolvers.front() + "/input";
+
+		m_modelComponent->importTableFile(itemName);
+	}
+}

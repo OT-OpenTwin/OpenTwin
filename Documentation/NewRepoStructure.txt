@@ -1,0 +1,113 @@
+T
+|
++--> OTOpenTwin                         (OPENTWIN_DEV_ROOT must point here)
+|          |
+|          +--> /Certificates
+|          |          |
+|          |          +--> /Generator
+|          |          |          |
+|          |          |          +--> /ca-config.json
+|          |          |          +--> ...
+|          |          |          +--> /CreateCertificate.bat
+|          |          |          +--> ...
+|          |          |
+|          |          +--> /Generated   (If OPENTWIN_CERTS_ROOT is not set it well be set here by "SetupEnvironment.bat")
+|          |          |          |
+|          |          |          (Generated certificate files...)
+|          |          |
+|          |          +--> /OpenTwinEncryptionKey.h
+|          |
+|          +--> /CoreLibraries (see Documentation)
+|          |
+|          +--> /CoreMicroservices (see Documentation)
+|          |
+|          +--> /DefaultLibraries (see Documentation)
+|          |
+|          +--> /DefaultMicroservices (see Documentation)
+|          |
+|          +--> /Deployment             (If OPENTWIN_DEPLOYMENT_ROOT is not set it will be set here by "SetupEnvironment.bat")
+|          |
+|          +--> /Documentation
+|          |          |
+|          |          +--> /CodeDocumentation
+|          |          |
+|          |          +--> /DeveloperGuide
+|          |          |
+|          |          +--> /UserGuide
+|          |
+|          +--> /Framework
+|          |          |
+|          |          +--> /MicroserviceFramework
+|          |                     |
+|          |                     +--> ... (old: /Microservices/OpenTwin)
+|          |
+|          +--> /Images
+|          |          +--> /Animations
+|          |          +--> /Application
+|          |          +--> /BackgroundImages
+|          |          +--> /ColorStyles
+|          |          +--> /ContextMenu
+|          |          +--> /Default
+|          |          +--> /Table
+|          |          +--> /ToolBar
+|          |          +--> /Textures
+|          |
+|          +--> /Scripts
+|          |          |
+|          |          +--> /Build
+|          |          |          
+|          |          +--> /Test
+|          |          |
+|          |          +--> /Deployment
+|          |          |          |
+|          |          |          +--> /DeployAll.bat
+|          |          |          +--> /DeployFrontend.bat
+|          |          |          |
+|          |          |         ...
+|          |          |
+|          |          +--> /Launch(er)
+|          |          |
+|          |          +--> /Shutdown
+|          |          |
+|          |          +--> /Other
+|          |          |
+|          |          +--> /SetupEnvironment.bat
+|          |
+|          +--> /Templates
+|          |          |
+|          |          +--> /PostmanCollection
+|          |          |
+|          |          +--> /DefaultMicroserviceTemplate
+|          |          |
+|          |          +--> /DefaultUiPluginTemplate
+|          |
+|          +--> /Tools
+|          |          |
+|          |          +--> /OToolkit     (If OT_OTOOLKIT_ROOT is not set it will be set here by "SetupEnvironment.bat")
+|          |          |
+|          |          +--> /KeyGenerator (If OT_KEYGENERATOR_ROOT is not set it will be set here by "SetupEnvironment.bat")
+|          |
+|          +--> /Webpages
+|                     |
+|                     +--> /AdminPanel
+|
+|
+|
++--> OTOpenTwinThirdParty               (OPENTWIN_THIRDPARTY_ROOT must point here)
+|          |
+|          +--> /Scripts
+|          |          |
+|          |          +--> /SetupEnvironment.bat
+|          |
+|          +--> /CurlBinaries (Curl installation used for Batch scripts)
+|          |
+|         ...
+|
+|
+|
++--> OTOpenTwinPlayground               (OPENTWIN_PLAYGROUND_ROOT must point here)
+           |
+           +--> /Scripts
+           |          |
+           |          +--> /SetupEnvironment.bat
+          ...

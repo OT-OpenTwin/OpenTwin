@@ -1,0 +1,18 @@
+.ErrorPage {
+    display: flex;
+    height: 95.5vh; // background-image: linear-gradient(79deg, #1e1e91, #4845d6 48%, #4b70c2);
+    background-image: url(../../../src/resources/background/BG2.png);
+    background-size: cover;
+    font-family: "Roboto", sans-serif;
+}
+
+.errorButton {
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 42px;
+    font-family: "Roboto", sans-serif;
+}
