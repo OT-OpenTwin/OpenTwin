@@ -40,25 +40,25 @@ REM 2: Name of the library in CamelCase with the same name as the created binari
 REM 3: Path to the library root folder without '\' suffix (e.g. "X:\testlib" will be set as root path)
 REM See contents of Scripts/SetLibraryEnv.bat for further information
 
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_BLOCKEDITOR BlockEditor %OPENTWIN_DEV_ROOT%\Libraries\BlockEditor
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_BLOCKEDITORAPI BlockEditorAPI %OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_CADMODELENTITIES CadModelEntities %OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_DATASTORAGE DataStorage %OPENTWIN_DEV_ROOT%\Libraries\DataStorage
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_MODELENTITIES ModelEntities %OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_BLOCKEDITOR BlockEditor %OPENTWIN_DEV_ROOT%\Libraries\BlockEditor
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_BLOCKEDITORAPI BlockEditorAPI %OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_CADMODELENTITIES CadModelEntities %OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_DATASTORAGE DataStorage %OPENTWIN_DEV_ROOT%\Libraries\DataStorage
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_MODELENTITIES ModelEntities %OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
 
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_COMMUNICATION OpenTwinCommunication %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_CORE OpenTwinCore %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_FOUNDATION OpenTwinServiceFoundation %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_SYSTEM OpenTwinSystem %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_GUI OTGui %OPENTWIN_DEV_ROOT%\Libraries\OTGui
-REM CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_WIDGETS OTWidgets %OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_COMMUNICATION OpenTwinCommunication %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_CORE OpenTwinCore %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_FOUNDATION OpenTwinServiceFoundation %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_SYSTEM OpenTwinSystem %OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GUI OTGui %OPENTWIN_DEV_ROOT%\Libraries\OTGui
+REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_WIDGETS OTWidgets %OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
 
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_QWTWRAPPER QwtWrapper %OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_RUBBERBANDAPI RubberbandEngineCore %OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_RUBBERBAND RubberbandEngineOsgWrapper %OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineOsgWrapper
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_UICORE uiCore %OPENTWIN_DEV_ROOT%\Libraries\uiCore
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_UIPLUGINAPI UIPluginAPI %OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI
-CALL "%OPEN_TWIN_DEV_ROOT%\MasterBuild\SetLibraryEnv.bat" OT_VIEWER Viewer %OPENTWIN_DEV_ROOT%\Libraries\Viewer
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_QWTWRAPPER QwtWrapper %OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_RUBBERBANDAPI RubberbandEngineCore %OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_RUBBERBAND RubberbandEngineOsgWrapper %OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineOsgWrapper
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_UICORE uiCore %OPENTWIN_DEV_ROOT%\Libraries\uiCore
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_UIPLUGINAPI UIPluginAPI %OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_VIEWER Viewer %OPENTWIN_DEV_ROOT%\Libraries\Viewer
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
