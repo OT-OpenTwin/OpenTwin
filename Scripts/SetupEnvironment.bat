@@ -33,6 +33,15 @@ IF NOT "%OPENTWIN_THIRDPARTY_ENV_DEFINED%" == "1" (
 )
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
+REM OpenTwin services paths
+REM Call the batch file with the following arguments:
+REM 1: Name of the library in upper case letters and underscores as delimiter (e.g. "TEST_LIB" will result in "TEST_LIB_ROOT"; "TEST_LIB_INCD"; ...)
+REM 2: Name of the library in CamelCase with the same name as the created binaries (<name>.dll) (e.g. "TestLib" will result in debug = "TestLibd.lib" and release = "TestLib.lib")
+REM 3: Path to the library root folder without '\' suffix (e.g. "X:\testlib" will be set as root path)
+REM See contents of Scripts/SetLibraryEnv.bat for further information
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_AUTHORISATION_SERVICE AuthorisationService %OPENTWIN_DEV_ROOT%\Services\AuthorisationService
+
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library paths
 REM Call the batch file with the following arguments:
 REM 1: Name of the library in upper case letters and underscores as delimiter (e.g. "TEST_LIB" will result in "TEST_LIB_ROOT"; "TEST_LIB_INCD"; ...)
