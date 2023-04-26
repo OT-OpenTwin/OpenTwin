@@ -1,0 +1,6 @@
+/server.pem
+/server-key.pem
+/ca.pem
+/ca-key.pem
+/certificateKeyFile.pem
+/encryptionKey.h

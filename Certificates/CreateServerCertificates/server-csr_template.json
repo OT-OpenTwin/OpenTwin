@@ -1,0 +1,17 @@
+{
+  "CN": "OpenTwin Server",
+  "hosts": ["$HOSTNAME$", "$IP_ADDRESS$", "localhost", "127.0.0.1"],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C": "DE",
+	  "L": "Hessen",
+	  "ST": "Frankfurt",
+	  "O": "Frankfurt University of Applied Sciences",
+	  "OU": "Computer Science and Engineering (Fb 2)"
+    }
+  ]
+}
