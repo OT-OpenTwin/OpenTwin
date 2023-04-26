@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include "TopoDS.hxx"
 #include "Geom_Surface.hxx"
