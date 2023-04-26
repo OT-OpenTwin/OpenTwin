@@ -27,5 +27,10 @@ ECHO Launching development enviroment
 REM Open project
 START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_MODELENTITIES_ROOT%\ModelEntities.vcxproj"
 
-:END
+GOTO END
 
+:PAUSE_END
+pause
+GOTO END
+
+:END

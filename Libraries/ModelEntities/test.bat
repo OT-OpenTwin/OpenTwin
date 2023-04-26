@@ -3,7 +3,7 @@
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
-REM 2. DEVENV_ROOT_2022
+REM 3. DEVENV_ROOT_2022
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
 	goto PAUSE_END
@@ -65,13 +65,11 @@ IF %RELEASE%==1 (
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesReleaseReport.xml" "ModelEntities" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\ModelEntitiesReleaseReport.xml"
 ) 
-  
+
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
 :END
-
-
-
-
-
-
-
-

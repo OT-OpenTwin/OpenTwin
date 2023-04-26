@@ -57,5 +57,10 @@ IF %RELEASE%==1 (
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_MODELENTITIES_ROOT%\ModelEntities.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
-:END
+GOTO END
 
+:PAUSE_END
+pause
+GOTO END
+
+:END
