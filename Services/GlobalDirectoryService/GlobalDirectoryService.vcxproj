@@ -124,8 +124,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(OT_COMMUNICATION_ROOT)\x64\$(Configuration);$(OT_FOUNDATION_ROOT)\x64\$(Configuration);$(OT_MODELENTITIES_ROOT)\x64\$(Configuration);$(OT_LOGGER_ROOT)\x64\$(Configuration);$(OT_DATASTORAGE_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;wsock32.lib;Userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -172,8 +172,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(OT_COMMUNICATION_ROOT)\x64\$(Configuration);$(OT_FOUNDATION_ROOT)\x64\$(Configuration);$(OT_MODELENTITIES_ROOT)\x64\$(Configuration);$(OT_LOGGER_ROOT)\x64\$(Configuration);$(OT_DATASTORAGE_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;wsock32.lib;Userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
