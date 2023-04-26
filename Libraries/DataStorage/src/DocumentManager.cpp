@@ -9,7 +9,7 @@
 #include "../include/Helper/BsonValuesHelper.h"
 #include "../include/DocumentAPI.h"
 #include "../include/GridFSFeature.h"
-#include <FTPClient.h>
+//#include <FTPClient.h>
 #include <map>
 #include <filesystem>
 #include "bsoncxx/json.hpp"
@@ -17,7 +17,7 @@
 #include <bsoncxx/builder/basic/kvp.hpp>
 #include "bsoncxx/builder/basic/document.hpp"
 
-using namespace embeddedmz;
+//using namespace embeddedmz;
 namespace fs = std::filesystem;
 using bsoncxx::builder::basic::kvp;
 
