@@ -6,9 +6,9 @@ REM Please note that the commands are case-sensitive and that they must not be e
 
 REM Call build script
 
-CALL "%SIM_PLAT_ROOT%\MasterBuild\rebuildAll.bat" BOTH BUILD
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\rebuildAll.bat" BOTH BUILD
 
-CALL "%SIM_PLAT_ROOT%\MasterBuild\CheckForFailedBuilds.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\CheckForFailedBuilds.bat"
 
 REM Sets the exit code of the script to be 0
 exit /B 0
