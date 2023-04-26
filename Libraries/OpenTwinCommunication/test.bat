@@ -1,9 +1,26 @@
 @ECHO OFF
 
-ECHO Setting up environment
+REM This script requires the following environment variables to be set:
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 2. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
 
-rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
+)
+
+IF "%DEVENV_ROOT_2022%" == "" (
+	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
+	goto PAUSE_END
+)
+
+REM Setup eviroment
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Testing Project : OpenTwinCommunication
 
@@ -30,30 +47,28 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-
-
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\OpenTwinCommunication.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_COMMUNICATION_ROOT%\OpenTwinCommunication.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\x64\Debug\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\OpenTwinCommunicationDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\OpenTwinCommunicationDebugReport.xml" "OpenTwinCommunication" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\OpenTwinCommunicationDebugReport.xml"
+	"%OT_COMMUNICATION_ROOT%\x64\Debug\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationDebugReport.xml" "OpenTwinCommunication" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCommunicationDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\OpenTwinCommunication.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_COMMUNICATION_ROOT%\OpenTwinCommunication.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\x64\Release\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\OpenTwinCommunicationReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\OpenTwinCommunicationReleaseReport.xml" "OpenTwinCommunication" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\OpenTwinCommunicationReleaseReport.xml"
+	"%OT_COMMUNICATION_ROOT%\x64\Release\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationReleaseReport.xml" "OpenTwinCommunication" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCommunicationReleaseReport.xml"
 ) 
   
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
 :END
-
-
-
-
-
-
