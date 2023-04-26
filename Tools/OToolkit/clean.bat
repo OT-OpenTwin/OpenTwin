@@ -1,28 +1,42 @@
 @ECHO OFF
 
 REM This script requires the following environment variables to be set:
-REM 1. SIM_PLAT_ROOT
-REM 2. DEVENV_ROOT_2022
-IF "%SIM_PLAT_ROOT%" == "" (
-	ECHO Please specify the following environment variables: SIM_PLAT_ROOT
-	goto END
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
+
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
 )
 
 IF "%DEVENV_ROOT_2022%" == "" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
+	goto PAUSE_END
+)
+
+REM Setup eviroment
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Setting up environment
-
-rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
-
 ECHO Building Project
 
-RMDIR /S /Q "%SIM_PLAT_ROOT%\Tools\OToolkit\.vs"
-RMDIR /S /Q "%SIM_PLAT_ROOT%\Tools\OToolkit\x64"
-RMDIR /S /Q "%SIM_PLAT_ROOT%\Tools\OToolkit\packages"
+RMDIR /S /Q "%OT_OTOOLKIT_ROOT%\.vs"
+RMDIR /S /Q "%OT_OTOOLKIT_ROOT%\x64"
+RMDIR /S /Q "%OT_OTOOLKIT_ROOT%\packages"
+
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
 
 :END
-
