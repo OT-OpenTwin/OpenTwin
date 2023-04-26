@@ -94,17 +94,17 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_FOUNDATION_ROOT)\include;$(OT_MODELENTITIES_ROOT)\include;$(OT_DATASTORAGE_ROOT)\include;$(R_JSON_ROOT)\include;%CURL_INC%;$(UICORE_LIB_ROOT)\include;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(OT_GUI_INCD);$(OT_UICORE_INCD);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UIPLUGINAPI_API_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);%QDIR%\lib;%CURL_LIB%;$(OT_COMMUNICATION_ROOT)\x64\$(Configuration);$(OT_FOUNDATION_ROOT)\x64\$(Configuration);$(OT_DATASTORAGE_ROOT)\x64\$(Configuration);$(OT_MODELENTITIES_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;$(UICORE_LIB_ROOT)\x64\$(Configuration);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;DataStorage.lib;ModelEntities.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHD);$(OT_CORE_LIBPATHD);$(OT_GUI_LIBPATHD);$(OT_UICORE_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(OT_GUI_LIBD);$(OT_UICORE_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_FOUNDATION_ROOT)\include;$(OT_MODELENTITIES_ROOT)\include;$(OT_DATASTORAGE_ROOT)\include;$(R_JSON_ROOT)\include;%CURL_INC%;$(UICORE_LIB_ROOT)\include;$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(OT_GUI_INCD);$(OT_UICORE_INCD);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UIPLUGINAPI_API_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -114,17 +114,17 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_FOUNDATION_ROOT)\include;$(OT_MODELENTITIES_ROOT)\include;$(OT_DATASTORAGE_ROOT)\include;$(R_JSON_ROOT)\include;%CURL_INC%;$(UICORE_LIB_ROOT)\include;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(OT_GUI_INCR);$(OT_UICORE_INCR);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UIPLUGINAPI_API_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);%QDIR%\lib;%CURL_LIB%;$(OT_COMMUNICATION_ROOT)\x64\$(Configuration);$(OT_FOUNDATION_ROOT)\x64\$(Configuration);$(OT_DATASTORAGE_ROOT)\x64\$(Configuration);$(OT_MODELENTITIES_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;$(UICORE_LIB_ROOT)\x64\$(Configuration);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;DataStorage.lib;ModelEntities.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHR);$(OT_CORE_LIBPATHR);$(OT_GUI_LIBPATHR);$(OT_UICORE_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(OT_GUI_LIBR);$(OT_UICORE_LIBR);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_FOUNDATION_ROOT)\include;$(OT_MODELENTITIES_ROOT)\include;$(OT_DATASTORAGE_ROOT)\include;$(R_JSON_ROOT)\include;%CURL_INC%;$(UICORE_LIB_ROOT)\include;$(MONGO_C_ROOT)\Release\include;$(MONGO_CXX_ROOT)\Release\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(OT_GUI_INCR);$(OT_UICORE_INCR);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UIPLUGINAPI_API_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
