@@ -55,6 +55,8 @@ SET %1_TESTR=%3\test
 REM Library path
 SET %1_LIBPATHD=%3\x64\Debug
 SET %1_LIBPATHR=%3\x64\Release
+SET %1_LIBPATHDT=%3\x64\DebugTest
+SET %1_LIBPATHRT=%3\x64\ReleaseTest
 
 REM Library dependency / name
 REM SET %1_LIBD=%2d.lib
