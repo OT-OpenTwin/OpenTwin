@@ -39,24 +39,24 @@ REM 1: Name of the library in upper case letters and underscores as delimiter (e
 REM 2: Name of the library in CamelCase with the same name as the created binaries (<name>.dll) (e.g. "TestLib" will result in debug = "TestLibd.lib" and release = "TestLib.lib")
 REM 3: Path to the library root folder without '\' suffix (e.g. "X:\testlib" will be set as root path)
 REM See contents of Scripts/SetLibraryEnv.bat for further information
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_AUTHORISATION_SERVICE AuthorisationService %OPENTWIN_DEV_ROOT%\Services\AuthorisationService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_MODEL_SERVICE Model %OPENTWIN_DEV_ROOT%\Services\Model
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GLOBAL_SESSION_SERVICE GlobalSessionService %OPENTWIN_DEV_ROOT%\Services\GlobalSessionService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_LOCAL_SESSION_SERVICE SessionService %OPENTWIN_DEV_ROOT%\Services\SessionService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GLOBAL_DIRECTORY_SERVICE GlobalDirectoryService %OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_LOCAL_DIRECTORY_SERVICE LocalDirectoryService %OPENTWIN_DEV_ROOT%\Services\LocalDirectoryService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_RELAY_SERVICE RelayService %OPENTWIN_DEV_ROOT%\Services\RelayService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_LOGGER_SERVICE LoggerService %OPENTWIN_DEV_ROOT%\Services\LoggerService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_PHREEC_SERVICE PHREECService %OPENTWIN_DEV_ROOT%\Services\PHREECService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_KRIGING_SERVICE KrigingService %OPENTWIN_DEV_ROOT%\Services\KrigingService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_MODELING_SERVICE ModelingService %OPENTWIN_DEV_ROOT%\Services\ModelingService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_VISUALIZATION_SERVICE VisualizationService %OPENTWIN_DEV_ROOT%\Services\VisualizationService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_FITTD_SERVICE FITTDService %OPENTWIN_DEV_ROOT%\Services\FITTDService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_CARTESIAN_MESH_SERVICE CartesianMeshService %OPENTWIN_DEV_ROOT%\Services\CartesianMeshService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_TET_MESH_SERVICE TetMeshService %OPENTWIN_DEV_ROOT%\Services\TetMeshService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_IMPORT_PARAMETERIZED_DATA_SERVICE ImportParameterizedData %OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GETDP_SERVICE GetDPService %OPENTWIN_DEV_ROOT%\Services\GetDPService
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GLOBAL_DIRECTORY_SERVICE GlobalDirectoryService %OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_AUTHORISATION_SERVICE AuthorisationService %OPENTWIN_DEV_ROOT%\Services\AuthorisationService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_MODEL_SERVICE Model %OPENTWIN_DEV_ROOT%\Services\Model
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_GLOBAL_SESSION_SERVICE GlobalSessionService %OPENTWIN_DEV_ROOT%\Services\GlobalSessionService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_LOCAL_SESSION_SERVICE SessionService %OPENTWIN_DEV_ROOT%\Services\SessionService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_GLOBAL_DIRECTORY_SERVICE GlobalDirectoryService %OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_LOCAL_DIRECTORY_SERVICE LocalDirectoryService %OPENTWIN_DEV_ROOT%\Services\LocalDirectoryService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_RELAY_SERVICE RelayService %OPENTWIN_DEV_ROOT%\Services\RelayService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_LOGGER_SERVICE LoggerService %OPENTWIN_DEV_ROOT%\Services\LoggerService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_PHREEC_SERVICE PHREECService %OPENTWIN_DEV_ROOT%\Services\PHREECService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_KRIGING_SERVICE KrigingService %OPENTWIN_DEV_ROOT%\Services\KrigingService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_MODELING_SERVICE ModelingService %OPENTWIN_DEV_ROOT%\Services\ModelingService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_VISUALIZATION_SERVICE VisualizationService %OPENTWIN_DEV_ROOT%\Services\VisualizationService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_FITTD_SERVICE FITTDService %OPENTWIN_DEV_ROOT%\Services\FITTDService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_CARTESIAN_MESH_SERVICE CartesianMeshService %OPENTWIN_DEV_ROOT%\Services\CartesianMeshService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_TET_MESH_SERVICE TetMeshService %OPENTWIN_DEV_ROOT%\Services\TetMeshService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_IMPORT_PARAMETERIZED_DATA_SERVICE ImportParameterizedData %OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_GETDP_SERVICE GetDPService %OPENTWIN_DEV_ROOT%\Services\GetDPService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_GLOBAL_DIRECTORY_SERVICE GlobalDirectoryService %OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library paths
@@ -85,6 +85,15 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_RUBBERBAND Rubberb
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_UICORE uiCore %OPENTWIN_DEV_ROOT%\Libraries\uiCore
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_UIPLUGINAPI UIPluginAPI %OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_VIEWER Viewer %OPENTWIN_DEV_ROOT%\Libraries\Viewer
+
+REM #########################################################################################################################################################################################################################################################################################################################################################################################
+REM OpenTwin tools paths
+REM Call the batch file with the following arguments:
+REM 1: Name of the library in upper case letters and underscores as delimiter (e.g. "TEST_LIB" will result in "TEST_LIB_ROOT"; "TEST_LIB_INCD"; ...)
+REM 2: Name of the library in CamelCase with the same name as the created binaries (<name>.dll) (e.g. "TestLib" will result in debug = "TestLibd.lib" and release = "TestLib.lib")
+REM 3: Path to the library root folder without '\' suffix (e.g. "X:\testlib" will be set as root path)
+REM See contents of Scripts/SetLibraryEnv.bat for further information
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_OTOOLKIT OToolkit %OPENTWIN_DEV_ROOT%\Tools\OToolkit
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
