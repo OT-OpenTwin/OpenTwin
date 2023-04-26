@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
@@ -29,7 +28,6 @@
     <ClCompile Include="src\UiTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Third_Party_Libraries\base64\base64.h" />
     <ClInclude Include="include\OpenTwinCommunication\ActionTypes.h" />
     <ClInclude Include="include\OpenTwinCommunication\CommunicationAPIExport.h" />
     <ClInclude Include="include\OpenTwinCommunication\CommunicationTypes.h" />
@@ -119,7 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(R_JSON_INCD);$(CURL_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
     </ClCompile>
@@ -127,8 +125,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);%CURL_LIB%;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;%CURL_LIB%\libCurl.lib;zlibd.lib;Userenv.lib;Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHD);$(OT_CORE_LIBPATHD);$(CURL_LIBPATHD);$(MONGO_C_LIBPATHD);$(MONGO_CXX_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(CURL_LIBD);$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -140,7 +138,7 @@
       <PreprocessorDefinitions>_DEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include;%CURL_INC%;$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(R_JSON_INCD);$(CURL_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
     </ClCompile>
@@ -166,7 +164,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(R_JSON_INCR);$(CURL_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
     </ClCompile>
@@ -176,8 +174,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);%CURL_LIB%;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;%CURL_LIB%\libCurl.lib;zlib.lib;Userenv.lib;Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHR);$(OT_CORE_LIBPATHR);$(CURL_LIBPATHR);$(MONGO_C_LIBPATHR);$(MONGO_CXX_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(CURL_LIBR);$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -191,7 +189,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include;%CURL_INC%;$(MONGO_C_ROOT)\Release\include;$(MONGO_CXX_ROOT)\Release\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(R_JSON_INCR);$(CURL_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
     </ClCompile>
