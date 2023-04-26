@@ -275,7 +275,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(OT_COMMUNICATION_INCD);$(OT_DATASTORAGE_INCD);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <MinimalRebuild />
@@ -284,8 +284,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(OT_COMMUNICATION_LIBD);$(OT_DATASTORAGE_LIBD);$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHD);$(OT_CORE_LIBPATHD);$(OT_COMMUNICATION_LIBPATHD);$(OT_DATASTORAGE_LIBPATHD);$(MONGO_C_LIBPATHD);$(MONGO_CXX_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -300,7 +300,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(OT_COMMUNICATION_INCD);$(OT_DATASTORAGE_INCD);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
     </ClCompile>
@@ -323,15 +323,15 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(OT_COMMUNICATION_INCR);$(OT_DATASTORAGE_INCR);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\x64\$(Configuration);$(OT_CORE_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(OT_COMMUNICATION_LIBR);$(OT_DATASTORAGE_LIBR);$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHR);$(OT_CORE_LIBPATHR);$(OT_COMMUNICATION_LIBPATHR);$(OT_DATASTORAGE_LIBPATHR);$(MONGO_C_LIBPATHR);$(MONGO_CXX_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -346,7 +346,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%R_JSON_ROOT%\include\;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(MONGO_C_ROOT)\Release\include;$(MONGO_CXX_ROOT)\Release\include;$(MONGO_BOOST_ROOT);$(ProjectDir)Include;%(AdditionalIncludeDirectories);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(OT_COMMUNICATION_INCR);$(OT_DATASTORAGE_INCR);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

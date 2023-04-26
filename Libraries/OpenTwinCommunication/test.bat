@@ -3,7 +3,7 @@
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
-REM 2. DEVENV_ROOT_2022
+REM 3. DEVENV_ROOT_2022
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
 	goto PAUSE_END
@@ -51,18 +51,18 @@ IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_COMMUNICATION_ROOT%\OpenTwinCommunication.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OT_COMMUNICATION_ROOT%\x64\Debug\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationDebugReport.xml"
+	"%OT_COMMUNICATION_ROOT%\x64\Debug\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCommunicationDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationDebugReport.xml" "OpenTwinCommunication" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCommunicationDebugReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCommunicationDebugReport.xml" "OpenTwinCommunication" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCommunicationDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_COMMUNICATION_ROOT%\OpenTwinCommunication.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OT_COMMUNICATION_ROOT%\x64\Release\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationReleaseReport.xml"
+	"%OT_COMMUNICATION_ROOT%\x64\Release\OpenTwinCommunicationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCommunicationReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OpenTwinCommunicationReleaseReport.xml" "OpenTwinCommunication" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCommunicationReleaseReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCommunicationReleaseReport.xml" "OpenTwinCommunication" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCommunicationReleaseReport.xml"
 ) 
   
 GOTO END

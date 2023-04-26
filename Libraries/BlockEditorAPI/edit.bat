@@ -1,27 +1,36 @@
 @ECHO OFF
 
 REM This script requires the following environment variables to be set:
-REM 1. SIM_PLAT_ROOT
-REM 2. DEVENV_ROOT_2022
-IF "%SIM_PLAT_ROOT%" == "" (
-	ECHO Please specify the following environment variables: SIM_PLAT_ROOT
-	goto END
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
+
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
 )
 
 IF "%DEVENV_ROOT_2022%" == "" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
-	goto END
+	goto PAUSE_END
 )
 
-ECHO Setting up envi1ronment
-
 REM Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\BlockEditorAPI\BlockEditorAPI.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_BLOCKEDITORAPI_ROOT%\BlockEditorAPI.vcxproj"
+
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
 
 :END
-
