@@ -129,8 +129,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies> $(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -182,8 +182,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+	  $(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>;$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,9 +1,9 @@
-@ECHO OFF
+@ECHO ON
 
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Testing Project : AuthorisationService
 
@@ -34,20 +34,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\AuthorisationService\AuthorisationService.vcxproj" %TYPE% "DebugTest|x64" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\AuthorisationService.vcxproj" %TYPE% "DebugTest|x64" 
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\AuthorisationService\x64\Debug\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\AuthorisationServiceDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\AuthorisationServiceDebugReport.xml" "AuthorisationService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\AuthorisationServiceDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\x64\Debug\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml" "AuthorisationService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\AuthorisationServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\AuthorisationService\AuthorisationService.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\AuthorisationService.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\AuthorisationService\x64\Release\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\AuthorisationServiceReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\AuthorisationServiceReleaseReport.xml" "AuthorisationService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\AuthorisationServiceReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\x64\Release\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml" "AuthorisationService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\AuthorisationServiceReleaseReport.xml"
 ) 
   
 :END
