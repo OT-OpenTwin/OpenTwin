@@ -23,17 +23,18 @@ IF "%QtMsBuild%"=="" (
 	goto END
 )
 
+REM ====================================================================
+REM Preparations for the build process 
+REM ====================================================================
 
 REM Setup eviroment
-
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
-cd /D "%OPENTWIN_DEV_ROOT%\Scripts"
-
 REM Create the certificates if necessary 
-cd CreateCertificates
-CALL createCertificates.bat
-cd ..
+cd /D "%OPENTWIN_DEV_ROOT%\Certificates\CreateMissingCertificates"
+CALL CreateMissingCertificates.bat
+
+cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 
 REM Clean up the build logs 
 
@@ -60,17 +61,17 @@ DEL RUSTbuildLog.txt
 DEL AdminPanel_buildLog.txt
 
 REM ====================================================================
-REM Build the key generator 
+REM Build the key generator and the encryption key, if needed
 REM ====================================================================
 
 ECHO ===============================================================
 ECHO Build Key Generator 
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Microservices\KeyGenerator\build.bat" RELEASE REBUILD 
+CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\build.bat" RELEASE REBUILD 
 
-IF NOT EXIST "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\encryptionKey.h" (
+IF NOT EXIST "%OPENTWIN_DEV_ROOT%\Certificates\Generated\encryptionKey.h" (
 	ECHO Updating header file 
-	CALL "%OPENTWIN_DEV_ROOT%\Microservices\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\encryptionKey.h"
+	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OPENTWIN_DEV_ROOT%\Certificates\Generated\encryptionKey.h"
 )
 
 REM ====================================================================
@@ -80,57 +81,57 @@ REM ====================================================================
 ECHO ===============================================================
 ECHO Build Library: OpenTwinSystem
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem\build.bat" %1 %2
+CALL "%OT_SYSTEM_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: OpenTwinCore
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore\build.bat" %1 %2
+CALL "%OT_CORE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: OTGui
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTGui\build.bat" %1 %2
+CALL "%OT_GUI_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: OpenTwinCommunications
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication\build.bat" %1 %2
+CALL "%OT_COMMUNICATION_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: BlockEditorAPI
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI\build.bat" %1 %2
+CALL "%OT_BLOCKEDITORAPI_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: BlockEditor
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\BlockEditor\build.bat" %1 %2
+CALL "%OT_BLOCKEDITOR_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: DataStorage
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\DataStorage\build.bat" %1 %2
+CALL "%OT_DATASTORAGE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: ModelEntities
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\ModelEntities\build.bat" %1 %2
+CALL "%OT_MODELENTITIES_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: CADModelEntities
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\CADModelEntities\build.bat" %1 %2
+CALL "%OT_CADMODELENTITIES_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: ServiceFoundation
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation\build.bat" %1 %2
+CALL "%OT_FOUNDATION_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: uiCore
 ECHO ===============================================================
-CALL "%UICORE_LIB_ROOT%\build.bat" %1 %2
+CALL "%OT_UICORE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: UI Plugin API
@@ -140,27 +141,27 @@ CALL "%OT_UIPLUGINAPI_ROOT%\build.bat" %1 %2
 ECHO ===============================================================
 ECHO Build Library: RubberbandEngine: Core
 ECHO ===============================================================
-CALL "%RUBBERBAND_ENGINE_CORE%\build.bat" %1 %2
+CALL "%OT_RUBBERBANDAPI_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: RubberbandEngine: osg Wrapper
 ECHO ===============================================================
-CALL "%RUBBERBAND_ENGINE_OSG%\build.bat" %1 %2
+CALL "%OT_RUBBERBAND_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: QWT Wrapper
 ECHO ===============================================================
-CALL "%QWT_WRAPPER%\build.bat" %1 %2
+CALL "%OT_QWTWRAPPER_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: Viewer
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\Viewer\build.bat" %1 %2
+CALL "%OT_VIEWER_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Microservice Launcher: OpenTwin
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Microservices\OpenTwin\build.bat" %1 %2 > RUSTbuildLog.txt
+CALL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\build.bat" %1 %2 > RUSTbuildLog.txt
 
 REM ====================================================================
 REM Build the services
@@ -169,87 +170,87 @@ REM ====================================================================
 ECHO ===============================================================
 ECHO Build Service: Model
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\Model\build.bat" %1 %2
+CALL "%OT_MODEL_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: GlobalSessionService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\GlobalSessionService\build.bat" %1 %2
+CALL "%OT_GLOBAL_SESSION_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: LocalSessionService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\SessionService\build.bat" %1 %2
+CALL "%OT_LOCAL_SESSION_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: GlobalDirectoryService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\GlobalDirectoryService\build.bat" %1 %2
+CALL "%OT_GLOBAL_DIRECTORY_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: LocalDirectoryService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\LocalDirectoryService\build.bat" %1 %2
+CALL "%OT_LOCAL_DIRECTORY_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: RelayService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\RelayService\build.bat" %1 %2
+CALL "%OT_RELAY_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: LoggerService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\LoggerService\build.bat" %1 %2
+CALL "%OT_LOGGER_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: AuthorisationService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\AuthorisationService\build.bat" %1 %2
+CALL "%OT_AUTHORISATION_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: PHREECService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\PHREECService\build.bat" %1 %2
+CALL "%OT_PHREEC_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: KrigingService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\KrigingService\build.bat" %1 %2
+CALL "%OT_KRIGING_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: ModelingService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\ModelingService\build.bat" %1 %2
+CALL "%OT_MODELING_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: VisualizationService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\VisualizationService\build.bat" %1 %2
+CALL "%OT_VISUALIZATION_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: FITTDService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\FITTDService\build.bat" %1 %2
+CALL "%OT_FITTD_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: CartesianMeshService
 ECHO ===============================================================
-CALL  "%OPENTWIN_DEV_ROOT%\Libraries\CartesianMeshService\build.bat" %1 %2
+CALL  "%OT_CARTESIAN_MESH_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: TetMeshService
 ECHO ===============================================================
-CALL  "%OPENTWIN_DEV_ROOT%\Libraries\TetMeshService\build.bat" %1 %2
+CALL  "%OT_TET_MESH_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: ImportParameterizedData
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\ImportParameterizedData\build.bat" %1 %2
+CALL "%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: GetDPService
 ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\GetDPService\build.bat" %1 %2
+CALL "%OT_GETDP_SERVICE_ROOT%\build.bat" %1 %2
 
 REM ====================================================================
 REM Build the executables
@@ -258,7 +259,7 @@ REM ====================================================================
 ECHO ===============================================================
 ECHO Build Executable: uiFrontend
 ECHO ===============================================================
-CALL "%UISERVICE_LIB_ROOT%\build.bat" %1 %2
+CALL "%OT_UI_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Executable: OToolkit
@@ -268,19 +269,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\build.bat" %1 %2
 ECHO ====================================================================
 ECHO Build Admin Panel
 ECHO ====================================================================
-PUSHD "%OPENTWIN_DEV_ROOT%\Microservices\AdminPanel"
-CALL "%OPENTWIN_DEV_ROOT%\Microservices\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\MasterBuild\AdminPanel_buildLog.txt"
+PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
+CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
 POPD
-
-REM ECHO ===============================================================
-REM ECHO Build Playground: UI_test - Executable
-REM ECHO ===============================================================
-REM CALL "%OPENTWIN_DEV_ROOT%\Playground\UI_test\build_exe.bat" %1 %2
-
-REM ECHO ===============================================================
-REM ECHO Build Playground: UI_test - DLL
-REM ECHO ===============================================================
-REM CALL "%OPENTWIN_DEV_ROOT%\Playground\UI_test\build_dll.bat" %1 %2
 
 REM ====================================================================
 REM Create the buildlog summary
