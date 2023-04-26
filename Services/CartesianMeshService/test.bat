@@ -3,7 +3,7 @@
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\set_env.bat"
 
 ECHO Testing Project : CartesianMeshService
 
@@ -34,20 +34,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\CartesianMeshService\CartesianMeshService.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\CartesianMeshService.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\CartesianMeshService\x64\Debug\CartesianMeshServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\CartesianMeshServiceDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\CartesianMeshServiceDebugReport.xml" "CartesianMeshService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\CartesianMeshServiceDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\x64\Debug\CartesianMeshServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\CartesianMeshServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\CartesianMeshServiceDebugReport.xml" "CartesianMeshService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\CartesianMeshServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\CartesianMeshService\CartesianMeshService.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\CartesianMeshService.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\CartesianMeshService\x64\Release\CartesianMeshServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\CartesianMeshServiceReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\CartesianMeshServiceReleaseReport.xml" "CartesianMeshService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\CartesianMeshServiceReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Libraries\CartesianMeshService\x64\Release\CartesianMeshServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\CartesianMeshServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\CartesianMeshServiceReleaseReport.xml" "CartesianMeshService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\CartesianMeshServiceReleaseReport.xml"
 ) 
   
 :END
