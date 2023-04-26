@@ -3,7 +3,7 @@
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\set_env.bat"
 
 ECHO Testing Project : FITTDService
 
@@ -33,20 +33,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\FITTDService\FITTDService.vcxproj" %TYPE% "DebugTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\FITTDService\FITTDService.vcxproj" %TYPE% "DebugTest|x64"
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\FITTDService\x64\Debug\FITTDServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\FITTDServiceDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\FITTDServiceDebugReport.xml" "FITTDService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\FITTDServiceDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\FITTDService\x64\Debug\FITTDServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\FITTDServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\FITTDServiceDebugReport.xml" "FITTDService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\FITTDServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\FITTDService\FITTDService.vcxproj" %TYPE% "ReleaseTest|x64" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\FITTDService\FITTDService.vcxproj" %TYPE% "ReleaseTest|x64" 
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\FITTDService\x64\Release\FITTDServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\FITTDServiceReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\FITTDServiceReleaseReport.xml" "FITTDService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\FITTDServiceReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\FITTDService\x64\Release\FITTDServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\FITTDServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\FITTDServiceReleaseReport.xml" "FITTDService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\FITTDServiceReleaseReport.xml"
 
 ) 
   
