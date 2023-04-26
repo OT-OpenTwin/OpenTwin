@@ -99,7 +99,7 @@
       <PreprocessorDefinitions>_DEBUG;OPENTWINFOUNDATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_MODELENTITIES_ROOT)\include;$(OT_DATASTORAGE_ROOT)\include;$(R_JSON_ROOT)\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(SIM_PLAT_ROOT)\Microservices\SSL_certificates;$(SIM_PLAT_ROOT)\Third_Party_Libraries\base64;$(OT_CADMODELENTITIES_ROOT)\include;$(OC_ROOT)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(OT_COMMUNICATION_INCD);$(OT_MODELENTITIES_INCD);$(OT_DATASTORAGE_INCD);$(R_JSON_INCD);$(CURL_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);$(BASE64_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild />
     </ClCompile>
@@ -183,7 +183,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c" />
     <ClCompile Include="src\ApplicationBase.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
@@ -200,7 +199,6 @@
     <ClCompile Include="src\UiPluginComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Third_Party_Libraries\base64\base64.h" />
     <ClInclude Include="include\OpenTwinFoundation\AbstractModelNotifier.h" />
     <ClInclude Include="include\OpenTwinFoundation\AbstractUiNotifier.h" />
     <ClInclude Include="include\OpenTwinFoundation\ApplicationBase.h" />
