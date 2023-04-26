@@ -43,6 +43,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_AUTHORISATION_SERV
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_CARTESIAN_MESH_SERVICE CartesianMeshService %OPENTWIN_DEV_ROOT%\Services\CartesianMeshService
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_FITTD_SERVICE FITTDService %OPENTWIN_DEV_ROOT%\Services\FITTDService
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GETDP_SERVICE GetDPService %OPENTWIN_DEV_ROOT%\Services\GetDPService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_GLOBAL_DIRECTORY_SERVICE GlobalDirectoryService %OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library paths
