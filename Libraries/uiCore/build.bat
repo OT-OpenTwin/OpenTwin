@@ -1,22 +1,26 @@
 @ECHO OFF
 
 REM This script requires the following environment variables to be set:
-REM 1. SIM_PLAT_ROOT
-REM 2. DEVENV_ROOT_2022
-IF "%SIM_PLAT_ROOT%" == "" (
-	ECHO Please specify the following environment variables: SIM_PLAT_ROOT
-	goto END
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
+
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
 )
 
 IF "%DEVENV_ROOT_2022%" == "" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
-	goto END
+	goto PAUSE_END
 )
 
-ECHO Setting up environment
-
-rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+REM Setup eviroment
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Building Project
 
@@ -45,13 +49,18 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\uiCore\uiCore.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_UICORE_ROOT%\uiCore.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\uiCore\uiCore.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_UICORE_ROOT%\uiCore.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
-:END
+GOTO END
 
+:PAUSE_END
+pause
+GOTO END
+
+:END

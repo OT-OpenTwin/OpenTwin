@@ -71,48 +71,6 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetLibraryEnv.bat" OT_VIEWER Viewer %OPE
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
-REM uiCore and uiWrapper Root Directory
-SET UICORE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\uiCore
-SET UISERVICE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\uiService
-
-REM RelayService Root Directory
-SET RELAYSERVICE_LIB_ROOT=%OPENTWIN_DEV_ROOT%\Services\RelayService
-
-REM #########################################################################################################################################################################################################################################################################################################################################################################################
-
-REM Set UI_CORE Project settings
-
-REM SET UICORE_PROJ_ENV_INC=%QDIR%\include\QtCore\; %QDIR%\include\QtGui\; %QDIR%\include\QtWidgets\; %QT_TT_ROOT%\include\; %R_JSON_ROOT%\include\; %CURL_INC%
-SET UICORE_PROJ_ENV_INC=%QDIR%\include\QtCore\; %QDIR%\include\QtGui\; %QDIR%\include\QtWidgets\; %QT_TT_ROOT%\include\; %R_JSON_ROOT%\include\;
-
-SET UICORE_ENV_INC=%UICORE_LIB_ROOT%\include; $(UICORE_PROJ_ENV_INC)
-
-REM SET UICORE_PROJ_ENV_LIB_ROOT=%QT_TT_ROOT%\src\TabToolbar\Release; %QDIR%\lib; %CURL_LIB%; %ZLIB_LIB%\Release\lib
-SET UICORE_PROJ_ENV_LIB_ROOT=%QT_TT_ROOT%\src\TabToolbar\Release; %QDIR%\lib;
-
-REM SET UICORE_PROJ_ENV_LIBD_ROOT=%QT_TT_ROOT%\src\TabToolbar\Debug; %QDIR%\lib; %CURL_LIB%; %ZLIB_LIB%\Debug\lib
-SET UICORE_PROJ_ENV_LIBD_ROOT=%QT_TT_ROOT%\src\TabToolbar\Debug; %QDIR%\lib;
-
-SET UICORE_ENV_LIB_ROOT=%UICORE_LIB_ROOT%\x64\Release;$(UICORE_PROJ_ENV_LIB_ROOT)
-SET UICORE_ENV_LIBD_ROOT=%UICORE_LIB_ROOT%\x64\Debug;$(UICORE_PROJ_ENV_LIBD_ROOT)
-
-REM SET UICORE_PROJ_ENV_LIB_INP=%QT_TT_ROOT%\src\TabToolbar\Release\TabToolbar.lib; %CURL_LIB%\libCurl.lib; zlib.lib
-SET UICORE_PROJ_ENV_LIB_INP=%QT_TT_ROOT%\src\TabToolbar\Release\TabToolbar.lib;
-
-REM SET UICORE_PROJ_ENV_LIBD_INP=%QT_TT_ROOT%\src\TabToolbar\Debug\TabToolbard.lib; %CURL_LIB%\libCurl.lib; zlibd.lib
-SET UICORE_PROJ_ENV_LIBD_INP=%QT_TT_ROOT%\src\TabToolbar\Debug\TabToolbard.lib;
-
-SET UICORE_ENV_LIB_INP=%UICORE_LIB_ROOT%\x64\Release\uiCore.lib; $(UICORE_PROJ_ENV_LIB_INP)
-SET UICORE_ENV_LIBD_INP=%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib; $(UICORE_PROJ_ENV_LIBD_INP)
-
-REM SET UICORE_ENV_DLL=%UICORE_LIB_ROOT%\x64\Release;%QT_TT_ROOT%\DLL;%CURL_DLL%; %ZLIB_LIB%
-SET UICORE_ENV_DLL=%UICORE_LIB_ROOT%\x64\Release;%QT_TT_ROOT%\DLL;
-
-REM SET UICORE_ENV_DLLD=%UICORE_LIB_ROOT%\x64\Debug;%QT_TT_ROOT%\src\TabToolbar\Debug\;
-SET UICORE_ENV_DLLD=%UICORE_LIB_ROOT%\x64\Debug;%QT_TT_ROOT%\src\TabToolbar\Debug\;%CURL_DLL%;%ZLIB_LIB%
-
-SET PATH=%OPENTWIN_DEV_ROOT%\Deployment;%PATH%
-
 REM HANDLING THE SSL CERTS
 
 IF DEFINED OPEN_TWIN_CERTS_PATH (
@@ -161,6 +119,9 @@ REM OpenTwin all services path
 SET OT_ALL_DLLD=%OT_BLOCKEDITOR_DLLD%;%OT_BLOCKEDITORAPI_DLLD%;%OT_CADMODELENTITIES_DLLD%;%OT_DATASTORAGE_DLLD%;%OT_MODELENTITIES_DLLD%;%OT_COMMUNICATION_DLLD%;%OT_CORE_DLLD%;%OT_FOUNDATION_DLLD%;%OT_SYSTEM_DLLD%;%OT_GUI_DLLD%;%OT_WIDGETS_DLLD%;%OT_QWTWRAPPER_DLLD%;%OT_RUBBERBANDAPI_DLLD%;%OT_RUBBERBAND_DLLD%;%OT_UICORE_DLLD%;%OT_UIPLUGINAPI_DLLD%;%OT_VIEWER_DLLD%;
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
+
+REM Add Deployment path to the 
+SET PATH=%OPENTWIN_DEV_ROOT%\Deployment;%PATH%
 
 REM Set the env defined at the end to ensure everything else was completed successfully
 SET OPENTWIN_DEV_ENV_DEFINED=1
