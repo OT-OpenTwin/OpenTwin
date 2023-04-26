@@ -13,8 +13,8 @@
 #pragma once
 
 // RBE header
-#include <rbeWrapper/rbeOsgWrapperDatatypes.h>
-#include <rbeCore/RubberbandEngine.h>
+#include "rbeWrapper/rbeOsgWrapperDatatypes.h"
+#include "rbeCore/RubberbandEngine.h"
 
 #include <osg/Array>
 #include <list>

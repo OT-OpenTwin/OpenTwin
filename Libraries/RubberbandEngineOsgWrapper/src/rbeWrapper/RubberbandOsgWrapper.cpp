@@ -13,14 +13,14 @@
 #include <stdafx.h>
 
 // RBE header
-#include <rbeWrapper/RubberbandOsgWrapper.h>
+#include "rbeWrapper/RubberbandOsgWrapper.h"
 
-#include <rbeCore/AbstractConnection.h>
-#include <rbeCore/LineConnection.h>
-#include <rbeCore/CircleConnection.h>
-#include <rbeCore/AbstractPoint.h>
-#include <rbeCore/rbeAssert.h>
-#include <rbeCore/NumericPoint.h>
+#include "rbeCore/AbstractConnection.h"
+#include "rbeCore/LineConnection.h"
+#include "rbeCore/CircleConnection.h"
+#include "rbeCore/AbstractPoint.h"
+#include "rbeCore/rbeAssert.h"
+#include "rbeCore/NumericPoint.h"
 
 // osg header
 #include <osg/StateSet>
