@@ -284,7 +284,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(OT_COMMUNICATION_LIBD);$(OT_DATASTORAGE_LIBD);$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(MONGO_C_LIBPATHD);$(MONGO_CXX_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
@@ -330,7 +330,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(OT_COMMUNICATION_LIBR);$(OT_DATASTORAGE_LIBR);$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(MONGO_C_LIBPATHR);$(MONGO_CXX_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>

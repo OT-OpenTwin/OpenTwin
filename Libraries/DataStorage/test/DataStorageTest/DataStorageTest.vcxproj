@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(GOOGLE_TEST_LIBPATHD)%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,7 +124,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(GOOGLE_TEST_LIBPATHR)%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
     </Link>

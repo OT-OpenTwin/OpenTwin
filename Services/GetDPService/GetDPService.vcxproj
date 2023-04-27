@@ -154,7 +154,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_LIBR);$(ZLIB_LIBR);$(OT_FOUNDATION_LIBR);Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(ZLIB_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
@@ -181,7 +181,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_LIBR);$(ZLIB_LIBR);$(OT_FOUNDATION_LIBR);Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(ZLIB_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>

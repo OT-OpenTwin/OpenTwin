@@ -85,7 +85,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(OT_GETDP_SERVICE_ROOT)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);$(OT_GETDP_SERVICE_LIBDT);$(GOOGLE_TEST_LIBD);$(OT_CADMODELENTITIES_LIBD)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBD);$(OT_GETDP_SERVICE_LIBDT);$(GOOGLE_TEST_LIBD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +121,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(OT_GETDP_SERVICE_LIBPATHRT);$(GOOGLE_TEST_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);$(OT_GETDP_SERVICE_LIBRT);$(GOOGLE_TEST_LIBR);$(OT_CADMODELENTITIES_LIBR)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBR);$(OT_GETDP_SERVICE_LIBRT);$(GOOGLE_TEST_LIBR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
