@@ -17,7 +17,7 @@ IF "%DEVENV_ROOT_2022%" == "" (
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Building Project
 

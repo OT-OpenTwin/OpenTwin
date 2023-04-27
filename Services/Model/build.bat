@@ -3,7 +3,7 @@
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Building Project
 
@@ -32,12 +32,12 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\Model\Model.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\Model\Model.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\Model\Model.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\Model\Model.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
 :END
