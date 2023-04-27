@@ -34,6 +34,19 @@ IF NOT "%OPENTWIN_THIRDPARTY_ENV_DEFINED%" == "1" (
 
 SET OT_ENCRYPTIONKEY_ROOT=%OPENTWIN_DEV_ROOT%\Certificates\Generated
 
+REM Set relative path variables
+
+SET OT_INCLUDE=include
+SET OT_SRC=src
+SET OT_DLLD=x64\Debug
+SET OT_DLLR=x64\Release
+SET OT_LIBD=x64\Debug
+SET OT_LIBR=x64\Release
+
+SET OT_TEST=test
+SET OT_LIBTESTD=\x64\DebugTest
+SET OT_LIBTESTR=\x64\ReleaseTest
+
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin services paths
 REM Call the batch file with the following arguments:
