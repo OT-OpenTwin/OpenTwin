@@ -6,7 +6,7 @@
 // Open Twin header
 #include "OpenTwinFoundation/UserCredentials.h"		// Corresponding header
 
-#include <encryptionKey.h>				// key header 
+#include "encryptionKey.h"				// key header 
 #include <cassert>
 
 // AK 
@@ -28,7 +28,7 @@ std::string ot::UserCredentials::encryptString(std::string data)
 	randomDataEncrypted[encryptedDataLength] = '\0';
 
 	for (int i = sizeof(int); i < encryptedDataLength; i++) {
-		randomDataEncrypted[i] = randomDataEncrypted[i] ^ key[(i-sizeof(int)) % (sizeof(key) / sizeof(int))];
+		randomDataEncrypted[i] = randomDataEncrypted[i] ^ ot::encryptionKey[(i-sizeof(int)) % (sizeof(ot::encryptionKey) / sizeof(int))];
 	}
 
 	int encoded_data_length = Base64encode_len(encryptedDataLength + 1);
@@ -63,7 +63,7 @@ std::string ot::UserCredentials::decryptString(std::string data)
 	}
 
 	for (unsigned int i = sizeof(int); i < originalLength * 2 + sizeof(int); i++) {
-		decoded_compressed_string[i] = decoded_compressed_string[i] ^ key[(i - sizeof(int)) % (sizeof(key) / sizeof(int))];
+		decoded_compressed_string[i] = decoded_compressed_string[i] ^ ot::encryptionKey[(i - sizeof(int)) % (sizeof(ot::encryptionKey) / sizeof(int))];
 	}
 
 	for (unsigned int i = 0; i < originalLength; i++) {
