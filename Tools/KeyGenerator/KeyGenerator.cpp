@@ -26,10 +26,15 @@ int main(int argc, char **argv)
 		std::cout << "Failed to open the file " << fileName << " ." << std::endl;
 		return -1;
 	}
+	
+	keyFile << "#pragma once" << std::endl << std::endl;
+	keyFile << "namespace ot {" << std::endl << std::endl;
 
-	keyFile << "const int keyLength = " << keyLength << ";" << std::endl;
+	keyFile << "\t//! @brief The length of the encryption key" << std::endl;
+	keyFile << "\tconst int encryptionKeyLength = " << keyLength << ";" << std::endl << std::endl;
 
-	keyFile << "const int key[] = {";
+	keyFile << "\t//! @brief OpenTwin encryption key" << std::endl;
+	keyFile << "\tconst int encryptionKey[] = {";
 	RandomNumberGeneratorCryptoSecure randomNumberGenerator; 
 	for (int i = 0; i < keyLength; i++) {
 		unsigned __int64 randomNumber = randomNumberGenerator.GetPositiveRandomInt64(255);
@@ -40,6 +45,8 @@ int main(int argc, char **argv)
 		}
 	}
 	keyFile << "};" << std::endl;
+
+	keyFile << "}" << std::endl;
 	keyFile.close();
 	
 	return 0;
