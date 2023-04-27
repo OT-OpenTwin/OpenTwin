@@ -21,7 +21,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%RELAYSERVICE_LIB_ROOT%\RelayService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_RELAY_SERVICE_ROOT%\RelayService.vcxproj"
 
 :END
 

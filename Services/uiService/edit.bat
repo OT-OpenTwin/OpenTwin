@@ -21,7 +21,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%DEVENV_ROOT_2022%\Services\uiService\uiService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_UI_SERVICE_ROOT%\uiService.vcxproj"
 
 :END
 
