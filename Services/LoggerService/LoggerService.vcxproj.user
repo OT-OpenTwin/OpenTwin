@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8090" "unused" "unused"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_LIBPATHD);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8090" "unknown" "unused"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug\;$(MONGO_C_ROOT)\Debug\bin;$(MONGO_CXX_ROOT)\Debug\bin;%CURL_DLLD%;%FTP_LIBCURL_ROOT%lib\dll-debug-x64;$(FTP_CLIENT_ROOT)Build\bin\Debug;%ZLIB_LIB%;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8090" "unknown" "unused"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_LIBPATHR);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8090" "unknown" "unused"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(MONGO_C_ROOT)\$(Configuration)\bin;$(MONGO_CXX_ROOT)\$(Configuration)\bin;%CURL_DLL%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release\;%FTP_LIBCURL_ROOT%lib\dll-release-x64;$(FTP_CLIENT_ROOT)Build\bin\Release;%ZLIB_LIB%\$(Configuration)\bin;;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>
