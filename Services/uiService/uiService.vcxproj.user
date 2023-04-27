@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=$(QtDllPath);$(OT_DEFAULT_SERVICE_DLLD);$(UICORE_ENV_DLLD);$(SIM_PLAT_ROOT)\Libraries\Viewer\x64\Debug\;%OSG_ROOT%\bin\Debug;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\x64\Debug\;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\x64\Debug\;$(OT_UIPLUGINAPI_ROOT)\x64\Debug;%FTP_LIBCURL_ROOT%lib\dll-debug-x64;$(FTP_CLIENT_ROOT)Build\bin\Debug;%ZLIB_LIB%;$(RUBBERBAND_ENGINE_CORE)\x64\Debug;$(RUBBERBAND_ENGINE_OSG)\x64\Debug;$(VTK_DLL)\Debug;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <LocalDebuggerEnvironment>PATH=$(QtDllPath);$(UICORE_ENV_DLLD);$(SIM_PLAT_ROOT)\Libraries\Viewer\x64\Debug\;%OSG_ROOT%\bin\Debug;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Debug\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Debug\;$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug\;$(OT_UIPLUGINAPI_ROOT)\x64\Debug;$(MONGO_C_ROOT)\Debug\bin;$(MONGO_CXX_ROOT)\Debug\bin;%CURL_DLLD%;%FTP_LIBCURL_ROOT%lib\dll-debug-x64;$(FTP_CLIENT_ROOT)Build\bin\Debug;%ZLIB_LIB%;$(RUBBERBAND_ENGINE_CORE)\x64\Debug;$(RUBBERBAND_ENGINE_OSG)\x64\Debug;$(VTK_DLL)\Debug;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerEnvironment>PATH=$(QtDllPath);$(UICORE_ENV_DLL);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Release\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Release;$(MONGO_C_ROOT)\Release\bin;$(MONGO_CXX_ROOT)\Release\bin;%CURL_DLL%;%FTP_LIBCURL_ROOT%lib\dll-release-x64;$(FTP_CLIENT_ROOT)Build\bin\Release;%OSG_ROOT%\bin\Release;%ZLIB_LIB%;$(VTK_DLL)\Release;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <LocalDebuggerEnvironment>PATH=$(QtDllPath);$(UICORE_ENV_DLL);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Release\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Release;$(MONGO_C_ROOT)\Release\bin;$(MONGO_CXX_ROOT)\Release\bin;%CURL_DLL%;%FTP_LIBCURL_ROOT%lib\dll-release-x64;$(FTP_CLIENT_ROOT)Build\bin\Release;%OSG_ROOT%\bin\Release;%ZLIB_LIB%;$(VTK_DLL)\Release;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments />
