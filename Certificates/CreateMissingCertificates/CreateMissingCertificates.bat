@@ -34,9 +34,9 @@ IF %REQUIRE_CERTIFICATE_GENERATION%==1 (
 	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server-key.pem"
 	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem"
 
-	cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+	"%CERT_CREATE_TOOLS%\cfssl.exe" gencert -initca ca-csr.json | "%CERT_CREATE_TOOLS%\cfssljson.exe" -bare ca
 
-	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=server server-csr.json | cfssljson -bare server
+	"%CERT_CREATE_TOOLS%\cfssl.exe" gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=server server-csr.json | "%CERT_CREATE_TOOLS%\cfssljson.exe" -bare server
 	
 	TYPE server.pem server-key.pem > certificateKeyFile.pem
 
