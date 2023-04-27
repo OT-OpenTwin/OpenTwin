@@ -69,10 +69,12 @@ ECHO Build Key Generator
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\build.bat" RELEASE REBUILD 
 
-IF NOT EXIST "%OPENTWIN_DEV_ROOT%\Certificates\Generated\encryptionKey.h" (
+IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h" (
 	ECHO Updating header file 
-	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OPENTWIN_DEV_ROOT%\Certificates\Generated\encryptionKey.h"
+	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h"
 )
+
+GOTO END
 
 REM ====================================================================
 REM Build the libraries 
