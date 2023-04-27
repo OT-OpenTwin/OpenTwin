@@ -1,9 +1,31 @@
 @ECHO OFF
 
-ECHO Setting up environment
+REM This script requires the following environment variables to be set:
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
 
-rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
+)
+
+IF "%DEVENV_ROOT_2022%" == "" (
+	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
+	goto PAUSE_END
+)
+
+REM Setup eviroment
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+	goto END
+)
 
 ECHO Testing Project : UIPluginTemplate
 
@@ -30,32 +52,28 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-
-
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\UIPluginTemplate\UIPluginTemplate.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Templates\UIPluginTemplate\UIPluginTemplate.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\UIPluginTemplate\x64\Debug\UIPluginTemplateTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\UIPluginTemplateDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\UIPluginTemplateDebugReport.xml" "UIPluginTemplate" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\UIPluginTemplateDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Templates\UIPluginTemplate\x64\Debug\UIPluginTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\UIPluginTemplateDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\UIPluginTemplateDebugReport.xml" "UIPluginTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\UIPluginTemplateDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\UIPluginTemplate\UIPluginTemplate.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Templates\UIPluginTemplate\UIPluginTemplate.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\UIPluginTemplate\x64\Release\UIPluginTemplateTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\UIPluginTemplateReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\UIPluginTemplateReleaseReport.xml" "UIPluginTemplate" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\UIPluginTemplateReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Templates\UIPluginTemplate\x64\Release\UIPluginTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\UIPluginTemplateReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\UIPluginTemplateReleaseReport.xml" "UIPluginTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\UIPluginTemplateReleaseReport.xml"
 ) 
   
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
 :END
-
-
-
-
-
-
-
-
