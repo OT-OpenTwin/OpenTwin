@@ -191,7 +191,7 @@ public:
 			numberChildBranches += child->getNumberOfBranches();
 		}
 
-		return max(1, numberChildBranches);
+		return std::max(1, numberChildBranches);
 	}
 
 	void removeChildrenFromScene(void);

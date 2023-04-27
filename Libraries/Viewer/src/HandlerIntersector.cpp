@@ -177,8 +177,8 @@ double HandlerIntersector::getSkewLinesDistance(const osg::Vec3d &r1, const osg:
 	double s = (d4321*d4331 - R2 * d3121) / den;
 	double t = (R1*d4331 - d4321 * d3121) / den;
 
-	t = max(0.0, min(1.0, t));
-	s = max(0.0, min(1.0, s));
+	t = std::max(0.0, std::min(1.0, t));
+	s = std::max(0.0, std::min(1.0, s));
 
 	osg::Vec3 dps = r1 + u1 * s;
 	osg::Vec3 dpt = v1 + u2 * t;
