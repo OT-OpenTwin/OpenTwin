@@ -51,8 +51,6 @@ ot::components::ModelComponent::~ModelComponent()
 	EntityBase::setUidGenerator(nullptr);
 }
 
-
-
 // #########################################################################################################
 
 // Model management
