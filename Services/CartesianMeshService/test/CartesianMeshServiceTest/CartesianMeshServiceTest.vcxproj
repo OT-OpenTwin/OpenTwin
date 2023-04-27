@@ -79,12 +79,12 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(SolutionDir)include; $(CARTESIAN_MESH_SERVICE_INCPATHD);$(OT_FOUNDATION_INCD);  $(OT_CADMODELENTITIES_INCD);$(EMBREE_INCD);$(CGAL_INCD);$(GMP_INCD);$(BOOST_INCD);$(OC_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(SolutionDir)include; $(CARTESIAN_MESH_SERVICE_INCPATHD);$(OT_FOUNDATION_ROOT)\$(OT_INC);  $(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EMBREE_INCD);$(CGAL_INCD);$(GMP_INCD);$(BOOST_INCD);$(OC_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(CARTESIAN_MESH_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(ZLIB_LIBPATHD);$(EMBREE_LIBPATHD);$(GMP_LIBPATHD);$(BOOST_LIBPATHD);$(OC_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(CARTESIAN_MESH_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(EMBREE_LIBPATHD);$(GMP_LIBPATHD);$(BOOST_LIBPATHD);$(OC_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies> $(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(GOOGLE_TEST_LIBD);CADModelEntities.lib;;$(ZLIB_LIBD);embree3.lib;libgmp-10.lib;TKBin.lib;TKBinL.lib;TKBinTObj.lib;TKBinXCAF.lib;TKBO.lib;TKBool.lib;TKBRep.lib;TKCAF.lib;TKCDF.lib;TKD3DHost.lib;TKDCAF.lib;TKDFBrowser.lib;TKDraw.lib;TKernel.lib;TKFeat.lib;TKFillet.lib;TKG2d.lib;TKG3d.lib;TKGeomAlgo.lib;TKGeomBase.lib;TKHLR.lib;TKIGES.lib;TKIVtk.lib;TKIVtkDraw.lib;TKLCAF.lib;TKMath.lib;TKMesh.lib;TKMeshVS.lib;TKOffset.lib;TKOpenGl.lib;TKPrim.lib;TKQADraw.lib;TKService.lib;TKShapeView.lib;TKShHealing.lib;TKStd.lib;TKStdL.lib;TKSTEP.lib;TKSTEP209.lib;TKSTEPAttr.lib;TKSTEPBase.lib;TKSTL.lib;TKTInspector.lib;TKTInspectorAPI.lib;TKTObj.lib;TKTObjDRAW.lib;TKToolsDraw.lib;TKTopAlgo.lib;TKTopTest.lib;TKTreeModel.lib;TKV3d.lib;TKVCAF.lib;TKView.lib;TKViewerTest.lib;TKVInspector.lib;TKVRML.lib;TKXCAF.lib;TKXDEDRAW.lib;TKXDEIGES.lib;TKXDESTEP.lib;TKXMesh.lib;TKXml.lib;TKXmlL.lib;TKXmlTObj.lib;TKXmlXCAF.lib;TKXSBase.lib;TKXSDRAW.lib;$(CARTESIAN_MESH_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -112,7 +112,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(SolutionDir)include; $(CARTESIAN_MESH_SERVICE_INCPATHR);$(OT_FOUNDATION_INCR);$(OT_CADMODELENTITIES_INCR);$(EMBREE_INCR);$(CGAL_INCR);$(GMP_INCR);$(BOOST_INCR);$(OC_INCR);$(GOOGLE_TEST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(SolutionDir)include; $(CARTESIAN_MESH_SERVICE_INCPATHR);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EMBREE_INCR);$(CGAL_INCR);$(GMP_INCR);$(BOOST_INCR);$(OC_INCR);$(GOOGLE_TEST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
@@ -120,7 +120,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(CARTESIAN_MESH_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(ZLIB_LIBPATHR);$(EMBREE_LIBPATHR);$(GMP_LIBPATHR);$(BOOST_LIBPATHR);$(OC_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(CARTESIAN_MESH_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(EMBREE_LIBPATHR);$(GMP_LIBPATHR);$(BOOST_LIBPATHR);$(OC_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies> $(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(GOOGLE_TEST_LIBR);$(CARTESIAN_MESH_SERVICE_LIBR);CADModelEntities.lib;;$(ZLIB_LIBR);embree3.lib;libgmp-10.lib;TKBin.lib;TKBinL.lib;TKBinTObj.lib;TKBinXCAF.lib;TKBO.lib;TKBool.lib;TKBRep.lib;TKCAF.lib;TKCDF.lib;TKD3DHost.lib;TKDCAF.lib;TKDFBrowser.lib;TKDraw.lib;TKernel.lib;TKFeat.lib;TKFillet.lib;TKG2d.lib;TKG3d.lib;TKGeomAlgo.lib;TKGeomBase.lib;TKHLR.lib;TKIGES.lib;TKIVtk.lib;TKIVtkDraw.lib;TKLCAF.lib;TKMath.lib;TKMesh.lib;TKMeshVS.lib;TKOffset.lib;TKOpenGl.lib;TKPrim.lib;TKQADraw.lib;TKService.lib;TKShapeView.lib;TKShHealing.lib;TKStd.lib;TKStdL.lib;TKSTEP.lib;TKSTEP209.lib;TKSTEPAttr.lib;TKSTEPBase.lib;TKSTL.lib;TKTInspector.lib;TKTInspectorAPI.lib;TKTObj.lib;TKTObjDRAW.lib;TKToolsDraw.lib;TKTopAlgo.lib;TKTopTest.lib;TKTreeModel.lib;TKV3d.lib;TKVCAF.lib;TKView.lib;TKViewerTest.lib;TKVInspector.lib;TKVRML.lib;TKXCAF.lib;TKXDEDRAW.lib;TKXDEIGES.lib;TKXDESTEP.lib;TKXMesh.lib;TKXml.lib;TKXmlL.lib;TKXmlTObj.lib;TKXmlXCAF.lib;TKXSBase.lib;TKXSDRAW.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -99,7 +99,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(ZLIB_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_FITTD_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_FITTD_SERVICE_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);$(GOOGLE_TEST_LIBD);$(OT_FITTD_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +136,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(ZLIB_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_FITTD_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_FITTD_SERVICE_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);$(GOOGLE_TEST_LIBR);$(OT_FITTD_SERVICE_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

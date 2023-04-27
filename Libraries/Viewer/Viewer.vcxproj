@@ -232,7 +232,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(OSG_INCD);$(QT_INC);$(QWTPOLAR_LIB_INCD);$(QWT_LIB_INCD);$(OT_RUBBERBANDAPI_INCD);$(OT_DATASTORAGE_INCD);$(OT_MODELENTITIES_INCD);$(OT_UICORE_INCD);$(OT_RUBBERBAND_INCD);$(OT_FOUNDATION_INCD);$(OT_COMMUNICATION_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(OSG_INCD);$(QT_INC);$(QWTPOLAR_LIB_INCD);$(QWT_LIB_INCD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_UICORE_ROOT)\$(OT_INC);$(OT_RUBBERBAND_ROOT)\$(OT_INC);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
     </ClCompile>
@@ -241,7 +241,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(OT_DATASTORAGE_LIBD);$(OT_RUBBERBANDAPI_LIBD);$(OT_RUBBERBAND_LIBD);$(OT_COMMUNICATION_LIBD);$(OT_FOUNDATION_LIBD);$(OT_MODELENTITIES_LIBD);$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(OSG_LIBD);$(QWT_LIB_LIBD);$(QWTPOLAR_LIB_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHD);$(OT_CORE_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_MODELENTITIES_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(OT_COMMUNICATION_LIBPATHD);$(OT_DATASTORAGE_LIBPATHD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_LIBPATHD);$(OT_RUBBERBAND_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -272,14 +272,14 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_INCR);$(OT_CORE_INCR);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCR);$(OSG_INCR);$(QT_INC);$(QWTPOLAR_LIB_INCR);$(QWT_LIB_INCR);$(OT_RUBBERBANDAPI_INCR);$(OT_DATASTORAGE_INCR);$(OT_MODELENTITIES_INCR);$(OT_UICORE_INCR);$(OT_RUBBERBAND_INCR);$(OT_FOUNDATION_INCR);$(OT_COMMUNICATION_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCR);$(OSG_INCR);$(QT_INC);$(QWTPOLAR_LIB_INCR);$(QWT_LIB_INCR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_UICORE_ROOT)\$(OT_INC);$(OT_RUBBERBAND_ROOT)\$(OT_INC);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(OT_DATASTORAGE_LIBR);$(OT_RUBBERBANDAPI_LIBR);$(OT_RUBBERBAND_LIBR);$(OT_COMMUNICATION_LIBR);$(OT_FOUNDATION_LIBR);$(OT_MODELENTITIES_LIBR);$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(OSG_LIBR);$(QWT_LIB_LIBR);$(QWTPOLAR_LIB_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHR);$(OT_CORE_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(OT_COMMUNICATION_LIBPATHR);$(OT_DATASTORAGE_LIBPATHR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_LIBPATHR);$(OT_RUBBERBAND_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

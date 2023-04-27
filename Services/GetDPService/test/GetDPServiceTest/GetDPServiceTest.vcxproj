@@ -79,12 +79,12 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_GETDP_SERVICE_INCDT);$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_INCD);$(GOOGLE_TEST_INCD);$(OT_CADMODELENTITIES_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_GETDP_SERVICE_INCDT);$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(GOOGLE_TEST_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_GETDP_SERVICE_LIBPATHDT);$(GOOGLE_TEST_LIBPATHD);$(OT_CADMODELENTITIES_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(OT_GETDP_SERVICE_ROOT)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);$(OT_GETDP_SERVICE_LIBDT);$(GOOGLE_TEST_LIBD);$(OT_CADMODELENTITIES_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -112,7 +112,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_GETDP_SERVICE_INCRT);$(OT_DEFAULT_SERVICE_INCR);$(OT_FOUNDATION_INCR);$(GOOGLE_TEST_INCR);$(OT_CADMODELENTITIES_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_GETDP_SERVICE_INCRT);$(OT_DEFAULT_SERVICE_INCR);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(GOOGLE_TEST_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
@@ -120,7 +120,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_GETDP_SERVICE_LIBPATHRT);$(GOOGLE_TEST_LIBPATHR);$(OT_CADMODELENTITIES_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(OT_GETDP_SERVICE_LIBPATHRT);$(GOOGLE_TEST_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);$(OT_GETDP_SERVICE_LIBRT);$(GOOGLE_TEST_LIBR);$(OT_CADMODELENTITIES_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

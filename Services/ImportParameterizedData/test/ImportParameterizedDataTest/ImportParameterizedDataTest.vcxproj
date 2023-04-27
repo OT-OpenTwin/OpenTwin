@@ -82,7 +82,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
       <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
@@ -91,7 +91,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_IMPORT_PARAMETERIZED_DATA_SERVICE_LIBPATHDT);%(AdditionalIncludeDirectories); </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(GOOGLE_TEST_LIBPATHD);$(OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT)\$(OT_LIBTESTD);%(AdditionalIncludeDirectories); </AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(GOOGLE_TEST_LIBD);ImportParameterizedData.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -120,7 +120,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
@@ -128,7 +128,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_IMPORT_PARAMETERIZED_DATA_SERVICE_LIBPATHRT);%(AdditionalIncludeDirectories); </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(GOOGLE_TEST_LIBPATHR);$(OT_IMPORT_PARAMETERIZED_DATA_SERVICE_LIBPATHRT);%(AdditionalIncludeDirectories); </AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(GOOGLE_TEST_LIBR);ImportParameterizedData.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

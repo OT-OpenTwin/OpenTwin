@@ -79,12 +79,12 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_GLOBAL_DIRECTORY_SERVICE_INCD)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_GLOBAL_DIRECTORY_SERVICE_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GLOBAL_DIRECTORY_SERVICE_LIBPATHDT)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GLOBAL_DIRECTORY_SERVICE_ROOT)\$(OT_LIBTESTD)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_GLOBAL_DIRECTORY_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -113,7 +113,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MinimalRebuild />
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCR);$(OT_GLOBAL_DIRECTORY_SERVICE_INCR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_DEFAULT_SERVICE_INCR);$(OT_GLOBAL_DIRECTORY_SERVICE_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

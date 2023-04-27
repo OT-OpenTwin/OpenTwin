@@ -79,12 +79,12 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_AUTHORISATION_SERVICE_INCD);$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_INCD);$(ZLIB_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_AUTHORISATION_SERVICE_ROOT)\$(OT_INC);$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(ZLIB_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(ZLIB_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_AUTHORISATION_SERVICE_LIBPATHDT); %(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_AUTHORISATION_SERVICE_ROOT)\$(OT_LIBTESTD); %(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD),$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);$(OT_AUTHORISATION_SERVICE_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -113,14 +113,14 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MinimalRebuild />
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_AUTHORISATION_SERVICE_INCR);$(OT_DEFAULT_SERVICE_INCR);$(OT_FOUNDATION_INCR);$(ZLIB_INCR);$(GOOGLE_TEST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_AUTHORISATION_SERVICE_ROOT)\$(OT_INC);$(OT_DEFAULT_SERVICE_INCR);$(OT_FOUNDATION_ROOT)\$(OT_INC);$(ZLIB_INCR);$(GOOGLE_TEST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(ZLIB_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_AUTHORISATION_SERVICE_LIBPATHRT); %(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_AUTHORISATION_SERVICE_LIBPATHRT); %(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR),$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);$(OT_AUTHORISATION_SERVICE_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
