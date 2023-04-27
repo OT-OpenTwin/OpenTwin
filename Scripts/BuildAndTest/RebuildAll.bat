@@ -70,11 +70,9 @@ ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\build.bat" RELEASE REBUILD 
 
 IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h" (
-	ECHO Updating header file 
+	ECHO Updating header file "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h"
 	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h"
 )
-
-GOTO END
 
 REM ====================================================================
 REM Build the libraries 
@@ -296,3 +294,11 @@ FIND %searchString% buildLog_Debug.txt buildLog_Release.txt > buildLog_Summary.t
 FIND """message"":" RUSTbuildLog.txt >> buildLog_Summary.txt
 
 EXIT /b 0
+
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
+:END
