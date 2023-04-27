@@ -131,7 +131,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_SYSTEM_ROOT)\$(OT_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -180,7 +180,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_SYSTEM_ROOT)\$(OT_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

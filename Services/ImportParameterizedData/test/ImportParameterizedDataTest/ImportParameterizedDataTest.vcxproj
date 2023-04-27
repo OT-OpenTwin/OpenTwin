@@ -92,7 +92,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(GOOGLE_TEST_LIBPATHD);$(OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT)\$(OT_LIBTESTD);%(AdditionalIncludeDirectories); </AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(GOOGLE_TEST_LIBD);ImportParameterizedData.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(GOOGLE_TEST_LIBD);ImportParameterizedData.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +129,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(GOOGLE_TEST_LIBPATHR);$(OT_IMPORT_PARAMETERIZED_DATA_SERVICE_LIBPATHRT);%(AdditionalIncludeDirectories); </AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(GOOGLE_TEST_LIBR);ImportParameterizedData.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(GOOGLE_TEST_LIBR);ImportParameterizedData.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>
