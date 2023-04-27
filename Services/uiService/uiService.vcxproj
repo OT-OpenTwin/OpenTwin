@@ -149,11 +149,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\ModelEntities\include;$(OT_UIPLUGINAPI_ROOT)\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITOR_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(QWTPOLAR_LIB_INCD);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(UICORE_ENV_LIBD_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\BlockEditor\x64\$(Configuration);$(OT_UIPLUGINAPI_ROOT)\x64\Debug;$(ZLIB_LIB)\Debug\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Debug;$(RUBBERBAND_ENGINE_OSG)\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(UICORE_ENV_LIBD_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLD);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLD);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND)/$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -162,11 +162,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\ModelEntities\include;$(OT_UIPLUGINAPI_ROOT)\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\Debug\include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITOR_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(QWTPOLAR_LIB_INCD);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(UICORE_ENV_LIBD_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Debug;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Debug;$(OT_UIPLUGINAPI_ROOT)\x64\Debug;$(MONGO_C_ROOT)\Debug\lib;$(MONGO_CXX_ROOT)\Debug\lib;$(ZLIB_LIB)\Debug\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Debug;$(RUBBERBAND_ENGINE_OSG)\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(UICORE_ENV_LIBD_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;OpenTwinLogger.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);%CURL_LIB%\libCurl.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLD);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLD);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND)/$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -175,11 +175,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;$(OT_UIPLUGINAPI_ROOT)\include;$(QWT_LIB_ROOT)\src;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_POLAR_LIB_ROOT)\src;$(Qt_INCLUDEPATH_);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITOR_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(QWTPOLAR_LIB_INCR);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(UICORE_ENV_LIB_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\BlockEditor\x64\$(Configuration);$(OT_UIPLUGINAPI_ROOT)\x64\Release;$(ZLIB_LIB)\Release\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Release;$(RUBBERBAND_ENGINE_OSG)\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(UICORE_ENV_LIB_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release\Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwt.lib;qwtpolar.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_VIEWER_ROOT)/$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLR);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_RUBBERBAND)/$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -188,11 +188,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;$(OT_UIPLUGINAPI_ROOT)\include;$(QWT_LIB_ROOT)\src;$(SIM_PLAT_ROOT)\Libraries\BlockEditorAPI\include;$(SIM_PLAT_ROOT)\Libraries\BlockEditor\include;$(QWT_POLAR_LIB_ROOT)\src;$(Qt_INCLUDEPATH_);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_INC);$(OT_BLOCKEDITOR_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(QWTPOLAR_LIB_INCR);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(UICORE_ENV_LIB_ROOT);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\Release;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\Release;$(OT_UIPLUGINAPI_ROOT)\x64\Release;$(MONGO_C_ROOT)\Release\lib;$(MONGO_CXX_ROOT)\Release\lib;$(ZLIB_LIB)\Release\lib;$(RUBBERBAND_ENGINE_CORE)\x64\Release;$(RUBBERBAND_ENGINE_OSG)\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(UICORE_ENV_LIB_INP);%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release\Viewer.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;OpenTwinLogger.lib;UIPluginAPI.lib;%CURL_LIB%\libCurl.lib;qwt.lib;qwtpolar.lib;$(Qt_LIBS_);DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_VIEWER_ROOT)/$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLR);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_RUBBERBAND)/$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
