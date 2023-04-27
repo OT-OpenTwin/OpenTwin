@@ -24,7 +24,7 @@ CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\KrigingService\KrigingService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_KRIGING_SERVICE_ROOT%\KrigingService.vcxproj"
 
 :END
 

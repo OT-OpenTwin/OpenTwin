@@ -21,7 +21,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\SettupEnvironment.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService\GlobalSessionService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_GLOBAL_SESSION_SERVICE_ROOT%\GlobalSessionService.vcxproj"
 
 :END
 

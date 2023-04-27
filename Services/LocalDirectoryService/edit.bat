@@ -25,6 +25,6 @@ CALL OpenTwin_set_up_services.bat
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LocalDirectoryService\LocalDirectoryService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_LOCAL_DIRECTORY_SERVICE_ROOT%\LocalDirectoryService.vcxproj"
 
 :END

@@ -21,7 +21,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Services\SetupEnvironment.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\FITTDService\FITTDService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_FITTD_SERVICE_ROOT%\FITTDService.vcxproj"
 
 :END
 

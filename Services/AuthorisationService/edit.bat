@@ -21,7 +21,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\AuthorisationService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_AUTHORISATION_SERVICE_ROOT%\AuthorisationService.vcxproj"
 
 :END
 

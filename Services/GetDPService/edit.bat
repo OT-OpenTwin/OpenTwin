@@ -21,7 +21,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\GetDPService\GetDPService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_GETDP_SERVICE_ROOT%\GetDPService.vcxproj"
 
 :END
 

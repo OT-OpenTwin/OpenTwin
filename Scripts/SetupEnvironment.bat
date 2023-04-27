@@ -66,7 +66,6 @@ SET OT_CARTESIAN_MESH_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\CartesianMeshSer
 SET OT_TET_MESH_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\TetMeshService
 SET OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData
 SET OT_GETDP_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\GetDPService
-SET OT_GLOBAL_DIRECTORY_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
 SET OT_UI_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\uiService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
