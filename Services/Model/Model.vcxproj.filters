@@ -33,7 +33,7 @@
     <ClCompile Include="src\MicroserviceAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c">
+    <ClCompile Include="$(BASE64_ROOT)\base64.c">
       <Filter>Third Party Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MicroserviceNotifier.cpp">
@@ -48,7 +48,7 @@
     <ClCompile Include="src\TableReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Third_Party_Libraries\tinyexpr\tinyexpr.c">
+    <ClCompile Include="$(EXPREVAL_ROOT)\tinyexpr.c">
       <Filter>Third Party Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GeometryOperations.cpp">
