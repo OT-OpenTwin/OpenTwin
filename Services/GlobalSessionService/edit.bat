@@ -16,7 +16,7 @@ IF "%DEVENV_ROOT_2022%" == "" (
 ECHO Setting up envi1ronment
 
 REM Setup eviroment
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SettupEnvironment.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Launching development enviroment
 
