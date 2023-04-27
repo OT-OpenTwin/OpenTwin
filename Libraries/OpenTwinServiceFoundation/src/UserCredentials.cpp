@@ -9,8 +9,8 @@
 #include "encryptionKey.h"				// key header 
 #include <cassert>
 
-// AK 
-#include "base64.h"
+// 
+#include <base64.h>
 
 std::string ot::UserCredentials::encryptString(std::string data)
 {

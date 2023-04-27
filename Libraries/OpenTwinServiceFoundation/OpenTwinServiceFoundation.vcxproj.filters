@@ -60,6 +60,9 @@
     <ClCompile Include="src\UiPluginComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+      <Filter>Third Party Libraries</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinFoundation\AbstractModelNotifier.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="include\OpenTwinFoundation\FoundationAPIExport.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
+      <Filter>Third Party Libraries</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
