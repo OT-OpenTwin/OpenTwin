@@ -183,7 +183,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c" />
+    <ClCompile Include="$(BASE64_ROOT)\base64.c" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\GmshMeshCreation.cpp" />
@@ -205,7 +205,7 @@
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Third_Party_Libraries\base64\base64.h" />
+    <ClInclude Include="$(BASE64_ROOT)\base64.h" />
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\GmshMeshCreation.h" />
     <ClInclude Include="include\MaterialManager.h" />
