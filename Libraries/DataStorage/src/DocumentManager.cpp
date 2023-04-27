@@ -317,9 +317,7 @@ namespace DataStorageAPI
 			}
 			else if(insertType == InsertType::FileStorage)
 			{
-				//std::cout << "Data Stored in File storage" << std::endl;
-				auto filePath = GetDocumentUsingFileStorage(filterQuery, projectionQuery);
-				response.setFilePath(filePath);
+				assert(0); // This storage is no longer supported (and was never really supported)
 			}
 			else if (insertType == InsertType::GridFS)
 			{
@@ -353,156 +351,10 @@ namespace DataStorageAPI
 			}
 			else
 			{
-				//std::cout << "The entire is Data Stored in File storage in json format. " << std::endl;
-
-				// No we need to get the id of the current item and search for this id as RefId in the FileStorage 
-				// Therefore we need to build a new filterQuery
-
-				auto results = response.getBsonResult().value();
-
-				auto doc_view = results.view();
-
-				std::map<std::string, bsoncxx::types::value> filterPairs;
-				filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("RefId", doc_view["_id"].get_oid()));
-
-				auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
-
-				auto filePath = GetDocumentUsingFileStorage(filterQuery, projectionQuery);
-
-				// Get file extension (.json or .bson)
-				std::string extension = filePath.substr(filePath.length() - 4);
-
-				// Read the entire content from the file to a string
-
-				if (extension == "json")
-				{
-					std::ifstream t(filePath);
-					std::stringstream buffer;
-					buffer << t.rdbuf();
-
-					response.setBsonResult(bsoncxx::from_json(buffer.str()));
-					response.setFilePath(filePath);
-				}
-				else if (extension == "bson")
-				{
-					std::ifstream t(filePath, std::ios::binary);
-
-					t.seekg(0, std::ios::end);
-					size_t length = t.tellg();
-					t.seekg(0, std::ios::beg);
-					
-					std::uint8_t *data = new std::uint8_t[length];
-					t.read((char *)data, length);
-
-					bsoncxx::document::value value(data, length, deleteData);
-
-					response.setBsonResult(value);
-					response.setFilePath(filePath);
-				}
-				else
-				{
-					assert(0); // Unknown file type
-				}
+				assert(0); // Unknown storage type
 			}
 		}
 		return response;
-	}
-
-	string DocumentManager::GetDocumentUsingFileStorage(BsonViewOrValue filterQuery, BsonViewOrValue projectionQuery)
-	{
-		DocumentAccessBase docAccess("Projects", "FileStorage");
-		auto response = docAccess.GetAllDocument(filterQuery, projectionQuery, 0);
-		if (response.begin() == response.end())
-			return "";
-
-		string filePath;
-		string refId;
-		unsigned long long entityId;
-		auto currentSiteId = ConnectionAPI::getInstance().getSiteId();
-		bool firstRecord = false;
-
-		for (auto docView : response)
-		{
-			auto siteId = docView["SiteId"].get_int32().value;
-			filePath = docView["FilePath"].get_utf8().value.to_string();
-			if (siteId == currentSiteId) {
-				std::cout << "Document is in same client location. No need to download via FTP" << std::endl;
-				return GetDocumentLocalFilePath(siteId, filePath);
-			}
-
-			if (!firstRecord)
-			{
-				refId = docView["RefId"].get_oid().value.to_string();
-				entityId = docView["EntityId"].get_int64().value;
-				firstRecord = true;
-			}
-		}
-
-		std::cout << "Document is not available in client location. Need to be downloaded via FTP" << std::endl;
-		auto relativeFilePath = GetDocumentUsingFTP(currentSiteId, filePath);
-		// Since the file is downloaded locally, the new path needs to be added to the file Storage collection. 
-		// So, next time you need not download via FTP
-		if (!relativeFilePath.empty())
-		{
-			auto entityIdVal = BsonValuesHelper::getInt64BsonValue(static_cast<int64_t>(entityId));
-			auto idVal = BsonValuesHelper::getOIdValue(refId);
-			auto storageData = Document{};
-			storageData.append(kvp("SiteId", currentSiteId),
-				kvp("RefId", idVal),
-				kvp("EntityId", entityIdVal),
-				kvp("FilePath", relativeFilePath));
-
-			docAccess.InsertDocument(storageData.extract(), false);
-		}
-		return relativeFilePath;
-	}
-
-	string DocumentManager::GetDocumentUsingFTP(int siteId, string sourcePath)
-	{
-		try
-		{
-			SystemDataAccess systemAccess("System", "Sites");
-			auto systemResult = systemAccess.GetSystemDetails(siteId);
-			if (systemResult.getSuccess())
-			{
-				auto docValue = *systemResult.getBsonResult();
-				auto docView = docValue.view();
-
-				auto networkPath = docView["NetworkPath"].get_utf8().value.to_string();
-				auto ftpServerPath = docView["FtpServerPath"].get_utf8().value.to_string();
-				auto userName = docView["UserName"].get_utf8().value.to_string();
-				auto password = docView["Password"].get_utf8().value.to_string();
-				auto docStoragePath = docView["DocStoragePath"].get_utf8().value.to_string();
-
-				CFTPClient FTPClient([](const std::string& strLogMsg) { std::cout << strLogMsg << std::endl; });
-				FTPClient.InitSession(ftpServerPath, 2121, userName, password, CFTPClient::FTP_PROTOCOL::FTP,
-					CFTPClient::SettingsFlag::ENABLE_LOG);
-
-				UniqueFileName unique;
-				auto destinationPath = unique.GetUniqueFilePathUsingDirectory(docStoragePath);
-				
-				std::cout << "Downloading of file started from " << ftpServerPath << sourcePath
-					<< " to " << destinationPath << std::endl;
-
-				if (FTPClient.DownloadFile(destinationPath, sourcePath))
-				{
-					std::cout << "The file was successfully downloaded" << std::endl;
-					destinationPath = destinationPath.substr(networkPath.length(), destinationPath.length() - 1);
-					return destinationPath;
-				}
-				else
-				{
-					std::cout << "Error while downloading the file" << std::endl;
-				}
-			}
-
-			return "";
-		}
-		catch (std::exception& e)
-		{
-			std::cout << e.what();
-			return "";
-		}
 	}
 
 	string DocumentManager::GetDocumentLocalFilePath(int siteId, string relativePath)

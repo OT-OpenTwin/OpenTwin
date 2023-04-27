@@ -82,13 +82,13 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(MONGO_CXX_ROOT)\Debug\include;$(MONGO_C_ROOT)\Debug\include;$(MONGO_BOOST_ROOT);$(R_JSON_ROOT)\include;$(FTP_CLIENT_ROOT)FTP;$(FTP_LIBCURL_ROOT)include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\DebugTest\;$(MONGO_CXX_ROOT)\Debug\lib;$(MONGO_C_ROOT)\Debug\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib;$(SolutionDir)$(Platform)\DebugTest\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHD);$(OT_CORE_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(GOOGLE_TEST_LIBPATHD)%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,7 +115,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(MONGO_CXX_ROOT)\Release\include;$(MONGO_C_ROOT)\Release\include;$(MONGO_BOOST_ROOT);$(R_JSON_ROOT)\include;$(FTP_CLIENT_ROOT)FTP;$(FTP_LIBCURL_ROOT)include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(OT_SYSTEM_INCD);$(OT_CORE_INCD);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
@@ -123,8 +123,8 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\ReleaseTest\;$(MONGO_CXX_ROOT)\Release\lib;$(MONGO_C_ROOT)\Release\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release;%(AdditionalLibraryDirectories);$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;OpenTwinCommunication.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_LIBPATHR);$(OT_CORE_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(GOOGLE_TEST_LIBPATHR)%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
     </Link>

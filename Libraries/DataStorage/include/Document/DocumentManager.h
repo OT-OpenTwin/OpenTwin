@@ -39,8 +39,6 @@ namespace DataStorageAPI
 		DataStorageResponse GetDocument(string collectionName, std::map<string, value> filterPairs, std::vector<string> columnNames,
 			bool includeDocumentId);
 
-		string GetDocumentUsingFileStorage(BsonViewOrValue filterQuery, BsonViewOrValue projectionQuery);
-		string GetDocumentUsingFTP(int siteId, string sourcePath);
 		static const int MaxDocumentLength = 16776216;
 
 	private:
