@@ -17,7 +17,9 @@ IF "%DEVENV_ROOT_2022%"=="" (
 	goto END
 )
 
-REM Setup eviroment
+REM ====================================================================
+REM Setup eviroment, shutdown services and delete existing libraries
+REM ====================================================================
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
@@ -67,12 +69,15 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\open_twin.exe"
 
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll"
 
-ECHO Delete Admin Service
+ECHO Delete Admin Panel 
 
 RMDIR /Q /S "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
 MKDIR "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
 
+REM ====================================================================
 REM  Copy libraries
+REM ====================================================================
+
 ECHO Copy libraries
 
 COPY "%OT_BLOCKEDITOR_DLLR%\BlockEditor.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
@@ -92,39 +97,48 @@ COPY "%OT_RUBBERBAND_DLLR%\RubberbandOsgWrapper.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_QWTWRAPPER_DLLR%\QwtWrapper.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_GUI_DLLR%\OTGui.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
+REM ====================================================================
 REM  Copy Services
+REM ====================================================================
+
 ECHO Copy Services
 
-COPY "%OPENTWIN_DEV_ROOT%\Services\Model\x64\Release\Model.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService\x64\Release\GlobalSessionService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\SessionService\x64\Release\SessionService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\x64\Release\GlobalDirectoryService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\LocalDirectoryService\x64\Release\LocalDirectoryService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%UISERVICE_LIB_ROOT%\x64\Release\uiFrontend.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%RELAYSERVICE_LIB_ROOT%\x64\Release\RelayService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\LoggerService\x64\Release\LoggerService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\x64\Release\AuthorisationService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\PHREECService\x64\Release\PHREECService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\KrigingService\x64\Release\KrigingService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\KrigingService\x64\Release\run.py" "%OPENTWIN_DEPLOYMENT_DIR%\Python"
-COPY "%OPENTWIN_DEV_ROOT%\Services\ModelingService\x64\Release\ModelingService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\VisualizationService\x64\Release\VisualizationService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\FITTDService\x64\Release\FITTDService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData\x64\Release\ImportParameterizedDataService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\x64\Release\CartesianMeshService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\x64\Release\TetMeshService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Services\GetDPService\x64\Release\GetDPService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_MODEL_SERVICE_DLLR%\Model.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_GLOBAL_SESSION_SERVICE_DLLR%\GlobalSessionService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_LOCAL_SESSION_SERVICE_DLLR%\SessionService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_GLOBAL_DIRECTORY_SERVICE_DLLR%\GlobalDirectoryService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_LOCAL_DIRECTORY_SERVICE_DLLR%\LocalDirectoryService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_UI_SERVICE_ROOT_DLLR%\uiFrontend.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_RELAY_SERVICE_DLLR%\RelayService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_LOGGER_SERVICE_DLLR%\LoggerService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_AUTHORISATION_SERVICE_DLLR%\AuthorisationService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_PHREEC_SERVICE_DLLR%\PHREECService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_KRIGING_SERVICE_DLLR%\KrigingService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_KRIGING_SERVICE_DLLR%\run.py" "%OPENTWIN_DEPLOYMENT_DIR%\Python"
+COPY "%OT_MODELING_SERVICE_DLLR%\ModelingService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_VISUALIZATION_SERVICE_DLLR%\VisualizationService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_FITTD_SERVICE_DLLR%\FITTDService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_DLLR%\ImportParameterizedDataService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_CARTESIAN_MESH_SERVICE_DLLR%\CartesianMeshService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_TET_MESH_SERVICE_DLLR%\TetMeshService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_GETDP_SERVICE_DLLR%\GetDPService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\OpenTwin\target\release\open_twin.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\open_twin.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 
+REM ====================================================================
 REM  Copy Tools
+REM ====================================================================
+
 ECHO Copy Tools
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\x64\Release\OToolkit.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
+REM ====================================================================
 REM  Copy Admin Panel
+REM ====================================================================
+
 ECHO Copy Admin Panel
-XCOPY /E /Q "%OPENTWIN_DEV_ROOT%\Microservices\AdminPanel\build\*.*" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\AdminPanel\Apache_config\.htaccess" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
-COPY /Y "%OPENTWIN_DEV_ROOT%\Microservices\AdminPanel\Apache_config\httpd.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf"
-COPY /Y "%OPENTWIN_DEV_ROOT%\Microservices\AdminPanel\Apache_config\httpd-ahssl.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra"
+XCOPY /E /Q "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build\*.*" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
+COPY "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\.htaccess" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
+COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf"
+COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd-ahssl.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra"
 

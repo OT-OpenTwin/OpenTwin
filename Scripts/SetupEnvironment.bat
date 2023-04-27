@@ -57,6 +57,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_TET_MESH_SERVICE T
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_IMPORT_PARAMETERIZED_DATA_SERVICE ImportParameterizedData %OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_GETDP_SERVICE GetDPService %OPENTWIN_DEV_ROOT%\Services\GetDPService
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_GLOBAL_DIRECTORY_SERVICE GlobalDirectoryService %OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Other\SetServiceEnv.bat" OT_UI_SERVICE uiService %OPENTWIN_DEV_ROOT%\Services\uiService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library paths

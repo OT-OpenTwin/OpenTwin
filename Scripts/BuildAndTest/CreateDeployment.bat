@@ -202,27 +202,24 @@ REM ===========================================================================
 REM Copy the build files
 REM ===========================================================================
 
-CALL "%OPENTWIN_DEV_ROOT%\MasterBuild\updateDeploymentLibrariesOnly.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UpdateDeploymentLibrariesOnly.bat"
 
-REM Python Microservice 
-REM COPY "%OPENTWIN_DEV_ROOT%\Microservices\FlaskFramework\dist\FlaskFramework.exe" "%OT_DEPLOYMENT_DIR%"
-
-REM Microservices Launcher
-XCOPY /S "%OPENTWIN_DEV_ROOT%\Microservices\Launcher\*.*" "%OT_DEPLOYMENT_DIR%"
+REM Launcher scripts
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\*.*" "%OT_DEPLOYMENT_DIR%"
 
 REM Copy the Password Encryption Tool
-XCOPY /S "%OPENTWIN_DEV_ROOT%\Microservices\PasswordEncryption\x64\Release\PasswordEncryption.exe" "%OT_DEPLOYMENT_DIR%"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Tools\PasswordEncryption\x64\Release\PasswordEncryption.exe" "%OT_DEPLOYMENT_DIR%"
 
 REM Copy the certificate creation tools
 XCOPY /S "%OPENTWIN_THIRDPARTY_ROOT%\CertificateCreation\*.*" "%OT_DEPLOYMENT_DIR%\Certificates"
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Certificates\CreateServerCertificates\*.*" "%OT_DEPLOYMENT_DIR%\Certificates"
 
 REM Copy the certificates
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\ca.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\server.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\server-key.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\ca-key.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
-COPY "%OPENTWIN_DEV_ROOT%\Microservices\SSL_certificates\certificateKeyFile.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server-key.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca-key.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem" "%OT_DEPLOYMENT_DIR%\Certificates"
 
 ECHO [Paths] > "%OT_DEPLOYMENT_DIR%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OT_DEPLOYMENT_DIR%\qt.conf"
