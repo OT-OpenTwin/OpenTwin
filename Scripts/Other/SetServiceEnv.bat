@@ -47,7 +47,8 @@ SET %1_TESTR=%3\test
 REM Binary path
 SET %1_DLLD=%3\x64\Debug
 SET %1_DLLR=%3\x64\Release
-
+SET %1_DLLD=%3\x64\DebugTest
+SET %1_DLLR=%3\x64\ReleaseTest
 GOTO END
 
 :INVALID_ARGS
