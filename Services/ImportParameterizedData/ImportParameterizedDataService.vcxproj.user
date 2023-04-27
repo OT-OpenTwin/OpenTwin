@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>$(SIM_PLAT_ROOT)\Microservices\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "1" "127.0.0.1:8099" "127.0.0.1:8093" "unused"</LocalDebuggerCommandArguments>
-    <LocalDebuggerEnvironment>PATH=$(QtDllPath);$(OT_DEFAULT_SERVICE_DLLD);%FTP_LIBCURL_ROOT%lib\dll-debug-x64;$(FTP_CLIENT_ROOT)Build\bin\Debug;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(QtDllPath);$(OT_DEFAULT_SERVICE_DLLD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">

@@ -3,7 +3,7 @@
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Testing Project : ServiceTemplate
 
@@ -34,20 +34,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\ServiceTemplate\x64\Debug\ServiceTemplateTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\ServiceTemplateDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\ServiceTemplateDebugReport.xml" "ServiceTemplate" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\ServiceTemplateDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\x64\Debug\ServiceTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateDebugReport.xml" "ServiceTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ServiceTemplateDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\ServiceTemplate\x64\Release\ServiceTemplateTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\ServiceTemplateReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\ServiceTemplateReleaseReport.xml" "ServiceTemplate" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\ServiceTemplateReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\x64\Release\ServiceTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateReleaseReport.xml" "ServiceTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ServiceTemplateReleaseReport.xml"
 ) 
   
 :END
