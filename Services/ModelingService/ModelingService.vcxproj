@@ -97,7 +97,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\include;$(OC_ROOT)\inc;$(RUBBERBAND_ENGINE_CORE)\include;$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_INCD);$(OC_INCD);$(OT_RUBBERBANDAPI_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -105,8 +105,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\x64\$(Configuration);$(OC_ROOT)\win64\vc14\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(ZLIB_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CadModelEntities.lib;RubberbandEngineCore.lib;$(CFG_OC_LIBS);zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_LIBPATHD);$(OC_LIBPATHD);$(RUBBERBAND_ENGINE_LIBPATHD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_CADMODELENTITIES_LIBD);$(OC_LIBD);$(RUBBERBAND_ENGINE_LIBD);$(ZLIB_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -118,7 +118,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\include;$(OC_ROOT)\inc;$(RUBBERBAND_ENGINE_CORE)\include;$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_INCD);$(OC_INCD);$(OT_RUBBERBANDAPI_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -126,8 +126,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\CADModelEntities\x64\$(Configuration);$(OC_ROOT)\win64\vc14\lib;$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;CADModelEntities.lib;RubberbandEngineCore.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;$(CFG_OC_LIBS);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_LIBPATHD);$(OC_LIBPATHD);$(RUBBERBAND_ENGINE_LIBPATHD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_CADMODELENTITIES_LIBD);$(OC_LIBD);$(RUBBERBAND_ENGINE_LIBD);$(ZLIB_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,7 +141,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\include;$(OC_ROOT)\inc;$(RUBBERBAND_ENGINE_CORE)\include;$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_INCR);$(OC_INCR);$(OT_RUBBERBANDAPI_INCR);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -151,8 +151,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\x64\$(Configuration);$(OC_ROOT)\win64\vc14\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(ZLIB_ROOT)\$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CadModelEntities.lib;RubberbandEngineCore.lib;$(CFG_OC_LIBS);zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_LIBPATHR);$(OC_LIBPATHR);$(RUBBERBAND_ENGINE_LIBPATHR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_LIBR);$(OC_LIBR);$(RUBBERBAND_ENGINE_LIBR);$(ZLIB_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -166,7 +166,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\include;$(OC_ROOT)\inc;$(RUBBERBAND_ENGINE_CORE)\include;$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_INCR);$(OC_INCR);$(OT_RUBBERBANDAPI_INCR);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -176,8 +176,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\CADModelEntities\x64\$(Configuration);$(OC_ROOT)\win64\vc14\lib;$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinLogger.lib;OpenTwinServiceFoundation.lib;DataStorage.lib;ModelEntities.lib;CADModelEntities.lib;RubberbandEngineCore.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;$(CFG_OC_LIBS);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_LIBPATHR);$(OC_LIBPATHR);$(RUBBERBAND_ENGINE_LIBPATHR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_LIBR);$(OC_LIBR);$(RUBBERBAND_ENGINE_LIBR);$(ZLIB_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
