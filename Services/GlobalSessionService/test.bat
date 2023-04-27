@@ -3,7 +3,7 @@
 ECHO Setting up environment
 
 rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 ECHO Testing Project : GlobalSessionService
 
@@ -34,20 +34,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\GlobalSessionService\GlobalSessionService.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService\GlobalSessionService.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%SIM_PLAT_ROOT%\Libraries\GlobalSessionService\x64\Debug\GlobalSessionServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\GlobalSessionServiceDebugReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\GlobalSessionServiceDebugReport.xml" "GlobalSessionService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\GlobalSessionServiceDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService\x64\Debug\GlobalSessionServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalSessionServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalSessionServiceDebugReport.xml" "GlobalSessionService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\GlobalSessionServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%SIM_PLAT_ROOT%\Libraries\GlobalSessionService\GlobalSessionService.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService\GlobalSessionService.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%SIM_PLAT_ROOT%\Libraries\GlobalSessionService\x64\Release\GlobalSessionServiceTest.exe" /Out --gtest_output="xml:%SIM_PLAT_ROOT%\MasterBuild\Reports\GlobalSessionServiceReleaseReport.xml"
-	CALL "%SIM_PLAT_ROOT%\Third_Party_Libraries\Python\set_paths_dev.bat"
-	python "%SIM_PLAT_ROOT%\MasterBuild\modifyXML.py" "%SIM_PLAT_ROOT%\MasterBuild\Reports\GlobalSessionServiceReleaseReport.xml" "GlobalSessionService" "%SIM_PLAT_ROOT%\MasterBuild\EditReports\GlobalSessionServiceReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService\x64\Release\GlobalSessionServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalSessionServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalSessionServiceReleaseReport.xml" "GlobalSessionService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\GlobalSessionServiceReleaseReport.xml"
 ) 
   
 :END

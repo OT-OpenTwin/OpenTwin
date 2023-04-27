@@ -79,13 +79,13 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%R_JSON_ROOT%\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_FOUNDATION_ROOT)\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_FOUNDATION_INCD);$(ZLIB_INCD);$(GOOGLE_TEST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(OT_COMMUNICATION_ROOT)\x64\$(Configuration);$(OT_FOUNDATION_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(SIM_PLAT_ROOT)\Libraries\GlobalSessionService\x64\DebugTest\;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;Userenv.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;wsock32.lib;GlobalSessionService.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_LIBPATHD);$(ZLIB_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalIncludeDirectories)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,15 +113,15 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MinimalRebuild />
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%R_JSON_ROOT%\include;$(OT_COMMUNICATION_ROOT)\include;$(OT_FOUNDATION_ROOT)\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_FOUNDATION_INCR);$(ZLIB_INCR);$(GOOGLE_TEST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(OT_COMMUNICATION_ROOT)\x64\$(Configuration);$(OT_FOUNDATION_ROOT)\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(SIM_PLAT_ROOT)\Libraries\GlobalSessionService\x64\ReleaseTest\;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%CURL_LIB%\libCurl.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;Userenv.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;wsock32.lib;GlobalSessionService.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_LIBPATHR);$(ZLIB_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalIncludeDirectories)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
