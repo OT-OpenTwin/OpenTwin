@@ -339,8 +339,8 @@ int MicroserviceAPI::init(const char * _localDirectoryServiceURL, const char * _
 			// Get file path
 			char * buffer = nullptr;
 			size_t bufferSize = 0;
-			if (_dupenv_s(&buffer, &bufferSize, "SIM_PLAT_ROOT") != 0 || buffer == nullptr) {
-				std::cout << "[ERROR] Please specify the environment variable \"SIM_PLAT_ROOT\"" << std::endl;
+			if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr) {
+				std::cout << "[ERROR] Please specify the environment variable \"OPENTWIN_DEV_ROOT\"" << std::endl;
 				return -20;
 			}
 			std::string path = buffer;

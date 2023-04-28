@@ -160,7 +160,7 @@ bool ot::msg::send(
 			if (!std::filesystem::exists(ca_cert_file))
 			{
 				// Get the development root environment variable and build the path to the deployment cert file
-				std::string dev_root = get_env_var("SIM_PLAT_ROOT");
+				std::string dev_root = get_env_var("OPENTWIN_DEV_ROOT");
 				ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
 			}
 		}

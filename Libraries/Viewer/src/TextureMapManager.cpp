@@ -35,7 +35,7 @@ osg::ref_ptr<osg::Texture2D> TextureMapManager::getTexture(std::string textureNa
 	fontPath.append(std::string("/Icons/Textures/" + textureName + ".jpg").c_str());
 	if (!QFile::exists(fontPath.c_str()))
 	{
-		fontPath = std::string(qgetenv("SIM_PLAT_ROOT")) + "/Libraries/Icons/Textures/" + textureName + ".jpg";
+		fontPath = std::string(qgetenv("OPENTWIN_DEV_ROOT")) + "/Assets/Icons/Textures/" + textureName + ".jpg";
 
 		if (!QFile::exists(fontPath.c_str())) {
 			assert(0); // Environment path does not exist aswell

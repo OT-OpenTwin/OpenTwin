@@ -62,8 +62,8 @@ std::string ot::ApplicationBase::deploymentPath(void) const {
 		return "";
 	}
 	size_t bufferSize = 100;
-	if (_dupenv_s(&buffer, &bufferSize, "SIM_PLAT_ROOT") != 0) {
-		std::cout << "[ERROR] Please specify the environment variable \"SIM_PLAT_ROOT\"" << std::endl;
+	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0) {
+		std::cout << "[ERROR] Please specify the environment variable \"OPENTWIN_DEV_ROOT\"" << std::endl;
 		return std::string();
 	}
 	std::string path = buffer;

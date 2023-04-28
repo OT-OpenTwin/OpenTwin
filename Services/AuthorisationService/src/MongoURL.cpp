@@ -34,7 +34,7 @@ std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::st
 			char buffer[4096];
 			size_t environmentVariableValueStringLength;
 
-			getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "SIM_PLAT_ROOT");
+			getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
 
 			std::string dev_root = std::string(buffer);
 			ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";

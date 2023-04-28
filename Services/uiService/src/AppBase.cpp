@@ -200,7 +200,7 @@ int AppBase::run() {
 		// Setup icon manager
 		int iconPathCounter{ 0 };
 #ifdef _DEBUG
-		try { uiAPI::addIconSearchPath(QString(qgetenv("SIM_PLAT_ROOT") + "\\Libraries\\Icons\\")); iconPathCounter++; }
+		try { uiAPI::addIconSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "\\Assets\\Icons\\")); iconPathCounter++; }
 #else
 		try { uiAPI::addIconSearchPath(".\\Icons\\"); iconPathCounter++; }
 #endif // _DEBUG
@@ -304,7 +304,7 @@ int AppBase::run() {
 		// Create plugin manager
 		m_uiPluginManager = new UiPluginManager(this);
 #ifdef _DEBUG
-		m_uiPluginManager->addPluginSearchPath(qgetenv("SIM_PLAT_ROOT") + "\\Deployment\\uiPlugins");
+		m_uiPluginManager->addPluginSearchPath(qgetenv("OPENTWIN_DEV_ROOT") + "\\Deployment\\uiPlugins");
 		//new DispatchableItemExample;
 #else
 		m_uiPluginManager->addPluginSearchPath(QDir::currentPath() + "\\uiPlugins");
@@ -1389,7 +1389,7 @@ void AppBase::createUi(void) {
 			fontPath.append("/fonts/Vera.ttf");
 			if (!QFile::exists(fontPath))
 			{
-				fontPath = qgetenv("SIM_PLAT_ROOT") + "/Libraries/Fonts/Vera.ttf";
+				fontPath = qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Fonts/Vera.ttf";
 				if (!QFile::exists(fontPath)) {
 					OT_LOG_E("Font does not exist: " + fontPath.toStdString());
 

@@ -49,7 +49,7 @@ WebsocketClient::WebsocketClient(const std::string &socketUrl) :
 		// Get the development root environment variable
 		std::cout << "Using development root certificate file" << std::endl;
 
-		caStr = QProcessEnvironment::systemEnvironment().value("SIM_PLAT_ROOT", "") + "\\Deployment\\Certificates\\ca.pem";
+		caStr = QProcessEnvironment::systemEnvironment().value("OPENTWIN_DEV_ROOT", "") + "\\Deployment\\Certificates\\ca.pem";
 	}
 	else
 	{

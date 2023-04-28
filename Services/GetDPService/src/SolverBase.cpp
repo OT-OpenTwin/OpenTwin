@@ -31,7 +31,7 @@ bool SolverBase::isPECMaterial(const std::string& materialName)
 
 void SolverBase::runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory)
 {
-	std::string exePath = readEnvironmentVariable("SIM_PLAT_ROOT");
+	std::string exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT");
 	if (exePath.empty())
 	{
 		// Get the path of the executable

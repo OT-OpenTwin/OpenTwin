@@ -124,8 +124,8 @@ extern "C"
 				// Get file path
 				char * buffer = new char[100];
 				size_t bufferSize = 100;
-				if (_dupenv_s(&buffer, &bufferSize, "SIM_PLAT_ROOT") != 0) {
-					OT_LOG_E("[ERROR] Please specify the environment variable \"SIM_PLAT_ROOT\"");
+				if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0) {
+					OT_LOG_E("[ERROR] Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
 					return -20;
 				}
 				std::string path = buffer;

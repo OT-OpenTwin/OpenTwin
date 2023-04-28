@@ -327,9 +327,9 @@ Configure the Environment
 Set the following Windows environment variables: 
 
 - ``DEVENV_ROOT_2022`` = The path to your Visual Studio 2022 installation (e.g.: ``C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE``)
-- ``SIM_PLAT_ROOT = X:\OpenTwin\Repo``
+- ``OPENTWIN_DEV_ROOT = X:\OpenTwin\Repo``
 
-The ``SIM_PLAT_ROOT`` environment variable must point to the directory that looks this:
+The ``OPENTWIN_DEV_ROOT`` environment variable must point to the directory that looks this:
 
 .. image:: images/repo_folders.jpg 
 

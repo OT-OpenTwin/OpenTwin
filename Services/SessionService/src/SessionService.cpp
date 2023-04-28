@@ -243,8 +243,8 @@ bool SessionService::runServiceInDebug(const std::string& _serviceName, const st
 
 	char * buffer = nullptr;
 	size_t bufferSize = 0;
-	if (_dupenv_s(&buffer, &bufferSize, "SIM_PLAT_ROOT") != 0 || buffer == nullptr) {
-		OT_LOG_E("Please specify the environment variable \"SIM_PLAT_ROOT\"");
+	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr) {
+		OT_LOG_E("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
 		return false;
 	}
 	std::string path = buffer;
@@ -287,8 +287,8 @@ bool SessionService::runRelayService(Session * _session, std::string & _websocke
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" in debug mode");
 		char * buffer = nullptr;
 		size_t bufferSize = 0;
-		if (_dupenv_s(&buffer, &bufferSize, "SIM_PLAT_ROOT") != 0 || buffer == nullptr) {
-			OT_LOG_E("Please specify the environment variable \"SIM_PLAT_ROOT\"");
+		if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr) {
+			OT_LOG_E("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
 			return false;
 		}
 		std::string path = buffer;
