@@ -179,7 +179,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_VIEWER_ROOT)\$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLR);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBAND_ROOT)/$(OT_DLLR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -192,7 +192,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_VIEWER_ROOT)/$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLR);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_RUBBERBAND_ROOT)/$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;UIPluginAPI.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
