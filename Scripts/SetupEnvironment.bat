@@ -123,8 +123,8 @@ SET OT_DEFAULT_SERVICE_LIBPATHR=%OT_CORE_ROOT%\%OT_LIBR%;%OT_SYSTEM_ROOT%\%OT_LI
 
 REM SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
 REM SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
-SET OT_DEFAULT_SERVICE_LIBD=%OT_CORE_LIBD%;%OT_SYSTEM_LIBD%;%OT_COMMUNICATION_LIBD%;%OT_FOUNDATION_LIBD%;%OT_MODELENTITIES_LIBD%;%OT_DATASTORAGE_LIBD%;%OT_UIPLUGINAPI_LIBD%;%CURL_LIBD%;%MONGO_C_LIBD%;%MONGO_CXX_LIBD%
-SET OT_DEFAULT_SERVICE_LIBR=%OT_CORE_LIBR%;%OT_SYSTEM_LIBR%;%OT_COMMUNICATION_LIBR%;%OT_FOUNDATION_LIBR%;%OT_MODELENTITIES_LIBR%;%OT_DATASTORAGE_LIBR%;%OT_UIPLUGINAPI_LIBR%;%CURL_LIBR%;%MONGO_C_LIBR%;%MONGO_CXX_LIBR%
+SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;UIPluginAPI.lib;%CURL_LIBD%;%MONGO_C_LIBD%;%MONGO_CXX_LIBD%
+SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;UIPluginAPI.lib;%CURL_LIBR%;%MONGO_C_LIBR%;%MONGO_CXX_LIBR%
 
 REM SET OT_DEFAULT_SERVICE_DLLD=%OT_CORE_ROOT%\x64\Debug;%OT_SYSTEM_ROOT%\x64\Debug;%OT_COMMUNICATION_ROOT%\x64\Debug;%OT_FOUNDATION_ROOT%\x64\Debug;%OT_MODELENTITIES_ROOT%\x64\Debug;%OT_DATASTORAGE_ROOT%\x64\Debug;%OT_UIPLUGINAPI_ROOT%\x64\Debug;%CURL_DLLD%;%MONGO_C_ROOT%\Debug\bin;%MONGO_CXX_ROOT%\Debug\bin
 REM SET OT_DEFAULT_SERVICE_DLLR=%OT_CORE_ROOT%\x64\Release;%OT_SYSTEM_ROOT%\x64\Release;%OT_COMMUNICATION_ROOT%\x64\Release;%OT_FOUNDATION_ROOT%\x64\Release;%OT_MODELENTITIES_ROOT%\x64\Release;%OT_DATASTORAGE_ROOT%\x64\Release;%OT_UIPLUGINAPI_ROOT%\x64\Release;%CURL_DLL%;%MONGO_C_ROOT%\Release\bin;%MONGO_CXX_ROOT%\Release\bin

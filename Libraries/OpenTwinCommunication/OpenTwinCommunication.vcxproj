@@ -126,7 +126,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(CURL_LIBPATHD);$(MONGO_C_LIBPATHD);$(MONGO_CXX_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(CURL_LIBD);$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;$(CURL_LIBD);$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -175,7 +175,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(CURL_LIBPATHR);$(MONGO_C_LIBPATHR);$(MONGO_CXX_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(CURL_LIBR);$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;$(CURL_LIBR);$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
