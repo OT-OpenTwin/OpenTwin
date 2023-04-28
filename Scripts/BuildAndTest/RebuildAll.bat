@@ -31,8 +31,8 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Create the certificates if necessary 
-cd /D "%OPENTWIN_DEV_ROOT%\Certificates\CreateMissingCertificates"
-CALL CreateMissingCertificates.bat
+cd /D "%OPENTWIN_DEV_ROOT%\Certificates\CreateLocalCertificates"
+CALL CreateLocalCertificates.bat
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 
