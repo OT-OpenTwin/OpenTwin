@@ -201,7 +201,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_CADMODELENTITIES_LIBD)</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
     </Link>
@@ -221,7 +221,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(OT_CADMODELENTITIES_LIBD)</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
     </Link>
@@ -282,7 +282,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -305,7 +305,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(OT_CADMODELENTITIES_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

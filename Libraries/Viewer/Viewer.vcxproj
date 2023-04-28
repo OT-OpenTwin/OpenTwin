@@ -240,7 +240,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(Qt_LIBS_);$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(OT_MODELENTITIES_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(OSG_LIBD);$(QWT_LIB_LIBD);$(QWTPOLAR_LIB_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(Qt_LIBS_);$(OT_SYSTEM_LIBD);$(OT_CORE_LIBD);$(OT_DATASTORAGE_LIBD);$(OT_RUBBERBANDAPI_LIBD);$(OT_RUBBERBAND_LIBD);$(OT_COMMUNICATION_LIBD);$(OT_FOUNDATION_LIBD);$(OT_MODELENTITIES_LIBD);$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(OSG_LIBD);$(QWT_LIB_LIBD);$(QWTPOLAR_LIB_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -278,7 +278,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>$(Qt_LIBS_);$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_MODELENTITIES_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(OSG_LIBR);$(QWT_LIB_LIBR);$(QWTPOLAR_LIB_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(Qt_LIBS_);$(OT_SYSTEM_LIBR);$(OT_CORE_LIBR);$(OT_DATASTORAGE_LIBR);$(OT_RUBBERBANDAPI_LIBR);$(OT_RUBBERBAND_LIBR);$(OT_COMMUNICATION_LIBR);$(OT_FOUNDATION_LIBR);$(OT_MODELENTITIES_LIBR);$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(OSG_LIBR);$(QWT_LIB_LIBR);$(QWTPOLAR_LIB_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

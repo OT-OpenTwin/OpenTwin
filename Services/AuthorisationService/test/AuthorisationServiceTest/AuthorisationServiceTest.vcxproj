@@ -85,7 +85,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_AUTHORISATION_SERVICE_ROOT)\$(OT_LIBTESTD); %(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD),$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(ZLIB_LIBD);$(OT_AUTHORISATION_SERVICE_ROOT)\$(OT_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD),$(OT_FOUNDATION_LIBD);$(ZLIB_LIBD);$(OT_AUTHORISATION_SERVICE_LIBD);$(GOOGLE_TEST_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +121,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_AUTHORISATION_SERVICE_LIBPATHRT); %(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR),$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(ZLIB_LIBR);$(OT_AUTHORISATION_SERVICE_ROOT)\$(OT_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR),$(OT_FOUNDATION_LIBR);$(ZLIB_LIBR);$(OT_AUTHORISATION_SERVICE_LIBR);$(GOOGLE_TEST_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
