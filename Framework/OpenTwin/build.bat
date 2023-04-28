@@ -1,13 +1,35 @@
 @ECHO OFF
 
-ECHO Setting up environment
+REM This script requires the following environment variables to be set:
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
 
-rem Setup eviroment
-CALL "%SIM_PLAT_ROOT%\MasterBuild\set_env.bat"
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
+)
+
+IF "%DEVENV_ROOT_2022%" == "" (
+	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
+	goto PAUSE_END
+)
+
+REM Setup eviroment
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+	goto END
+)
 
 ECHO Building Project
 
-PUSHD "%SIM_PLAT_ROOT%\Microservices\OpenTwin"
+PUSHD "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin"
 
 REM Open project
 
@@ -46,8 +68,8 @@ IF %DEBUG%==1 (
 	FOR /F %%I IN ('where /r target\debug\.fingerprint output-bin-open_twin') DO TYPE %%I >> buildLog_Debug.txt
 
 	REM Setup QT config
-	DEL %SIM_PLAT_ROOT%\Microservices\OpenTwin\target\debug\qt.conf
-	COPY "%SIM_PLAT_ROOT%\MasterBuild\qt.conf" "%SIM_PLAT_ROOT%\Microservices\OpenTwin\target\debug\qt.conf"
+	DEL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\debug\qt.conf"
+	COPY "%OPENTWIN_DEV_ROOT%\Assets\qt.conf" "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\debug\qt.conf"
 )
 
 IF %RELEASE%==1 (
@@ -66,17 +88,19 @@ IF %RELEASE%==1 (
 	FOR /F %%I IN ('where /r target\release\.fingerprint output-bin-open_twin') DO TYPE %%I >> buildLog_Release.txt
 
 	REM Setup QT config
-	DEL %SIM_PLAT_ROOT%\Microservices\OpenTwin\target\release\qt.conf
-	COPY "%SIM_PLAT_ROOT%\MasterBuild\qt.conf" "%SIM_PLAT_ROOT%\Microservices\OpenTwin\target\release\qt.conf"
+	DEL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\qt.conf"
+	COPY "%OPENTWIN_DEV_ROOT%\Assets\qt.conf" "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\qt.conf"
 ) 
+
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
 
 :END
 
 POPD
 
-TYPE "%SIM_PLAT_ROOT%\Microservices\OpenTwin\buildLog_Debug.txt"
-TYPE "%SIM_PLAT_ROOT%\Microservices\OpenTwin\buildLog_Release.txt"
-
-
-
-
+TYPE "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\buildLog_Debug.txt"
+TYPE "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\buildLog_Release.txt"

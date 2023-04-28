@@ -1,6 +1,13 @@
 @ECHO OFF
 
-SET OT_BATCH_TMP=%SIM_PLAT_ROOT%
+REM This script requires the following environment variables to be set:
+REM 1. OPENTWIN_DEV_ROOT
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
+
+SET OT_BATCH_TMP=%OPENTWIN_DEV_ROOT%
 SET OT_BATCH_TMP=%OT_BATCH_TMP:\=\\%
 
 SET OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
@@ -21,3 +28,11 @@ SET OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"GetDPService"^
 		]^
 	}
+
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
+:END
