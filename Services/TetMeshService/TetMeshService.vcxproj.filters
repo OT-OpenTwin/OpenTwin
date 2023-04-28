@@ -52,15 +52,13 @@
     <ClCompile Include="src\MeshExport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c">
-      <Filter>Third Party files</Filter>
-    </ClCompile>
     <ClCompile Include="src\TmpFileManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MeshImport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(BASE64_ROOT)\base64.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -111,15 +109,13 @@
     <ClInclude Include="include\MeshExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Third_Party_Libraries\base64\base64.h">
-      <Filter>Third Party files</Filter>
-    </ClInclude>
     <ClInclude Include="include\TmpFileManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\MeshImport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(BASE64_ROOT)\base64.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
