@@ -97,15 +97,15 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(VTK_INC);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(VTK_INC);$(BOOST_INCD);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(ZLIB_LIB)\$(Configuration)\lib;$(VTK_LIB)$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;zlibd.lib;$(VTK_LIBLIST_DEBUG);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(VTK_LIB)$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;$(VTK_LIBLIST_DEBUG);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -117,7 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(VTK_INC);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(VTK_INC);$(BOOST_INCD);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -139,7 +139,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(VTK_INC);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(VTK_INC);$(BOOST_INCR);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -148,8 +148,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(ZLIB_LIB)\$(Configuration)\lib;$(VTK_LIB)$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;zlib.lib;$(VTK_LIBLIST_RELEASE);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(VTK_LIB)$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;$(VTK_LIBLIST_RELEASE);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -163,7 +163,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(VTK_INC);%OSG_ROOT%\include\;A:\SimulationPlatform\Third_Party_Libraries\vtk\VTK-9.0.3\build_Win64\Filters\Parallel;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(VTK_INC);$(BOOST_INCR);%OSG_ROOT%\include\;A:\SimulationPlatform\Third_Party_Libraries\vtk\VTK-9.0.3\build_Win64\Filters\Parallel;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
