@@ -99,7 +99,7 @@
     <ClCompile Include="src\STEPReader.cpp">
       <Filter>Source Files\Operations</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Third_Party_Libraries\base64\base64.c">
+    <ClCompile Include="$(BASE64_ROOT)\base64.c">
       <Filter>Third Party Files</Filter>
     </ClCompile>
   </ItemGroup>
