@@ -27,7 +27,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : RubberbandOsgWrapper
+ECHO Testing Project : RubberbandEngineOsgWrapper
 
 REM Open project
 
@@ -56,20 +56,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RUBBERBAND_ROOT%\RubberbandOsgWrapper.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RUBBERBAND_ROOT%\RubberbandEngineOsgWrapper.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OT_RUBBERBAND_ROOT%\x64\Debug\RubberbandOsgWrapperTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandOsgWrapperDebugReport.xml"
+	"%OT_RUBBERBAND_ROOT%\x64\Debug\RubberbandEngineOsgWrapperTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandEngineOsgWrapperDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandOsgWrapperDebugReport.xml" "RubberbandOsgWrapper" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\RubberbandOsgWrapperDebugReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandEngineOsgWrapperDebugReport.xml" "RubberbandEngineOsgWrapper" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\RubberbandEngineOsgWrapperDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RUBBERBAND_ROOT%\RubberbandOsgWrapper.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RUBBERBAND_ROOT%\RubberbandEngineOsgWrapper.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OT_RUBBERBAND_ROOT%\x64\Release\RubberbandOsgWrapperTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandOsgWrapperReleaseReport.xml"
+	"%OT_RUBBERBAND_ROOT%\x64\Release\RubberbandEngineOsgWrapperTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandEngineOsgWrapperReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandOsgWrapperReleaseReport.xml" "RubberbandOsgWrapper" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\RubberbandOsgWrapperReleaseReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\RubberbandEngineOsgWrapperReleaseReport.xml" "RubberbandEngineOsgWrapper" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\RubberbandEngineOsgWrapperReleaseReport.xml"
 ) 
   
 GOTO END

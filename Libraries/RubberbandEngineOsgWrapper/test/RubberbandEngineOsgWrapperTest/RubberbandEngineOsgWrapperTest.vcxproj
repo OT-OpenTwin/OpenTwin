@@ -25,6 +25,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <ProjectName>RubberbandEngineOsgWrapperTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -85,7 +86,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(SIM_PLAT_ROOT)\Libraries\RubberbandEngine\OsgWrapper\x64\DebugTest\;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(Qt_LIBS_);%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(Qt_LIBS_);%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +122,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(RUBBERBAND_ENGINE_CORE)\x64\$(Configuration);%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(SIM_PLAT_ROOT)\Libraries\RubberbandEngine\OsgWrapper\x64\ReleaseTest\;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(Qt_LIBS_);%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;RubberbandEngineCore.lib;RubberbandOsgWrapper.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(Qt_LIBS_);%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
