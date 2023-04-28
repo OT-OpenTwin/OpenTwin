@@ -98,7 +98,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild />
     </ClCompile>
@@ -106,8 +106,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(ZLIB_LIBD)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_FOUNDATION_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OpenTwinServiceFoundation.lib;$(ZLIB_LIBD);Advapi32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -119,7 +119,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild>
       </MinimalRebuild>
@@ -143,7 +143,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild />
     </ClCompile>
@@ -153,8 +153,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(ZLIB_LIBR)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(MONGO_BOOST_ROOT);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);Advapi32.lib;$(ZLIB_LIBR)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
@@ -169,7 +169,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild>
       </MinimalRebuild>
@@ -181,7 +181,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(ZLIB_LIBR)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);Advapi32.lib;$(ZLIB_LIBR)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
