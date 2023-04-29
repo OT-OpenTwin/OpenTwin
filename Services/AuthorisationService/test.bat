@@ -1,4 +1,4 @@
-@ECHO ON
+@ECHO OFF
 
 ECHO Setting up environment
 
@@ -34,20 +34,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\AuthorisationService.vcxproj" %TYPE% "DebugTest|x64" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_AUTHORISATION_SERVICE_ROOT%\AuthorisationService.vcxproj" %TYPE% "DebugTest|x64" 
 	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\x64\Debug\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml"
+	"%OT_AUTHORISATION_SERVICE_ROOT%\%OT_DLLD%\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml" "AuthorisationService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\AuthorisationServiceDebugReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ModifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml" "AuthorisationService" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\AuthorisationService.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_AUTHORISATION_SERVICE_ROOT%\AuthorisationService.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\x64\Release\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml"
+	"%OT_AUTHORISATION_SERVICE_ROOT%\%OT_DLLR%\AuthorisationServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml" "AuthorisationService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\AuthorisationServiceReleaseReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ModifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml" "AuthorisationService" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\AuthorisationServiceReleaseReport.xml"
 ) 
   
 :END
