@@ -74,13 +74,13 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\ModelEntities\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;%R_JSON_ROOT%\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(VTK_INC);%OSG_ROOT%\include\;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;$(VTK_LIB)$(Configuration);%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(SIM_PLAT_ROOT)\Libraries\VisualizationService\x64\DebugTest\;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%OSG_ROOT%\lib\Debug\OpenThreadsd.lib;%OSG_ROOT%\lib\Debug\osgAnimationd.lib;%OSG_ROOT%\lib\Debug\osgd.lib;%OSG_ROOT%\lib\Debug\osgDBd.lib;%OSG_ROOT%\lib\Debug\osgFXd.lib;%OSG_ROOT%\lib\Debug\osgGAd.lib;%OSG_ROOT%\lib\Debug\osgManipulatord.lib;%OSG_ROOT%\lib\Debug\osgParticled.lib;%OSG_ROOT%\lib\Debug\osgPresentationd.lib;%OSG_ROOT%\lib\Debug\osgQt5d.lib;%OSG_ROOT%\lib\Debug\osgShadowd.lib;%OSG_ROOT%\lib\Debug\osgSimd.lib;%OSG_ROOT%\lib\Debug\osgTerraind.lib;%OSG_ROOT%\lib\Debug\osgTextd.lib;%OSG_ROOT%\lib\Debug\osgUId.lib;%OSG_ROOT%\lib\Debug\osgUtild.lib;%OSG_ROOT%\lib\Debug\osgViewerd.lib;%OSG_ROOT%\lib\Debug\osgVolumed.lib;%OSG_ROOT%\lib\Debug\osgWidgetd.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;VisualizationService.lib;gtest_main.lib;gtest.lib;$(VTK_LIBLIST_DEBUG);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>VisualizationService.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,15 +108,15 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MinimalRebuild />
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\ModelEntities\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\include;$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;%R_JSON_ROOT%\include;%CURL_INC%;$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(VTK_INC);%OSG_ROOT%\include\;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>%CURL_LIB%;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;$(VTK_LIB)$(Configuration);%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(SIM_PLAT_ROOT)\Libraries\VisualizationService\x64\ReleaseTest\;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%OSG_ROOT%\lib\Release\OpenThreads.lib;%OSG_ROOT%\lib\Release\osgAnimation.lib;%OSG_ROOT%\lib\Release\osg.lib;%OSG_ROOT%\lib\Release\osgDB.lib;%OSG_ROOT%\lib\Release\osgFX.lib;%OSG_ROOT%\lib\Release\osgGA.lib;%OSG_ROOT%\lib\Release\osgManipulator.lib;%OSG_ROOT%\lib\Release\osgParticle.lib;%OSG_ROOT%\lib\Release\osgPresentation.lib;%OSG_ROOT%\lib\Release\osgQt5.lib;%OSG_ROOT%\lib\Release\osgShadow.lib;%OSG_ROOT%\lib\Release\osgSim.lib;%OSG_ROOT%\lib\Release\osgTerrain.lib;%OSG_ROOT%\lib\Release\osgText.lib;%OSG_ROOT%\lib\Release\osgUI.lib;%OSG_ROOT%\lib\Release\osgUtil.lib;%OSG_ROOT%\lib\Release\osgViewer.lib;%OSG_ROOT%\lib\Release\osgVolume.lib;%OSG_ROOT%\lib\Release\osgWidget.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;DataStorage.lib;ModelEntities.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;VisualizationService.lib;gtest_main.lib;gtest.lib;$(VTK_LIBLIST_RELEASE);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>VisualizationService.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

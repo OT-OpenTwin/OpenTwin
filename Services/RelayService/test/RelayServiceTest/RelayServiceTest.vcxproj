@@ -74,13 +74,13 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;%QDIR%\include\QtCore\;%QDIR%\include\QtGui\;%QDIR%\include\QtWidgets\;%UICORE_LIB_ROOT%\include;%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\Model\include;%R_JSON_ROOT%\include;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\RelayService\x64\DebugTest\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Debug;%UICORE_LIB_ROOT%\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug;$(MONGO_C_ROOT)\Debug\lib;$(MONGO_CXX_ROOT)\Debug\lib;$(ZLIB_LIB)\Debug\lib;%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;$(Qt_LIBS_);%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug\Model.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;RelayService.lib;Viewer.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RelayService.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,15 +108,15 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MinimalRebuild />
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;%QDIR%\include\QtCore\;%QDIR%\include\QtGui\;%QDIR%\include\QtWidgets\;%UICORE_LIB_ROOT%\include;%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\Model\include;%R_JSON_ROOT%\include;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\$(Configuration)\include;$(MONGO_CXX_ROOT)\$(Configuration)\include;$(MONGO_BOOST_ROOT);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\RelayService\x64\ReleaseTest\;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\Release;%UICORE_LIB_ROOT%\x64\Release;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Release;$(MONGO_C_ROOT)\Release\lib;$(MONGO_CXX_ROOT)\Release\lib;$(ZLIB_LIB)\Release\lib;%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;$(GOOGLE_TEST_LIB)\$(PlatformShortName)-$(Configuration)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;$(Qt_LIBS_);%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug\Model.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;DataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;RelayService.lib;Viewer.lib;uiCore.lib;gtest_main.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RelayService.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

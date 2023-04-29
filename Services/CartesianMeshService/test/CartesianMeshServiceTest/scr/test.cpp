@@ -1,5 +1,4 @@
 #include <iostream>
-#include "pch.h"
 #include "gtest/gtest.h"
 
 TEST(CartesianMeshService, TestName) {
