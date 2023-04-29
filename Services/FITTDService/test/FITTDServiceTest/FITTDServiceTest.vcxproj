@@ -63,8 +63,6 @@
   <ImportGroup Label="ExtensionTargets" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
@@ -89,19 +87,17 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);$(BOOST_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FITTDService.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories);$(OT_DEFAULT_SERVICE_LIBPATHD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FITTDService.lib;$(GOOGLE_TEST_LIB);$(OT_DEFAULT_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -123,7 +119,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
@@ -131,8 +127,8 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FITTDService.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FITTDService.lib;$(GOOGLE_TEST_LIB);$(OT_DEFAULT_SERVICE_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>
