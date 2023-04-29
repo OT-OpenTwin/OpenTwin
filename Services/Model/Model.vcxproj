@@ -215,7 +215,7 @@
       <PreprocessorDefinitions>_DEBUG;MODEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -273,7 +273,7 @@
       <PreprocessorDefinitions>NDEBUG;MODEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCR)\</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -296,7 +296,7 @@
       <PreprocessorDefinitions>NDEBUG;MODEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCR)\</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>

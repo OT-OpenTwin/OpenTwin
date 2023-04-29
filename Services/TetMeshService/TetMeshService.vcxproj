@@ -122,6 +122,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)/$(OT_INC);$(EMBREE_INCD);$(CGAL_INCD);$(GMP_INCD);$(OC_INCD);$(GMSH_ROOT_INC);$(MONGO_BOOST_ROOT);$(BOOST_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -171,6 +172,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)/$(OT_INC);$(EMBREE_INCR);$(CGAL_INCR);$(MONGO_BOOST_ROOT);$(BOOST_INCD);$(GMP_INCR);$(OC_INCR);$(GMSH_ROOT_INC);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
