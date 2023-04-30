@@ -1,6 +1,6 @@
 #pragma once
 #include "gtest/gtest.h"
-#include "openTwin/Matrix.h"
+#include "OpenTwinFoundation/Matrix.h"
 #include <string>
 
 class FixtureMatrix : public testing::Test

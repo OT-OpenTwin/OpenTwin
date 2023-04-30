@@ -1,5 +1,5 @@
 #include "FixtureMatrix.h"
-#include "openTwin/MatrixFactory.h"
+#include "OpenTwinFoundation/MatrixFactory.h"
 
 FixtureMatrix::FixtureMatrix()
 {
