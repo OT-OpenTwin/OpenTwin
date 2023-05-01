@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "" "127.0.0.1:8097" "127.0.0.1:8093" "New:Data-202113-1483-54"</LocalDebuggerCommandArguments>
-    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebug|x64'">
@@ -14,8 +14,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>$(TargetPath) "1" "127.0.0.1:8099" "127.0.0.1:8093" "unused"</LocalDebuggerCommandArguments>
-    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerCommandArguments>$(TargetPath) "1" "127.0.0.1:8199" "127.0.0.1:8093" "unused"</LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>PATH=%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
