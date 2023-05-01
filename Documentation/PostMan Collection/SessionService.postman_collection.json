@@ -231,7 +231,7 @@
 			"name": "ServiceDebug",
 			"item": [
 				{
-					"name": "Model.Debug.On",
+					"name": "Logger.Debug.On",
 					"protocolProfileBehavior": {
 						"strictSSL": false
 					},
@@ -247,7 +247,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"Model\"\r\n}",
+							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"LoggerService\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -272,7 +272,7 @@
 					"response": []
 				},
 				{
-					"name": "Logger.Debug.On",
+					"name": "Model.Debug.On",
 					"protocolProfileBehavior": {
 						"strictSSL": false
 					},
@@ -288,7 +288,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"LoggerService\"\r\n}",
+							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"Model\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -847,6 +847,68 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"action\":\"Service.DebugDisable\",\r\n    \"Service.Name\":\"TetMeshService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8093/execute",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8093",
+							"path": [
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ImportParameterizedData.Debug.On",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"ImportParameterizedDataService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8093/execute",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8093",
+							"path": [
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ImportParameterizedData.Debug.Off",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"action\":\"Service.DebugDisable\",\r\n    \"Service.Name\":\"ImportParameterizedDataService\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

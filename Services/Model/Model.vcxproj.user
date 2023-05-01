@@ -4,7 +4,7 @@
     <LocalDebuggerAttach>false</LocalDebuggerAttach>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>"$(TargetPath)" "1" "127.0.0.1:8097" "127.0.0.1:8093" "test:Data-202117-123852-77"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(TargetPath) "1" "127.0.0.1:8097" "127.0.0.1:8093" "test:Data-202117-123852-77"</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <LocalDebuggerDebuggerType>Auto</LocalDebuggerDebuggerType>
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
