@@ -21,11 +21,8 @@ int main(int argc, char *argv[])
 {
 	try {
 		// Initialize logging
-#ifdef _DEBUG
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, "", false);
-#else
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, "", false);
-#endif
+
 		AppBase * app = AppBase::instance();
 		app->setSiteID(0);
 		app->getExternalServicesComponent()->setRelayServiceIsRequired();

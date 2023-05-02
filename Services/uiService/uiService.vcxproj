@@ -22,6 +22,16 @@
     <ClCompile Include="$(BASE64_ROOT)\base64.c" />
     <ClCompile Include="src\ContextMenuManager.cpp" />
     <ClCompile Include="src\debugNotifier.cpp" />
+    <ClCompile Include="src\DevLogger.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ExternalServicesComponent.cpp" />
     <ClCompile Include="src\ControlsManager.cpp" />
@@ -52,6 +62,7 @@
     <QtMoc Include="include\ManageGroups.h" />
     <QtMoc Include="include\ManageAccess.h" />
     <QtMoc Include="include\ManageOwner.h" />
+    <QtMoc Include="include\DevLogger.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <ClInclude Include="include\ToolBar.h" />
     <QtMoc Include="include\welcomeScreen.h" />

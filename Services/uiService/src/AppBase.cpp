@@ -22,6 +22,7 @@
 #include <ManageAccess.h>
 #include <UiPluginComponent.h>
 #include <UiPluginManager.h>
+#include "DevLogger.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -169,6 +170,8 @@ int AppBase::run() {
 		// Initialize uiCore
 		OT_LOG_I("Initializing UI Core Module");
 		uiAPI::ini("OpenTwin", "uiService");
+
+		OT_UISERVICE_DEV_LOGGER_INIT;
 
 		// Check for a sufficient OpenGL version
 		QOffscreenSurface surf;
