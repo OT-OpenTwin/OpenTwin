@@ -34,18 +34,18 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT%\ImportParameterizedData.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\x64\Debug\ServiceTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateDebugReport.xml"
+	"%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT%\%OT_DLLD%\ImportParameterizedDataTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateDebugReport.xml" "ServiceTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ServiceTemplateDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT%\ImportParameterizedData.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\ServiceTemplate\x64\Release\ServiceTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateReleaseReport.xml"
+	"%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT%\%OT_DLLR%\ImportParameterizedDataTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ServiceTemplateReleaseReport.xml" "ServiceTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ServiceTemplateReleaseReport.xml"
 ) 

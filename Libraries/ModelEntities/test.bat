@@ -52,7 +52,7 @@ IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_MODELENTITIES_ROOT%\ModelEntities.vcxproj" %TYPE% "DebugTest|x64"
 	ECHO %TYPE% DEBUG
-	"%OT_MODELENTITIES_ROOT%\x64\Debug\ModelEntitiesTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesDebugReport.xml"
+	"%OT_MODELENTITIES_ROOT%\%OT_DLLD%\ModelEntitiesTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesDebugReport.xml" "ModelEntities" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\ModelEntitiesDebugReport.xml"
 )
@@ -61,7 +61,7 @@ IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_MODELENTITIES_ROOT%\ModelEntities.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OT_MODELENTITIES_ROOT%\x64\Release\ModelEntitiesTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesReleaseReport.xml"
+	"%OT_MODELENTITIES_ROOT%\%OT_DLLR%\ModelEntitiesTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ModelEntitiesReleaseReport.xml" "ModelEntities" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\ModelEntitiesReleaseReport.xml"
 ) 
