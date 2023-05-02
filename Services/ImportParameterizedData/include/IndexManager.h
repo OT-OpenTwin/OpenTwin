@@ -61,6 +61,7 @@ inline void IndexManager::AddMetadataParameterToBundle(const std::map<std::strin
 			{
 				existingMetadata[field.first].values.push_back(newValue);
 			}
+			existingMetadata[field.first].values.unique();
 
 			existingMetadata[field.first].parameterName = field.first;
 			int32_t nextParameterIndex = 1;

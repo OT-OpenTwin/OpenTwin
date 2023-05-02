@@ -20,7 +20,7 @@ void DataCollectionCreationHandler::CreateDataCollection()
 	BranchSynchronizer branchSynchronizer;
 	_uiComponent->displayMessage("Waiting for branch synchronization\n");
 	branchSynchronizer.WaitForTurn();
-	_uiComponent->displayMessage("Branches synchronized. Started creation of dataset.\n");
+	_uiComponent->displayMessage("Branches synchronized.\n");
 
 	Documentation::INSTANCE()->ClearDocumentation();
 	
@@ -60,17 +60,15 @@ void DataCollectionCreationHandler::CreateDataCollection()
 			msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
 			if(indexManager->DoesMSMDAlreadyExist(msmdName))
 			{
-				Documentation::INSTANCE()->AddToDocumentation("Skipped the creation of " + msmdName + " since an entity with the exact same name already exists in the dataset.\n");
+				Documentation::INSTANCE()->AddToDocumentation("Skipped " + msmdName + "\n");
 				continue;
 			}
-
+			Documentation::INSTANCE()->AddToDocumentation("Create "+ msmdName+":\n");
 			//Load all required tables that are not loaded yet.
 			std::list<std::string> requiredTables;
+			Documentation::INSTANCE()->AddToDocumentation("Required tables:\n");
 			AddRequiredTables(metadataAssembly, requiredTables);
-			if (metadataAssembly.next != nullptr)
-			{
-				AddRequiredTables(*metadataAssembly.next, requiredTables);
-			}
+
 			requiredTables.unique();
 			LoadRequiredTables(requiredTables, loadedTables);
 
@@ -80,62 +78,86 @@ void DataCollectionCreationHandler::CreateDataCollection()
 			
 			std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));						
 			metadataBuffer->setName(_datasetFolder + "/" + msmdName);
-
+			Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
 			for (auto& field : rangeData.GetStringFields())
 			{
 				metadataBuffer->InsertInField(field.first, field.second);
+				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 			}
 			for (auto& field : rangeData.GetDoubleFields())
 			{
 				metadataBuffer->InsertInField(field.first, field.second);
+				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 			}
 			for (auto& field : rangeData.GetInt32Fields())
 			{
 				metadataBuffer->InsertInField(field.first, field.second);
+				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 			}
 			for (auto& field : rangeData.GetInt64Fields())
 			{
 				metadataBuffer->InsertInField(field.first, field.second);
+				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 			}
 
 			assert(metadataAssembly.next != nullptr); //ToDo: Check earlier
+
 			auto parameterAssembly = metadataAssembly.next;
 			MetadataAssemblyRangeData parameterData;
+			Documentation::INSTANCE()->AddToDocumentation("Required tables for parameter:\n");
+			AddRequiredTables(*parameterAssembly, requiredTables);
+			requiredTables.unique();
+			LoadRequiredTables(requiredTables, loadedTables);
 			parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, loadedTables);
 			//Todo: MetadataAssemblyRangeData not needed anymore! Delete in process!
 			MetadataParameterBundle parameterBundle = indexManager->CreateMetadataParameter(parameterData);
+			
+			Documentation::INSTANCE()->AddToDocumentation("Adding parameter:\n");
 			for (const auto& field : parameterBundle.getStringParameter())
 			{
-					
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
 				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
-						
+				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 			for (const auto& field : parameterBundle.getDoubleParameter())
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
 				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 			for (auto field : parameterBundle.getInt32Parameter())
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
 				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 			for (auto field : parameterBundle.getInt64Parameter())
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
 				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 
 			assert(parameterAssembly->next != nullptr);
 			auto quantityAssembly = parameterAssembly->next;
 			MetadataAssemblyRangeData quantityData;
+			
+			Documentation::INSTANCE()->AddToDocumentation("Required tables for quantities:\n");
+			AddRequiredTables(*quantityAssembly, requiredTables);
+			requiredTables.unique();
+			LoadRequiredTables(requiredTables, loadedTables);
 			quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, loadedTables);
+			
 			std::map<std::string,MetadataQuantity*> notExistingQuantities = indexManager->GetNonExistingQuantityAbbreviationsByName(quantityData);
+			Documentation::INSTANCE()->AddToDocumentation("Create "+ std::to_string(notExistingQuantities.size()) + " new quantit(y/ies):\n");
+			for (const auto& newQuantity : notExistingQuantities)
+			{
+				Documentation::INSTANCE()->AddToDocumentation(newQuantity.first + "\n");
+			}
 
 			for (auto field : quantityData.GetStringFields())
 			{
@@ -180,6 +202,8 @@ void DataCollectionCreationHandler::CreateDataCollection()
 		forceVisible.push_back(false);
 	}
 	_modelComponent->addEntitiesToModel(entityIDs, entityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Created new n-dimensional parameterized data collection");
+	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+	
 	//rangeData muss jetzt sterben!
 
 	//if entity is msmd and has parameter set
@@ -239,11 +263,6 @@ std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExisting
 		{
 			existingMetadataEntities.push_back(std::shared_ptr<EntityMeasurementMetadata>(dynamic_cast<EntityMeasurementMetadata*>(entBase)));
 		}
-	}
-	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(existingMetadataEntities.size()) + " existing measurement metadata:\n");
-	for (const auto& msmd : existingMetadataEntities)
-	{
-		Documentation::INSTANCE()->AddToDocumentation(msmd->getName() + "\n");
 	}
 	return std::shared_ptr<IndexManager>(new IndexManager(existingMetadataEntities, _nameField, _dataTypeField,_valueField));
 }
@@ -388,7 +407,6 @@ void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeas
 
 void DataCollectionCreationHandler::AddRequiredTables(MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
 {
-	Documentation::INSTANCE()->AddToDocumentation("Required tables:\n");
 	for (auto range : dataAssembly.allSelectionRanges)
 	{
 		requiredTables.push_back(range->getTableName());
