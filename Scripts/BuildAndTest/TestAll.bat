@@ -50,7 +50,7 @@ ECHO ===============================================================
 CALL "%OT_LOCAL_DIRECTORY_SERVICE_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
-ECHO Test Service: Local Directory
+ECHO Test Service: Relay
 ECHO ===============================================================
 CALL "%OT_RELAY_SERVICE_ROOT%%testBat%" %1 %2
 
