@@ -21,7 +21,12 @@ private:
 	const std::string _parameterFolder;
 	const std::string _quantityFolder;
 	const std::string _tableFolder;
+	
 	const std::string _rmdEntityName = "ResearchMetadata";
+	const std::string _nameField = "Name";
+	const std::string _valueField = "Value";
+	const std::string _dataTypeField = "Datatype";
+
 	std::unique_ptr<EntityResearchMetadata> _rmdEntity;
 
 	std::shared_ptr<IndexManager> ConsiderAllExistingMetadata();

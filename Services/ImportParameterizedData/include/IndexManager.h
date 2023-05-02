@@ -9,7 +9,7 @@
 class IndexManager
 {
 public:
-	IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities);
+	IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, std::string nameField, std::string dataTypeField, std::string valueField);
 
 	MetadataParameterBundle CreateMetadataParameter(MetadataAssemblyRangeData& allParameter);
 	std::map<std::string, MetadataQuantity*> GetNonExistingQuantityAbbreviationsByName(MetadataAssemblyRangeData& allParameter);
@@ -18,7 +18,10 @@ public:
 private:
 	const std::string _parameterAbbreviationBase = "P_";
 	const std::string _quantityAbbreviationBase = "Q_";
-	
+	const std::string _nameField;
+	const std::string _valueField;
+	const std::string _typeField;
+
 	std::map<std::string, MetadataParameter<std::string>> _stringParameterByName; 
 	std::map<std::string, MetadataParameter<double>> _doubleParameterByName;
 	std::map<std::string, MetadataParameter<int32_t>> _int32ParameterByName;

@@ -49,8 +49,11 @@
     <ClCompile Include="src\DataCollectionCreationHandler.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
-    <ClCompile Include="include\IndexManager.cpp">
+    <ClCompile Include="src\IndexManager.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Documentation.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="include\MetadataQuantity.h">
       <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Documentation.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

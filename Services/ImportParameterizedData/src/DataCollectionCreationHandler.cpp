@@ -8,6 +8,7 @@
 #include "BranchSynchronizer.h"
 #include "MetadataParameter.h"
 #include "GenericDocument.h"
+#include "Documentation.h"
 
 DataCollectionCreationHandler::DataCollectionCreationHandler(std::string baseFolder, std::string datasetFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
@@ -21,7 +22,7 @@ void DataCollectionCreationHandler::CreateDataCollection()
 	branchSynchronizer.WaitForTurn();
 	_uiComponent->displayMessage("Branches synchronized. Started creation of dataset.\n");
 
-	auto indexManager = ConsiderAllExistingMetadata();
+	Documentation::INSTANCE()->ClearDocumentation();
 	
 	//All sorted ranges by the metadata they belong to. MSMD has a pointer to the parameter metadata, parameter has a pointer to the quantity metadata
 	auto allMetadataAssembliesByNames = GetAllMetadataAssemblies(); 
@@ -37,6 +38,8 @@ void DataCollectionCreationHandler::CreateDataCollection()
 		_uiComponent->displayMessage(numberOfAssemblies + " metadata assemblies are considered.\n");
 	}
 
+	//Load all existing metadata. They are henceforth neglected in selections.
+	auto indexManager = ConsiderAllExistingMetadata();
 	
 	//ToDo: Check for overlapping selections with different types
 	//ToDo: Check, if parameter and quantities are on the same table
@@ -44,25 +47,25 @@ void DataCollectionCreationHandler::CreateDataCollection()
 	//ToDo: Check if existing parameter have the same name, only differing in lower/upper case spelling.
 
 	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
-
-	std::list<std::string> requiredTables;
 	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
 
+	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
+	Documentation::INSTANCE()->AddToDocumentation("Start analysis of range selections.\n");
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
 		auto metadataAssembly = metadataAssemblyByName.second;
-
 		if (metadataAssembly.dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 		{
 			std::string msmdName = metadataAssemblyByName.first;
 			msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
 			if(indexManager->DoesMSMDAlreadyExist(msmdName))
 			{
-				_uiComponent->displayMessage("Skipped the creation of " + msmdName + " since an entity with the exact same name already exists in the dataset.\n");
+				Documentation::INSTANCE()->AddToDocumentation("Skipped the creation of " + msmdName + " since an entity with the exact same name already exists in the dataset.\n");
 				continue;
 			}
 
-			requiredTables.clear();
+			//Load all required tables that are not loaded yet.
+			std::list<std::string> requiredTables;
 			AddRequiredTables(metadataAssembly, requiredTables);
 			if (metadataAssembly.next != nullptr)
 			{
@@ -74,10 +77,8 @@ void DataCollectionCreationHandler::CreateDataCollection()
 			//Filling a new EntityMeasurementMetadata object with its fields.
 			MetadataAssemblyRangeData rangeData;
 			rangeData.LoadAllRangeSelectionInformation(metadataAssembly.allSelectionRanges, loadedTables);
-
-			std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));			
 			
-			
+			std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));						
 			metadataBuffer->setName(_datasetFolder + "/" + msmdName);
 
 			for (auto& field : rangeData.GetStringFields())
@@ -239,7 +240,12 @@ std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExisting
 			existingMetadataEntities.push_back(std::shared_ptr<EntityMeasurementMetadata>(dynamic_cast<EntityMeasurementMetadata*>(entBase)));
 		}
 	}
-	return std::shared_ptr<IndexManager>(new IndexManager(existingMetadataEntities));
+	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(existingMetadataEntities.size()) + " existing measurement metadata:\n");
+	for (const auto& msmd : existingMetadataEntities)
+	{
+		Documentation::INSTANCE()->AddToDocumentation(msmd->getName() + "\n");
+	}
+	return std::shared_ptr<IndexManager>(new IndexManager(existingMetadataEntities, _nameField, _dataTypeField,_valueField));
 }
 
 std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAllMetadataAssemblies()
@@ -259,6 +265,8 @@ std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAl
 		assert(rangeEntity != nullptr);
 		allRangeEntities.push_back(rangeEntity);
 	}
+	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(allRangeEntities.size()) + " selection ranges.\n");
+
 
 	//Sort the range selection entities as rmd, msmd, parameter or quantity, depending on the topology level in their name
 	std::map<std::string, MetadataAssemblyData> allMetadataAssembliesByName;
@@ -267,13 +275,7 @@ std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAl
 	ExtractAllQuantities(allMetadataAssembliesByName, allRangeEntities);
 	assert(allRangeEntities.size() == 0);
 
-	//ToDo: check for existing rmd!
-	//std::list<MetadataAssemblyData> allMetadata;
-	//for (auto metadataAssembly : allMetadataAssembliesByName)
-	//{
-	//	allMetadata.push_back(metadataAssembly.second);
-	//}
-	return std::move(allMetadataAssembliesByName);
+	return allMetadataAssembliesByName;
 }
 
 void DataCollectionCreationHandler::ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
@@ -386,9 +388,11 @@ void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeas
 
 void DataCollectionCreationHandler::AddRequiredTables(MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
 {
+	Documentation::INSTANCE()->AddToDocumentation("Required tables:\n");
 	for (auto range : dataAssembly.allSelectionRanges)
 	{
 		requiredTables.push_back(range->getTableName());
+		Documentation::INSTANCE()->AddToDocumentation(range->getTableName()+"\n");
 	}
 }
 

@@ -1,12 +1,19 @@
 #include "IndexManager.h"
 #include "OpenTwinCore/TypeNames.h"
+#include "Documentation.h"
 
-IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
+IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, std::string nameField, std::string dataTypeField, std::string valueField)
+	:_nameField(nameField), _valueField(valueField), _typeField(dataTypeField)
 {
 	if (existingMetadataEntities.size() != 0)
 	{
+		Documentation::INSTANCE()->AddToDocumentation("Already existing metadata are ignored when the selections are analysed.\n");
+		Documentation::INSTANCE()->AddToDocumentation("Thus, none of the following MSMDs, parameter and quantities are created nor altered.\n");
+		Documentation::INSTANCE()->AddToDocumentation("Parameter:\n");
 		StoreAllParameter(existingMetadataEntities);
+		Documentation::INSTANCE()->AddToDocumentation("Quantities:\n");
 		StoreAllQuantities(existingMetadataEntities);
+		Documentation::INSTANCE()->AddToDocumentation("MSMDs:\n");
 		StoreAllMSMDs(existingMetadataEntities);
 	}
 }
@@ -21,48 +28,57 @@ void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurement
 		{
 			std::string subDocumentName = parameterName.substr(parameterName.find(parameterDocumentName), parameterName.size());
 			std::string::difference_type n = std::count(subDocumentName.begin(), subDocumentName.end(), '/');
-			if (n == 1)
+			//getAllParameterDocumentNames also returns all subDocuments and the superdocument of the parameter. Only the parameter are further analysed:
+			if (n != 1)
 			{
-				std::string parameterAbbreviation = subDocumentName.substr(subDocumentName.find(_parameterAbbreviationBase), subDocumentName.size());
-				std::string parameterIndex = parameterAbbreviation.substr(parameterAbbreviation.find(_parameterAbbreviationBase) + _parameterAbbreviationBase.size(), parameterAbbreviation.size());
-				_takenParameterIndices.insert(std::stoi(parameterIndex));
-
-				auto document = existingMetadata->getDocument(parameterName);
-				auto allStringFieldsByName = document->getStringFields();
-				if (allStringFieldsByName->find("Name") == allStringFieldsByName->end())
-				{
-					assert(0);
-				}
-				std::string parameterName = *allStringFieldsByName->find("Name")->second.begin();
-				auto allInt32FieldsByName = document->getInt32Fields();
-				auto allInt64FieldsByName = document->getInt64Fields();
-				auto allDoubleFieldsByName = document->getDoubleFields();
-
-				if (allStringFieldsByName->find("Value") != allStringFieldsByName->end())
-				{
-					_stringParameterByName[parameterName].values = allStringFieldsByName->find("Value")->second;
-					_stringParameterByName[parameterName].parameterName = parameterName;
-					_stringParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				}
-				else if (allInt32FieldsByName->find("Value") != allInt32FieldsByName->end())
-				{
-					_int32ParameterByName[parameterName].values = allInt32FieldsByName->find("Value")->second;
-					_int32ParameterByName[parameterName].parameterName = parameterName;
-					_int32ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				}
-				else if (allInt64FieldsByName->find("Value") != allInt64FieldsByName->end())
-				{
-					_int64ParameterByName[parameterName].values = allInt64FieldsByName->find("Value")->second;
-					_int64ParameterByName[parameterName].parameterName = parameterName;
-					_int64ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				}
-				else if (allDoubleFieldsByName->find("Value") != allDoubleFieldsByName->end())
-				{
-					_doubleParameterByName[parameterName].values = allDoubleFieldsByName->find("Value")->second;
-					_doubleParameterByName[parameterName].parameterName = parameterName;
-					_doubleParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				}
+				continue;
 			}
+
+			std::string parameterAbbreviation = subDocumentName.substr(subDocumentName.find(_parameterAbbreviationBase), subDocumentName.size());
+			std::string parameterIndex = parameterAbbreviation.substr(parameterAbbreviation.find(_parameterAbbreviationBase) + _parameterAbbreviationBase.size(), parameterAbbreviation.size());
+			_takenParameterIndices.insert(std::stoi(parameterIndex));
+
+			auto document = existingMetadata->getDocument(parameterName);
+			auto allStringFieldsByName = document->getStringFields();
+			if (allStringFieldsByName->find(_nameField) == allStringFieldsByName->end())
+			{
+				assert(0);
+			}
+			std::string parameterName = *allStringFieldsByName->find(_nameField)->second.begin();
+			auto allInt32FieldsByName = document->getInt32Fields();
+			auto allInt64FieldsByName = document->getInt64Fields();
+			auto allDoubleFieldsByName = document->getDoubleFields();
+
+			Documentation::INSTANCE()->AddToDocumentation(parameterAbbreviation + ": " + parameterName + " ");
+			if (allStringFieldsByName->find(_valueField) != allStringFieldsByName->end())
+			{
+				_stringParameterByName[parameterName].values = allStringFieldsByName->find(_valueField)->second;
+				_stringParameterByName[parameterName].parameterName = parameterName;
+				_stringParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
+				Documentation::INSTANCE()->AddToDocumentation("with " +	std::to_string(_stringParameterByName[parameterName].values.size()) + " string values.\n");
+			}
+			else if (allInt32FieldsByName->find(_valueField) != allInt32FieldsByName->end())
+			{
+				_int32ParameterByName[parameterName].values = allInt32FieldsByName->find(_valueField)->second;
+				_int32ParameterByName[parameterName].parameterName = parameterName;
+				_int32ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
+				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int32ParameterByName[parameterName].values.size()) + " int32 values.\n");
+			}
+			else if (allInt64FieldsByName->find(_valueField) != allInt64FieldsByName->end())
+			{
+				_int64ParameterByName[parameterName].values = allInt64FieldsByName->find(_valueField)->second;
+				_int64ParameterByName[parameterName].parameterName = parameterName;
+				_int64ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
+				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int64ParameterByName[parameterName].values.size()) + " int64 values.\n");
+			}
+			else if (allDoubleFieldsByName->find(_valueField) != allDoubleFieldsByName->end())
+			{
+				_doubleParameterByName[parameterName].values = allDoubleFieldsByName->find(_valueField)->second;
+				_doubleParameterByName[parameterName].parameterName = parameterName;
+				_doubleParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
+				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_doubleParameterByName[parameterName].values.size()) + " double values.\n");
+			}
+			
 		}
 	}
 }
@@ -77,20 +93,25 @@ void IndexManager::StoreAllQuantities(std::list<std::shared_ptr<EntityMeasuremen
 		{
 			std::string subDocumentName = quantityName.substr(quantityName.find(quantityDocumentName), quantityName.size());
 			std::string::difference_type n = std::count(subDocumentName.begin(), subDocumentName.end(), '/');
-			if (n == 1)
+	
+			//getAllQuantityDocumentNames also returns all subDocuments and the superdocument of the quantity. Only the quantities themselve are further analysed:
+			if (n != 1)
 			{
-				auto document = existingMetadata->getDocument(quantityName);
-				auto allStringFieldsByName = document->getStringFields();
-				std::string quantityName = *allStringFieldsByName->find("Name")->second.begin();
-				_takenQuantitiesByName[quantityName].quantityName = quantityName;
-
-				_takenQuantitiesByName[quantityName].typeName = *allStringFieldsByName->find("Datatype")->second.begin();
-
-				std::string quantityAbbreviation = subDocumentName.substr(subDocumentName.find(_quantityAbbreviationBase), subDocumentName.size());
-				std::string quantityIndex = quantityAbbreviation.substr(quantityAbbreviation.find(_quantityAbbreviationBase) + _quantityAbbreviationBase.size(), quantityAbbreviation.size());
-				_takenQuantitiesByName[quantityName].quantityAbbreviation = quantityAbbreviation;
-				_takenQuantitiesByName[quantityName].quantityIndex = std::stoi(quantityIndex);
+				continue;
 			}
+
+			auto document = existingMetadata->getDocument(quantityName);
+			auto allStringFieldsByName = document->getStringFields();
+			std::string quantityName = *allStringFieldsByName->find(_nameField)->second.begin();
+
+			_takenQuantitiesByName[quantityName].quantityName = quantityName;
+			_takenQuantitiesByName[quantityName].typeName = *allStringFieldsByName->find(_typeField)->second.begin();
+
+			std::string quantityAbbreviation = subDocumentName.substr(subDocumentName.find(_quantityAbbreviationBase), subDocumentName.size());
+			std::string quantityIndex = quantityAbbreviation.substr(quantityAbbreviation.find(_quantityAbbreviationBase) + _quantityAbbreviationBase.size(), quantityAbbreviation.size());
+			_takenQuantitiesByName[quantityName].quantityAbbreviation = quantityAbbreviation;
+			_takenQuantitiesByName[quantityName].quantityIndex = std::stoi(quantityIndex);
+			Documentation::INSTANCE()->AddToDocumentation(quantityAbbreviation + ": " + quantityName + " of type " + _takenQuantitiesByName[quantityName].typeName + "\n");
 		}
 	}
 }
@@ -102,6 +123,7 @@ void IndexManager::StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMeta
 		std::string msmdName = msmd->getName();
 		msmdName = msmdName.substr(msmdName.find_last_of('/')+1, msmdName.size());
 		_takenMetadataNames.insert(msmdName);
+		Documentation::INSTANCE()->AddToDocumentation(msmdName + "\n");
 	}
 }
 
