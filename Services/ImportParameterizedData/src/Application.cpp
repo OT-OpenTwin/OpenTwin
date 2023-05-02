@@ -114,7 +114,11 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{
+				m_uiComponent->displayMessage("===========================================================================\n");
+				m_uiComponent->displayMessage("Start creation of dataset\n");
 				_collectionCreationHandler->CreateDataCollection();
+				m_uiComponent->displayMessage("Creation of dataset finished\n");
+				m_uiComponent->displayMessage("===========================================================================\n\n");
 			}
 			else
 			{

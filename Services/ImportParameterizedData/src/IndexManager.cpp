@@ -7,14 +7,14 @@ IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>>
 {
 	if (existingMetadataEntities.size() != 0)
 	{
-		Documentation::INSTANCE()->AddToDocumentation("Already existing metadata are ignored when the selections are analysed.\n");
-		Documentation::INSTANCE()->AddToDocumentation("Thus, none of the following MSMDs, parameter and quantities are created nor altered.\n");
+		Documentation::INSTANCE()->AddToDocumentation("Already existing metadata are ignored.\n");
+		Documentation::INSTANCE()->AddToDocumentation("Subsequently, none of the following MSMDs, parameter and quantities are created nor altered.\n");
+		Documentation::INSTANCE()->AddToDocumentation("MSMDs:\n");
+		StoreAllMSMDs(existingMetadataEntities);
 		Documentation::INSTANCE()->AddToDocumentation("Parameter:\n");
 		StoreAllParameter(existingMetadataEntities);
 		Documentation::INSTANCE()->AddToDocumentation("Quantities:\n");
 		StoreAllQuantities(existingMetadataEntities);
-		Documentation::INSTANCE()->AddToDocumentation("MSMDs:\n");
-		StoreAllMSMDs(existingMetadataEntities);
 	}
 }
 
