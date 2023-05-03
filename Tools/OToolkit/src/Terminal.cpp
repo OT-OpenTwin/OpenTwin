@@ -629,6 +629,16 @@ void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter *
 		actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
 	}
 
+
+	menu.addSeparator();
+
+	QAction* actionNewRequest = menu.addAction(QIcon(":/images/Add.png"), "New Request");
+
+	menu.addSeparator();
+
+	QAction* actionImport = menu.addAction(QIcon(":/images/Import.png"), "Import Request(s)");
+	QAction* actionExport = menu.addAction(QIcon(":/images/Export.png"), "Export Request(s)");
+
 	// Show context menu
 	QAction * result = menu.exec(m_navigation->mapToGlobal(_pt));
 	if (result == nullptr) {
@@ -642,6 +652,15 @@ void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter *
 	else if (result == actionRemove) {
 		removeFilter(_filter);
 	}
+	else if (result == actionNewRequest) {
+
+	}
+	else if (result == actionImport) {
+
+	}
+	else if (result == actionExport) {
+
+	}
 }
 
 void Terminal::handleContextRequest(const QPoint& _pt, TerminalRequest * _request) {
@@ -649,6 +668,8 @@ void Terminal::handleContextRequest(const QPoint& _pt, TerminalRequest * _reques
 
 	// Add actions
 	QAction * actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
+	QAction * actionReplace = menu.addAction(QIcon(":/images/DownPage.png"), "Replace with current");
+	actionReplace->setToolTip("Will save the current configuration here");
 
 	// Show context menu
 	QAction * result = menu.exec(m_navigation->mapToGlobal(_pt));

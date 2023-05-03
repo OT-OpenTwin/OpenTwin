@@ -13,5 +13,9 @@
         <file>images/Exit.png</file>
         <file>images/Log.png</file>
         <file>images/Settings.png</file>
+        <file>images/DownPage.png</file>
+        <file>images/Export.png</file>
+        <file>images/Import.png</file>
+        <file>images/Add.png</file>
     </qresource>
 </RCC>
