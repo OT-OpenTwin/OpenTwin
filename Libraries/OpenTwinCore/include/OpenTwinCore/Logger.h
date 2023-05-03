@@ -1,3 +1,13 @@
+//! @file Logger.h
+//! @brief OpenTwin Logging system.
+//! 
+//! This file contains the Log functionallity, 
+//! that any OpenTwin related class should use to generate their log messages.
+//! 
+//! @author Alexander Kuester (alexk95)
+//! @date January 2021
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 #include "OpenTwinCore/CoreAPIExport.h"
@@ -10,20 +20,23 @@
 #include <ostream>
 #include <list>
 
-#define OT_INTERN_LOG_TIME_FORMAT_STDSTRING "%Y-%m-%d %H:%M:%S"
+//! @brief Time format string for the timetamps
+#define OT_LOG_TIME_FORMAT_STDSTRING "%Y-%m-%d %H:%M:%S"
 
 #ifdef _DEBUG
+
 //! Log a message according to the service logger configuration and the provided flags
 //! In debug mode every single log message will be dispatched.
-//! In release mode only log messages with "enabled log flags will be logged (See: LogDispatcher::dispatch(LogMessage))
+//! In release mode only log messages with "enabled log flags" will be logged (See: LogDispatcher::dispatch(LogMessage))
 //! @param ___text The log message text
 //! @param ___flags LogFlags describing the type of the created log message
 #define OT_LOG(___text, ___flags) ot::LogDispatcher::instance().dispatch(___text, __FUNCTION__, ___flags)
 
 #else
+
 //! Log a message according to the service logger configuration and the provided flags
 //! In debug mode every single log message will be dispatched.
-//! In release mode only log messages with "enabled log flags will be logged (See: LogDispatcher::dispatch(LogMessage))
+//! In release mode only log messages with "enabled log flags" will be logged (See: LogDispatcher::dispatch(LogMessage))
 //! @param ___text The log message text
 //! @param ___flags LogFlags describing the type of the created log message
 #define OT_LOG(___text, ___flags) if (ot::LogDispatcher::mayLog(___flags)) { ot::LogDispatcher::instance().dispatch(___text, __FUNCTION__, ___flags); }
@@ -46,18 +59,18 @@
 
 namespace ot {
 
-	//! Log message verbouse level
+	//! @brief Log message verbouse level
 	enum LogFlag {
-		NO_LOG                          = 0x00,
-		DEFAULT_LOG                     = 0x01,
-		DETAILED_LOG                    = 0x02,
-		WARNING_LOG                     = 0x04,
-		ERROR_LOG                       = 0x08,
-		INBOUND_MESSAGE_LOG             = 0x10,
-		QUEUED_INBOUND_MESSAGE_LOG      = 0x20,
-		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 0x40,
-		OUTGOING_MESSAGE_LOG            = 0x80,
-		ALL_LOG_FLAGS                   = 0xFF
+		NO_LOG                          = 0x00,		//! @brief Mask used to unset all log types
+		DEFAULT_LOG                     = 0x01,		//! @brief Information log (few logs)
+		DETAILED_LOG                    = 0x02,		//! @brief Detailed log (more logs)
+		WARNING_LOG                     = 0x04,		//! @brief Warning log
+		ERROR_LOG                       = 0x08,		//! @brief Error log
+		INBOUND_MESSAGE_LOG             = 0x10,		//! @brief Execute endpoint log
+		QUEUED_INBOUND_MESSAGE_LOG      = 0x20,		//! @brief Queue endpoint log
+		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 0x40,		//! @brief OneWay-TLS endpoint log
+		OUTGOING_MESSAGE_LOG            = 0x80,		//! @brief Message out log
+		ALL_LOG_FLAGS                   = 0xFF		//! @brief Mask used to set all log types
 	};
 }
 OT_ADD_FLAG_FUNCTIONS(ot::LogFlag);
@@ -86,10 +99,12 @@ namespace ot {
 		//! @brief Log flags that are set for this log message
 		const ot::Flags<ot::LogFlag>& flags(void) const { return m_flags; };
 
-		//! @brief "YYYY-MM-DD HH:MM:SS" string representation of the system timestamp at message creation
+		//! @brief String representation of the system timestamp at message creation
+		//! OT_LOG_TIME_FORMAT_STDSTRING contains the string format
 		const std::string& localSystemTime(void) const { return m_localSystemTime; };
 
-		//! @brief "YYYY-MM-DD HH:MM:SS" string representation of the system timestamp at when the message was received by the Logger Service
+		//! @brief String representation of the system timestamp at when the message was received by the Logger Service
+		//! OT_LOG_TIME_FORMAT_STDSTRING contains the string format
 		const std::string& globalSystemTime(void) const { return m_globalSystemTime; };
 
 		//! @brief Set the current system time as message creation timestamp

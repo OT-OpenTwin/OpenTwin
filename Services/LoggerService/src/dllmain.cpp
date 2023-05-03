@@ -77,11 +77,14 @@ extern "C"
 
 			globalServiceURL = _serviceURL;
 			
-			ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
-
 #ifdef _DEBUG
+			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, true);
+			ot::LogDispatcher::instance().setLogFlags(ot::DEFAULT_LOG | ot::DETAILED_LOG | ot::WARNING_LOG | ot::ERROR_LOG);
 			std::cout << "LoggerService" << std::endl;
-#endif
+#else
+			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, false);
+			ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
+#endif // _DEBUG
 		}
 		catch (const std::exception & e) {
 			OutputDebugStringA("ERROR: ");

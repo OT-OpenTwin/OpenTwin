@@ -57,7 +57,7 @@ void ot::LogMessage::setCurrentTimeAsLocalSystemTime(void) {
 	time(&rawtime);
 	gmtime_s(&timeinfo, &rawtime);
 
-	strftime(buffer, sizeof(buffer), OT_INTERN_LOG_TIME_FORMAT_STDSTRING, &timeinfo);
+	strftime(buffer, sizeof(buffer), OT_LOG_TIME_FORMAT_STDSTRING, &timeinfo);
 	m_localSystemTime = buffer;
 }
 
@@ -69,7 +69,7 @@ void ot::LogMessage::setCurrentTimeAsGlobalSystemTime(void) {
 	time(&rawtime);
 	gmtime_s(&timeinfo, &rawtime);
 
-	strftime(buffer, sizeof(buffer), OT_INTERN_LOG_TIME_FORMAT_STDSTRING, &timeinfo);
+	strftime(buffer, sizeof(buffer), OT_LOG_TIME_FORMAT_STDSTRING, &timeinfo);
 	m_globalSystemTime = buffer;
 }
 
