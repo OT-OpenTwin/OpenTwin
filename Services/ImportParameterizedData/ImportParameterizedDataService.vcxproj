@@ -193,11 +193,14 @@
     <ClCompile Include="src\Documentation.cpp" />
     <ClCompile Include="src\IndexManager.cpp" />
     <ClCompile Include="src\MetadataAssemblyRangeData.cpp" />
+    <ClCompile Include="src\MetadataParameterBundle.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\FileToTableExtractorFactory.cpp" />
     <ClCompile Include="src\DataCategorizationHandler.cpp" />
     <ClCompile Include="src\PreviewAssembler.cpp" />
     <ClCompile Include="src\PreviewAssemblerRMD.cpp" />
+    <ClCompile Include="src\QuantityContainer.cpp" />
+    <ClCompile Include="src\QuantityContainerCreator.cpp" />
     <ClCompile Include="src\TableExtractorCSV.cpp" />
     <ClCompile Include="src\TableHandler.cpp" />
     <ClCompile Include="src\TableStatisticAnalyser.cpp" />
@@ -222,6 +225,8 @@
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
     <ClInclude Include="include\IndexManager.h" />
+    <ClInclude Include="include\QuantityContainer.h" />
+    <ClInclude Include="include\QuantityContainerCreator.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />
     <ClInclude Include="include\ModelNotifier.h" />

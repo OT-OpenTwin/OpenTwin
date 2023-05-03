@@ -1,5 +1,6 @@
 #pragma once
 #include "MetadataParameter.h"
+#include <set>
 
 class MetadataParameterBundle
 {
@@ -14,10 +15,14 @@ public:
 	std::list<MetadataParameter<int32_t>>& getInt32Parameter() { return _int32Parameter; };
 	std::list<MetadataParameter<int64_t>>& getInt64Parameter() { return _int64Parameter; };
 
+	std::set<std::string> GetAllParameterAbbreviations();
+	std::list<int32_t> GetParameterValueIndices(int32_t quantityIndex);
+
 private:
+	std::set<std::string> _allParameterAbbreviations;
+
 	std::list<MetadataParameter<std::string>> _stringParameter;
 	std::list<MetadataParameter<double>> _doubleParameter;
 	std::list<MetadataParameter<int32_t>> _int32Parameter;
 	std::list<MetadataParameter<int64_t>> _int64Parameter;
 };
-

@@ -52,31 +52,31 @@ void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurement
 			Documentation::INSTANCE()->AddToDocumentation(parameterAbbreviation + ": " + parameterName + " ");
 			if (allStringFieldsByName->find(_valueField) != allStringFieldsByName->end())
 			{
-				_stringParameterByName[parameterName].values = allStringFieldsByName->find(_valueField)->second;
+				_stringParameterByName[parameterName].uniqueValues = allStringFieldsByName->find(_valueField)->second;
 				_stringParameterByName[parameterName].parameterName = parameterName;
 				_stringParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " +	std::to_string(_stringParameterByName[parameterName].values.size()) + " string values.\n");
+				Documentation::INSTANCE()->AddToDocumentation("with " +	std::to_string(_stringParameterByName[parameterName].uniqueValues.size()) + " string values.\n");
 			}
 			else if (allInt32FieldsByName->find(_valueField) != allInt32FieldsByName->end())
 			{
-				_int32ParameterByName[parameterName].values = allInt32FieldsByName->find(_valueField)->second;
+				_int32ParameterByName[parameterName].uniqueValues = allInt32FieldsByName->find(_valueField)->second;
 				_int32ParameterByName[parameterName].parameterName = parameterName;
 				_int32ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int32ParameterByName[parameterName].values.size()) + " int32 values.\n");
+				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int32ParameterByName[parameterName].uniqueValues.size()) + " int32 values.\n");
 			}
 			else if (allInt64FieldsByName->find(_valueField) != allInt64FieldsByName->end())
 			{
-				_int64ParameterByName[parameterName].values = allInt64FieldsByName->find(_valueField)->second;
+				_int64ParameterByName[parameterName].uniqueValues = allInt64FieldsByName->find(_valueField)->second;
 				_int64ParameterByName[parameterName].parameterName = parameterName;
 				_int64ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int64ParameterByName[parameterName].values.size()) + " int64 values.\n");
+				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int64ParameterByName[parameterName].uniqueValues.size()) + " int64 values.\n");
 			}
 			else if (allDoubleFieldsByName->find(_valueField) != allDoubleFieldsByName->end())
 			{
-				_doubleParameterByName[parameterName].values = allDoubleFieldsByName->find(_valueField)->second;
+				_doubleParameterByName[parameterName].uniqueValues = allDoubleFieldsByName->find(_valueField)->second;
 				_doubleParameterByName[parameterName].parameterName = parameterName;
 				_doubleParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_doubleParameterByName[parameterName].values.size()) + " double values.\n");
+				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_doubleParameterByName[parameterName].uniqueValues.size()) + " double values.\n");
 			}
 			
 		}
@@ -146,6 +146,8 @@ MetadataParameterBundle IndexManager::CreateMetadataParameter(MetadataAssemblyRa
 	AddMetadataParameterToBundle(allParameter.GetInt32Fields(), _int32ParameterByName, parameterBundle);
 	AddMetadataParameterToBundle(allParameter.GetInt64Fields(), _int64ParameterByName, parameterBundle);
 	AddMetadataParameterToBundle(allParameter.GetDoubleFields(), _doubleParameterByName, parameterBundle);
+
+	CreateParameterValueIndices();
 	return parameterBundle;
 }
 
@@ -282,6 +284,11 @@ std::string IndexManager::GetNextAvailableMSMDName()
 	return nameBase + std::to_string(index);
 }
 
+int32_t IndexManager::GetQuantityIndex(const std::string quantityName)
+{
+	return _takenQuantitiesByName.find(quantityName)->second.quantityIndex;
+}
+
 std::map<std::string, MetadataQuantity*> IndexManager::GetNonExistingQuantityAbbreviationsByName(MetadataAssemblyRangeData& allParameter)
 {
 	std::string summary ="";
@@ -317,5 +324,13 @@ int32_t IndexManager::GetNextQuantityIndex()
 		index++;
 	}
 	return -1;
+}
+
+void IndexManager::CreateParameterValueIndices()
+{
+	CreateParameterValueIndices(_stringParameterByName, _stringParameterValueIndicesByName);
+	CreateParameterValueIndices(_doubleParameterByName, _doubleParameterValueIndicesByName);
+	CreateParameterValueIndices(_int32ParameterByName, _int32ParameterValueIndicesByName);
+	CreateParameterValueIndices(_int64ParameterByName, _int64ParameterValueIndicesByName);
 }
 

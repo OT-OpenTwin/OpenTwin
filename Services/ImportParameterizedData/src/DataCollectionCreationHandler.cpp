@@ -10,6 +10,8 @@
 #include "GenericDocument.h"
 #include "Documentation.h"
 
+#include "QuantityContainerCreator.h"
+
 DataCollectionCreationHandler::DataCollectionCreationHandler(std::string baseFolder, std::string datasetFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
 {
@@ -117,28 +119,28 @@ void DataCollectionCreationHandler::CreateDataCollection()
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
 				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 			for (const auto& field : parameterBundle.getDoubleParameter())
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
 				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 			for (auto field : parameterBundle.getInt32Parameter())
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
 				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 			for (auto field : parameterBundle.getInt64Parameter())
 			{
 				std::list<std::string> parameterName{ field.parameterName };
 				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.values, field.parameterAbbreviation);
+				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
 				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 			}
 
@@ -159,35 +161,74 @@ void DataCollectionCreationHandler::CreateDataCollection()
 				Documentation::INSTANCE()->AddToDocumentation(newQuantity.first + "\n");
 			}
 
+			int32_t msmdIndex = std::stoi(msmdName.substr(msmdName.find_last_of('_'), msmdName.size()));
+			std::set<std::string> parameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
+			int32_t containerSize = 1;
+			QuantityContainerCreator qcCreator(msmdIndex, parameterAbbreviations, containerSize);
 			for (auto field : quantityData.GetStringFields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
 				{
 					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getStringTypeName());
 				}
+				auto valuePointer = field.second.begin();
+				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+				for (int32_t i = 0; i < field.second.size(); i++)
+				{
+					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+					valuePointer++;
+				}
 			}
+			qcCreator.Flush();
 			for (auto field : quantityData.GetDoubleFields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
 				{
 					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getDoubleTypeName());
 				}
+				auto valuePointer = field.second.begin();
+				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+				for (int32_t i = 0; i < field.second.size(); i++)
+				{
+					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+					valuePointer++;
+				}
 			}
+			qcCreator.Flush();
 			for (auto field : quantityData.GetInt32Fields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
 				{
 					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt32TypeName());
 				}
+				auto valuePointer = field.second.begin();
+				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+				for (int32_t i = 0; i < field.second.size(); i++)
+				{
+					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+					valuePointer++;
+				}
 			}
+			qcCreator.Flush();
 			for (auto field : quantityData.GetInt64Fields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
 				{
 					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt64TypeName());
 				}
+				auto valuePointer = field.second.begin();
+				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+				for (int32_t i = 0; i < field.second.size(); i++)
+				{
+					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+					valuePointer++;
+				}
 			}
-
+			qcCreator.Flush();
 			allMetadata.push_back(metadataBuffer);
 		}
 	}
