@@ -16,7 +16,6 @@ public:
 	std::list<MetadataParameter<int64_t>>& getInt64Parameter() { return _int64Parameter; };
 
 	std::set<std::string> GetAllParameterAbbreviations();
-	std::list<int32_t> GetParameterValueIndices(int32_t quantityIndex);
 
 private:
 	std::set<std::string> _allParameterAbbreviations;

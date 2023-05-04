@@ -157,9 +157,9 @@ inline void IndexManager::CreateParameterValueIndices(std::map<std::string, Meta
 	for (const auto& parameter : parameterByName)
 	{
 		auto valuePointer = parameter.second.uniqueValues.begin();
-		for (int i = 1; i < parameter.second.uniqueValues.size(); i++)
+		for (int i = 1; i <= parameter.second.uniqueValues.size(); i++)
 		{
-			parameterValueIndices[parameter.first][*valuePointer] = i;
+			parameterValueIndices[parameter.second.parameterAbbreviation][*valuePointer] = i;
 			valuePointer++;
 
 		}

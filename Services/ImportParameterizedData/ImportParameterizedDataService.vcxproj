@@ -227,6 +227,7 @@
     <ClInclude Include="include\IndexManager.h" />
     <ClInclude Include="include\QuantityContainer.h" />
     <ClInclude Include="include\QuantityContainerCreator.h" />
+    <ClInclude Include="include\QuantityDataStorageAccess.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />
     <ClInclude Include="include\ModelNotifier.h" />

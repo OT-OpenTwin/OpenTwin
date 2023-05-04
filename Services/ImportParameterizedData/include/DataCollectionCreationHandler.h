@@ -13,7 +13,9 @@ class DataCollectionCreationHandler : public BusinessLogicHandler
 {
 public:
 	DataCollectionCreationHandler(std::string baseFolder, std::string datasetFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder);
-	void CreateDataCollection();
+	void CreateDataCollection(std::string dbURL, std::string projectName);
+
+
 
 private:
 	const std::string _baseFolder;
@@ -21,6 +23,7 @@ private:
 	const std::string _parameterFolder;
 	const std::string _quantityFolder;
 	const std::string _tableFolder;
+	const std::string _dbURL;
 	
 	const std::string _rmdEntityName = "ResearchMetadata";
 	const std::string _nameField = "Name";
@@ -40,4 +43,5 @@ private:
 
 	void AddQuantityToMSMD(std::shared_ptr<EntityMeasurementMetadata> msmd, std::string abbreviation, std::string name, std::string type);
 
+	std::list<int32_t> GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex);
 };

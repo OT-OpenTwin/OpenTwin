@@ -116,7 +116,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			{
 				m_uiComponent->displayMessage("===========================================================================\n");
 				m_uiComponent->displayMessage("Start creation of dataset\n");
-				_collectionCreationHandler->CreateDataCollection();
+				_collectionCreationHandler->CreateDataCollection(dataBaseURL(), m_collectionName);
 				m_uiComponent->displayMessage("Creation of dataset finished\n");
 				m_uiComponent->displayMessage("===========================================================================\n\n");
 			}

@@ -11,14 +11,19 @@
 #include "Documentation.h"
 
 #include "QuantityContainerCreator.h"
+#include "ResultDataStorageAPI.h"
+
 
 DataCollectionCreationHandler::DataCollectionCreationHandler(std::string baseFolder, std::string datasetFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
 {
 }
 
-void DataCollectionCreationHandler::CreateDataCollection()
+void DataCollectionCreationHandler::CreateDataCollection(std::string dbURL, std::string projectName)
 {
+
+	DataStorageAPI::ResultDataStorageAPI dataStorageAccess("Projects", projectName);
+
 	BranchSynchronizer branchSynchronizer;
 	_uiComponent->displayMessage("Waiting for branch synchronization\n");
 	branchSynchronizer.WaitForTurn();
@@ -161,7 +166,8 @@ void DataCollectionCreationHandler::CreateDataCollection()
 				Documentation::INSTANCE()->AddToDocumentation(newQuantity.first + "\n");
 			}
 
-			int32_t msmdIndex = std::stoi(msmdName.substr(msmdName.find_last_of('_'), msmdName.size()));
+			std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') +1, msmdName.size());
+			int32_t msmdIndex = std::stoi(msmdIndexString);
 			std::set<std::string> parameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
 			int32_t containerSize = 1;
 			QuantityContainerCreator qcCreator(msmdIndex, parameterAbbreviations, containerSize);
@@ -175,12 +181,12 @@ void DataCollectionCreationHandler::CreateDataCollection()
 				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
 				for (int32_t i = 0; i < field.second.size(); i++)
 				{
-					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager,parameterBundle,i);
 					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
 					valuePointer++;
 				}
 			}
-			qcCreator.Flush();
+			qcCreator.Flush(dataStorageAccess);
 			for (auto field : quantityData.GetDoubleFields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
@@ -191,12 +197,12 @@ void DataCollectionCreationHandler::CreateDataCollection()
 				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
 				for (int32_t i = 0; i < field.second.size(); i++)
 				{
-					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
 					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
 					valuePointer++;
 				}
 			}
-			qcCreator.Flush();
+			qcCreator.Flush(dataStorageAccess);
 			for (auto field : quantityData.GetInt32Fields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
@@ -207,12 +213,12 @@ void DataCollectionCreationHandler::CreateDataCollection()
 				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
 				for (int32_t i = 0; i < field.second.size(); i++)
 				{
-					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
 					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
 					valuePointer++;
 				}
 			}
-			qcCreator.Flush();
+			qcCreator.Flush(dataStorageAccess);
 			for (auto field : quantityData.GetInt64Fields())
 			{
 				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
@@ -223,12 +229,12 @@ void DataCollectionCreationHandler::CreateDataCollection()
 				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
 				for (int32_t i = 0; i < field.second.size(); i++)
 				{
-					std::list<int32_t> parameterValueIndices = parameterBundle.GetParameterValueIndices(i);
+					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
 					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
 					valuePointer++;
 				}
 			}
-			qcCreator.Flush();
+			qcCreator.Flush(dataStorageAccess);
 			allMetadata.push_back(metadataBuffer);
 		}
 	}
@@ -444,6 +450,74 @@ void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeas
 	msmd->InsertToQuantityField("Name", quantityName, abbreviation);
 	std::list<std::string> dataType{ type };
 	msmd->InsertToQuantityField("Datatype", dataType, abbreviation);
+}
+
+std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex)
+{
+	std::list<int32_t> paramValueIndices;
+	auto allParameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
+	for (const std::string abbrev : allParameterAbbreviations)
+	{
+		bool paramerterFound = false;
+		for (const auto& param : parameterBundle.getStringParameter())
+		{
+			if (param.parameterAbbreviation == abbrev)
+			{
+				int32_t parameterValueIndex = indexManager.GetParameterIndex(abbrev, param.selectedValues[quantityValueIndex]);
+				paramValueIndices.push_back(parameterValueIndex);
+				paramerterFound = true;
+				break;
+			}
+		}
+		if (paramerterFound)
+		{
+			break;
+		}
+		for (const auto& param : parameterBundle.getDoubleParameter())
+		{
+			if (param.parameterAbbreviation == abbrev)
+			{
+				int32_t parameterValueIndex = indexManager.GetParameterIndex(abbrev, param.selectedValues[quantityValueIndex]);
+				paramValueIndices.push_back(parameterValueIndex);
+				paramerterFound = true;
+				break;
+			}
+		}
+		if (paramerterFound)
+		{
+			break;
+		}
+		for (const auto& param : parameterBundle.getInt32Parameter())
+		{
+			if (param.parameterAbbreviation == abbrev)
+			{
+				int32_t parameterValueIndex = indexManager.GetParameterIndex(abbrev, param.selectedValues[quantityValueIndex]);
+				paramValueIndices.push_back(parameterValueIndex);
+				paramerterFound = true;
+				break;
+			}
+		}
+		if (paramerterFound)
+		{
+			break;
+		}
+		for (const auto& param : parameterBundle.getInt64Parameter())
+		{
+			if (param.parameterAbbreviation == abbrev)
+			{
+				int32_t parameterValueIndex = indexManager.GetParameterIndex(abbrev, param.selectedValues[quantityValueIndex]);
+				paramValueIndices.push_back(parameterValueIndex);
+				paramerterFound = true;
+				break;
+			}
+		}
+		if (paramerterFound)
+		{
+			break;
+		}
+	}
+
+	return paramValueIndices;
 }
 
 void DataCollectionCreationHandler::AddRequiredTables(MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)

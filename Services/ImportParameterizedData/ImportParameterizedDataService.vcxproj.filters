@@ -144,6 +144,9 @@
     <ClInclude Include="include\QuantityContainer.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
+    <ClInclude Include="include\QuantityDataStorageAccess.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

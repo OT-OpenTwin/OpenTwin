@@ -26,26 +26,46 @@ void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, st
 	AddToQuantityContainer(_int64QuantContainers, quantityIndex, parameterValueIndices, value);
 }
 
-void QuantityContainerCreator::Flush()
+void QuantityContainerCreator::Flush(DataStorageAPI::ResultDataStorageAPI& storageAPI)
 {
 	for (auto& qc : _stringQuantContainers)
 	{
-		qc.StoreToDatabase();
-		_stringQuantContainers.clear();
+		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
+		if (!response.getSuccess())
+		{
+			throw std::exception("Insertion of quantity container failed.");
+		}
 	}
+	_stringQuantContainers.clear();
+
 	for (auto& qc : _doubleQuantContainers)
 	{
-		qc.StoreToDatabase();
-		_doubleQuantContainers.clear();
+	
+		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
+		if (!response.getSuccess())
+		{
+			throw std::exception("Insertion of quantity container failed.");
+		}
 	}
+	_doubleQuantContainers.clear();
+
 	for (auto& qc : _int32QuantContainers)
 	{
-		qc.StoreToDatabase();
-		_int32QuantContainers.clear();
+		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
+		if (!response.getSuccess())
+		{
+			throw std::exception("Insertion of quantity container failed.");
+		}
 	}
+	_int32QuantContainers.clear();
+
 	for (auto& qc : _int64QuantContainers)
 	{
-		qc.StoreToDatabase();
-		_int64QuantContainers.clear();
+		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
+		if (!response.getSuccess())
+		{
+			throw std::exception("Insertion of quantity container failed.");
+		}
 	}
+	_int64QuantContainers.clear();
 }

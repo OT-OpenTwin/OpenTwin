@@ -14,13 +14,14 @@ class QuantityContainer
 {
 public:
 	inline QuantityContainer(int32_t msmdIndex, std::set<std::string>& parameterAbbreviations, std::list<int32_t>& parameterValueIndices, int32_t quantityIndex, bool isFlatCollection);
-	inline void StoreToDatabase();
+	inline const bsoncxx::builder::basic::document* GetDocument() const { return &_mongoDocument; };
 	
 	inline void AddValue(T value);
 	inline bool ParameterValueIndicesAndQuantityIndexAreMatching(const std::list<int32_t>& parameterValueIndices, int32_t quantityIndex);
 	inline size_t GetValueArraySize() const { return _values.size(); };
-private:
 	bsoncxx::builder::basic::document _mongoDocument;
+	
+private:
 	std::list<T> _values;
 	bool _isFlatCollection;
 	std::list<int32_t> _parameterValueIndices;
@@ -46,27 +47,9 @@ inline QuantityContainer<T>::QuantityContainer(int32_t msmdIndex, std::set<std::
 }
 
 template<class T>
-inline void QuantityContainer<T>::StoreToDatabase()
-{
-	if (!_isFlatCollection)
-	{
-		auto valueArray = bsoncxx::builder::basic::array();
-		for (const T& value : _values)
-		{
-			valueArray.append(value);
-		}
-		_mongoDocument.append(bsoncxx::builder::basic::kvp("Values", valueArray));
-	}
-	else
-	{
-		_mongoDocument.append(bsoncxx::builder::basic::kvp("Value", *_values.begin()));
-	}
-
-}
-
-template<class T>
 inline void QuantityContainer<T>::AddValue(T value)
 {
+	_mongoDocument.append(bsoncxx::builder::basic::kvp("Value", value));
 	_values.push_back(value);
 }
 
