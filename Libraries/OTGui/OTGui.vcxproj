@@ -11,16 +11,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTGui\FillPainter2D.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
+    <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
+    <ClInclude Include="include\OTGui\Painter2D.h" />
+    <ClInclude Include="include\OTGui\Painter2DFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FillPainter2D.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
     <ClCompile Include="src\LengthLimitation.cpp" />
+    <ClCompile Include="src\LinearGradientPainter2D.cpp" />
     <ClCompile Include="src\Margins.cpp" />
+    <ClCompile Include="src\Painter2D.cpp" />
+    <ClCompile Include="src\Painter2DFactory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

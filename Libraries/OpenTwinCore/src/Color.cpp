@@ -13,11 +13,11 @@ ot::Color::~Color() {}
 
 ot::Color & ot::Color::operator = (const Color & _other) { m_r = _other.m_r; m_g = _other.m_g; m_b = _other.m_b; m_a = _other.m_a; return *this; }
 
-bool ot::Color::operator == (const Color & _other) {
+bool ot::Color::operator == (const Color & _other) const {
 	return m_r == _other.m_r && m_g == _other.m_g && m_b == _other.m_b && m_a == _other.m_a;
 }
 
-bool ot::Color::operator != (const Color & _other) {
+bool ot::Color::operator != (const Color & _other) const {
 	return m_r != _other.m_r || m_g != _other.m_g || m_b != _other.m_b || m_a != _other.m_a;
 }
 

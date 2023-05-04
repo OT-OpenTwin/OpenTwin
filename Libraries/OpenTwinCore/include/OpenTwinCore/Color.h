@@ -25,8 +25,8 @@ namespace ot {
 		// Operators
 
 		Color & operator = (const Color & _other);
-		bool operator == (const Color & _other);
-		bool operator != (const Color & _other);
+		bool operator == (const Color & _other) const;
+		bool operator != (const Color & _other) const;
 
 		// Base class functions
 

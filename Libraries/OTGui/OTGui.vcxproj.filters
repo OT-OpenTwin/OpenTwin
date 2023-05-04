@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Painter2D">
+      <UniqueIdentifier>{db012fd4-7501-4074-a987-29421177a6b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Painter2D">
+      <UniqueIdentifier>{1ff6a0d7-763f-486d-80c8-fbf5a4d9c97d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GuiTypes.h">
@@ -27,6 +33,18 @@
     <ClInclude Include="include\OTGui\LengthLimitation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2D.h">
+      <Filter>Header Files\Painter2D</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\FillPainter2D.h">
+      <Filter>Header Files\Painter2D</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\LinearGradientPainter2D.h">
+      <Filter>Header Files\Painter2D</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2DFactory.h">
+      <Filter>Header Files\Painter2D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -40,6 +58,18 @@
     </ClCompile>
     <ClCompile Include="src\GuiTypes.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinearGradientPainter2D.cpp">
+      <Filter>Source Files\Painter2D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2D.cpp">
+      <Filter>Source Files\Painter2D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FillPainter2D.cpp">
+      <Filter>Source Files\Painter2D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DFactory.cpp">
+      <Filter>Source Files\Painter2D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
