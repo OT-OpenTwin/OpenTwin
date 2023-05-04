@@ -21,11 +21,17 @@
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 
+//! @brief JSON document
 #define OT_rJSON_doc rapidjson::Document
+
+//! @brief JSON value
 #define OT_rJSON_val rapidjson::Value
+
+//! @
 #define OT_rJSON_parseDOC(___doc, ___json) OT_rJSON_doc ___doc; ___doc.Parse(___json);
 #define OT_rJSON_createDOC(___doc) OT_rJSON_doc ___doc; ___doc.SetObject();
 #define OT_rJSON_createValueObject(___val) OT_rJSON_val ___val; ___val.SetObject();
+#define OT_rJSON_createValueNull(___val) OT_rJSON_val ___val; ___val.SetNull();
 #define OT_rJSON_createValueArray(___val) OT_rJSON_val ___val(rapidjson::kArrayType);
 #define OT_rJSON_docCheck(___doc) if (!___doc.IsObject()) { throw std::exception("Document is not an object"); }
 #define OT_rJSON_ifNoMember(___doc, ___member) if (!___doc.HasMember(___member))
@@ -38,6 +44,9 @@
 namespace ot {
 	namespace rJSON {
 		
+		//typedef rapidjson::Document Document;
+		//typedef rapidjson::Value Value;
+
 		//! @brief Will check if the provided member is part of the specified doc
 		//! @param _doc The document
 		//! @param _member The member to check

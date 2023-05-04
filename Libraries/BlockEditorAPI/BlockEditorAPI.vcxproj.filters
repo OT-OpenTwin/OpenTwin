@@ -48,6 +48,18 @@
     <ClCompile Include="src\BlockLayerConfiguration.cpp">
       <Filter>Source Files\BlockLayers</Filter>
     </ClCompile>
+    <ClCompile Include="src\ImageBlockLayerConfiguration.cpp">
+      <Filter>Source Files\BlockLayers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextBlockLayerConfiguration.cpp">
+      <Filter>Source Files\BlockLayers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RectangleBlockLayerConfiguration.cpp">
+      <Filter>Source Files\BlockLayers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockLayerConfigurationFactory.cpp">
+      <Filter>Source Files\BlockLayers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h">
@@ -78,6 +90,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h">
+      <Filter>Header Files\BlockLayers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\ImageBlockLayerConfiguration.h">
+      <Filter>Header Files\BlockLayers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\TextBlockLayerConfiguration.h">
+      <Filter>Header Files\BlockLayers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\RectangleBlockLayerConfiguration.h">
+      <Filter>Header Files\BlockLayers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\BlockLayers.h">
+      <Filter>Header Files\BlockLayers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h">
       <Filter>Header Files\BlockLayers</Filter>
     </ClInclude>
   </ItemGroup>

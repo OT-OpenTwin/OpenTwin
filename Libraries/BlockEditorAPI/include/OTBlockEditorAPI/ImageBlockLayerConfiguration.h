@@ -1,4 +1,4 @@
-//! @file BlockLayerConfiguration.h
+//! @file ImageBlockLayerConfiguration.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,14 +6,16 @@
 #pragma once
 
 // OpenTwin header
-#include "OTBlockEditorAPI/BlockConfigurationGraphicsObject.h"
+#include "OTBlockEditorAPI/BlockLayerConfiguration.h"
+
+#define OT_IMAGEBLOCKLAYERCONFIGURATION_TYPE "ImageBlockLayer"
 
 namespace ot {
 
-	class BLOCKEDITORAPI_API_EXPORT BlockLayerConfiguration : public ot::BlockConfigurationGraphicsObject {
+	class BLOCKEDITORAPI_API_EXPORT ImageBlockLayerConfiguration : public ot::BlockLayerConfiguration {
 	public:
-		BlockLayerConfiguration();
-		virtual ~BlockLayerConfiguration();
+		ImageBlockLayerConfiguration(const std::string& _imageSubPath = std::string());
+		virtual ~ImageBlockLayerConfiguration();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -26,11 +28,15 @@ namespace ot {
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
 		//! @brief Returns the layer configuration type
-		virtual std::string layerType(void) const = 0;
+		virtual std::string layerType(void) const { return OT_IMAGEBLOCKLAYERCONFIGURATION_TYPE; };
+
+		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
+		const std::string& imagePath(void) const { return m_imageSubPath; };
 
 	private:
+		std::string m_imageSubPath;
 
-		BlockLayerConfiguration(BlockLayerConfiguration&) = delete;
-		BlockLayerConfiguration& operator = (BlockLayerConfiguration&) = delete;
+		ImageBlockLayerConfiguration(ImageBlockLayerConfiguration&) = delete;
+		ImageBlockLayerConfiguration& operator = (ImageBlockLayerConfiguration&) = delete;
 	};
 }

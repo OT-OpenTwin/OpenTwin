@@ -18,8 +18,12 @@
     <ClCompile Include="src\BlockConnectorConfiguration.cpp" />
     <ClCompile Include="src\BlockEditorAPITypes.cpp" />
     <ClCompile Include="src\BlockLayerConfiguration.cpp" />
+    <ClCompile Include="src\BlockLayerConfigurationFactory.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FlowBlockConfiguration.cpp" />
+    <ClCompile Include="src\ImageBlockLayerConfiguration.cpp" />
+    <ClCompile Include="src\RectangleBlockLayerConfiguration.cpp" />
+    <ClCompile Include="src\TextBlockLayerConfiguration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h" />
@@ -31,7 +35,12 @@
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPIAPIExport.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPITypes.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\BlockLayers.h" />
     <ClInclude Include="include\OTBlockEditorAPI\FlowBlockConfiguration.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\ImageBlockLayerConfiguration.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\RectangleBlockLayerConfiguration.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\TextBlockLayerConfiguration.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
