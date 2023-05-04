@@ -19,6 +19,12 @@
     <Filter Include="Source Files\BlockLayers">
       <UniqueIdentifier>{4bd3b4ad-9f6f-4d53-b818-abcd5d2494d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ConnectorManagers">
+      <UniqueIdentifier>{572803dd-5890-4a35-8ec8-09abd9399410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ConnectorManagers">
+      <UniqueIdentifier>{0186d4d8-ca14-49c2-af03-017312d92a1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -59,6 +65,15 @@
     </ClCompile>
     <ClCompile Include="src\BlockLayerConfigurationFactory.cpp">
       <Filter>Source Files\BlockLayers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConnectorManager.cpp">
+      <Filter>Source Files\ConnectorManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConnectorManagerFactory.cpp">
+      <Filter>Source Files\ConnectorManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BorderLayoutConnectorManager.cpp">
+      <Filter>Source Files\ConnectorManagers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +121,15 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h">
       <Filter>Header Files\BlockLayers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\ConnectorManager.h">
+      <Filter>Header Files\ConnectorManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\ConnectorManagerFactory.h">
+      <Filter>Header Files\ConnectorManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutConnectorManager.h">
+      <Filter>Header Files\ConnectorManagers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

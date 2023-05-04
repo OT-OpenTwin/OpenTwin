@@ -19,6 +19,9 @@
     <ClCompile Include="src\BlockEditorAPITypes.cpp" />
     <ClCompile Include="src\BlockLayerConfiguration.cpp" />
     <ClCompile Include="src\BlockLayerConfigurationFactory.cpp" />
+    <ClCompile Include="src\BorderLayoutConnectorManager.cpp" />
+    <ClCompile Include="src\ConnectorManager.cpp" />
+    <ClCompile Include="src\ConnectorManagerFactory.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FlowBlockConfiguration.cpp" />
     <ClCompile Include="src\ImageBlockLayerConfiguration.cpp" />
@@ -37,6 +40,9 @@
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayers.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutConnectorManager.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\ConnectorManager.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\ConnectorManagerFactory.h" />
     <ClInclude Include="include\OTBlockEditorAPI\FlowBlockConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\ImageBlockLayerConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\RectangleBlockLayerConfiguration.h" />

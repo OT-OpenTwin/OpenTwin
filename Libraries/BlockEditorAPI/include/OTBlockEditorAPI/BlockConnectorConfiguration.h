@@ -42,11 +42,6 @@ namespace ot {
 		void setTitlePosition(BlockComponentPosition _position) { m_titlePosition = _position; };
 		BlockComponentPosition titlePosition(void) const { return m_titlePosition; };
 
-		void addTag(const std::string& _tag);
-		void addTags(const std::list<std::string>& _tags);
-		void setTags(const std::list<std::string>& _tags);
-		const std::list<std::string>& tags(void) const { return m_tags; };
-
 		void setStyle(BlockConnectorStyle _style) { m_style = _style; };
 		BlockConnectorStyle style(void) const { return m_style; };
 
@@ -62,7 +57,6 @@ namespace ot {
 	private:
 		std::string m_title;
 		BlockComponentPosition m_titlePosition;
-		std::list<std::string> m_tags;
 		BlockConnectorStyle m_style;
 		std::string m_imageSubPath;
 		ot::Color m_fillColor;

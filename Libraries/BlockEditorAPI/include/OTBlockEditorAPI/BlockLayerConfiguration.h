@@ -8,7 +8,15 @@
 // OpenTwin header
 #include "OTBlockEditorAPI/BlockConfigurationGraphicsObject.h"
 
+// std header
+#include "vector"
+
+#define OT_JSON_MEMBER_BlockLayerConfigurationType "BlockLayerConfigurationType"
+
 namespace ot {
+
+	class BlockConnectorConfiguration;
+	class ConnectorManager;
 
 	class BLOCKEDITORAPI_API_EXPORT BlockLayerConfiguration : public ot::BlockConfigurationGraphicsObject {
 	public:
@@ -28,7 +36,11 @@ namespace ot {
 		//! @brief Returns the layer configuration type
 		virtual std::string layerType(void) const = 0;
 
+		//! @brief Will set the currently used connector manager
+		void setConnectorManager(ot::ConnectorManager* _manager);
+
 	private:
+		ConnectorManager* m_connectorManager;
 
 		BlockLayerConfiguration(BlockLayerConfiguration&) = delete;
 		BlockLayerConfiguration& operator = (BlockLayerConfiguration&) = delete;
