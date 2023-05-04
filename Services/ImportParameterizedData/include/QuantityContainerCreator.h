@@ -5,6 +5,7 @@
 #include <list>
 
 #include "QuantityContainer.h"
+#include "ResultDataStorageAPI.h"
 
 class QuantityContainerCreator
 {
@@ -15,7 +16,7 @@ public:
 	void AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, int32_t& value);
 	void AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, int64_t& value);
 
-	void Flush();
+	void Flush(DataStorageAPI::ResultDataStorageAPI& storageAPI);
 private:
 	std::list<QuantityContainer<std::string>> _stringQuantContainers;
 	std::list<QuantityContainer<int32_t>> _int32QuantContainers;
@@ -25,6 +26,8 @@ private:
 	int32_t _msmdIndex;
 	int32_t _containerSize;
 	bool _isFlatCollection;
+	bool _checkForDocumentExistenceBeforeInsert = false;
+	bool _quequeDocumentsWhenInserting = false;
 	std::set<std::string> _parameterAbbreviations;
 
 	template <class T>
@@ -34,21 +37,21 @@ private:
 template<class T>
 inline void QuantityContainerCreator::AddToQuantityContainer(std::list<QuantityContainer<T>>& quantityContainerOfType, int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, T& value)
 {
-	for (auto& quantityContainer : quantityContainerOfType)
+	bool doesAlreadyExist = false;
+	//for (auto& quantityContainer : quantityContainerOfType)
+	//{
+	//	if (quantityContainer.ParameterValueIndicesAndQuantityIndexAreMatching(parameterValueIndices, quantityIndex))
+	//	{
+	//		doesAlreadyExist = true;
+	//	}
+	//}
+	if(!doesAlreadyExist)
 	{
-		if (quantityContainer.ParameterValueIndicesAndQuantityIndexAreMatching(parameterValueIndices, quantityIndex))
-		{
-			if (quantityContainer.GetValueArraySize() >= _containerSize)
-			{
-				assert(0);// Container size should match with the number of parameter apperiences.
-			}
-			quantityContainer.AddValue(value);
-		}
-		else
-		{
-
-			quantityContainerOfType.push_back(QuantityContainer<T>(_msmdIndex, _parameterAbbreviations, parameterValueIndices, quantityIndex, _isFlatCollection));
-			quantityContainerOfType.back().AddValue(value);
-		}
+		//if (quantityContainerOfType.back().GetValueArraySize() >= _containerSize)
+		//{
+		//	assert(0);// Container size should match with the number of parameter apperiences.
+		//}
+		quantityContainerOfType.push_back(QuantityContainer<T>(_msmdIndex, _parameterAbbreviations, parameterValueIndices, quantityIndex, _isFlatCollection));
+		quantityContainerOfType.back().AddValue(value);
 	}
 }

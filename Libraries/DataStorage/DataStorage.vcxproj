@@ -298,7 +298,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;DATASTORAGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(ProjectDir)$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
@@ -325,6 +325,7 @@
     <ClInclude Include="include\DocumentAPI.h" />
     <ClInclude Include="include\Document\DocumentAccessBase.h" />
     <ClInclude Include="include\Document\DocumentManager.h" />
+    <ClInclude Include="include\ResultDataStorageAPI.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\System\SystemDataAccess.h" />
     <ClInclude Include="include\targetver.h" />
@@ -346,6 +347,7 @@
     <ClCompile Include="src\DocumentManager.cpp" />
     <ClCompile Include="src\MongoDBAssertions.cpp" />
     <ClCompile Include="src\QueryBuilder.cpp" />
+    <ClCompile Include="src\ResultDataStorageAPI.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|Win32'">Create</PrecompiledHeader>
