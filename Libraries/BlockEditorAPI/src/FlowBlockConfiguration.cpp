@@ -2,11 +2,11 @@
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OTBlockEditorAPI/FlowBlockConfiguration.h"
 #include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
+#include "OTGui/Painter2D.h"
 
 #define JSON_MEMBER_BackgroundIcon "BackgroundIcon"
-#define JSON_MEMBER_BackgroundColor "BackgroundColor"
+#define JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 #define JSON_MEMBER_TitleIcon "TitleIcon"
-#define JSON_MEMBER_CustomTitleBackground "CustomTitleBackground"
 #define JSON_MEMBER_TitleColorLeft "TitleColorLeft"
 #define JSON_MEMBER_TitleColorRight "TitleColorRight"
 #define JSON_MEMBER_TitleTextColor "TitleTextColor"
@@ -16,13 +16,13 @@
 #define JSON_MEMBER_IconBottomRight "IconBottomRight"
 
 ot::FlowBlockConfiguration::FlowBlockConfiguration(const std::string& _name)
-	: BlockConfiguration(_name)
+	: BlockConfiguration(_name), m_backgroundPainter(nullptr)
 {
 
 }
 
 ot::FlowBlockConfiguration::~FlowBlockConfiguration() {
-
+	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 void ot::FlowBlockConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
@@ -30,23 +30,22 @@ void ot::FlowBlockConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJS
 
 	ot::rJSON::add(_document, _object, JSON_MEMBER_BackgroundIcon, m_backgroundIconSubPath);
 
-	OT_rJSON_createValueObject(backgroundColorObj);
-	m_backgroundColor.addToJsonObject(_document, backgroundColorObj);
-	ot::rJSON::add(_document, _object, JSON_MEMBER_BackgroundColor, backgroundColorObj);
+	OT_rJSON_createValueObject(backgroundPainterObj);
+	m_backgroundPainter->addToJsonObject(_document, backgroundPainterObj);
+	ot::rJSON::add(_document, _object, JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
 
 	ot::rJSON::add(_document, _object, JSON_MEMBER_TitleIcon, m_titleIconSubPath);
-	ot::rJSON::add(_document, _object, JSON_MEMBER_CustomTitleBackground, m_titleCustomBackgroundColor);
 	
 	OT_rJSON_createValueObject(titleColorLeftObj);
-	m_backgroundColor.addToJsonObject(_document, titleColorLeftObj);
+	m_titleColorLeft.addToJsonObject(_document, titleColorLeftObj);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_TitleColorLeft, titleColorLeftObj);
 
 	OT_rJSON_createValueObject(titleColorRightObj);
-	m_backgroundColor.addToJsonObject(_document, titleColorRightObj);
+	m_titleColorRight.addToJsonObject(_document, titleColorRightObj);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_TitleColorRight, titleColorRightObj);
 
 	OT_rJSON_createValueObject(titleTextColorObj);
-	m_backgroundColor.addToJsonObject(_document, titleTextColorObj);
+	m_titleTextColor.addToJsonObject(_document, titleTextColorObj);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_TitleTextColor, titleTextColorObj);
 	
 	OT_rJSON_createValueArray(inputsArr);
@@ -73,9 +72,8 @@ void ot::FlowBlockConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 	BlockConfiguration::setFromJsonObject(_object);
 
 	OT_rJSON_checkMember(_object, JSON_MEMBER_BackgroundIcon, String);
-	OT_rJSON_checkMember(_object, JSON_MEMBER_BackgroundColor, Object);
+	OT_rJSON_checkMember(_object, JSON_MEMBER_BackgroundPainter, Object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleIcon, String);
-	OT_rJSON_checkMember(_object, JSON_MEMBER_CustomTitleBackground, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleColorLeft, Object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleColorRight, Object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleTextColor, Object);
@@ -86,12 +84,11 @@ void ot::FlowBlockConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 
 	m_backgroundIconSubPath = _object[JSON_MEMBER_BackgroundIcon].GetString();
 	m_titleIconSubPath = _object[JSON_MEMBER_TitleIcon].GetString();
-	m_titleCustomBackgroundColor = _object[JSON_MEMBER_CustomTitleBackground].GetString();
 	m_bottomLeftIconSubPath = _object[JSON_MEMBER_IconBottomLeft].GetString();
 	m_bottomRightIconSubPath = _object[JSON_MEMBER_IconBottomRight].GetString();
 
-	OT_rJSON_val backgroundColorObj = _object[JSON_MEMBER_BackgroundColor].GetObject();
-	m_backgroundColor.setFromJsonObject(backgroundColorObj);
+	OT_rJSON_val backgroundPainterObj = _object[JSON_MEMBER_BackgroundPainter].GetObject();
+	m_backgroundPainter->setFromJsonObject(backgroundPainterObj);
 
 	OT_rJSON_val titleColorLeftObj = _object[JSON_MEMBER_TitleColorLeft].GetObject();
 	m_titleColorLeft.setFromJsonObject(titleColorLeftObj);
@@ -139,6 +136,12 @@ void ot::FlowBlockConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 			throw std::exception("Fatal: Unknown error");
 		}
 	}
+}
+
+void ot::FlowBlockConfiguration::setBackgroundPainter(Painter2D*& _painter) {
+	if (m_backgroundPainter == _painter) return;
+	if (m_backgroundPainter) delete m_backgroundPainter;
+	m_backgroundPainter = _painter;
 }
 
 void ot::FlowBlockConfiguration::addInput(BlockConnectorConfiguration* _block) {

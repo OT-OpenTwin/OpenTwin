@@ -1,3 +1,8 @@
+//! @file BlockCategoryConfiguration.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
@@ -44,6 +49,9 @@ namespace ot {
 		const std::list<BlockConfiguration*>& items(void) const { return m_items; };
 
 	private:
+		inline void setParentCategory(BlockCategoryConfiguration* _category) { m_parentCategory = _category; };
+		inline BlockCategoryConfiguration* parentCategory(void) const { return m_parentCategory; };
+
 		BlockCategoryConfiguration* m_parentCategory;
 		std::string m_iconSubPath;
 		std::list<BlockCategoryConfiguration*> m_childs;

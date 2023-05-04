@@ -1,10 +1,14 @@
+//! @file BlockConnectorConfiguration.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Serializable.h"
-#include "OpenTwinCore/Color.h"
-#include "OTBlockEditorAPI/BlockEditorAPIAPIExport.h"
+#include "OTBlockEditorAPI/BlockConfigurationGraphicsObject.h"
 #include "OTBlockEditorAPI/BlockEditorAPITypes.h"
+#include "OpenTwinCore/Color.h"
 
 #include <string>
 #include <list>
@@ -13,7 +17,7 @@
 
 namespace ot {
 
-	class BLOCKEDITORAPI_API_EXPORT BlockConnectorConfiguration : public ot::Serializable {
+	class BLOCKEDITORAPI_API_EXPORT BlockConnectorConfiguration : public ot::BlockConfigurationGraphicsObject {
 	public:
 		BlockConnectorConfiguration();
 		virtual ~BlockConnectorConfiguration();
@@ -31,9 +35,6 @@ namespace ot {
 		// ########################################################################################################################################################
 
 		// Setter/Getter
-
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
 
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string title(void) const { return m_title; };
@@ -59,7 +60,6 @@ namespace ot {
 		const ot::Color& borderColor(void) const { return m_borderColor; };
 
 	private:
-		std::string m_name;
 		std::string m_title;
 		BlockComponentPosition m_titlePosition;
 		std::list<std::string> m_tags;

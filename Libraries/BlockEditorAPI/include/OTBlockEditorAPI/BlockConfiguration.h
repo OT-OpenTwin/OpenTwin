@@ -1,3 +1,8 @@
+//! @file BlockConfiguration.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
@@ -6,12 +11,16 @@
 
 // std header
 #include <string>
+#include <vector>
 
 #pragma warning (disable:4251)
+
+#define OT_DEFAULTBLOCKCONFIGURATION_TYPE "DefaultBlock"
 
 namespace ot {
 
 	class BlockCategoryConfiguration;
+	class BlockLayerConfiguration;
 
 	class BLOCKEDITORAPI_API_EXPORT BlockConfiguration : public ot::BlockConfigurationGraphicsObject {
 	public:
@@ -29,7 +38,7 @@ namespace ot {
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
 		//! @brief Returns the block type as a string
-		virtual std::string type(void) const { return "Default"; };
+		virtual std::string type(void) const { return OT_DEFAULTBLOCKCONFIGURATION_TYPE; };
 
 		// ########################################################################################################################################################
 
@@ -40,8 +49,11 @@ namespace ot {
 
 	private:
 		friend class BlockCategoryConfiguration;
+		inline void setParentCategory(BlockCategoryConfiguration* _category) { m_parentCategory = _category; };
+		inline BlockCategoryConfiguration* parentCategory(void) const { return m_parentCategory; };
 
-		BlockCategoryConfiguration* m_parentCategory;
+		BlockCategoryConfiguration*           m_parentCategory;
+		std::vector<BlockLayerConfiguration*> m_layers;
 
 		BlockConfiguration(BlockConfiguration&) = delete;
 		BlockConfiguration& operator = (BlockConfiguration&) = delete;

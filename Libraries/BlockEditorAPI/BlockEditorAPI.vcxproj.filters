@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\BlockLayers">
+      <UniqueIdentifier>{2527c096-3817-41dd-8608-a5cd70ca6ebe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BlockLayers">
+      <UniqueIdentifier>{4bd3b4ad-9f6f-4d53-b818-abcd5d2494d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -30,12 +36,6 @@
     <ClCompile Include="src\BlockConnectorConfiguration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CustomBlockConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CustomBlockLayerConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockEditorAPITypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -44,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="src\BlockConfigurationGraphicsObject.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockLayerConfiguration.cpp">
+      <Filter>Source Files\BlockLayers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -65,12 +68,6 @@
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPITypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\CustomBlockConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\CustomBlockLayerConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\FlowBlockConfiguration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -79,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationGraphicsObject.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h">
+      <Filter>Header Files\BlockLayers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

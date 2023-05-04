@@ -1,3 +1,8 @@
+//! @file FlowBlockConfiguration.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
@@ -14,6 +19,7 @@
 namespace ot {
 
 	class BlockConnectorConfiguration;
+	class Painter2D;
 
 	class BLOCKEDITORAPI_API_EXPORT FlowBlockConfiguration : public ot::BlockConfiguration {
 	public:
@@ -40,14 +46,11 @@ namespace ot {
 		void setBackgroundIconSubPath(const std::string& _path) { m_backgroundIconSubPath = _path; };
 		const std::string& backgroundIconSubPath(void) const { return m_backgroundIconSubPath; };
 
-		void setBackgroundColor(const Color& _color) { m_backgroundColor = _color; };
-		const Color& backgroundColor(void) const { return m_backgroundColor; };
+		void setBackgroundPainter(Painter2D *& _painter);
+		Painter2D *& backgroundPainter(void) { return m_backgroundPainter; };
 
 		void setTitleIconSubPath(const std::string& _path) { m_titleIconSubPath = _path; };
 		const std::string& titleIconSubPath(void) const { return m_titleIconSubPath; };
-
-		void setTitleCustomBackgroundColor(const std::string& _css) { m_titleCustomBackgroundColor = _css; };
-		const std::string& titleCustomBackgroundColor(void) const { return m_titleCustomBackgroundColor; };
 
 		void setTitleColorLeft(const Color& _color) { m_titleColorLeft = _color; };
 		const Color& titleColorLeft(void) const { return m_titleColorLeft; };
@@ -66,9 +69,8 @@ namespace ot {
 
 	private:
 		std::string m_backgroundIconSubPath;
-		ot::Color m_backgroundColor;
+		ot::Painter2D * m_backgroundPainter;
 		std::string m_titleIconSubPath;
-		std::string m_titleCustomBackgroundColor;
 		ot::Color m_titleColorLeft;
 		ot::Color m_titleColorRight;
 		ot::Color m_titleTextColor;

@@ -17,8 +17,7 @@
     <ClCompile Include="src\BlockConfigurationGraphicsObject.cpp" />
     <ClCompile Include="src\BlockConnectorConfiguration.cpp" />
     <ClCompile Include="src\BlockEditorAPITypes.cpp" />
-    <ClCompile Include="src\CustomBlockConfiguration.cpp" />
-    <ClCompile Include="src\CustomBlockLayerConfiguration.cpp" />
+    <ClCompile Include="src\BlockLayerConfiguration.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FlowBlockConfiguration.cpp" />
   </ItemGroup>
@@ -31,8 +30,7 @@
     <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPIAPIExport.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPITypes.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\CustomBlockConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\CustomBlockLayerConfiguration.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\FlowBlockConfiguration.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -3,11 +3,11 @@
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OTBlockEditorAPI/BlockConfigurationFactory.h"
 #include "OTBlockEditorAPI/FlowBlockConfiguration.h"
-#include "OTBlockEditorAPI/CustomBlockConfiguration.h"
+#include "OTBlockEditorAPI/BlockConfiguration.h"
 
 ot::BlockConfiguration* ot::BlockConfigurationFactory::blockConfigurationFromType(const std::string& _type) {
 	if (_type == OT_FLOWBLOCKCONFIGURATION_TYPE) return new FlowBlockConfiguration;
-	else if (_type == OT_CUSTOMBLOCKCONFIGURATION_TYPE) return new CustomBlockConfiguration;
+	else if (_type == OT_DEFAULTBLOCKCONFIGURATION_TYPE) return new BlockConfiguration;
 	else {
 		otAssert(0, "Unknown block type");
 		throw std::exception("Invalid type");

@@ -96,7 +96,7 @@ void ot::BlockCategoryConfiguration::addChild(BlockCategoryConfiguration* _categ
 	// In release mode a valid name is expected (refer to Documentation)
 	assert(_category->name().find('|') == std::string::npos);
 
-	_category->m_parentCategory = this;
+	_category->setParentCategory(this);
 	m_childs.push_back(_category);
 	
 }
@@ -106,6 +106,6 @@ void ot::BlockCategoryConfiguration::addItem(BlockConfiguration* _item) {
 	// In release mode a valid name is expected (refer to Documentation)
 	assert(_item->name().find('|') == std::string::npos);
 
-	_item->m_parentCategory = this;
+	_item->setParentCategory(this);
 	m_items.push_back(_item);
 }

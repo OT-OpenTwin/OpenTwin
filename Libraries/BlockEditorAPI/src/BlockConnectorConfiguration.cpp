@@ -20,7 +20,7 @@ ot::BlockConnectorConfiguration::~BlockConnectorConfiguration() {
 }
 
 void ot::BlockConnectorConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, JSON_MEMBER_Name, m_name);
+	BlockConfigurationGraphicsObject::addToJsonObject(_document, _object);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Title, m_title);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_TitlePosition, toString(m_titlePosition));
 
@@ -42,6 +42,7 @@ void ot::BlockConnectorConfiguration::addToJsonObject(OT_rJSON_doc& _document, O
 }
 
 void ot::BlockConnectorConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
+	BlockConfigurationGraphicsObject::setFromJsonObject(_object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitlePosition, String);
@@ -53,7 +54,6 @@ void ot::BlockConnectorConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 
 	m_tags.clear();
 	
-	m_name = _object[JSON_MEMBER_Name].GetString();
 	m_title = _object[JSON_MEMBER_Title].GetString();
 	m_titlePosition = blockComponentPositionFromString(_object[JSON_MEMBER_TitlePosition].GetString());
 	m_style = blockConnectorStyleFromString(_object[JSON_MEMBER_Style].GetString());
