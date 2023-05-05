@@ -199,7 +199,8 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection "UI.VIEW.ColourSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges "UI.VIEW.SelectRanges"
 
-#define OT_ACTION_CMD_UI_BLOCKEDITOR_CreateBlockEditor "UI.BlockEditor.Create"
+#define OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor "UI.BlockEditor.CreateEmpty"
+//#define OT_ACTION_CMD_UI_BLOCKEDITOR_CreateBlockEditor "UI.BlockEditor.Create"
 #define OT_ACTION_CMD_UI_BLOCKEDITOR_BlockDropped "UI.BlockEditor.Block.Dropped"
 #define OT_ACTION_CMD_UI_BLOCKEDITOR_BlockRemoved "UI.BlockEditor.Block.Removed"
 #define OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionDropped "UI.BlockEditor.Connection.Dropped"
