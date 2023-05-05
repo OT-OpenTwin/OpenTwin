@@ -201,7 +201,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp" />
-    <ClCompile Include="src\BlockConfig.cpp" />
     <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\BlockConnector.cpp" />
     <ClCompile Include="src\BlockNetworkEditor.cpp">
@@ -216,21 +215,14 @@
     </ClCompile>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\BlockNetwork.cpp" />
-    <ClCompile Include="src\FlowBlock.cpp" />
-    <ClCompile Include="src\FlowConnection.cpp" />
-    <ClCompile Include="src\FlowConnector.cpp" />
     <ClCompile Include="src\GraphicItemPickerWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\openTwin\GraphicItemPickerWidget.h" />
     <QtMoc Include="include\openTwin\Block.h" />
-    <ClInclude Include="include\openTwin\BlockConfig.h" />
     <ClInclude Include="include\openTwin\BlockConnection.h" />
     <ClInclude Include="include\openTwin\BlockConnector.h" />
     <ClInclude Include="include\openTwin\BlockEditorSharedDatatypes.h" />
-    <QtMoc Include="include\openTwin\FlowBlock.h" />
-    <ClInclude Include="include\openTwin\FlowConnection.h" />
-    <ClInclude Include="include\openTwin\FlowConnector.h" />
     <QtMoc Include="include\openTwin\BlockNetwork.h" />
     <QtMoc Include="include\openTwin\BlockNetworkEditor.h" />
   </ItemGroup>
