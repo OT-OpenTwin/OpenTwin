@@ -52,8 +52,6 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-
-
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_DATASTORAGE_ROOT%\DataStorage.vcxproj" %TYPE% "DebugTest|x64"  

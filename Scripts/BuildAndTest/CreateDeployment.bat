@@ -225,3 +225,10 @@ COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem" "%OT_DE
 ECHO [Paths] > "%OT_DEPLOYMENT_DIR%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OT_DEPLOYMENT_DIR%\qt.conf"
 
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
+:END

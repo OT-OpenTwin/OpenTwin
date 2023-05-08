@@ -22,6 +22,11 @@ IF "%DEVENV_ROOT_2022%" == "" (
 REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+	goto END
+)
+
 ECHO Building Project
 
 RMDIR /S /Q "%OT_MODELENTITIES_ROOT%\.vs"

@@ -1,27 +1,35 @@
 @ECHO OFF
 
-REM The first argument of the shell defines whether a release or debug build shall be performed. "BOTH" (default) , "RELEASE", "DEBUG" 
-REM The second argument of hte shell defines whetehr a full rebuild or just a build is performed. "BUILD" (default), "REBUILD"
-
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
-REM 2. DEVENV_ROOT_2022
-
-IF "%OPENTWIN_DEV_ROOT%"=="" (
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto END
+	goto PAUSE_END
 )
 
-IF "%DEVENV_ROOT_2022%"=="" (
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
+)
+
+IF "%DEVENV_ROOT_2022%" == "" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
-	goto END
+	goto PAUSE_END
 )
 
 REM ====================================================================
 REM Setup eviroment, shutdown services and delete existing libraries
 REM ====================================================================
 
+REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+	goto END
+)
 
 IF "%OPENTWIN_DEPLOYMENT_DIR%" == "" (
     SET OPENTWIN_DEPLOYMENT_DIR=%OPENTWIN_DEV_ROOT%\Deployment
@@ -142,3 +150,10 @@ COPY "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\.htaccess" "%OPENTWIN_D
 COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf"
 COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd-ahssl.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra"
 
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
+:END

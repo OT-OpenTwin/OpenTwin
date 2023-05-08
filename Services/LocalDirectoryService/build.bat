@@ -2,21 +2,30 @@
 
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
-REM 2. DEVENV_ROOT_2022
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto END
+	goto PAUSE_END
+)
+
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
 )
 
 IF "%DEVENV_ROOT_2022%" == "" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
-	goto END
+	goto PAUSE_END
 )
 
-ECHO Setting up environment
-
-rem Setup eviroment
+REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+	goto END
+)
 
 ECHO Building Project
 
@@ -53,5 +62,10 @@ IF %RELEASE%==1 (
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LocalDirectoryService\LocalDirectoryService.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
-:END
+GOTO END
 
+:PAUSE_END
+pause
+GOTO END
+
+:END

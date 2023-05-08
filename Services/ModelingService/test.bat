@@ -1,9 +1,31 @@
 @ECHO OFF
 
-ECHO Setting up environment
+REM This script requires the following environment variables to be set:
+REM 1. OPENTWIN_DEV_ROOT
+REM 2. OPENTWIN_THIRDPARTY_ROOT
+REM 3. DEVENV_ROOT_2022
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	goto PAUSE_END
+)
 
-rem Setup eviroment
+IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
+	goto PAUSE_END
+)
+
+IF "%DEVENV_ROOT_2022%" == "" (
+	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
+	goto PAUSE_END
+)
+
+REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+	goto END
+)
 
 ECHO Testing Project : ModelingService
 
@@ -30,8 +52,6 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-
-
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ModelingService\ModelingService.vcxproj" %TYPE% "DebugTest|x64"  
@@ -50,12 +70,10 @@ IF %RELEASE%==1 (
 	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ModelingServiceReleaseReport.xml" "ModelingService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ModelingServiceReleaseReport.xml"
 ) 
   
+GOTO END
+
+:PAUSE_END
+pause
+GOTO END
+
 :END
-
-
-
-
-
-
-
-

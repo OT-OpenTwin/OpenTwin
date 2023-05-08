@@ -52,8 +52,6 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-
-
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RUBBERBAND_ROOT%\RubberbandEngineOsgWrapper.vcxproj" %TYPE% "DebugTest|x64"  
