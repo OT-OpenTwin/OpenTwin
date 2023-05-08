@@ -1,7 +1,12 @@
+//! @file BlockNetwork.h
+//! @author Alexander Kuester (alexk95)
+//! @date May 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
-#include <openTwin/BlockEditorSharedDatatypes.h>
+#include "OTBlockEditor/BlockEditorAPIExport.h"
 
 // Qt header
 #include <QtCore/qlist.h>

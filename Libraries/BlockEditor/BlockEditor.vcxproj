@@ -218,13 +218,17 @@
     <ClCompile Include="src\GraphicItemPickerWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\openTwin\GraphicItemPickerWidget.h" />
-    <QtMoc Include="include\openTwin\Block.h" />
-    <ClInclude Include="include\openTwin\BlockConnection.h" />
-    <ClInclude Include="include\openTwin\BlockConnector.h" />
-    <ClInclude Include="include\openTwin\BlockEditorSharedDatatypes.h" />
-    <QtMoc Include="include\openTwin\BlockNetwork.h" />
-    <QtMoc Include="include\openTwin\BlockNetworkEditor.h" />
+    <QtMoc Include="include\OTBlockEditor\GraphicItemPickerWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\OTBlockEditor\Block.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\OTBlockEditor\BlockConnection.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockConnector.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockEditorAPIExport.h" />
+    <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h" />
+    <QtMoc Include="include\OTBlockEditor\BlockNetwork.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -1,13 +1,7 @@
-/*
- *	File:		dllmain.cpp
- *	Package:	-NONE-
- *
- *  Created on: March 25, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2023 OpenTwin
- *	This file is subject to the terms and conditions defined in
- *	file 'LICENSE', which is part of this source code package.
- */
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date May 2023
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include <Windows.h>
 

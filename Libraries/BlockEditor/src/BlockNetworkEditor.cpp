@@ -1,7 +1,12 @@
+//! @file BlockNetworkEditor.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date May 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // OpenTwin header
-#include <openTwin/BlockNetworkEditor.h>
-#include <openTwin/BlockNetwork.h>
-#include <openTwin/Block.h>
+#include "OTBlockEditor/BlockNetworkEditor.h"
+#include "OTBlockEditor/BlockNetwork.h"
+#include "OTBlockEditor/Block.h"
 
 // Qt header
 #include <QtGui/qevent.h>

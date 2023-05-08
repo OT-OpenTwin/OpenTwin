@@ -59,28 +59,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\openTwin\BlockEditorSharedDatatypes.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\openTwin\BlockConnection.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\openTwin\BlockConnector.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="include\openTwin\BlockNetwork.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\openTwin\BlockNetworkEditor.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\openTwin\Block.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\openTwin\GraphicItemPickerWidget.h">
+    <QtMoc Include="include\OTBlockEditor\GraphicItemPickerWidget.h">
       <Filter>Header Files\Widgets</Filter>
     </QtMoc>
+    <QtMoc Include="include\OTBlockEditor\Block.h">
+      <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTBlockEditor\BlockNetwork.h">
+      <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h">
+      <Filter>Header Files\General</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\OTBlockEditor\BlockConnection.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockConnector.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockEditorAPIExport.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,5 +1,10 @@
+//! @file BlockConnection.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date May 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // OpenTwin header
-#include <openTwin/BlockConnection.h>
+#include "OTBlockEditor/BlockConnection.h"
 
 // Qt header
 #include <QtGui/qpainter.h>

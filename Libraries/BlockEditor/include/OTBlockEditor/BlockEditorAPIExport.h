@@ -1,18 +1,12 @@
-//! @file Block.cpp
+//! @file BlockEditorAPIExport.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// OpenTwin header
-#include "OTBlockEditor/Block.h"
+#pragma once
 
-ot::Block::Block() {}
-
-ot::Block::~Block() {}
-
-QRectF ot::Block::boundingRect(void) const {
-	return QRectF(
-		QPointF(pos().x() - (blockWidth() / 2), pos().y() - (blockHeigth() / 2)), 
-		QSizeF(blockWidth(), blockHeigth())
-	);
-}
+#ifdef BLOCK_EDITOR_EXPORT
+#define BLOCK_EDITOR_API_EXPORT __declspec(dllexport)
+#else
+#define BLOCK_EDITOR_API_EXPORT __declspec(dllimport)
+#endif // BLOCK_EDITOR_EXPORT

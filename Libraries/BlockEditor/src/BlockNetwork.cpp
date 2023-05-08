@@ -1,7 +1,12 @@
+//! @file BlockNetwork.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date May 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // OpenTwin header
-#include <openTwin/BlockNetwork.h>
-#include <openTwin/Block.h>
-#include <openTwin/BlockConnection.h>
+#include "OTBlockEditor/BlockNetwork.h"
+#include "OTBlockEditor/Block.h"
+#include "OTBlockEditor/BlockConnection.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -75,8 +80,8 @@ void ot::BlockNetwork::drawBackground(QPainter* _painter, const QRectF& _rect)
 	pen.setColor(QColor(0, 0, 255));
 	_painter->setPen(pen);
 
-	qreal left = int(_rect.left()) - (int(_rect.left()) % m_gridSize);
-	qreal top = int(_rect.top()) - (int(_rect.top()) % m_gridSize);
+	qreal left = (qreal)(int(_rect.left()) - (int(_rect.left()) % m_gridSize));
+	qreal top = (qreal)(int(_rect.top()) - (int(_rect.top()) % m_gridSize));
 	QVector<QPointF> points;
 	for (qreal x = left; x < _rect.right(); x += m_gridSize) {
 		for (qreal y = top; y < _rect.bottom(); y += m_gridSize) {
