@@ -2,7 +2,6 @@ REM @ECHO OFF
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
-REM 3. DEVENV_ROOT_2022
 
 REM Ensure that the setup will only be performed once
 IF "%OPENTWIN_DEV_ENV_DEFINED%"=="1" (
@@ -16,11 +15,6 @@ IF "%OPENTWIN_DEV_ROOT%" == "" (
 
 IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
-	goto PAUSE_END
-)
-
-IF "%DEVENV_ROOT_2022%" == "" (
-	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
 	goto PAUSE_END
 )
 
@@ -81,7 +75,7 @@ SET OT_CORE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
 SET OT_FOUNDATION_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation
 SET OT_SYSTEM_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem
 SET OT_GUI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTGui
-REM SET OT_WIDGETS_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
+SET OT_WIDGETS_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
 
 SET OT_QWTWRAPPER_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper
 SET OT_RUBBERBANDAPI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore
@@ -143,7 +137,7 @@ SET PATH=%OPENTWIN_DEV_ROOT%\Deployment;%PATH%
 
 REM Set the env defined at the end to ensure everything else was completed successfully
 SET OPENTWIN_DEV_ENV_DEFINED=1
-ECHO Environment was set up successfully.
+ECHO OpenTwin Developer environment was set up successfully.
 
 GOTO END
 
