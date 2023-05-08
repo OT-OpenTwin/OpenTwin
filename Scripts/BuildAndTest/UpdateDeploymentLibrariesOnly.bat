@@ -73,6 +73,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\CartesianMeshService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\TetMeshService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\GetDPService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTGui.dll"
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTWidgets.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\open_twin.exe"
 
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll"
@@ -104,6 +105,7 @@ COPY "%OT_RUBBERBANDAPI_ROOT%\%OT_DLLR%\RubberbandEngineCore.dll" "%OPENTWIN_DEP
 COPY "%OT_RUBBERBAND_ROOT%\%OT_DLLR%\RubberbandEngineOsgWrapper.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_QWTWRAPPER_ROOT%\%OT_DLLR%\QwtWrapper.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_GUI_ROOT%\%OT_DLLR%\OTGui.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_WIDGETS_ROOT%\%OT_DLLR%\OTWidgets.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
 REM ====================================================================
 REM  Copy Services

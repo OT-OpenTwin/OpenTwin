@@ -46,6 +46,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\DataStorage\clean.bat"
 ECHO Clean: OTGui
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTGui\clean.bat"
 
+ECHO Clean: OTGui
+CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets\clean.bat"
+
 ECHO Clean: Model Entities Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\ModelEntities\clean.bat"
 
