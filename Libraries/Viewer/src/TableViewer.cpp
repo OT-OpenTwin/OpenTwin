@@ -77,7 +77,7 @@ bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityP
 				}
 				itemRowIndex++;
 			}
-			//_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+			_table->resizeColumnsToContents();
 			_tableName = table->getName();
 			_tableID = table->getEntityID();
 			_tableVersion = table->getEntityStorageVersion();
