@@ -26,7 +26,7 @@ bool ot::BlockEditorAPI::createEmptyBlockEditor(BlockEditorNotifier* _callbackNo
 	if (intern::BlockEditorAPIManager::instance().contains(_editorName)) {
 		otAssert(0, "Duplicate Block Editor name");
 		OT_LOG_E("A Block Editor (with: name = \"" + _editorName + "\") already exists");
-		return;
+		return false;
 	}
 
 	// Construct UI message
