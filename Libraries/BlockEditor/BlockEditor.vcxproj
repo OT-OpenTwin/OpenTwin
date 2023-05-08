@@ -86,17 +86,17 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BLOCK_EDITOR_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_LIBD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;BlockEditorAPI.lib;$(Qt_LIBS_);Advapi32.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_LIBD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;OTWidgets.lib;BlockEditorAPI.lib;$(Qt_LIBS_);Advapi32.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BLOCK_EDITOR_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -106,17 +106,17 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BLOCK_EDITOR_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_LIBR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;BlockEditorAPI.lib;$(Qt_LIBS_);odbc32.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_LIBR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;OTWidgets.lib;BlockEditorAPI.lib;$(Qt_LIBS_);odbc32.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BLOCK_EDITOR_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -215,10 +215,10 @@
     </ClCompile>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\BlockNetwork.cpp" />
-    <ClCompile Include="src\GraphicItemPickerWidget.cpp" />
+    <ClCompile Include="src\BlockPickerWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\OTBlockEditor\GraphicItemPickerWidget.h" />
+    <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\Block.h" />

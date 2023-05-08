@@ -54,12 +54,12 @@
     <ClCompile Include="src\BlockConnector.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicItemPickerWidget.cpp">
+    <ClCompile Include="src\BlockPickerWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\OTBlockEditor\GraphicItemPickerWidget.h">
+    <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h">
       <Filter>Header Files\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTBlockEditor\Block.h">

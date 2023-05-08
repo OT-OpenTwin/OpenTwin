@@ -4,15 +4,15 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OpenTwinCore/otAssert.h"
 #include "OTBlockEditor/BlockNetwork.h"
 #include "OTBlockEditor/Block.h"
 #include "OTBlockEditor/BlockConnection.h"
 
 // Qt header
-#include <QtGui/qpainter.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::BlockNetwork::BlockNetwork() : m_gridSize(10), m_selectedConnection(nullptr) {
+ot::BlockNetwork::BlockNetwork() : m_selectedConnection(nullptr) {
 
 }
 
@@ -69,24 +69,7 @@ void ot::BlockNetwork::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 			update();
 		}
 		else {
-			//todo: replace with otAssert
+			otAssert(0, "Unknown item selected");
 		}
 	}
-}
-
-void ot::BlockNetwork::drawBackground(QPainter* _painter, const QRectF& _rect)
-{
-	QPen pen;
-	pen.setColor(QColor(0, 0, 255));
-	_painter->setPen(pen);
-
-	qreal left = (qreal)(int(_rect.left()) - (int(_rect.left()) % m_gridSize));
-	qreal top = (qreal)(int(_rect.top()) - (int(_rect.top()) % m_gridSize));
-	QVector<QPointF> points;
-	for (qreal x = left; x < _rect.right(); x += m_gridSize) {
-		for (qreal y = top; y < _rect.bottom(); y += m_gridSize) {
-			points.append(QPointF(x, y));
-		}
-	}
-	_painter->drawPoints(points.data(), points.size());
 }
