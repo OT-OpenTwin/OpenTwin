@@ -53,16 +53,16 @@ IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_CORE_ROOT%\OpenTwinCore.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OT_CORE_ROOT%\x64\Debug\OpenTwinCoreTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCoreDebugReport.xml"
+	"%OT_CORE_ROOT%\%(OT_DLLD)%\OpenTwinCoreTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCoreDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCoreDebugReport.xml" "OpenTwinCore" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCoreDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore\OpenTwinCore.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_CORE_ROOT%\OpenTwinCore.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore\x64\Release\OpenTwinCoreTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCoreReleaseReport.xml"
+	"%OT_CORE_ROOT%\%(OT_DLLR)%\OpenTwinCoreTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCoreReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OpenTwinCoreReleaseReport.xml" "OpenTwinCore" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OpenTwinCoreReleaseReport.xml"
 ) 
