@@ -17,5 +17,8 @@
         <file>images/Export.png</file>
         <file>images/Import.png</file>
         <file>images/Add.png</file>
+        <file>images/Rename.png</file>
+        <file>images/Go.png</file>
+        <file>images/Ok.png</file>
     </qresource>
 </RCC>

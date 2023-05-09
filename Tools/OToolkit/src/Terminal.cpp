@@ -57,6 +57,11 @@
 #define TERMINAL_JSON_MEM_CHECK_TYPE(___jsonObject, ___memberName, ___memberType, ___errorReturnCase)  if (!___jsonObject[___memberName].is##___memberType()) { TERMINAL_LOGE(QString("JSON object member \"") + ___memberName + "\" is not a " + #___memberType); ___errorReturnCase; }
 #define TERMINAL_JSON_MEM_CHECK(___jsonObject, ___memberName, ___memberType, ___errorReturnCase) TERMINAL_JSON_MEM_CHECK_EXISTS(___jsonObject, ___memberName, ___errorReturnCase); TERMINAL_JSON_MEM_CHECK_TYPE(___jsonObject, ___memberName, ___memberType, ___errorReturnCase)
 
+namespace intern {
+	const Qt::ItemFlags FilterFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	const Qt::ItemFlags RequestFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+}
+
 TerminalCollectionItem::TerminalCollectionItem(Terminal * _owner, const QString& _title) : m_owner(_owner) {
 	setTitle(_title);
 }
@@ -107,6 +112,7 @@ TerminalCollectionFilter::TerminalCollectionFilter(Terminal * _owner, const QStr
 	: TerminalCollectionItem(_owner, _title) 
 {
 	setIcon(0, QIcon(":/images/Folder.png"));
+	setFlags(intern::FilterFlags);
 }
 
 TerminalCollectionFilter::~TerminalCollectionFilter() {}
@@ -188,9 +194,10 @@ bool TerminalCollectionFilter::hasChild(TerminalCollectionItem * _item) const {
 // #####################################################################################################################################################################################
 
 TerminalRequest::TerminalRequest(Terminal * _owner, const QString& _title)
-	: TerminalCollectionItem(_owner, _title)
+	: TerminalCollectionItem(_owner, _title), m_endpoint(ot::EXECUTE)
 {
 	setIcon(0, QIcon(":/images/Run.png"));
+	setFlags(intern::RequestFlags);
 }
 
 TerminalRequest::~TerminalRequest(void) {}
@@ -208,7 +215,7 @@ bool TerminalRequest::setFromJsonObject(const QJsonObject& _object) {
 
 	m_url = _object[OT_JSON_REQUEST_Url].toString();
 	m_messageBody = _object[OT_JSON_REQUEST_Message].toString();
-	m_endpoint = _object[OT_JSON_REQUEST_Endpoint].toString();
+	m_endpoint = ot::stringToMessageTypeFlag(_object[OT_JSON_REQUEST_Endpoint].toString().toStdString());
 
 	return true;
 }
@@ -219,7 +226,7 @@ void TerminalRequest::addToJsonObject(QJsonObject& _object) const {
 
 	_object[OT_JSON_REQUEST_Url] = m_url;
 	_object[OT_JSON_REQUEST_Message] = m_messageBody;
-	_object[OT_JSON_REQUEST_Endpoint] = m_endpoint;
+	_object[OT_JSON_REQUEST_Endpoint] = QString::fromStdString(ot::toString(m_endpoint));
 }
 
 // #####################################################################################################################################################################################
@@ -228,7 +235,7 @@ void TerminalRequest::addToJsonObject(QJsonObject& _object) const {
 
 // #####################################################################################################################################################################################
 
-Terminal::Terminal() {
+Terminal::Terminal() : m_exportLock(false) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
@@ -342,12 +349,15 @@ Terminal::Terminal() {
 
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
+	m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
 	m_navigation->addTopLevelItem(m_requestsRootFilter);
-
+	
 	slotLoadRequestCollection();
 
 	// Connect signals
 	connect(m_navigation, &QTreeWidget::customContextMenuRequested, this, &Terminal::slotShowNavigationContextMenu);
+	connect(m_navigation, &QTreeWidget::itemDoubleClicked, this, &Terminal::slotNavigationItemDoubleClicked);
+	connect(m_navigation, &QTreeWidget::itemChanged, this, &Terminal::slotNavigationItemChanged);
 	connect(m_btnSend, &QPushButton::clicked, this, &Terminal::slotSendMessage);
 	connect(m_receiverName, &QComboBox::currentTextChanged, this, &Terminal::slotServiceNameChanged);
 
@@ -371,6 +381,37 @@ QWidget * Terminal::widget(void) {
 void Terminal::notifyItemDeleted(TerminalCollectionItem * _item) {
 
 }
+
+void Terminal::setEndpointFromMessageType(ot::MessageType _type) {
+	switch (_type)
+	{
+	case ot::QUEUE: m_endpoint->setCurrentText(TERMINAL_TXT_ENDPOINT_QUEUE); break;
+	case ot::EXECUTE: m_endpoint->setCurrentText(TERMINAL_TXT_ENDPOINT_EXECUTE); break;
+	case ot::EXECUTE_ONE_WAY_TLS: m_endpoint->setCurrentText(TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS); break;
+	case ot::SECURE_MESSAGE_TYPES:
+	case ot::ALL_MESSAGE_TYPES:
+		otAssert(0, "Invalid message type");
+		break;
+	default:
+		otAssert(0, "Unknown message type");
+		break;
+	}
+}
+
+ot::MessageType Terminal::endpointToMessageType(void) const {
+	QString txt = m_endpoint->currentText();
+	if (txt == TERMINAL_TXT_ENDPOINT_EXECUTE) return ot::EXECUTE;
+	else if (txt == TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS) return ot::EXECUTE_ONE_WAY_TLS;
+	else if (txt == TERMINAL_TXT_ENDPOINT_QUEUE) return ot::QUEUE;
+	else {
+		otAssert(0, "Unknown endpoint");
+		return ot::EXECUTE;
+	}
+}
+
+// ################################################################################################################################
+
+// Private: Slots
 
 void Terminal::slotSendMessage(void) {
 	// Check receiver input
@@ -486,14 +527,39 @@ void Terminal::slotShowNavigationContextMenu(const QPoint& _pt) {
 		}
 		else {
 			otAssert(0, "Cast failed");
+			OTOOLKIT_LOGE("Terminal", "Navigation item cast failed");
 		}
 	}
 	else {
 		otAssert(0, "Unknown root item");
+		OTOOLKIT_LOGE("Terminal", "Unknown navigation root item");
+	}
+}
+
+void Terminal::slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _column) {
+	TerminalRequest* request = dynamic_cast<TerminalRequest*>(_item);
+	if (request) {
+		applyRequest(request);
+	}
+}
+
+void Terminal::slotNavigationItemChanged(QTreeWidgetItem* _item, int _column) {
+	TerminalCollectionItem* itm = dynamic_cast<TerminalCollectionItem*>(_item);
+	if (itm) { 
+		if (itm->text(0) != itm->title()) {
+			itm->setTitle(itm->text(0));
+			slotSaveRequestCollection();
+		} 
+	}
+	else {
+		otAssert(0, "Unknown navigation item");
+		TERMINAL_LOGE("Unknwon navitaion item");
 	}
 }
 
 void Terminal::slotLoadRequestCollection(void) {
+	TERMINAL_LOG("Importing OTerminal request collection...");
+
 	QSettings s("OpenTwin", applicationName());
 
 	QByteArray bArr = s.value("Terminal.RequestCollection", QByteArray()).toByteArray();
@@ -531,6 +597,10 @@ void Terminal::slotLoadRequestCollection(void) {
 }
 
 void Terminal::slotSaveRequestCollection(void) {
+	if (m_exportLock) return;
+
+	TERMINAL_LOG("Exporting OTerminal request collection...");
+
 	QJsonObject obj;
 	obj[OT_JSON_COLLECTION_Version] = INFO_COLLECTION_VERSION;
 
@@ -542,7 +612,13 @@ void Terminal::slotSaveRequestCollection(void) {
 
 	QSettings s("OpenTwin", applicationName());
 	s.setValue("Terminal.RequestCollection", doc.toJson());
+
+	TERMINAL_LOG("Terminal request collection exported successfully.");
 }
+
+// ################################################################################################################################
+
+// Private: Helper
 
 void Terminal::initializeServices(void) {
 	// todo: add import from last settings
@@ -618,17 +694,27 @@ void Terminal::setWaitingMode(bool _isWaiting) {
 	m_progressBar->setRange(0, (_isWaiting ? 0 : 1));
 }
 
+// ################################################################################################################################
+
+// Private: Context Menu handling
+
 void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter * _filter) {
 	QMenu menu(m_navigation);
 
 	// Add actions
 	QAction * actionNewFilter = menu.addAction(QIcon(":/images/NewFolder.png"), "Add Filter");
+	actionNewFilter->setToolTip("Add new child filter to this filter");
+
+	QAction * actionRename = nullptr;
 	QAction * actionRemove = nullptr;
 	// Add optional actions
 	if (_filter != m_requestsRootFilter) {
-		actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
-	}
+		QAction* actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
+		actionRemove->setToolTip("Remove this filter and all of its childs");
 
+		QAction* actionRename = menu.addAction(QIcon(":/images/Rename.png"), "Rename");
+		actionRename->setToolTip("Enter rename mode");
+	}
 
 	menu.addSeparator();
 
@@ -644,16 +730,19 @@ void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter *
 	if (result == nullptr) {
 		return;
 	}
-
+	
 	// Check selected action
 	if (result == actionNewFilter) {
 		addNewFilter(_filter);
+	}
+	else if (result == actionRename) {
+		m_navigation->editItem(_filter);
 	}
 	else if (result == actionRemove) {
 		removeFilter(_filter);
 	}
 	else if (result == actionNewRequest) {
-
+		addNewRequestFromCurrent(_filter);
 	}
 	else if (result == actionImport) {
 
@@ -667,10 +756,23 @@ void Terminal::handleContextRequest(const QPoint& _pt, TerminalRequest * _reques
 	QMenu menu(m_navigation);
 
 	// Add actions
-	QAction * actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
-	QAction * actionReplace = menu.addAction(QIcon(":/images/DownPage.png"), "Replace with current");
-	actionReplace->setToolTip("Will save the current configuration here");
+	QAction* actionApply = menu.addAction(QIcon(":/images/Ok.png"), "Apply");
+	actionApply->setToolTip("Set this as currently active configuration");
 
+	QAction* actionApplyAndSend = menu.addAction(QIcon(":/images/Go.png"), "Apply and Send");
+	actionApplyAndSend->setToolTip("Set this as currently active configuration and send the message");
+
+	menu.addSeparator();
+	QAction* actionReplace = menu.addAction(QIcon(":/images/DownPage.png"), "Set values from current");
+	actionReplace->setToolTip("Set values from currently active configuration");
+
+	menu.addSeparator();
+	QAction* actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
+	actionRemove->setToolTip("Remove this request");
+
+	QAction* actionRename = menu.addAction(QIcon(":/images/Rename.png"), "Rename");
+	actionRename->setToolTip("Enter rename mode");
+	
 	// Show context menu
 	QAction * result = menu.exec(m_navigation->mapToGlobal(_pt));
 	if (result == nullptr) {
@@ -678,7 +780,19 @@ void Terminal::handleContextRequest(const QPoint& _pt, TerminalRequest * _reques
 	}
 
 	// Check selected action
-	if (result == actionRemove) {
+	if (result == actionApply) {
+		applyRequest(_request);
+	}
+	else if (result == actionApplyAndSend) {
+		applyAndSendRequest(_request);
+	}
+	else if (result == actionReplace) {
+		updateRequestFromCurrent(_request);
+	}
+	else if (result == actionRename) {
+		m_navigation->editItem(_request);
+	}
+	else if (result == actionRemove) {
 		removeRequest(_request);
 	}
 }
@@ -691,7 +805,6 @@ void Terminal::addNewFilter(TerminalCollectionFilter * _parentFilter) {
 	}
 
 	TerminalCollectionFilter * newFilter = new TerminalCollectionFilter(this, filterName);
-	newFilter->setFlags(newFilter->flags() | Qt::ItemIsEditable);
 
 	// Add child and ensure visibility
 	_parentFilter->addChild(newFilter);
@@ -700,6 +813,8 @@ void Terminal::addNewFilter(TerminalCollectionFilter * _parentFilter) {
 	}
 
 	slotSaveRequestCollection();
+
+	m_navigation->editItem(newFilter);
 }
 
 void Terminal::removeFilter(TerminalCollectionFilter * _filter) {
@@ -709,8 +824,10 @@ void Terminal::removeFilter(TerminalCollectionFilter * _filter) {
 	else {
 		QTreeWidgetItem * par = _filter->parent();
 		if (par) {
+			m_exportLock = true;
 			par->removeChild(_filter);
 			delete _filter;
+			m_exportLock = false;
 		}
 		else {
 			otAssert(0, "No parent item");
@@ -721,39 +838,79 @@ void Terminal::removeFilter(TerminalCollectionFilter * _filter) {
 	slotSaveRequestCollection();
 }
 
-void Terminal::addNewRequest(TerminalCollectionFilter * _parentFilter) {
-	QString filterName = "New Request";
-	int filterNameCount = 0;
-	while (_parentFilter->hasAnyChildWith(filterName)) {
-		filterName = "New Request " + QString::number(++filterNameCount);
+void Terminal::addNewRequestFromCurrent(TerminalCollectionFilter * _parentFilter) {
+	QString requestName = "New Request";
+	int requestNameCount = 1;
+	while (_parentFilter->hasAnyChildWith(requestName)) {
+		requestName = "New Request " + QString::number(++requestNameCount);
 	}
 
-	TerminalRequest * newFilter = new TerminalRequest(this, filterName);
-	newFilter->setFlags(newFilter->flags() | Qt::ItemIsEditable);
+	TerminalRequest * newRequest = new TerminalRequest(this, requestName);
 
 	// Add child and ensure visibility
-	_parentFilter->addChild(newFilter);
+	_parentFilter->addChild(newRequest);
 	if (!_parentFilter->isExpanded()) {
 		_parentFilter->setExpanded(true);
 	}
+
+	// This call will save the collection
+	updateRequestFromCurrent(newRequest);
+
+	m_navigation->editItem(newRequest);
+}
+
+void Terminal::updateRequestFromCurrent(TerminalRequest* _request) {
+	_request->setUrl(m_receiverUrl->text());
+	_request->setEndpoint(endpointToMessageType());
+	_request->setMessageBody(m_messageEdit->toPlainText());
 
 	slotSaveRequestCollection();
 }
 
 void Terminal::removeRequest(TerminalRequest * _request) {
+	QTreeWidgetItem* par = _request->parent();
+	if (par) {
+		m_exportLock = true;
+		par->removeChild(_request);
+		delete _request;
+		m_exportLock = false;
+	}
+	else {
+		otAssert(0, "No parent item");
+		TERMINAL_LOGE("Parent item not found");
+	}
 
 	slotSaveRequestCollection();
 }
 
+void Terminal::applyRequest(TerminalRequest* _request) {
+	m_receiverName->setCurrentText(TERMINAL_TXT_RECEIVER_MANUAL);
+	m_receiverUrl->setText(_request->url());
+	m_messageEdit->setPlainText(_request->messageBody());
+	setEndpointFromMessageType(_request->endpoint());
+}
+
+void Terminal::applyAndSendRequest(TerminalRequest* _request) {
+	applyRequest(_request);
+	slotSendMessage();
+}
+
+// ################################################################################################################################
+
+// Private: Async worker functions
+
 void Terminal::workerSendMessage(const std::string& _receiverUrl, ot::MessageType _messageType, const QByteArray& _data) {
 	std::string response;
 	if (!ot::msg::send("", _receiverUrl, _messageType, _data.toStdString(), response)) {
-		QMetaObject::invokeMethod(this, "slotMessageSendFailed", Qt::QueuedConnection, Q_ARG(const QString&, QString(
+		if (!QMetaObject::invokeMethod(this, "slotMessageSendFailed", Qt::QueuedConnection, Q_ARG(const QString&, QString(
 			"Failed to send message to \"" + QString::fromStdString(_receiverUrl) + "\""
-		)));
+		)))) {
+			OTOOLKIT_LOGE("Terminal Worker", "Failed to queue send failed call");
+		}
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotMessageSendSuccessful", Qt::QueuedConnection, Q_ARG(const QByteArray&, QByteArray::fromStdString(response)));
+		if (!QMetaObject::invokeMethod(this, "slotMessageSendSuccessful", Qt::QueuedConnection, Q_ARG(const QByteArray&, QByteArray::fromStdString(response)))) {
+			OTOOLKIT_LOGE("Terminal Worker", "Failed to queue send success call");
+		}
 	}
-
 }

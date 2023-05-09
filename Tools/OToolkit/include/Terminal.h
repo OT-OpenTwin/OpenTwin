@@ -97,13 +97,13 @@ public:
 	void setMessageBody(const QString& _messageBody) { m_messageBody = _messageBody; };
 	const QString& messageBody(void) const { return m_messageBody; };
 
-	void setEndpoint(const QString& _endpoint) { m_endpoint = _endpoint; };
-	const QString& endpoint(void) const { return m_endpoint; };
+	void setEndpoint(ot::MessageType _endpoint) { m_endpoint = _endpoint; };
+	ot::MessageType endpoint(void) const { return m_endpoint; };
 
 private:
-	QString		m_url;
-	QString		m_messageBody;
-	QString		m_endpoint;
+	QString				m_url;
+	QString				m_messageBody;
+	ot::MessageType		m_endpoint;
 
 	TerminalRequest() = delete;
 	TerminalRequest(TerminalRequest&) = delete;
@@ -130,29 +130,53 @@ public:
 
 	void notifyItemDeleted(TerminalCollectionItem * _item);
 
+	void setEndpointFromMessageType(ot::MessageType _type);
+	ot::MessageType endpointToMessageType(void) const;
+
+	// ################################################################################################################################
+
+	// Private: Slots
+
 private slots:
 	void slotSendMessage(void);
 	void slotMessageSendSuccessful(const QByteArray& _response);
 	void slotMessageSendFailed(const QString& _errorString);
 	void slotServiceNameChanged(void);
 	void slotShowNavigationContextMenu(const QPoint& _pt);
+	void slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _column);
+	void slotNavigationItemChanged(QTreeWidgetItem* _item, int _column);
 
 	void slotLoadRequestCollection(void);
 	void slotSaveRequestCollection(void);
 
 private:
+	// ################################################################################################################################
+
+	// Private: Helper
+
 	void initializeServices(void);
 	void initializeDefaultServices(void);
 	void setWaitingMode(bool _isWaiting);
 	
+	// ################################################################################################################################
+
+	// Private: Context Menu handling
+
 	void handleContextFilter(const QPoint& _pt, TerminalCollectionFilter * _filter);
 	void handleContextRequest(const QPoint& _pt, TerminalRequest * _request);
 	
 	void addNewFilter(TerminalCollectionFilter * _parentFilter);
 	void removeFilter(TerminalCollectionFilter * _filter);
 
-	void addNewRequest(TerminalCollectionFilter * _parentFilter);
+	void addNewRequestFromCurrent(TerminalCollectionFilter * _parentFilter);
+	void updateRequestFromCurrent(TerminalRequest * _request);
 	void removeRequest(TerminalRequest * _request);
+	void applyRequest(TerminalRequest* _request);
+	void applyAndSendRequest(TerminalRequest* _request);
+
+	// ################################################################################################################################
+
+	// Private: Async worker functions
 
 	void workerSendMessage(const std::string& _receiverUrl, ot::MessageType _messageType, const QByteArray& _data);
 
@@ -165,6 +189,7 @@ private:
 	// Data
 	QList<ServiceInfo>			m_services;
 	TerminalCollectionFilter *	m_requestsRootFilter;
+	bool						m_exportLock;
 
 	// Layouts
 

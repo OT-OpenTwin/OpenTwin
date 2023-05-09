@@ -82,5 +82,8 @@
     <ClInclude Include="include\OpenTwinCore\Singleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\FlagsHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
