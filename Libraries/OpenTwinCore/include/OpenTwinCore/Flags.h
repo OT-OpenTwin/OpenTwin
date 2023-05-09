@@ -50,6 +50,11 @@ namespace ot {
 		//! @brief Returns a copy of the data
 		inline T data(void) const { return m_data; }
 
+		//! @brief Replace data if data differs
+		//! @param _other The other flags
+		//! @return True if the data was updated
+		inline bool update(const Flags<T>& _other) { if (*this == _other) { return false; } else { m_data = _other.m_data; return true; } };
+
 		//! @brief Replace the current data
 		//! @param _data The data that should be replaced with
 		inline void replaceWith(T _data) { m_data = _data; }

@@ -10,6 +10,15 @@
     <ClCompile Include="src\GraphicsScene.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\TreeWidget.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LineEdit.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeWidgetFilter.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -24,10 +33,28 @@
     <Filter Include="include\Graphics">
       <UniqueIdentifier>{e0f72ae4-7d3f-401e-a945-e22cef86b61f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\General">
+      <UniqueIdentifier>{f2ea0c71-2d10-4329-aca9-9d9bf05b441e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\General">
+      <UniqueIdentifier>{a4fb4c3c-12e7-4533-8201-e6fcd5789c20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\TreeWidget.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\LineEdit.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\QWidgetInterface.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
     <ClInclude Include="include\OTWidgets\OTWidgetsAPIExport.h">
-      <Filter>include</Filter>
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetTypes.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +63,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsView.h">
       <Filter>include\Graphics</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h">
+      <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

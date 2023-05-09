@@ -5,12 +5,15 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTBlockEditor/BlockEditorAPIExport.h"
+
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtWidgets/qgraphicsitem.h>
 
 namespace ot {
-	class BlockConnection : public QObject, public QGraphicsItem {
+	class BLOCK_EDITOR_API_EXPORT BlockConnection : public QObject, public QGraphicsItem {
 	public:
 		BlockConnection();
 		virtual ~BlockConnection();

@@ -16,15 +16,13 @@ class BlockConfig;
 
 class QGraphicsItem;
 class QSplitter;
-class QTreeWidget;
-class QTreeWidgetItem;
-
 namespace ot {
 
+	class TreeWidgetFilter;
 	class GraphicsView;
 	class GraphicsScene;
 
-	class BlockPickerWidget : public QObject {
+	class BLOCK_EDITOR_API_EXPORT BlockPickerWidget : public QObject {
 		Q_OBJECT
 	public:
 		BlockPickerWidget(Qt::Orientation _orientation = Qt::Vertical);
@@ -35,10 +33,10 @@ namespace ot {
 		void setOrientation(Qt::Orientation _orientation);
 
 	private:
-		QSplitter*      m_splitter;
-		QTreeWidget*    m_navigation;
-		GraphicsView*   m_view;
-		GraphicsScene*	m_scene;
+		QSplitter*        m_splitter;
+		TreeWidgetFilter* m_navigation;
+		GraphicsView*     m_view;
+		GraphicsScene*	  m_scene;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -47,7 +45,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class BlockPicker : public QDockWidget {
+	class BLOCK_EDITOR_API_EXPORT BlockPicker : public QDockWidget {
 		Q_OBJECT
 	public:
 		BlockPicker(QWidget* _parentWidget = (QWidget*)nullptr);
