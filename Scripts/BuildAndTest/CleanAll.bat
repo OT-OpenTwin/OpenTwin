@@ -43,10 +43,10 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\CADModelEntities\clean.bat"
 ECHO Clean: Data Storage Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\DataStorage\clean.bat"
 
-ECHO Clean: OTGui
+ECHO Clean: OTGui Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTGui\clean.bat"
 
-ECHO Clean: OTGui
+ECHO Clean: OTWidgets Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets\clean.bat"
 
 ECHO Clean: Model Entities Library
@@ -79,9 +79,6 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\uiCore\clean.bat"
 ECHO Clean: UIPluginAPI Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI\clean.bat"
 
-ECHO Clean: UIPlugin Template
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\UIPluginTemplate\clean.bat"
-
 ECHO Clean: Viewer Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\Viewer\clean.bat"
 
@@ -96,6 +93,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\clean.bat"
 
 ECHO Clean: FITTD Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\FITTDService\clean.bat"
+
+ECHO Clean: GetDP Service
+CALL "%OPENTWIN_DEV_ROOT%\Services\GetDPService\clean.bat"
 
 ECHO Clean: Global Directory Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\clean.bat"
