@@ -1,4 +1,4 @@
-//! @file GraphicItemPickerWidget.h
+//! @file BlockPickerWidget.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -10,17 +10,20 @@
 
 // Qt header
 #include <QtCore/qobject.h>
-#include <QtWidgets/qdockwidget.h>
 
-class BlockConfig;
+// std header
 
 class QGraphicsItem;
 class QSplitter;
+class QTreeWidgetItem;
+
 namespace ot {
 
 	class TreeWidgetFilter;
 	class GraphicsView;
 	class GraphicsScene;
+	class BlockConfiguration;
+	class BlockCategoryConfiguration;
 
 	class BLOCK_EDITOR_API_EXPORT BlockPickerWidget : public QObject {
 		Q_OBJECT
@@ -31,32 +34,23 @@ namespace ot {
 		QWidget* widget(void);
 
 		void setOrientation(Qt::Orientation _orientation);
+		Qt::Orientation orientation(void) const;
+
+		void addTopLevelCategory(ot::BlockCategoryConfiguration* _topLevelCategory);
+		void addTopLevelCategories(const std::list<ot::BlockCategoryConfiguration *>& _topLevelCategories);
+		
+		void clear(void);
 
 	private:
+		void addCategory(ot::BlockCategoryConfiguration* _category, QTreeWidgetItem* _parentNavigationItem);
+		void addCategories(const std::list<ot::BlockCategoryConfiguration*>& _categories, QTreeWidgetItem* _parentNavigationItem);
+
+		void addBlockToNavigation(ot::BlockConfiguration* _block, QTreeWidgetItem* _parentNavigationItem);
+		void addBlocksToNavigation(const std::list <ot::BlockConfiguration*>& _blocks, QTreeWidgetItem* _parentNavigationItem);
+
 		QSplitter*        m_splitter;
 		TreeWidgetFilter* m_navigation;
 		GraphicsView*     m_view;
 		GraphicsScene*	  m_scene;
-	};
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	class BLOCK_EDITOR_API_EXPORT BlockPicker : public QDockWidget {
-		Q_OBJECT
-	public:
-		BlockPicker(QWidget* _parentWidget = (QWidget*)nullptr);
-		BlockPicker(const QString& _title, QWidget* _parentWidget = (QWidget*)nullptr);
-		virtual ~BlockPicker();
-
-		virtual void resizeEvent(QResizeEvent* _event) override;
-
-	private:
-		inline Qt::Orientation calcWidgetOrientation(void) const { return (this->width() > this->height() ? Qt::Horizontal : Qt::Vertical); };
-
-		BlockPickerWidget* m_widget;
-	};
+	};	
 }

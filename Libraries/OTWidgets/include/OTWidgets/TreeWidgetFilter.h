@@ -51,6 +51,8 @@ namespace ot {
 		//! @return True if this item or any of its childs match the filter
 		bool filterChilds(QTreeWidgetItem* _item, const QString& _filter);
 
+		void expandAllParents(QTreeWidgetItem* _item);
+
 		int             m_filterColumn;
 		QString         m_lastFilter;
 		QWidget*        m_layoutW;

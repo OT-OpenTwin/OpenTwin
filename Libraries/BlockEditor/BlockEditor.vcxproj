@@ -213,6 +213,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\BlockPickerDockWidget.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\BlockNetwork.cpp" />
     <ClCompile Include="src\BlockPickerWidget.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="include\OTBlockEditor\BlockConnection.h" />
     <ClInclude Include="include\OTBlockEditor\BlockConnector.h" />
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPIExport.h" />
+    <QtMoc Include="include\OTBlockEditor\BlockPickerDockWidget.h" />
     <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h" />
     <QtMoc Include="include\OTBlockEditor\BlockNetwork.h" />
   </ItemGroup>

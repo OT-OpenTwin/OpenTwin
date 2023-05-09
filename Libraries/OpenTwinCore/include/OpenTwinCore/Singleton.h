@@ -9,8 +9,8 @@
 
 //! @brief Required macro for classes implementing the Singleton interface
 //! "The class that is provided as T should add this macro to their class declaration"
-//! @param ___type The Singleton type
-#define OT_SINGLETON(___type) friend class ot::Singleton<___type>;
+//! Provide the Singleton type as arg(s)
+#define OT_SINGLETON(...) friend class ot::Singleton<__VA_ARGS__>;
 
 namespace ot {
 

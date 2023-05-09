@@ -81,6 +81,7 @@ void ot::TreeWidgetFilter::dispatchFilter(const QString& _text) {
 		if (m_lastFilter == _text) return;
 		m_lastFilter = _text;
 
+		m_tree->collapseAll();
 		applyFilter(_text);
 
 		emit filterChanged(m_lastFilter);
@@ -101,8 +102,17 @@ bool ot::TreeWidgetFilter::filterChilds(QTreeWidgetItem* _item, const QString& _
 		if (filterChilds(_item->child(i), _filter)) vis = true;
 	}
 	
-	if (_item->text(m_filterColumn).toLower().contains(_filter)) vis = true;
+	if (_item->text(m_filterColumn).toLower().contains(_filter)) {
+		vis = true;
+		expandAllParents(_item->parent());
+	}
 	
 	_item->setHidden(!vis);
 	return vis;
+}
+
+void ot::TreeWidgetFilter::expandAllParents(QTreeWidgetItem* _item) {
+	if (_item == nullptr) return;
+	expandAllParents(_item->parent());
+	_item->setExpanded(true);
 }

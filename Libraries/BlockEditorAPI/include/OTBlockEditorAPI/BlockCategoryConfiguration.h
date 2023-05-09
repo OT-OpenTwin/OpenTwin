@@ -21,7 +21,7 @@ namespace ot {
 
 	class BLOCKEDITORAPI_API_EXPORT BlockCategoryConfiguration : public ot::BlockConfigurationObject {
 	public:
-		BlockCategoryConfiguration(const std::string& _name = std::string());
+		BlockCategoryConfiguration(const std::string& _name = std::string(), const std::string& _title = std::string());
 		virtual ~BlockCategoryConfiguration();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -38,6 +38,9 @@ namespace ot {
 
 		// Setter/Getter
 
+		void setTitle(const std::string& _title) { m_title = _title; };
+		const std::string& title(void) const { return m_title; };
+
 		void setIconSubPath(const std::string& _path) { m_iconSubPath = _path; };
 		const std::string& iconSubPath(void) const { return m_iconSubPath; };
 
@@ -52,6 +55,7 @@ namespace ot {
 		inline void setParentCategory(BlockCategoryConfiguration* _category) { m_parentCategory = _category; };
 		inline BlockCategoryConfiguration* parentCategory(void) const { return m_parentCategory; };
 
+		std::string m_title;
 		BlockCategoryConfiguration* m_parentCategory;
 		std::string m_iconSubPath;
 		std::list<BlockCategoryConfiguration*> m_childs;

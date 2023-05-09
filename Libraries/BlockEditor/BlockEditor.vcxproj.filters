@@ -34,6 +34,12 @@
     <Filter Include="Source Files\Widgets">
       <UniqueIdentifier>{53558a27-6c40-49ab-9557-084c80f32569}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Factories">
+      <UniqueIdentifier>{b47b0c1e-7c9c-4eea-92ef-7423e45d6925}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Factories">
+      <UniqueIdentifier>{8aa10979-32ed-4aab-8204-4b71009f579c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -57,6 +63,9 @@
     <ClCompile Include="src\BlockPickerWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockPickerDockWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h">
@@ -70,6 +79,9 @@
     </QtMoc>
     <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h">
       <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTBlockEditor\BlockPickerDockWidget.h">
+      <Filter>Header Files\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

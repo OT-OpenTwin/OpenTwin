@@ -44,9 +44,13 @@ namespace ot {
 
 		// Setter/Getter
 
-	protected:
+		//! @brief Set the block title
+		//! @param _title The title to set
+		void setTitle(const std::string& _title) { m_title = _title; };
 
-
+		//! @brif Return the block title
+		const std::string& title(void) const { return m_title; };
+		
 	private:
 		friend class BlockCategoryConfiguration;
 		inline void setParentCategory(BlockCategoryConfiguration* _category) { m_parentCategory = _category; };
@@ -54,6 +58,7 @@ namespace ot {
 
 		BlockCategoryConfiguration*           m_parentCategory;
 		std::vector<BlockLayerConfiguration*> m_layers;
+		std::string                           m_title;
 
 		BlockConfiguration(BlockConfiguration&) = delete;
 		BlockConfiguration& operator = (BlockConfiguration&) = delete;

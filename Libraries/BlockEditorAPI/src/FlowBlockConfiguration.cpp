@@ -3,6 +3,7 @@
 #include "OTBlockEditorAPI/FlowBlockConfiguration.h"
 #include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
 #include "OTGui/Painter2D.h"
+#include "OpenTwinCore/otAssert.h"
 
 #define JSON_MEMBER_BackgroundIcon "BackgroundIcon"
 #define JSON_MEMBER_BackgroundPainter "BackgroundPainter"
@@ -26,6 +27,8 @@ ot::FlowBlockConfiguration::~FlowBlockConfiguration() {
 }
 
 void ot::FlowBlockConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	otAssert(!m_inputs.empty() || !m_outputs.empty(), "Exporting invalid flow block configuration:\n\tNo inputs or outputs provided");
+
 	BlockConfiguration::addToJsonObject(_document, _object);
 
 	ot::rJSON::add(_document, _object, JSON_MEMBER_BackgroundIcon, m_backgroundIconSubPath);
