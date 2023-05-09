@@ -15,12 +15,11 @@
 
 namespace ot {
 
-
-
 	//! @param K Key type
 	//! @param V Value/Object type
 	template <class K, class V>
 	class ObjectManagerTemplate : public ot::Singleton<ObjectManagerTemplate<K, V>> {
+		OT_SINGLETON(ObjectManagerTemplate<K, V>)
 	public:
 		//! @brief Store the provided object for the given key.
 		//! If there exists an entry for the given key the function will terminate.
@@ -56,7 +55,6 @@ namespace ot {
 		V* const operator [](const K& _key);
 
 	private:
-		friend class ot::Singleton<ObjectManagerTemplate<K, V>>;
 		ObjectManagerTemplate() {};
 		virtual ~ObjectManagerTemplate() {};
 
