@@ -40,9 +40,11 @@ Howto
 
    how_to/debug_the_software
    how_to/create_new_services
+   how_to/create_new_library
    how_to/load_create_entities
    how_to/build_user_interface
    how_to/create_documentation
+   
 
 .. toctree::
    :maxdepth: 2
