@@ -203,6 +203,8 @@
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\BlockConnector.cpp" />
+    <ClCompile Include="src\BlockFactory.cpp" />
+    <ClCompile Include="src\BlockLayer.cpp" />
     <ClCompile Include="src\BlockNetworkEditor.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
@@ -214,9 +216,13 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\BlockPickerDockWidget.cpp" />
+    <ClCompile Include="src\DefaultBlock.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\BlockNetwork.cpp" />
     <ClCompile Include="src\BlockPickerWidget.cpp" />
+    <ClCompile Include="src\ImageBlockLayer.cpp" />
+    <ClCompile Include="src\RectangularBlockLayer.cpp" />
+    <ClCompile Include="src\TextBlockLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h" />
@@ -228,6 +234,12 @@
     <ClInclude Include="include\OTBlockEditor\BlockConnection.h" />
     <ClInclude Include="include\OTBlockEditor\BlockConnector.h" />
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPIExport.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockFactory.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockLayer.h" />
+    <ClInclude Include="include\OTBlockEditor\ImageBlockLayer.h" />
+    <ClInclude Include="include\OTBlockEditor\RectangularBlockLayer.h" />
+    <ClInclude Include="include\OTBlockEditor\TextBlockLayer.h" />
+    <QtMoc Include="include\OTBlockEditor\DefaultBlock.h" />
     <QtMoc Include="include\OTBlockEditor\BlockPickerDockWidget.h" />
     <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h" />
     <QtMoc Include="include\OTBlockEditor\BlockNetwork.h" />

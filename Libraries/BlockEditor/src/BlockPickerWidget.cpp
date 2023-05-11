@@ -33,10 +33,10 @@ ot::BlockPickerWidget::BlockPickerWidget(Qt::Orientation _orientation) : m_navig
 	m_navigation->treeWidget()->setHeaderHidden(true);
 	m_navigation->setWidgetFlags(ot::ApplyFilterOnTextChange);
 
-	m_view = new GraphicsView;
-	
 	m_scene = new GraphicsScene;
-	
+	m_scene->setGridSize(0);
+
+	m_view = new GraphicsView;
 	m_view->setScene(m_scene);
 
 	m_splitter->addWidget(m_navigation->getWidget());
@@ -143,8 +143,8 @@ void ot::BlockPickerWidget::addBlockToNavigation(ot::BlockConfiguration* _block,
 	if (blockItem == nullptr) {
 		blockItem = new QTreeWidgetItem;
 		blockItem->setText(intern::ntTitle, QString::fromStdString(_block->title()));
-		blockItem->setHidden(true);
 		_parentNavigationItem->addChild(blockItem);
+		blockItem->setHidden(true);
 	}
 }
 

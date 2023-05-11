@@ -24,7 +24,7 @@ namespace ot {
 
 	class BLOCKEDITORAPI_API_EXPORT BlockConfiguration : public ot::BlockConfigurationGraphicsObject {
 	public:
-		BlockConfiguration(const std::string& _name = std::string());
+		BlockConfiguration(const std::string& _name = std::string(), const std::string& _title = std::string());
 		virtual ~BlockConfiguration();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -51,10 +51,26 @@ namespace ot {
 		//! @brif Return the block title
 		const std::string& title(void) const { return m_title; };
 		
+		//! @brief Add the provided block layer
+		//! @param _layer The layer to add
+		void addLayer(BlockLayerConfiguration* _layer);
+
+		//! @brief Add the provided block layers
+		//! @param _layers The layers to add
+		void addLayers(const std::vector<BlockLayerConfiguration*>& _layers);
+
+		//! @brief Will replace the current layers with the provided ones
+		void setLayers(const std::vector<BlockLayerConfiguration*>& _layers);
+
+		//! @brief Returns the layers that were set for this block
+		const std::vector<BlockLayerConfiguration*>& layers(void) const { return m_layers; };
+
 	private:
 		friend class BlockCategoryConfiguration;
 		inline void setParentCategory(BlockCategoryConfiguration* _category) { m_parentCategory = _category; };
 		inline BlockCategoryConfiguration* parentCategory(void) const { return m_parentCategory; };
+
+		void clearLayers(void);
 
 		BlockCategoryConfiguration*           m_parentCategory;
 		std::vector<BlockLayerConfiguration*> m_layers;

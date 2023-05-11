@@ -11,7 +11,12 @@
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtCore/qpoint.h>
+#include <QtGui/qcolor.h>
 #include <QtWidgets/qgraphicsitem.h>
+
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QWidget;
 
 namespace ot {
 
@@ -27,13 +32,20 @@ namespace ot {
 
 		virtual QRectF boundingRect(void) const override;
 
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget *)nullptr) override;
+
 		virtual qreal blockWidth(void) const = 0;
 		virtual qreal blockHeigth(void) const = 0;
 
-		virtual BlockConnector* connectorAt(const QPointF& _point) const = 0;
+		void setHighlighted(bool _isHighlighted = true) { m_isHighlighted = _isHighlighted; };
+		bool isHighlighted(void) const { return m_isHighlighted; };
+
+		void setHighlightColor(const QColor& _color) { m_highlightColor = _color; };
+		const QColor& highlightColor(void) const { return m_highlightColor; };
 
 	private:
-
+		bool m_isHighlighted;
+		QColor m_highlightColor;
 	};
 
 }
