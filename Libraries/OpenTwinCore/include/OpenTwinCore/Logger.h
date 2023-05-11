@@ -13,6 +13,7 @@
 #include "OpenTwinCore/CoreAPIExport.h"
 
 #include "OpenTwinCore/Flags.h"
+#include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/Serializable.h"
 
@@ -43,17 +44,63 @@
 
 #endif
 
-//! Log a info message according to the service logger configuration
+//! @brief Log a info message according to the service logger configuration.
+//! Information messages should contain general information.
+//! @param ___text The log message.
 #define OT_LOG_I(___text) OT_LOG(___text, ot::DEFAULT_LOG)
 
-//! Log a detailed information message according to the service logger configuration
+//! @brief Log a info message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_IA(___text) otAssert(0, ___text); OT_LOG(___text, ot::DEFAULT_LOG)
+
+//! @brief Log a info message according to the service logger configuration and assert.
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_IAS(___text) assert(0); OT_LOG(___text, ot::DEFAULT_LOG)
+
+//! @brief Log a detailed information message according to the service logger configuration.
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
 #define OT_LOG_D(___text) OT_LOG(___text, ot::DETAILED_LOG)
 
-//! Log a warning message according to the service logger configuration
+//! @brief Log a detailed information message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_DA(___text) otAssert(0, ___text); OT_LOG(___text, ot::DETAILED_LOG)
+
+//! @brief Log a detailed information message according to the service logger configuration and assert.
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_DAS(___text) assert(0); OT_LOG(___text, ot::DETAILED_LOG)
+
+//! @brief Log a warning message according to the service logger configuration.
+//! @param ___text The log message.
 #define OT_LOG_W(___text) OT_LOG(___text, ot::WARNING_LOG)
 
-//! Log a error message according to the service logger configuration
+//! @brief Log a warning message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! @param ___text The log message.
+#define OT_LOG_WA(___text) otAssert(0, ___text); OT_LOG(___text, ot::WARNING_LOG)
+
+//! @brief Log a warning message according to the service logger configuration and assert.
+//! @param ___text The log message.
+#define OT_LOG_WAS(___text) assert(0); OT_LOG(___text, ot::WARNING_LOG)
+
+//! @brief Log a error message according to the service logger configuration.
+//! @param ___text The log message.
 #define OT_LOG_E(___text) OT_LOG(___text, ot::ERROR_LOG)
+
+//! @brief Log a error message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! @param ___text The log message.
+#define OT_LOG_EA(___text) otAssert(0, ___text); OT_LOG(___text, ot::ERROR_LOG)
+
+//! @brief Log a error message according to the service logger configuration and assert.
+//! @param ___text The log message.
+#define OT_LOG_EAS(___text) assert(0); OT_LOG(___text, ot::ERROR_LOG)
 
 #pragma warning (disable: 4251)
 
