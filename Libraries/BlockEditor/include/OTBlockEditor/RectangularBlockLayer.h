@@ -7,6 +7,8 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockLayer.h"
+#include "OTGui/Border.h"
+#include "OpenTwinCore/Color.h"
 
 // Qt header
 #include <QtGui/qcolor.h>
@@ -22,6 +24,18 @@ namespace ot {
 		virtual ~RectangularBlockLayer();
 
 		virtual void paintLayer(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) override;
+
+		void setBorder(const ot::Border& _border);
+		void setBorder(const QColor& _color, int _borderWidth);
+
+		void setBorderWidth(int _borderWidth) { m_borderWidth = _borderWidth; };
+		int borderWidth(void) const { return m_borderWidth; };
+
+		void setBorderColor(const QColor& _borderColor) { m_borderColor = _borderColor; };
+		const QColor& borderColor(void) const { return m_borderColor; };
+
+		void setBrush(const QBrush& _brush) { m_brush = _brush; };
+		const QBrush& brush(void) { return m_brush; };
 
 	private:
 		int m_cornerRadius;

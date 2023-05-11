@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/TextBlockLayer.h"
+#include "OpenTwinCore/otAssert.h"
 
 ot::TextBlockLayer::TextBlockLayer(ot::DefaultBlock* _block) : ot::BlockLayer(_block) {
 
