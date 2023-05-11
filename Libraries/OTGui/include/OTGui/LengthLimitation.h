@@ -10,7 +10,7 @@ namespace ot {
 	class __declspec(dllexport) LengthLimitationTemplate : public ot::Serializable {
 	public:
 		LengthLimitationTemplate() : m_min((T)0), m_minSet(false), m_max((T)0), m_maxSet(false) {};
-		LengthLimitationTemplate(T _min, T _max) : m_min(_min), m_minSet(true), m_max(_max), m_maxSet(true) {};
+		LengthLimitationTemplate(T _min, T _max) : m_min(_min), m_minSet(_min > 0), m_max(_max), m_maxSet(_max > 0) {};
 		LengthLimitationTemplate(const LengthLimitationTemplate<T>& _other) : m_min(_other.m_min), m_minSet(_other.m_minSet), m_max(_other.m_max), m_maxSet(_other.m_maxSet) {};
 		virtual ~LengthLimitationTemplate() {};
 
@@ -20,11 +20,11 @@ namespace ot {
 
 		inline void set(T _min, T _max);
 
-		void setMin(T _min) { m_min = _min; m_minSet = true; };
+		void setMin(T _min) { m_min = _min; m_minSet = (_min > 0); };
 		T min(void) const { return m_min; };
 		bool isMinSet(void) const { return m_minSet; };
 
-		void setMax(T _max) { m_max = _max; m_maxSet = true; };
+		void setMax(T _max) { m_max = _max; m_maxSet = (_max > 0); };
 		T max(void) const { return m_max; };
 		bool isMaxSet(void) const { return m_maxSet; };
 
