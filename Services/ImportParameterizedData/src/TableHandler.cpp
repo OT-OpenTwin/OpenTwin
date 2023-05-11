@@ -31,7 +31,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	tableData->StoreToDataBase();
 
 	topoEnt->setTableData(tableData);
-	topoEnt->SetTableDimensions(tableData->getNumberOfRows(), tableData->getNumberOfColumns());
+	topoEnt->SetTableDimensions(static_cast<unsigned int> (tableData->getNumberOfRows()), static_cast<unsigned int> (tableData->getNumberOfColumns()));
 	topoEnt->SetSourceFile(sourceFile->getFileName() + "." + sourceFile->getFileType(), sourceFile->getPath());
 	topoEnt->createProperties(EntityParameterizedDataTable::HeaderOrientation::horizontal);
 	topoEnt->StoreToDataBase();
@@ -68,7 +68,7 @@ std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableDa
 	auto tableData = std::make_shared<EntityResultTableData<std::string>>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	tableData->setNumberOfColumns(numberOfColumns);
 	tableData->setNumberOfRows(processedTableData.size());
-	uint64_t lineCounter(0);
+	unsigned int lineCounter(0);
 	for (auto& row : processedTableData)
 	{
 		tableData->setRow(lineCounter, row);

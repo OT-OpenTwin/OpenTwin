@@ -16,12 +16,13 @@ using BsonViewOrValue = bsoncxx::document::view_or_value;
 
 namespace DataStorageAPI
 {
-	class __declspec(dllexport) ResultDataStorageAPI
+	class ResultDataStorageAPI
 	{
 	public:
 
-		ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName);
-		DataStorageResponse	InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing);
+		__declspec(dllexport) ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName);
+		__declspec(dllexport) DataStorageResponse	InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing);
+
 	private:
 		const int maxDocumentLength = 16776216;
 		DocumentAccess documentAccess;
