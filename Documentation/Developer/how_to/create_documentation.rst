@@ -1,6 +1,8 @@
 Create Documentation
 ====================
 
+.. _target to top of document:
+
 =======================
 Build the Documentation
 =======================
@@ -42,6 +44,10 @@ This example shows how to embed code snippets:
 Images:
 
 .. image:: ../images/logo.png
+
+References to other pages, chaper, sections, etc. shall be defined explicitly.
+They require a target which then can be :ref:`referenced <target to top of document>`
+
 
 And links to external web pages:
 http:www.google.de
