@@ -23,20 +23,17 @@ namespace PythonAPI
 			return _parameterAsString;
 		}
 
-		//void getValueFromDictionary(PyObject* dictionary)
-		//{
-		//	_value = value;
-		//	_parameterAsString = _parameterName + "=" + std::to_string(value);
-		//}
-		//T getValue() const { return _value; }
+		T getValueFromDictionary(PyObject* dictionary)
+		{
+			return GetValueFromPythonDictionary(dictionary, _parameterName);
+		}
+		
 
 	private:
 		std::string _parameterName;
 		std::string _parameterAsString;
 		T(*GetValueFromPythonDictionary)(PyObject* dict, const std::string& parameterName);
 		T _value;
-		//PyDict_SetItemString(localDictionary, "localOne", PyLong_FromLong(1));
-		//long result = PyLong_AsLong(PyDict_GetItemString(localDictionary, "result"));
 	};
 
 	template<class T>

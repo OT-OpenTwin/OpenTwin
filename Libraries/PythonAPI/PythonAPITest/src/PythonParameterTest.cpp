@@ -55,12 +55,14 @@ TEST(PythonParameter, TestNotSupportedDataType_char)
 	ASSERT_ANY_THROW(PythonAPI::PythonParameter<char>(parameterName, value));
 }
 
-//TEST(PythonParameter, TestParameterString)
-//{
-//	const std::string parameterName = "Parameter";
-//	const int32_t value = 13;
-//
-//	ASSERT_NO_THROW(PythonAPI::PythonParameter<int32_t>(parameterName, value));
-//}
+TEST(PythonParameter, TestParameterString)
+{
+	const std::string parameterName = "Parameter";
+	const int32_t value = 13;
+	const std::string expectedParameterString = "Parameter=13";
+
+	PythonAPI::PythonParameter<int32_t> parameter(parameterName, value);
+	ASSERT_EQ(parameter.getParameterString(), expectedParameterString);
+}
 
 

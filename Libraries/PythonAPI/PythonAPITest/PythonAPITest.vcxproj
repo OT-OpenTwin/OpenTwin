@@ -133,8 +133,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixturePythonWrapper.cpp" />
     <ClCompile Include="src\PythonParameterTest.cpp" />
     <ClCompile Include="src\test.cpp" />
+    <ClCompile Include="src\TestPythonWrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixturePythonWrapper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

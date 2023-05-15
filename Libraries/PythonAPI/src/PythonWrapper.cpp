@@ -1,6 +1,6 @@
 #include "PythonWrapper.h"
 
-PythonWrapper::PythonWrapper()
+PythonAPI::PythonWrapper::PythonWrapper()
 {
 	_pythonRoot = getenv("PYTHON310_ROOT");
 	_pythonPath = 
@@ -9,26 +9,38 @@ PythonWrapper::PythonWrapper()
 		_pythonRoot;
 }
 
-void PythonWrapper::ExecuteString(std::string executionCommand)
+void PythonAPI::PythonWrapper::ExecuteString(std::string executionCommand)
 {
 	try
 	{
-		std::wstring pyhtonPath(_pythonPath.begin(), _pythonPath.end());
+		if (!_pythonInterpreterIsInitialized)
+		{
+			InitializePythonInterpreter();
+		}
+		
 		int start = Py_file_input;
-		Py_SetPath(pyhtonPath.c_str());
-		int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())
-		Py_InitializeEx(skipSignalHandlerRegistration);
-
 		PyObject* main = PyImport_AddModule("__main__");
 		PyObject* globalDictionary = PyModule_GetDict(main);
 		PyObject* localDictionary = PyDict_New();
 
-		PyObject* returnVal = PyRun_String(executionCommand.c_str(), start, globalDictionary, localDictionary);
+		std::string allParameter = GetAllGlobalParameter();
 
+		PyObject* allParameterSet = PyRun_String(allParameter.c_str(), start, globalDictionary, localDictionary);
+		if (allParameterSet == nullptr)
+		{
+			ThrowPythonException();
+		}
+
+
+		PyObject* returnVal = PyRun_String(executionCommand.c_str(), start, globalDictionary, localDictionary);
 		if (returnVal == nullptr)
 		{
 			ThrowPythonException();
 		}
+
+		SetAllGlobalParameter(globalDictionary);
+		
+		ClosePythonInterpreter();
 	}
 	catch (const std::exception& exception)
 	{
@@ -37,7 +49,83 @@ void PythonWrapper::ExecuteString(std::string executionCommand)
 	}
 }
 
-void PythonWrapper::ThrowPythonException()
+void PythonAPI::PythonWrapper::InitializePythonInterpreter()
+{
+	std::wstring pyhtonPath(_pythonPath.begin(), _pythonPath.end());
+
+	Py_SetPath(pyhtonPath.c_str());
+	int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())
+	Py_InitializeEx(skipSignalHandlerRegistration);
+	if (Py_IsInitialized() != 1)
+	{
+		ThrowPythonException();
+	}
+	_pythonInterpreterIsInitialized = true;
+}
+
+void PythonAPI::PythonWrapper::operator<<(const std::string& executionCommand)
+{
+}
+
+std::string PythonAPI::PythonWrapper::GetAllGlobalParameter()
+{
+	std::string allParameter = "";
+	for (const auto& parameter : *_globalParameterBool)
+	{
+		allParameter += parameter.getParameterString() + "\n";
+	}
+	for (const auto& parameter : *_globalParameterDouble)
+	{
+		allParameter += parameter.getParameterString() + "\n";
+	}
+	for (const auto& parameter : *_globalParameterFloat)
+	{
+		allParameter += parameter.getParameterString() + "\n";
+	}
+	for (const auto& parameter : *_globalParameterInt32)
+	{
+		allParameter += parameter.getParameterString() + "\n";
+	}
+	for (const auto& parameter : *_globalParameterInt64)
+	{
+		allParameter += parameter.getParameterString() + "\n";
+	}
+	for (const auto& parameter : *_globalParameterString)
+	{
+		allParameter += parameter.getParameterString() + "\n";
+	}
+	return allParameter;
+}
+
+void PythonAPI::PythonWrapper::SetAllGlobalParameter(PyObject* globalDict)
+{
+	for (auto& parameter : *_globalParameterBool)
+	{
+		parameter.getValueFromDictionary(globalDict);
+	}
+	for (auto& parameter : *_globalParameterDouble)
+	{
+		parameter.getValueFromDictionary(globalDict);
+	}
+	for (auto& parameter : *_globalParameterFloat)
+	{
+		parameter.getValueFromDictionary(globalDict);
+	}
+	for (auto& parameter : *_globalParameterInt32)
+	{
+		parameter.getValueFromDictionary(globalDict);
+	}
+	for (auto& parameter : *_globalParameterInt64)
+	{
+		parameter.getValueFromDictionary(globalDict);
+	}
+	for (auto& parameter : *_globalParameterString)
+	{
+		parameter.getValueFromDictionary(globalDict);
+	}
+}
+
+void PythonAPI::PythonWrapper::ThrowPythonException()
 {
 	PyObject* type, * value, * traceback;
 	PyErr_Fetch(&type, &value, &traceback);
@@ -48,11 +136,12 @@ void PythonWrapper::ThrowPythonException()
 	throw std::exception(errorMessage.c_str());
 }
 
-void PythonWrapper::ClosePythonInterpreter()
+void PythonAPI::PythonWrapper::ClosePythonInterpreter()
 {
 	int success = Py_FinalizeEx();
 	if (success == -1)
 	{
 		ThrowPythonException();
 	}
+	_pythonInterpreterIsInitialized = false;
 }
