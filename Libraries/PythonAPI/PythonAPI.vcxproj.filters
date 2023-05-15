@@ -18,9 +18,21 @@
     <ClInclude Include="include\PythonAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PythonWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonParameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PythonAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PythonWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PythonParameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
