@@ -53,19 +53,18 @@ namespace PythonAPI
 		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
 		{
 			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
-			return 1;
-		//	if (var == nullptr)
-		//	{
-		//		throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
-		//	}
-		//	if (PyLong_Check(var) == 1)
-		//	{
-		//		return static_cast<int32_t>(PyLong_AsLong(var));
-		//	}
-		//	else
-		//	{
-		//		throw std::exception(("Requested python parameter " + parameterName + " is not an integer type.").c_str());
-		//	}
+			if (var == nullptr)
+			{
+				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
+			}
+			if (PyLong_Check(var) == 1)
+			{
+				return static_cast<int32_t>(PyLong_AsLong(var));
+			}
+			else
+			{
+				throw std::exception(("Requested python parameter " + parameterName + " is not an integer type.").c_str());
+			}
 		};
 	}
 
@@ -76,7 +75,11 @@ namespace PythonAPI
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
 		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
 		{
-			PyObject* var = GetPythonVariableFromDictionary(dict, parameterName);
+			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			if (var == nullptr)
+			{
+				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
+			}
 			if (PyLong_Check(var) == 1)
 			{
 				return static_cast<int64_t>(PyLong_AsLongLong(var));
@@ -95,7 +98,11 @@ namespace PythonAPI
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
 		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
 		{
-			PyObject* var = GetPythonVariableFromDictionary(dict, parameterName);
+			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			if (var == nullptr)
+			{
+				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
+			}
 			if (PyFloat_Check(var) == 1)
 			{
 				return (PyFloat_AsDouble(var));
@@ -114,7 +121,11 @@ namespace PythonAPI
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
 		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
 		{
-			PyObject* var = GetPythonVariableFromDictionary(dict, parameterName);
+			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			if (var == nullptr)
+			{
+				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
+			}
 			if (PyFloat_Check(var) == 1)
 			{
 				return (static_cast<float>(PyFloat_AsDouble(var)));
@@ -133,7 +144,11 @@ namespace PythonAPI
 		_parameterAsString = _parameterName + "=" + value;
 		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
 		{
-			PyObject* var = GetPythonVariableFromDictionary(dict, parameterName);
+			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			if (var == nullptr)
+			{
+				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
+			}
 			if (PyUnicode_Check(var) == 1)
 			{
 				return std::string(PyUnicode_AsUTF8(var));
@@ -152,7 +167,11 @@ namespace PythonAPI
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
 		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
 		{
-			PyObject* var = GetPythonVariableFromDictionary(dict, parameterName);
+			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			if (var == nullptr)
+			{
+				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
+			}
 			if (PyBool_Check(var) == 1)
 			{
 				long value = PyLong_AsLong(var);
