@@ -17,7 +17,7 @@ public:
 	}
 	std::string GetExecutionStringAlterInt32Var1() { return "var1=var1*13"; }
 	int32_t GetExpectedAlteredInt32Var1() { return  26; }
-	
+	int32_t GetInt32Var1() { return _parameter[0].getValue(); }
 
 private:
 

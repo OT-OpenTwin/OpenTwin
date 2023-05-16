@@ -35,9 +35,12 @@ TEST_F(FixturePythonWrapper, GettingGlobalParameterInt)
 	ASSERT_EQ(globalParameter, GetExpectedParameterStringInt32());
 }
 
-//TEST_F(FixturePythonWrapper, GlobalParameterAlteration)
-//{
-//	getPythonWrapper()->setGlobalParameter(GetTestParameterInt32());
-//	getPythonWrapper()->InitializePythonInterpreter();
-//	getPythonWrapper()->ExecuteString(GetExecutionStringAlterInt32Var1());
-//}
+TEST_F(FixturePythonWrapper, GlobalParameterAlteration)
+{
+	getPythonWrapper()->setGlobalParameter(GetTestParameterInt32());
+	getPythonWrapper()->InitializePythonInterpreter();
+	getPythonWrapper()->ExecuteString(GetExecutionStringAlterInt32Var1());
+	int32_t newValue = GetInt32Var1();
+	int32_t expectedValue = GetExpectedAlteredInt32Var1();
+	ASSERT_EQ(newValue, expectedValue );
+}

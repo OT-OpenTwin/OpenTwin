@@ -25,9 +25,14 @@ namespace PythonAPI
 
 		T getValueFromDictionary(PyObject** dictionary)
 		{
-			return GetValueFromPythonDictionary(dictionary, _parameterName);
+			_value = GetValueFromPythonDictionary(dictionary, _parameterName);
+			return _value;
 		}
 		
+		T getValue() const
+		{
+			return _value;
+		}
 
 	private:
 		std::string _parameterName;
