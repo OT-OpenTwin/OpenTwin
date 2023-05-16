@@ -3,14 +3,13 @@
 #include <Python.h>
 #include <string>
 #include <vector>
+#include <signal.h>
+
 #include "PythonParameter.h"
 
-namespace PythonAPI
-{
 	class  PythonWrapper
 	{
-	friend class FixturePythonWrapper;
-
+		friend class FixturePythonWrapper;
 	public:
 		PythonWrapper();
 		void ExecuteString(std::string executionCommand);
@@ -30,6 +29,7 @@ namespace PythonAPI
 		std::string _pythonPath;
 		std::string _pythonRoot;
 		bool _pythonInterpreterIsInitialized;
+
 		std::vector<PythonAPI::PythonParameter<int32_t>>* _globalParameterInt32;
 		std::vector<PythonAPI::PythonParameter<int64_t>>* _globalParameterInt64;
 		std::vector<PythonAPI::PythonParameter<std::string>>* _globalParameterString;
@@ -41,7 +41,8 @@ namespace PythonAPI
 		void SetAllGlobalParameter(PyObject* globalDict);
 		void ThrowPythonException();
 
+		static void SignalHandlerForPythonCrash(int signum)
+		{
+			throw std::exception("Signal for exiting the application was raised.");
+		}
 	};
-}
-
-

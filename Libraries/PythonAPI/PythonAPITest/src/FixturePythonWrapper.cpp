@@ -1,7 +1,22 @@
 #include "FixturePythonWrapper.h"
+#include <tuple>
+#include <vector>
 
 FixturePythonWrapper::FixturePythonWrapper()
 {
-	PythonAPI::PythonWrapper wrapper;
-	
+}
+
+PythonWrapper* FixturePythonWrapper::getPythonWrapper()
+{
+	return &pythonWrapper;
+}
+
+std::string FixturePythonWrapper::getAllGlobalParameter()
+{
+	return pythonWrapper.GetAllGlobalParameter();
+}
+
+void FixturePythonWrapper::SetFalsePythonSysPath()
+{
+	pythonWrapper._pythonPath = "C:\\Users";
 }
