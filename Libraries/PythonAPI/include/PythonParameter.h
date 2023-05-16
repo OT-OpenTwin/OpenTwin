@@ -23,7 +23,7 @@ namespace PythonAPI
 			return _parameterAsString;
 		}
 
-		T getValueFromDictionary(PyObject* dictionary)
+		T getValueFromDictionary(PyObject** dictionary)
 		{
 			return GetValueFromPythonDictionary(dictionary, _parameterName);
 		}
@@ -32,7 +32,7 @@ namespace PythonAPI
 	private:
 		std::string _parameterName;
 		std::string _parameterAsString;
-		T(*GetValueFromPythonDictionary)(PyObject* dict, const std::string& parameterName);
+		T(*GetValueFromPythonDictionary)(PyObject** dict, const std::string& parameterName);
 		T _value;
 	};
 
@@ -47,9 +47,9 @@ namespace PythonAPI
 		: _parameterName(parameterName), _value(value)
 	{
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
-		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
+		GetValueFromPythonDictionary = [](PyObject** dict, const std::string& parameterName)
 		{
-			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			PyObject* var = PyDict_GetItemString(*dict, parameterName.c_str());
 			if (var == nullptr)
 			{
 				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
@@ -70,9 +70,9 @@ namespace PythonAPI
 		: _parameterName(parameterName), _value(value)
 	{
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
-		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
+		GetValueFromPythonDictionary = [](PyObject** dict, const std::string& parameterName)
 		{
-			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			PyObject* var = PyDict_GetItemString(*dict, parameterName.c_str());
 			if (var == nullptr)
 			{
 				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
@@ -93,9 +93,9 @@ namespace PythonAPI
 		: _parameterName(parameterName), _value(value)
 	{
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
-		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
+		GetValueFromPythonDictionary = [](PyObject** dict, const std::string& parameterName)
 		{
-			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			PyObject* var = PyDict_GetItemString(*dict, parameterName.c_str());
 			if (var == nullptr)
 			{
 				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
@@ -116,9 +116,9 @@ namespace PythonAPI
 		: _parameterName(parameterName), _value(value)
 	{
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
-		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
+		GetValueFromPythonDictionary = [](PyObject** dict, const std::string& parameterName)
 		{
-			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			PyObject* var = PyDict_GetItemString(*dict, parameterName.c_str());
 			if (var == nullptr)
 			{
 				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
@@ -139,9 +139,9 @@ namespace PythonAPI
 		: _parameterName(parameterName), _value(value)
 	{
 		_parameterAsString = _parameterName + "=" + value;
-		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
+		GetValueFromPythonDictionary = [](PyObject** dict, const std::string& parameterName)
 		{
-			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			PyObject* var = PyDict_GetItemString(*dict, parameterName.c_str());
 			if (var == nullptr)
 			{
 				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());
@@ -162,9 +162,9 @@ namespace PythonAPI
 		: _parameterName(parameterName), _value(value)
 	{
 		_parameterAsString = _parameterName + "=" + std::to_string(value);
-		GetValueFromPythonDictionary = [](PyObject* dict, const std::string& parameterName)
+		GetValueFromPythonDictionary = [](PyObject** dict, const std::string& parameterName)
 		{
-			PyObject* var = PyDict_GetItemString(dict, parameterName.c_str());
+			PyObject* var = PyDict_GetItemString(*dict, parameterName.c_str());
 			if (var == nullptr)
 			{
 				throw std::exception(("Failed to extract python variable " + parameterName + " from dictionary.").c_str());

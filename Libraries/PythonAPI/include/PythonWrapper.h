@@ -30,19 +30,43 @@
 		std::string _pythonRoot;
 		bool _pythonInterpreterIsInitialized;
 
-		std::vector<PythonAPI::PythonParameter<int32_t>>* _globalParameterInt32;
-		std::vector<PythonAPI::PythonParameter<int64_t>>* _globalParameterInt64;
-		std::vector<PythonAPI::PythonParameter<std::string>>* _globalParameterString;
-		std::vector<PythonAPI::PythonParameter<double>>* _globalParameterDouble;
-		std::vector<PythonAPI::PythonParameter<float>>* _globalParameterFloat;
-		std::vector<PythonAPI::PythonParameter<bool>>* _globalParameterBool;
+		std::vector<PythonAPI::PythonParameter<int32_t>>* _globalParameterInt32 = nullptr;
+		std::vector<PythonAPI::PythonParameter<int64_t>>* _globalParameterInt64 = nullptr;
+		std::vector<PythonAPI::PythonParameter<std::string>>* _globalParameterString = nullptr;
+		std::vector<PythonAPI::PythonParameter<double>>* _globalParameterDouble = nullptr;
+		std::vector<PythonAPI::PythonParameter<float>>* _globalParameterFloat = nullptr;
+		std::vector<PythonAPI::PythonParameter<bool>>* _globalParameterBool = nullptr;
 
 		std::string GetAllGlobalParameter();
-		void SetAllGlobalParameter(PyObject* globalDict);
+		void SetAllGlobalParameter(PyObject** globalDict);
 		void ThrowPythonException();
 
-		static void SignalHandlerForPythonCrash(int signum)
-		{
-			throw std::exception("Signal for exiting the application was raised.");
-		}
+		template <class T>
+		void AddParameterString(std::string& totalString, std::vector<PythonAPI::PythonParameter<T>>* parameter);
+		template <class T>
+		void UpdateParameter(PyObject** globalDict, std::vector<PythonAPI::PythonParameter<T>>* parameter);
 	};
+
+	template<class T>
+	inline void PythonWrapper::AddParameterString(std::string& totalString, std::vector<PythonAPI::PythonParameter<T>>* parameters)
+	{
+		if (parameters != nullptr)
+		{
+			for (const auto& parameter : *parameters)
+			{
+				totalString += parameter.getParameterString() + "\n";
+			}
+		}
+	}
+
+	template<class T>
+	inline void PythonWrapper::UpdateParameter(PyObject** globalDict, std::vector<PythonAPI::PythonParameter<T>>* parameters)
+	{
+		if (parameters != nullptr)
+		{
+			for (auto& parameter : *parameters)
+			{
+				parameter.getValueFromDictionary(globalDict);
+			}
+		}
+	}
