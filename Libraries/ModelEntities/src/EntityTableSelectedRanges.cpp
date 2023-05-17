@@ -32,7 +32,34 @@ void EntityTableSelectedRanges::addVisualizationNodes()
 	EntityBase::addVisualizationNodes();
 }
 
-void EntityTableSelectedRanges::createProperties()
+bool EntityTableSelectedRanges::updateFromProperties(void)
+{
+
+	// Now we need to update the entity after a property change
+	assert(getProperties().anyPropertyNeedsUpdate());
+
+	// Since there is a change now, we need to set the modified flag
+	setModified();
+
+	// Here we need to update the plot (send a message to the visualization service)
+	getProperties().forceResetUpdateForAllProperties();
+	
+	auto showScriptSelection = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
+	auto scriptSelectionProperty = getProperties().getProperty(_pythonScriptProperty);
+
+	if (showScriptSelection->getValue() != scriptSelectionProperty->getVisible())
+	{
+		scriptSelectionProperty->setVisible(showScriptSelection->getValue());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
+}
+
+void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID)
 {
 	std::string sourceFileGroup = "Source file";
 
@@ -55,10 +82,20 @@ void EntityTableSelectedRanges::createProperties()
 	leftColumn->setReadOnly(true);
 	auto rightColumn = new EntityPropertiesInteger("Right column", _rightCells);
 	rightColumn->setReadOnly(true);
+	
+	const std::string updateStrategyGroup = "Update strategy";
+	auto considerInAutomaticCreation = new EntityPropertiesBoolean(_propNameConsiderForBatchProcessing, false);
+	auto updateScript = new EntityPropertiesEntityList(_pythonScriptProperty, pythonScriptFolder, pythonScriptFolderID, pythonScriptName, pythonScriptID);
+	updateScript->setVisible(false);
+	
+	
 	getProperties().createProperty(topRow, rangeGroup);
 	getProperties().createProperty(bottomRow, rangeGroup);
 	getProperties().createProperty(leftColumn, rangeGroup);
 	getProperties().createProperty(rightColumn, rangeGroup);
+
+	getProperties().createProperty(considerInAutomaticCreation, updateStrategyGroup);
+	getProperties().createProperty(updateScript, updateStrategyGroup);
 }
 
 void EntityTableSelectedRanges::SetTableProperties(std::string tableName, ot::UID tableID, ot::UID tableVersion, std::string tableOrientation)
@@ -83,6 +120,11 @@ void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bot
 	bottomRow = _buttomCells;
 	leftColumn = _leftCells;
 	rightColumn = _rightCells;
+}
+
+bool EntityTableSelectedRanges::getConsiderForBatchprocessing()
+{
+	return getProperties().getProperty(_propNameConsiderForBatchProcessing)->getVisible();
 }
 
 void EntityTableSelectedRanges::AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell)

@@ -84,6 +84,7 @@ public:
 	std::string getParameterRootName(void) { return "Parameters"; };
 	std::string getMeshRootName(void) { return "Meshes"; };
 	std::string getSolverRootName(void) { return "Solvers"; };
+	std::string getScriptsRootName(void) { return "Scripts"; };
 	std::string getUnitRootName(void) { return "Units"; };
 	std::string getDataCategorizationRootName(void) { return "Data Categorization"; };
 	std::string getDatasetRootName() { return "Dataset"; };

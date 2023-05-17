@@ -52,6 +52,8 @@ private:
 	const std::string _tableFolder;
 	const std::string _previewTableName;
 	const std::string _msmdFolder = "Measurementseries Metadata";
+	const std::string _scriptFolder = "Scripts";
+	ot::UID _scriptFolderUID = -1;
 	std::string _rmdPath;
 
 	const std::string _selectionRangeName = "Selection";
@@ -65,6 +67,8 @@ private:
 
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
+
+	void ModelComponentWasSet() override;
 
 	void AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category);
 	void AddRMDEntries(ot::EntityInformation entityInfos);

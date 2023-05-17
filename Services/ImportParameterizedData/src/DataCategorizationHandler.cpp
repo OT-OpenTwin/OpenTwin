@@ -11,7 +11,6 @@ DataCategorizationHandler::DataCategorizationHandler(std::string baseFolder, std
 	:_baseFolder(baseFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder), _previewTableName(previewTableName),
 	_rmdColour(88, 175, 233, 100), _msmdColour(166, 88, 233, 100), _parameterColour(88, 233, 122, 100), _quantityColour(233, 185, 88, 100)
 {
-
 }
 
 
@@ -37,6 +36,13 @@ void DataCategorizationHandler::AddSelectionsAsQuantity(std::list<ot::UID> selec
 {
 	_backgroundColour = _quantityColour;
 	AddSelectionsWithCategory(selectedEntities, EntityParameterizedDataCategorization::DataCategorie::quantity);
+}
+
+void DataCategorizationHandler::ModelComponentWasSet()
+{
+	ot::EntityInformation entityInfo;
+	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
+	_scriptFolderUID = entityInfo.getID();
 }
 
 void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
@@ -283,7 +289,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			tableRange->AddRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getEntityStorageVersion(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(false);
-			tableRange->createProperties();
+			tableRange->createProperties(_scriptFolder,_scriptFolderUID,"",-1);
 
 			tableRange->StoreToDataBase();
 			topologyEntityIDList.push_back(tableRange->getEntityID());
