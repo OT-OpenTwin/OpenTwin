@@ -124,7 +124,14 @@ void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bot
 
 bool EntityTableSelectedRanges::getConsiderForBatchprocessing()
 {
-	return getProperties().getProperty(_propNameConsiderForBatchProcessing)->getVisible();
+	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
+	return considerForBatchProcessing->getValue();
+}
+
+std::string EntityTableSelectedRanges::getScriptName()
+{
+	auto selectedScript = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty(_pythonScriptProperty));
+	return selectedScript->getValueName();
 }
 
 void EntityTableSelectedRanges::AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell)

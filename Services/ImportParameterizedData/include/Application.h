@@ -127,6 +127,8 @@ private:
 	ot::MenuButtonDescription _buttonCreateRMDEntry;
 	ot::MenuButtonDescription _buttonCreateParameterEntry;
 	ot::MenuButtonDescription _buttonCreateQuantityEntry;
+	ot::MenuButtonDescription _buttonAutomaticCreationMSMD;
+
 
 	ot::MenuButtonDescription _buttonCreateDataCollection;
 

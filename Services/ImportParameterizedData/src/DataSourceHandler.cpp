@@ -109,7 +109,6 @@ std::vector<char> DataSourceHandler::ExtractFileContentAsBinary(std::string file
 	}
 }
 
-
 std::shared_ptr<EntityParameterizedDataSource> DataSourceHandler::CreateNewSourceEntity(std::string dataType)
 {
 	EntityParameterizedDataSource* newSource = nullptr;

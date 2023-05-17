@@ -3,6 +3,7 @@
 #include "ClassFactory.h"
 #include "Application.h"
 #include "PreviewAssemblerRMD.h"
+#include "PythonAPI.h"
 
 #include <algorithm>
 #include <memory>
@@ -12,7 +13,6 @@ DataCategorizationHandler::DataCategorizationHandler(std::string baseFolder, std
 	_rmdColour(88, 175, 233, 100), _msmdColour(166, 88, 233, 100), _parameterColour(88, 233, 122, 100), _quantityColour(233, 185, 88, 100)
 {
 }
-
 
 void DataCategorizationHandler::AddSelectionsAsRMD(std::list<ot::UID> selectedEntities)
 {
@@ -289,7 +289,12 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			tableRange->AddRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getEntityStorageVersion(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(false);
-			tableRange->createProperties(_scriptFolder,_scriptFolderUID,"",-1);
+
+			ot::EntityInformation entityInfo;
+			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
+			_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+
+			tableRange->createProperties(_scriptFolder,_scriptFolderUID, entityInfo.getName(), entityInfo.getID());
 
 			tableRange->StoreToDataBase();
 			topologyEntityIDList.push_back(tableRange->getEntityID());
@@ -316,6 +321,88 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 
 	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
+}
+
+void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
+{
+
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
+	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>> > allRelevantTableSelectionsByMSMD;
+	for (const auto& tableSelection : allRelevantTableSelections)
+	{
+		std::string tableSelectionName = tableSelection->getName();
+		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(_msmdFolder), tableSelectionName.size());
+		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
+		allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
+	}
+	allRelevantTableSelections.clear();
+	
+	std::list< std::string> scriptNames;
+	for (const auto& element : allRelevantTableSelectionsByMSMD)
+	{
+		for (const auto& selection : element.second)
+		{
+			scriptNames.push_back(selection->getScriptName());
+		}
+	}
+	scriptNames.unique();
+
+	std::map<std::string, std::string> pythonScripts = LoadAllPythonScripts(scriptNames);
+
+	
+	for (const auto& element: allRelevantTableSelectionsByMSMD)
+	{
+		auto newMSMD = new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		newMSMD->setName(CreateNewUniqueTopologyName(_rmdPath, _msmdFolder));
+		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
+		EntityParameterizedDataCategorization* parameter = nullptr;
+		EntityParameterizedDataCategorization* quantities = nullptr;
+
+		for (const auto& selection : element.second)
+		{
+			std::string newSelectionName = "";
+			if (selection->getName().find(_parameterFolder) != string::npos)
+			{
+				if (parameter == nullptr)
+				{
+					parameter = new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+					parameter->setName(newMSMD->getName() + "/" + _parameterFolder);
+				}
+				newSelectionName = CreateNewUniqueTopologyName(parameter->getName(), _selectionRangeName);
+			}
+			else if (selection->getName().find(_quantityFolder) != string::npos)
+			{
+				if (quantities == nullptr)
+				{
+					quantities = new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+					quantities->setName(newMSMD->getName() + "/" + _quantityFolder);
+				}
+				newSelectionName = CreateNewUniqueTopologyName(quantities->getName(), _selectionRangeName);
+			}
+			else
+			{
+				newSelectionName = CreateNewUniqueTopologyName(newMSMD->getName(), _selectionRangeName);
+			}
+			
+			uint32_t topRow, bottomRow, leftCollumn, rightColumn;
+			selection->getSelectedRange(topRow, bottomRow, leftCollumn, rightColumn);
+			std::string tableSource = selection->getTableName();
+			std::string scriptName = selection->getScriptName();
+
+			std::string script = pythonScripts[scriptName];
+			script = "TopRow=" + std::to_string(topRow) + "\n" +
+				"BottomRow=" + std::to_string(bottomRow) + "\n" +
+				"LeftColumn=" + std::to_string(leftCollumn) + "\n" +
+				"RightColumn=" + std::to_string(rightColumn) + "\n" +
+				"TableName=" + tableSource + "\n" +
+				script;
+
+			
+
+
+		}
+	}
+
 }
 
 std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInformation selectedPreviewTable)
@@ -450,6 +537,46 @@ std::pair<ot::UID, ot::UID> DataCategorizationHandler::CreateNewTable(std::strin
 
 	auto newTableIdentifier = std::make_pair<ot::UID, ot::UID>(updatedTableEntity->getEntityID(), updatedTableEntity->getEntityStorageVersion());
 	return newTableIdentifier;
+}
+
+std::list<std::shared_ptr<EntityTableSelectedRanges>> DataCategorizationHandler::FindAllTableSelectionsWithScripts()
+{
+	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
+	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(_baseFolder, tempEntity.getClassName(), true);
+	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
+	ClassFactory classFactory;
+
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
+	for (ot::UID selectionRangeID : selectionRangeIDs)
+	{
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), classFactory);
+		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
+		assert(rangeEntity != nullptr);
+		if (rangeEntity->getConsiderForBatchprocessing())
+		{
+			allRangeEntities.push_back(rangeEntity);
+		}
+	}
+	return allRangeEntities;
+}
+
+std::map<std::string, std::string> DataCategorizationHandler::LoadAllPythonScripts(std::list<std::string>& scriptNames)
+{
+
+	std::list<ot::EntityInformation> entityInfos;
+	_modelComponent->getEntityInformation(scriptNames, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	ClassFactory classFactory;
+	std::map<std::string, std::string> pythonScripts;
+	for (const ot::EntityInformation& entityInfo : entityInfos)
+	{
+		auto entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto script = dynamic_cast<EntityParameterizedDataSource*>(entityBase);
+		const std::vector<char> scriptContentRaw = script->getData()->getData();
+		pythonScripts[entityInfo.getName()] = std::string(scriptContentRaw.begin(), scriptContentRaw.end());
+	}
+
+	return pythonScripts;
 }
 
 void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)

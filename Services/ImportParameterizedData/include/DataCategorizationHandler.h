@@ -34,6 +34,8 @@ public:
 	void AddSelectionsAsParameter(std::list<ot::UID> selectedEntities);
 	void AddSelectionsAsQuantity(std::list<ot::UID> selectedEntities);
 	void StoreSelectionRanges(ot::UID tableEntityID, ot::UID tableEntityVersion, std::vector<ot::TableRange> ranges);
+	void CreateNewScriptDescribedMSMD();
+
 	std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
 
 	void SetColourOfRanges(std::string tableName);
@@ -84,4 +86,7 @@ private:
 	void FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier);
 	bool CheckIfPreviewIsUpToDate(std::shared_ptr<EntityParameterizedDataPreviewTable> categorizationEntity, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 	std::pair<ot::UID, ot::UID> CreateNewTable(std::string tableName, EntityParameterizedDataCategorization::DataCategorie category, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
+
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
+	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
 };

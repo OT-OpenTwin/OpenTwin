@@ -123,6 +123,10 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 				_parametrizedDataHandler->AddSelectionsAsQuantity(m_selectedEntities);
 				RequestSelectedRanges();
 			}
+			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
+			{
+				_parametrizedDataHandler->CreateNewScriptDescribedMSMD();
+			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{
 				m_uiComponent->displayMessage("===========================================================================\n");
@@ -243,6 +247,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add MSMD Entry");
 	_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Parameter Entry");
 	_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Quantity Entry");
+	_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Create next MSMD");
 
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 	
@@ -253,6 +258,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
+	
+	_ui->addMenuButton(_buttonAutomaticCreationMSMD, modelWrite, "BatchProcessing");
 	_ui->addMenuButton(_buttonCreateDataCollection, modelWrite, "database");
 
 	if (isUiConnected()) {
