@@ -45,6 +45,7 @@
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.h" />
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.hpp" />
     <ClInclude Include="include\OpenTwinCore\TypeNames.h" />
+    <ClInclude Include="include\OpenTwinCore\Variable.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
