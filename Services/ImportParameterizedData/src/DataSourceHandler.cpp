@@ -26,7 +26,7 @@ void DataSourceHandler::StoreSourceFileAsEntity(std::string fileName)
 	documentName = documentName.substr(0, documentName.find("."));
 
 	auto newSourceEntity = CreateNewSourceEntity(documentType);
-	std::string fullFileName = CreateNewUniqueTopologyName(_dataSourceFolder, documentName);
+	std::string fullFileName = CreateNewUniqueTopologyNamePlainPossible(_dataSourceFolder, documentName);
 	newSourceEntity->setName(fullFileName);
 	newSourceEntity->setInitiallyHidden(false);
 	newSourceEntity->setFileProperties(path, documentName, documentType);
@@ -34,6 +34,43 @@ void DataSourceHandler::StoreSourceFileAsEntity(std::string fileName)
 	ot::UID newDataID = _modelComponent->createEntityUID();
 	std::unique_ptr <EntityBinaryData> newData(new EntityBinaryData(newDataID, newSourceEntity.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	newData->setData(memBlock.data(),memBlock.size());
+	newData->StoreToDataBase();
+
+	newSourceEntity->setData(newData->getEntityID(), newData->getEntityStorageVersion());
+	newSourceEntity->StoreToDataBase();
+
+	std::list<ot::UID> topologyEntityIDList = { newSourceEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { newSourceEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false };
+
+	std::list<ot::UID> dataEntityIDList{ newDataID };
+	std::list<ot::UID> dataEntityVersionList{ newData->getEntityStorageVersion() };
+	std::list<ot::UID> dataEntityParentList{ newSourceEntity->getEntityID() };
+
+	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
+		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new source file: " + fullFileName);
+}
+
+void DataSourceHandler::StorePythonScriptAsEntity(std::string fileName)
+{
+	CheckEssentials();
+
+	auto memBlock = ExtractFileContentAsBinary(fileName);
+
+	std::string documentName = fileName.substr(fileName.find_last_of("/") + 1);
+	std::string path = fileName.substr(0, fileName.find_last_of("/"));
+	std::string documentType = documentName.substr(documentName.find(".") + 1);
+	documentName = documentName.substr(0, documentName.find("."));
+
+	auto newSourceEntity = CreateNewSourceEntity(documentType);
+	std::string fullFileName = CreateNewUniqueTopologyNamePlainPossible("Scripts", documentName);
+	newSourceEntity->setName(fullFileName);
+	newSourceEntity->setInitiallyHidden(false);
+	newSourceEntity->setFileProperties(path, documentName, documentType);
+
+	ot::UID newDataID = _modelComponent->createEntityUID();
+	std::unique_ptr <EntityBinaryData> newData(new EntityBinaryData(newDataID, newSourceEntity.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	newData->setData(memBlock.data(), memBlock.size());
 	newData->StoreToDataBase();
 
 	newSourceEntity->setData(newData->getEntityID(), newData->getEntityStorageVersion());

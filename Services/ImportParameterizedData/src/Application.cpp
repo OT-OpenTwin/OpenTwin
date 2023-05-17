@@ -84,6 +84,17 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
 				uiComponent()->sendMessage(true, doc);
 			}
+			else if (action == _buttonImportPythonScript.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import Python Script");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "Python scripts (*.py)");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importPythonScript");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
+				uiComponent()->sendMessage(true, doc);
+			}
 			else if (action == _buttonCreateTable.GetFullDescription())
 			{
 				std::list<ot::EntityInformation> selectedEntityInfo;
@@ -132,6 +143,12 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			{
 				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 				_dataSourceHandler->StoreSourceFileAsEntity(fileName);
+				returnMessage = "Import of " + fileName + " succeeded\n";
+			}
+			else if (subsequentFunction == "importPythonScript")
+			{
+				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+				_dataSourceHandler->StorePythonScriptAsEntity(fileName);
 				returnMessage = "Import of " + fileName + " succeeded\n";
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
@@ -237,7 +254,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
 	_ui->addMenuButton(_buttonCreateDataCollection, modelWrite, "database");
-
 
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
