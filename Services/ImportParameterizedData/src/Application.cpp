@@ -219,6 +219,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
 
 	_buttonImportCSV.SetDescription(pageName, groupNameImport, "Import File");
+	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
 	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
 
 	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add RMD Entry");
@@ -229,6 +230,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 	
 	_ui->addMenuButton(_buttonImportCSV, modelWrite, "TextVisible");
+	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
 	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
 	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
 	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");

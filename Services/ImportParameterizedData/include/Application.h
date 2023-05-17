@@ -120,6 +120,7 @@ private:
 	virtual ~Application();
 	
 	ot::MenuButtonDescription _buttonImportCSV;
+	ot::MenuButtonDescription _buttonImportPythonScript;
 	ot::MenuButtonDescription _buttonCreateTable;
 
 	ot::MenuButtonDescription _buttonCreateMSMDEntry;
