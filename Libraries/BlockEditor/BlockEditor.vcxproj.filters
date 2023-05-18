@@ -90,6 +90,9 @@
     <ClCompile Include="src\RectangularBlockLayer.cpp">
       <Filter>Source Files\Layers</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockPaintJob.cpp">
+      <Filter>Source Files\Factories</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h">
@@ -135,6 +138,9 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\RectangularBlockLayer.h">
       <Filter>Header Files\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockPaintJob.h">
+      <Filter>Header Files\Factories</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,6 +15,11 @@ ot::BlockLayer::~BlockLayer() {
 
 }
 
+ot::BlockLayer::QueueResultFlags ot::BlockLayer::runPaintJob(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
+	paintLayer(_painter, _option, _widget);
+	return ot::BlockLayer::Ok;
+}
+
 QRectF ot::BlockLayer::layerRect(void) const {
 	QRectF r = m_block->boundingRect();
 	r.marginsRemoved(m_margins);

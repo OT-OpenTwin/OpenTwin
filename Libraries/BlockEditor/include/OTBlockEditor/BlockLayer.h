@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorAPIExport.h"
+#include "OTBlockEditor/BlockPaintJob.h"
 #include "OTGui/Margins.h"
 
 // Qt header
@@ -21,11 +22,12 @@ namespace ot {
 
 	class DefaultBlock;
 
-	class BLOCK_EDITOR_API_EXPORT BlockLayer {
+	class BLOCK_EDITOR_API_EXPORT BlockLayer : public ot::BlockPaintJob {
 	public:
 		BlockLayer(ot::DefaultBlock * _block);
 		virtual ~BlockLayer();
 
+		virtual QueueResultFlags runPaintJob(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget);
 		virtual void paintLayer(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) = 0;
 
 		//! @brief Returns the rect for this layer for painting
