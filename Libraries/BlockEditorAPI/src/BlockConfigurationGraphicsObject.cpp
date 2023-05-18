@@ -46,3 +46,7 @@ void ot::BlockConfigurationGraphicsObject::setFromJsonObject(OT_rJSON_val& _obje
 	m_heightLimits.setFromJsonObject(heightObj);
 	m_widthLimits.setFromJsonObject(widthObj);
 }
+
+void ot::BlockConfigurationGraphicsObject::setMargins(double _top, double _right, double _bottom, double _left) {
+	m_margins.set(_top, _right, _bottom, _left);
+}

@@ -8,7 +8,7 @@
 #include "OTBlockEditor/DefaultBlock.h"
 #include "OTBlockEditor/BlockConnectorManager.h"
 
-ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block) : m_block(_block), m_connectorManager(nullptr) {
+ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : m_block(_block), m_connectorManager(_connectorManager) {
 
 };
 
@@ -20,7 +20,7 @@ ot::BlockLayer::QueueResultFlags ot::BlockLayer::runPaintJob(AbstractQueue* _que
 	paintLayer(_arg->rect(), _arg->painter(), _arg->styleOption(), _arg->widget());
 	//ToDo: Check if the connector needs to be painted manually
 	//if (m_connectorManager) _queue->queue(m_connectorManager);
-	return ot::BlockLayer::Ok;
+	return Ok | NoMemClear;
 }
 
 QSizeF ot::BlockLayer::layerSizeHint(void) const {

@@ -38,5 +38,5 @@ bool ot::DefaultBlockConnectorManager::addConnector(BlockConnector* _connector, 
 
 ot::DefaultBlockConnectorManager::QueueResultFlags ot::DefaultBlockConnectorManager::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
 	
-	return Ok;
+	return Ok | NoMemClear;
 }

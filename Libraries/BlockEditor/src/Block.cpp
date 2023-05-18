@@ -15,10 +15,25 @@ ot::Block::Block() : m_isHighlighted(false), m_highlightColor(250, 28, 28) {}
 ot::Block::~Block() {}
 
 QRectF ot::Block::boundingRect(void) const {
-	return QRectF(
-		QPointF(pos().x() - (blockWidth() / 2), pos().y() - (blockHeigth() / 2)), 
-		QSizeF(blockWidth(), blockHeigth())
-	);
+	QPointF p(pos());
+	qreal w(blockWidth());
+	qreal h(blockHeigth());
+
+	if (m_widthLimit.isMinSet()) {
+		if (m_widthLimit.min() > w) w = m_widthLimit.min();
+	}
+	if (m_widthLimit.isMaxSet()) {
+		if (m_widthLimit.max() < w) w = m_widthLimit.max();
+	}
+
+	if (m_heightLimit.isMinSet()) {
+		if (m_heightLimit.min() > h) h = m_heightLimit.min();
+	}
+	if (m_heightLimit.isMaxSet()) {
+		if (m_heightLimit.max() < h) h = m_heightLimit.max();
+	}
+
+	return QRectF(QPointF(p.x() - (w / 2), p.y() - (h / 2)), QSizeF(w, h));
 }
 
 void ot::Block::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {

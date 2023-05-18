@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorAPIExport.h"
+#include "OTGui/LengthLimitation.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -43,9 +44,19 @@ namespace ot {
 		void setHighlightColor(const QColor& _color) { m_highlightColor = _color; };
 		const QColor& highlightColor(void) const { return m_highlightColor; };
 
+		void setHeightLimit(const LengthLimitation& _limit) { m_heightLimit = _limit; };
+		LengthLimitation& getHeightLimit(void) { return m_heightLimit; };
+		const LengthLimitation& heightLimit(void) const { return m_heightLimit; };
+
+		void setWidthLimit(const LengthLimitation& _limit) { m_widthLimit = _limit; };
+		LengthLimitation& getWidthLimit(void) { return m_widthLimit; };
+		const LengthLimitation& widthLimit(void) const { return m_widthLimit; };
+
 	private:
 		bool m_isHighlighted;
 		QColor m_highlightColor;
+		LengthLimitation m_heightLimit;
+		LengthLimitation m_widthLimit;
 	};
 
 }

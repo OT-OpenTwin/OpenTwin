@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTBlockEditorAPI/BlockLayerConfiguration.h"
+#include "OTGui/Font.h"
 #include "OpenTwinCore/Color.h"
 
 #define OT_TEXTBLOCKLAYERCONFIGURATION_TYPE "TextBlockLayer"
@@ -15,7 +16,7 @@ namespace ot {
 
 	class BLOCKEDITORAPI_API_EXPORT TextBlockLayerConfiguration : public ot::BlockLayerConfiguration {
 	public:
-		TextBlockLayerConfiguration(const std::string& _text = std::string(), int _textSize = 12, const ot::Color& _textColor = ot::Color());
+		TextBlockLayerConfiguration(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
 		virtual ~TextBlockLayerConfiguration();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -34,15 +35,15 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& text(void) const { return m_text; };
 
-		void setTextSize(int _px) { m_textPixelSize = _px; };
-		int textSize(void) const { return m_textPixelSize; };
+		void setTextFont(const ot::Font& _font) { m_textFont = _font; };
+		const ot::Font& textFont(void) const { return m_textFont; };
 
 		void setTextColor(const ot::Color& _color) { m_textColor = _color; };
 		const ot::Color& textColor(void) const { return m_textColor; };
 
 	private:
 		std::string m_text;
-		int         m_textPixelSize;
+		ot::Font    m_textFont;
 		ot::Color   m_textColor;
 
 		TextBlockLayerConfiguration(TextBlockLayerConfiguration&) = delete;

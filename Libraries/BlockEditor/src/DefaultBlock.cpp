@@ -77,6 +77,6 @@ void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
 		}
 	}
 #endif // _DEBUG
-
+	
 	m_layers.push_back(_layer);
 }

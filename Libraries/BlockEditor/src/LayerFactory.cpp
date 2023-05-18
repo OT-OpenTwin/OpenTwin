@@ -45,7 +45,7 @@ ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block,
 	return layer;
 }
 
-ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::ImageBlockLayerConfiguration* _config) {
+ot::ImageBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::ImageBlockLayerConfiguration* _config) {
 	OTAssertNullptr(_block);
 	OTAssertNullptr(_config);
 
@@ -53,15 +53,19 @@ ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block,
 	return nullptr;
 }
 
-ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::TextBlockLayerConfiguration* _config) {
+ot::TextBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::TextBlockLayerConfiguration* _config) {
 	OTAssertNullptr(_block);
 	OTAssertNullptr(_config);
 
-	otAssert(0, "ot implemented yet");
-	return nullptr;
+	ot::TextBlockLayer* newLayer = new ot::TextBlockLayer(_block);
+	newLayer->setTextColor(colorToQColor(_config->textColor()));
+	newLayer->setText(QString::fromStdString(_config->text()));
+	newLayer->setTextFont(ot::fontToQFont(_config->textFont()));
+
+	return newLayer;
 }
 
-ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::RectangleBlockLayerConfiguration* _config) {
+ot::RectangularBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::RectangleBlockLayerConfiguration* _config) {
 	OTAssertNullptr(_block);
 	OTAssertNullptr(_config);
 	

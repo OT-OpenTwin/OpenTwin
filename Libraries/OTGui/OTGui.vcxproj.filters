@@ -48,6 +48,9 @@
     <ClInclude Include="include\OTGui\Border.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files\Painter2D</Filter>
     </ClCompile>
     <ClCompile Include="src\Border.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

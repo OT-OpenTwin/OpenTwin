@@ -33,6 +33,7 @@ namespace ot {
 		Orientation orientation(void) const { return m_orientation; };
 
 		void setMargins(MarginsD& _margins) { m_margins = _margins; };
+		void setMargins(double _top, double _right, double _bottom, double _left);
 		const MarginsD& margins(void) const { return m_margins; };
 
 		void setIsUserMoveable(bool _isUserMoveable = true) { m_isUserMoveable = _isUserMoveable; };

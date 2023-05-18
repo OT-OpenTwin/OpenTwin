@@ -26,7 +26,7 @@ namespace ot {
 
 	class BLOCK_EDITOR_API_EXPORT BlockLayer : public ot::BlockPaintJob {
 	public:
-		BlockLayer(ot::DefaultBlock * _block);
+		BlockLayer(ot::DefaultBlock * _block, BlockConnectorManager * _connectorManager = (BlockConnectorManager *)nullptr);
 		virtual ~BlockLayer();
 
 		virtual QueueResultFlags runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) override;
