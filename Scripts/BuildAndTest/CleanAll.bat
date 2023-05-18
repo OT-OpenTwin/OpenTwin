@@ -46,6 +46,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\DataStorage\clean.bat"
 ECHO Clean: OTGui Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTGui\clean.bat"
 
+ECHO Clean: OT Qt Wrapper Library
+CALL "%OT_QTWRAPPER_ROOT%\clean.bat"
+
 ECHO Clean: OTWidgets Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets\clean.bat"
 
