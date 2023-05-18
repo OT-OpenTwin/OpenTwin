@@ -91,5 +91,8 @@
     <ClInclude Include="include\OpenTwinCore\Queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\Variable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

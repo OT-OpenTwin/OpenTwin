@@ -34,16 +34,17 @@ To create the test project follow these steps:
    #. Select `Configuration`->`All Configurations` and `Platform`->`x64`
    #. In `C/C++`->`General`->`Additional Include Directories` add `$(SolutionDir)include`, `$(ProjectDir)include` and  `$(GOOGLE_TEST_INC)`
    #. The linker settings are build configuration depending. Thus, select after another the `Debug` and `Release` configuration and add the following paths with `D` as an ending for the debug paths and `R` as an ending for the release paths 
-   #. In `Linker`->`General`->`Additional Library Directories` add `$(GOOGLE_TEST_LIBPATHD)` and `$(<Project environmentvariable>)\$(OT_LIBD)`
+   #. In `Linker`->`General`->`Additional Library Directories` add `$(GOOGLE_TEST_LIBPATHD)` and `$(<Project environmentvariable>)\(OT_LIBTESTD)`
    #. In `Linker`->`Input`->`Additional Dependencies` add `$(GOOGLE_TEST_LIB)` and `<ProjectName>.lib`
    #. Close the test project and open the .sln file in the project directory
    #. Both project and test project should be listed
    #. In the topline of Visual Studio, there is an option to select the build configuration (Debug or Release) and the build target (x64). Select the build configuration and open the `Configuration Manager`
    #. In `Active solution configuration` create two new settings: `ReleaseTest` and `DebugTest`
-   #. If the option `Create new project configurations` was selected, remove the new configurations from the test project
+   #. If the option `Create new project configurations` was selected, remove the new configurations from the test project; ultimately, only the project shall have the two additional settings
    #. Select the regular debug/release settings for the project and deselect the build option for the test project
-   #. Select the test configurations and set the project build configurations accordingly
+   #. Select the test build configurations and set the project build configurations so that e.g. for the `DebugTest` solution setting, the project uses `DebugTest` and the test project uses `Debug` 
    #. In the test project setting, choose `Build Dependencies`->`Project Dependencies` and select the project as dependency
+   #. In `C/C++`->`Code Generation`->`Runtime Library` take care that `Multi-threaded Debug DLL` is selected for the `DebugTest` setting of the project
 
 .. image:: ../images/ProjectReleaseConfiguration.png
 .. image:: ../images/ProjectReleaseTestConfiguration.png

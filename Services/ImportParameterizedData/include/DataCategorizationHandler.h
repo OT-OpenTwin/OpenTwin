@@ -34,6 +34,8 @@ public:
 	void AddSelectionsAsParameter(std::list<ot::UID> selectedEntities);
 	void AddSelectionsAsQuantity(std::list<ot::UID> selectedEntities);
 	void StoreSelectionRanges(ot::UID tableEntityID, ot::UID tableEntityVersion, std::vector<ot::TableRange> ranges);
+	void CreateNewScriptDescribedMSMD();
+
 	std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
 
 	void SetColourOfRanges(std::string tableName);
@@ -52,6 +54,8 @@ private:
 	const std::string _tableFolder;
 	const std::string _previewTableName;
 	const std::string _msmdFolder = "Measurementseries Metadata";
+	const std::string _scriptFolder = "Scripts";
+	ot::UID _scriptFolderUID = -1;
 	std::string _rmdPath;
 
 	const std::string _selectionRangeName = "Selection";
@@ -65,6 +69,8 @@ private:
 
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
+
+	void ModelComponentWasSet() override;
 
 	void AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category);
 	void AddRMDEntries(ot::EntityInformation entityInfos);
@@ -80,4 +86,7 @@ private:
 	void FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier);
 	bool CheckIfPreviewIsUpToDate(std::shared_ptr<EntityParameterizedDataPreviewTable> categorizationEntity, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 	std::pair<ot::UID, ot::UID> CreateNewTable(std::string tableName, EntityParameterizedDataCategorization::DataCategorie category, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
+
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
+	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
 };

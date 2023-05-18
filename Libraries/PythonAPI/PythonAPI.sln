@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PythonAPI", "PythonAPI.vcxproj", "{FB9EE038-44C9-4933-BD21-DE856143060E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PythonAPITest", "PythonAPITest\PythonAPITest.vcxproj", "{4D45BAC0-F166-40B2-AB07-A8AF6EF6ED2F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FB9EE038-44C9-4933-BD21-DE856143060E} = {FB9EE038-44C9-4933-BD21-DE856143060E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

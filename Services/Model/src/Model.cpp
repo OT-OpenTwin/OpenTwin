@@ -177,6 +177,9 @@ void Model::resetToNew(void)
 	EntityContainer *entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
 	entitySolverRoot->setName(getSolverRootName());
 
+	EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+	entityScriptRoot->setName(getScriptsRootName());
+
 	auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
 	entityUnits->setName(getUnitRootName());
 	entityUnits->createProperties();
@@ -206,6 +209,7 @@ void Model::resetToNew(void)
 	addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
 	addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
 	addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+	addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
 	addEntityToModel(entityUnits->getName(), entityUnits, entityRoot, true, allNewEntities);
 	addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
 	addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);

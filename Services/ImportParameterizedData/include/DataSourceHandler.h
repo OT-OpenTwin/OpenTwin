@@ -17,6 +17,8 @@ class DataSourceHandler : public BusinessLogicHandler
 public:
 	DataSourceHandler(const std::string dataSourceFolder);
 	void StoreSourceFileAsEntity(std::string fileName);
+	void StorePythonScriptAsEntity(std::string fileName);
+
 	std::vector<char> ExtractFileContentAsBinary(std::string fileName);
 private:
 	
