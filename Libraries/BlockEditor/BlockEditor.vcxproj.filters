@@ -93,6 +93,15 @@
     <ClCompile Include="src\BlockPaintJob.cpp">
       <Filter>Source Files\Factories</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockConnectorManager.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LayerFactory.cpp">
+      <Filter>Source Files\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PainterFactory.cpp">
+      <Filter>Source Files\Factories</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h">
@@ -140,6 +149,18 @@
       <Filter>Header Files\Layers</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockPaintJob.h">
+      <Filter>Header Files\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockConnectorManager.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockEditorTypes.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\LayerFactory.h">
+      <Filter>Header Files\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\PainterFactory.h">
       <Filter>Header Files\Factories</Filter>
     </ClInclude>
   </ItemGroup>

@@ -17,11 +17,15 @@ ot::RectangularBlockLayer::~RectangularBlockLayer() {
 
 }
 
-void ot::RectangularBlockLayer::paintLayer(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
+void ot::RectangularBlockLayer::paintLayer(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
 	QPen p;
 	p.setColor(m_borderColor);
 	p.setWidth(m_borderWidth);
 	_painter->setPen(p);
+	_painter->setBrush(m_brush);
+
+	if (m_cornerRadius > 0) _painter->drawRoundedRect(_rect, (double)m_cornerRadius, (double)m_cornerRadius);
+	else _painter->drawRect(_rect);
 }
 
 void ot::RectangularBlockLayer::setBorder(const ot::Border& _border) {

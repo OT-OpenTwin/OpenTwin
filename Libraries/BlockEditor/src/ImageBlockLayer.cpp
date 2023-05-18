@@ -15,6 +15,6 @@ ot::ImageBlockLayer::~ImageBlockLayer() {
 
 }
 
-void ot::ImageBlockLayer::paintLayer(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
+void ot::ImageBlockLayer::paintLayer(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
 	otAssert(0, "Not implemented yet");
 }

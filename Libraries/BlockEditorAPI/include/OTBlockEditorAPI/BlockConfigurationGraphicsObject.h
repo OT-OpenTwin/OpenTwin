@@ -32,8 +32,8 @@ namespace ot {
 		void setOrientation(Orientation _orientation) { m_orientation = _orientation; };
 		Orientation orientation(void) const { return m_orientation; };
 
-		void setMargins(Margins& _margins) { m_margins = _margins; };
-		const Margins& margins(void) const { return m_margins; };
+		void setMargins(MarginsD& _margins) { m_margins = _margins; };
+		const MarginsD& margins(void) const { return m_margins; };
 
 		void setIsUserMoveable(bool _isUserMoveable = true) { m_isUserMoveable = _isUserMoveable; };
 		bool isUserMoveable(void) const { return m_isUserMoveable; };
@@ -46,7 +46,7 @@ namespace ot {
 
 	private:
 		Orientation			m_orientation;
-		Margins				m_margins;
+		MarginsD				m_margins;
 		bool				m_isUserMoveable;
 		LengthLimitation	m_heightLimits;
 		LengthLimitation	m_widthLimits;

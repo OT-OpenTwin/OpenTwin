@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/Block.h"
+#include "OTBlockEditor/BlockPaintJob.h"
 
 // Qt header
 #include <QtGui/qpainter.h>

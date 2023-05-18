@@ -7,18 +7,18 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorTypes.h"
+#include "OTBlockEditor/BlockPaintJob.h"
+
+// std header
+#include <list>
 
 namespace ot {
 
 	class BlockLayer;
 	class BlockConnector;
 
-	class BlockConnectorManager {
+	class BlockConnectorManager : public ot::BlockPaintJob {
 	public:
-		enum ConnectorLocation {
-
-		};
-
 		BlockConnectorManager(BlockLayer * _layer) : m_layer(_layer) {};
 		virtual ~BlockConnectorManager() {};
 
@@ -41,8 +41,14 @@ namespace ot {
 		virtual ~DefaultBlockConnectorManager();
 
 		virtual bool addConnector(BlockConnector* _connector, const BlockConnectorLocationFlags& _flags) override;
+		
+		virtual QueueResultFlags runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) override;
 
 	private:
+		std::list<ot::BlockConnector*> m_top; //! @brief Connectors at the top of the box
+		std::list<ot::BlockConnector*> m_right; //! @brief Connectors at the right of the box
+		std::list<ot::BlockConnector*> m_bottom; //! @brief Connectors at the bottom of the box
+		std::list<ot::BlockConnector*> m_left; //! @brief Connectors at the left of the box
 
 		DefaultBlockConnectorManager(const DefaultBlockConnectorManager&) = delete;
 		DefaultBlockConnectorManager& operator = (const DefaultBlockConnectorManager&) = delete;

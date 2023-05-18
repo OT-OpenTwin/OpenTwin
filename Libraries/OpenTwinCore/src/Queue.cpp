@@ -76,5 +76,8 @@ void ot::SimpleQueue::clear(void) {
 
 void ot::SimpleQueue::memClear(const std::pair<QueueObject*, QueueData*>& _entry) {
 	if (_entry.first) delete _entry.first;
-	if (_entry.second) delete _entry.second;
+	if (_entry.second) {
+		// Delete data object if needed
+		if (!_entry.second->isNoDeleteByQueue()) delete _entry.second;
+	}
 }

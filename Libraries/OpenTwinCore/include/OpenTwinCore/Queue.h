@@ -18,10 +18,21 @@ namespace ot {
 
 	class __declspec(dllexport) QueueData {
 	public:
-		QueueData() {};
+		QueueData() : m_noDeleteByQueue(false) {};
 		virtual ~QueueData() {};
 
+		//! @brief If set the creator keeps the ownership when adding this data object to the queue.
+		//! This function can be called when adding this object to the queue (simplified use) and processing the queue before destroying the data object.
+		//! If the data object is destroyed by the user, the user has to take care of cleaning up the queue.
+		//! @param _isNoDelete False if the data object should be destroyed by the queue when needed.
+		QueueData* noDeleteByQueue(bool _isNoDelete = true) { m_noDeleteByQueue = _isNoDelete; return this; };
+
+		//! @brief If false the data object should be destroyed by the queue when needed, otherwise the creator has the ownership.
+		bool isNoDeleteByQueue(void) const { return m_noDeleteByQueue; };
+
 	private:
+		bool m_noDeleteByQueue;
+
 		QueueData(const QueueData&) = delete;
 		QueueData& operator = (const QueueData&) = delete;
 	};

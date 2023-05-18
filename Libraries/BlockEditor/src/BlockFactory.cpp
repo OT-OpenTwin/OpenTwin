@@ -12,10 +12,12 @@
 #include "OTBlockEditorAPI/BlockLayerConfiguration.h"
 #include "OTBlockEditorAPI/FlowBlockConfiguration.h"
 
+#include "OTBlockEditorAPI/BlockLayers.h"
+
 #include "OpenTwinCore/Logger.h"
 
 ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
-	otAssert(_config, "nullptr provided");
+	OTAssertNullptr(_config);
 
 	if (_config->type() == OT_FLOWBLOCKCONFIGURATION_TYPE) {
 		return blockFromConfig(dynamic_cast<ot::FlowBlockConfiguration*>(_config));
@@ -30,14 +32,22 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 
 	// Add layers
 	for (auto layer : _config->layers()) {
+		if (layer->layerType() == OT_RECTANGLEBLOCKLAYERCONFIGURATION_TYPE) {
 
+		}
+		else if (layer->layerType() == OT_IMAGEBLOCKLAYERCONFIGURATION_TYPE) {
+
+		}
+		else if (layer->layerType() == OT_TEXTBLOCKLAYERCONFIGURATION_TYPE) {
+
+		}
 	}
 
 	return newBlock;
 }
 
 ot::Block* ot::BlockFactory::blockFromConfig(ot::FlowBlockConfiguration* _config) {
-	otAssert(_config, "nullptr provided");
+	OTAssertNullptr(_config);
 
 	otAssert(0, "zzZ");
 	return nullptr;

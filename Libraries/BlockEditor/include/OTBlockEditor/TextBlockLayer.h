@@ -17,7 +17,7 @@ namespace ot {
 		TextBlockLayer(ot::DefaultBlock* _block);
 		virtual ~TextBlockLayer();
 
-		virtual void paintLayer(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) override;
+		virtual void paintLayer(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) override;
 
 	private:
 

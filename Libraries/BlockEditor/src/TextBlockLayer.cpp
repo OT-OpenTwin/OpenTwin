@@ -15,6 +15,6 @@ ot::TextBlockLayer::~TextBlockLayer() {
 
 }
 
-void ot::TextBlockLayer::paintLayer(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
+void ot::TextBlockLayer::paintLayer(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
 	otAssert(0, "Not implemented yet");
 }
