@@ -146,7 +146,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(PYTHON310_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(PYTHON310_INC);$(OT_CORE_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -182,6 +182,9 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\CPythonObjectBorrowed.h" />
+    <ClInclude Include="include\CPythonObjectNew.h" />
+    <ClInclude Include="include\DecRefDecorator.h" />
     <ClInclude Include="include\PythonAPI.h" />
     <ClInclude Include="include\PythonParameter.h" />
     <ClInclude Include="include\PythonWrapper.h" />

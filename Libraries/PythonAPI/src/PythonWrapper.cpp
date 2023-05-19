@@ -9,45 +9,24 @@ PythonWrapper::PythonWrapper()
 		_pythonRoot;
 }
 
-void PythonWrapper::ExecuteString(std::string executionCommand)
+PythonWrapper::~PythonWrapper()
 {
-	try
+	Py_DECREF(_mainModule);
+
+}
+
+void PythonWrapper::ExecuteString(std::string executionCommand, ot::VariableBundle& globalVariables)
+{
+	int start = Py_file_input;
+	CPythonObjectNew activeGlobalDirectory = PyDict_Copy(_cleanGlobalDirectory);
+	CPythonObjectNew returnVal = PyRun_String(executionCommand.c_str(), start, _activeGlobalDirectory, _activeGlobalDirectory);
+
+	if (returnVal == nullptr)
 	{
-		if (!_pythonInterpreterIsInitialized)
-		{
-			InitializePythonInterpreter();
-		}
-		
-		int start = Py_file_input;
-		PyObject* main = PyImport_AddModule("__main__");
-		PyObject* globalDictionary = PyModule_GetDict(main);
-		PyObject* localDictionary = PyDict_New();
-
-		std::string allParameter = GetAllGlobalParameter();
-
-		PyObject* allParameterSet = PyRun_String(allParameter.c_str(), start, localDictionary, globalDictionary);
-
-		if (allParameterSet == nullptr)
-		{
-			ThrowPythonException();
-		}
-
-
-		PyObject* returnVal = PyRun_String(executionCommand.c_str(), start, localDictionary, globalDictionary);
-		if (returnVal == nullptr)
-		{
-			ThrowPythonException();
-		}
-
-		SetAllGlobalParameter(&globalDictionary);
-		
-		ClosePythonInterpreter();
+		ThrowPythonException();
 	}
-	catch (const std::exception& exception)
-	{
-		ClosePythonInterpreter();
-		throw exception;
-	}
+
+	ExtractVariables(globalVariables, activeGlobalDirectory);
 }
 
 void PythonWrapper::InitializePythonInterpreter()
@@ -61,34 +40,78 @@ void PythonWrapper::InitializePythonInterpreter()
 	{
 		ThrowPythonException();
 	}
-	_pythonInterpreterIsInitialized = true;
+	_mainModule = PyImport_AddModule("__main__");
+	_cleanGlobalDirectory = PyModule_GetDict(_mainModule);
 }
 
 void PythonWrapper::operator<<(const std::string& executionCommand)
 {
+	int start = Py_file_input;
+	CPythonObjectNew returnVal = PyRun_String(executionCommand.c_str(), start, _activeGlobalDirectory, _activeGlobalDirectory);
+
+	if (returnVal == nullptr)
+	{
+		ThrowPythonException();
+	}
 }
 
-std::string PythonWrapper::GetAllGlobalParameter()
+void PythonWrapper::ExtractVariables(ot::VariableBundle& globalVariables, PyObject* activeGlobalDirectory)
 {
-	std::string allParameter = "";
-	AddParameterString(allParameter, _globalParameterBool);
-	AddParameterString(allParameter, _globalParameterDouble);
-	AddParameterString(allParameter, _globalParameterFloat);
-	AddParameterString(allParameter, _globalParameterInt32);
-	AddParameterString(allParameter, _globalParameterInt64);
-	AddParameterString(allParameter, _globalParameterString);
+	auto boolVariables = globalVariables.GetVariablesBool();
+	for(int i = 0; i < boolVariables->size(); i++)
+	{
+		ExtractValueFromGlobalDirectory((*boolVariables)[i],activeGlobalDirectory);
+	}
 	
-	return allParameter;
+	auto stringVariables = globalVariables.GetVariablesString();
+	for (int i = 0; i < stringVariables->size(); i++)
+	{
+		ExtractValueFromGlobalDirectory((*stringVariables)[i], activeGlobalDirectory);
+	}
+
+	auto doubleVariables = globalVariables.GetVariablesDouble();
+	for(int i = 0; i < doubleVariables->size(); i++)
+	{
+		ExtractValueFromGlobalDirectory((*doubleVariables)[i], activeGlobalDirectory);
+	}
+
+	auto floatVariables = globalVariables.GetVariablesFloat();
+	for (int i = 0; i < floatVariables->size(); i++)
+	{
+		ExtractValueFromGlobalDirectory((*floatVariables)[i], activeGlobalDirectory);
+	}
+	
+	auto int32Variables = globalVariables.GetVariablesInt32();
+	for (int i = 0; i < int32Variables->size(); i++)
+	{
+		ExtractValueFromGlobalDirectory((*int32Variables)[i], activeGlobalDirectory);
+	}
+
+	auto int64Variables = globalVariables.GetVariablesInt64();
+	for (int i = 0; i < int64Variables->size(); i++)
+	{
+		ExtractValueFromGlobalDirectory((*int64Variables)[i], activeGlobalDirectory);
+	}
 }
 
-void PythonWrapper::SetAllGlobalParameter(PyObject** globalDict)
+void PythonWrapper::ExtractVariables(ot::VariableBundle& globalVariables)
 {
-	UpdateParameter(globalDict, _globalParameterBool);
-	UpdateParameter(globalDict, _globalParameterDouble);
-	UpdateParameter(globalDict, _globalParameterFloat);
-	UpdateParameter(globalDict, _globalParameterInt32);
-	UpdateParameter(globalDict, _globalParameterInt64);
-	UpdateParameter(globalDict, _globalParameterString);
+	assert(_activeGlobalDirectory.ReferenceIsSet());
+	ExtractVariables(globalVariables, _activeGlobalDirectory);
+}
+
+void PythonWrapper::InitiateExecutionSequence()
+{
+	if (_activeGlobalDirectory.ReferenceIsSet())
+	{
+		_activeGlobalDirectory.FreePythonObject();
+	}
+	_activeGlobalDirectory = PyDict_Copy(_cleanGlobalDirectory);
+}
+
+void PythonWrapper::EndExecutionSequence()
+{
+	_activeGlobalDirectory.FreePythonObject();
 }
 
 void PythonWrapper::ThrowPythonException()
@@ -102,6 +125,108 @@ void PythonWrapper::ThrowPythonException()
 	throw std::exception(errorMessage.c_str());
 }
 
+void PythonWrapper::ExtractValueFromGlobalDirectory(ot::Variable<std::string>& variable, PyObject* activeGlobalDirectory)
+{
+	CPythonObjectNew var = PyDict_GetItemString(activeGlobalDirectory, variable.name.c_str());
+	if (!var.ReferenceIsSet())
+	{
+		throw std::exception(("Failed to extract python variable " + variable.name + " from dictionary.").c_str());
+	}
+	if (PyUnicode_Check(var) == 1)
+	{
+		variable.value = std::string(PyUnicode_AsUTF8(var));
+	}
+	else
+	{
+		throw std::exception(("Requested python parameter " + variable.name + " is not an unicode type.").c_str());
+	}
+}
+
+void PythonWrapper::ExtractValueFromGlobalDirectory(ot::Variable<double>& variable, PyObject* activeGlobalDirectory)
+{
+	CPythonObjectNew var = PyDict_GetItemString(activeGlobalDirectory, variable.name.c_str());
+	if (!var.ReferenceIsSet())
+	{
+		throw std::exception(("Failed to extract python variable " + variable.name + " from dictionary.").c_str());
+	}
+	if (PyUnicode_Check(var) == 1)
+	{
+		variable.value = PyFloat_AsDouble(var);
+	}
+	else
+	{
+		throw std::exception(("Requested python parameter " + variable.name + " is not an floating type.").c_str());
+	}
+}
+
+void PythonWrapper::ExtractValueFromGlobalDirectory(ot::Variable<float>& variable, PyObject* activeGlobalDirectory)
+{
+	CPythonObjectNew var = PyDict_GetItemString(activeGlobalDirectory, variable.name.c_str());
+	if (!var.ReferenceIsSet())
+	{
+		throw std::exception(("Failed to extract python variable " + variable.name + " from dictionary.").c_str());
+	}
+	if (PyFloat_Check(var) == 1)
+	{
+		variable.value = (static_cast<float>(PyFloat_AsDouble(var)));
+	}
+	else
+	{
+		throw std::exception(("Requested python parameter " + variable.name + " is not an floating type.").c_str());
+	}
+}
+
+void PythonWrapper::ExtractValueFromGlobalDirectory(ot::Variable<int32_t>& variable, PyObject* activeGlobalDirectory)
+{
+	CPythonObjectNew var = PyDict_GetItemString(activeGlobalDirectory, variable.name.c_str());
+	if (!var.ReferenceIsSet())
+	{
+		throw std::exception(("Failed to extract python variable " + variable.name + " from dictionary.").c_str());
+	}
+	if (PyLong_Check(var) == 1)
+	{
+		variable.value = static_cast<int32_t>(PyLong_AsLong(var));
+	}
+	else
+	{
+		throw std::exception(("Requested python parameter " + variable.name + " is not an integer type.").c_str());
+	}
+}
+
+void PythonWrapper::ExtractValueFromGlobalDirectory(ot::Variable<int64_t>& variable, PyObject* activeGlobalDirectory)
+{
+	CPythonObjectNew var = PyDict_GetItemString(activeGlobalDirectory, variable.name.c_str());
+	if (!var.ReferenceIsSet())
+	{
+		throw std::exception(("Failed to extract python variable " + variable.name + " from dictionary.").c_str());
+	}
+	if (PyLong_Check(var) == 1)
+	{
+		variable.value = static_cast<int64_t>(PyLong_AsLongLong(var));
+	}
+	else
+	{
+		throw std::exception(("Requested python parameter " + variable.name + " is not an integer type.").c_str());
+	}
+}
+
+void PythonWrapper::ExtractValueFromGlobalDirectory(ot::Variable<bool>& variable, PyObject* activeGlobalDirectory)
+{
+	CPythonObjectNew var = PyDict_GetItemString(activeGlobalDirectory, variable.name.c_str());
+	if (!var.ReferenceIsSet())
+	{
+		throw std::exception(("Failed to extract python variable " + variable.name + " from dictionary.").c_str());
+	}
+	if (PyBool_Check(var) == 1)
+	{
+		variable.value = PyLong_AsLong(var);
+	}
+	else
+	{
+		throw std::exception(("Requested python parameter " + variable.name + " is not an unicode type.").c_str());
+	}
+}
+
 void PythonWrapper::ClosePythonInterpreter()
 {
 	int success = Py_FinalizeEx();
@@ -109,5 +234,4 @@ void PythonWrapper::ClosePythonInterpreter()
 	{
 		ThrowPythonException();
 	}
-	_pythonInterpreterIsInitialized = false;
 }
