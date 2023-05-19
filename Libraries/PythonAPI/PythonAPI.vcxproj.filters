@@ -24,6 +24,15 @@
     <ClInclude Include="include\PythonParameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\DecRefDecorator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CPythonObjectBorrowed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CPythonObjectNew.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PythonAPI.cpp">
