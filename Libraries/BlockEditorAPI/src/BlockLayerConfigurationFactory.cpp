@@ -16,8 +16,8 @@ ot::BlockLayerConfiguration* ot::BlockLayerConfigurationFactory::blockLayerConfi
 }
 
 ot::BlockLayerConfiguration* ot::BlockLayerConfigurationFactory::blockLayerConfigurationFromJson(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, "Type", String);
-	ot::BlockLayerConfiguration* newBlockLayer = blockLayerConfigurationFromType(_object["Type"].GetString());
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_BlockLayerConfigurationType, String);
+	ot::BlockLayerConfiguration* newBlockLayer = blockLayerConfigurationFromType(_object[OT_JSON_MEMBER_BlockLayerConfigurationType].GetString());
 	try {
 		newBlockLayer->setFromJsonObject(_object);
 		return newBlockLayer;

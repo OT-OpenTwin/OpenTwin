@@ -5,15 +5,19 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockPickerWidget.h"
+#include "OTBlockEditor/Block.h"
+#include "OTBlockEditor/BlockFactory.h"
 #include "OTBlockEditor/BlockNetwork.h"
 #include "OTBlockEditor/BlockNetworkEditor.h"
 #include "OTBlockEditorAPI/BlockConfiguration.h"
+#include "OTBlockEditorAPI/BlockConfigurationFactory.h"
 #include "OTBlockEditorAPI/BlockCategoryConfiguration.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OpenTwinCore/otAssert.h"
 
 // Qt Header
+#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qgraphicsview.h>
 #include <QtWidgets/qgraphicsscene.h>
@@ -25,7 +29,7 @@ namespace intern {
 	};
 }
 
-ot::BlockPickerWidget::BlockPickerWidget(Qt::Orientation _orientation) : m_navigation(nullptr), m_view(nullptr), m_scene(nullptr), m_splitter(nullptr) {
+ot::BlockPickerWidget::BlockPickerWidget(Qt::Orientation _orientation) : m_navigation(nullptr), m_splitter(nullptr), m_repaintPreviewRequired(false), m_previewSize(50, 50) {
 	// Create controls
 	m_splitter = new QSplitter(_orientation);
 	
@@ -33,14 +37,13 @@ ot::BlockPickerWidget::BlockPickerWidget(Qt::Orientation _orientation) : m_navig
 	m_navigation->treeWidget()->setHeaderHidden(true);
 	m_navigation->setWidgetFlags(ot::ApplyFilterOnTextChange);
 
-	m_scene = new GraphicsScene;
-	m_scene->setGridSize(0);
-
-	m_view = new GraphicsView;
-	m_view->setScene(m_scene);
+	m_viewLayoutW = new QWidget;
+	m_viewLayout = new QGridLayout(m_viewLayoutW);
 
 	m_splitter->addWidget(m_navigation->getWidget());
-	m_splitter->addWidget(m_view);
+	m_splitter->addWidget(m_viewLayoutW);
+
+	connect(m_navigation->treeWidget(), &QTreeWidget::itemSelectionChanged, this, &BlockPickerWidget::slotSelectionChanged);
 }
 
 ot::BlockPickerWidget::~BlockPickerWidget() {
@@ -73,6 +76,54 @@ void ot::BlockPickerWidget::addTopLevelCategories(const std::list<ot::BlockCateg
 
 void ot::BlockPickerWidget::clear(void) {
 	m_navigation->treeWidget()->clear();
+	for (auto d : m_previewData) { 
+		for (auto e : d.second) delete e;
+	}
+	m_previewData.clear();
+	for (auto v : m_views) {
+		m_viewLayout->removeWidget(v.view);
+		delete v.view;
+	}
+}
+
+// ##############################################################################################################################
+
+// Private: Slots
+
+void ot::BlockPickerWidget::slotSelectionChanged(void) {
+	for (auto v : m_views) {
+		m_viewLayout->removeWidget(v.view);
+		delete v.view;
+	}
+
+	std::list<PreviewBox> previews;
+
+	for (auto itm : m_navigation->treeWidget()->selectedItems()) {
+		auto it = m_previewData.find(itm);
+		if (it != m_previewData.end()) {
+			for (auto bCfg : it->second) {
+				// Construct block
+				ot::Block* newBlock = BlockFactory::blockFromConfig(bCfg);
+				if (newBlock) {
+					PreviewBox box;
+
+					box.scene = new GraphicsScene;
+					box.scene->setGridSize(0);
+
+					box.view = new GraphicsView;
+					box.view->setScene(box.scene);
+					box.view->setMaximumSize(m_previewSize);
+					box.view->setMinimumSize(m_previewSize);
+
+					box.scene->addItem(newBlock);
+
+					m_viewLayout->addWidget(box.view);
+					//m_viewLayout->addWidget(box.view, 0, 0);
+					m_views.push_back(box);
+				}
+			}
+		}
+	}
 }
 
 // ##############################################################################################################################
@@ -145,6 +196,11 @@ void ot::BlockPickerWidget::addBlockToNavigation(ot::BlockConfiguration* _block,
 		blockItem->setText(intern::ntTitle, QString::fromStdString(_block->title()));
 		_parentNavigationItem->addChild(blockItem);
 		blockItem->setHidden(true);
+
+		OT_rJSON_createDOC(doc);
+		OT_rJSON_createValueObject(obj);
+		_block->addToJsonObject(doc, obj);
+		storePreviewData(_parentNavigationItem, BlockConfigurationFactory::blockConfigurationFromJson(obj));
 	}
 }
 
@@ -152,4 +208,16 @@ void ot::BlockPickerWidget::addBlocksToNavigation(const std::list <ot::BlockConf
 	for (auto b : _blocks) {
 		this->addBlockToNavigation(b, _parentNavigationItem);
 	}
+}
+
+void ot::BlockPickerWidget::storePreviewData(QTreeWidgetItem* _item, BlockConfiguration* _config) {
+	auto it = m_previewData.find(_item);
+	if (it != m_previewData.end()) {
+		it->second.push_back(_config);
+	}
+	else {
+		m_previewData.insert_or_assign(_item, std::list<BlockConfiguration*>());
+		storePreviewData(_item, _config);
+	}
+
 }

@@ -10,12 +10,16 @@
 
 // Qt header
 #include <QtCore/qobject.h>
+#include <QtCore/qsize.h>
 
 // std header
+#include <list>
+#include <map>
 
 class QGraphicsItem;
 class QSplitter;
 class QTreeWidgetItem;
+class QGridLayout;
 
 namespace ot {
 
@@ -41,6 +45,12 @@ namespace ot {
 		
 		void clear(void);
 
+		void setPreviewBoxSize(const QSize& _size) { m_previewSize = _size; };
+		const QSize& previewBoxSize(void) const { return m_previewSize; };
+
+	private slots:
+		void slotSelectionChanged(void);
+
 	private:
 		void addCategory(ot::BlockCategoryConfiguration* _category, QTreeWidgetItem* _parentNavigationItem);
 		void addCategories(const std::list<ot::BlockCategoryConfiguration*>& _categories, QTreeWidgetItem* _parentNavigationItem);
@@ -48,9 +58,23 @@ namespace ot {
 		void addBlockToNavigation(ot::BlockConfiguration* _block, QTreeWidgetItem* _parentNavigationItem);
 		void addBlocksToNavigation(const std::list <ot::BlockConfiguration*>& _blocks, QTreeWidgetItem* _parentNavigationItem);
 
-		QSplitter*        m_splitter;
-		TreeWidgetFilter* m_navigation;
-		GraphicsView*     m_view;
-		GraphicsScene*	  m_scene;
+		void storePreviewData(QTreeWidgetItem* _item, BlockConfiguration* _config);
+
+		struct PreviewBox {
+			GraphicsView* view;
+			GraphicsScene* scene;
+		};
+
+		bool                  m_repaintPreviewRequired;
+
+		QSize                 m_previewSize;
+		QSplitter*            m_splitter;
+		TreeWidgetFilter*     m_navigation;
+		
+		std::list<PreviewBox> m_views;
+		QWidget*              m_viewLayoutW;
+		QGridLayout *         m_viewLayout;
+
+		std::map<QTreeWidgetItem*, std::list<BlockConfiguration*>> m_previewData;
 	};	
 }
