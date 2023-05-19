@@ -47,15 +47,12 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 
 	// Create paint job queue and arguments object
 	SimpleQueue paintQueue;
-	BlockPaintJobArg paintArgs(boundingRect(), _painter, _option, _widget);
-
-	// Set this so the queue does not destroy this object after calling a paintjob
-	paintArgs.noDeleteByQueue();
-
+	
 	// Add every layer as a paintjob, from bottom to top
 	// The layers will queue the connectors if needed
+	// The arg pointer will be removed my the queue
 	for (auto l : m_layers) { 
-		paintQueue.queue(l, &paintArgs); 
+		paintQueue.queue(l, new BlockPaintJobArg(boundingRect().marginsRemoved(l->margins()), _painter, _option, _widget));
 	}
 
 	// Run the paintjob

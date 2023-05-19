@@ -24,49 +24,12 @@ ot::BlockLayer::QueueResultFlags ot::BlockLayer::runPaintJob(AbstractQueue* _que
 }
 
 QSizeF ot::BlockLayer::layerSizeHint(void) const {
-	QSizeF defaultSize(60., 40.);
-	adjustSizeToLimits(defaultSize);
-	return defaultSize;
+	return fitIntoLimits(QSizeF(60., 40.));
 }
 
-void ot::BlockLayer::setMargins(const ot::MarginsD& _margins) {
-	m_margins.setBottom(_margins.bottom());
-	m_margins.setLeft(_margins.left());
-	m_margins.setRight(_margins.right());
-	m_margins.setTop(_margins.top());
-}
+
 
 void ot::BlockLayer::setConnectorManger(BlockConnectorManager* _connectorManager) {
 	if (m_connectorManager) delete m_connectorManager;
 	m_connectorManager = _connectorManager;
-}
-
-void ot::BlockLayer::adjustSizeToLimits(QSizeF& _size) const {
-	// Width min
-	if (m_widthLimit.isMinSet()) {
-		if (m_widthLimit.min() > _size.width()) {
-			_size.setWidth(m_widthLimit.min());
-		}
-	}
-
-	// Width max
-	if (m_widthLimit.isMaxSet()) {
-		if (m_widthLimit.max() < _size.width()) {
-			_size.setWidth(m_widthLimit.max());
-		}
-	}
-
-	// Height min
-	if (m_heightLimit.isMinSet()) {
-		if (m_heightLimit.min() > _size.height()) {
-			_size.setHeight(m_heightLimit.min());
-		}
-	}
-
-	// Height max
-	if (m_heightLimit.isMaxSet()) {
-		if (m_heightLimit.max() < _size.height()) {
-			_size.setHeight(m_heightLimit.max());
-		}
-	}
 }

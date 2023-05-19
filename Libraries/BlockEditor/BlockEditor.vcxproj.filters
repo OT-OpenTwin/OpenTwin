@@ -102,6 +102,9 @@
     <ClCompile Include="src\BlockNetworkEditor.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockGraphicsObject.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h">
@@ -162,6 +165,9 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\PainterFactory.h">
       <Filter>Header Files\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockGraphicsObject.h">
+      <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

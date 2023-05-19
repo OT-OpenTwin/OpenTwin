@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorAPIExport.h"
+#include "OTBlockEditor/BlockGraphicsObject.h"
 #include "OTGui/LengthLimitation.h"
 
 // Qt header
@@ -23,7 +24,7 @@ namespace ot {
 
 	class BlockConnector;
 
-	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem {
+	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem, public ot::BlockGraphicsObject {
 		Q_OBJECT
 		Q_INTERFACES(QGraphicsItem)
 
