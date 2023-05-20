@@ -27,6 +27,7 @@ class QGroupBox;
 class QLabel;
 class QPushButton;
 class QProgressBar;
+class QShortcut;
 
 class TerminalCollectionItem : public QTreeWidgetItem {
 public:
@@ -234,4 +235,11 @@ private:
 	QLabel *			m_responseLength;
 
 	QProgressBar *		m_progressBar;
+
+	// Shortcuts
+
+	QShortcut* m_shortcutSave;
+	QShortcut* m_shortcutSend;
+	QShortcut* m_shortcutRename;
+
 };

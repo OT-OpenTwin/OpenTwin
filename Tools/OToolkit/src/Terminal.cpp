@@ -23,6 +23,7 @@
 #include <QtWidgets/qprogressbar.h>
 #include <QtWidgets/qtreewidget.h>
 #include <QtWidgets/qmenu.h>
+#include <QtWidgets/qshortcut.h>
 
 // Std header
 #include <thread>
@@ -240,6 +241,7 @@ Terminal::Terminal() : m_exportLock(false) {
 
 	// Create layouts
 	m_splitter = new QSplitter;
+	m_splitter->setObjectName("OToolkit_Terminal_MainSplitter");
 
 	m_leftLayoutW = new QWidget;
 	m_leftLayout = new QVBoxLayout(m_leftLayoutW);

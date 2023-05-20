@@ -217,6 +217,8 @@ void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 }
 
 AppBase::AppBase() : m_mainThread(QThread::currentThreadId()) {
+	setObjectName("OToolkit_MainWindow");
+
 	// Create controls
 	m_tabWidget = new QTabWidget;
 	m_tabWidget->setObjectName("OToolkit_MainTabWidget");
@@ -258,7 +260,8 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()) {
 	m_outputAction->setChecked(true);
 
 	// Apply style if it exists
-	QFile styleFile("OToolkit.style.qss");
+	
+	QFile styleFile(":/OToolkit.qss");
 	if (styleFile.exists()) {
 		if (styleFile.open(QIODevice::ReadOnly)) {
 			setStyleSheet(styleFile.readAll());
