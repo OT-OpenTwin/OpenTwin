@@ -45,9 +45,7 @@ public slots:
 
 private slots:
 	void slotInitialize(void);
-	void slotLog(const QString& _sender, const QString& _message);
-	void slotLogWarning(const QString& _sender, const QString& _message);
-	void slotLogError(const QString& _sender, const QString& _message);
+	void slotLog(const QString& _sender, const QString& _message, int _type);
 
 private:
 	AppBase();

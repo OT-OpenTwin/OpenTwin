@@ -1009,7 +1009,7 @@ QPushButton {
   background-color: #455364;
   color: #E0E1E3;
   border-radius: 4px;
-  padding: 2px;
+  padding: 4px;
   outline: none;
   border: none;
 }
@@ -1018,13 +1018,13 @@ QPushButton:disabled {
   background-color: #455364;
   color: #9DA9B5;
   border-radius: 4px;
-  padding: 2px;
+  padding: 4px;
 }
 
 QPushButton:checked {
   background-color: #60798B;
   border-radius: 4px;
-  padding: 2px;
+  padding: 4px;
   outline: none;
 }
 
@@ -1032,7 +1032,7 @@ QPushButton:checked:disabled {
   background-color: #60798B;
   color: #9DA9B5;
   border-radius: 4px;
-  padding: 2px;
+  padding: 4px;
   outline: none;
 }
 

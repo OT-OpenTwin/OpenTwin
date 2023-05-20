@@ -305,6 +305,8 @@ Terminal::Terminal() : m_exportLock(false) {
 
 	m_progressBar->setMaximumHeight(5);
 
+	m_btnSend->setMinimumWidth(50);
+
 	// Setup layouts
 	m_splitter->addWidget(m_leftLayoutW);
 	m_splitter->addWidget(m_rightLayoutW);

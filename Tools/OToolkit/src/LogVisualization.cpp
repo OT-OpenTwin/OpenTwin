@@ -345,8 +345,8 @@ void LogVisualization::slotAutoScrollToBottomChanged(void) {
 }
 
 void LogVisualization::slotUpdateCheckboxColors(void) {
-	QString red("QCheckBox { color: red; }");
-	QString green("QCheckBox { color: green; }");
+	QString red("QCheckBox { color: #c02020; }");
+	QString green("QCheckBox { color: #20c020; }");
 	QString def("");
 
 	m_msgTypeFilterDebug->setStyleSheet(m_msgTypeFilterDebug->isChecked() ? green : red);

@@ -11,11 +11,16 @@
 // Qt header
 #include <QtCore/qdatetime.h>
 #include <QtCore/qsettings.h>
-#include <QtCore/qfile.h>
 #include <QtWidgets/qtabwidget.h>
 #include <QtWidgets/qmenubar.h>
 #include <QtWidgets/qdockwidget.h>
 #include <QtWidgets/qtextedit.h>
+
+enum InternLogType {
+	InternInfo,
+	InternWarning,
+	InternError
+};
 
 static AppBase * g_instance{ nullptr };
 
@@ -48,28 +53,28 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 
 void AppBase::log(const QString& _sender, const QString& _message) {
 	if (QThread::currentThreadId() == m_mainThread) {
-		slotLog(_sender, _message);
+		slotLog(_sender, _message, InternInfo);
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message));
+		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternInfo));
 	}
 }
 
 void AppBase::logWarning(const QString& _sender, const QString& _message) {
 	if (QThread::currentThreadId() == m_mainThread) {
-		slotLogWarning(_sender, _message);
+		slotLog(_sender, _message, InternWarning);
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotLogWarning", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message));
+		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternWarning));
 	}
 }
 
 void AppBase::logError(const QString& _sender, const QString& _message) {
 	if (QThread::currentThreadId() == m_mainThread) {
-		slotLogError(_sender, _message);
+		slotLog(_sender, _message, InternError);
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message));
+		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternError));
 	}
 }
 
@@ -121,9 +126,7 @@ void AppBase::slotClose(void) {
 }
 
 void AppBase::slotInitialize(void) {
-	OTOOLKIT_LOG("", "Starting initialize...");
-	OTOOLKIT_LOGW("", "Test W");
-	OTOOLKIT_LOGE("", "Test E");
+	OTOOLKIT_LOG("OToolkit", "Starting initialize...");
 
 	// Create tools
 	m_logger = new LogVisualization;
@@ -140,76 +143,45 @@ void AppBase::slotInitialize(void) {
 	m_statusBar->setCurrentTool(m_logger);
 }
 
-void AppBase::slotLog(const QString& _sender, const QString& _message) {
+void AppBase::slotLog(const QString& _sender, const QString& _message, int _type) {
 	QTextCursor cursor = m_output->textCursor();
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
-	formatTime.setForeground(QBrush(QColor(40, 40, 255)));
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatTime);
-	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	if (!_sender.isEmpty()) {
-		cursor.insertText("[" + _sender + "] ");
-	}
-	cursor.insertText(_message);
-	m_output->setTextCursor(cursor);
-	m_output->append("");
-}
-
-void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
-	QTextCursor cursor = m_output->textCursor();
-	QTextCharFormat format = cursor.charFormat();
-	QTextCharFormat formatTime = format;
+	QTextCharFormat formatSender = format;
 	QTextCharFormat formatWarn = format;
-	formatTime.setForeground(QBrush(QColor(40, 40, 255)));
-	formatWarn.setForeground(QBrush(QColor(255, 242, 0)));
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatTime);
-	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-	cursor.setCharFormat(format);
-	cursor.insertText("] [");
-
-	if (!_sender.isEmpty()) {
-		cursor.insertText(_sender + "] [");
-	}
-
-	cursor.setCharFormat(formatWarn);
-	cursor.insertText("Warning");
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	cursor.insertText(_message);
-	m_output->setTextCursor(cursor);
-	m_output->append("");
-}
-
-void AppBase::slotLogError(const QString& _sender, const QString& _message) {
-	QTextCursor cursor = m_output->textCursor();
-	QTextCharFormat format = cursor.charFormat();
-	QTextCharFormat formatTime = format;
 	QTextCharFormat formatError = format;
-	formatTime.setForeground(QBrush(QColor(40, 40, 255)));
+	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
+	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
+	formatWarn.setForeground(QBrush(QColor(255, 242, 0)));
 	formatError.setForeground(QBrush(QColor(255, 0, 0)));
 
 	cursor.insertText("[");
 	cursor.setCharFormat(formatTime);
 	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 	cursor.setCharFormat(format);
-	cursor.insertText("] [");
+	cursor.insertText("] ");
 
 	if (!_sender.isEmpty()) {
-		cursor.insertText(_sender + "] [");
+		cursor.insertText("[");
+		cursor.setCharFormat(formatSender);
+		cursor.insertText(_sender);
+		cursor.setCharFormat(format);
+		cursor.insertText("] ");
 	}
 
-	cursor.setCharFormat(formatError);
-	cursor.insertText("Error");
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
+	if (_type == InternWarning) {
+		cursor.insertText("[");
+		cursor.setCharFormat(formatWarn);
+		cursor.insertText("Warning");
+		cursor.setCharFormat(format);
+		cursor.insertText("] ");
+	} else if (_type == InternError) {
+		cursor.insertText("[");
+		cursor.setCharFormat(formatError);
+		cursor.insertText("Error");
+		cursor.setCharFormat(format);
+		cursor.insertText("] ");
+	}
 
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
@@ -259,16 +231,6 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()) {
 	m_outputAction->setCheckable(true);
 	m_outputAction->setChecked(true);
 
-	// Apply style if it exists
-	
-	QFile styleFile(":/OToolkit.qss");
-	if (styleFile.exists()) {
-		if (styleFile.open(QIODevice::ReadOnly)) {
-			setStyleSheet(styleFile.readAll());
-			styleFile.close();
-		}
-	}
-
 	// Restore settings
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 	bool isMax = s.value("IsMaximized", false).toBool();
@@ -293,7 +255,7 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()) {
 	connect(m_settingsAction, &QAction::triggered, this, &AppBase::slotSettings);
 	connect(m_exitAction, &QAction::triggered, this, &AppBase::slotClose);
 
-	log("", "Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
+	log("OToolkit", "Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
 }

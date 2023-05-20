@@ -14,6 +14,7 @@
 
 #include <exception>
 
+#include <QtCore/qfile.h>
 #include <QtWidgets/qapplication.h>
 
 // Open Twin header
@@ -45,6 +46,18 @@ void mainApplicationThread()
 	try {
 		int argc = 0;
 		QApplication application(argc, nullptr);
+
+		// Set global text size
+		application.setStyleSheet("* { font-size: 9pt; }");
+
+		QFile styleFile(":/OToolkit.qss");
+		if (styleFile.exists()) {
+			if (styleFile.open(QIODevice::ReadOnly)) {
+				application.setStyleSheet(styleFile.readAll());
+				styleFile.close();
+			}
+		}
+
 		ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
 		AppBase::instance()->setUrl(QString::fromStdString(g_serviceURL));
 		g_starting = false;
