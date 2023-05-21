@@ -30,6 +30,7 @@ SET OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"TetMeshService",^
 		"ImportParameterizedDataService",^
 		"VisualizationService",^
+		"PythonExecutionService",^
 		"GetDPService"^
 		]^
 	}

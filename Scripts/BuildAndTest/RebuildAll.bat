@@ -282,6 +282,13 @@ ECHO Build Service: GetDPService
 ECHO ===============================================================
 CALL "%OT_GETDP_SERVICE_ROOT%\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Service: PythonExecutionService
+ECHO ===============================================================
+CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2
+
+
+
 REM ====================================================================
 REM Build the executables
 REM ====================================================================
