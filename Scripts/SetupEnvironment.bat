@@ -61,6 +61,7 @@ SET OT_TET_MESH_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\TetMeshService
 SET OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData
 SET OT_GETDP_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\GetDPService
 SET OT_UI_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\uiService
+SET OT_PYTHON_EXECUTION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PythonExecutionService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths
@@ -69,7 +70,6 @@ SET OT_BLOCKEDITORAPI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI
 SET OT_CADMODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
 SET OT_DATASTORAGE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\DataStorage
 SET OT_MODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
-SET OT_PYTHONAPI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\PythonAPI
 
 SET OT_COMMUNICATION_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication
 SET OT_CORE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
@@ -130,7 +130,7 @@ SET OT_DEFAULT_SERVICE_DLLR=%OT_CORE_ROOT%\%OT_DLLR%;%OT_SYSTEM_ROOT%\%OT_DLLR%;
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin all services path
 
-SET OT_ALL_DLLD=%OT_BLOCKEDITOR_ROOT%\%OT_DLLD%;%OT_BLOCKEDITORAPI_ROOT%\%OT_DLLD%;%OT_CADMODELENTITIES_ROOT%\%OT_DLLD%;%OT_DATASTORAGE_ROOT%\%OT_DLLD%;%OT_MODELENTITIES_ROOT%\%OT_DLLD%;%OT_COMMUNICATION_ROOT%\%OT_DLLD%;%OT_CORE_ROOT%\%OT_DLLD%;%OT_FOUNDATION_ROOT%\%OT_DLLD%;%OT_SYSTEM_ROOT%\%OT_DLLD%;%OT_GUI_ROOT%\%OT_DLLD%;%OT_WIDGETS_DLLD%;%OT_QWTWRAPPER_ROOT%\%OT_DLLD%;%OT_RUBBERBANDAPI_ROOT%\%OT_DLLD%;%OT_RUBBERBAND_ROOT%\%OT_DLLD%;%OT_UICORE_ROOT%\%OT_DLLD%;%OT_UIPLUGINAPI_ROOT%\%OT_DLLD%;%OT_VIEWER_ROOT%\%OT_DLLD%;%MONGO_C_DLLD%;%MONGO_CXX_DLLD%;%CURL_DLLD%;%ZLIB_DLLPATHD%;%VTK_DLLD%;%OSG_DLLD%;%QT_DLLD%;%QWT_LIB_DLLD%;%QWTPOLAR_LIB_DLLD%;%QT_TT_DLLD%
+SET OT_ALL_DLLD=%OT_BLOCKEDITOR_ROOT%\%OT_DLLD%;%OT_BLOCKEDITORAPI_ROOT%\%OT_DLLD%;%OT_CADMODELENTITIES_ROOT%\%OT_DLLD%;%OT_DATASTORAGE_ROOT%\%OT_DLLD%;%OT_MODELENTITIES_ROOT%\%OT_DLLD%;%OT_COMMUNICATION_ROOT%\%OT_DLLD%;%OT_CORE_ROOT%\%OT_DLLD%;%OT_FOUNDATION_ROOT%\%OT_DLLD%;%OT_SYSTEM_ROOT%\%OT_DLLD%;%OT_GUI_ROOT%\%OT_DLLD%;%OT_WIDGETS_DLLD%;%OT_QWTWRAPPER_ROOT%\%OT_DLLD%;%OT_RUBBERBANDAPI_ROOT%\%OT_DLLD%;%OT_RUBBERBAND_ROOT%\%OT_DLLD%;%OT_UICORE_ROOT%\%OT_DLLD%;%OT_UIPLUGINAPI_ROOT%\%OT_DLLD%;%OT_VIEWER_ROOT%\%OT_DLLD%;%MONGO_C_DLLD%;%MONGO_CXX_DLLD%;%CURL_DLLD%;%ZLIB_DLLPATHD%;%VTK_DLLD%;%OSG_DLLD%;%QT_DLLD%;%QWT_LIB_DLLD%;%QWTPOLAR_LIB_DLLD%;%QT_TT_DLLD%;%PYTHON310_ROOT%
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 
