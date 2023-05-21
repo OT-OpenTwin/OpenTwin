@@ -1,0 +1,6 @@
+﻿  Application.cpp
+  dllmain.cpp
+  ModelNotifier.cpp
+  UiNotifier.cpp
+  Generating Code...
+  PythonExecutionService.vcxproj -> C:\OpenTwin\Services\PythonExecutionService\x64\ReleaseTest\PythonExecutionService.lib
