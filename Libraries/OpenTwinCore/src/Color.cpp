@@ -1,7 +1,12 @@
 // Project header
 #include "OpenTwinCore/Color.h"
+#include "OpenTwinCore/otAssert.h"
 
 ot::Color::Color() : m_r(0.f), m_g(0.f), m_b(0.f), m_a(1.f) {}
+
+ot::Color::Color(DefaultColor _color) : m_r(0.f), m_g(0.f), m_b(0.f), m_a(1.f) {
+	set(_color);
+}
 
 ot::Color::Color(float _r, float _g, float _b, float _a) : m_r(_r), m_g(_g), m_b(_b), m_a(_a) {}
 
@@ -33,6 +38,302 @@ void ot::Color::setFromJsonObject(OT_rJSON_val& _object) {
 	m_g = ot::rJSON::getFloat(_object, "G");
 	m_b = ot::rJSON::getFloat(_object, "B");
 	m_a = ot::rJSON::getFloat(_object, "A");
+}
+
+void ot::Color::set(ot::Color::DefaultColor _color) {
+    switch (_color) {
+    case DefaultColor::Aqua:
+        m_r = 0.0f;
+        m_g = 1.0f;
+        m_b = 1.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Beige:
+        m_r = 0.96f;
+        m_g = 0.96f;
+        m_b = 0.86f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Black:
+        m_r = 0.0f;
+        m_g = 0.0f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Blue:
+        m_r = 0.0f;
+        m_g = 0.0f;
+        m_b = 1.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Chocolate:
+        m_r = 0.82f;
+        m_g = 0.41f;
+        m_b = 0.12f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Coral:
+        m_r = 1.0f;
+        m_g = 0.5f;
+        m_b = 0.31f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Cyan:
+        m_r = 0.0f;
+        m_g = 1.0f;
+        m_b = 1.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::DarkGray:
+        m_r = 0.66f;
+        m_g = 0.66f;
+        m_b = 0.66f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::DarkGreen:
+        m_r = 0.0f;
+        m_g = 0.39f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::DarkOrange:
+        m_r = 1.0f;
+        m_g = 0.55f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::DarkViolet:
+        m_r = 0.58f;
+        m_g = 0.0f;
+        m_b = 0.83f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::DodgerBlue:
+        m_r = 0.12f;
+        m_g = 0.56f;
+        m_b = 1.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Fuchsia:
+        m_r = 1.0f;
+        m_g = 0.0f;
+        m_b = 1.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Gold:
+        m_r = 1.0f;
+        m_g = 0.84f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Gray:
+        m_r = 0.5f;
+        m_g = 0.5f;
+        m_b = 0.5f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Green:
+        m_r = 0.0f;
+        m_g = 0.5f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::IndianRed:
+        m_r = 0.80f;
+        m_g = 0.36f;
+        m_b = 0.36f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Indigo:
+        m_r = 0.29f;
+        m_g = 0.0f;
+        m_b = 0.51f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Ivory:
+        m_r = 1.0f;
+        m_g = 1.0f;
+        m_b = 0.94f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Khaki:
+        m_r = 0.94f;
+        m_g = 0.90f;
+        m_b = 0.55f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Lavender:
+        m_r = 0.90f;
+        m_g = 0.90f;
+        m_b = 0.98f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Lime:
+        m_r = 0.0f;
+        m_g = 1.0f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::LightGray:
+        m_r = 0.83f;
+        m_g = 0.83f;
+        m_b = 0.83f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Maroon:
+        m_r = 0.50f;
+        m_g = 0.0f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::MidnightBlue:
+        m_r = 0.10f;
+        m_g = 0.10f;
+        m_b = 0.44f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Mint:
+        m_r = 0.74f;
+        m_g = 0.99f;
+        m_b = 0.79f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Navy:
+        m_r = 0.0f;
+        m_g = 0.0f;
+        m_b = 0.50f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Olive:
+        m_r = 0.50f;
+        m_g = 0.50f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Orange:
+        m_r = 1.0f;
+        m_g = 0.65f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Orchid:
+        m_r = 0.85f;
+        m_g = 0.44f;
+        m_b = 0.84f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Pink:
+        m_r = 1.0f;
+        m_g = 0.75f;
+        m_b = 0.80f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Plum:
+        m_r = 0.87f;
+        m_g = 0.63f;
+        m_b = 0.87f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Purple:
+        m_r = 0.50f;
+        m_g = 0.0f;
+        m_b = 0.50f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Red:
+        m_r = 1.0f;
+        m_g = 0.0f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::RoyalBlue:
+        m_r = 0.25f;
+        m_g = 0.41f;
+        m_b = 0.88f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Salmon:
+        m_r = 0.98f;
+        m_g = 0.50f;
+        m_b = 0.45f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Sienna:
+        m_r = 0.63f;
+        m_g = 0.32f;
+        m_b = 0.18f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Silver:
+        m_r = 0.75f;
+        m_g = 0.75f;
+        m_b = 0.75f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::SlateGray:
+        m_r = 0.44f;
+        m_g = 0.50f;
+        m_b = 0.56f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::SkyBlue:
+        m_r = 0.53f;
+        m_g = 0.81f;
+        m_b = 0.92f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::SteelBlue:
+        m_r = 0.27f;
+        m_g = 0.51f;
+        m_b = 0.71f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Tan:
+        m_r = 0.82f;
+        m_g = 0.71f;
+        m_b = 0.55f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Teal:
+        m_r = 0.0f;
+        m_g = 0.50f;
+        m_b = 0.50f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Tomato:
+        m_r = 1.0f;
+        m_g = 0.39f;
+        m_b = 0.28f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Turquoise:
+        m_r = 0.25f;
+        m_g = 0.88f;
+        m_b = 0.82f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Violet:
+        m_r = 0.93f;
+        m_g = 0.51f;
+        m_b = 0.93f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::White:
+        m_r = 1.0f;
+        m_g = 1.0f;
+        m_b = 1.0f;
+        m_a = 1.0f;
+        break;
+    case DefaultColor::Yellow:
+        m_r = 1.0f;
+        m_g = 1.0f;
+        m_b = 0.0f;
+        m_a = 1.0f;
+        break;
+    default:
+        otAssert(0, "Unknown color provided");
+        break;
+    }
 }
 
 void ot::Color::set(int _r, int _g, int _b, int _a) { setR(_r); setG(_g); setB(_b); setA(_a); }

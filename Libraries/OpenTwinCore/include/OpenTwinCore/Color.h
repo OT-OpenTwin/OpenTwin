@@ -16,7 +16,59 @@ namespace ot {
 
 	class OT_CORE_API_EXPORT Color : public ot::Serializable {
 	public:
+		enum DefaultColor {
+			Aqua,
+			Beige,
+			Black,
+			Blue,
+			Chocolate,
+			Coral,
+			Cyan,
+			DarkGray,
+			DarkGreen,
+			DarkOrange,
+			DarkViolet,
+			DodgerBlue,
+			Fuchsia,
+			Gold,
+			Gray,
+			Green,
+			IndianRed,
+			Indigo,
+			Ivory,
+			Khaki,
+			Lavender,
+			Lime,
+			LightGray,
+			Maroon,
+			MidnightBlue,
+			Mint,
+			Navy,
+			Olive,
+			Orange,
+			Orchid,
+			Pink,
+			Plum,
+			Purple,
+			Red,
+			RoyalBlue,
+			Salmon,
+			Sienna,
+			Silver,
+			SlateGray,
+			SkyBlue,
+			SteelBlue,
+			Tan,
+			Teal,
+			Tomato,
+			Turquoise,
+			Violet,
+			White,
+			Yellow
+		};
+
 		explicit Color();
+		explicit Color(DefaultColor _color);
 		explicit Color(float _r, float _g, float _b, float _a = 1.f);
 		explicit Color(int r, int g, int b, int a = 255);
 		Color(const Color& _other);
@@ -39,6 +91,10 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		//! @brief Will set the color values according to the provided default color
+		//! @param _color The color to set
+		void set(DefaultColor _color);
 
 		//! @brief Will set the color values
 		//! @param _r The red channel value ( 0.0 - 1.0 )
