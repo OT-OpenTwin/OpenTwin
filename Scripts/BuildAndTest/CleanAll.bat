@@ -70,6 +70,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem\clean.bat"
 ECHO Clean: Qwt Wrapper
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper\clean.bat"
 
+ECHO Clean: OTsci
+CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTsci\clean.bat"
+
 ECHO Clean: Rubberband Engine Library: Core
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore\clean.bat"
 
