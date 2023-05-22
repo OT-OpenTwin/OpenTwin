@@ -248,6 +248,106 @@ std::string ot::intern::ExternalServicesComponent::init(
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+std::string ot::intern::ExternalServicesComponent::init2(const std::string& _sessionServiceURL, const std::string& _sessionID)
+{
+	if (m_componentState != WaitForInit) {
+		otAssert(0, "Component already initialized");
+		return OT_ACTION_RETURN_INDICATOR_Error "Component already initialized";
+	}
+
+	OT_LOG_D("Starting Foundation initialization");
+
+	// Store information
+	m_application->setSessionServiceURL(_sessionServiceURL);
+	m_application->setSessionID(_sessionID);
+
+	// Get the database information
+	{
+		OT_rJSON_createDOC(request);
+
+		// todo: maybe merge get database url and register new service into one call? (nothin else is happening before anyway
+		ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_GetDatabaseUrl);
+
+		std::string response;
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(request), response)) {
+			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send get database URL message";
+		}
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			return response;
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			return response;
+		}
+
+		m_application->setDataBaseURL(response);
+		DataBase::GetDataBase()->setDataBaseServerURL(response);
+		DataBase::GetDataBase()->setSiteIDString("1");
+	}
+
+	OT_LOG_D("Database setup completed (URL = \"" + DataBase::GetDataBase()->getDataBaseServerURL() + "\"; Site.ID = \"" + DataBase::GetDataBase()->getSiteIDString());
+
+	// Register this service as a service in the session service
+	{
+		OT_rJSON_createDOC(newServiceCommandDoc);
+		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewService);
+		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SESSION_ID, m_application->sessionID());
+		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SERVICE_NAME, m_application->serviceName());
+		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(m_application->serviceURL()));
+		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SERVICE_TYPE, m_application->serviceType());
+		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_START_RELAY, m_application->startAsRelayService());
+
+
+		auto handle = GetCurrentProcess();
+		if (handle != nullptr) {
+			unsigned long handleID = GetProcessId(handle);
+			assert(handleID != 0); // Failed to get process handle ID
+			ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_PROCESS_ID, std::to_string(handleID));
+		}
+		else {
+			assert(0); // Failed to get current process handle
+		}
+
+
+		std::string response;
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(newServiceCommandDoc), response)) {
+			OT_LOG_E("Failed to send http request to LSS at \"" + m_application->sessionServiceURL() + "\"");
+			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send register command to LSS";
+		}
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			OT_LOG_E("Error response from LSS: \"" + response + "\"");
+			return response;
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_E("Warning response from LSS: \"" + response + "\"");
+			return response;
+		}
+
+		OT_rJSON_parseDOC(reply, response.c_str());
+		OT_rJSON_docCheck(reply);
+		m_application->setServiceID(ot::rJSON::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
+
+		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
+
+		if (m_application->startAsRelayService()) {
+			m_application->setWebSocketURL(ot::rJSON::getString(reply, OT_ACTION_PARAM_WebsocketURL));
+
+			OT_LOG_D("Websocket URL set to: \"" + m_application->webSocketURL() + "\"");
+		}
+
+	}
+
+	m_componentState = Ready;
+
+	// Start session service health check
+	std::thread t{ ot::intern::sessionServiceHealthChecker, m_application->sessionServiceURL() };
+	t.detach();
+
+	OT_LOG_D("Initialization completed");
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+
 
 std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	const std::string &					_json,
@@ -679,7 +779,7 @@ int ot::foundation::init2(
 			return startupResult;
 		}
 
-		std::string initResult = intern::ExternalServicesComponent::instance()->init(actualSessionServiceURL, actualSessionID);
+		std::string initResult = intern::ExternalServicesComponent::instance()->init2(actualSessionServiceURL, actualSessionID);
 		if (initResult != OT_ACTION_RETURN_VALUE_OK) {
 			return -22;
 		}
