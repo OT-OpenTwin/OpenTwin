@@ -407,7 +407,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 		auto subDocument = parameterObject.GetObject();
 		for (ot::Variable<bool>& variable : (*variableBundle->GetVariablesBool()))
 		{
-			subDocument[variable.name].GetBool();
+			//subDocument[variable.name].GetBool();
 		}
 
 		for (ot::Variable<std::string>& variable : (*variableBundle->GetVariablesString()))
@@ -434,7 +434,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 		{
 
 		}
-		auto subDocument = parameter.GetObject();
+		//auto subDocument = parameter.GetObject();
 
 		
 	}
