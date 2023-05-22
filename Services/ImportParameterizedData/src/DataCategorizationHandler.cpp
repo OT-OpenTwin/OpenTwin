@@ -703,7 +703,8 @@ void DataCategorizationHandler::SendPythonExecutionRequest(std::map<std::string,
 	}
 	ot::rJSON::add(newDocument, "Parameter", parameter);
 
-	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
+	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
 	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, "createUpdatedSelections");
 	ot::rJSON::add(newDocument, "MSMD", msmdName);
 	ot::rJSON::add(newDocument, OT_ACTION_PARAM_SENDER_URL, Application::instance()->serviceURL());
