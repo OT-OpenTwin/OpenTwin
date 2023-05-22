@@ -1,4 +1,0 @@
-﻿  test.cpp
-gtest.lib(gtest-all.cc.obj) : warning LNK4099: PDB '' was not found with 'gtest.lib(gtest-all.cc.obj)' or at ''; linking object as if no debug info
-gtest_main.lib(gtest_main.cc.obj) : warning LNK4099: PDB '' was not found with 'gtest_main.lib(gtest_main.cc.obj)' or at ''; linking object as if no debug info
-  PythonExecutionServiceTest.vcxproj -> C:\OpenTwin\Services\PythonExecutionService\x64\Release\PythonExecutionServiceTest.exe
