@@ -103,6 +103,6 @@ private:
 	std::map<std::string, ot::UID> GetAllNewlyReferencedScripts(std::vector<ot::VariableBundle>& allUpdatedVariables);
 	
 	void SendPythonExecutionRequest(std::map<std::string, std::string>& pythonScripts,const std::string& msmdName);
-	void CreateUpdatedSelections(std::string msmdName, std::vector<ot::VariableBundle>& bundles);
+	void UpdateVariables(OT_rJSON_doc& document);
 
 };

@@ -38,8 +38,5 @@
     <ClInclude Include="include\ModelNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DecRefDecorator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

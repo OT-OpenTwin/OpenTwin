@@ -14,10 +14,6 @@
 // Open twin header
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
 
 Application * g_instance{ nullptr };
 
@@ -59,25 +55,7 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
-	try
-	{
-		std::string returnMessage = "";
-		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-		{
-			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS)
-			{
-				
-			}
-		}
-		return returnMessage;
-	}
-	catch (std::runtime_error& e)
-	{
-		std::string errorMessage = "Failed to execute action " + _action + " due to runtime error: " + e.what();
-		m_uiComponent->displayMessage(errorMessage);
-		return errorMessage;
-	}
+	return ""; // Return empty string if the request does not expect a return
 }
 
 std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
