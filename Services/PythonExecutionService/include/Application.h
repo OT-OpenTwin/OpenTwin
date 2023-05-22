@@ -11,6 +11,7 @@
 // Open twin header
 #include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
 #include "OpenTwinFoundation/ApplicationBase.h" // Base class
+#include "PythonAPI.h"
 
 // C++ header
 #include <string>
@@ -113,4 +114,7 @@ public:
 	//! send to the uiService to update the Settings in the dialog
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(ot::AbstractSettingsItem * _item);
+
+private:
+	PythonAPI _pythonAPI;
 };
