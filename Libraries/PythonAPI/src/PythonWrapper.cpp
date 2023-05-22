@@ -11,8 +11,6 @@ PythonWrapper::PythonWrapper()
 
 PythonWrapper::~PythonWrapper()
 {
-	Py_DECREF(_mainModule);
-
 }
 
 void PythonWrapper::ExecuteString(std::string executionCommand, ot::VariableBundle& globalVariables)
@@ -40,8 +38,9 @@ void PythonWrapper::InitializePythonInterpreter()
 	{
 		ThrowPythonException();
 	}
-	_mainModule = PyImport_AddModule("__main__");
-	_cleanGlobalDirectory = PyModule_GetDict(_mainModule);
+
+	_mainModule.reset(PyImport_AddModule("__main__"));
+	
 }
 
 void PythonWrapper::operator<<(const std::string& executionCommand)
@@ -102,11 +101,9 @@ void PythonWrapper::ExtractVariables(ot::VariableBundle& globalVariables)
 
 void PythonWrapper::InitiateExecutionSequence()
 {
-	if (_activeGlobalDirectory.ReferenceIsSet())
-	{
-		_activeGlobalDirectory.FreePythonObject();
-	}
-	_activeGlobalDirectory = PyDict_Copy(_cleanGlobalDirectory);
+	_cleanGlobalDirectory.reset(PyModule_GetDict(_mainModule));
+	PyObject* copy = PyDict_Copy(_cleanGlobalDirectory);
+	_activeGlobalDirectory.reset(copy);
 }
 
 void PythonWrapper::EndExecutionSequence()

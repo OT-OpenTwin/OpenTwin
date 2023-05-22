@@ -19,4 +19,10 @@ class CPythonObjectNew : public DecRefDecorator
 {	
 public:
 	CPythonObjectNew(PyObject* newRef) : DecRefDecorator(newRef) {}
+    void reset(PyObject* ref)
+    {
+        Py_XDECREF(_ref);
+        _ref = nullptr;
+        _ref = ref;
+    }
 };

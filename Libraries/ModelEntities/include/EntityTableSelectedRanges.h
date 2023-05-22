@@ -21,7 +21,6 @@ public:
 	void getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t & leftColumn, uint32_t & rightColumn);
 	bool getConsiderForBatchprocessing();
 	std::string getScriptName();
-
 	void AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell);
 
 private:
