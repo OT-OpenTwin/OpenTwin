@@ -1,7 +1,0 @@
-﻿  Application.cpp
-  dllmain.cpp
-  ModelNotifier.cpp
-  UiNotifier.cpp
-  Generating Code...
-     Creating library C:\OpenTwin\Services\PythonExecutionService\x64\Release\PythonExecutionService.lib and object C:\OpenTwin\Services\PythonExecutionService\x64\Release\PythonExecutionService.exp
-  PythonExecutionService.vcxproj -> C:\OpenTwin\Services\PythonExecutionService\x64\Release\PythonExecutionService.dll
