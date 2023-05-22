@@ -17,8 +17,11 @@ void PythonAPI::InterpreteString(std::vector<std::string>& programms, std::vecto
 	for (const std::string programm : programms)
 	{
 		wrapper << programm;
-		wrapper.ExtractVariables(*variableSet);
-		variableSet++;
+		if (variableSet != variables.end())
+		{
+			wrapper.ExtractVariables(*variableSet);
+			variableSet++;
+		}
 	}
 	wrapper.EndExecutionSequence();
 }

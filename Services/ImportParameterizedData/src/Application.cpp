@@ -64,11 +64,20 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 	//_parametrizedDataHandler->Init();
 }
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	try
 	{
+		if (_action == "Test")
+		{
+			int testInt = _doc["TestField"].GetInt();
+			rapidjson::Value subDoc = _doc["Test"].GetObject();
+			int testIntSub = subDoc["TestField"].GetInt();
+		}
+
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{

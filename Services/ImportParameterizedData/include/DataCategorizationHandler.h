@@ -9,8 +9,7 @@
  * \date   February 2023
  *********************************************************************/
 #pragma once
-#include <map>
-#include <string>
+
 #include "BusinessLogicHandler.h"
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityParameterizedDataPreviewTable.h"
@@ -20,7 +19,13 @@
 #include "OpenTwinFoundation/TableRange.h"
 #include "OpenTwinFoundation/EntityInformation.h"
 #include "MetadataAssemblyData.h"
+#include "EntityTableSelectedRanges.h"
+#include "OpenTwinCore/Variable.h"
+#include "PythonAPI.h"
 
+#include <map>
+#include <string>
+#include <memory>
 
 class DataCategorizationHandler : public BusinessLogicHandler
 {
@@ -67,6 +72,8 @@ private:
 
 	ot::Color _backgroundColour;
 
+	PythonAPI _pythonAPI;
+
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
 
@@ -89,4 +96,8 @@ private:
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
 	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
+	std::vector<ot::VariableBundle> UpdateAllPropertyValues(std::list < std::shared_ptr<EntityTableSelectedRanges>>& ranges, std::map<std::string, std::string>& pythonScripts);
+	std::map<std::string, std::pair<ot::UID, ot::UID>> GetAllNewlyReferencedTables(std::vector<ot::VariableBundle>& allUpdatedVariables);
+	std::map<std::string, ot::UID> GetAllNewlyReferencedScripts(std::vector<ot::VariableBundle>& allUpdatedVariables);
+	
 };
