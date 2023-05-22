@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTsci\AbstractInterpreterNotifier.h">
+    <ClInclude Include="include\OTsci\SCINotifierInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTsci\AbstractOSHandler.h">
+    <ClInclude Include="include\OTsci\SCIOSInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTsci\AbstractPrinter.h">
+    <ClInclude Include="include\OTsci\SCIPrinterInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTsci\OTsciAPIExport.h">
@@ -36,51 +36,36 @@
     <ClInclude Include="include\OTsci\API.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTsci\Convert.h">
+    <ClInclude Include="include\OTsci\SCIDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTsci\ExternalDllScript.h">
+    <ClInclude Include="include\OTsci\SCIObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTsci\InterpreterCore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTsci\InterpreterObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTsci\OS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTsci\ScriptLoader.h">
+    <ClInclude Include="include\OTsci\SCILibraryLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\aDir.cpp">
+    <ClCompile Include="src\SCIDir.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\aFile.cpp">
+    <ClCompile Include="src\SCIFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\API.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Convert.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\InterpreterCore.cpp">
+    <ClCompile Include="src\SCIDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\InterpreterObject.cpp">
+    <ClCompile Include="src\SCIObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScriptLoader.cpp">
+    <ClCompile Include="src\SCILibraryLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

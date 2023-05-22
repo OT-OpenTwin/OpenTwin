@@ -25,6 +25,7 @@
     <ClCompile Include="src\rJSON.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
     <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\StringHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h" />
@@ -44,6 +45,7 @@
     <ClInclude Include="include\OpenTwinCore\ServiceBase.h" />
     <ClInclude Include="include\OpenTwinCore\Logger.h" />
     <ClInclude Include="include\OpenTwinCore\Singleton.h" />
+    <ClInclude Include="include\OpenTwinCore\StringHelper.h" />
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.h" />
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.hpp" />
     <ClInclude Include="include\OpenTwinCore\TypeNames.h" />

@@ -1,46 +1,26 @@
-//! @file OTsciAPIExport.h
+//! @file SCIDir.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date November 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#include <aci/aDir.h>
-#include <aci/aFile.h>
-#include <aci/OS.h>
-#include <aci/Convert.h>
+#include "OTsci/SCIDir.h"
+#include "OTsci/SCIFile.h"
+#include "OTsci/SCIOS.h"
+#include "OpenTwinCore/StringHelper.h"
 
-using namespace aci;
-
-aDir::aDir(const std::wstring& _name, const std::wstring& _fullPath) 
+ot::SCIDir::SCIDir(const std::wstring& _name, const std::wstring& _fullPath) 
 	: m_name(_name), m_fullPath(_fullPath) {}
 
-aDir::aDir(const aDir& _other) 
-	: m_name(_other.m_name), m_fullPath(_other.m_fullPath)
-{
-	for (auto sd : _other.m_subDirectories) {
-		m_subDirectories.push_back(sd);
-	}
-	for (auto f : _other.m_files) {
-		m_files.push_back(f);
-	}
-}
+ot::SCIDir::SCIDir(const SCIDir& _other)
+	: m_name(_other.m_name), m_fullPath(_other.m_fullPath), m_subDirectories(_other.m_subDirectories), m_files(_other.m_files) {}
 
-aDir::~aDir() {
-	clearSubdirectories();
-	clearFiles();
-}
+ot::SCIDir::~SCIDir() {}
 
-aDir& aDir::operator = (const aDir& _other) {
+ot::SCIDir& ot::SCIDir::operator = (const SCIDir& _other) {
 	m_name = _other.m_name;
 	m_fullPath = _other.m_fullPath;
-
-	clearSubdirectories();
-	for (auto sd : _other.m_subDirectories) {
-		m_subDirectories.push_back(sd);
-	}
-	clearFiles();
-	for (auto f : _other.m_files) {
-		m_files.push_back(f);
-	}
+	m_subDirectories = _other.m_subDirectories;
+	m_files = _other.m_files;
 
 	return *this;
 }
@@ -49,34 +29,34 @@ aDir& aDir::operator = (const aDir& _other) {
 
 // IO operations
 
-void aDir::scanAll(void) {
+void ot::SCIDir::scanAll(void) {
 	clearSubdirectories();
 	AbstractOSHandler * os = OS::instance()->handler();
 	for (auto s : os->subdirectories(fullPath(), true)) {
-		aDir * newSub = new aDir(s, fullPath() + L"/" + s);
+		SCIDir * newSub = new SCIDir(s, fullPath() + L"/" + s);
 		newSub->scanAll();
 		m_subDirectories.push_back(newSub);
 	}
 	scanFiles(true);
 }
 
-void aDir::scanDirectories(bool _scanSubdirectories) {
+void ot::SCIDir::scanDirectories(bool _scanSubdirectories) {
 	clearSubdirectories();
 
 	AbstractOSHandler * os = OS::instance()->handler();
 	for (auto s : os->subdirectories(fullPath(), true)) {
-		aDir * newSub = new aDir(s, fullPath() + L"/" + s);
+		SCIDir * newSub = new SCIDir(s, fullPath() + L"/" + s);
 		if (_scanSubdirectories && s != L"." && s != L"..") { newSub->scanDirectories(true); }
 		m_subDirectories.push_back(newSub);
 	}
 }
 
-void aDir::scanFiles(bool _scanSubdirectories) {
+void ot::SCIDir::scanFiles(bool _scanSubdirectories) {
 	clearFiles();
 
 	AbstractOSHandler * os = OS::instance()->handler();
 	for (auto s : os->filesInDirectory(fullPath(), true)) {
-		aFile * newFile = new aFile(s, fullPath() + L"/" + s);
+		SCIFile * newFile = new SCIFile(s, fullPath() + L"/" + s);
 		m_files.push_back(newFile);
 	}
 
@@ -87,7 +67,7 @@ void aDir::scanFiles(bool _scanSubdirectories) {
 	}
 }
 
-void aDir::filterDirectoriesWithWhitelist(const std::list<std::wstring>& _list) {
+void ot::SCIDir::filterDirectoriesWithWhitelist(const std::list<std::wstring>& _list) {
 	bool erased{ true };
 
 	// Check subdirectories
@@ -112,7 +92,7 @@ void aDir::filterDirectoriesWithWhitelist(const std::list<std::wstring>& _list) 
 	}
 }
 
-void aDir::filterDirectoriesWithBlacklist(const std::list<std::wstring>& _list) {
+void ot::SCIDir::filterDirectoriesWithBlacklist(const std::list<std::wstring>& _list) {
 	bool erased{ true };
 
 	// Check subdirectories
@@ -137,7 +117,7 @@ void aDir::filterDirectoriesWithBlacklist(const std::list<std::wstring>& _list) 
 	}
 }
 
-void aDir::filterFilesWithWhitelist(const std::list<std::wstring>& _list) {
+void ot::SCIDir::filterFilesWithWhitelist(const std::list<std::wstring>& _list) {
 	bool erased{ true };
 
 	// Check files
@@ -163,7 +143,7 @@ void aDir::filterFilesWithWhitelist(const std::list<std::wstring>& _list) {
 	}
 }
 
-void aDir::filterFilesWithBlacklist(const std::list<std::wstring>& _list) {
+void ot::SCIDir::filterFilesWithBlacklist(const std::list<std::wstring>& _list) {
 	bool erased{ true };
 
 	// Check files
@@ -193,17 +173,16 @@ void aDir::filterFilesWithBlacklist(const std::list<std::wstring>& _list) {
 
 // Setter
 
-void aDir::clearSubdirectories(void) {
-	for (auto d : m_subDirectories) {
-		delete d;
-	}
+void ot::SCIDir::clear(void) {
+	this->clearSubdirectories();
+	this->clearFiles();
+}
+
+void ot::SCIDir::clearSubdirectories(void) {
 	m_subDirectories.clear();
 }
 
-void aDir::clearFiles(void) {
-	for (auto f : m_files) {
-		delete f;
-	}
+void ot::SCIDir::clearFiles(void) {
 	m_files.clear();
 }
 
@@ -211,7 +190,7 @@ void aDir::clearFiles(void) {
 
 // Getter
 
-std::list<std::wstring> aDir::subdirectoryNameList(void) const {
+std::list<std::wstring> ot::SCIDir::subdirectoryNameList(void) const {
 	std::list<std::wstring> ret;
 	for (auto sub : m_subDirectories) {
 		ret.push_back(sub->name());
@@ -222,7 +201,7 @@ std::list<std::wstring> aDir::subdirectoryNameList(void) const {
 	return ret;
 }
 
-std::list<std::wstring> aDir::fileNameList(void) const {
+std::list<std::wstring> ot::SCIDir::fileNameList(void) const {
 	std::list<std::wstring> ret;
 	for (auto f : m_files) {
 		ret.push_back(f->name());
@@ -235,12 +214,12 @@ std::list<std::wstring> aDir::fileNameList(void) const {
 	return ret;
 }
 
-bool aDir::exists(void) const {
+bool ot::SCIDir::exists(void) const {
 	AbstractOSHandler * os = OS::instance()->handler();
 	return os->directoryExists(fullPath());
 }
 
-size_t aDir::subDirCount(void) {
+size_t ot::SCIDir::subDirCount(void) {
 	size_t ret = m_subDirectories.size();
 	for (auto sub : m_subDirectories) {
 		ret += sub->subDirCount();
@@ -248,7 +227,7 @@ size_t aDir::subDirCount(void) {
 	return ret;
 }
 
-size_t aDir::fileCount(void) {
+size_t ot::SCIDir::fileCount(void) {
 	size_t ret = m_files.size();
 	for (auto sub : m_subDirectories) {
 		ret += sub->fileCount();
@@ -260,7 +239,7 @@ size_t aDir::fileCount(void) {
 
 // Static functions
 
-std::wstring aDir::lastFolder(const std::wstring& _path) {
+std::wstring ot::SCIDir::nameFromPath(const std::wstring& _path) {
 	if (_path.empty()) { return _path; }
 	std::wstring str = _path;
 	for (size_t i{ 0 }; i < str.length(); i++) {

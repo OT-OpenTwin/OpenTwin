@@ -181,7 +181,7 @@ CALL "%OT_QWTWRAPPER_ROOT%\build.bat" %1 %2
 ECHO ===============================================================
 ECHO Build Library: OT sci
 ECHO ===============================================================
-CALL "%OT_SCI_ROOT%\build.bat" %1 %2
+REM CALL "%OT_SCI_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: Viewer

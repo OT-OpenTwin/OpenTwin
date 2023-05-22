@@ -1,24 +1,24 @@
-//! @file OTsciAPIExport.h
+//! @file OTsciAPIExport.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date November 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #include <aci/InterpreterObject.h>
 #include <aci/InterpreterCore.h>
 #include <aci/AbstractPrinter.h>
-#include <aci/aFile.h>
-#include <aci/aDir.h>
+#include <aci/SCIFile.h>
+#include <aci/SCIDir.h>
 #include <aci/OS.h>
 #include <aci/Convert.h>
 #include <aci/AbstractInterpreterNotifier.h>
 
-aci::InterpreterObject::InterpreterObject() : m_printer(nullptr), m_core(nullptr), m_notifier(nullptr) {}
+ot::InterpreterObject::InterpreterObject() : m_printer(nullptr), m_core(nullptr), m_notifier(nullptr) {}
 
 // ################################################################################################################################
 
 // Output
 
-void aci::InterpreterObject::showInfo(void) {
+void ot::InterpreterObject::showInfo(void) {
 	printDelimiterLine();
 	print("###  ");
 	setColor(240, 70, 140);
@@ -30,7 +30,7 @@ void aci::InterpreterObject::showInfo(void) {
 	showCommandInfo();
 }
 
-void aci::InterpreterObject::printDelimiterLine(void) {
+void ot::InterpreterObject::printDelimiterLine(void) {
 	setColor(0, 255, 0);
 	print("####################################################################################################\n");
 	setColor(255, 255, 255);
@@ -40,26 +40,26 @@ void aci::InterpreterObject::printDelimiterLine(void) {
 
 // File operations
 
-bool aci::InterpreterObject::readDataFile(std::wstring& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
+bool ot::InterpreterObject::readDatSCIFile(std::wstring& _data, const std::wstring& _filename, bool _showLog) {
+	std::wstring filePath = OS::instance()->handler()->scriptDatSCIDirectory() + L"/" + key() + L"/" + _filename;
 	return OS::instance()->handler()->readFile(_data, filePath);
 }
 
-bool aci::InterpreterObject::readDataFile(std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
+bool ot::InterpreterObject::readDatSCIFile(std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
+	std::wstring filePath = OS::instance()->handler()->scriptDatSCIDirectory() + L"/" + key() + L"/" + _filename;
 	return OS::instance()->handler()->readLinesFromFile(_data, filePath);
 }
 
-bool aci::InterpreterObject::writeDataFile(const std::wstring& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
+bool ot::InterpreterObject::writeDatSCIFile(const std::wstring& _data, const std::wstring& _filename, bool _showLog) {
+	std::wstring filePath = OS::instance()->handler()->scriptDatSCIDirectory() + L"/" + key() + L"/" + _filename;
 	for (size_t i{ 0 }; i < filePath.length(); i++) {
 		if (filePath.at(i) == L'\\') { filePath.replace(i, 1, L"/"); }
 	}
 	return OS::instance()->handler()->writeFile(_data, filePath);
 }
 
-bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
-	std::wstring filePath = OS::instance()->handler()->scriptDataDirectory() + L"/" + key() + L"/" + _filename;
+bool ot::InterpreterObject::writeDatSCIFile(const std::list<std::wstring>& _data, const std::wstring& _filename, bool _showLog) {
+	std::wstring filePath = OS::instance()->handler()->scriptDatSCIDirectory() + L"/" + key() + L"/" + _filename;
 	for (size_t i{ 0 }; i < filePath.length(); i++) {
 		if (filePath.at(i) == L'\\') { filePath.replace(i, 1, L"/"); }
 	}
@@ -70,20 +70,20 @@ bool aci::InterpreterObject::writeDataFile(const std::list<std::wstring>& _data,
 
 // Setter
 
-void aci::InterpreterObject::disableInput(void) {
+void ot::InterpreterObject::disableInput(void) {
 	if (m_notifier) m_notifier->disableInput();
 }
 
-void aci::InterpreterObject::enableInput(void) {
+void ot::InterpreterObject::enableInput(void) {
 	if (m_notifier) {
 		m_notifier->enableInput();
 	}
 }
 
-void aci::InterpreterObject::print(const char * _message) { print(std::string(_message)); }
-void aci::InterpreterObject::print(const wchar_t * _message) { print(std::wstring(_message)); }
+void ot::InterpreterObject::print(const char * _message) { print(std::string(_message)); }
+void ot::InterpreterObject::print(const wchar_t * _message) { print(std::wstring(_message)); }
 
-void aci::InterpreterObject::print(bool _value) {
+void ot::InterpreterObject::print(bool _value) {
 	if (_value) {
 		setColor(0, 255, 0);
 		print(L"TRUE");
@@ -96,48 +96,48 @@ void aci::InterpreterObject::print(bool _value) {
 	}
 }
 
-void aci::InterpreterObject::print(const std::string& _message) {
+void ot::InterpreterObject::print(const std::string& _message) {
 	if (m_printer) { m_printer->print(_message); }
 }
-void aci::InterpreterObject::print(const std::wstring& _message) {
+void ot::InterpreterObject::print(const std::wstring& _message) {
 	if (m_printer) { m_printer->print(_message); }
 }
 
-void aci::InterpreterObject::setColor(int _r, int _g, int _b, int _a) {
+void ot::InterpreterObject::setColor(int _r, int _g, int _b, int _a) {
 	setColor(Color(_r, _g, _b, _a));
 }
-void aci::InterpreterObject::setColor(const Color& _color) {
+void ot::InterpreterObject::setColor(const Color& _color) {
 	if (m_printer) { m_printer->setColor(_color); }
 }
-void aci::InterpreterObject::setColor(Color::DefaultColor _color) { setColor(Color(_color)); }
+void ot::InterpreterObject::setColor(Color::DefaultColor _color) { setColor(Color(_color)); }
 
 // ################################################################################################################################
 
 // Getter
 
-std::list<std::wstring> aci::InterpreterObject::filesInDirectory(const std::wstring& _directoryPath) {
+std::list<std::wstring> ot::InterpreterObject::filesInDirectory(const std::wstring& _directoryPath) {
 	AbstractOSHandler * os = OS::instance()->handler();
 	return os->filesInDirectory(_directoryPath, true);
 }
-std::list<std::wstring> aci::InterpreterObject::filesInDataDirectory(const std::wstring& _subdirectory) {
+std::list<std::wstring> ot::InterpreterObject::filesInDatSCIDirectory(const std::wstring& _subdirectory) {
 	AbstractOSHandler * os = OS::instance()->handler();
-	return os->filesInDirectory(os->scriptDataDirectory() + L"/" + key() + L"/" + _subdirectory, true);
+	return os->filesInDirectory(os->scriptDatSCIDirectory() + L"/" + key() + L"/" + _subdirectory, true);
 }
 
-std::list<std::wstring> aci::InterpreterObject::subdirectories(const std::wstring& _directoryPath) {
+std::list<std::wstring> ot::InterpreterObject::subdirectories(const std::wstring& _directoryPath) {
 	AbstractOSHandler * os = OS::instance()->handler();
 	return os->subdirectories(_directoryPath, true);
 }
-std::list<std::wstring> aci::InterpreterObject::subdirectoriesInDataDirectory(const std::wstring& _subdirectory) {
+std::list<std::wstring> ot::InterpreterObject::subdirectoriesInDatSCIDirectory(const std::wstring& _subdirectory) {
 	AbstractOSHandler * os = OS::instance()->handler();
-	return os->subdirectories(os->scriptDataDirectory() + L"/" + key() + L"/" + _subdirectory, true);
+	return os->subdirectories(os->scriptDatSCIDirectory() + L"/" + key() + L"/" + _subdirectory, true);
 }
 
 // ################################################################################################################################
 
 // Static functions
 
-std::wstring aci::InterpreterObject::isolateFilename(const std::wstring& _path) {
+std::wstring ot::InterpreterObject::isolateFilename(const std::wstring& _path) {
 	std::wstring path = _path;
 	for (size_t i{ 0 }; i < path.length(); i++) {
 		if (path.at(i) == L'\\') { path.replace(i, 1, L"/"); }

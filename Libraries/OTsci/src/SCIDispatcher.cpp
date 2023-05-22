@@ -1,19 +1,17 @@
 //! @file OTsciAPIExport.h
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date November 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #include <aci/InterpreterCore.h>
 #include <aci/AbstractInterpreterNotifier.h>
 #include <aci/InterpreterObject.h>
 #include <aci/AbstractPrinter.h>
-#include <aci/aFile.h>
-#include <aci/aDir.h>
+#include <aci/SCIFile.h>
+#include <aci/SCIDir.h>
 #include <aci/Convert.h>
 #include <aci/OS.h>
 #include <aci/ScriptLoader.h>
-
-using namespace aci;
 
 InterpreterCore * g_instance{ nullptr };
 
@@ -33,12 +31,12 @@ void InterpreterCore::clearInstance(void) {
 
 // Setter
 
-void InterpreterCore::attachPrinter(aci::AbstractPrinter * _printer) {
+void InterpreterCore::attachPrinter(ot::AbstractPrinter * _printer) {
 	m_printer = _printer;
 	for (auto obj : m_objects) { obj.second->attachPrinter(m_printer); }
 }
 
-void InterpreterCore::addScriptObject(aci::InterpreterObject * _obj) {
+void InterpreterCore::addScriptObject(ot::InterpreterObject * _obj) {
 	if (_obj == nullptr) {
 		if (m_printer) { m_printer->print("Failed to load NULL as script\n"); }
 		return;
@@ -123,7 +121,7 @@ bool InterpreterCore::handle(const std::wstring& _message) {
 			m_printer->print(L"\t<empty>\n");
 			return true;
 		}
-		aci::aDir dir(L"", currentPath());
+		ot::SCIDir dir(L"", currentPath());
 		dir.scanDirectories();
 		dir.scanFiles();
 
@@ -236,14 +234,14 @@ bool InterpreterCore::cmdCd(const std::wstring& _path) {
 	else {
 		if (!m_path.empty()) {
 			std::wstring subDir = currentPath() + L"/" + _path;
-			aDir currentDir(L"", subDir);
+			SCIDir currentDir(L"", subDir);
 			if (currentDir.exists()) {
 				setCurrentPath(currentPath() + L"/" + _path);
 				return true;
 			}
 		}
 
-		aDir dir(L"", _path);
+		SCIDir dir(L"", _path);
 		if (dir.exists()) {
 			setCurrentPath(_path);
 			return true;
@@ -272,7 +270,7 @@ std::wstring InterpreterCore::currentPath(void) const {
 	return path;
 }
 
-aci::InterpreterObject * InterpreterCore::findFirstMatchingItem(const std::wstring& _key) {
+ot::InterpreterObject * InterpreterCore::findFirstMatchingItem(const std::wstring& _key) {
 	auto it = m_objects.find(_key);
 	if (it != m_objects.end()) {
 		return it->second;

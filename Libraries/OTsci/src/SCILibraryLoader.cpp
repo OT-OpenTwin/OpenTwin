@@ -1,6 +1,6 @@
-//! @file OTsciAPIExport.h
+//! @file OTsciAPIExport.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date November 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #include <aci/ScriptLoader.h>
@@ -8,16 +8,16 @@
 #include <aci/InterpreterObject.h>
 #include <aci/AbstractPrinter.h>
 #include <aci/ExternalDllScript.h>
-#include <aci/aDir.h>
-#include <aci/aFile.h>
+#include <aci/SCIDir.h>
+#include <aci/SCIFile.h>
 
-aci::ScriptLoader::ScriptLoader(InterpreterCore * _core) : m_core(_core) {}
+ot::ScriptLoader::ScriptLoader(InterpreterCore * _core) : m_core(_core) {}
 
-aci::ScriptLoader::~ScriptLoader() {
+ot::ScriptLoader::~ScriptLoader() {
 
 }
 
-void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _filename) {
+void ot::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _filename) {
 	m_core->printer()->setColor(255, 255, 255);
 	m_core->printer()->print(L"[script loader] Load library: " + _filename);
 	HINSTANCE hGetProcIDDLL = LoadLibrary(_path.c_str());
@@ -27,7 +27,7 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 		ExternalDllScript::DLLGenerateObjectsFunctionType func = (ExternalDllScript::DLLGenerateObjectsFunctionType)GetProcAddress(hGetProcIDDLL, "generateObjects");
 		if (func) {
 			int objCt{ 0 };
-			aci::InterpreterObject ** obj = func(objCt);
+			ot::InterpreterObject ** obj = func(objCt);
 			int ct{ 0 };
 			
 			for (int o{ 0 }; o < objCt; o++) {
@@ -63,9 +63,9 @@ void aci::ScriptLoader::loadDll(const std::wstring& _path, const std::wstring& _
 	}
 }
 
-void aci::ScriptLoader::loadDllsFromDirectory(const std::wstring& _directoryPath) {
+void ot::ScriptLoader::loadDllsFromDirectory(const std::wstring& _directoryPath) {
 	m_core->printer()->print(L"[script loader] Searching for files at: " + _directoryPath + L"\n");
-	aDir directory(L"", _directoryPath);
+	SCIDir directory(L"", _directoryPath);
 	directory.scanFiles(false);
 	m_core->printer()->print(L"[script loader] Filter for *.dll files\n");
 	directory.filterFilesWithWhitelist({ L".dll" });
@@ -75,7 +75,7 @@ void aci::ScriptLoader::loadDllsFromDirectory(const std::wstring& _directoryPath
 	}
 }
 
-void aci::ScriptLoader::unloadScripts(void) {
+void ot::ScriptLoader::unloadScripts(void) {
 	for (auto script : m_externalDlls) {
 		m_core->removeScriptObject(script->interptreterObject()->key(), true);
 		FreeLibrary(script->libraryInstance());

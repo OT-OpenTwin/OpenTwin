@@ -12,12 +12,19 @@ namespace ot {
 
 #include <Windows.h>
 
-//! Handle to a process
+//! @brief Process handle
 #define OT_PROCESS_HANDLE HANDLE
 
-//! Invalid handle (no handle)
+//! @brief Invalid process handle
 #define OT_INVALID_PROCESS_HANDLE nullptr
 
+//! @brief Infinite timeout
 #define OT_INFINITE_TIMEOUT INFINITE
+
+namespace  ot {
+	//! @brief Instance to an loaded external library
+	typedef HINSTANCE ExternalLibraryInstance_t;
+}
+
 
 #endif

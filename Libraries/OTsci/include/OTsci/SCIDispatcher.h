@@ -1,10 +1,11 @@
-//! @file OTsciAPIExport.h
+//! @file SCIDispatcher.h
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date November 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
+// OpenTwin header
 #include "OTsci/OTsciAPIExport.h"
 
 #pragma warning(disable:4251)
@@ -14,25 +15,23 @@
 #include <list>
 #include <string>
 
-namespace aci {
-	class AbstractInterpreterNotifier;
-	class AbstractPrinter;
-	class InterpreterObject;
-	class ScriptLoader;
+namespace ot {
+	class SCILibraryLoader;
+	class SCINotifierInterface;
+	class SCINotifierInterface;
 
-	class OTSCI_API_EXPORT InterpreterCore {
+	class OTSCI_API_EXPORT SCIDispatcher {
 	public:
-		static InterpreterCore * instance(void);
-		static void clearInstance(void);
+		static SCIDispatcher& instance(void);
 
 		// ########################################################################################
 
 		// Setter
 
-		void attachNotifier(AbstractInterpreterNotifier * _notifier) { m_notifier = _notifier; }
+		void setNotifier(ot::SCINotifierInterface* _notifier) { m_notifier = _notifier; }
+		void setPrinter(ot::SCIPrinterInterface* _printer);
 		void setAutoClean(bool _isAutoClean) { m_autoClean = _isAutoClean; }
-		void attachPrinter(aci::AbstractPrinter * _printer);
-		void addScriptObject(aci::InterpreterObject * _obj);
+		void addScriptObject(ot::InterpreterObject * _obj);
 		void removeScriptObject(const std::wstring& _key, bool _deleteObject = true);
 		void setCurrentPath(const std::wstring& _path);
 
@@ -43,14 +42,13 @@ namespace aci {
 		bool handle(const std::wstring& _message);
 		bool cmdData(const std::vector<std::wstring>& _args);
 		void showHelp(void);
-		bool cmdCd(const std::wstring& _path);
 
 		// ########################################################################################
 
 		// Getter
 
 		std::wstring currentPath(void) const;
-		aci::AbstractPrinter * printer(void) { return m_printer; }
+		ot::AbstractPrinter * printer(void) { return m_printer; }
 
 		// ########################################################################################
 
@@ -62,26 +60,26 @@ namespace aci {
 
 		// Getter
 
-		const std::map<std::wstring, aci::InterpreterObject *>& objects(void) const { return m_objects; }
-		std::map<std::wstring, aci::InterpreterObject *>& objects(void) { return m_objects; }
+		const std::map<std::wstring, ot::InterpreterObject *>& objects(void) const { return m_objects; }
+		std::map<std::wstring, ot::InterpreterObject *>& objects(void) { return m_objects; }
 
-		aci::InterpreterObject * findFirstMatchingItem(const std::wstring& _key);
+		ot::InterpreterObject * findFirstMatchingItem(const std::wstring& _key);
 
-		ScriptLoader * scriptLoader(void) { return m_scriptLoader; }
+		SCILibraryLoader* libraryLoader(void) { return m_scriptLoader; }
 
 	private:
-		aci::AbstractPrinter *								m_printer;
-		AbstractInterpreterNotifier *						m_notifier;
-		ScriptLoader *										m_scriptLoader;
+		ot::AbstractPrinter *								m_printer;
+		ot::AbstractInterpreterNotifier *						m_notifier;
+		SCILibraryLoader *									m_scriptLoader;
 		bool												m_autoClean;
 
 		std::list<std::wstring>								m_path;
 
-		std::map<std::wstring, aci::InterpreterObject *>	m_objects;
+		std::map<std::wstring, ot::InterpreterObject *>	m_objects;
 
-		InterpreterCore();
-		virtual ~InterpreterCore();
-		InterpreterCore(InterpreterCore&) = delete;
-		InterpreterCore& operator = (InterpreterCore&) = delete;
+		SCIDispatcher();
+		virtual ~SCIDispatcher();
+		SCIDispatcher(const SCIDispatcher&) = delete;
+		SCIDispatcher& operator = (const SCIDispatcher&) = delete;
 	};
 }

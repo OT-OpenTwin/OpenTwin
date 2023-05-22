@@ -1,6 +1,6 @@
 //! @file OTsciAPIExport.h
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date November 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -11,14 +11,14 @@
 
 #include <string>
 
-namespace aci {
+namespace ot {
 
-	class OTSCI_API_EXPORT aFile {
+	class OTSCI_API_EXPORT SCIFile {
 	public:
-		aFile(const std::wstring& _filename, const std::wstring& _fullPath);
-		aFile(const aFile& _other);
-		virtual ~aFile();
-		aFile& operator = (const aFile& _other);
+		SCIFile(const std::wstring& _filename, const std::wstring& _fullPath);
+		SCIFile(const SCIFile& _other);
+		virtual ~SCIFile();
+		SCIFile& operator = (const SCIFile& _other);
 
 		// ##############################################################
 
@@ -32,6 +32,6 @@ namespace aci {
 		std::wstring	m_name;
 		std::wstring	m_fullpath;
 
-		aFile() = delete;
+		SCIFile() = delete;
 	};
 }

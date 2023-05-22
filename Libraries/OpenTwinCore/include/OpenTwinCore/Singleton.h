@@ -1,4 +1,4 @@
-//! @file ObjectManagerTemplate.h
+//! @file Singleton.h
 //! @brief Defines the Singleton class template.
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
