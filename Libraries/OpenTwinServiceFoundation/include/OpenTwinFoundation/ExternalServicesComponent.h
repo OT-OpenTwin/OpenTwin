@@ -55,6 +55,10 @@ namespace ot {
 			std::string init(
 				const std::string &					_sessionServiceURL,
 				const std::string &					_sessionID
+			);			
+			std::string init2(
+				const std::string &					_sessionServiceURL,
+				const std::string &					_sessionID
 			);
 
 			//! @brief Will perform the provided action
@@ -136,6 +140,14 @@ namespace ot {
 			const std::string &					_sessionServiceURL,
 			const std::string &					_sessionID,
 			ApplicationBase *					_application
+		);
+
+		__declspec (dllexport) int init2(
+			const std::string& _localDirectoryServiceURL,
+			const std::string& _ownURL,
+			const std::string& _sessionServiceURL,
+			const std::string& _sessionID,
+			ApplicationBase* _application
 		);
 	} // namespace foundation
 

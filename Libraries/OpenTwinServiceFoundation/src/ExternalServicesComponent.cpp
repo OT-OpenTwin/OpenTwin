@@ -248,6 +248,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+
 std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	const std::string &					_json,
 	const std::string &					_sender,
@@ -613,6 +614,81 @@ int ot::foundation::init(
 #endif
 	}
 	catch (const std::exception & e) {
+		std::cout << "[INIT] ERROR: " << e.what() << std::endl;
+		return -1;
+	}
+	catch (...) {
+		std::cout << "[INIT] ERROR: Unknown error" << std::endl;
+		return -2;
+	}
+}
+
+
+int ot::foundation::init2(
+	const std::string& _localDirectoryServiceURL,
+	const std::string& _ownIP,
+	const std::string& _sessionServiceIP,
+	const std::string& _sessionID,
+	ApplicationBase* _application
+) {
+	try {
+		// Setup logger
+		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", true);
+		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", true);
+
+
+		// The following code is used to make the service lauchable in debug mode in the editor when the session service is requesting the service to start
+		// In addition, if an empty siteID is passed to the service, it also reads its information from the config file. This allows for debugging services
+		// which are built in release mode.
+
+		// Get file path
+		std::string deplyomentPath = _application->deploymentPath();
+		if (deplyomentPath.empty()) return -20;
+
+		std::string data = _application->serviceName();
+		std::transform(data.begin(), data.end(), data.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+
+		deplyomentPath.append(data + ".cfg");
+
+		// Read file
+		std::ifstream stream(deplyomentPath);
+		char inBuffer[512];
+		stream.getline(inBuffer, 512);
+		std::string info(inBuffer);
+
+		if (info.empty()) {
+			std::cout << "No configuration found" << std::endl;
+			assert(0);
+			return -21;
+		}
+		// Parse doc
+		OT_rJSON_parseDOC(params, info.c_str());
+		assert(params.IsObject());
+
+		OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
+
+		std::string actualServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+		std::string actualSessionServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+		std::string actualLocalDirectoryServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
+		std::string actualSessionID = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_ID);
+		// Initialize the service with the parameters from the file
+
+		int startupResult = intern::ExternalServicesComponent::instance()->startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
+		if (startupResult != 0) {
+			return startupResult;
+		}
+
+		std::string initResult = intern::ExternalServicesComponent::instance()->init(actualSessionServiceURL, actualSessionID);
+		if (initResult != OT_ACTION_RETURN_VALUE_OK) {
+			return -22;
+		}
+		else {
+			return 0;
+		}
+
+	}
+	catch (const std::exception& e) {
 		std::cout << "[INIT] ERROR: " << e.what() << std::endl;
 		return -1;
 	}

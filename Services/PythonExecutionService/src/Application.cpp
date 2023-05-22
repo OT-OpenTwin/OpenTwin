@@ -64,14 +64,11 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
-			rapidjson::Document newDocument;
-			newDocument.AddMember(OT_ACTION_MEMBER, "Test", newDocument.GetAllocator());
-			newDocument.AddMember("TestField", 13, newDocument.GetAllocator());
-			rapidjson::Document subDocument;
-			subDocument.AddMember("TestField", 2, subDocument.GetAllocator());
-			newDocument.AddMember("TestSubDoc", subDocument, newDocument.GetAllocator());
-
-			sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
+			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			if (action == OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS)
+			{
+				
+			}
 		}
 		return returnMessage;
 	}

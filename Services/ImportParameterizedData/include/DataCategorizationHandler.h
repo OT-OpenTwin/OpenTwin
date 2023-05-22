@@ -21,7 +21,7 @@
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"
 #include "OpenTwinCore/Variable.h"
-#include "PythonAPI.h"
+
 
 #include <map>
 #include <string>
@@ -40,7 +40,8 @@ public:
 	void AddSelectionsAsQuantity(std::list<ot::UID> selectedEntities);
 	void StoreSelectionRanges(ot::UID tableEntityID, ot::UID tableEntityVersion, std::vector<ot::TableRange> ranges);
 	void CreateNewScriptDescribedMSMD();
-
+	void CreateUpdatedSelections(OT_rJSON_doc& document);
+	
 	std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
 
 	void SetColourOfRanges(std::string tableName);
@@ -72,8 +73,9 @@ private:
 
 	ot::Color _backgroundColour;
 
-	PythonAPI _pythonAPI;
-
+	//PythonAPI _pythonAPI;
+	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
+	std::map<std::string, std::vector<ot::VariableBundle>> _allVariableBundlesByMSMD;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
 
@@ -96,8 +98,11 @@ private:
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
 	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
-	std::vector<ot::VariableBundle> UpdateAllPropertyValues(std::list < std::shared_ptr<EntityTableSelectedRanges>>& ranges, std::map<std::string, std::string>& pythonScripts);
+	
 	std::map<std::string, std::pair<ot::UID, ot::UID>> GetAllNewlyReferencedTables(std::vector<ot::VariableBundle>& allUpdatedVariables);
 	std::map<std::string, ot::UID> GetAllNewlyReferencedScripts(std::vector<ot::VariableBundle>& allUpdatedVariables);
 	
+	void SendPythonExecutionRequest(std::map<std::string, std::string>& pythonScripts,const std::string& msmdName);
+	void CreateUpdatedSelections(std::string msmdName, std::vector<ot::VariableBundle>& bundles);
+
 };

@@ -71,13 +71,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 {
 	try
 	{
-		if (_action == "Test")
-		{
-			int testInt = _doc["TestField"].GetInt();
-			rapidjson::Value subDoc = _doc["Test"].GetObject();
-			int testIntSub = subDoc["TestField"].GetInt();
-		}
-
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
@@ -134,6 +127,52 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
+
+				OT_rJSON_createDOC(newDocument);
+				ot::rJSON::add(newDocument, OT_ACTION_MEMBER, "Test");
+				ot::rJSON::add(newDocument, "TestField", 13);
+
+				OT_rJSON_createValueObject(subDoc);
+				ot::rJSON::add(newDocument, subDoc, "TestField", 26);
+
+				ot::rJSON::add(newDocument, "SubDoc", subDoc);
+
+				OT_rJSON_createValueArray(array);
+				for (int i = 0; i < 10; i++)
+				{
+					array.PushBack(i, newDocument.GetAllocator());
+				}
+				ot::rJSON::add(newDocument, "array", array);
+
+				
+
+				//rapidjson::Document newDocument;
+				//newDocument.SetObject();
+				//newDocument.AddMember(OT_ACTION_MEMBER, "Test", newDocument.GetAllocator());
+				//newDocument.AddMember("TestField", 13, newDocument.GetAllocator());
+
+				//rapidjson::Document subDocument;
+				//subDocument.SetObject();
+				//subDocument.AddMember("TestField", 2, subDocument.GetAllocator());
+
+				//newDocument.AddMember("TestSubDoc", subDocument, newDocument.GetAllocator());
+
+				int testInt = newDocument["TestField"].GetInt();
+				
+				auto testArray = newDocument["array"].GetArray();
+				for (auto& element : testArray)
+				{
+					std::cout << element.GetInt();
+				}
+				
+				//auto temp =	newDocument.FindMember("Test");
+				//auto val = temp->value;
+				auto sbDoc = newDocument["SubDoc"].GetObject();
+				int testIntSub = sbDoc["TestField"].GetInt();
+
+
+				//sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
+
 				_parametrizedDataHandler->CreateNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
@@ -185,6 +224,11 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			{
 				std::string tableName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
 				_parametrizedDataHandler->SetColourOfRanges(tableName);
+			}
+			else if (subsequentFunction == "createUpdatedSelections")
+			{
+
+				_parametrizedDataHandler->CreateUpdatedSelections(_doc);
 			}
 			else
 			{
