@@ -688,9 +688,12 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 	std::vector<std::shared_ptr<EntityTableSelectedRanges>> newSelections;
 	newSelections.reserve(_allRelevantTableSelectionsByMSMD[msmdName].size());
 
-	auto variables = bundles.begin();
+	auto tableSelectionsForThisMSMD = _allRelevantTableSelectionsByMSMD[msmdName];
+	std::vector<std::string> parameterSelectionNames;
+	std::vector<std::string> quantitySelectionNames;
+	std::vector<std::string> msmdSelectionNames;
 
-	for (const auto& selection : _allRelevantTableSelectionsByMSMD[msmdName])
+	for (const auto& selection : tableSelectionsForThisMSMD)
 	{
 		std::string newSelectionName = "";
 		if (selection->getName().find(_parameterFolder) != string::npos)
@@ -701,7 +704,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 				parameter->setName(newMSMD->getName() + "/" + _parameterFolder);
 				parameter->CreateProperties(EntityParameterizedDataCategorization::parameter);
 			}
-			newSelectionName = CreateNewUniqueTopologyName(parameter->getName(), _selectionRangeName);
+			parameterSelectionNames.push_back(_selectionRangeName);
 		}
 		else if (selection->getName().find(_quantityFolder) != string::npos)
 		{
@@ -711,15 +714,50 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 				quantities->setName(newMSMD->getName() + "/" + _quantityFolder);
 				quantities->CreateProperties(EntityParameterizedDataCategorization::quantity);
 			}
-			newSelectionName = CreateNewUniqueTopologyName(quantities->getName(), _selectionRangeName);
+			quantitySelectionNames.push_back(_selectionRangeName);
 		}
 		else
 		{
-			newSelectionName = CreateNewUniqueTopologyName(newMSMD->getName(), _selectionRangeName);
+			msmdSelectionNames.push_back(_selectionRangeName);
 		}
+	}
 
+	if (parameterSelectionNames.size() != 0)
+	{
+		parameterSelectionNames = CreateNewUniqueTopologyName(parameter->getName(), _selectionRangeName, parameterSelectionNames.size());
+	}
+	if (quantitySelectionNames.size() != 0)
+	{
+		quantitySelectionNames = CreateNewUniqueTopologyName(quantities->getName(), _selectionRangeName, quantitySelectionNames.size());
+	}
+	if (msmdSelectionNames.size() != 0)
+	{
+		msmdSelectionNames = CreateNewUniqueTopologyName(newMSMD->getName(), _selectionRangeName, msmdSelectionNames.size());
+	}
+
+	auto nextParameterSelectionName = parameterSelectionNames.begin();
+	auto nextQuantitySelectionNAme = quantitySelectionNames.begin();
+	auto nextMSMDSelectionName = msmdSelectionNames.begin();
+
+	auto variables = bundles.begin();
+	for (const auto& selection : tableSelectionsForThisMSMD)
+	{
 		newSelections.push_back(std::shared_ptr<EntityTableSelectedRanges>(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService)));
-		newSelections.back()->setName(newSelectionName);
+		if (selection->getName().find(_parameterFolder) != string::npos)
+		{
+			newSelections.back()->setName(*nextParameterSelectionName);
+			nextParameterSelectionName++;
+		}
+		else if (selection->getName().find(_quantityFolder) != string::npos)
+		{
+			newSelections.back()->setName(*nextQuantitySelectionNAme);
+			nextQuantitySelectionNAme++;
+		}
+		else
+		{
+			newSelections.back()->setName(*nextMSMDSelectionName);
+			nextMSMDSelectionName++;
+		}
 
 		uint32_t topRow(-1), bottomRow(-1), leftCollumn(-1), rightColumn(-1);
 		for (int i = 0; i < variables->GetVariablesInt32()->size(); i++)
@@ -816,11 +854,6 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 		forceVisible.push_back(false);
 	}
 	_modelComponent->addEntitiesToModel(topologyEntityIDs, topologyEntityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Automatic creation of " + newMSMD->getName());
-
-	for (auto& selection : newSelections)
-	{
-		selection->updateFromProperties();
-	}
 }
 
 

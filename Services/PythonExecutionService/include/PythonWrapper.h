@@ -27,6 +27,7 @@
 		void ClosePythonInterpreter();
 
 		void ExecuteString(std::string executionCommand, ot::VariableBundle& globalVariables);
+		void ExecuteString(std::string executionCommand, PyObject* activeDirectory);
 		void operator<<(const std::string& executionCommand);
 
 		void ExtractVariables(ot::VariableBundle& globalVariables, PyObject* activeGlobalDirectory);

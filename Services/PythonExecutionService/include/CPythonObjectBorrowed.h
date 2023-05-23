@@ -18,8 +18,11 @@ public:
     }
     void reset(PyObject* ref)
     {
-        Py_XDECREF(_ref);
-        _ref = nullptr;
+        if (_ref != nullptr)
+        {
+            Py_XDECREF(_ref);
+            _ref = nullptr;
+        }
         _ref = ref;
         Py_XINCREF(_ref);
     }

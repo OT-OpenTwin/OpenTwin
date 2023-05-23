@@ -14,12 +14,14 @@ void PythonAPI::InterpreteString(std::vector<std::string>& programms, std::vecto
 {
 	auto variableSet = variables.begin();
 	wrapper.InitiateExecutionSequence();
+	PyObject* activeDirectory = PyDict_New();
 	for (const std::string programm : programms)
 	{
-		wrapper << programm;
+		wrapper.ExecuteString(programm, activeDirectory);
+		//wrapper << programm;
 		if (variableSet != variables.end())
 		{
-			wrapper.ExtractVariables(*variableSet);
+			wrapper.ExtractVariables(*variableSet, activeDirectory);
 			variableSet++;
 		}
 	}
