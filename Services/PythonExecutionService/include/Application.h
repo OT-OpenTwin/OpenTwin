@@ -117,4 +117,6 @@ public:
 
 private:
 	PythonAPI _pythonAPI;
+
+	void ProcessScriptExecution(std::vector<std::string> scripts, std::vector<ot::VariableBundle> allParameter, std::string subsequentFunction, std::string msmdName);
 };

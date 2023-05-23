@@ -14,6 +14,10 @@
 // Open twin header
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
+#include <vector>
+#include <string>
+#include "OpenTwinCore/Variable.h"
+#include "OpenTwinCore/TypeNames.h"
 
 Application * g_instance{ nullptr };
 
@@ -53,6 +57,9 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 }
 
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	try
@@ -63,7 +70,62 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS)
 			{
+				std::string subsequentFunction = _doc[OT_ACTION_PARAM_MODEL_FunctionName].GetString();
+				std::string msmdName = _doc["MSMD"].GetString();
+				std::string senderURL = _doc[OT_ACTION_PARAM_SENDER_URL].GetString();
 
+				auto scriptArray = _doc["Scripts"].GetArray();
+				std::vector<std::string> scripts;
+				for (auto& element : scriptArray)
+				{
+					scripts.push_back(element.GetString());
+				}
+
+				auto parameterArray = _doc["Parameter"].GetArray();
+				std::vector<ot::VariableBundle> allParameter;
+				for (auto& element : parameterArray)
+				{
+					auto subDocument = element.GetObject();
+					ot::VariableBundle parameter;
+					for (auto& subElement : subDocument)
+					{
+						std::string name = subElement.name.GetString();
+						std::string type = subElement.value.GetString();
+						if (type == ot::TypeNames::getStringTypeName())
+						{
+							ot::Variable<std::string> var(name, type);
+							parameter.AddVariable(var);
+						}
+						else if (type == ot::TypeNames::getDoubleTypeName())
+						{
+							ot::Variable<double> var(name, type);
+							parameter.AddVariable(var);
+						}
+						else if (type == ot::TypeNames::getFloatTypeName())
+						{
+							ot::Variable<float> var(name, type);
+							parameter.AddVariable(var);
+						}
+						else if (type == ot::TypeNames::getInt32TypeName())
+						{
+							ot::Variable<int32_t> var(name, type);
+							parameter.AddVariable(var);
+						}
+						else if (type == ot::TypeNames::getInt64TypeName())
+						{
+							ot::Variable<int64_t> var(name, type);
+							parameter.AddVariable(var);
+						}
+						else if (type == ot::TypeNames::getBoolTypeName())
+						{
+							ot::Variable<bool> var(name, type);
+							parameter.AddVariable(var);
+						}
+					}
+					allParameter.push_back(parameter);
+				}
+				std::thread workerThread(&Application::ProcessScriptExecution,this, scripts, allParameter, subsequentFunction, msmdName);
+				workerThread.detach();
 			}
 		}
 		return returnMessage;
@@ -139,6 +201,54 @@ void Application::settingsSynchronized(ot::SettingsData * _dataset) {
 
 bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	return false;
+}
+
+void Application::ProcessScriptExecution(std::vector<std::string> scripts, std::vector<ot::VariableBundle> allParameter, std::string subsequentFunction, std::string msmdName)
+{
+
+	_pythonAPI.InterpreteString(scripts, allParameter);
+
+
+	OT_rJSON_createDOC(newDocument);
+
+	OT_rJSON_createValueArray(parameter);
+	for (auto& element : allParameter)
+	{
+		OT_rJSON_createValueObject(subDoc);
+
+		for (ot::Variable<int32_t>& intVariable : (*element.GetVariablesInt32()))
+		{
+			ot::rJSON::add(newDocument, subDoc, intVariable.name, intVariable.value);
+		}
+		for (ot::Variable<int64_t>& intVariable : (*element.GetVariablesInt64()))
+		{
+			//Takes only unsinged int64!!
+			//ot::rJSON::add(newDocument, subDoc, intVariable.name, intVariable.value);
+		}
+		for (ot::Variable<std::string>& intVariable : (*element.GetVariablesString()))
+		{
+			ot::rJSON::add(newDocument, subDoc, intVariable.name, intVariable.value);
+		}
+		for (ot::Variable<bool>& intVariable : (*element.GetVariablesBool()))
+		{
+			ot::rJSON::add(newDocument, subDoc, intVariable.name, intVariable.value);
+		}
+		for (ot::Variable<double>& intVariable : (*element.GetVariablesDouble()))
+		{
+			ot::rJSON::add(newDocument, subDoc, intVariable.name, intVariable.value);
+		}
+		for (ot::Variable<float>& intVariable : (*element.GetVariablesFloat()))
+		{
+			ot::rJSON::add(newDocument, subDoc, intVariable.name, intVariable.value);
+		}
+		parameter.PushBack(subDoc, newDocument.GetAllocator());
+	}
+	ot::rJSON::add(newDocument, "Parameter", parameter);
+
+	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
+	ot::rJSON::add(newDocument, "MSMD", msmdName);
+	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
 }
 
 // ##################################################################################################################################################################################################################
