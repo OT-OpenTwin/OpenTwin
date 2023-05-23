@@ -298,9 +298,16 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 
 			ot::EntityInformation entityInfo;
 			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
-			_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+			if (allScripts.size() > 0)
+			{
+				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+				tableRange->createProperties(_scriptFolder,_scriptFolderUID, entityInfo.getName(), entityInfo.getID());
+			}
+			else
+			{
+				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1);
+			}
 
-			tableRange->createProperties(_scriptFolder,_scriptFolderUID, entityInfo.getName(), entityInfo.getID());
 
 			tableRange->StoreToDataBase();
 			topologyEntityIDList.push_back(tableRange->getEntityID());
