@@ -133,6 +133,12 @@ bool EntityTableSelectedRanges::getConsiderForBatchprocessing()
 	return considerForBatchProcessing->getValue();
 }
 
+void EntityTableSelectedRanges::setConsiderForBatchprocessing(bool considerForBatchprocessing)
+{
+	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
+	considerForBatchProcessing->setValue(considerForBatchprocessing);
+}
+
 bool EntityTableSelectedRanges::getPassOnScript()
 {
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNamePassOnScript));

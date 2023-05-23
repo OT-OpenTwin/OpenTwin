@@ -709,7 +709,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 			{
 				quantities.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				quantities->setName(newMSMD->getName() + "/" + _quantityFolder);
-				parameter->CreateProperties(EntityParameterizedDataCategorization::quantity);
+				quantities->CreateProperties(EntityParameterizedDataCategorization::quantity);
 			}
 			newSelectionName = CreateNewUniqueTopologyName(quantities->getName(), _selectionRangeName);
 		}
@@ -775,6 +775,14 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 				}
 			}
 		}
+
+		bool passOnScript = selection->getPassOnScript();
+		if (passOnScript)
+		{
+			newSelections.back()->setConsiderForBatchprocessing(true);
+			selection->setConsiderForBatchprocessing(false);
+			newSelections.push_back(selection);
+		}
 		variables++;
 	}
 
@@ -809,6 +817,10 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 	}
 	_modelComponent->addEntitiesToModel(topologyEntityIDs, topologyEntityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Automatic creation of " + newMSMD->getName());
 
+	for (auto& selection : newSelections)
+	{
+		selection->updateFromProperties();
+	}
 }
 
 

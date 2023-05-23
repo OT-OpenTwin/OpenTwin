@@ -20,6 +20,7 @@ public:
 	const std::string getTableOrientation() const { return _tableOrientation; }
 	void getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t & leftColumn, uint32_t & rightColumn);
 	bool getConsiderForBatchprocessing();
+	void setConsiderForBatchprocessing(bool considerForBatchprocessing);
 	bool getPassOnScript();
 	std::string getScriptName();
 	void AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell);
