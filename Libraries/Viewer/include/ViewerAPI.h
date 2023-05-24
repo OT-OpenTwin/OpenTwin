@@ -196,8 +196,6 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void addNewVersionGraphStateAndActivate(ot::UID _viewerID, const std::string &newVersion, const std::string &activeBranch, const std::string &parentVersion, const std::string &description);
 
-	__declspec(dllexport) void setBlockDiagramEditor(ot::UID _viewerID);
-
 	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
 	__declspec(dllexport) QWidget * getPlotWidget(ot::UID _viewerID);
@@ -218,7 +216,6 @@ namespace ViewerAPI
 	__declspec(dllexport) QWidget * getVersionGraphWidget(ot::UID _viewerID);
 
 	__declspec(dllexport) void viewerTabChanged(const std::string & _tabTitle);
-
 
 	__declspec(dllexport) void shortcutActivated(const std::string & _keySequence);
 

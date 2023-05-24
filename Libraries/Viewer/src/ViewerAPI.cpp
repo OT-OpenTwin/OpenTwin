@@ -722,7 +722,6 @@ void ViewerAPI::setVersionGraph(ot::UID _viewerID, std::list<std::tuple<std::str
 	}
 }
 
-
 void ViewerAPI::setVersionGraphActive(ot::UID _viewerID, const std::string &activeVersion, const std::string &activeBranch)
 {
 	auto itm = viewerManager.find(_viewerID);
@@ -820,6 +819,7 @@ bool ViewerAPI::setTable(ot::UID _viewerID, ot::UID entityID, ot::UID entityVers
 		return false;
 	}
 }
+
 void ViewerAPI::setTableSelection(ot::UID _viewerID, std::vector<ot::TableRange> ranges)
 {
 	Viewer * v = viewerManager[_viewerID];
@@ -835,7 +835,6 @@ void ViewerAPI::setTableSelection(ot::UID _viewerID, std::vector<ot::TableRange>
 	}
 }
 
-
 std::vector<ot::TableRange> ViewerAPI::GetSelectedTableRange(ot::UID _viewerID)
 {
 	Viewer * v = viewerManager[_viewerID];
@@ -849,8 +848,6 @@ std::vector<ot::TableRange> ViewerAPI::GetSelectedTableRange(ot::UID _viewerID)
 		throw std::runtime_error("Tableviewer is not connected with viewer.");
 	}
 }
-
-
 
 void ViewerAPI::ChangeColourOfSelection(ot::UID _viewerID, ot::Color backGroundColour)
 {
@@ -902,8 +899,6 @@ void ViewerAPI::viewerTabChanged(const std::string & _tabTitle)
 		globalActiveModel->viewerTabChanged(_tabTitle);
 	}
 }
-
-
 
 void ViewerAPI::shortcutActivated(const std::string & _keySequence) {
 	if (globalActiveModel != nullptr) {

@@ -55,16 +55,10 @@
     <ClCompile Include="src\AbstractPlot.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\XYPlot_BAK.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\xyPlot.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PolarPlot_BAK.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\polarPlot.cpp">
