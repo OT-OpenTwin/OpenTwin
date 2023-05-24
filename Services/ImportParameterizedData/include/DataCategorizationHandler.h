@@ -99,10 +99,11 @@ private:
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
 	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
 	
-	std::map<std::string, std::pair<ot::UID, ot::UID>> GetAllNewlyReferencedTables(std::vector<ot::VariableBundle>& allUpdatedVariables);
-	std::map<std::string, ot::UID> GetAllNewlyReferencedScripts(std::vector<ot::VariableBundle>& allUpdatedVariables);
+	std::map<std::string, std::pair<ot::UID, ot::UID>> GetAllTables();
+	std::map<std::string, ot::UID> GetAllScripts();
 	
-	void SendPythonExecutionRequest(std::map<std::string, std::string>& pythonScripts,const std::string& msmdName);
-	void CreateUpdatedSelections(std::string msmdName, std::vector<ot::VariableBundle>& bundles);
-
+	void SendPythonExecutionRequest(std::vector<std::string>& pythonScripts,const std::string& msmdName);
+	void UpdateVariables(OT_rJSON_doc& document);
+	
+	std::vector<std::string> _allTableNames;
 };

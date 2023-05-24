@@ -24,5 +24,6 @@ namespace ot
 		static std::string getDoubleTypeName() { return "double"; };
 		static std::string getFloatTypeName() { return "float"; };
 		static std::string getCharTypeName() { return "char"; };
+		static std::string getBoolTypeName() { return "bool"; };
 	};
 }

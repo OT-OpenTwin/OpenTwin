@@ -11,7 +11,7 @@
 // Open twin header
 #include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
 #include "OpenTwinFoundation/ApplicationBase.h" // Base class
-//#include "PythonAPI.h"
+#include "PythonAPI.h"
 
 // C++ header
 #include <string>
@@ -115,7 +115,8 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(ot::AbstractSettingsItem * _item);
 
-
 private:
-	//PythonAPI _pythonAPI;
+	PythonAPI _pythonAPI;
+
+	void ProcessScriptExecution(std::vector<std::string> scripts, std::vector<ot::VariableBundle> allParameter, std::string subsequentFunction, std::string msmdName);
 };

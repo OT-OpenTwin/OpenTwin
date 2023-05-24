@@ -14,9 +14,7 @@ DataCategorizationHandler::DataCategorizationHandler(std::string baseFolder, std
 	:_baseFolder(baseFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder), _previewTableName(previewTableName),
 	_rmdColour(88, 175, 233, 100), _msmdColour(166, 88, 233, 100), _parameterColour(88, 233, 122, 100), _quantityColour(233, 185, 88, 100)
 {
-	/*std::vector<ot::VariableBundle> empty;
-	std::vector<std::string> hello{ "print(\"Hallo\")\n","print(\"World\")" };
-	_pythonAPI.InterpreteString(hello, empty);*/
+
 }
 
 void DataCategorizationHandler::AddSelectionsAsRMD(std::list<ot::UID> selectedEntities)
@@ -48,6 +46,10 @@ void DataCategorizationHandler::ModelComponentWasSet()
 	ot::EntityInformation entityInfo;
 	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
 	_scriptFolderUID = entityInfo.getID();
+	std::list<std::string> allItems =	_modelComponent->getListOfFolderItems(_baseFolder);
+	_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
+	_rmdPath = entityInfo.getName();
+
 }
 
 void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
@@ -69,7 +71,6 @@ void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& se
 		bool hasACategorizationEntitySelected = false;
 		Application::instance()->prefetchDocumentsFromStorage(selectedEntities);
 		ClassFactory classFactory;
-		_rmdPath = entityInfos.begin()->getName();
 
 		for (ot::UID entityID : selectedEntities)
 		{
@@ -297,9 +298,16 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 
 			ot::EntityInformation entityInfo;
 			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
-			_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+			if (allScripts.size() > 0)
+			{
+				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+				tableRange->createProperties(_scriptFolder,_scriptFolderUID, entityInfo.getName(), entityInfo.getID());
+			}
+			else
+			{
+				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1);
+			}
 
-			tableRange->createProperties(_scriptFolder,_scriptFolderUID, entityInfo.getName(), entityInfo.getID());
 
 			tableRange->StoreToDataBase();
 			topologyEntityIDList.push_back(tableRange->getEntityID());
@@ -326,119 +334,6 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 
 	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
-}
-
-void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
-{
-	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
-	_allRelevantTableSelectionsByMSMD.clear();
-	_allVariableBundlesByMSMD.clear();
-
-	for (const auto& tableSelection : allRelevantTableSelections)
-	{
-		std::string tableSelectionName = tableSelection->getName();
-		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(_msmdFolder), tableSelectionName.size());
-		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
-		_allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
-	}
-	allRelevantTableSelections.clear();
-	
-	std::list< std::string> scriptNames;
-	for (const auto& element : _allRelevantTableSelectionsByMSMD)
-	{
-		for (const auto& selection : element.second)
-		{
-			scriptNames.push_back(selection->getScriptName());
-		}
-	}
-	scriptNames.unique();
-
-	std::map<std::string, std::string> pythonScripts = LoadAllPythonScripts(scriptNames);
-
-
-	for (auto& element : _allRelevantTableSelectionsByMSMD)
-	{
-
-		_allVariableBundlesByMSMD[element.first].reserve(element.second.size());
-		std::vector<std::string> scripts;
-		scripts.reserve(element.second.size());
-
-		for (const auto& selection : element.second)
-		{
-
-			uint32_t topRow, bottomRow, leftCollumn, rightColumn;
-			selection->getSelectedRange(topRow, bottomRow, leftCollumn, rightColumn);
-			ot::VariableBundle variables;
-			variables.AddVariable(ot::Variable<int32_t>("TopRow", ot::TypeNames::getInt32TypeName(), topRow));
-			variables.AddVariable(ot::Variable<int32_t>("BottomRow", ot::TypeNames::getInt32TypeName(), bottomRow));
-			variables.AddVariable(ot::Variable<int32_t>("LeftColumn", ot::TypeNames::getInt32TypeName(), leftCollumn));
-			variables.AddVariable(ot::Variable<int32_t>("RightColumn", ot::TypeNames::getInt32TypeName(), rightColumn));
-
-			std::string tableName = selection->getTableName();
-			variables.AddVariable(ot::Variable<std::string>("TableName", ot::TypeNames::getStringTypeName(), tableName));
-			std::string scriptName = selection->getScriptName();
-			variables.AddVariable(ot::Variable<std::string>("ScriptName", ot::TypeNames::getStringTypeName(), scriptName));
-
-			_allVariableBundlesByMSMD[element.first].push_back(variables);
-			std::string script = pythonScripts[scriptName];
-			script = "TopRow=" + std::to_string(topRow) + "\n" +
-				"BottomRow=" + std::to_string(bottomRow) + "\n" +
-				"LeftColumn=" + std::to_string(leftCollumn) + "\n" +
-				"RightColumn=" + std::to_string(rightColumn) + "\n" +
-				"TableName=" + tableName + "\n" +
-				"ScriptName=" + scriptName + "\n" +
-				script;
-			scripts.push_back(script);
-		}
-
-		SendPythonExecutionRequest(pythonScripts, element.first);
-	}
-}
-
-void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
-{
-
-	std::string msmdName = document["MSMD"].GetString();
-	std::vector<ot::VariableBundle> bundles;
-	auto parameterObjects = document["Parameter"].GetArray();
-	auto variableBundle = _allVariableBundlesByMSMD[msmdName].begin();
-	for (auto& parameterObject : parameterObjects)
-	{
-		auto subDocument = parameterObject.GetObject();
-		for (ot::Variable<bool>& variable : (*variableBundle->GetVariablesBool()))
-		{
-			//subDocument[variable.name].GetBool();
-		}
-
-		for (ot::Variable<std::string>& variable : (*variableBundle->GetVariablesString()))
-		{
-
-		}
-
-		for (ot::Variable<int32_t>& variable : (*variableBundle->GetVariablesInt32()))
-		{
-
-		}
-
-		for (ot::Variable<int64_t>& variable : (*variableBundle->GetVariablesInt64()))
-		{
-
-		}
-
-		for (ot::Variable<double>& variable : (*variableBundle->GetVariablesDouble()))
-		{
-
-		}
-
-		for (ot::Variable<float>& variable : (*variableBundle->GetVariablesFloat()))
-		{
-
-		}
-		//auto subDocument = parameter.GetObject();
-
-		
-	}
-
 }
 
 std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInformation selectedPreviewTable)
@@ -617,49 +512,25 @@ std::map<std::string, std::string> DataCategorizationHandler::LoadAllPythonScrip
 }
 
 
-std::map<std::string, std::pair<ot::UID, ot::UID>> DataCategorizationHandler::GetAllNewlyReferencedTables(std::vector<ot::VariableBundle>& allUpdatedVariables)
+std::map<std::string, std::pair<ot::UID, ot::UID>> DataCategorizationHandler::GetAllTables()
 {
 	std::map<std::string, std::pair<ot::UID, ot::UID>> allTableIdentifierByName;
 	std::list<std::string> allTables =	_modelComponent->getListOfFolderItems(_tableFolder);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(allTables, entityInfos);
 
-	for (auto& variables : allUpdatedVariables)
+	
+	for (const auto& entityInfo : entityInfos)
 	{
-		for (int i = 0; i < variables.GetVariablesString()->size(); i++)
-		{
-			ot::Variable<std::string>* variable = &(*variables.GetVariablesString())[i];
-			if (variable->name == "TableName")
-			{
-				if (allTableIdentifierByName.find(variable->name) == allTableIdentifierByName.end())
-				{
-					bool found = false;
-					std::pair<ot::UID, ot::UID> tableIdentifier;
-					for (const auto& entityInfo : entityInfos)
-					{
-						if (entityInfo.getName() == variable->name)
-						{
-							found = true;
-							tableIdentifier = { entityInfo.getID(), entityInfo.getVersion() };
-							break;
-						}
-					}
-					if (!found)
-					{
-						Documentation::INSTANCE()->AddToDocumentation("Updated table " + variable->name + " was not found\n");
-					}
-					else
-					{
-						allTableIdentifierByName[variable->value] = tableIdentifier;
-					}
-				}
-			}
-		}
+		
+		std::pair<ot::UID, ot::UID> tableIdentifier = { entityInfo.getID(), entityInfo.getVersion() };
+		allTableIdentifierByName[entityInfo.getName()] = tableIdentifier;
 	}
+	
 	return allTableIdentifierByName;
 }
 
-std::map<std::string, ot::UID> DataCategorizationHandler::GetAllNewlyReferencedScripts(std::vector<ot::VariableBundle>& allUpdatedVariables)
+std::map<std::string, ot::UID> DataCategorizationHandler::GetAllScripts()
 {
 	std::map<std::string, ot::UID> scriptUIDsByName;
 	
@@ -667,53 +538,94 @@ std::map<std::string, ot::UID> DataCategorizationHandler::GetAllNewlyReferencedS
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(allScripts, entityInfos);
 
-	for (auto& variables : allUpdatedVariables)
+	for (const auto& entityInfo : entityInfos)
 	{
-		for (int i = 0; i < variables.GetVariablesString()->size(); i++)
-		{
-			ot::Variable<std::string>* variable = &(*variables.GetVariablesString())[i];
-			if (variable->name == "ScripName")
-			{
-				if (scriptUIDsByName.find(variable->name) == scriptUIDsByName.end())
-				{
-					bool found = false;
-					ot::UID scriptUID;
-					for (const auto& entityInfo : entityInfos)
-					{
-						if (entityInfo.getName() == variable->name)
-						{
-							found = true;
-							scriptUID = entityInfo.getID();
-							break;
-						}
-					}
-					if (!found)
-					{
-						Documentation::INSTANCE()->AddToDocumentation("Updated table " + variable->name + " was not found\n");
-					}
-					else
-					{
-						scriptUIDsByName[variable->value] = scriptUID;
-					}
-				}
-			}
-		}
+		scriptUIDsByName[entityInfo.getName()] = entityInfo.getID();
 	}
 	return scriptUIDsByName;
 }
 
-void DataCategorizationHandler::SendPythonExecutionRequest(std::map<std::string, std::string>& pythonScripts, const std::string& msmdName)
+void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
+{
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
+	_allRelevantTableSelectionsByMSMD.clear();
+	_allVariableBundlesByMSMD.clear();
+	_allTableNames.clear();
+
+	for (const auto& tableSelection : allRelevantTableSelections)
+	{
+		std::string tableSelectionName = tableSelection->getName();
+		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(_msmdFolder), tableSelectionName.size());
+		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
+		_allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
+	}
+	allRelevantTableSelections.clear();
+
+	std::list< std::string> scriptNames;
+	for (const auto& element : _allRelevantTableSelectionsByMSMD)
+	{
+		for (const auto& selection : element.second)
+		{
+			scriptNames.push_back(selection->getScriptName());
+		}
+	}
+	scriptNames.unique();
+
+	std::map<std::string, std::string> pythonScripts = LoadAllPythonScripts(scriptNames);
+
+
+	for (auto& element : _allRelevantTableSelectionsByMSMD)
+	{
+
+		_allVariableBundlesByMSMD[element.first].reserve(element.second.size());
+		std::vector<std::string> scripts;
+		scripts.reserve(element.second.size());
+
+		for (const auto& selection : element.second)
+		{
+
+			uint32_t topRow, bottomRow, leftCollumn, rightColumn;
+			selection->getSelectedRange(topRow, bottomRow, leftCollumn, rightColumn);
+			ot::VariableBundle variables;
+			variables.AddVariable(ot::Variable<int32_t>("TopRow", ot::TypeNames::getInt32TypeName(), topRow));
+			variables.AddVariable(ot::Variable<int32_t>("BottomRow", ot::TypeNames::getInt32TypeName(), bottomRow));
+			variables.AddVariable(ot::Variable<int32_t>("LeftColumn", ot::TypeNames::getInt32TypeName(), leftCollumn));
+			variables.AddVariable(ot::Variable<int32_t>("RightColumn", ot::TypeNames::getInt32TypeName(), rightColumn));
+
+			std::string tableName = selection->getTableName();
+			_allTableNames.push_back(tableName);
+			variables.AddVariable(ot::Variable<std::string>("TableName", ot::TypeNames::getStringTypeName(), tableName));
+			std::string scriptName = selection->getScriptName();
+			variables.AddVariable(ot::Variable<std::string>("ScriptName", ot::TypeNames::getStringTypeName(), scriptName));
+
+			_allVariableBundlesByMSMD[element.first].push_back(variables);
+			std::string script = pythonScripts[scriptName];
+			script = "TopRow=" + std::to_string(topRow) + "\n" +
+				"BottomRow=" + std::to_string(bottomRow) + "\n" +
+				"LeftColumn=" + std::to_string(leftCollumn) + "\n" +
+				"RightColumn=" + std::to_string(rightColumn) + "\n" +
+				"TableName=\"" + tableName + "\"\n" +
+				"ScriptName=\"" + scriptName + "\"\n" +
+				script;
+			scripts.push_back(script);
+		}
+
+		SendPythonExecutionRequest(scripts, element.first);
+	}
+}
+
+void DataCategorizationHandler::SendPythonExecutionRequest(std::vector<std::string>& pythonScripts, const std::string& msmdName)
 {
 	OT_rJSON_createDOC(newDocument);
-	OT_rJSON_createValueArray(array);
+	OT_rJSON_createValueArray(scripts);
 
-	for (const auto& element : pythonScripts)
+	for (const auto& scriptContent : pythonScripts)
 	{
 		rapidjson::Value strVal;
-		strVal.SetString(element.second.c_str(), element.second.length(), newDocument.GetAllocator());
-		array.PushBack(strVal, newDocument.GetAllocator());
+		strVal.SetString(scriptContent.c_str(), static_cast<uint32_t>(scriptContent.length()), newDocument.GetAllocator());
+		scripts.PushBack(strVal, newDocument.GetAllocator());
 	}
-	ot::rJSON::add(newDocument, "Scripts", array);
+	ot::rJSON::add(newDocument, "Scripts", scripts);
 
 	OT_rJSON_createValueArray(parameter);
 	for (auto& element : _allVariableBundlesByMSMD[msmdName])
@@ -748,7 +660,8 @@ void DataCategorizationHandler::SendPythonExecutionRequest(std::map<std::string,
 	}
 	ot::rJSON::add(newDocument, "Parameter", parameter);
 
-	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
+	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
 	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, "createUpdatedSelections");
 	ot::rJSON::add(newDocument, "MSMD", msmdName);
 	ot::rJSON::add(newDocument, OT_ACTION_PARAM_SENDER_URL, Application::instance()->serviceURL());
@@ -756,10 +669,16 @@ void DataCategorizationHandler::SendPythonExecutionRequest(std::map<std::string,
 
 }
 
-void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, std::vector<ot::VariableBundle>& bundles)
+
+void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 {
-	std::map<std::string, std::pair<ot::UID, ot::UID>> allReferencedTables = GetAllNewlyReferencedTables(bundles);
-	std::map<std::string, ot::UID> allReferencedScripts = GetAllNewlyReferencedScripts(bundles);
+	UpdateVariables(document);
+
+	std::string msmdName = document["MSMD"].GetString();
+	auto bundles = _allVariableBundlesByMSMD[msmdName];
+
+	std::map<std::string, std::pair<ot::UID, ot::UID>> allTables = GetAllTables();
+	std::map<std::string, ot::UID> allScripts = GetAllScripts();
 
 	std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	newMSMD->setName(CreateNewUniqueTopologyName(_rmdPath, _msmdFolder));
@@ -769,9 +688,12 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 	std::vector<std::shared_ptr<EntityTableSelectedRanges>> newSelections;
 	newSelections.reserve(_allRelevantTableSelectionsByMSMD[msmdName].size());
 
-	auto variables = bundles.begin();
+	auto tableSelectionsForThisMSMD = _allRelevantTableSelectionsByMSMD[msmdName];
+	std::vector<std::string> parameterSelectionNames;
+	std::vector<std::string> quantitySelectionNames;
+	std::vector<std::string> msmdSelectionNames;
 
-	for (const auto& selection : _allRelevantTableSelectionsByMSMD[msmdName])
+	for (const auto& selection : tableSelectionsForThisMSMD)
 	{
 		std::string newSelectionName = "";
 		if (selection->getName().find(_parameterFolder) != string::npos)
@@ -780,8 +702,9 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 			{
 				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				parameter->setName(newMSMD->getName() + "/" + _parameterFolder);
+				parameter->CreateProperties(EntityParameterizedDataCategorization::parameter);
 			}
-			newSelectionName = CreateNewUniqueTopologyName(parameter->getName(), _selectionRangeName);
+			parameterSelectionNames.push_back(_selectionRangeName);
 		}
 		else if (selection->getName().find(_quantityFolder) != string::npos)
 		{
@@ -789,19 +712,55 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 			{
 				quantities.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				quantities->setName(newMSMD->getName() + "/" + _quantityFolder);
+				quantities->CreateProperties(EntityParameterizedDataCategorization::quantity);
 			}
-			newSelectionName = CreateNewUniqueTopologyName(quantities->getName(), _selectionRangeName);
+			quantitySelectionNames.push_back(_selectionRangeName);
 		}
 		else
 		{
-			newSelectionName = CreateNewUniqueTopologyName(newMSMD->getName(), _selectionRangeName);
+			msmdSelectionNames.push_back(_selectionRangeName);
+		}
+	}
+
+	if (parameterSelectionNames.size() != 0)
+	{
+		parameterSelectionNames = CreateNewUniqueTopologyName(parameter->getName(), _selectionRangeName, parameterSelectionNames.size());
+	}
+	if (quantitySelectionNames.size() != 0)
+	{
+		quantitySelectionNames = CreateNewUniqueTopologyName(quantities->getName(), _selectionRangeName, quantitySelectionNames.size());
+	}
+	if (msmdSelectionNames.size() != 0)
+	{
+		msmdSelectionNames = CreateNewUniqueTopologyName(newMSMD->getName(), _selectionRangeName, msmdSelectionNames.size());
+	}
+
+	auto nextParameterSelectionName = parameterSelectionNames.begin();
+	auto nextQuantitySelectionNAme = quantitySelectionNames.begin();
+	auto nextMSMDSelectionName = msmdSelectionNames.begin();
+
+	auto variables = bundles.begin();
+	for (const auto& selection : tableSelectionsForThisMSMD)
+	{
+		newSelections.push_back(std::shared_ptr<EntityTableSelectedRanges>(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService)));
+		if (selection->getName().find(_parameterFolder) != string::npos)
+		{
+			newSelections.back()->setName(*nextParameterSelectionName);
+			nextParameterSelectionName++;
+		}
+		else if (selection->getName().find(_quantityFolder) != string::npos)
+		{
+			newSelections.back()->setName(*nextQuantitySelectionNAme);
+			nextQuantitySelectionNAme++;
+		}
+		else
+		{
+			newSelections.back()->setName(*nextMSMDSelectionName);
+			nextMSMDSelectionName++;
 		}
 
-		newSelections.push_back(std::shared_ptr<EntityTableSelectedRanges>(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService)));
-		newSelections.back()->setName(newSelectionName);
-			
 		uint32_t topRow(-1), bottomRow(-1), leftCollumn(-1), rightColumn(-1);
-		for (int i =0; i < variables->GetVariablesInt32()->size(); i++)
+		for (int i = 0; i < variables->GetVariablesInt32()->size(); i++)
 		{
 			ot::Variable<int32_t>* variable = &(*variables->GetVariablesInt32())[i];
 			if (variable->name == "TopRow")
@@ -816,12 +775,12 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 			{
 				leftCollumn = variable->value;
 			}
-			else if (variable->name == "RightColumn") 
+			else if (variable->name == "RightColumn")
 			{
 				rightColumn = variable->value;
 			}
 		}
-		newSelections.back()->AddRange(topRow,bottomRow,leftCollumn,rightColumn);
+		newSelections.back()->AddRange(topRow, bottomRow, leftCollumn, rightColumn);
 
 		std::string scriptName(""), tableName("");
 		for (int i = 0; i < variables->GetVariablesString()->size(); i++)
@@ -830,10 +789,10 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 			if (variable->name == "TableName")
 			{
 				tableName = variable->value;
-				if (allReferencedTables.find(tableName) != allReferencedTables.end())
+				if (allTables.find(tableName) != allTables.end())
 				{
-					std::pair<ot::UID, ot::UID > tableIdentifier = allReferencedTables[tableName];
-					newSelections.back()->SetTableProperties(tableName, tableIdentifier.first, tableIdentifier.second,selection->getTableOrientation()); //ToDo: Should also be editable viathe python script.
+					std::pair<ot::UID, ot::UID > tableIdentifier = allTables[tableName];
+					newSelections.back()->SetTableProperties(tableName, tableIdentifier.first, tableIdentifier.second, selection->getTableOrientation()); //ToDo: Should also be editable viathe python script.
 				}
 				else
 				{
@@ -843,9 +802,9 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 			else if (variable->name == "ScriptName")
 			{
 				scriptName = variable->value;
-				if (allReferencedScripts.find(scriptName) != allReferencedScripts.end())
+				if (allScripts.find(scriptName) != allScripts.end())
 				{
-					ot::UID scriptUID = allReferencedScripts[scriptName];
+					ot::UID scriptUID = allScripts[scriptName];
 					newSelections.back()->createProperties(_scriptFolder, _scriptFolderUID, scriptName, scriptUID);
 				}
 				else
@@ -853,6 +812,14 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 					Documentation::INSTANCE()->AddToDocumentation("Creation of range selection based on " + selection->getName() + " skipped, since the referenced python script was not found.");
 				}
 			}
+		}
+
+		bool passOnScript = selection->getPassOnScript();
+		if (passOnScript)
+		{
+			newSelections.back()->setConsiderForBatchprocessing(true);
+			selection->setConsiderForBatchprocessing(false);
+			newSelections.push_back(selection);
 		}
 		variables++;
 	}
@@ -879,7 +846,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 		topologyEntityVersions.push_back(quantities->getEntityStorageVersion());
 		forceVisible.push_back(false);
 	}
-	for (auto& newSelection: newSelections)
+	for (auto& newSelection : newSelections)
 	{
 		newSelection->StoreToDataBase();
 		topologyEntityIDs.push_back(newSelection->getEntityID());
@@ -887,8 +854,57 @@ void DataCategorizationHandler::CreateUpdatedSelections(std::string msmdName, st
 		forceVisible.push_back(false);
 	}
 	_modelComponent->addEntitiesToModel(topologyEntityIDs, topologyEntityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Automatic creation of " + newMSMD->getName());
-
 }
+
+
+void DataCategorizationHandler::UpdateVariables(OT_rJSON_doc& document)
+{
+	std::string msmdName = document["MSMD"].GetString();
+	std::vector<ot::VariableBundle> bundles;
+	auto parameterObjects = document["Parameter"].GetArray();
+	auto currentVariableBundle = _allVariableBundlesByMSMD[msmdName].begin();
+	for (auto& parameterObject : parameterObjects)
+	{
+		auto subDocument = parameterObject.GetObject();
+		for (ot::Variable<bool>& variable : (*currentVariableBundle->GetVariablesBool()))
+		{
+			std::string name = variable.name;
+			variable.value = subDocument[name.c_str()].GetBool();
+		}
+
+		for (ot::Variable<std::string>& variable : (*currentVariableBundle->GetVariablesString()))
+		{
+			std::string name = variable.name;
+			variable.value = subDocument[name.c_str()].GetString();
+		}
+
+		for (ot::Variable<int32_t>& variable : (*currentVariableBundle->GetVariablesInt32()))
+		{
+			std::string name = variable.name;
+			variable.value = subDocument[name.c_str()].GetInt();
+		}
+
+		for (ot::Variable<int64_t>& variable : (*currentVariableBundle->GetVariablesInt64()))
+		{
+			std::string name = variable.name;
+			variable.value = subDocument[name.c_str()].GetInt64();
+		}
+
+		for (ot::Variable<double>& variable : (*currentVariableBundle->GetVariablesDouble()))
+		{
+			std::string name = variable.name;
+			variable.value = subDocument[name.c_str()].GetDouble();
+		}
+
+		for (ot::Variable<float>& variable : (*currentVariableBundle->GetVariablesFloat()))
+		{
+			std::string name = variable.name;
+			variable.value = subDocument[name.c_str()].GetFloat();
+		}
+		currentVariableBundle++;
+	}
+}
+
 
 void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 {

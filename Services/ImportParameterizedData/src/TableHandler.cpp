@@ -18,7 +18,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 		assert(0); // Only EntityParameterizedDataSource should reach here.
 	}
 	auto topoEnt = new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-	std::string fullName = CreateNewUniqueTopologyName(_tableFolder, sourceFile->getFileName());
+	std::string fullName = CreateNewUniqueTopologyNamePlainPossible(_tableFolder, sourceFile->getFileName());
 	topoEnt->setName(fullName);
 	std::string type = sourceFile->getFileType();
 	auto tableExtractor = FileToTableExtractorFactory::GetInstance()->Create(sourceFile->getFileType());

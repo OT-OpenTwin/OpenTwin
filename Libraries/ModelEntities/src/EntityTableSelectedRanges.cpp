@@ -46,10 +46,12 @@ bool EntityTableSelectedRanges::updateFromProperties(void)
 	
 	auto showScriptSelection = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
 	auto scriptSelectionProperty = getProperties().getProperty(_pythonScriptProperty);
+	auto passOnScriptProperty = getProperties().getProperty(_propNamePassOnScript);
 
 	if (showScriptSelection->getValue() != scriptSelectionProperty->getVisible())
 	{
 		scriptSelectionProperty->setVisible(showScriptSelection->getValue());
+		passOnScriptProperty->setVisible(showScriptSelection->getValue());
 		return true;
 	}
 	else
@@ -88,7 +90,9 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	auto updateScript = new EntityPropertiesEntityList(_pythonScriptProperty, pythonScriptFolder, pythonScriptFolderID, pythonScriptName, pythonScriptID);
 	updateScript->setVisible(false);
 	
-	
+	auto passOnScript = new EntityPropertiesBoolean(_propNamePassOnScript, false);
+	passOnScript->setVisible(false);
+
 	getProperties().createProperty(topRow, rangeGroup);
 	getProperties().createProperty(bottomRow, rangeGroup);
 	getProperties().createProperty(leftColumn, rangeGroup);
@@ -96,6 +100,7 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 
 	getProperties().createProperty(considerInAutomaticCreation, updateStrategyGroup);
 	getProperties().createProperty(updateScript, updateStrategyGroup);
+	getProperties().createProperty(passOnScript, updateStrategyGroup);
 }
 
 void EntityTableSelectedRanges::SetTableProperties(std::string tableName, ot::UID tableID, ot::UID tableVersion, std::string tableOrientation)
@@ -125,6 +130,18 @@ void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bot
 bool EntityTableSelectedRanges::getConsiderForBatchprocessing()
 {
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
+	return considerForBatchProcessing->getValue();
+}
+
+void EntityTableSelectedRanges::setConsiderForBatchprocessing(bool considerForBatchprocessing)
+{
+	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
+	considerForBatchProcessing->setValue(considerForBatchprocessing);
+}
+
+bool EntityTableSelectedRanges::getPassOnScript()
+{
+	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNamePassOnScript));
 	return considerForBatchProcessing->getValue();
 }
 

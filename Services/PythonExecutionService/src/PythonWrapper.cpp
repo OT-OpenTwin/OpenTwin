@@ -27,6 +27,17 @@ void PythonWrapper::ExecuteString(std::string executionCommand, ot::VariableBund
 	ExtractVariables(globalVariables, activeGlobalDirectory);
 }
 
+void PythonWrapper::ExecuteString(std::string executionCommand, PyObject* activeDirectory)
+{
+	int start = Py_file_input;
+	CPythonObjectNew returnVal = PyRun_String(executionCommand.c_str(), start, activeDirectory, activeDirectory);
+
+	if (returnVal == nullptr)
+	{
+		ThrowPythonException();
+	}
+}
+
 void PythonWrapper::InitializePythonInterpreter()
 {
 	std::wstring pyhtonPath(_pythonPath.begin(), _pythonPath.end());
@@ -40,13 +51,13 @@ void PythonWrapper::InitializePythonInterpreter()
 	}
 
 	_mainModule.reset(PyImport_AddModule("__main__"));
-	
+	_cleanGlobalDirectory.reset(PyModule_GetDict(_mainModule));
 }
 
 void PythonWrapper::operator<<(const std::string& executionCommand)
 {
 	int start = Py_file_input;
-	CPythonObjectNew returnVal = PyRun_String(executionCommand.c_str(), start, _activeGlobalDirectory, _activeGlobalDirectory);
+	CPythonObjectNew returnVal = PyRun_String(executionCommand.c_str(), start, _cleanGlobalDirectory, _cleanGlobalDirectory);
 
 	if (returnVal == nullptr)
 	{
@@ -96,19 +107,19 @@ void PythonWrapper::ExtractVariables(ot::VariableBundle& globalVariables, PyObje
 void PythonWrapper::ExtractVariables(ot::VariableBundle& globalVariables)
 {
 	assert(_activeGlobalDirectory.ReferenceIsSet());
-	ExtractVariables(globalVariables, _activeGlobalDirectory);
+	ExtractVariables(globalVariables, _cleanGlobalDirectory);
 }
 
 void PythonWrapper::InitiateExecutionSequence()
 {
-	_cleanGlobalDirectory.reset(PyModule_GetDict(_mainModule));
-	PyObject* copy = PyDict_Copy(_cleanGlobalDirectory);
-	_activeGlobalDirectory.reset(copy);
+	//_cleanGlobalDirectory.reset(PyModule_GetDict(_mainModule));
+	//PyObject* copy = PyDict_Copy(_cleanGlobalDirectory);
+	//_activeGlobalDirectory.reset(copy);
 }
 
 void PythonWrapper::EndExecutionSequence()
 {
-	_activeGlobalDirectory.FreePythonObject();
+	//_activeGlobalDirectory.FreePythonObject();
 }
 
 void PythonWrapper::ThrowPythonException()
