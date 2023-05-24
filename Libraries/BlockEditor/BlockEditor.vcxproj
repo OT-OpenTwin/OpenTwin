@@ -206,6 +206,7 @@
     <ClCompile Include="src\BlockConnectorManager.cpp" />
     <ClCompile Include="src\BlockFactory.cpp" />
     <ClCompile Include="src\BlockGraphicsObject.cpp" />
+    <ClCompile Include="src\BlockHelper.cpp" />
     <ClCompile Include="src\BlockLayer.cpp" />
     <ClCompile Include="src\BlockNetworkEditor.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -243,6 +244,7 @@
     <ClInclude Include="include\OTBlockEditor\BlockEditorTypes.h" />
     <ClInclude Include="include\OTBlockEditor\BlockFactory.h" />
     <ClInclude Include="include\OTBlockEditor\BlockGraphicsObject.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockHelper.h" />
     <ClInclude Include="include\OTBlockEditor\BlockLayer.h" />
     <ClInclude Include="include\OTBlockEditor\BlockPaintJob.h" />
     <ClInclude Include="include\OTBlockEditor\ImageBlockLayer.h" />

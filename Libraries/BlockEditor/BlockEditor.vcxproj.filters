@@ -46,6 +46,9 @@
     <Filter Include="Header Files\Layers">
       <UniqueIdentifier>{1c0cceb0-7df9-4bca-8b9e-a64dc876adb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{35d8128f-7fb0-4e19-8679-793786c1eeee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -104,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="src\BlockGraphicsObject.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockHelper.cpp">
+      <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +173,9 @@
       <Filter>Header Files\Factories</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockGraphicsObject.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockHelper.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
