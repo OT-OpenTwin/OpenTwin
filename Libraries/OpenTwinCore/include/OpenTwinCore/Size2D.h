@@ -1,6 +1,6 @@
-//! @file Point2D.h
+//! @file Size2D.h
 //! @author Alexander Kuester (alexk95)
-//! @date April 2023
+//! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -11,55 +11,46 @@
 
 namespace ot {
 
-	template <class T> 
-	class __declspec(dllexport) Point2DTemplate : public ot::Serializable {
+	template <class T>
+	class Size2DTemplate : public ot::Serializable {
 	public:
-		Point2DTemplate() : m_x((T)0), m_y((T)0) {};
+		Size2DTemplate() : m_w((T)0), m_h((T)0) {};
+		Size2DTemplate(T _w, T _h) : m_w(_w), m_h(_h) {};
+		Size2DTemplate(const Size2DTemplate<T>& _other) : m_w(_other.m_w), m_h(_other.m_h) {};
+		virtual ~Size2DTemplate() {};
 
-		//! @brief Constructor
-		//! @param _x The initial X value
-		//! @param _y The initial Y value
-		Point2DTemplate(T _x, T _y) : m_x(_x), m_y(_y) {};
+		Size2DTemplate& operator = (const Size2DTemplate<T>& _other) { m_w = _other.m_w; m_h = _other.m_h; return *this; };
+		bool operator == (const Size2DTemplate<T>& _other) const { return m_w == _other.m_w && m_h == _other.m_h; };
+		bool operator != (const Size2DTemplate<T>& _other) const { return m_w != _other.m_w || m_h != _other.m_h; };
 
-		//! @brief Copy constructor
-		//! @param _other The other 2D point
-		Point2DTemplate(const Point2DTemplate<T>& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
+		//! @brief Set width
+		//! @param _w Width to set
+		void setWidth(T _w) { m_w = _w; };
 
-		virtual ~Point2DTemplate() {};
+		//! @brief Return the width
+		T width(void) const { return m_w; };
 
-		Point2DTemplate<T>& operator = (const Point2DTemplate<T>& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
-		bool operator == (const Point2DTemplate<T>& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
-		bool operator != (const Point2DTemplate<T>& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
+		//! @brief Set height
+		//! @param _h Height to set
+		void setHeight(T _h) { m_h = _h; };
 
-		//! @brief Returns the current X value
-		T x(void) const { return m_x; };
-
-		//! @brief Returns the current Y value
-		T y(void) const { return m_y; };
-
-		//! @brief Set the X value
-		//! @param _x The X value to set
-		void setX(T _x) { m_x = _x; };
-
-		//! @brief Set the Y value
-		//! @param _y The Y value to set
-		void setY(T _y) { m_y = _y; };
+		//! @brief Return the height
+		T height(void) const { return m_h; };
 
 	protected:
-		T		m_x;			//! The current X value
-		T		m_y;			//! The current Y value
-
+		T m_w;
+		T m_h;
 	};
 
-	//! @brief 2D Point with integer values
-	class OT_CORE_API_EXPORT Point2D : public Point2DTemplate<int> {
+	//! @brief 2D Size with integer values
+	class OT_CORE_API_EXPORT Size2D : public Size2DTemplate<int> {
 	public:
-		Point2D() : Point2DTemplate(0, 0) {};
-		Point2D(int _w, int _h) : Point2DTemplate(_w, _h) {};
-		Point2D(const Point2D& _other) : Point2DTemplate(_other) {};
-		virtual ~Point2D() {};
+		Size2D() : Size2DTemplate(0, 0) {};
+		Size2D(int _w, int _h) : Size2DTemplate(_w, _h) {};
+		Size2D(const Size2D& _other) : Size2DTemplate(_other) {};
+		virtual ~Size2D() {};
 
-		Point2D& operator = (const Point2D& _other) = default;
+		Size2D& operator = (const Size2D& _other) = default;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -72,15 +63,15 @@ namespace ot {
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 	};
 
-	//! @brief 2D Point with float values
-	class OT_CORE_API_EXPORT Point2DF : public Point2DTemplate<float> {
+	//! @brief 2D Size with float values
+	class OT_CORE_API_EXPORT Size2DF : public Size2DTemplate<float> {
 	public:
-		Point2DF() : Point2DTemplate(0, 0) {};
-		Point2DF(float _w, float _h) : Point2DTemplate(_w, _h) {};
-		Point2DF(const Point2DF& _other) : Point2DTemplate(_other) {};
-		virtual ~Point2DF() {};
+		Size2DF() : Size2DTemplate(0, 0) {};
+		Size2DF(float _w, float _h) : Size2DTemplate(_w, _h) {};
+		Size2DF(const Size2DF& _other) : Size2DTemplate(_other) {};
+		virtual ~Size2DF() {};
 
-		Point2DF& operator = (const Point2DF& _other) = default;
+		Size2DF& operator = (const Size2DF& _other) = default;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -93,15 +84,15 @@ namespace ot {
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 	};
 
-	//! @brief 2D Point with double values
-	class OT_CORE_API_EXPORT Point2DD : public Point2DTemplate<double> {
+	//! @brief 2D Size with double values
+	class OT_CORE_API_EXPORT Size2DD : public Size2DTemplate<double> {
 	public:
-		Point2DD() : Point2DTemplate(0, 0) {};
-		Point2DD(double _w, double _h) : Point2DTemplate(_w, _h) {};
-		Point2DD(const Point2DD& _other) : Point2DTemplate(_other) {};
-		virtual ~Point2DD() {};
+		Size2DD() : Size2DTemplate(0, 0) {};
+		Size2DD(double _w, double _h) : Size2DTemplate(_w, _h) {};
+		Size2DD(const Size2DD& _other) : Size2DTemplate(_other) {};
+		virtual ~Size2DD() {};
 
-		Point2DD& operator = (const Point2DD& _other) = default;
+		Size2DD& operator = (const Size2DD& _other) = default;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Queue.cpp" />
     <ClCompile Include="src\rJSON.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
     <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\Size2D.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +47,7 @@
     <ClInclude Include="include\OpenTwinCore\ServiceBase.h" />
     <ClInclude Include="include\OpenTwinCore\Logger.h" />
     <ClInclude Include="include\OpenTwinCore\Singleton.h" />
+    <ClInclude Include="include\OpenTwinCore\Size2D.h" />
     <ClInclude Include="include\OpenTwinCore\StringHelper.h" />
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.h" />
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.hpp" />
