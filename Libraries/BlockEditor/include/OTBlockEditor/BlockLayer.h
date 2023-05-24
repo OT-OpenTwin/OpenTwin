@@ -9,6 +9,7 @@
 #include "OTBlockEditor/BlockEditorAPIExport.h"
 #include "OTBlockEditor/BlockGraphicsObject.h"
 #include "OTBlockEditor/BlockPaintJob.h"
+#include "OTGui/GuiTypes.h"
 
 // Qt header
 #include <QtCore/qrect.h>
@@ -37,10 +38,13 @@ namespace ot {
 		void setConnectorManger(BlockConnectorManager* _connectorManager);
 		BlockConnectorManager* getConnectorManager(void) { return m_connectorManager; };
 
+		void setLayerOrientation(ot::Orientation _orient) { m_orientation = _orient; };
+		ot::Orientation layerOrientation(void) const { return m_orientation; };
+
 	private:
 		ot::DefaultBlock* m_block;
 		BlockConnectorManager* m_connectorManager;
-
+		ot::Orientation m_orientation;
 		BlockLayer() = delete;
 		BlockLayer(const BlockLayer&) = delete;
 		BlockLayer& operator = (const BlockLayer&) = delete;

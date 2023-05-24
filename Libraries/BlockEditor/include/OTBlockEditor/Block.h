@@ -24,12 +24,29 @@ namespace ot {
 
 	class BlockConnector;
 
+	class BLOCK_EDITOR_API_EXPORT BlockGraphicsItemGroup : public QGraphicsItemGroup {
+	public:
+		BlockGraphicsItemGroup() {};
+		virtual ~BlockGraphicsItemGroup() {};
+
+	private:
+
+		BlockGraphicsItemGroup(const BlockGraphicsItemGroup&) = delete;
+		BlockGraphicsItemGroup& operator = (const BlockGraphicsItemGroup&) = delete;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem, public ot::BlockGraphicsObject {
 		Q_OBJECT
 		Q_INTERFACES(QGraphicsItem)
 
 	public:
-		Block();
+		Block(BlockGraphicsItemGroup* _graphicsItemGroup);
 		virtual ~Block();
 
 		virtual QRectF boundingRect(void) const override;
@@ -38,6 +55,9 @@ namespace ot {
 
 		virtual qreal blockWidth(void) const = 0;
 		virtual qreal blockHeigth(void) const = 0;
+
+		void setGraphicsItemGroup(BlockGraphicsItemGroup* _gig) { m_gig = _gig; };
+		BlockGraphicsItemGroup* graphicsItemGroup(void) { return m_gig; }
 
 		void setHighlighted(bool _isHighlighted = true) { m_isHighlighted = _isHighlighted; };
 		bool isHighlighted(void) const { return m_isHighlighted; };
@@ -54,10 +74,15 @@ namespace ot {
 		const LengthLimitation& widthLimit(void) const { return m_widthLimit; };
 
 	private:
+		BlockGraphicsItemGroup* m_gig;
 		bool m_isHighlighted;
 		QColor m_highlightColor;
 		LengthLimitation m_heightLimit;
 		LengthLimitation m_widthLimit;
+
+		Block() = delete;
+		Block(const Block&) = delete;
+		Block& operator = (const Block&) = delete;
 	};
 
 }

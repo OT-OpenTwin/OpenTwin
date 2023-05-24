@@ -42,7 +42,7 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 	}
 
 	// Create default block
-	ot::DefaultBlock* newBlock = new ot::DefaultBlock;
+	ot::DefaultBlock* newBlock = new ot::DefaultBlock(new BlockGraphicsItemGroup);
 
 	// Add layers
 	for (auto layer : _config->layers()) {

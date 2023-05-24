@@ -8,10 +8,11 @@
 #include "OTBlockEditor/DefaultBlock.h"
 #include "OTBlockEditor/BlockLayer.h"
 #include "OTBlockEditor/BlockPaintJob.h"
+#include "OTBlockEditor/BlockHelper.h"
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Queue.h"
 
-ot::DefaultBlock::DefaultBlock() {
+ot::DefaultBlock::DefaultBlock(BlockGraphicsItemGroup* _graphicsItemGroup) : ot::Block(_graphicsItemGroup) {
 
 }
 
@@ -52,7 +53,12 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 	// The layers will queue the connectors if needed
 	// The arg pointer will be removed my the queue
 	for (auto l : m_layers) { 
-		paintQueue.queue(l, new BlockPaintJobArg(boundingRect().marginsRemoved(l->margins()), _painter, _option, _widget));
+		paintQueue.queue(l, new BlockPaintJobArg(
+			ot::calculateChildRect(boundingRect(), l->layerOrientation(), l->layerSizeHint()).marginsRemoved(l->margins()),
+			_painter, 
+			_option,
+			_widget)
+		);
 	}
 
 	// Run the paintjob

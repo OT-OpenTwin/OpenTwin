@@ -8,7 +8,7 @@
 #include "OTBlockEditor/DefaultBlock.h"
 #include "OTBlockEditor/BlockConnectorManager.h"
 
-ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : m_block(_block), m_connectorManager(_connectorManager) {
+ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : m_block(_block), m_connectorManager(_connectorManager), m_orientation(ot::OrientCenter) {
 
 };
 

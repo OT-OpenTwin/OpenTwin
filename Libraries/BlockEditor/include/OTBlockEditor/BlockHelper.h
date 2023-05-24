@@ -7,13 +7,13 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorAPIExport.h"
-#include "OTBlockEditorAPI/BlockEditorAPITypes.h"
+#include "OTGui/GuiTypes.h"
 
 // Qt header
 #include <QtCore/qrect.h>
 
 namespace ot {
 
-	BLOCK_EDITOR_API_EXPORT QRectF calculateChildRect(const QRectF& _parentRect, ot::BlockComponentPosition _childPosition,const QSizeF& _childSize);
+	BLOCK_EDITOR_API_EXPORT QRectF calculateChildRect(const QRectF& _parentRect, ot::Orientation _childOrientation,const QSizeF& _childSize);
 
 }

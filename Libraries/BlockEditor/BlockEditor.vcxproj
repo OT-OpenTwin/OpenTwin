@@ -238,7 +238,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTBlockEditor\BlockConnection.h" />
-    <ClInclude Include="include\OTBlockEditor\BlockConnector.h" />
+    <QtMoc Include="include\OTBlockEditor\BlockConnector.h" />
     <ClInclude Include="include\OTBlockEditor\BlockConnectorManager.h" />
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPIExport.h" />
     <ClInclude Include="include\OTBlockEditor\BlockEditorTypes.h" />

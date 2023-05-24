@@ -7,20 +7,26 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorAPIExport.h"
+#include "OTBlockEditor/BlockGraphicsObject.h"
 
 // Qt header
+#include <QtCore/qobject.h>
 #include <QtCore/qpoint.h>
+#include <QtGui/qcolor.h>
+#include <QtWidgets/qgraphicsitem.h>
 
 class QPainter;
 
 namespace ot {
-	class BLOCK_EDITOR_API_EXPORT BlockConnector {
+	class BLOCK_EDITOR_API_EXPORT BlockConnector : public QObject, public QGraphicsItem, public ot::BlockGraphicsObject {
+		Q_OBJECT
+		Q_INTERFACES(QGraphicsItem)
 	public:
-		BlockConnector() {};
-		virtual ~BlockConnector() {};
+		BlockConnector();
+		virtual ~BlockConnector();
 
-		virtual void paint(QPainter* _painter, qreal _xLimit, qreal _y) = 0;
-		virtual QPointF connectionPoint(void) const = 0;
-		virtual bool canConnect(void) const { return true; };
+		virtual QRectF boundingRect(void) const override;
+
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) override;
 	};
 }

@@ -6,11 +6,15 @@
 // OpenTwin header
 #include "OTBlockEditor/Block.h"
 #include "OTBlockEditor/BlockPaintJob.h"
+#include "OpenTwinCore/otAssert.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 
-ot::Block::Block() : m_isHighlighted(false), m_highlightColor(250, 28, 28) {}
+ot::Block::Block(BlockGraphicsItemGroup* _graphicsItemGroup) : m_gig(_graphicsItemGroup), m_isHighlighted(false), m_highlightColor(250, 28, 28) {
+	OTAssertNullptr(m_gig);
+	m_gig->addToGroup(this);
+}
 
 ot::Block::~Block() {}
 
