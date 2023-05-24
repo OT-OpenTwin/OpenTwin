@@ -31,7 +31,8 @@ SET OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"ImportParameterizedDataService",^
 		"VisualizationService",^
 		"PythonExecutionService",^
-		"GetDPService"^
+		"GetDPService",^
+		"BlockEditorService"^
 		]^
 	}
 
