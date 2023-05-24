@@ -11,11 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OpenTwinCore\Layout.h" />
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\FillPainter2D.h" />
     <ClInclude Include="include\OTGui\Font.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
+    <ClInclude Include="include\OTGui\Layout.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />

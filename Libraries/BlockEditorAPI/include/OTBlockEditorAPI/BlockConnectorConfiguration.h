@@ -39,8 +39,8 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string title(void) const { return m_title; };
 
-		void setTitlePosition(BlockComponentPosition _position) { m_titlePosition = _position; };
-		BlockComponentPosition titlePosition(void) const { return m_titlePosition; };
+		void setTitleOrientation(Orientation _orientation) { m_titleOrientation = _orientation; };
+		Orientation titleOrientation(void) const { return m_titleOrientation; };
 
 		void setStyle(BlockConnectorStyle _style) { m_style = _style; };
 		BlockConnectorStyle style(void) const { return m_style; };
@@ -56,7 +56,7 @@ namespace ot {
 
 	private:
 		std::string m_title;
-		BlockComponentPosition m_titlePosition;
+		Orientation m_titleOrientation;
 		BlockConnectorStyle m_style;
 		std::string m_imageSubPath;
 		ot::Color m_fillColor;

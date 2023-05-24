@@ -5,15 +5,15 @@
 std::string ot::toString(ot::Orientation _orientation) {
 	switch (_orientation)
 	{
-	case ot::Orientation::Center: return "Center";
-	case ot::Orientation::Top: return "Top";
-	case ot::Orientation::TopRight: return "TopRight";
-	case ot::Orientation::Right: return "Right";
-	case ot::Orientation::BottomRight: return "BottomRight";
-	case ot::Orientation::Bottom: return "Bottom";
-	case ot::Orientation::BottomLeft: return "BottomLeft";
-	case ot::Orientation::Left: return "Left";
-	case ot::Orientation::TopLeft: return "TopLeft";
+	case ot::Orientation::OrientCenter: return "Center";
+	case ot::Orientation::OrientTop: return "Top";
+	case ot::Orientation::OrientTopRight: return "TopRight";
+	case ot::Orientation::OrientRight: return "Right";
+	case ot::Orientation::OrientBottomRight: return "BottomRight";
+	case ot::Orientation::OrientBottom: return "Bottom";
+	case ot::Orientation::OrientBottomLeft: return "BottomLeft";
+	case ot::Orientation::OrientLeft: return "Left";
+	case ot::Orientation::OrientTopLeft: return "TopLeft";
 	default:
 		OT_LOG_EA("Unknown orientation provided");
 		throw std::exception("Unknown orientation provided");
@@ -21,15 +21,15 @@ std::string ot::toString(ot::Orientation _orientation) {
 }
 
 ot::Orientation ot::stringToOrientation(const std::string& _string) {
-	if (_string == toString(ot::Orientation::Center)) return ot::Orientation::Center;
-	else if (_string == toString(ot::Orientation::Top)) return ot::Orientation::Top;
-	else if (_string == toString(ot::Orientation::TopRight)) return ot::Orientation::TopRight;
-	else if (_string == toString(ot::Orientation::Right)) return ot::Orientation::Right;
-	else if (_string == toString(ot::Orientation::BottomRight)) return ot::Orientation::BottomRight;
-	else if (_string == toString(ot::Orientation::Bottom)) return ot::Orientation::Bottom;
-	else if (_string == toString(ot::Orientation::BottomLeft)) return ot::Orientation::BottomLeft;
-	else if (_string == toString(ot::Orientation::Left)) return ot::Orientation::Left;
-	else if (_string == toString(ot::Orientation::TopLeft)) return ot::Orientation::TopLeft;
+	if (_string == toString(ot::Orientation::OrientCenter)) return ot::Orientation::OrientCenter;
+	else if (_string == toString(ot::Orientation::OrientTop)) return ot::Orientation::OrientTop;
+	else if (_string == toString(ot::Orientation::OrientTopRight)) return ot::Orientation::OrientTopRight;
+	else if (_string == toString(ot::Orientation::OrientRight)) return ot::Orientation::OrientRight;
+	else if (_string == toString(ot::Orientation::OrientBottomRight)) return ot::Orientation::OrientBottomRight;
+	else if (_string == toString(ot::Orientation::OrientBottom)) return ot::Orientation::OrientBottom;
+	else if (_string == toString(ot::Orientation::OrientBottomLeft)) return ot::Orientation::OrientBottomLeft;
+	else if (_string == toString(ot::Orientation::OrientLeft)) return ot::Orientation::OrientLeft;
+	else if (_string == toString(ot::Orientation::OrientTopLeft)) return ot::Orientation::OrientTopLeft;
 	else {
 		OT_LOG_EA("Unknown orientation provided");
 		throw std::exception("Unknown orientation provided");

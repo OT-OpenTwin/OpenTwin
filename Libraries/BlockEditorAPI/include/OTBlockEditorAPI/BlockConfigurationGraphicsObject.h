@@ -47,7 +47,7 @@ namespace ot {
 
 	private:
 		Orientation			m_orientation;
-		MarginsD				m_margins;
+		MarginsD			m_margins;
 		bool				m_isUserMoveable;
 		LengthLimitation	m_heightLimits;
 		LengthLimitation	m_widthLimits;

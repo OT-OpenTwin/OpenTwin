@@ -13,18 +13,6 @@
 
 namespace ot {
 
-	enum BlockComponentPosition {
-		ComponentCenter,
-		ComponentTop,
-		ComponentTopRight,
-		ComponentRight,
-		ComponentBottomRight,
-		ComponentBottom,
-		ComponentBottomLeft,
-		ComponentLeft,
-		ComponentTopLeft
-	};
-
 	enum BlockConnectorStyle {
 		ConnectorNone,
 		ConnectorImage,
@@ -45,9 +33,6 @@ namespace ot {
 		SizeAutomaticWithMax,
 		SizeAutomaticWithMinMax
 	};
-
-	BLOCKEDITORAPI_API_EXPORT std::string toString(BlockComponentPosition _pos);
-	BLOCKEDITORAPI_API_EXPORT BlockComponentPosition blockComponentPositionFromString(const std::string& _string);
 
 	BLOCKEDITORAPI_API_EXPORT std::string toString(BlockConnectorStyle _style);
 	BLOCKEDITORAPI_API_EXPORT BlockConnectorStyle blockConnectorStyleFromString(const std::string& _string);

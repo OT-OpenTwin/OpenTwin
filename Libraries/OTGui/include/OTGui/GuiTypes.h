@@ -9,15 +9,15 @@
 namespace ot {
 
 	enum Orientation {
-		Center,
-		Top,
-		TopRight,
-		Right,
-		BottomRight,
-		Bottom,
-		BottomLeft,
-		Left,
-		TopLeft
+		OrientCenter,
+		OrientTop,
+		OrientTopRight,
+		OrientRight,
+		OrientBottomRight,
+		OrientBottom,
+		OrientBottomLeft,
+		OrientLeft,
+		OrientTopLeft
 	};
 
 	//! @brief Generally available font families

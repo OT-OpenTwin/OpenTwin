@@ -8,7 +8,7 @@
 #define JSON_MEMBER_WidthLimits "WidthLimits"
 
 ot::BlockConfigurationGraphicsObject::BlockConfigurationGraphicsObject(const std::string& _name)
-	: BlockConfigurationObject(_name), m_orientation(Center), m_isUserMoveable(false)
+	: BlockConfigurationObject(_name), m_orientation(OrientCenter), m_isUserMoveable(false)
 {}
 
 void ot::BlockConfigurationGraphicsObject::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {

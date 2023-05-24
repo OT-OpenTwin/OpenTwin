@@ -4,42 +4,6 @@
 // std header
 #include <cassert>
 
-std::string ot::toString(BlockComponentPosition _pos) {
-	switch (_pos)
-	{
-	case ot::BlockComponentPosition::ComponentCenter: return "Center";
-	case ot::BlockComponentPosition::ComponentTop: return "Top";
-	case ot::BlockComponentPosition::ComponentTopRight: return "TopRight";
-	case ot::BlockComponentPosition::ComponentRight: return "Right";
-	case ot::BlockComponentPosition::ComponentBottomRight: return "BottomRight";
-	case ot::BlockComponentPosition::ComponentBottom: return "Bottom";
-	case ot::BlockComponentPosition::ComponentBottomLeft: return "BottomLeft";
-	case ot::BlockComponentPosition::ComponentLeft: return "Left";
-	case ot::BlockComponentPosition::ComponentTopLeft: return "TopLeft";
-	default:
-		//todo: replace with otAssert
-		assert(0);
-		return "Center";
-	}
-}
-
-ot::BlockComponentPosition ot::blockComponentPositionFromString(const std::string& _string) {
-	if (_string == toString(ot::BlockComponentPosition::ComponentCenter)) return ot::BlockComponentPosition::ComponentCenter;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentTop)) return ot::BlockComponentPosition::ComponentTop;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentTopRight)) return ot::BlockComponentPosition::ComponentTopRight;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentRight)) return ot::BlockComponentPosition::ComponentRight;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentBottomRight)) return ot::BlockComponentPosition::ComponentBottomRight;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentBottom)) return ot::BlockComponentPosition::ComponentBottom;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentBottomLeft)) return ot::BlockComponentPosition::ComponentBottomLeft;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentLeft)) return ot::BlockComponentPosition::ComponentLeft;
-	else if (_string == toString(ot::BlockComponentPosition::ComponentTopLeft)) return ot::BlockComponentPosition::ComponentTopLeft;
-	else {
-		//todo: replace with otAssert
-		assert(0);
-		return ot::BlockComponentPosition::ComponentCenter;
-	}
-}
-
 std::string ot::toString(BlockConnectorStyle _style) {
 	switch (_style)
 	{

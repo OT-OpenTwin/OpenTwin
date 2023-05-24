@@ -4,13 +4,13 @@
 
 #define JSON_MEMBER_Name "Name"
 #define JSON_MEMBER_Title "Title"
-#define JSON_MEMBER_TitlePosition "TitlePosition"
+#define JSON_MEMBER_TitleOrientation "TitleOrientation"
 #define JSON_MEMBER_Style "Style"
 #define JSON_MEMBER_ImageSubPath "ImageSubPath"
 #define JSON_MEMBER_FillColor "FillColor"
 #define JSON_MEMBER_BorderColor "BorderColor"
 
-ot::BlockConnectorConfiguration::BlockConnectorConfiguration() : m_titlePosition(ot::ComponentBottom), m_style(ot::ConnectorNone) {
+ot::BlockConnectorConfiguration::BlockConnectorConfiguration() : m_titleOrientation(ot::OrientBottom), m_style(ot::ConnectorNone) {
 
 }
 
@@ -21,7 +21,7 @@ ot::BlockConnectorConfiguration::~BlockConnectorConfiguration() {
 void ot::BlockConnectorConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	BlockConfigurationGraphicsObject::addToJsonObject(_document, _object);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Title, m_title);
-	ot::rJSON::add(_document, _object, JSON_MEMBER_TitlePosition, toString(m_titlePosition));
+	ot::rJSON::add(_document, _object, JSON_MEMBER_TitleOrientation, toString(m_titleOrientation));
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Style, toString(m_style));
 	ot::rJSON::add(_document, _object, JSON_MEMBER_ImageSubPath, m_imageSubPath);
 
@@ -38,14 +38,14 @@ void ot::BlockConnectorConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 	BlockConfigurationGraphicsObject::setFromJsonObject(_object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Title, String);
-	OT_rJSON_checkMember(_object, JSON_MEMBER_TitlePosition, String);
+	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleOrientation, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Style, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_ImageSubPath, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_FillColor, Object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_BorderColor, Object);
 
 	m_title = _object[JSON_MEMBER_Title].GetString();
-	m_titlePosition = blockComponentPositionFromString(_object[JSON_MEMBER_TitlePosition].GetString());
+	m_titleOrientation = stringToOrientation(_object[JSON_MEMBER_TitleOrientation].GetString());
 	m_style = blockConnectorStyleFromString(_object[JSON_MEMBER_Style].GetString());
 	m_imageSubPath = _object[JSON_MEMBER_ImageSubPath].GetString();
 
