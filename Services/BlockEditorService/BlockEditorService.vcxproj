@@ -96,15 +96,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;BlockEditorAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -115,7 +115,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
     </ClCompile>
@@ -137,7 +137,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
@@ -146,8 +146,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;BlockEditorAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -160,7 +160,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(OT_BLOCKEDITORAPI_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
     </ClCompile>

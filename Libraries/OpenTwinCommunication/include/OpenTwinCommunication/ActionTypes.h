@@ -470,6 +470,7 @@
 #define OT_ACTION_PARAM_CARTESIANMESH_MeshEntityID "CartesianMesh.MeshEntityID"
 #define OT_ACTION_PARAM_CARTESIANMESH_ModelStateVersion "CartesianMesh.ModelVersion"
 
+#define OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage "BlockEditor.ConfigurationPackage"
 #define OT_ACTION_PARAM_BLOCKEDITOR_Categories "BlockEditor.Categories"
 #define OT_ACTION_PARAM_BLOCKEDITOR_EditorName "BlockEditor.Name"
 #define OT_ACTION_PARAM_BLOCKEDITOR_EditorTitle "BlockEditor.Title"

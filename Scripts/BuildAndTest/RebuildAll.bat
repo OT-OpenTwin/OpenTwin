@@ -287,7 +287,10 @@ ECHO Build Service: PythonExecutionService
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2
 
-
+ECHO ===============================================================
+ECHO Build Service: BlockEditorService
+ECHO ===============================================================
+CALL "%OT_BLOCKEDITORSERVICE_ROOT%\build.bat" %1 %2
 
 REM ====================================================================
 REM Build the executables

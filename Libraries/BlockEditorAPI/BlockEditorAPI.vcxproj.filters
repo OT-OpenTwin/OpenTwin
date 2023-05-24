@@ -78,6 +78,9 @@
     <ClCompile Include="src\BlockEditorAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockEditorConfigurationPackage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files\ConnectorManagers</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditorAPI\BlockEditorConfigurationPackage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTBlockEditorAPI/BlockEditorAPIAPIExport.h"
+#include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
 
 // std header
 #include <string>
@@ -33,10 +34,8 @@ namespace ot {
 		//! @brief Will create a Block Editor view in the ui frontend application with the given settings
 		//! @param _callbackNotifier The notifier that will receive the block editor callbacks
 		//! @param _uiUrl The url where the ui frontend application can be reached at
-		//! @param _editorName The name of the Editor, this name must be unique inside a service
-		//! @param _editorTitle The title for the Block Editor (The UI Frontend may add a prefix and/or suffix to the title to distinguish the editor from other editors with the same title)
-		//! @param _topLevelBlockCategories The top level categories that hold the block configuration for every block that may be added by the user in the editor
-		BLOCKEDITORAPI_API_EXPORT bool createEmptyBlockEditor(BlockEditorNotifier* _callbackNotifier, const std::string& _uiUrl, const std::string& _editorName, const std::string& _editorTitle, const std::list<ot::BlockCategoryConfiguration *>& _topLevelBlockCategories);
+		//! @param _config The block editor configuration
+		BLOCKEDITORAPI_API_EXPORT bool createEmptyBlockEditor(BlockEditorNotifier* _callbackNotifier, const std::string& _uiUrl, const ot::BlockEditorConfigurationPackage& _config);
 
 	}
 

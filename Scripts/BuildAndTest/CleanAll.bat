@@ -94,6 +94,9 @@ REM SERVICES
 ECHO Clean: Authorisation Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\AuthorisationService\clean.bat"
 
+ECHO Clean: Authorisation Service
+CALL "%OPENTWIN_DEV_ROOT%\Services\BlockEditorService\clean.bat"
+
 ECHO Clean: Cartesian Mesh Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\clean.bat"
 

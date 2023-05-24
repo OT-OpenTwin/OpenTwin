@@ -36,7 +36,7 @@
 #include "OpenTwinFoundation/Dispatcher.h"
 #include "OpenTwinFoundation/TableRange.h"
 #include "OpenTwinFoundation/ContextMenu.h"
-#include "OTBlockEditorAPI/BlockCategoryConfiguration.h"
+#include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2672,21 +2672,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
 			}
 			else if (action == OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor) {
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_BLOCKEDITOR_Categories, Array);
+				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, Object);
+				ot::BlockEditorConfigurationPackage pckg;
+				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage].GetObject();
+				pckg.setFromJsonObject(configurationObj);
 
-				std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_BLOCKEDITOR_EditorName);
-				std::string editorTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_BLOCKEDITOR_EditorTitle);
-				std::list<ot::BlockCategoryConfiguration*> editorCategories;
-
-				OT_rJSON_val categoriesArr = _doc[OT_ACTION_PARAM_BLOCKEDITOR_Categories].GetArray();
-				for (rapidjson::SizeType i = 0; i < categoriesArr.Size(); i++) {
-					OT_rJSON_checkArrayEntryType(categoriesArr, i, Object);
-					OT_rJSON_val categoryObj = categoriesArr[i].GetObject();
-					ot::BlockCategoryConfiguration* newCategory = new ot::BlockCategoryConfiguration;
-					newCategory->setFromJsonObject(categoryObj);
-					editorCategories.push_back(newCategory);
-				}
-				otAssert(0, "No implementation yet");
 			}
 			else
 			{

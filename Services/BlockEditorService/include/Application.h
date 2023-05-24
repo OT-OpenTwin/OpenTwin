@@ -11,6 +11,7 @@
 // Open twin header
 #include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
 #include "OpenTwinFoundation/ApplicationBase.h" // Base class
+#include "OTBlockEditorAPI/BlockEditorAPI.h"
 
 // C++ header
 #include <string>
@@ -23,7 +24,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::BlockEditorAPI::BlockEditorNotifier {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -44,6 +45,9 @@ public:
 	// The third parameter is a String containing the action name
 	// The last parameter are flags describing the allowed message types for this handler
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
+
+	//! @brief Will be called when the specified editor was closed in the UI Frontend
+	virtual void editorClosed(const std::string& _editorName) override;
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
 	
