@@ -5,9 +5,6 @@
 
 #pragma once
 
-// OpenTwin header
-#include "OpenTwinCore/Singleton.h"
-
 // std header
 #include <map>
 
@@ -18,9 +15,10 @@ namespace ot {
 	//! @param K Key type
 	//! @param V Value/Object type
 	template <class K, class V>
-	class ObjectManagerTemplate : public ot::Singleton<ObjectManagerTemplate<K, V>> {
-		OT_SINGLETON(ObjectManagerTemplate<K, V>)
+	class ObjectManagerTemplate {
 	public:
+		virtual ~ObjectManagerTemplate() {};
+
 		//! @brief Store the provided object for the given key.
 		//! If there exists an entry for the given key the function will terminate.
 		//! @param _object Pointer to object to store (Object Manager takes ownership).
@@ -55,11 +53,7 @@ namespace ot {
 		V* const operator [](const K& _key);
 
 	private:
-		ObjectManagerTemplate() {};
-		virtual ~ObjectManagerTemplate() {};
-
 		std::map<K, V *> m_objects;
-
 	};
 }
 

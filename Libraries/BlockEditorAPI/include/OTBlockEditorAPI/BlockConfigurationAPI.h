@@ -1,4 +1,4 @@
-//! @file API.h
+//! @file BlockConfigurationAPI.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -17,7 +17,7 @@ namespace ot {
 
 	class BlockCategoryConfiguration;
 
-	namespace BlockEditorAPI {
+	namespace BlockConfigurationAPI {
 
 		class __declspec(dllexport) BlockEditorNotifier {
 		public:

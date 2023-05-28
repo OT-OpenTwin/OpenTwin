@@ -130,7 +130,7 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::BlockEditorConfigurationPackage pckg("AlwaysNumberOne", "Block Editor");
 		pckg.setTopLevelBlockCategories(createTestCategories());
 
-		if (!ot::BlockEditorAPI::createEmptyBlockEditor(this, m_uiComponent->serviceURL(), pckg)) {
+		if (!ot::BlockConfigurationAPI::createEmptyBlockEditor(this, m_uiComponent->serviceURL(), pckg)) {
 			m_uiComponent->displayMessage("Failed to create empty block editor");
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to create empty block editor";
 		}

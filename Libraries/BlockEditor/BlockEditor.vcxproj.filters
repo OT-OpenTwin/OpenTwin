@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Helper">
       <UniqueIdentifier>{35d8128f-7fb0-4e19-8679-793786c1eeee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\API">
+      <UniqueIdentifier>{b3f5883b-7c2d-4d97-88db-5b58d45ea0d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\API">
+      <UniqueIdentifier>{ef9537d1-3f19-4e3d-bd93-632342b75eb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -110,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="src\BlockHelper.cpp">
       <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockEditorAPI.cpp">
+      <Filter>Source Files\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockHelper.h">
       <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockEditorAPI.h">
+      <Filter>Header Files\API</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

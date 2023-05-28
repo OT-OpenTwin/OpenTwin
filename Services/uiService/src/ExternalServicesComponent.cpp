@@ -28,6 +28,7 @@
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Color.h"
+#include "OpenTwinCore/Owner.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/IpConverter.h"
 #include "OpenTwinCommunication/Msg.h"
@@ -37,6 +38,8 @@
 #include "OpenTwinFoundation/TableRange.h"
 #include "OpenTwinFoundation/ContextMenu.h"
 #include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
+#include "OTBlockEditor/BlockEditorAPI.h"
+#include "OTBlockEditor/BlockNetworkEditor.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -1146,10 +1149,6 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 
 		if (_event == ak::etClicked || _event == ak::etEditingFinished)
 		{
-#ifdef _DEBUG
-			std::cout << "< Clicked or editing finished: " << _senderId << std::endl;
-#endif // _DEBUG
-
 			auto receiver = m_controlsManager->objectCreator(_senderId);
 			if (receiver != nullptr) {
 				OT_rJSON_createDOC(doc);
@@ -1180,8 +1179,11 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 			else { executeAction(AppBase::instance()->getViewerComponent()->getActiveDataModel(), _senderId); }
 		}
 	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_EA("Unknown error");
 	}
 }
 
@@ -2673,9 +2675,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor) {
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, Object);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+
 				ot::BlockEditorConfigurationPackage pckg;
 				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage].GetObject();
 				pckg.setFromJsonObject(configurationObj);
+				
+				
+				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.editorTitle()), ot::BlockEditorAPI::createEmptyBlockEditor(owner, pckg));
 
 			}
 			else

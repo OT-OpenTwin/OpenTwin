@@ -75,7 +75,7 @@
     <ClCompile Include="src\BorderLayoutConnectorManager.cpp">
       <Filter>Source Files\ConnectorManagers</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockEditorAPI.cpp">
+    <ClCompile Include="src\BlockConfigurationAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockEditorConfigurationPackage.cpp">
@@ -137,7 +137,7 @@
     <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutConnectorManager.h">
       <Filter>Header Files\ConnectorManagers</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPI.h">
+    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorConfigurationPackage.h">

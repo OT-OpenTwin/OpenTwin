@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BlockEditorAPI.cpp" />
+    <ClCompile Include="src\BlockConfigurationAPI.cpp" />
     <ClCompile Include="src\BlockCategoryConfiguration.cpp" />
     <ClCompile Include="src\BlockConfiguration.cpp" />
     <ClCompile Include="src\BlockConfigurationFactory.cpp" />
@@ -31,7 +31,7 @@
     <ClCompile Include="src\TextBlockLayerConfiguration.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPI.h" />
+    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationAPI.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationFactory.h" />

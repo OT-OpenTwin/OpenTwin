@@ -38,6 +38,9 @@
     <ClCompile Include="src\Point2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Owner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h">
@@ -107,6 +110,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenTwinCore\Size2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\Owner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

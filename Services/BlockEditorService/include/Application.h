@@ -11,7 +11,7 @@
 // Open twin header
 #include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
 #include "OpenTwinFoundation/ApplicationBase.h" // Base class
-#include "OTBlockEditorAPI/BlockEditorAPI.h"
+#include "OTBlockEditorAPI/BlockConfigurationAPI.h"
 
 // C++ header
 #include <string>
@@ -24,7 +24,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::BlockEditorAPI::BlockEditorNotifier {
+class Application : public ot::ApplicationBase, public ot::BlockConfigurationAPI::BlockEditorNotifier {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

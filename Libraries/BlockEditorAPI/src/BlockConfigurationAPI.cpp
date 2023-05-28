@@ -1,15 +1,25 @@
 // OpenTwin header
-#include "OTBlockEditorAPI/BlockEditorAPI.h"
+#include "OTBlockEditorAPI/BlockConfigurationAPI.h"
 #include "OTBlockEditorAPI/BlockCategoryConfiguration.h"
 #include "OpenTwinCore/ObjectManagerTemplate.h"
 #include "OpenTwinCore/otAssert.h"
+#include "OpenTwinCore/Singleton.h"
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OpenTwinCommunication/Msg.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
-namespace ot { namespace intern { typedef ot::ObjectManagerTemplate<std::string, ot::BlockEditorAPI::BlockEditorNotifier> BlockEditorAPIManager; } }
+namespace ot {
+	namespace intern { 
+		class BlockEditorAPIManager : 
+			public ot::ObjectManagerTemplate<std::string, ot::BlockConfigurationAPI::BlockEditorNotifier>, 
+			public ot::Singleton<ot::intern::BlockEditorAPIManager>
+		{
+			OT_SINGLETON(ot::intern::BlockEditorAPIManager)
+		};
+	}
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -17,7 +27,7 @@ namespace ot { namespace intern { typedef ot::ObjectManagerTemplate<std::string,
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-bool ot::BlockEditorAPI::createEmptyBlockEditor(BlockEditorNotifier* _callbackNotifier, const std::string& _uiUrl, const ot::BlockEditorConfigurationPackage& _config) {
+bool ot::BlockConfigurationAPI::createEmptyBlockEditor(BlockEditorNotifier* _callbackNotifier, const std::string& _uiUrl, const ot::BlockEditorConfigurationPackage& _config) {
 	// Check params (debug only)
 	otAssert(_callbackNotifier, "No callback notifier provided");
 	otAssert(!_uiUrl.empty(), "UI URL is empty");
@@ -38,7 +48,7 @@ bool ot::BlockEditorAPI::createEmptyBlockEditor(BlockEditorNotifier* _callbackNo
 
 	// Send request to UI
 	std::string response;
-	if (!ot::msg::send("", _uiUrl, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+	if (!ot::msg::send("", _uiUrl, ot::QUEUE, ot::rJSON::toJSON(doc), response)) {
 		otAssert(0, "[ERROR]: Failed to request Block Editor");
 		OT_LOG_E("Failed to request block editor (with: name = \"" + _config.editorName() + "\") at UI Frontend (with: url = \"" + _uiUrl + "\"). Reason: Failed to deliver ping");
 		return false;
