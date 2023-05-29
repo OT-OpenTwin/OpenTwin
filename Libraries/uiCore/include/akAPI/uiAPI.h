@@ -42,6 +42,7 @@ class QWidget;
 class QMovie;
 class QTabBar;
 class QSettings;
+class QDockWidget;
 
 namespace ak {
 
@@ -895,7 +896,7 @@ namespace ak {
 
 			UICORE_API_EXPORT void addWatch(
 				ak::UID						_dockWatcherUid,
-				aDockWidget *				_dock
+				QDockWidget *				_dock
 			);
 
 			UICORE_API_EXPORT void removeWatch(
@@ -905,7 +906,7 @@ namespace ak {
 
 			UICORE_API_EXPORT void removeWatch(
 				ak::UID						_dockWatcherUid,
-				aDockWidget *				_dock
+				QDockWidget *				_dock
 			);
 
 			UICORE_API_EXPORT void setWatchEnabled(

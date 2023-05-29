@@ -47,6 +47,9 @@ namespace ot {
 
 		void clear(void);
 
+		ot::BlockPickerWidget* pickerWidget(void) { return m_widget; };
+
+
 	private:
 		inline Qt::Orientation calcWidgetOrientation(void) const { return (this->width() > this->height() ? Qt::Horizontal : Qt::Vertical); };
 

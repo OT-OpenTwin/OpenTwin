@@ -233,7 +233,7 @@ void ak::aWindowManager::setCentralWidget(
 // Dock management
 
 void ak::aWindowManager::addDock(
-	aDockWidget *										_dock,
+	QDockWidget*										_dock,
 	dockLocation								_dockLocation
 ) {
 	try {
@@ -263,8 +263,8 @@ void ak::aWindowManager::addDock(
 }
 
 void ak::aWindowManager::tabifyDock(
-	aDockWidget *							_mainDock,
-	aDockWidget *							_subDock
+	QDockWidget*							_mainDock,
+	QDockWidget*							_subDock
 ) {
 	assert(_mainDock != nullptr); // Cast failed
 	assert(_subDock != nullptr); // Cast failed

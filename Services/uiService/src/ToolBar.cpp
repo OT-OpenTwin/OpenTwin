@@ -121,6 +121,10 @@ void ToolBar::addDockWatch(ak::UID _uid) {
 	uiAPI::dockWatcher::addWatch(m_view.gUserInterface_aDisplayDocks, _uid);
 }
 
+void ToolBar::addDockWatch(QDockWidget * _dock) {
+	uiAPI::dockWatcher::addWatch(m_view.gUserInterface_aDisplayDocks, _dock);
+}
+
 ak::UID ToolBar::addPage(ak::UID _creator, const QString & _pageName) {
 	return uiAPI::createTabToolBarSubContainer(_creator, m_owner->m_mainWindow, _pageName);
 }

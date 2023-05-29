@@ -7,6 +7,7 @@
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
+#include "OpenTwinCore/Owner.h"
 #include "OpenTwinCommunication/Msg.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
@@ -45,6 +46,7 @@ bool ot::BlockConfigurationAPI::createEmptyBlockEditor(BlockEditorNotifier* _cal
 	OT_rJSON_createValueObject(configurationObj);
 	_config.addToJsonObject(doc, configurationObj);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, configurationObj);
+	ot::GlobalOwner::instance().addToJsonObject(doc, doc);
 
 	// Send request to UI
 	std::string response;

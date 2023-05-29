@@ -61,7 +61,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_CORE_API_EXPORT GlobalOwner : public ot::Owner<ot::serviceID_t>, ot::Singleton<ot::GlobalOwner> {
+	class OT_CORE_API_EXPORT GlobalOwner : public ot::Owner<ot::serviceID_t>, public ot::Singleton<ot::GlobalOwner> {
 		OT_SINGLETON(ot::GlobalOwner)
 	public:
 		//! @brief Retreives the global owner id from the provided json object

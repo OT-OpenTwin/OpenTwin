@@ -14,6 +14,7 @@
 
 class AppBase;
 class LockManager;
+class QDockWidget;
 
 class ToolBar : public ak::aNotifier {
 public:
@@ -30,6 +31,7 @@ public:
 	// ###################################################################################
 
 	void addDockWatch(ak::UID _uid);
+	void addDockWatch(QDockWidget * _dock);
 
 	ak::UID addPage(ak::UID _creator, const QString & _pageName);
 

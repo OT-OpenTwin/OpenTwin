@@ -29,6 +29,7 @@
 
 // Forward declaration
 class QWidget;
+class QDockWidget;
 class QLabel;
 class QProgressBar;
 class QTimer;
@@ -39,7 +40,6 @@ namespace ak {
 
 	// Forward declaration
 	class aColorStyle;
-	class aDockWidget;
 	class aIconManager;
 	class aMessenger;
 	class aObjectManager;
@@ -109,7 +109,7 @@ namespace ak {
 		//! @param _dock The dock to add
 		//! @param _dockLocation The location to add the dock at
 		void addDock(
-			aDockWidget *										_dock,
+			QDockWidget*										_dock,
 			dockLocation								_dockLocation
 		);
 
@@ -118,8 +118,8 @@ namespace ak {
 		//! @param _mainDockUid The UID of the main (parent) dock
 		//! @param _subDockUid The UID of the sub (child) dock
 		void tabifyDock(
-			aDockWidget *							_mainDock,
-			aDockWidget *							_subDock
+			QDockWidget*							_mainDock,
+			QDockWidget*							_subDock
 		);
 
 		//! @brief Will set the priority of the bottom left corner to the specified dock location

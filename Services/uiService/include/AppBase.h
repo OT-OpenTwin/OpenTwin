@@ -55,6 +55,7 @@ class UiPluginManager;
 class ToolBar;
 namespace ak { class aNotifier; class aColorStyle; class aWindow; }
 namespace ot { class AbstractSettingsItem; }
+namespace ot { class BlockPickerDockWidget; }
 struct structModelViewInfo
 {
 	ViewerUIDtype	view;
@@ -588,6 +589,7 @@ private:
 	ak::UID						m_viewerUid;					//! The UID of the viewer
 	ak::UID						m_modelUid;					//! The UID of the model
 	ak::UID						m_timerRestoreStateAfterTabChange;
+	ot::BlockPickerDockWidget * m_blockPickerDock;
 
 	std::string					m_currentStateWindow;
 	std::string					m_currentStateColorStyle;

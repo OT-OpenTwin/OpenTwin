@@ -958,7 +958,7 @@ void ak::uiAPI::dockWatcher::addWatch(
 
 void ak::uiAPI::dockWatcher::addWatch(
 	ak::UID						_dockWatcherUid,
-	aDockWidget *				_dock
+	QDockWidget*				_dock
 ) {
 	object::get<aDockWatcherWidget>(_dockWatcherUid)->addWatch(_dock);
 }
@@ -972,7 +972,7 @@ void ak::uiAPI::dockWatcher::removeWatch(
 
 void ak::uiAPI::dockWatcher::removeWatch(
 	ak::UID						_dockWatcherUid,
-	aDockWidget *				_dock
+	QDockWidget*				_dock
 ) {
 	object::get<aDockWatcherWidget>(_dockWatcherUid)->removeWatch(_dock);
 }
