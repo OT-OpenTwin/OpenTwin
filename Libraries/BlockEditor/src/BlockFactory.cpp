@@ -56,6 +56,7 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 	}
 
 	ot::intern::applyGeneralBlockSetting(newBlock, _config);
+	newBlock->attachToGroup();
 
 	return newBlock;
 }

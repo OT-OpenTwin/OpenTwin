@@ -13,7 +13,6 @@
 
 ot::Block::Block(BlockGraphicsItemGroup* _graphicsItemGroup) : m_gig(_graphicsItemGroup), m_isHighlighted(false), m_highlightColor(250, 28, 28) {
 	OTAssertNullptr(m_gig);
-	m_gig->addToGroup(this);
 }
 
 ot::Block::~Block() {}
@@ -47,4 +46,8 @@ void ot::Block::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _optio
 		_painter->setBrush(Qt::NoBrush);
 		_painter->drawRect(this->boundingRect());
 	}
+}
+
+void ot::Block::attachToGroup(void) {
+	m_gig->addToGroup(this);
 }

@@ -73,6 +73,8 @@ namespace ot {
 		LengthLimitation& getWidthLimit(void) { return m_widthLimit; };
 		const LengthLimitation& widthLimit(void) const { return m_widthLimit; };
 
+		void attachToGroup(void);
+
 	private:
 		BlockGraphicsItemGroup* m_gig;
 		bool m_isHighlighted;

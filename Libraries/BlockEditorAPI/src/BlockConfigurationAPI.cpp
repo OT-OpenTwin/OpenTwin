@@ -55,7 +55,12 @@ bool ot::BlockConfigurationAPI::createEmptyBlockEditor(BlockEditorNotifier* _cal
 		OT_LOG_E("Failed to request block editor (with: name = \"" + _config.editorName() + "\") at UI Frontend (with: url = \"" + _uiUrl + "\"). Reason: Failed to deliver ping");
 		return false;
 	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		otAssert(0, "[ERROR]: Warning response for Block Editor request");
+		OT_LOG_E("Failed to request block editor (with: name = \"" + _config.editorName() + "\") at UI Frontend (with: url = \"" + _uiUrl + "\"). Reason: Invalid response (expected = \"" OT_ACTION_RETURN_VALUE_OK "\"; received = \"" + response + "\")");
+		return false;
+	}
+	OT_ACTION_IF_RESPONSE_WARNING(response) {
 		otAssert(0, "[ERROR]: Warning response for Block Editor request");
 		OT_LOG_E("Failed to request block editor (with: name = \"" + _config.editorName() + "\") at UI Frontend (with: url = \"" + _uiUrl + "\"). Reason: Invalid response (expected = \"" OT_ACTION_RETURN_VALUE_OK "\"; received = \"" + response + "\")");
 		return false;
