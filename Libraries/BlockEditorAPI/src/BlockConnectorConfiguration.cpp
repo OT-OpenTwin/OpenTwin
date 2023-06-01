@@ -6,7 +6,6 @@
 #define JSON_MEMBER_Title "Title"
 #define JSON_MEMBER_TitleOrientation "TitleOrientation"
 #define JSON_MEMBER_Style "Style"
-#define JSON_MEMBER_ImageSubPath "ImageSubPath"
 #define JSON_MEMBER_FillColor "FillColor"
 #define JSON_MEMBER_BorderColor "BorderColor"
 
@@ -23,7 +22,6 @@ void ot::BlockConnectorConfiguration::addToJsonObject(OT_rJSON_doc& _document, O
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Title, m_title);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_TitleOrientation, toString(m_titleOrientation));
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Style, toString(m_style));
-	ot::rJSON::add(_document, _object, JSON_MEMBER_ImageSubPath, m_imageSubPath);
 
 	OT_rJSON_createValueObject(fillObj);
 	m_fillColor.addToJsonObject(_document, fillObj);
@@ -40,14 +38,12 @@ void ot::BlockConnectorConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleOrientation, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Style, String);
-	OT_rJSON_checkMember(_object, JSON_MEMBER_ImageSubPath, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_FillColor, Object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_BorderColor, Object);
 
 	m_title = _object[JSON_MEMBER_Title].GetString();
 	m_titleOrientation = stringToOrientation(_object[JSON_MEMBER_TitleOrientation].GetString());
 	m_style = blockConnectorStyleFromString(_object[JSON_MEMBER_Style].GetString());
-	m_imageSubPath = _object[JSON_MEMBER_ImageSubPath].GetString();
 
 	OT_rJSON_val fillObj = _object[JSON_MEMBER_FillColor].GetObject();
 	m_fillColor.setFromJsonObject(fillObj);

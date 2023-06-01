@@ -203,7 +203,9 @@
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\BlockConnector.cpp" />
+    <ClCompile Include="src\BlockConnectorFactory.cpp" />
     <ClCompile Include="src\BlockConnectorManager.cpp" />
+    <ClCompile Include="src\BlockConnectorManagerFactory.cpp" />
     <ClCompile Include="src\BlockEditorAPI.cpp" />
     <ClCompile Include="src\BlockFactory.cpp" />
     <ClCompile Include="src\BlockGraphicsObject.cpp" />
@@ -238,6 +240,8 @@
     <QtMoc Include="include\OTBlockEditor\Block.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTBlockEditor\BlockConnectorFactory.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockConnectorManagerFactory.h" />
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPI.h" />
     <ClInclude Include="include\OTBlockEditor\BlockConnection.h" />
     <QtMoc Include="include\OTBlockEditor\BlockConnector.h" />

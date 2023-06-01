@@ -32,6 +32,9 @@ namespace ot {
 
 		const std::list<BlockLayer*>& layers(void) const { return m_layers; };
 
+	protected:
+		virtual void attachChildsToGroup(BlockGraphicsItemGroup* _gig) override;
+
 	private:
 		std::list<BlockLayer*> m_layers;
 

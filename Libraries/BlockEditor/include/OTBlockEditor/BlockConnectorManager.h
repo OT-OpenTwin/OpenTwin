@@ -16,6 +16,7 @@ namespace ot {
 
 	class BlockLayer;
 	class BlockConnector;
+	class BlockGraphicsItemGroup;
 
 	class BlockConnectorManager : public ot::BlockPaintJob {
 	public:
@@ -25,7 +26,12 @@ namespace ot {
 		BlockLayer* getBlockLayer(void) { return m_layer; };
 
 		//! @brief Add the provided connector the the manager according to the provided flags
+		//! @param _connector The connector to add
+		//! @param _flags Connector location flags
 		virtual bool addConnector(BlockConnector* _connector, const BlockConnectorLocationFlags& _flags) = 0;
+
+		//! @brief Return all connectors that are owned by this manager
+		virtual std::list<BlockConnector*> getAllConnectors(void) const = 0;
 
 	private:
 		BlockLayer* m_layer;
@@ -35,13 +41,19 @@ namespace ot {
 		BlockConnectorManager& operator = (const BlockConnectorManager&) = delete;
 	};
 
-	class DefaultBlockConnectorManager : public BlockConnectorManager {
+	class BorderLayoutBlockConnectorManager : public BlockConnectorManager {
 	public:
-		DefaultBlockConnectorManager(BlockLayer* _layer);
-		virtual ~DefaultBlockConnectorManager();
+		BorderLayoutBlockConnectorManager(BlockLayer* _layer);
+		virtual ~BorderLayoutBlockConnectorManager();
 
+		//! @brief Add the provided connector the the manager according to the provided flags
+		//! @param _connector The connector to add
+		//! @param _flags Connector location flags
 		virtual bool addConnector(BlockConnector* _connector, const BlockConnectorLocationFlags& _flags) override;
 		
+		//! @brief Return all connectors that are owned by this manager
+		virtual std::list<BlockConnector*> getAllConnectors(void) const override;
+
 		virtual QueueResultFlags runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) override;
 
 	private:
@@ -50,8 +62,8 @@ namespace ot {
 		std::list<ot::BlockConnector*> m_bottom; //! @brief Connectors at the bottom of the box
 		std::list<ot::BlockConnector*> m_left; //! @brief Connectors at the left of the box
 
-		DefaultBlockConnectorManager(const DefaultBlockConnectorManager&) = delete;
-		DefaultBlockConnectorManager& operator = (const DefaultBlockConnectorManager&) = delete;
+		BorderLayoutBlockConnectorManager(const BorderLayoutBlockConnectorManager&) = delete;
+		BorderLayoutBlockConnectorManager& operator = (const BorderLayoutBlockConnectorManager&) = delete;
 	};
 
 }

@@ -10,6 +10,7 @@
 #include "OTBlockEditor/TextBlockLayer.h"
 #include "OTBlockEditor/ImageBlockLayer.h"
 #include "OTBlockEditor/RectangularBlockLayer.h"
+#include "OTBlockEditor/BlockConnectorManagerFactory.h"
 #include "OTBlockEditorAPI/BlockLayers.h"
 #include "OTQtWrapper/TypeConversion.h"
 #include "OpenTwinCore/otAssert.h"
@@ -23,13 +24,13 @@ ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block,
 
 	// Specific block type
 	if (_config->layerType() == OT_IMAGEBLOCKLAYERCONFIGURATION_TYPE) {
-		layer = blockLayerFromConfig(_block, dynamic_cast<ot::ImageBlockLayerConfiguration*>(_config));
+		layer = ot::LayerFactory::intern::blockLayerFromConfig(_block, dynamic_cast<ot::ImageBlockLayerConfiguration*>(_config));
 	}
 	else if (_config->layerType() == OT_TEXTBLOCKLAYERCONFIGURATION_TYPE) {
-		layer = blockLayerFromConfig(_block, dynamic_cast<ot::TextBlockLayerConfiguration*>(_config));
+		layer = ot::LayerFactory::intern::blockLayerFromConfig(_block, dynamic_cast<ot::TextBlockLayerConfiguration*>(_config));
 	}
 	else if (_config->layerType() == OT_RECTANGLEBLOCKLAYERCONFIGURATION_TYPE) {
-		layer = blockLayerFromConfig(_block, dynamic_cast<ot::RectangleBlockLayerConfiguration*>(_config));
+		layer = ot::LayerFactory::intern::blockLayerFromConfig(_block, dynamic_cast<ot::RectangleBlockLayerConfiguration*>(_config));
 	}
 	else {
 		OT_LOG_EAS("Unknown block layer configuration type (type = \"" + _config->layerType() + "\")");
@@ -43,18 +44,26 @@ ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block,
 	layer->setWidthLimit(_config->widthLimits());
 	layer->setLayerOrientation(_config->orientation());
 
+	if (_config->getConnectorManager()) {
+		layer->setConnectorManger(BlockConnectorManagerFactory::connectorManagerFromConfig(layer, _config->getConnectorManager()));
+	}
+
 	return layer;
 }
 
-ot::ImageBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::ImageBlockLayerConfiguration* _config) {
+ot::ImageBlockLayer* ot::LayerFactory::intern::blockLayerFromConfig(ot::DefaultBlock* _block, ot::ImageBlockLayerConfiguration* _config) {
 	OTAssertNullptr(_block);
 	OTAssertNullptr(_config);
 
-	otAssert(0, "ot implemented yet");
-	return nullptr;
+	ot::ImageBlockLayer* newLayer = new ot::ImageBlockLayer(_block);
+	otAssert(0, "Image layer NOT using image loader from uiAPI yet!");
+	QPixmap pix(QString::fromStdString(_config->imagePath()));
+	newLayer->setPixmap(pix);
+
+	return newLayer;
 }
 
-ot::TextBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::TextBlockLayerConfiguration* _config) {
+ot::TextBlockLayer* ot::LayerFactory::intern::blockLayerFromConfig(ot::DefaultBlock* _block, ot::TextBlockLayerConfiguration* _config) {
 	OTAssertNullptr(_block);
 	OTAssertNullptr(_config);
 
@@ -66,7 +75,7 @@ ot::TextBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _bl
 	return newLayer;
 }
 
-ot::RectangularBlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block, ot::RectangleBlockLayerConfiguration* _config) {
+ot::RectangularBlockLayer* ot::LayerFactory::intern::blockLayerFromConfig(ot::DefaultBlock* _block, ot::RectangleBlockLayerConfiguration* _config) {
 	OTAssertNullptr(_block);
 	OTAssertNullptr(_config);
 	

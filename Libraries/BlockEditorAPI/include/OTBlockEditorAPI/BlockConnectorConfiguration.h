@@ -45,9 +45,6 @@ namespace ot {
 		void setStyle(BlockConnectorStyle _style) { m_style = _style; };
 		BlockConnectorStyle style(void) const { return m_style; };
 
-		void setImageSubPath(const std::string& _path) { m_imageSubPath = _path; };
-		const std::string& imageSubPath(void) const { return m_imageSubPath; };
-
 		void setFillColor(const ot::Color& _color) { m_fillColor = _color; };
 		const ot::Color& fillColor(void) const { return m_fillColor; };
 
@@ -58,7 +55,6 @@ namespace ot {
 		std::string m_title;
 		Orientation m_titleOrientation;
 		BlockConnectorStyle m_style;
-		std::string m_imageSubPath;
 		ot::Color m_fillColor;
 		ot::Color m_borderColor;
 

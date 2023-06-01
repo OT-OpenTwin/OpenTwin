@@ -1,7 +1,7 @@
 // OpenTwin header
 #include "OTBlockEditorAPI/BlockLayerConfiguration.h"
-#include "OTBlockEditorAPI/ConnectorManager.h"
-#include "OTBlockEditorAPI/ConnectorManagerFactory.h"
+#include "OTBlockEditorAPI/BlockConnectorManagerConfiguration.h"
+#include "OTBlockEditorAPI/BlockConnectorManagerConfigurationFactory.h"
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OpenTwinCore/otAssert.h"
 
@@ -42,15 +42,14 @@ void ot::BlockLayerConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 
 	if (_object[OT_JSON_MEMBER_ConnectorManager].IsObject()) {
 		OT_rJSON_val connectorManagerObj = _object[OT_JSON_MEMBER_ConnectorManager].GetObject();
-		setConnectorManager(ConnectorManagerFactory::connectorManagerConfigurationFromJson(connectorManagerObj));
-
+		setConnectorManager(ConnectorManagerConfigurationFactory::connectorManagerConfigurationFromJson(connectorManagerObj));
 	}
 	else if (_object[OT_JSON_MEMBER_ConnectorManager].IsNull()) {
 		setConnectorManager(nullptr);
 	}
 }
 
-void ot::BlockLayerConfiguration::setConnectorManager(ot::ConnectorManager* _manager) {
+void ot::BlockLayerConfiguration::setConnectorManager(ot::BlockConnectorManagerConfiguration* _manager) {
 	if (m_connectorManager == _manager) return;
 	if (m_connectorManager) delete m_connectorManager;
 	m_connectorManager = _manager;

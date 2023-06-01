@@ -1,4 +1,4 @@
-//! @file BorderLayoutConnectorManager.h
+//! @file ConnectorManagerConfiguration.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,34 +6,43 @@
 #pragma once
 
 // OpenTwin header
-#include "OTBlockEditorAPI/ConnectorManager.h"
+#include "OTBlockEditorAPI/BlockConfigurationObject.h"
+#include "OTBlockEditorAPI/BlockEditorAPIAPIExport.h"
 
 // std header
 #include "vector"
 
-#define OT_BORDERLAYOUTCONNECTORMANAGERCONFIGURATION_TYPE "BorderLayoutConnectorManager"
+#define OT_JSON_MEMBER_ConnectorManagerType "ConnectorManagerType"
 
 namespace ot {
 
 	class BlockConnectorConfiguration;
 
-	class BLOCKEDITORAPI_API_EXPORT BorderLayoutConnectorManager : public ot::ConnectorManager {
+	class BLOCKEDITORAPI_API_EXPORT BlockConnectorManagerConfiguration : public ot::BlockConfigurationObject {
 	public:
-		BorderLayoutConnectorManager() {};
-		virtual ~BorderLayoutConnectorManager();
+		enum ConnectorLocation {
+			TOP,
+			LEFT,
+			RIGHT,
+			BOTTOM,
+			AUTO
+		};
+
+		BlockConnectorManagerConfiguration() {};
+		virtual ~BlockConnectorManagerConfiguration() {};
 
 		//! @brief Return the connector manager type
-		virtual std::string connectorManagerType(void) const override { return OT_BORDERLAYOUTCONNECTORMANAGERCONFIGURATION_TYPE; };
+		virtual std::string connectorManagerType(void) const = 0;
 
 		//! @brief Add the provided connector to the specified location
 		//! @param _connector The connector to add
 		//! @param _insertLocation The location to insert the connector to
-		virtual void addConnector(ot::BlockConnectorConfiguration* _connector, ConnectorManager::ConnectorLocation _insertLocation) override;
+		virtual void addConnector(ot::BlockConnectorConfiguration* _connector, ConnectorLocation _insertLocation) = 0;
 
 		//! @brief Find the connector with the provided name at the specified location
 		//! @param _connectorName The name of the connector
 		//! @param _searchLocation The location where to search for the connector (AUTO = anywhere)
-		virtual BlockConnectorConfiguration* findConnector(const std::string& _connectorName, ConnectorManager::ConnectorLocation _searchLocation) override;
+		virtual BlockConnectorConfiguration* findConnector(const std::string& _connectorName, ConnectorLocation _searchLocation) = 0;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -44,12 +53,6 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
-
-	private:
-		std::vector<ot::BlockConnectorConfiguration*> m_top;
-		std::vector<ot::BlockConnectorConfiguration*> m_left;
-		std::vector<ot::BlockConnectorConfiguration*> m_right;
-		std::vector<ot::BlockConnectorConfiguration*> m_bottom;
 	};
 
 }

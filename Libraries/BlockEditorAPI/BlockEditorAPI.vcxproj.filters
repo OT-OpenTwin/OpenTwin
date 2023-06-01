@@ -66,13 +66,13 @@
     <ClCompile Include="src\BlockLayerConfigurationFactory.cpp">
       <Filter>Source Files\BlockLayers</Filter>
     </ClCompile>
-    <ClCompile Include="src\ConnectorManager.cpp">
+    <ClCompile Include="src\BlockConnectorManagerConfiguration.cpp">
       <Filter>Source Files\ConnectorManagers</Filter>
     </ClCompile>
-    <ClCompile Include="src\ConnectorManagerFactory.cpp">
+    <ClCompile Include="src\BlockConnectorManagerConfigurationFactory.cpp">
       <Filter>Source Files\ConnectorManagers</Filter>
     </ClCompile>
-    <ClCompile Include="src\BorderLayoutConnectorManager.cpp">
+    <ClCompile Include="src\BorderLayoutBlockConnectorManagerConfiguration.cpp">
       <Filter>Source Files\ConnectorManagers</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockConfigurationAPI.cpp">
@@ -128,13 +128,13 @@
     <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h">
       <Filter>Header Files\BlockLayers</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\ConnectorManager.h">
+    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorManagerConfiguration.h">
       <Filter>Header Files\ConnectorManagers</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\ConnectorManagerFactory.h">
+    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorManagerConfigurationFactory.h">
       <Filter>Header Files\ConnectorManagers</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutConnectorManager.h">
+    <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutBlockConnectorManagerConfiguration.h">
       <Filter>Header Files\ConnectorManagers</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationAPI.h">

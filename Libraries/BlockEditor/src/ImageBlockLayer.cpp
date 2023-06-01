@@ -7,6 +7,9 @@
 #include "OTBlockEditor/ImageBlockLayer.h"
 #include "OpenTwinCore/otAssert.h"
 
+// Qt header
+#include <qpainter.h>
+
 ot::ImageBlockLayer::ImageBlockLayer(ot::DefaultBlock* _block) : ot::BlockLayer(_block) {
 
 }
@@ -16,5 +19,5 @@ ot::ImageBlockLayer::~ImageBlockLayer() {
 }
 
 void ot::ImageBlockLayer::paintLayer(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
-	otAssert(0, "Not implemented yet");
+	_painter->drawPixmap(_rect.toRect(), m_pixmap);
 }

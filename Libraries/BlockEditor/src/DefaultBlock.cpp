@@ -3,12 +3,13 @@
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-
 // OpenTwin header
 #include "OTBlockEditor/DefaultBlock.h"
 #include "OTBlockEditor/BlockLayer.h"
 #include "OTBlockEditor/BlockPaintJob.h"
 #include "OTBlockEditor/BlockHelper.h"
+#include "OTBlockEditor/BlockConnector.h"
+#include "OTBlockEditor/BlockConnectorManager.h"
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Queue.h"
 
@@ -82,4 +83,15 @@ void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
 #endif // _DEBUG
 	
 	m_layers.push_back(_layer);
+}
+
+void ot::DefaultBlock::attachChildsToGroup(BlockGraphicsItemGroup* _gig) {
+	for (BlockLayer * layer : m_layers) {
+		ot::BlockConnectorManager * connectorManager = layer->getConnectorManager();
+		if (connectorManager) {
+			for (BlockConnector * connector : connectorManager->getAllConnectors()) {
+				_gig->addToGroup(connector);
+			}
+		}
+	}
 }

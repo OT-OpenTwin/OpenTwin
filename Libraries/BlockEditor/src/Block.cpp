@@ -50,4 +50,5 @@ void ot::Block::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _optio
 
 void ot::Block::attachToGroup(void) {
 	m_gig->addToGroup(this);
+	attachChildsToGroup(m_gig);
 }

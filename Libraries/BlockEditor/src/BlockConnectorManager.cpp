@@ -5,17 +5,18 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockConnectorManager.h"
+#include "OTBlockEditor/Block.h"
 #include "OpenTwinCore/otAssert.h"
 
-ot::DefaultBlockConnectorManager::DefaultBlockConnectorManager(BlockLayer* _layer) : BlockConnectorManager(_layer) {
+ot::BorderLayoutBlockConnectorManager::BorderLayoutBlockConnectorManager(BlockLayer* _layer) : BlockConnectorManager(_layer) {
 
 }
 
-ot::DefaultBlockConnectorManager::~DefaultBlockConnectorManager() {
+ot::BorderLayoutBlockConnectorManager::~BorderLayoutBlockConnectorManager() {
 
 }
 
-bool ot::DefaultBlockConnectorManager::addConnector(BlockConnector* _connector, const BlockConnectorLocationFlags& _flags) {
+bool ot::BorderLayoutBlockConnectorManager::addConnector(BlockConnector* _connector, const BlockConnectorLocationFlags& _flags) {
 	OTAssertNullptr(_connector);
 
 	if (_flags.flagIsSet(ot::ConnectorPushFront)) {
@@ -36,7 +37,16 @@ bool ot::DefaultBlockConnectorManager::addConnector(BlockConnector* _connector, 
 	return true;
 }
 
-ot::DefaultBlockConnectorManager::QueueResultFlags ot::DefaultBlockConnectorManager::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
+std::list<ot::BlockConnector*> ot::BorderLayoutBlockConnectorManager::getAllConnectors(void) const {
+	std::list<ot::BlockConnector*> ret;
+	for (auto c : m_top) ret.push_back(c);
+	for (auto c : m_left) ret.push_back(c);
+	for (auto c : m_right) ret.push_back(c);
+	for (auto c : m_bottom) ret.push_back(c);
+	return ret;
+}
+
+ot::BorderLayoutBlockConnectorManager::QueueResultFlags ot::BorderLayoutBlockConnectorManager::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
 	
 	return Ok | NoMemClear;
 }

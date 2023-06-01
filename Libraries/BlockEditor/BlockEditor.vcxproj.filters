@@ -120,6 +120,12 @@
     <ClCompile Include="src\BlockEditorAPI.cpp">
       <Filter>Source Files\API</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockConnectorManagerFactory.cpp">
+      <Filter>Source Files\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockConnectorFactory.cpp">
+      <Filter>Source Files\Factories</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h">
@@ -189,6 +195,12 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPI.h">
       <Filter>Header Files\API</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockConnectorManagerFactory.h">
+      <Filter>Header Files\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockConnectorFactory.h">
+      <Filter>Header Files\Factories</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

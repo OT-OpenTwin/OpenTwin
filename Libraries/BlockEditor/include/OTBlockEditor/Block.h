@@ -75,6 +75,9 @@ namespace ot {
 
 		void attachToGroup(void);
 
+	protected:
+		virtual void attachChildsToGroup(BlockGraphicsItemGroup* _gig) {};
+
 	private:
 		BlockGraphicsItemGroup* m_gig;
 		bool m_isHighlighted;

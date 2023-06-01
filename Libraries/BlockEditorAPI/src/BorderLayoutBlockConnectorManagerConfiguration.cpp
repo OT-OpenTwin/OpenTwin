@@ -1,5 +1,5 @@
 // OpenTwin header
-#include "OTBlockEditorAPI/BorderLayoutConnectorManager.h"
+#include "OTBlockEditorAPI/BorderLayoutBlockConnectorManagerConfiguration.h"
 #include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/Logger.h"
@@ -10,21 +10,21 @@
 #define OT_JSON_MEMBER_RightItems "RightItems"
 #define OT_JSON_MEMBER_BottomItems "BottomItems"
 
-ot::BorderLayoutConnectorManager::~BorderLayoutConnectorManager() {
+ot::BorderLayoutBlockConnectorManagerConfiguration::~BorderLayoutBlockConnectorManagerConfiguration() {
 	for (auto c : m_top) delete c;
 	for (auto c : m_left) delete c;
 	for (auto c : m_right) delete c;
 	for (auto c : m_bottom) delete c;
 }
 
-void ot::BorderLayoutConnectorManager::addConnector(ot::BlockConnectorConfiguration* _connector, ConnectorLocation _insertLocation) {
+void ot::BorderLayoutBlockConnectorManagerConfiguration::addConnector(ot::BlockConnectorConfiguration* _connector, ConnectorLocation _insertLocation) {
 	switch (_insertLocation)
 	{
-	case ot::ConnectorManager::TOP: m_top.push_back(_connector); break;
-	case ot::ConnectorManager::LEFT: m_left.push_back(_connector); break;
-	case ot::ConnectorManager::RIGHT: m_right.push_back(_connector); break;
-	case ot::ConnectorManager::BOTTOM: m_bottom.push_back(_connector); break;
-	case ot::ConnectorManager::AUTO: 
+	case ot::BlockConnectorManagerConfiguration::TOP: m_top.push_back(_connector); break;
+	case ot::BlockConnectorManagerConfiguration::LEFT: m_left.push_back(_connector); break;
+	case ot::BlockConnectorManagerConfiguration::RIGHT: m_right.push_back(_connector); break;
+	case ot::BlockConnectorManagerConfiguration::BOTTOM: m_bottom.push_back(_connector); break;
+	case ot::BlockConnectorManagerConfiguration::AUTO:
 	{
 		ConnectorLocation l = TOP;
 		size_t c = m_top.size();
@@ -43,11 +43,11 @@ void ot::BorderLayoutConnectorManager::addConnector(ot::BlockConnectorConfigurat
 
 		switch (l)
 		{
-		case ot::ConnectorManager::TOP: m_top.push_back(_connector); break;
-		case ot::ConnectorManager::LEFT: m_left.push_back(_connector); break;
-		case ot::ConnectorManager::RIGHT: m_right.push_back(_connector); break;
-		case ot::ConnectorManager::BOTTOM: m_bottom.push_back(_connector); break;
-		case ot::ConnectorManager::AUTO:
+		case ot::BlockConnectorManagerConfiguration::TOP: m_top.push_back(_connector); break;
+		case ot::BlockConnectorManagerConfiguration::LEFT: m_left.push_back(_connector); break;
+		case ot::BlockConnectorManagerConfiguration::RIGHT: m_right.push_back(_connector); break;
+		case ot::BlockConnectorManagerConfiguration::BOTTOM: m_bottom.push_back(_connector); break;
+		case ot::BlockConnectorManagerConfiguration::AUTO:
 		default:
 			otAssert(0, "Invalid insert location");
 			OT_LOG_W("Invalid insert location");
@@ -62,14 +62,14 @@ void ot::BorderLayoutConnectorManager::addConnector(ot::BlockConnectorConfigurat
 	}
 }
 
-ot::BlockConnectorConfiguration* ot::BorderLayoutConnectorManager::findConnector(const std::string& _connectorName, ConnectorLocation _searchLocation) {
+ot::BlockConnectorConfiguration* ot::BorderLayoutBlockConnectorManagerConfiguration::findConnector(const std::string& _connectorName, ConnectorLocation _searchLocation) {
 	switch (_searchLocation)
 	{
-	case ot::ConnectorManager::TOP: for (auto c : m_top) { if (c->name() == _connectorName) return c; }; break;
-	case ot::ConnectorManager::LEFT: for (auto c : m_left) { if (c->name() == _connectorName) return c; }; break;
-	case ot::ConnectorManager::RIGHT: for (auto c : m_right) { if (c->name() == _connectorName) return c; }; break;
-	case ot::ConnectorManager::BOTTOM: for (auto c : m_bottom) { if (c->name() == _connectorName) return c; }; break;
-	case ot::ConnectorManager::AUTO:
+	case ot::BlockConnectorManagerConfiguration::TOP: for (auto c : m_top) { if (c->name() == _connectorName) return c; }; break;
+	case ot::BlockConnectorManagerConfiguration::LEFT: for (auto c : m_left) { if (c->name() == _connectorName) return c; }; break;
+	case ot::BlockConnectorManagerConfiguration::RIGHT: for (auto c : m_right) { if (c->name() == _connectorName) return c; }; break;
+	case ot::BlockConnectorManagerConfiguration::BOTTOM: for (auto c : m_bottom) { if (c->name() == _connectorName) return c; }; break;
+	case ot::BlockConnectorManagerConfiguration::AUTO:
 	{
 		ot::BlockConnectorConfiguration* connector = findConnector(_connectorName, TOP);
 		if (connector) return connector;
@@ -87,7 +87,7 @@ ot::BlockConnectorConfiguration* ot::BorderLayoutConnectorManager::findConnector
 	return nullptr;
 }
 
-void ot::BorderLayoutConnectorManager::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+void ot::BorderLayoutBlockConnectorManagerConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	OT_rJSON_createValueArray(topArr);
 	OT_rJSON_createValueArray(leftArr);
 	OT_rJSON_createValueArray(rightArr);
@@ -120,7 +120,7 @@ void ot::BorderLayoutConnectorManager::addToJsonObject(OT_rJSON_doc& _document, 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BottomItems, bottomArr);
 }
 
-void ot::BorderLayoutConnectorManager::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::BorderLayoutBlockConnectorManagerConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_TopItems, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_LeftItems, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RightItems, Array);

@@ -15,8 +15,7 @@
 
 namespace ot {
 
-	class BlockConnectorConfiguration;
-	class ConnectorManager;
+	class BlockConnectorManagerConfiguration;
 
 	class BLOCKEDITORAPI_API_EXPORT BlockLayerConfiguration : public ot::BlockConfigurationGraphicsObject {
 	public:
@@ -37,10 +36,13 @@ namespace ot {
 		virtual std::string layerType(void) const = 0;
 
 		//! @brief Will set the currently used connector manager
-		void setConnectorManager(ot::ConnectorManager* _manager);
+		void setConnectorManager(ot::BlockConnectorManagerConfiguration* _manager);
+
+		//! @brief Returns the currently used conenctor manager
+		ot::BlockConnectorManagerConfiguration* getConnectorManager(void) { return m_connectorManager; };
 
 	private:
-		ConnectorManager* m_connectorManager;
+		BlockConnectorManagerConfiguration* m_connectorManager;
 
 		BlockLayerConfiguration(BlockLayerConfiguration&) = delete;
 		BlockLayerConfiguration& operator = (BlockLayerConfiguration&) = delete;
