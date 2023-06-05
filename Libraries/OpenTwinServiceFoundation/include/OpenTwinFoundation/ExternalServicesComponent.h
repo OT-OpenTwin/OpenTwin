@@ -56,7 +56,7 @@ namespace ot {
 				const std::string &					_sessionServiceURL,
 				const std::string &					_sessionID
 			);			
-			std::string init2(
+			std::string initDebugExplicit(
 				const std::string &					_sessionServiceURL,
 				const std::string &					_sessionID
 			);
@@ -142,7 +142,7 @@ namespace ot {
 			ApplicationBase *					_application
 		);
 
-		__declspec (dllexport) int init2(
+		__declspec (dllexport) int initDebugExplicit(
 			const std::string& _localDirectoryServiceURL,
 			const std::string& _ownURL,
 			const std::string& _sessionServiceURL,

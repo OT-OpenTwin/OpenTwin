@@ -60,6 +60,6 @@ extern "C" {
 	// This function is called once upon startup of this service
 	_declspec(dllexport) int init(const char * _siteID, const char * _ownIP, const char * _sessionServiceIP, const char * _sessionID)
 	{
-		return ot::foundation::init2(_siteID, _ownIP, _sessionServiceIP, _sessionID, Application::instance());
+		return ot::foundation::initDebugExplicit(_siteID, _ownIP, _sessionServiceIP, _sessionID, Application::instance());
 	};
 }
