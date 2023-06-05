@@ -45,7 +45,7 @@ RMDIR /S /Q "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%\uiPlugins"
 MKDIR "%OT_DEPLOYMENT_DIR%\Certificates"
-
+MKDIR "%OT_DEPLOYMENT_DIR%\Python"
 
 REM ===========================================================================
 REM Copy the library files
@@ -187,9 +187,8 @@ REM GETDP
 COPY "%GETDP_BIN%\*.*" "%OT_DEPLOYMENT_DIR%"
 
 REM PYTHON
-MKDIR "%OT_DEPLOYMENT_DIR%\Python"
-XCOPY /S "%PYTHON_ROOT%\*.*" "%OT_DEPLOYMENT_DIR%\Python"
-COPY "%PYTHON_ROOT%\python39.dll" "%OT_DEPLOYMENT_DIR%"
+COPY "%PYTHON310_ROOT%\python310.dll" "%OT_DEPLOYMENT_DIR%"
+XCOPY /S "%PYTHON310_ROOT%\Lib" "%OT_DEPLOYMENT_DIR%\Python" 
 
 REM Visual Studio Redistributables
 MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
