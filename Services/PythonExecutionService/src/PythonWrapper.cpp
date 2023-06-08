@@ -2,10 +2,15 @@
 
 PythonWrapper::PythonWrapper()
 {
+#ifdef RELEASEDEBUG
 	_pythonRoot = getenv("PYTHON310_ROOT");
-	_pythonPath = 
-		_pythonRoot + "\\Lib;"+
-		_pythonRoot + "\\Lib\\site-packages;"+
+	_pythonRoot += "\\Lib";
+#else
+	_pythonRoot = ".\\Python";
+#endif // RELEASEDEBUG
+	_pythonPath =
+		_pythonRoot + ";" +
+		_pythonRoot + "\\site-packages;" +
 		_pythonRoot;
 }
 

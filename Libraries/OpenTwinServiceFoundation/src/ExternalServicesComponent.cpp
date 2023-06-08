@@ -250,7 +250,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::init2(const std::string& _sessionServiceURL, const std::string& _sessionID)
+std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::string& _sessionServiceURL, const std::string& _sessionID)
 {
 	if (m_componentState != WaitForInit) {
 		otAssert(0, "Component already initialized");
@@ -727,7 +727,7 @@ int ot::foundation::init(
 }
 
 
-int ot::foundation::init2(
+int ot::foundation::initDebugExplicit(
 	const std::string& _localDirectoryServiceURL,
 	const std::string& _ownIP,
 	const std::string& _sessionServiceIP,
@@ -782,7 +782,7 @@ int ot::foundation::init2(
 			return startupResult;
 		}
 
-		std::string initResult = intern::ExternalServicesComponent::instance()->init2(actualSessionServiceURL, actualSessionID);
+		std::string initResult = intern::ExternalServicesComponent::instance()->initDebugExplicit(actualSessionServiceURL, actualSessionID);
 		if (initResult != OT_ACTION_RETURN_VALUE_OK) {
 			return -22;
 		}
