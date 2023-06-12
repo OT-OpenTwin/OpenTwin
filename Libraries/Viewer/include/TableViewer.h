@@ -52,5 +52,5 @@ private:
 	ot::UID _tableID = -1;
 	ot::UID _tableVersion = -1;
 	std::string _tableName;
-	EntityParameterizedDataTable::HeaderOrientation	_tableOrientation;
+	EntityParameterizedDataTable::HeaderOrientation	_tableOrientation = EntityParameterizedDataTable::HeaderOrientation::horizontal;
 };
