@@ -147,5 +147,7 @@ private:
 	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
 	DataCollectionCreationHandler* _collectionCreationHandler = nullptr;
 
+	void HandleSelectionChanged();
+	void ProcessActionDetached(const std::string& _action, OT_rJSON_doc _doc);
 	void RequestSelectedRanges();
 };

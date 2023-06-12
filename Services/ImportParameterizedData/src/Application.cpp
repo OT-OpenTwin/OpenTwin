@@ -69,201 +69,10 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
-	try
-	{
-		std::string returnMessage = "";
-		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-		{
-			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == _buttonImportCSV.GetFullDescription())
-			{
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.csv;*.txt)");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importCSVFile");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
-				uiComponent()->sendMessage(true, doc);
-			}
-			else if (action == _buttonImportPythonScript.GetFullDescription())
-			{
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import Python Script");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "Python scripts (*.py)");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importPythonScript");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
-				uiComponent()->sendMessage(true, doc);
-			}
-			else if (action == _buttonCreateTable.GetFullDescription())
-			{
-				std::list<ot::EntityInformation> selectedEntityInfo;
-				if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-				m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc));
+	handler.detach();
 
-				_tableHandler->AddTableView(selectedEntityInfo.begin()->getID(), selectedEntityInfo.begin()->getVersion());
-			}
-			else if (action == _buttonCreateRMDEntry.GetFullDescription())
-			{
-				_parametrizedDataHandler->AddSelectionsAsRMD(m_selectedEntities);
-				RequestSelectedRanges();
-			}
-			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
-			{
-				_parametrizedDataHandler->AddSelectionsAsMSMD(m_selectedEntities);
-				RequestSelectedRanges();
-			}
-			else if (action == _buttonCreateParameterEntry.GetFullDescription())
-			{
-				_parametrizedDataHandler->AddSelectionsAsParameter(m_selectedEntities);
-				RequestSelectedRanges();
-			}
-			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
-			{
-				_parametrizedDataHandler->AddSelectionsAsQuantity(m_selectedEntities);
-				RequestSelectedRanges();
-			}
-			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
-			{
-
-				OT_rJSON_createDOC(newDocument);
-				ot::rJSON::add(newDocument, OT_ACTION_MEMBER, "Test");
-				ot::rJSON::add(newDocument, "TestField", 13);
-
-				OT_rJSON_createValueObject(subDoc);
-				ot::rJSON::add(newDocument, subDoc, "TestField", 26);
-
-				ot::rJSON::add(newDocument, "SubDoc", subDoc);
-
-				OT_rJSON_createValueArray(array);
-				for (int i = 0; i < 10; i++)
-				{
-					array.PushBack(i, newDocument.GetAllocator());
-				}
-				ot::rJSON::add(newDocument, "array", array);
-
-				
-
-				//rapidjson::Document newDocument;
-				//newDocument.SetObject();
-				//newDocument.AddMember(OT_ACTION_MEMBER, "Test", newDocument.GetAllocator());
-				//newDocument.AddMember("TestField", 13, newDocument.GetAllocator());
-
-				//rapidjson::Document subDocument;
-				//subDocument.SetObject();
-				//subDocument.AddMember("TestField", 2, subDocument.GetAllocator());
-
-				//newDocument.AddMember("TestSubDoc", subDocument, newDocument.GetAllocator());
-
-				int testInt = newDocument["TestField"].GetInt();
-				
-				auto testArray = newDocument["array"].GetArray();
-				for (auto& element : testArray)
-				{
-					std::cout << element.GetInt();
-				}
-				
-				//auto temp =	newDocument.FindMember("Test");
-				//auto val = temp->value;
-				auto sbDoc = newDocument["SubDoc"].GetObject();
-				int testIntSub = sbDoc["TestField"].GetInt();
-
-
-				//sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
-
-				_parametrizedDataHandler->CreateNewScriptDescribedMSMD();
-			}
-			else if (action == _buttonCreateDataCollection.GetFullDescription())
-			{
-				m_uiComponent->displayMessage("===========================================================================\n");
-				m_uiComponent->displayMessage("Start creation of dataset\n");
-				_collectionCreationHandler->CreateDataCollection(dataBaseURL(), m_collectionName);
-				m_uiComponent->displayMessage("Creation of dataset finished\n");
-				m_uiComponent->displayMessage("===========================================================================\n\n");
-			}
-			else
-			{
-				return OT_ACTION_RETURN_UnknownAction;
-			}
-		}
-		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
-		{
-			std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-			if (subsequentFunction == "importCSVFile")
-			{
-				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				_dataSourceHandler->StoreSourceFileAsEntity(fileName);
-				returnMessage = "Import of " + fileName + " succeeded\n";
-			}
-			else if (subsequentFunction == "importPythonScript")
-			{
-				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				_dataSourceHandler->StorePythonScriptAsEntity(fileName);
-				returnMessage = "Import of " + fileName + " succeeded\n";
-			}
-			else if (subsequentFunction == "CreateSelectedRangeEntity")
-			{
-				auto listOfSerializedRanges = ot::rJSON::getObjectList(_doc, "Ranges");
-				std::vector<ot::TableRange> ranges;
-				ranges.reserve(listOfSerializedRanges.size());
-				for (auto range : listOfSerializedRanges)
-				{
-					OT_rJSON_parseDOC(serializedRange, range.c_str());
-					ot::TableRange tableRange;
-					tableRange.setFromJsonObject(serializedRange);					
-					ranges.push_back(tableRange);
-				}
-
-				ot::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				ot::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				_parametrizedDataHandler->StoreSelectionRanges(tableEntityID, tableEntityVersion, ranges);
-			}
-			else if (subsequentFunction == "ColourRanges")
-			{
-				std::string tableName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
-				_parametrizedDataHandler->SetColourOfRanges(tableName);
-			}
-			else if (subsequentFunction == "createUpdatedSelections")
-			{
-
-				_parametrizedDataHandler->CreateUpdatedSelections(_doc);
-			}
-			else
-			{
-				return OT_ACTION_RETURN_UnknownAction;
-			}
-		}
-		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-		{
-			std::list<ot::EntityInformation> entityInfos;
-			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-			if (entityInfos.begin()->getName().find(_tableFolder) != std::string::npos)
-			{
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long) entityInfos.begin()->getVersion());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
-
-				uiComponent()->sendMessage(true, doc);
-			}
-		}
-		else {
-			return OT_ACTION_RETURN_UnknownAction;
-		}
-		m_uiComponent->displayMessage(returnMessage);
-		return returnMessage;
-	}
-	catch (std::runtime_error& e)
-	{
-		std::string errorMessage = "Failed to execute action " + _action + " due to runtime error: " + e.what();
-		m_uiComponent->displayMessage(errorMessage);
-		return errorMessage;
-	}
+	return "Action is being processed.";
 }
 
 std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
@@ -386,6 +195,201 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 
 void Application::modelSelectionChanged(void)
 {
+	std::thread handler(&Application::HandleSelectionChanged,this);
+	handler.detach();
+}
+
+// ##################################################################################################################################
+
+void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc _doc)
+{
+	std::mutex onlyOneActionPerTime;
+	std::lock_guard<std::mutex> lock (onlyOneActionPerTime);
+
+	try
+	{
+		std::string returnMessage = "";
+		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+		{
+			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			if (action == _buttonImportCSV.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.csv;*.txt)");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importCSVFile");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonImportPythonScript.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import Python Script");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "Python scripts (*.py)");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importPythonScript");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonCreateTable.GetFullDescription())
+			{
+				std::list<ot::EntityInformation> selectedEntityInfo;
+				if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
+				m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+
+				_tableHandler->AddTableView(selectedEntityInfo.begin()->getID(), selectedEntityInfo.begin()->getVersion());
+			}
+			else if (action == _buttonCreateRMDEntry.GetFullDescription())
+			{
+				_parametrizedDataHandler->AddSelectionsAsRMD(m_selectedEntities);
+				RequestSelectedRanges();
+			}
+			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
+			{
+				_parametrizedDataHandler->AddSelectionsAsMSMD(m_selectedEntities);
+				RequestSelectedRanges();
+			}
+			else if (action == _buttonCreateParameterEntry.GetFullDescription())
+			{
+				_parametrizedDataHandler->AddSelectionsAsParameter(m_selectedEntities);
+				RequestSelectedRanges();
+			}
+			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
+			{
+				_parametrizedDataHandler->AddSelectionsAsQuantity(m_selectedEntities);
+				RequestSelectedRanges();
+			}
+			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
+			{
+
+				//OT_rJSON_createDOC(newDocument);
+				//ot::rJSON::add(newDocument, OT_ACTION_MEMBER, "Test");
+				//ot::rJSON::add(newDocument, "TestField", 13);
+
+				//OT_rJSON_createValueObject(subDoc);
+				//ot::rJSON::add(newDocument, subDoc, "TestField", 26);
+
+				//ot::rJSON::add(newDocument, "SubDoc", subDoc);
+
+				//OT_rJSON_createValueArray(array);
+				//for (int i = 0; i < 10; i++)
+				//{
+				//	array.PushBack(i, newDocument.GetAllocator());
+				//}
+				//ot::rJSON::add(newDocument, "array", array);
+
+				//int testInt = newDocument["TestField"].GetInt();
+
+				//auto testArray = newDocument["array"].GetArray();
+				//for (auto& element : testArray)
+				//{
+				//	std::cout << element.GetInt();
+				//}
+
+				////auto temp =	newDocument.FindMember("Test");
+				////auto val = temp->value;
+				//auto sbDoc = newDocument["SubDoc"].GetObject();
+				//int testIntSub = sbDoc["TestField"].GetInt();
+				//sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
+
+				_parametrizedDataHandler->CreateNewScriptDescribedMSMD();
+			}
+			else if (action == _buttonCreateDataCollection.GetFullDescription())
+			{
+				m_uiComponent->displayMessage("===========================================================================\n");
+				m_uiComponent->displayMessage("Start creation of dataset\n");
+				_collectionCreationHandler->CreateDataCollection(dataBaseURL(), m_collectionName);
+				m_uiComponent->displayMessage("Creation of dataset finished\n");
+				m_uiComponent->displayMessage("===========================================================================\n\n");
+			}
+			else
+			{
+				throw std::exception(OT_ACTION_RETURN_UnknownAction);
+			}
+		}
+		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
+		{
+			std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+			if (subsequentFunction == "importCSVFile")
+			{
+				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+				_dataSourceHandler->StoreSourceFileAsEntity(fileName);
+				returnMessage = "Import of " + fileName + " succeeded\n";
+			}
+			else if (subsequentFunction == "importPythonScript")
+			{
+				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+				_dataSourceHandler->StorePythonScriptAsEntity(fileName);
+				returnMessage = "Import of " + fileName + " succeeded\n";
+			}
+			else if (subsequentFunction == "CreateSelectedRangeEntity")
+			{
+				auto listOfSerializedRanges = ot::rJSON::getObjectList(_doc, "Ranges");
+				std::vector<ot::TableRange> ranges;
+				ranges.reserve(listOfSerializedRanges.size());
+				for (auto range : listOfSerializedRanges)
+				{
+					OT_rJSON_parseDOC(serializedRange, range.c_str());
+					ot::TableRange tableRange;
+					tableRange.setFromJsonObject(serializedRange);
+					ranges.push_back(tableRange);
+				}
+
+				ot::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+				ot::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
+				_parametrizedDataHandler->StoreSelectionRanges(tableEntityID, tableEntityVersion, ranges);
+			}
+			else if (subsequentFunction == "ColourRanges")
+			{
+				std::string tableName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
+				_parametrizedDataHandler->SetColourOfRanges(tableName);
+			}
+			else if (subsequentFunction == "createUpdatedSelections")
+			{
+
+				_parametrizedDataHandler->CreateUpdatedSelections(_doc);
+			}
+			else
+			{
+				throw std::exception(OT_ACTION_RETURN_UnknownAction);
+			}
+		}
+		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
+		{
+			std::list<ot::EntityInformation> entityInfos;
+			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
+			if (entityInfos.begin()->getName().find(_tableFolder) != std::string::npos)
+			{
+				OT_rJSON_createDOC(doc);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long) entityInfos.begin()->getVersion());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
+
+				uiComponent()->sendMessage(true, doc);
+			}
+		}
+		else {
+			throw std::exception(OT_ACTION_RETURN_UnknownAction);
+		}
+		m_uiComponent->displayMessage(returnMessage);
+	}
+	catch (std::runtime_error& e)
+	{
+		std::string errorMessage = "Failed to execute action " + _action + " due to runtime error: " + e.what();
+		m_uiComponent->displayMessage(errorMessage);
+	}
+}
+
+void Application::HandleSelectionChanged()
+{
+	std::mutex onlyOneActionPerTime;
+	std::lock_guard<std::mutex> lock(onlyOneActionPerTime);
 	try
 	{
 		std::list<ot::EntityInformation> selectedEntityInfo;
@@ -460,8 +464,6 @@ void Application::modelSelectionChanged(void)
 	}
 }
 
-// ##################################################################################################################################
-
 void Application::RequestSelectedRanges()
 {
 	OT_rJSON_createDOC(doc);
@@ -469,11 +471,11 @@ void Application::RequestSelectedRanges()
 
 	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, m_modelComponent->getCurrentVisualizationModelID());
 	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-	
+
 	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "CreateSelectedRangeEntity");
 
 	OT_rJSON_createValueObject(obj);
-	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(doc,obj);
+	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(doc, obj);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_COLOUR_BACKGROUND, obj);
 
 
