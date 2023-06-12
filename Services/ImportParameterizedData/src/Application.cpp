@@ -402,11 +402,13 @@ void Application::HandleSelectionChanged()
 			if (entityName.find(_dataSourcesFolder) != std::string::npos)
 			{
 				uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), true);
+				uiComponent()->sendUpdatedControlState();
 			}
 			else
 			{
 				uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
-				
+				uiComponent()->sendUpdatedControlState();
+
 				if (entityName.find(_tableFolder) != std::string::npos)
 				{
 					if (_visualizationModel == -1)
@@ -445,6 +447,7 @@ void Application::HandleSelectionChanged()
 		else
 		{
 			uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
+			uiComponent()->sendUpdatedControlState();
 		}
 
 		ot::UIDList selectedRangesID, selectedRangesVersion;
