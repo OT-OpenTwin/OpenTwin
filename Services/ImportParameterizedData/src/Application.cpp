@@ -72,7 +72,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc));
 	handler.detach();
 
-	return "Action is being processed.";
+	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
