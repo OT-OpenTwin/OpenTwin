@@ -242,10 +242,10 @@ ECHO Build Service: PHREECService
 ECHO ===============================================================
 CALL "%OT_PHREEC_SERVICE_ROOT%\build.bat" %1 %2
 
-ECHO ===============================================================
-ECHO Build Service: KrigingService
-ECHO ===============================================================
-CALL "%OT_KRIGING_SERVICE_ROOT%\build.bat" %1 %2
+REM ECHO ===============================================================
+REM ECHO Build Service: KrigingService
+REM ECHO ===============================================================
+REM CALL "%OT_KRIGING_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: ModelingService
