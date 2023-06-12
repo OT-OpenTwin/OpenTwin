@@ -403,38 +403,43 @@ void Application::HandleSelectionChanged()
 			{
 				uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), true);
 			}
-			else if (entityName.find(_tableFolder) != std::string::npos)
+			else
 			{
-				if (_visualizationModel == -1)
+				uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
+				
+				if (entityName.find(_tableFolder) != std::string::npos)
 				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
+					if (_visualizationModel == -1)
+					{
+						_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+					}
+					OT_rJSON_createDOC(doc);
+					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
+					ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion());
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID());
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
 
-				uiComponent()->sendMessage(true, doc);
-			}
-			else if (entityName.find(_previewTableNAme) != std::string::npos)
-			{
-				if (_visualizationModel == -1)
+					uiComponent()->sendMessage(true, doc);
+				}
+				else if (entityName.find(_previewTableNAme) != std::string::npos)
 				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel));
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second));
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first));
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "");
+					if (_visualizationModel == -1)
+					{
+						_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+					}
+					auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
+					OT_rJSON_createDOC(doc);
+					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
+					ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel));
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second));
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first));
+					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "");
 
-				uiComponent()->sendMessage(true, doc);
+					uiComponent()->sendMessage(true, doc);
+				}
 			}
 		}
 		else
