@@ -104,6 +104,42 @@ void EntityBase::StoreToDataBase(void)
 	resetModified();
 }
 
+void EntityBase::StoreToDataBase(ot::UID givenEntityVersion )
+{
+	if (!getModified()) return;
+
+	entityStorageVersion = givenEntityVersion; 
+	entityIsStored();
+
+	// This item collects all information about the entity and adds it to the storage data 
+	auto doc = bsoncxx::builder::basic::document{};
+
+	doc.append(bsoncxx::builder::basic::kvp("SchemaType", getClassName()));
+
+	assert(!owningService.empty());
+
+	bsoncxx::document::value bsonObj = bsoncxx::from_json(properties.getJSON(nullptr, false));
+
+	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
+		bsoncxx::builder::basic::kvp("EntityID", (long long)entityID),
+		bsoncxx::builder::basic::kvp("Version", (long long)entityStorageVersion),
+		bsoncxx::builder::basic::kvp("Name", name),
+		bsoncxx::builder::basic::kvp("initiallyHidden", initiallyHidden),
+		bsoncxx::builder::basic::kvp("isEditable", isEditable),
+		bsoncxx::builder::basic::kvp("selectChildren", selectChildren),
+		bsoncxx::builder::basic::kvp("manageParentVisibility", manageParentVisibility),
+		bsoncxx::builder::basic::kvp("manageChildVisibility", manageChildVisibility),
+		bsoncxx::builder::basic::kvp("Owner", owningService),
+		bsoncxx::builder::basic::kvp("Properties", bsonObj)
+	);
+
+	AddStorageData(doc);
+
+	DataBase::GetDataBase()->StoreDataItem(doc);
+
+	resetModified();
+}
+
 void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	setParent(parent);

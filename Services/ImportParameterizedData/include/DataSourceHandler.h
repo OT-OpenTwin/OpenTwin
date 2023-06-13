@@ -16,12 +16,14 @@ class DataSourceHandler : public BusinessLogicHandler
 {
 public:
 	DataSourceHandler(const std::string dataSourceFolder);
-	void StoreSourceFileAsEntity(std::string fileName);
+	void AddSourceFileToModel();
 	void StorePythonScriptAsEntity(std::string fileName);
 
+	void ReserveSourceUIDs(const ot::UIDList& entityID) { _reserveSourceUIDs = entityID; };
 	std::vector<char> ExtractFileContentAsBinary(std::string fileName);
+
 private:
-	
+	ot::UIDList _reserveSourceUIDs;
 	const std::string _dataSourceFolder;
 	std::shared_ptr<EntityParameterizedDataSource> CreateNewSourceEntity(std::string dataType);
 };

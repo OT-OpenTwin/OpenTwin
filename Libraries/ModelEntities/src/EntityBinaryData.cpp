@@ -21,10 +21,6 @@ bool EntityBinaryData::getEntityBox(double &xmin, double &xmax, double &ymin, do
 	return false;
 }
 
-void EntityBinaryData::StoreToDataBase(void)
-{
-	EntityBase::StoreToDataBase();
-}
 
 void EntityBinaryData::AddStorageData(bsoncxx::builder::basic::document &storage)
 {

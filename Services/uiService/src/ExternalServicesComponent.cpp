@@ -40,6 +40,7 @@
 #include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
 #include "OTBlockEditor/BlockEditorAPI.h"
 #include "OTBlockEditor/BlockNetworkEditor.h"
+#include "FileHandler.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -1704,6 +1705,49 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				requestFileForReading(dialogTitle, fileMask, subsequentFunction, senderURL, loadContent);
 			}
+			else if (action == OT_Action_CMD_UI_StoreFileInDataBase)
+			{
+				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+				std::string fileMask = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+				
+				try
+				{
+					std::string absoluteFilePath = RequestFileName(dialogTitle, fileMask);
+					if (absoluteFilePath != "")
+					{
+						ot::UIDList entityIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+						std::string entityPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_NAME);
+						std::list<std::string> takenNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
+						std::string senderName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER);
+						std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+
+						FileHandler handler;
+						std::string fileName = handler.ExtractFileNameFromPath(absoluteFilePath);
+						std::string uniqueEntityName = handler.CreateNewUniqueTopologyName(takenNames, fileName, entityPath);
+						handler.StoreFileInDataBase(absoluteFilePath, uniqueEntityName, entityIDs, senderName);
+
+						std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+						rapidjson::Document returnDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_ExecuteFunction);
+						ot::rJSON::add(returnDoc, OT_ACTION_PARAM_FILE_OriginalName, fileName);
+						ot::rJSON::add(returnDoc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
+
+						std::string response;
+						sendHttpRequest(EXECUTE, senderURL, returnDoc, response);
+
+						// Check if response is an error or warning
+						OT_ACTION_IF_RESPONSE_ERROR(response) {
+							assert(0); // ERROR
+						}
+						else OT_ACTION_IF_RESPONSE_WARNING(response) {
+							assert(0); // WARNING
+						}
+					}
+				}
+				catch (std::exception& e)
+				{
+					displayInfoMessage("Failed to load file due to: " + std::string(e.what()));
+				}
+			}
 			else if (action == OT_ACTION_CMD_UI_SaveFileContent)
 			{
 				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
@@ -3365,6 +3409,22 @@ void ExternalServicesComponent::selectFileForStoring(const std::string & dialogT
 	catch (...)
 	{
 		assert(0); // Error handling
+	}
+}
+
+std::string ExternalServicesComponent::RequestFileName(const std::string& dialogTitle, const std::string& fileMask)
+{
+	try {
+		QString fileName = QFileDialog::getOpenFileName(
+			nullptr,
+			dialogTitle.c_str(),
+			QDir::currentPath(),
+			QString(fileMask.c_str()) + " ;; All files (*.*)");
+		return fileName.toStdString();
+	}
+	catch (std::exception& e)
+	{
+		throw std::exception(("File could not be loaded due to this exeption: " + std::string(e.what())).c_str());
 	}
 }
 

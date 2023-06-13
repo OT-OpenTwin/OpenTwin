@@ -243,6 +243,7 @@ public:
 	// ###################################################################################################
 
 	// File operations
+	std::string RequestFileName(const std::string& dialogTitle, const std::string& fileMask);
 
 	void requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentAction, const std::string &senderURL, bool loadContent);
 	void selectFileForStoring(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, const std::string &senderURL);

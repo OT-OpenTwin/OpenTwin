@@ -120,6 +120,7 @@
 #define OT_ACTION_CMD_UI_Unlock "UI.MasterLock.Disable"
 #define OT_ACTION_CMD_UI_GenerateUIDs "UI.UID.Generate"
 #define OT_ACTION_CMD_UI_RequestFileForReading "UI.RequestFileForReading"
+#define OT_Action_CMD_UI_StoreFileInDataBase "UI.SaveFileInDataBase"
 #define OT_ACTION_CMD_UI_SelectFileForStoring "UI.SelectFileForStoring"
 #define OT_ACTION_CMD_UI_SaveFileContent "UI.SaveFileContent"
 #define OT_ACTION_CMD_UI_FillPropertyGrid "UI.FillPropertyGrid"
@@ -269,12 +270,11 @@
 #define OT_ACTION_PARAM_FILE_Mode "File.Mode"
 #define OT_ACTION_PARAM_FILE_Mask "File.Mask"
 #define OT_ACTION_PARAM_FILE_Name "File.Name"
+#define OT_ACTION_PARAM_FILE_TAKEN_NAMES "File.TakenNames"
 #define OT_ACTION_PARAM_FILE_Content "File.Content"
 #define OT_ACTION_PARAM_FILE_Content_UncompressedDataLength "File.Content.DataLength.Uncompressed"
 #define OT_ACTION_PARAM_FILE_OriginalName "File.OriginalName"
 #define OT_ACTION_PARAM_FILE_LoadContent "File.LoadContent"
-
-#define OT_ACTION_PARAM_FILE_EntityUID "File.UID"
 #define OT_ACTION_PARAM_SENDER_URL "Sender.URL"
 
 #define OT_ACTION_PARAM_LOG "LogMessage"

@@ -15,8 +15,6 @@ public:
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
-	virtual void StoreToDataBase(void) override;
-
 	virtual std::string getClassName(void) { return "EntityBinaryData"; };
 
 	virtual entityType getEntityType(void) override { return DATA; };

@@ -56,11 +56,6 @@ void EntityParameterizedDataSource::addVisualizationNodes(void)
 
 }
 
-void EntityParameterizedDataSource::StoreToDataBase(void)
-{
-	EntityBase::StoreToDataBase();
-}
-
 void EntityParameterizedDataSource::setFileProperties(std::string path, std::string fileName, std::string fileType)
 {
 	_path = path;

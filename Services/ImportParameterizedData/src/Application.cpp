@@ -215,12 +215,24 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			if (action == _buttonImportCSV.GetFullDescription())
 			{
 				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_Action_CMD_UI_StoreFileInDataBase);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
 				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.csv;*.txt)");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importCSVFile");
+				
+				ot::UIDList uids;
+				uids.push_back( m_modelComponent->createEntityUID());
+				uids.push_back( m_modelComponent->createEntityUID());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityIDList, uids);
+				_dataSourceHandler->ReserveSourceUIDs(uids);
+				
+				ot::rJSON::add(doc, OT_ACTION_PARAM_NAME, _dataSourcesFolder);
+
+				std::list<std::string> takenNames =	m_modelComponent->getListOfFolderItems(_dataSourcesFolder);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES, takenNames);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importCSVFile");
+
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonImportPythonScript.GetFullDescription())
@@ -316,7 +328,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			if (subsequentFunction == "importCSVFile")
 			{
 				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				_dataSourceHandler->StoreSourceFileAsEntity(fileName);
+				_dataSourceHandler->AddSourceFileToModel();
 				returnMessage = "Import of " + fileName + " succeeded\n";
 			}
 			else if (subsequentFunction == "importPythonScript")

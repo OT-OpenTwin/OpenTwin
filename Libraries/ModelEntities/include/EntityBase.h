@@ -90,6 +90,7 @@ public:
 	virtual bool considerChildrenForPropertyFilter(void) { return true; };
 
 	virtual void StoreToDataBase(void);
+	virtual void StoreToDataBase(ot::UID givenEntityVersion);
 
 	void setModified(void);
 	void resetModified(void) { isModified = false; };

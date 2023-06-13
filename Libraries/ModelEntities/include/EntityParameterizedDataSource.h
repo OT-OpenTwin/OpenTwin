@@ -12,7 +12,6 @@ class __declspec(dllexport) EntityParameterizedDataSource : public EntityBase
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityParameterizedDataSource"; };
-	virtual void StoreToDataBase() override;
 	virtual bool updateFromProperties(void) override;
 	virtual void addVisualizationNodes() override;
 

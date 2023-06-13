@@ -32,6 +32,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\FileHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ExternalServicesComponent.cpp" />
     <ClCompile Include="src\ControlsManager.cpp" />
@@ -63,6 +64,7 @@
     <QtMoc Include="include\ManageAccess.h" />
     <QtMoc Include="include\ManageOwner.h" />
     <QtMoc Include="include\DevLogger.h" />
+    <ClInclude Include="include\FileHandler.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <ClInclude Include="include\ToolBar.h" />
     <QtMoc Include="include\welcomeScreen.h" />

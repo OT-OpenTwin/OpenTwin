@@ -14,41 +14,20 @@
 DataSourceHandler::DataSourceHandler(std::string dataSourceFolder) : _dataSourceFolder(dataSourceFolder) 
 {}
 
-void DataSourceHandler::StoreSourceFileAsEntity(std::string fileName)
+void DataSourceHandler::AddSourceFileToModel()
 {
-	CheckEssentials();
-	
-	auto memBlock = ExtractFileContentAsBinary(fileName);
-
-	std::string documentName = fileName.substr(fileName.find_last_of("/") + 1);
-	std::string path = fileName.substr(0, fileName.find_last_of("/"));
-	std::string documentType = documentName.substr(documentName.find(".") + 1);
-	documentName = documentName.substr(0, documentName.find("."));
-
-	auto newSourceEntity = CreateNewSourceEntity(documentType);
-	std::string fullFileName = CreateNewUniqueTopologyNamePlainPossible(_dataSourceFolder, documentName);
-	newSourceEntity->setName(fullFileName);
-	newSourceEntity->setInitiallyHidden(false);
-	newSourceEntity->setFileProperties(path, documentName, documentType);
-
-	ot::UID newDataID = _modelComponent->createEntityUID();
-	std::unique_ptr <EntityBinaryData> newData(new EntityBinaryData(newDataID, newSourceEntity.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	newData->setData(memBlock.data(),memBlock.size());
-	newData->StoreToDataBase();
-
-	newSourceEntity->setData(newData->getEntityID(), newData->getEntityStorageVersion());
-	newSourceEntity->StoreToDataBase();
-
-	std::list<ot::UID> topologyEntityIDList = { newSourceEntity->getEntityID() };
-	std::list<ot::UID> topologyEntityVersionList = { newSourceEntity->getEntityStorageVersion() };
+	auto uid = _reserveSourceUIDs.begin();
+	std::list<ot::UID> topologyEntityIDList = { *uid };
+	std::list<ot::UID> topologyEntityVersionList = { *uid +1};
 	std::list<bool> topologyEntityForceVisible = { false };
 
-	std::list<ot::UID> dataEntityIDList{ newDataID };
-	std::list<ot::UID> dataEntityVersionList{ newData->getEntityStorageVersion() };
-	std::list<ot::UID> dataEntityParentList{ newSourceEntity->getEntityID() };
+	uid++;
+	std::list<ot::UID> dataEntityIDList{ *uid };
+	std::list<ot::UID> dataEntityVersionList{ *uid +1 };
+	std::list<ot::UID> dataEntityParentList{ *_reserveSourceUIDs.begin() };
 
 	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new source file: " + fullFileName);
+		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new source file");
 }
 
 void DataSourceHandler::StorePythonScriptAsEntity(std::string fileName)
