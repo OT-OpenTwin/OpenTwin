@@ -13,7 +13,7 @@ struct MetadataAssemblyData
 {
 public:
 	MetadataAssemblyData() {};
-	MetadataAssemblyData(MetadataAssemblyData&& other)
+	MetadataAssemblyData(MetadataAssemblyData&& other) noexcept
 	{
 		this->allSelectionRanges.merge(other.allSelectionRanges);
 		this->next = other.next;
@@ -31,5 +31,5 @@ public:
 	 */
 	MetadataAssemblyData* next = nullptr;
 	std::list< std::shared_ptr<EntityTableSelectedRanges>> allSelectionRanges;
-	EntityParameterizedDataCategorization::DataCategorie dataCategory;
+	EntityParameterizedDataCategorization::DataCategorie dataCategory = EntityParameterizedDataCategorization::DataCategorie::UNKNOWN;
 };

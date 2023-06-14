@@ -73,7 +73,6 @@ private:
 
 	ot::Color _backgroundColour;
 
-	//PythonAPI _pythonAPI;
 	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
 	std::map<std::string, std::vector<ot::VariableBundle>> _allVariableBundlesByMSMD;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;

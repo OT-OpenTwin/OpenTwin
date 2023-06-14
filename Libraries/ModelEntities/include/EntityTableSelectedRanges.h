@@ -30,15 +30,15 @@ private:
 	const std::string _propNameConsiderForBatchProcessing = "Consider for batching";
 	const std::string _propNamePassOnScript= "Pass on script";
 	const std::string _pythonScriptProperty = "Update script";
-	uint32_t _topCells;
-	uint32_t _buttomCells;
-	uint32_t _leftCells;
-	uint32_t _rightCells;
+	uint32_t _topCells = 0;
+	uint32_t _buttomCells = 0;
+	uint32_t _leftCells = 0;
+	uint32_t _rightCells = 0;
 
-	std::string _tableName;
-	std::string _tableOrientation;
-	ot::UID _tableID;
-	ot::UID _tableVersion;
+	std::string _tableName = "";
+	std::string _tableOrientation = "";
+	ot::UID _tableID = -1;
+	ot::UID _tableVersion = -1;
 
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
