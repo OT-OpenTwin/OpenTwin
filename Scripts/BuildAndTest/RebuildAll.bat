@@ -101,7 +101,7 @@ CALL "%OT_CORE_ROOT%\build.bat" %1 %2
 ECHO ===============================================================
 ECHO Build Library: OTPythonAPI
 ECHO ===============================================================
-CALL "%OT_PYTHONAPI_ROOT%\build.bat" %1 %2
+CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: OTGui
