@@ -276,37 +276,6 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
-
-				//OT_rJSON_createDOC(newDocument);
-				//ot::rJSON::add(newDocument, OT_ACTION_MEMBER, "Test");
-				//ot::rJSON::add(newDocument, "TestField", 13);
-
-				//OT_rJSON_createValueObject(subDoc);
-				//ot::rJSON::add(newDocument, subDoc, "TestField", 26);
-
-				//ot::rJSON::add(newDocument, "SubDoc", subDoc);
-
-				//OT_rJSON_createValueArray(array);
-				//for (int i = 0; i < 10; i++)
-				//{
-				//	array.PushBack(i, newDocument.GetAllocator());
-				//}
-				//ot::rJSON::add(newDocument, "array", array);
-
-				//int testInt = newDocument["TestField"].GetInt();
-
-				//auto testArray = newDocument["array"].GetArray();
-				//for (auto& element : testArray)
-				//{
-				//	std::cout << element.GetInt();
-				//}
-
-				////auto temp =	newDocument.FindMember("Test");
-				////auto val = temp->value;
-				//auto sbDoc = newDocument["SubDoc"].GetObject();
-				//int testIntSub = sbDoc["TestField"].GetInt();
-				//sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
-
 				_parametrizedDataHandler->CreateNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
@@ -397,7 +366,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 		m_uiComponent->displayMessage(errorMessage);
 	}
 }
-
+#include "ClassFactory.h"
 void Application::HandleSelectionChanged()
 {
 	std::mutex onlyOneActionPerTime;
@@ -462,21 +431,40 @@ void Application::HandleSelectionChanged()
 			uiComponent()->sendUpdatedControlState();
 		}
 
-		ot::UIDList selectedRangesID, selectedRangesVersion;
+		ot::UIDList potentialRangesID, potentialRangesVersions;
 		for (auto entityInfo : selectedEntityInfo)
 		{
 			std::string name = entityInfo.getName();
 			if (name.find(_dataCategorizationFolder) != std::string::npos)
 			{
-				if (name.find("Selection") != std::string::npos)
-				{
-					selectedRangesID.push_back(entityInfo.getID());
-					selectedRangesVersion.push_back(entityInfo.getVersion());
-				}
+				potentialRangesID.push_back(entityInfo.getID());
+				potentialRangesVersions.push_back(entityInfo.getVersion());
 			}
 		}
-
+		Application::instance()->prefetchDocumentsFromStorage(potentialRangesID);
+		ClassFactory classFactory;
+		auto version = potentialRangesVersions.begin();
+		ot::UIDList selectedRangesID, selectedRangesVersion;
+		for (const ot::UID& uid : potentialRangesID)
+		{
+			EntityBase* entBase = m_modelComponent->readEntityFromEntityIDandVersion(uid, *version, classFactory);
+			EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(entBase);
+			if (selectionRange != nullptr)
+			{
+				selectedRangesID.push_back(uid);
+				selectedRangesVersion.push_back(*version);
+				delete selectionRange;
+				selectionRange = nullptr;
+			}
+			else
+			{
+				delete entBase;
+				entBase = nullptr;
+			}
+			version++;
+		}
 		_parametrizedDataHandler->SelectRange(selectedRangesID, selectedRangesVersion);
+
 	}
 	catch (std::exception& e)
 	{

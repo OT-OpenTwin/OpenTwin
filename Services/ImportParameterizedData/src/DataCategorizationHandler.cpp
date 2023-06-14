@@ -49,7 +49,6 @@ void DataCategorizationHandler::ModelComponentWasSet()
 	std::list<std::string> allItems =	_modelComponent->getListOfFolderItems(_baseFolder);
 	_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
 	_rmdPath = entityInfo.getName();
-
 }
 
 void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
@@ -64,6 +63,7 @@ void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& se
 
 	if (category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 	{
+		assert(entityInfos.begin()->getName() == _rmdPath);
 		AddRMDEntries(*entityInfos.begin());
 	}
 	else
@@ -75,15 +75,18 @@ void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& se
 		for (ot::UID entityID : selectedEntities)
 		{
 			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID),classFactory);
-			if (baseEnt->getName().find(_baseFolder) != std::string::npos && baseEnt->getName().find("Selection") == std::string::npos)
+			auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt);
+			if (categorizationEnt != nullptr)
 			{
 				hasACategorizationEntitySelected = true;
-				delete baseEnt;
+				delete categorizationEnt;
+				categorizationEnt = nullptr;
 				break;
 			}
 			else
 			{
 				delete baseEnt;
+				baseEnt = nullptr;
 			}
 		}
 
@@ -294,7 +297,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			tableRange->setName(names[i]);
 			tableRange->AddRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getEntityStorageVersion(), tableEntPtr->getSelectedHeaderOrientationString());
-			tableRange->setEditable(false);
+			tableRange->setEditable(true);
 
 			ot::EntityInformation entityInfo;
 			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
@@ -374,13 +377,23 @@ void DataCategorizationHandler::FindExistingRanges(std::string containerName, st
 	std::list<std::string> folderItems = _modelComponent->getListOfFolderItems(containerName);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(folderItems, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	ClassFactory classFactory;
 
 	for (auto entityInfo : entityInfos)
 	{
-		std::string entityName = entityInfo.getName();
-		if (entityName.find(_selectionRangeName) != std::string::npos)
+		EntityBase* base = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(base);
+		if (selectionRange != nullptr)
 		{
 			existingRanges.push_back(std::make_pair<>(entityInfo.getID(), entityInfo.getVersion()));
+			delete selectionRange;
+			selectionRange = nullptr;
+		}
+		else
+		{
+			delete base;
+			base = nullptr;
 		}
 	}
 }
