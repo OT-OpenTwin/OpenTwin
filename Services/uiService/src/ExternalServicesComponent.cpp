@@ -3412,15 +3412,25 @@ void ExternalServicesComponent::selectFileForStoring(const std::string & dialogT
 	}
 }
 
-std::string ExternalServicesComponent::RequestFileName(const std::string& dialogTitle, const std::string& fileMask)
+std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::string& dialogTitle, const std::string& fileMask)
 {
 	try {
-		QString fileName = QFileDialog::getOpenFileName(
-			nullptr,
-			dialogTitle.c_str(),
-			QDir::currentPath(),
-			QString(fileMask.c_str()) + " ;; All files (*.*)");
-		return fileName.toStdString();
+		QFileDialog dialog(nullptr);
+		dialog.setFileMode(QFileDialog::ExistingFiles);
+		dialog.setWindowTitle(dialogTitle.c_str());
+		dialog.setWindowFilePath(QDir::currentPath());
+		dialog.setNameFilter(QString(fileMask.c_str()) + " ;; All files (*.*)");
+		
+		if (dialog.exec())
+		{
+			QStringList selectedFiles = dialog.selectedFiles();
+			std::list<std::string> selectedFilesStd;
+			for (QString& file : selectedFiles)
+			{
+				selectedFilesStd.push_back(file.toStdString());
+			}
+			return selectedFilesStd;
+		}
 	}
 	catch (std::exception& e)
 	{

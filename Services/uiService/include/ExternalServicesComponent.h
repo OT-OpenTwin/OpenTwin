@@ -243,9 +243,25 @@ public:
 	// ###################################################################################################
 
 	// File operations
-	std::string RequestFileName(const std::string& dialogTitle, const std::string& fileMask);
+	std::list<std::string> RequestFileNames(const std::string& dialogTitle, const std::string& fileMask);
 
+	/// <summary>
+	/// Opens a file selection dialog. The path of the selected file is send to the service that created the request. Optionally, the content of the file can be send with the http response.
+	/// </summary>
+	/// <param name="dialogTitle"></param>
+	/// <param name="fileMask"> Filters the types of files that are shown in the file dialog. </param>
+	/// <param name="subsequentAction"> Info for the requesting service. </param>
+	/// <param name="senderURL"></param>
+	/// <param name="loadContent"> Option to load the files content and send it as part of the response. </param>
 	void requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentAction, const std::string &senderURL, bool loadContent);
+	
+	/// <summary>
+	/// Opens a SAVE FILE dialog window. The path to the selected file is send back to the requesting service.
+	/// </summary>
+	/// <param name="dialogTitle"></param>
+	/// <param name="fileMask">Filters the types of files that are shown in the file dialog. </param>
+	/// <param name="subsequentFunction"></param>
+	/// <param name="senderURL"></param>
 	void selectFileForStoring(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, const std::string &senderURL);
 	void ReadFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength);
 	void saveFileContent(const std::string &dialogTitle, const std::string &fileName, const std::string &fileContent, ot::UID uncompressedDataLength);
