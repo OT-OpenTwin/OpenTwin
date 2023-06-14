@@ -33,8 +33,10 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="src\FixtureCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\FixtureTableExtractorCSV.cpp" />
     <ClCompile Include="src\FixtureTableStatisticAnalyser.cpp" />
+    <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\TestTableStatisticAnalyser.cpp" />
     <ClCompile Include="src\TestParameterInitialization.cpp" />
     <ClCompile Include="src\TestTableExtractorCSV.cpp" />
@@ -48,6 +50,7 @@
     <None Include="Files\WorkingTestTableTab.csv" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\FixtureCategorizationConsistencyChecker.h" />
     <ClInclude Include="include\FixtureTableExtractorCSV.h" />
     <ClInclude Include="include\FixtureTableStatisticAnalyser.h" />
   </ItemGroup>

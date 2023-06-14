@@ -1,3 +1,13 @@
+/*****************************************************************//**
+ * \file   IndexManager.cpp
+ * \brief  Oversees all parameter and quantity indices. 
+ *			Both are being abstracted as P0, P1, ... respectively Q0, Q1, ...
+ *			The IndexManager takes care that new parameter and quantities get the next available index assigned.
+ *			The IndexManager also takes care of the indices of each parametervalue, respectively quantityvalue.
+ * 
+ * \author Wagner
+ * \date   June 2023
+ *********************************************************************/
 #include "IndexManager.h"
 #include "OpenTwinCore/TypeNames.h"
 #include "Documentation.h"

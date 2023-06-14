@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   MetadataAssemblyData.h
- * \brief  
+ * \brief  Container for groups of TableSelectionEntities that describe the same metadata categorization.
  * 
  * \author Wagner
  * \date   March 2023
@@ -13,12 +13,14 @@ struct MetadataAssemblyData
 {
 public:
 	MetadataAssemblyData() {};
+	
 	MetadataAssemblyData(MetadataAssemblyData&& other) noexcept
 	{
 		this->allSelectionRanges.merge(other.allSelectionRanges);
 		this->next = other.next;
 		this->dataCategory = other.dataCategory;
 	}
+
 	MetadataAssemblyData(const MetadataAssemblyData& other)
 	{
 		this->allSelectionRanges = other.allSelectionRanges;

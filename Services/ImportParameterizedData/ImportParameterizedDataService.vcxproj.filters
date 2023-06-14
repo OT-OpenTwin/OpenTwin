@@ -64,6 +64,9 @@
     <ClCompile Include="src\QuantityContainerCreator.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
+    <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -145,6 +148,9 @@
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\QuantityDataStorageAccess.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataCategorizationConsistencyChecker.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
   </ItemGroup>

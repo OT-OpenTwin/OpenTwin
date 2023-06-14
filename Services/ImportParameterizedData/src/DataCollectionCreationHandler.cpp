@@ -9,31 +9,35 @@
 #include "MetadataParameter.h"
 #include "GenericDocument.h"
 #include "Documentation.h"
+#include "DataCategorizationConsistencyChecker.h"
 
 #include "QuantityContainerCreator.h"
 #include "ResultDataStorageAPI.h"
 
 
-DataCollectionCreationHandler::DataCollectionCreationHandler(std::string baseFolder, std::string datasetFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder)
+DataCollectionCreationHandler::DataCollectionCreationHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
 {
 }
 
-void DataCollectionCreationHandler::CreateDataCollection(std::string dbURL, std::string projectName)
+void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbURL, const std::string& projectName)
 {
 
 	DataStorageAPI::ResultDataStorageAPI dataStorageAccess("Projects", projectName);
 
+	//To guarantee the uniqueness of parameter and quantity indices, a branch overreaching mutual exclusion has to be realized. 
+	//So far branching is not realized yet, thus this implementation is a place holder. Ultimately, a client-server mutual exclusion with (maybe) the modelservice needs to be implemented.
 	BranchSynchronizer branchSynchronizer;
 	_uiComponent->displayMessage("Waiting for branch synchronization\n");
 	branchSynchronizer.WaitForTurn();
 	_uiComponent->displayMessage("Branches synchronized.\n");
 
-	Documentation::INSTANCE()->ClearDocumentation();
-	
 	//All sorted ranges by the metadata they belong to. MSMD has a pointer to the parameter metadata, parameter has a pointer to the quantity metadata
+	Documentation::INSTANCE()->ClearDocumentation();
 	auto allMetadataAssembliesByNames = GetAllMetadataAssemblies(); 
-	
+	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+	Documentation::INSTANCE()->ClearDocumentation();
+
 	if (allMetadataAssembliesByNames.size() == 0)
 	{
 		_uiComponent->displayInformationPrompt("No selection ranges found for creating a dataset.\n");
@@ -47,11 +51,23 @@ void DataCollectionCreationHandler::CreateDataCollection(std::string dbURL, std:
 
 	//Load all existing metadata. They are henceforth neglected in selections.
 	auto indexManager = ConsiderAllExistingMetadata();
+	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+	Documentation::INSTANCE()->ClearDocumentation();
+
+	//Consistency checks for the data categorizations
+	DataCategorizationConsistencyChecker checker;
+	bool categorizationsAreValid = true;
+	categorizationsAreValid &= checker.isValidAllMSMDHaveParameterAndQuantities(allMetadataAssembliesByNames);
+	categorizationsAreValid &= checker.isValidAllParameterAndQuantitiesReferenceSameTable(allMetadataAssembliesByNames);
 	
-	//ToDo: Check for overlapping selections with different types
-	//ToDo: Check, if parameter and quantities are on the same table
-	//ToDo: Check, if all MSMD have parameter and quantities referenced
+	if (!categorizationsAreValid)
+	{
+		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+		Documentation::INSTANCE()->ClearDocumentation();
+		return;
+	}
 	//ToDo: Check if existing parameter have the same name, only differing in lower/upper case spelling.
+	//ToDo: Check for overlapping selections with different types
 
 	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
 	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
@@ -331,8 +347,8 @@ std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAl
 		assert(rangeEntity != nullptr);
 		allRangeEntities.push_back(rangeEntity);
 	}
-	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(allRangeEntities.size()) + " selection ranges.\n");
 
+	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(allRangeEntities.size()) + " selection ranges.\n");
 
 	//Sort the range selection entities as rmd, msmd, parameter or quantity, depending on the topology level in their name
 	std::map<std::string, MetadataAssemblyData> allMetadataAssembliesByName;
@@ -444,7 +460,7 @@ void DataCollectionCreationHandler::ExtractAllQuantities(std::map<std::string, M
 	}
 }
 
-void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeasurementMetadata> msmd, std::string abbreviation, std::string name, std::string type)
+void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeasurementMetadata> msmd, const std::string& abbreviation, const std::string& name, const std::string& type)
 {
 	std::list<std::string> quantityName{ name };
 	msmd->InsertToQuantityField("Name", quantityName, abbreviation);

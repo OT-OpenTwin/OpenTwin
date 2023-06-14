@@ -131,6 +131,10 @@
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -187,6 +191,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\CollectionAssembler.cpp" />
+    <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\DataCollectionCreationHandler.cpp" />
     <ClCompile Include="src\DataSourceHandler.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -211,6 +216,7 @@
     <ClInclude Include="include\BranchSynchronizer.h" />
     <ClInclude Include="include\BusinessLogicHandler.h" />
     <ClInclude Include="include\CollectionAssembler.h" />
+    <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
     <ClInclude Include="include\DataCollectionCreationHandler.h" />
     <ClInclude Include="include\DataSourceHandler.h" />
     <ClInclude Include="include\Documentation.h" />

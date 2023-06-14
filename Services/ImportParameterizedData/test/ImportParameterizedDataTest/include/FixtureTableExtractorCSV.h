@@ -1,5 +1,5 @@
 #pragma once
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "TableExtractorCSV.h"
 
 class FixtureTableExtractorCSV : public testing::TestWithParam<int>

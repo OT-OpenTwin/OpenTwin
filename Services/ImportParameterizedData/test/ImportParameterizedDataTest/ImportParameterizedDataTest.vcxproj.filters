@@ -36,6 +36,12 @@
     <ClCompile Include="src\TestTableStatisticAnalyser.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\FixtureCategorizationConsistencyChecker.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -53,6 +59,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FixtureTableStatisticAnalyser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureCategorizationConsistencyChecker.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

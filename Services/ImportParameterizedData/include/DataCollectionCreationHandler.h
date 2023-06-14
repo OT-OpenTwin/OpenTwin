@@ -1,3 +1,10 @@
+/*****************************************************************//**
+ * \file   DataCollectionCreationHandler.h
+ * \brief  Handler for storring data in the result collection.
+ * 
+ * \author Wagner
+ * \date   June 2023
+ *********************************************************************/
 #pragma once
 #include <map>
 #include <string>
@@ -12,10 +19,8 @@
 class DataCollectionCreationHandler : public BusinessLogicHandler
 {
 public:
-	DataCollectionCreationHandler(std::string baseFolder, std::string datasetFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder);
-	void CreateDataCollection(std::string dbURL, std::string projectName);
-
-
+	DataCollectionCreationHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder);
+	void CreateDataCollection(const std::string& dbURL, const std::string& projectName);
 
 private:
 	const std::string _baseFolder;
@@ -41,7 +46,7 @@ private:
 	void ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 	void ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 
-	void AddQuantityToMSMD(std::shared_ptr<EntityMeasurementMetadata> msmd, std::string abbreviation, std::string name, std::string type);
+	void AddQuantityToMSMD(std::shared_ptr<EntityMeasurementMetadata> msmd, const std::string& abbreviation, const std::string& name, const std::string& type);
 
 	std::list<int32_t> GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex);
 };

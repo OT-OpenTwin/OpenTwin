@@ -22,6 +22,7 @@
 //Application specific includes
 #include "TemplateDefaultManager.h"
 #include <string>
+#include "ClassFactory.h"
 
 Application * g_instance{ nullptr };
 
@@ -366,7 +367,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 		m_uiComponent->displayMessage(errorMessage);
 	}
 }
-#include "ClassFactory.h"
+
 void Application::HandleSelectionChanged()
 {
 	std::mutex onlyOneActionPerTime;
