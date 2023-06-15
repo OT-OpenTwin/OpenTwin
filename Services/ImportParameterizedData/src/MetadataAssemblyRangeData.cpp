@@ -5,21 +5,23 @@ void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list
 	std::map<std::string, std::list<std::string>> allFields;
 	std::map<std::string, std::string> rangeTypesByRangeNames;
 
-	for (auto range : allRanges)
+	for (const auto& range : allRanges)
 	{
 		auto table = allTables[range->getTableName()];
 		auto newFields = ExtractFieldsFromRange(range, table);
 		for (auto newField : newFields)
 		{
-			if (allFields.find(newField.first) != allFields.end())
+			const std::string& fieldKey = newField.first;
+			std::list<std::string>& fieldValues = newField.second;
+			if (allFields.find(fieldKey) != allFields.end())
 			{
-				allFields[newField.first].merge(newField.second);
+				std::move(fieldValues.begin(), fieldValues.end(), allFields[fieldKey].end());
 			}
 			else
 			{
-				allFields.insert({ newField.first, newField.second });
-				std::string type = range->getSelectedType();
-				rangeTypesByRangeNames[newField.first] = type;
+				allFields.insert({ fieldKey, std::move(fieldValues)});
+				const std::string& type = range->getSelectedType();
+				rangeTypesByRangeNames[fieldKey] = type;
 			}
 		}
 	}
@@ -43,9 +45,11 @@ std::map<std::string, std::list<std::string>> MetadataAssemblyRangeData::Extract
 	{
 		for (uint32_t column = selection[2]; column <= selection[3]; column++)
 		{
-			for (uint32_t row = selection[0]; row <= selection[1]; row++)
+			const std::string& fieldKey = table->getTableData()->getValue(0, column);
+			for (uint32_t row = selection[0] + offsetDueToHeader; row <= selection[1] + offsetDueToHeader; row++)
 			{
-				extractedField[table->getTableData()->getValue(0, column)].push_back(table->getTableData()->getValue(row + offsetDueToHeader, column));
+				const std::string& value = table->getTableData()->getValue(row, column);
+				extractedField[fieldKey].push_back(value);
 			}
 		}
 	}
@@ -53,54 +57,59 @@ std::map<std::string, std::list<std::string>> MetadataAssemblyRangeData::Extract
 	{
 		for (uint32_t row = selection[0]; row <= selection[1]; row++)
 		{
-			for (uint32_t column = selection[2]; column <= selection[3]; column++)
+			const std::string& fieldKey = table->getTableData()->getValue(row, 0);
+			for (uint32_t column = selection[2] + offsetDueToHeader; column <= selection[3] + offsetDueToHeader; column++)
 			{
-				extractedField[table->getTableData()->getValue(row, 0)].push_back(table->getTableData()->getValue(row, column + offsetDueToHeader));
+				const std::string& value = table->getTableData()->getValue(row, column);
+				extractedField[fieldKey].push_back(value);
 			}
 		}
 	}
-	return std::move(extractedField);
+	return extractedField;
 }
 
 void MetadataAssemblyRangeData::TransformSelectedDataIntoSelectedDataType(std::map<std::string, std::list<std::string>>& allFields, std::map<std::string, std::string>& rangeTypesByRangeNames)
 {
-	auto it = allFields.begin();
-	while(it != allFields.end())
+	auto currentField = allFields.begin();
+	while(currentField != allFields.end())
 	{
-		if (rangeTypesByRangeNames[(*it).first] == ot::TypeNames::getDoubleTypeName())
+		const std::string& fieldName = currentField->first;
+		const std::list<std::string>& fieldValuesRaw = currentField->second;
+		if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
 		{
 			std::list<double> fieldValues;
-			for (std::string fieldValueString : (*it).second)
+			for (const std::string& fieldValueString : fieldValuesRaw)
 			{
 				fieldValues.push_back(std::stod(fieldValueString));
 			}
-			_doubleFields.insert({ (*it).first, fieldValues });
-			it = allFields.erase(it);
+			_doubleFields.insert({ fieldName, fieldValues });
+			currentField = allFields.erase(currentField);
 		}
-		else if (rangeTypesByRangeNames[(*it).first] == ot::TypeNames::getInt32TypeName())
+		else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
 		{
 			std::list<int32_t> fieldValues;
-			for (std::string fieldValueString : (*it).second)
+			for (std::string fieldValueString : fieldValuesRaw)
 			{
 				fieldValues.push_back(std::stoi(fieldValueString));
 			}
-			_int32Fields.insert({ (*it).first, fieldValues });
-			it = allFields.erase(it);
+			_int32Fields.insert({fieldName, fieldValues });
+			currentField = allFields.erase(currentField);
 		}
-		else if (rangeTypesByRangeNames[(*it).first] == ot::TypeNames::getInt64TypeName())
+		else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
 		{
 			std::list<int64_t> fieldValues;
-			for (std::string fieldValueString : (*it).second)
+			for (std::string fieldValueString : fieldValuesRaw)
 			{
 				fieldValues.push_back(std::stoll(fieldValueString));
 			}
-			_int64Fields.insert({ (*it).first, fieldValues });
-			it = allFields.erase(it);
+			_int64Fields.insert({ fieldName, fieldValues });
+			currentField = allFields.erase(currentField);
 		}
-		else if (rangeTypesByRangeNames[(*it).first] == ot::TypeNames::getStringTypeName())
+		else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getStringTypeName())
 		{
-			_stringFields.insert({ (*it).first, (*it).second});
-			it = allFields.erase(it);
+			_stringFields.insert({ fieldName, fieldValuesRaw});
+			currentField = allFields.erase(currentField);
 		}
 	}
+	assert(allFields.size() == 0);
 }
