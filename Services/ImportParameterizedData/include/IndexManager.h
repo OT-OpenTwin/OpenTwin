@@ -1,24 +1,43 @@
+/*****************************************************************//**
+ * \file   IndexManager.h
+ * \brief	Handler for all types of indices that are needed. Parameter and quantities are abstracted via an indexed name (e.g. P_0, P_1, P_2, ...for parameter)
+ *			Additionally, all parameter values are substituted by an index as well. Both types of indices have to be consecutive with already existing ones. 
+ *			Thus, this class holds already existing indices and hands out new ones, if required.
+ * 
+ * \author Wagner
+ * \date   June 2023
+ *********************************************************************/
+
 #pragma once
 #include "EntityMeasurementMetadata.h"
 #include "MetadataParameterBundle.h"
 #include "MetadataAssemblyRangeData.h"
 #include "MetadataQuantity.h"
+#include "Documentation.h"
+
 #include <set>
 #include <map>
 
 class IndexManager
 {
 public:
-	IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, std::string nameField, std::string dataTypeField, std::string valueField);
+	IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField);
+	IndexManager(const IndexManager& other) = delete;
+	IndexManager(const IndexManager&& other) = delete;
+	IndexManager& operator=(const IndexManager& other) = delete;
+	IndexManager& operator=(const IndexManager&& other) = delete;
 
 	MetadataParameterBundle CreateMetadataParameter(MetadataAssemblyRangeData& allParameter);
 	std::map<std::string, MetadataQuantity*> GetNonExistingQuantityAbbreviationsByName(MetadataAssemblyRangeData& allParameter);
-	std::string GetNextAvailableMSMDName();
-	bool DoesMSMDAlreadyExist(std::string msmdIndex) { return _takenMetadataNames.find(msmdIndex) != _takenMetadataNames.end(); }
+	
+	bool DoesMSMDAlreadyExist(const std::string& msmdIndex) { return _takenMetadataNames.find(msmdIndex) != _takenMetadataNames.end(); }
 
-	template<class T>
-	int32_t GetParameterIndex(std::string parameterName, T value);
-	int32_t GetQuantityIndex(const std::string quantityName);
+	int32_t GetParameterIndex(const std::string& parameterName, const std::string& value);
+	int32_t GetParameterIndex(const std::string& parameterName, const double& value);
+	int32_t GetParameterIndex(const std::string& parameterName, const int32_t& value);
+	int32_t GetParameterIndex(const std::string& parameterName, const int64_t& value);
+
+	int32_t GetQuantityIndex(const std::string& quantityName);
 
 private:
 	const std::string _parameterAbbreviationBase = "P_";
@@ -26,6 +45,7 @@ private:
 	const std::string _nameField;
 	const std::string _valueField;
 	const std::string _typeField;
+	const std::string _msmdNameBase = "Measurementserieses Metadata_";
 
 	std::map<std::string, MetadataParameter<std::string>> _stringParameterByName; 
 	std::map<std::string, MetadataParameter<double>> _doubleParameterByName;
@@ -57,39 +77,9 @@ private:
 	template <class T>
 	void CreateParameterValueIndices(std::map<std::string, MetadataParameter<T>>& parameterByName, std::map<std::string, std::map<T, int32_t>>& parameterValueIndices);
 	template <class T>
-	void AddNewQuantities(const std::map<std::string, std::list<T>>& felder, std::string expectedType, std::map<std::string, MetadataQuantity*>& newQuantities, std::string summary);
+	void AddNewQuantities(const std::map<std::string, std::list<T>>& felder, std::string expectedType, std::map<std::string, MetadataQuantity*>& newQuantities);
 
 };
-
-template<class T>
-inline int32_t IndexManager::GetParameterIndex(std::string parameterName, T value)
-{
-	throw std::exception("Not supported Action: trying to receive an index for a not supported parameter type");
-}
-template<>
-inline int32_t IndexManager::GetParameterIndex(std::string parameterName, std::string value)
-{
-	auto parameterIndices = _stringParameterValueIndicesByName.find(parameterName);
-	return parameterIndices->second.find(value)->second;
-}
-template<>
-inline int32_t IndexManager::GetParameterIndex(std::string parameterName, double value)
-{
-	auto parameterIndices = _doubleParameterValueIndicesByName.find(parameterName);
-	return parameterIndices->second.find(value)->second;
-}
-template<>
-inline int32_t IndexManager::GetParameterIndex(std::string parameterName, int32_t value)
-{
-	auto parameterIndices = _int32ParameterValueIndicesByName.find(parameterName);
-	return parameterIndices->second.find(value)->second;
-}
-template<>
-inline int32_t IndexManager::GetParameterIndex(std::string parameterName, int64_t value)
-{
-	auto parameterIndices = _int64ParameterValueIndicesByName.find(parameterName);
-	return parameterIndices->second.find(value)->second;
-}
 
 template<class T>
 inline void IndexManager::AddMetadataParameterToBundle(const std::map<std::string, std::list<T>>& allFieldsOfTypeT, std::map<std::string, MetadataParameter<T>>& existingMetadata, MetadataParameterBundle& bundle)
@@ -167,7 +157,7 @@ inline void IndexManager::CreateParameterValueIndices(std::map<std::string, Meta
 }
 
 template<class T>
-inline void IndexManager::AddNewQuantities(const std::map<std::string, std::list<T>>& fields, std::string expectedType, std::map<std::string, MetadataQuantity*>& newQuantities, std::string summary)
+inline void IndexManager::AddNewQuantities(const std::map<std::string, std::list<T>>& fields, std::string expectedType, std::map<std::string, MetadataQuantity*>& newQuantities)
 {
 	for (auto& field : fields)
 	{
@@ -175,11 +165,11 @@ inline void IndexManager::AddNewQuantities(const std::map<std::string, std::list
 		{
 			if (_takenQuantitiesByName[field.first].typeName != ot::TypeNames::getDoubleTypeName())
 			{
-				summary += "Quantity " + field.first + " is already used with a different datatype in a previous MSMD\n";
+				Documentation::INSTANCE()->AddToDocumentation("Quantity " + field.first + " is already used with a different datatype in a previous MSMD\n");
 			}
 			else
 			{
-				summary += "Quantity " + field.first + " already exists\n";
+				Documentation::INSTANCE()->AddToDocumentation("Quantity " + field.first + " already exists\n");
 			}
 		}
 		else
@@ -189,7 +179,7 @@ inline void IndexManager::AddNewQuantities(const std::map<std::string, std::list
 			_takenQuantitiesByName[field.first].quantityIndex = GetNextQuantityIndex();
 			_takenQuantitiesByName[field.first].quantityAbbreviation = _quantityAbbreviationBase + std::to_string(_takenQuantitiesByName[field.first].quantityIndex);
 			newQuantities[_takenQuantitiesByName[field.first].quantityName] = &_takenQuantitiesByName[field.first];
-			summary += "Added new Quantity " + field.first + " as " + _takenQuantitiesByName[field.first].quantityAbbreviation +"\n";
+			Documentation::INSTANCE()->AddToDocumentation("Added new Quantity " + field.first + " as " + _takenQuantitiesByName[field.first].quantityAbbreviation + "\n");
 		}
 	}
 }

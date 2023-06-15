@@ -10,9 +10,9 @@
  *********************************************************************/
 #include "IndexManager.h"
 #include "OpenTwinCore/TypeNames.h"
-#include "Documentation.h"
 
-IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, std::string nameField, std::string dataTypeField, std::string valueField)
+
+IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField)
 	:_nameField(nameField), _valueField(valueField), _typeField(dataTypeField)
 {
 	if (existingMetadataEntities.size() != 0)
@@ -28,13 +28,24 @@ IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>>
 	}
 }
 
+void IndexManager::StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
+{
+	for (auto& msmd : existingMetadataEntities)
+	{
+		std::string msmdName = msmd->getName();
+		msmdName = msmdName.substr(msmdName.find_last_of('/')+1, msmdName.size());
+		_takenMetadataNames.insert(msmdName);
+		Documentation::INSTANCE()->AddToDocumentation(msmdName + "\n");
+	}
+}
+
 void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
 {
 	std::string parameterDocumentName = (*existingMetadataEntities.begin())->getParameterDocumentName();
 	for (auto existingMetadata : existingMetadataEntities)
 	{
 		std::vector<std::string> allParameterNames = existingMetadata->getAllParameterDocumentNames();
-		for (std::string parameterName : allParameterNames)
+		for (const std::string& parameterName : allParameterNames)
 		{
 			std::string subDocumentName = parameterName.substr(parameterName.find(parameterDocumentName), parameterName.size());
 			std::string::difference_type n = std::count(subDocumentName.begin(), subDocumentName.end(), '/');
@@ -123,17 +134,6 @@ void IndexManager::StoreAllQuantities(std::list<std::shared_ptr<EntityMeasuremen
 			_takenQuantitiesByName[quantityName].quantityIndex = std::stoi(quantityIndex);
 			Documentation::INSTANCE()->AddToDocumentation(quantityAbbreviation + ": " + quantityName + " of type " + _takenQuantitiesByName[quantityName].typeName + "\n");
 		}
-	}
-}
-
-void IndexManager::StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
-{
-	for (auto msmd : existingMetadataEntities)
-	{
-		std::string msmdName = msmd->getName();
-		msmdName = msmdName.substr(msmdName.find_last_of('/')+1, msmdName.size());
-		_takenMetadataNames.insert(msmdName);
-		Documentation::INSTANCE()->AddToDocumentation(msmdName + "\n");
 	}
 }
 
@@ -283,31 +283,51 @@ bool IndexManager::CheckIfAllParameterHaveSameSize(MetadataAssemblyRangeData& al
 	return sizeIsConsistent;
 }
 
-std::string IndexManager::GetNextAvailableMSMDName()
+int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const std::string& value)
 {
-	int32_t index = 1;
-	std::string nameBase = "Measurementserieses Metadata_";
-	while (_takenMetadataNames.find(nameBase+ std::to_string(index)) != _takenMetadataNames.end())
-	{
-		index++;
-	}
-	return nameBase + std::to_string(index);
+	const auto parameterValueIndicesByName = _stringParameterValueIndicesByName.find(parameterName);
+	const auto& parameterValueIndices = parameterValueIndicesByName->second;
+	int32_t index = parameterValueIndices.find(value)->second;
+	return index;
 }
 
-int32_t IndexManager::GetQuantityIndex(const std::string quantityName)
+int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const double& value)
+{
+	const auto parameterValueIndicesByName = _doubleParameterValueIndicesByName.find(parameterName);
+	const auto& parameterValueIndices = parameterValueIndicesByName->second;
+	int32_t index = parameterValueIndices.find(value)->second;
+	return index;
+}
+
+int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const int32_t& value)
+{
+	const auto parameterValueIndicesByName = _int32ParameterValueIndicesByName.find(parameterName);
+	const auto& parameterValueIndices = parameterValueIndicesByName->second;
+	int32_t index = parameterValueIndices.find(value)->second;
+	return index;
+}
+
+int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const int64_t& value)
+{
+	const auto parameterValueIndicesByName = _int64ParameterValueIndicesByName.find(parameterName);
+	const auto& parameterValueIndices = parameterValueIndicesByName->second;
+	int32_t index = parameterValueIndices.find(value)->second;
+	return index;
+}
+
+int32_t IndexManager::GetQuantityIndex(const std::string& quantityName)
 {
 	return _takenQuantitiesByName.find(quantityName)->second.quantityIndex;
 }
 
 std::map<std::string, MetadataQuantity*> IndexManager::GetNonExistingQuantityAbbreviationsByName(MetadataAssemblyRangeData& allParameter)
 {
-	std::string summary ="";
 	std::map<std::string, MetadataQuantity*> newQuantities;
 
-	AddNewQuantities(*allParameter.GetDoubleFields(), ot::TypeNames::getDoubleTypeName(), newQuantities,summary);
-	AddNewQuantities(*allParameter.GetInt32Fields(), ot::TypeNames::getInt32TypeName(), newQuantities,summary);
-	AddNewQuantities(*allParameter.GetInt64Fields(), ot::TypeNames::getInt64TypeName(), newQuantities,summary);
-	AddNewQuantities(*allParameter.GetStringFields(), ot::TypeNames::getStringTypeName(), newQuantities,summary);
+	AddNewQuantities(*allParameter.GetDoubleFields(), ot::TypeNames::getDoubleTypeName(), newQuantities);
+	AddNewQuantities(*allParameter.GetInt32Fields(), ot::TypeNames::getInt32TypeName(), newQuantities);
+	AddNewQuantities(*allParameter.GetInt64Fields(), ot::TypeNames::getInt64TypeName(), newQuantities);
+	AddNewQuantities(*allParameter.GetStringFields(), ot::TypeNames::getStringTypeName(), newQuantities);
 
 	return newQuantities;
 }
