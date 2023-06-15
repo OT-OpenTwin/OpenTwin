@@ -152,10 +152,10 @@ MetadataParameterBundle IndexManager::CreateMetadataParameter(MetadataAssemblyRa
 	}
 
 	MetadataParameterBundle parameterBundle;
-	AddMetadataParameterToBundle(allParameter.GetStringFields(), _stringParameterByName, parameterBundle);
-	AddMetadataParameterToBundle(allParameter.GetInt32Fields(), _int32ParameterByName, parameterBundle);
-	AddMetadataParameterToBundle(allParameter.GetInt64Fields(), _int64ParameterByName, parameterBundle);
-	AddMetadataParameterToBundle(allParameter.GetDoubleFields(), _doubleParameterByName, parameterBundle);
+	AddMetadataParameterToBundle(*allParameter.GetStringFields(), _stringParameterByName, parameterBundle);
+	AddMetadataParameterToBundle(*allParameter.GetInt32Fields(), _int32ParameterByName, parameterBundle);
+	AddMetadataParameterToBundle(*allParameter.GetInt64Fields(), _int64ParameterByName, parameterBundle);
+	AddMetadataParameterToBundle(*allParameter.GetDoubleFields(), _doubleParameterByName, parameterBundle);
 
 	CreateParameterValueIndices();
 	return parameterBundle;
@@ -170,7 +170,7 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 		return "Parameter: " + parameterName + " already exists as: " + type + "\n";
 	};
 
-	for (auto& field : allParameter.GetStringFields())
+	for (auto& field : *allParameter.GetStringFields())
 	{
 		if (_int32ParameterByName.find(field.first) != _int32ParameterByName.end())
 		{
@@ -189,7 +189,7 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 		}
 	}
 
-	for (auto& field : allParameter.GetDoubleFields())
+	for (auto& field : *allParameter.GetDoubleFields())
 	{
 		if (_stringParameterByName.find(field.first) != _stringParameterByName.end())
 		{
@@ -208,7 +208,7 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 		}
 	}
 
-	for (auto& field : allParameter.GetInt32Fields())
+	for (auto& field : *allParameter.GetInt32Fields())
 	{
 		if (_stringParameterByName.find(field.first) != _stringParameterByName.end())
 		{
@@ -227,7 +227,7 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 		}
 	}
 
-	for (auto& field : allParameter.GetInt64Fields())
+	for (auto& field : *allParameter.GetInt64Fields())
 	{
 		if (_stringParameterByName.find(field.first) != _stringParameterByName.end())
 		{
@@ -252,19 +252,19 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 bool IndexManager::CheckIfAllParameterHaveSameSize(MetadataAssemblyRangeData& allParameter, std::string& errorMessage)
 {
 	std::map<std::string, uint64_t> parameterNameBySize;
-	for (const auto& field : allParameter.GetStringFields())
+	for (const auto& field : *allParameter.GetStringFields())
 	{
 		parameterNameBySize[field.first] = field.second.size();
 	}
-	for (const auto& field : allParameter.GetDoubleFields())
+	for (const auto& field : *allParameter.GetDoubleFields())
 	{
 		parameterNameBySize[field.first] = field.second.size();
 	}
-	for (const auto& field : allParameter.GetInt32Fields())
+	for (const auto& field : *allParameter.GetInt32Fields())
 	{
 		parameterNameBySize[field.first] = field.second.size();
 	}
-	for (const auto& field : allParameter.GetInt64Fields())
+	for (const auto& field : *allParameter.GetInt64Fields())
 	{
 		parameterNameBySize[field.first] = field.second.size();
 	}
@@ -304,10 +304,10 @@ std::map<std::string, MetadataQuantity*> IndexManager::GetNonExistingQuantityAbb
 	std::string summary ="";
 	std::map<std::string, MetadataQuantity*> newQuantities;
 
-	AddNewQuantities(allParameter.GetDoubleFields(), ot::TypeNames::getDoubleTypeName(), newQuantities,summary);
-	AddNewQuantities(allParameter.GetInt32Fields(), ot::TypeNames::getInt32TypeName(), newQuantities,summary);
-	AddNewQuantities(allParameter.GetInt64Fields(), ot::TypeNames::getInt64TypeName(), newQuantities,summary);
-	AddNewQuantities(allParameter.GetStringFields(), ot::TypeNames::getStringTypeName(), newQuantities,summary);
+	AddNewQuantities(*allParameter.GetDoubleFields(), ot::TypeNames::getDoubleTypeName(), newQuantities,summary);
+	AddNewQuantities(*allParameter.GetInt32Fields(), ot::TypeNames::getInt32TypeName(), newQuantities,summary);
+	AddNewQuantities(*allParameter.GetInt64Fields(), ot::TypeNames::getInt64TypeName(), newQuantities,summary);
+	AddNewQuantities(*allParameter.GetStringFields(), ot::TypeNames::getStringTypeName(), newQuantities,summary);
 
 	return newQuantities;
 }

@@ -156,76 +156,76 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		ProgressUpdater updater(_uiComponent,"Storing quantity container");
 		qcCreator.SetUpdateProgress(updater);
 
-		for (auto field : quantityData.GetStringFields())
-		{
-			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-			{
-				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getStringTypeName());
-			}
-			auto valuePointer = field.second.begin();
-			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-			for (int32_t i = 0; i < field.second.size(); i++)
-			{
-				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager,parameterBundle,i);
-				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-				valuePointer++;
-			}
-			fieldCounter++;
-		}
-		qcCreator.Flush(dataStorageAccess);
+		//for (auto field : *quantityData.GetStringFields())
+		//{
+		//	if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+		//	{
+		//		AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getStringTypeName());
+		//	}
+		//	auto valuePointer = field.second.begin();
+		//	int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+		//	for (int32_t i = 0; i < field.second.size(); i++)
+		//	{
+		//		std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager,parameterBundle,i);
+		//		qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+		//		valuePointer++;
+		//	}
+		//	fieldCounter++;
+		//}
+		//qcCreator.Flush(dataStorageAccess);
 
-		for (auto field : quantityData.GetDoubleFields())
-		{
-			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-			{
-				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getDoubleTypeName());
-			}
-			auto valuePointer = field.second.begin();
-			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-			for (int32_t i = 0; i < field.second.size(); i++)
-			{
-				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-				valuePointer++;
-			}
-			fieldCounter++;
-		}
-		qcCreator.Flush(dataStorageAccess);
+		//for (auto field : quantityData.GetDoubleFields())
+		//{
+		//	if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+		//	{
+		//		AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getDoubleTypeName());
+		//	}
+		//	auto valuePointer = field.second.begin();
+		//	int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+		//	for (int32_t i = 0; i < field.second.size(); i++)
+		//	{
+		//		std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
+		//		qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+		//		valuePointer++;
+		//	}
+		//	fieldCounter++;
+		//}
+		//qcCreator.Flush(dataStorageAccess);
 
-		for (auto field : quantityData.GetInt32Fields())
-		{
-			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-			{
-				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt32TypeName());
-			}
-			auto valuePointer = field.second.begin();
-			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-			for (int32_t i = 0; i < field.second.size(); i++)
-			{
-				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-				valuePointer++;
-			}
-			fieldCounter++;
-		}
-		qcCreator.Flush(dataStorageAccess);
+		//for (auto field : quantityData.GetInt32Fields())
+		//{
+		//	if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+		//	{
+		//		AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt32TypeName());
+		//	}
+		//	auto valuePointer = field.second.begin();
+		//	int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+		//	for (int32_t i = 0; i < field.second.size(); i++)
+		//	{
+		//		std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
+		//		qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+		//		valuePointer++;
+		//	}
+		//	fieldCounter++;
+		//}
+		//qcCreator.Flush(dataStorageAccess);
 
-		for (auto field : quantityData.GetInt64Fields())
-		{
-			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-			{
-				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt64TypeName());
-			}
-			auto valuePointer = field.second.begin();
-			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-			for (int32_t i = 0; i < field.second.size(); i++)
-			{
-				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-				valuePointer++;
-			}
-		}
-		qcCreator.Flush(dataStorageAccess);
+		//for (auto field : quantityData.GetInt64Fields())
+		//{
+		//	if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+		//	{
+		//		AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt64TypeName());
+		//	}
+		//	auto valuePointer = field.second.begin();
+		//	int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+		//	for (int32_t i = 0; i < field.second.size(); i++)
+		//	{
+		//		std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
+		//		qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+		//		valuePointer++;
+		//	}
+		//}
+		//qcCreator.Flush(dataStorageAccess);
 
 		allMetadata.push_back(metadataBuffer);
 	}
@@ -564,22 +564,22 @@ void DataCollectionCreationHandler::LoadRequiredTables(std::list<string>& requir
 void DataCollectionCreationHandler::AddFieldsToMSMD(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityMeasurementMetadata> msmd)
 {
 	Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
-	for (auto& field : rangeData.GetStringFields())
+	for (const auto& field : *rangeData.GetStringFields())
 	{
 		msmd->InsertInField(field.first, field.second);
 		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 	}
-	for (auto& field : rangeData.GetDoubleFields())
+	for (const auto& field : *rangeData.GetDoubleFields())
 	{
 		msmd->InsertInField(field.first, field.second);
 		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 	}
-	for (auto& field : rangeData.GetInt32Fields())
+	for (const auto& field : *rangeData.GetInt32Fields())
 	{
 		msmd->InsertInField(field.first, field.second);
 		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
 	}
-	for (auto& field : rangeData.GetInt64Fields())
+	for (const auto& field : *rangeData.GetInt64Fields())
 	{
 		msmd->InsertInField(field.first, field.second);
 		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
