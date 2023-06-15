@@ -28,44 +28,20 @@ void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, st
 
 void QuantityContainerCreator::Flush(DataStorageAPI::ResultDataStorageAPI& storageAPI)
 {
-	for (auto& qc : _stringQuantContainers)
+	uint64_t totalSize = _stringQuantContainers.size() + _doubleQuantContainers.size() + _int32QuantContainers.size() + _int64QuantContainers.size();
+	if (totalSize > 0)
 	{
-		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
-		if (!response.getSuccess())
-		{
-			throw std::exception("Insertion of quantity container failed.");
-		}
-	}
-	_stringQuantContainers.clear();
+		_updater->SetTotalNumberOfUpdates(5, totalSize);
+		_triggerCounter = 0;
 
-	for (auto& qc : _doubleQuantContainers)
-	{
-	
-		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
-		if (!response.getSuccess())
-		{
-			throw std::exception("Insertion of quantity container failed.");
-		}
+		FlushTypedList<>(_stringQuantContainers, storageAPI);
+		FlushTypedList<>(_doubleQuantContainers, storageAPI);
+		FlushTypedList<>(_int32QuantContainers , storageAPI);
+		FlushTypedList<>(_int64QuantContainers , storageAPI);
 	}
-	_doubleQuantContainers.clear();
+}
 
-	for (auto& qc : _int32QuantContainers)
-	{
-		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
-		if (!response.getSuccess())
-		{
-			throw std::exception("Insertion of quantity container failed.");
-		}
-	}
-	_int32QuantContainers.clear();
-
-	for (auto& qc : _int64QuantContainers)
-	{
-		DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
-		if (!response.getSuccess())
-		{
-			throw std::exception("Insertion of quantity container failed.");
-		}
-	}
-	_int64QuantContainers.clear();
+void QuantityContainerCreator::SetUpdateProgress(ProgressUpdater& updater)
+{
+	_updater = &updater;
 }

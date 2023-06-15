@@ -13,7 +13,7 @@
 
 #include "QuantityContainerCreator.h"
 #include "ResultDataStorageAPI.h"
-
+#include "ProgressUpdater.h"
 
 DataCollectionCreationHandler::DataCollectionCreationHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
@@ -66,6 +66,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		Documentation::INSTANCE()->ClearDocumentation();
 		return;
 	}
+
 	//ToDo: Check if existing parameter have the same name, only differing in lower/upper case spelling.
 	//ToDo: Check for overlapping selections with different types
 
@@ -73,187 +74,163 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
 
 	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
-	Documentation::INSTANCE()->AddToDocumentation("Start analysis of range selections.\n");
+	
+	_uiComponent->displayMessage("Start analysis of range selections.\n\n");
+	
+	std::list<const std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
-		auto metadataAssembly = metadataAssemblyByName.second;
-		if (metadataAssembly.dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
+		if (metadataAssembly->dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 		{
-			std::string msmdName = metadataAssemblyByName.first;
-			msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
-			if(indexManager->DoesMSMDAlreadyExist(msmdName))
-			{
-				Documentation::INSTANCE()->AddToDocumentation("Skipped " + msmdName + "\n");
-				continue;
-			}
-			Documentation::INSTANCE()->AddToDocumentation("Create "+ msmdName+":\n");
-			//Load all required tables that are not loaded yet.
-			std::list<std::string> requiredTables;
-			Documentation::INSTANCE()->AddToDocumentation("Required tables:\n");
-			AddRequiredTables(metadataAssembly, requiredTables);
-
-			requiredTables.unique();
-			LoadRequiredTables(requiredTables, loadedTables);
-
-			//Filling a new EntityMeasurementMetadata object with its fields.
-			MetadataAssemblyRangeData rangeData;
-			rangeData.LoadAllRangeSelectionInformation(metadataAssembly.allSelectionRanges, loadedTables);
-			
-			std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));						
-			metadataBuffer->setName(_datasetFolder + "/" + msmdName);
-			Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
-			for (auto& field : rangeData.GetStringFields())
-			{
-				metadataBuffer->InsertInField(field.first, field.second);
-				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
-			}
-			for (auto& field : rangeData.GetDoubleFields())
-			{
-				metadataBuffer->InsertInField(field.first, field.second);
-				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
-			}
-			for (auto& field : rangeData.GetInt32Fields())
-			{
-				metadataBuffer->InsertInField(field.first, field.second);
-				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
-			}
-			for (auto& field : rangeData.GetInt64Fields())
-			{
-				metadataBuffer->InsertInField(field.first, field.second);
-				Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
-			}
-
-			assert(metadataAssembly.next != nullptr); //ToDo: Check earlier
-
-			auto parameterAssembly = metadataAssembly.next;
-			MetadataAssemblyRangeData parameterData;
-			Documentation::INSTANCE()->AddToDocumentation("Required tables for parameter:\n");
-			AddRequiredTables(*parameterAssembly, requiredTables);
-			requiredTables.unique();
-			LoadRequiredTables(requiredTables, loadedTables);
-			parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, loadedTables);
-			//Todo: MetadataAssemblyRangeData not needed anymore! Delete in process!
-			MetadataParameterBundle parameterBundle = indexManager->CreateMetadataParameter(parameterData);
-			
-			Documentation::INSTANCE()->AddToDocumentation("Adding parameter:\n");
-			for (const auto& field : parameterBundle.getStringParameter())
-			{
-				std::list<std::string> parameterName{ field.parameterName };
-				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
-				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
-			}
-			for (const auto& field : parameterBundle.getDoubleParameter())
-			{
-				std::list<std::string> parameterName{ field.parameterName };
-				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
-				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
-			}
-			for (auto field : parameterBundle.getInt32Parameter())
-			{
-				std::list<std::string> parameterName{ field.parameterName };
-				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
-				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
-			}
-			for (auto field : parameterBundle.getInt64Parameter())
-			{
-				std::list<std::string> parameterName{ field.parameterName };
-				metadataBuffer->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-				metadataBuffer->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
-				Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
-			}
-
-			assert(parameterAssembly->next != nullptr);
-			auto quantityAssembly = parameterAssembly->next;
-			MetadataAssemblyRangeData quantityData;
-			
-			Documentation::INSTANCE()->AddToDocumentation("Required tables for quantities:\n");
-			AddRequiredTables(*quantityAssembly, requiredTables);
-			requiredTables.unique();
-			LoadRequiredTables(requiredTables, loadedTables);
-			quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, loadedTables);
-			
-			std::map<std::string,MetadataQuantity*> notExistingQuantities = indexManager->GetNonExistingQuantityAbbreviationsByName(quantityData);
-			Documentation::INSTANCE()->AddToDocumentation("Create "+ std::to_string(notExistingQuantities.size()) + " new quantit(y/ies):\n");
-			for (const auto& newQuantity : notExistingQuantities)
-			{
-				Documentation::INSTANCE()->AddToDocumentation(newQuantity.first + "\n");
-			}
-
-			std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') +1, msmdName.size());
-			int32_t msmdIndex = std::stoi(msmdIndexString);
-			std::set<std::string> parameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
-			int32_t containerSize = 1;
-			QuantityContainerCreator qcCreator(msmdIndex, parameterAbbreviations, containerSize);
-			for (auto field : quantityData.GetStringFields())
-			{
-				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-				{
-					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getStringTypeName());
-				}
-				auto valuePointer = field.second.begin();
-				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-				for (int32_t i = 0; i < field.second.size(); i++)
-				{
-					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager,parameterBundle,i);
-					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-					valuePointer++;
-				}
-			}
-			qcCreator.Flush(dataStorageAccess);
-			for (auto field : quantityData.GetDoubleFields())
-			{
-				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-				{
-					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getDoubleTypeName());
-				}
-				auto valuePointer = field.second.begin();
-				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-				for (int32_t i = 0; i < field.second.size(); i++)
-				{
-					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-					valuePointer++;
-				}
-			}
-			qcCreator.Flush(dataStorageAccess);
-			for (auto field : quantityData.GetInt32Fields())
-			{
-				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-				{
-					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt32TypeName());
-				}
-				auto valuePointer = field.second.begin();
-				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-				for (int32_t i = 0; i < field.second.size(); i++)
-				{
-					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-					valuePointer++;
-				}
-			}
-			qcCreator.Flush(dataStorageAccess);
-			for (auto field : quantityData.GetInt64Fields())
-			{
-				if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
-				{
-					AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt64TypeName());
-				}
-				auto valuePointer = field.second.begin();
-				int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-				for (int32_t i = 0; i < field.second.size(); i++)
-				{
-					std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-					qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-					valuePointer++;
-				}
-			}
-			qcCreator.Flush(dataStorageAccess);
-			allMetadata.push_back(metadataBuffer);
+			allMSMDMetadataAssembliesByNames.push_back(&metadataAssemblyByName);
 		}
 	}
+
+	for (auto& metadataAssemblyByName : allMSMDMetadataAssembliesByNames)
+	{
+		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName->second;
+		std::string msmdName = metadataAssemblyByName->first;
+		msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
+		if(indexManager->DoesMSMDAlreadyExist(msmdName))
+		{
+			_uiComponent->displayMessage("Skipped " + msmdName + "\n");
+			continue;
+		}
+		_uiComponent->displayMessage("Create "+ msmdName+":\n");
+		
+		//Load all required tables that are not loaded yet.
+		std::list<std::string> requiredTables;
+		_uiComponent->displayMessage("\nRequired tables:\n");
+		AddRequiredTables(*metadataAssembly, requiredTables); //for msmd
+		AddRequiredTables(*(metadataAssembly->next), requiredTables); //for parameter
+		AddRequiredTables(*(metadataAssembly->next->next), requiredTables); //for quantities
+		requiredTables.unique();
+		LoadRequiredTables(requiredTables, loadedTables);
+		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+		Documentation::INSTANCE()->ClearDocumentation();
+
+		//Filling a new EntityMeasurementMetadata object with its fields.
+		MetadataAssemblyRangeData rangeData;
+		rangeData.LoadAllRangeSelectionInformation(metadataAssembly->allSelectionRanges, loadedTables);
+
+		std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));						
+		metadataBuffer->setName(_datasetFolder + "/" + msmdName);
+		AddFieldsToMSMD(rangeData, metadataBuffer);
+		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+		Documentation::INSTANCE()->ClearDocumentation();
+		//Todo: MetadataAssemblyRangeData not needed anymore! Delete in process!
+
+		//Loading parameter information
+		auto parameterAssembly = metadataAssembly->next;
+		MetadataAssemblyRangeData parameterData;
+		parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, loadedTables);
+		MetadataParameterBundle parameterBundle = indexManager->CreateMetadataParameter(parameterData);		
+		AddParameterFieldsToMSMD(parameterBundle, metadataBuffer);
+		_uiComponent->displayMessage("\n" + Documentation::INSTANCE()->GetFullDocumentation());
+		Documentation::INSTANCE()->ClearDocumentation();
+
+		//Loading quantity information
+		auto quantityAssembly = parameterAssembly->next;
+		MetadataAssemblyRangeData quantityData;
+		quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, loadedTables);
+		std::map<std::string,MetadataQuantity*> notExistingQuantities = indexManager->GetNonExistingQuantityAbbreviationsByName(quantityData);
+		Documentation::INSTANCE()->AddToDocumentation("\nCreate "+ std::to_string(notExistingQuantities.size()) + " new quantit(y/ies):\n");
+		for (const auto& newQuantity : notExistingQuantities)
+		{
+			Documentation::INSTANCE()->AddToDocumentation(newQuantity.first + "\n");
+		}
+		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+		Documentation::INSTANCE()->ClearDocumentation();
+
+		//Adding quantity information and gradually flushing quantity container into the result collection
+		std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') +1, msmdName.size());
+		int32_t msmdIndex = std::stoi(msmdIndexString);
+		std::set<std::string> parameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
+		int32_t containerSize = 1;
+		QuantityContainerCreator qcCreator(msmdIndex, parameterAbbreviations, containerSize);
+
+		int fieldCounter = 0;
+		uint64_t totalNumberOfFields = quantityData.getNumberOfFields();
+		
+		ProgressUpdater updater(_uiComponent,"Storing quantity container");
+		qcCreator.SetUpdateProgress(updater);
+
+		for (auto field : quantityData.GetStringFields())
+		{
+			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+			{
+				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getStringTypeName());
+			}
+			auto valuePointer = field.second.begin();
+			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+			for (int32_t i = 0; i < field.second.size(); i++)
+			{
+				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager,parameterBundle,i);
+				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+				valuePointer++;
+			}
+			fieldCounter++;
+		}
+		qcCreator.Flush(dataStorageAccess);
+
+		for (auto field : quantityData.GetDoubleFields())
+		{
+			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+			{
+				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getDoubleTypeName());
+			}
+			auto valuePointer = field.second.begin();
+			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+			for (int32_t i = 0; i < field.second.size(); i++)
+			{
+				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
+				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+				valuePointer++;
+			}
+			fieldCounter++;
+		}
+		qcCreator.Flush(dataStorageAccess);
+
+		for (auto field : quantityData.GetInt32Fields())
+		{
+			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+			{
+				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt32TypeName());
+			}
+			auto valuePointer = field.second.begin();
+			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+			for (int32_t i = 0; i < field.second.size(); i++)
+			{
+				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
+				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+				valuePointer++;
+			}
+			fieldCounter++;
+		}
+		qcCreator.Flush(dataStorageAccess);
+
+		for (auto field : quantityData.GetInt64Fields())
+		{
+			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+			{
+				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getInt64TypeName());
+			}
+			auto valuePointer = field.second.begin();
+			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
+			for (int32_t i = 0; i < field.second.size(); i++)
+			{
+				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
+				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
+				valuePointer++;
+			}
+		}
+		qcCreator.Flush(dataStorageAccess);
+
+		allMetadata.push_back(metadataBuffer);
+	}
+
+	//Adding all new MSMD handle
 	std::list<ot::UID> entityIDs, entityVersions, dataEntities{};
 	std::list<bool> forceVisible;
 
@@ -266,42 +243,6 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	}
 	_modelComponent->addEntitiesToModel(entityIDs, entityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Created new n-dimensional parameterized data collection");
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-	
-	//rangeData muss jetzt sterben!
-
-	//if entity is msmd and has parameter set
-	//if ((*itMetadataAssembly).second.dataCategory= nullptr)
-	//{
-	//	allMetadataAssemblies.find((*itMetadataAssembly).second.next);
-	//	itMetadataAssembly = ;
-	//	allMetadataAssemblies.erase(itMetadataAssembly);
-	//}
-	//else
-	//{
-	//	if ((*itMetadataAssembly).second.dataCategory == EntityParameterizedDataCategorization::quantity)
-	//	{
-	//		SaveQuantityContainer();
-	//	}
-
-	//	allMetadata.push_back(metadataBuffer);
-	//	metadataBuffer = nullptr;
-	//}
-	//itMetadataAssembly = allMetadataAssemblies.erase(itMetadataAssembly);
-//else
-//{
-//	if ((*itMetadataAssembly).second.dataCategory == EntityParameterizedDataCategorization::parameter)
-//	{
-//		//Type transferred
-//		auto parameterList = CreateParameterIndices();
-//		metadataBuffer->AddToParameterDocument(parameterList);
-//	}
-//	else
-//	{
-//		//Quantity benötigt: orientierung und Spalte/Zeile des zugehörigehn Parameters + Liste aller parameter (uniques um den Index herauszufinden)
-//		assert(metadataBuffer->GetParameterList().size() != 0)
-//		auto quantityList = CreateQuantityIndices(metadataBuffer->GetParameterList());
-//	}
-//}
 }
 
 std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExistingMetadata()
@@ -487,7 +428,7 @@ std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(Index
 		}
 		if (paramerterFound)
 		{
-			break;
+			continue;
 		}
 		for (const auto& param : parameterBundle.getDoubleParameter())
 		{
@@ -501,7 +442,7 @@ std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(Index
 		}
 		if (paramerterFound)
 		{
-			break;
+			continue;
 		}
 		for (const auto& param : parameterBundle.getInt32Parameter())
 		{
@@ -515,7 +456,7 @@ std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(Index
 		}
 		if (paramerterFound)
 		{
-			break;
+			continue;
 		}
 		for (const auto& param : parameterBundle.getInt64Parameter())
 		{
@@ -529,14 +470,14 @@ std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(Index
 		}
 		if (paramerterFound)
 		{
-			break;
+			continue;
 		}
 	}
 
 	return paramValueIndices;
 }
 
-void DataCollectionCreationHandler::AddRequiredTables(MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
+void DataCollectionCreationHandler::AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
 {
 	for (auto range : dataAssembly.allSelectionRanges)
 	{
@@ -618,4 +559,63 @@ void DataCollectionCreationHandler::LoadRequiredTables(std::list<string>& requir
 			loadedTables.insert({ tableEntity->getName(), tableEntity });
 		}
 	}
+}
+
+void DataCollectionCreationHandler::AddFieldsToMSMD(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityMeasurementMetadata> msmd)
+{
+	Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
+	for (auto& field : rangeData.GetStringFields())
+	{
+		msmd->InsertInField(field.first, field.second);
+		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
+	}
+	for (auto& field : rangeData.GetDoubleFields())
+	{
+		msmd->InsertInField(field.first, field.second);
+		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
+	}
+	for (auto& field : rangeData.GetInt32Fields())
+	{
+		msmd->InsertInField(field.first, field.second);
+		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
+	}
+	for (auto& field : rangeData.GetInt64Fields())
+	{
+		msmd->InsertInField(field.first, field.second);
+		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
+	}
+}
+
+void DataCollectionCreationHandler::AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMeasurementMetadata> msmd)
+{
+	Documentation::INSTANCE()->AddToDocumentation("Adding parameter:\n");
+	for (const auto& field : parameterBundle.getStringParameter())
+	{
+		std::list<std::string> parameterName{ field.parameterName };
+		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
+		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
+		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
+	}
+	for (const auto& field : parameterBundle.getDoubleParameter())
+	{
+		std::list<std::string> parameterName{ field.parameterName };
+		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
+		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
+		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
+	}
+	for (auto field : parameterBundle.getInt32Parameter())
+	{
+		std::list<std::string> parameterName{ field.parameterName };
+		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
+		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
+		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
+	}
+	for (auto field : parameterBundle.getInt64Parameter())
+	{
+		std::list<std::string> parameterName{ field.parameterName };
+		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
+		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
+		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
+	}
+
 }

@@ -34,8 +34,8 @@ protected:
 	virtual void UIComponentWasSet() {};
 	virtual void ModelComponentWasSet() {};
 	void CheckEssentials();
-	std::string CreateNewUniqueTopologyName(std::string folderName, std::string fileName);
-	std::string CreateNewUniqueTopologyNamePlainPossible(std::string folderName, std::string fileName);
-	std::vector<std::string> CreateNewUniqueTopologyName(std::string FolderName, std::string fileName, int numberOfFiles);
+	std::string CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName);
+	std::string CreateNewUniqueTopologyNamePlainPossible(const std::string& folderName, const std::string& fileName);
+	std::vector<std::string> CreateNewUniqueTopologyName(const std::string& FolderName, const std::string& fileName, uint64_t numberOfFiles);
 };
 

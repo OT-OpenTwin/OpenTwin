@@ -1,6 +1,6 @@
 #include "BusinessLogicHandler.h"
 
-std::string BusinessLogicHandler::CreateNewUniqueTopologyName(std::string folderName, std::string fileName)
+std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName)
 {
 	std::list<std::string> folderContent = _modelComponent->getListOfFolderItems(folderName);
 	int count = 1;
@@ -13,7 +13,7 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyName(std::string folder
 	return fullFileName;
 }
 
-std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(std::string folderName, std::string fileName)
+std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(const std::string& folderName, const std::string& fileName)
 {
 	std::list<std::string> folderContent = _modelComponent->getListOfFolderItems(folderName);
 	int count = 1;
@@ -26,13 +26,13 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(std::
 	return fullFileName;
 }
 
-std::vector<std::string> BusinessLogicHandler::CreateNewUniqueTopologyName(std::string folderName, std::string fileName, int numberOfFiles)
+std::vector<std::string> BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles)
 {
 	std::list<std::string> uniqueFileNames = _modelComponent->getListOfFolderItems(folderName);
 	std::vector<std::string> newNames;
 	int count = 1;
 	std::string fullFileName = folderName + "/" + fileName;
-	for (int i = 0; i < numberOfFiles; i++)
+	for (uint64_t i = 0; i < numberOfFiles; i++)
 	{
 		while (std::find(uniqueFileNames.begin(), uniqueFileNames.end(), fullFileName) != uniqueFileNames.end())
 		{

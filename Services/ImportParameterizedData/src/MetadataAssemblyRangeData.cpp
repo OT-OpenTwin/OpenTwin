@@ -1,6 +1,6 @@
 #include "MetadataAssemblyRangeData.h"
 
-void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRanges, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& allTables)
+void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRanges, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& allTables)
 {
 	std::map<std::string, std::list<std::string>> allFields;
 	std::map<std::string, std::string> rangeTypesByRangeNames;
@@ -25,6 +25,11 @@ void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(std::list<std::
 	}
 
 	TransformSelectedDataIntoSelectedDataType(allFields, rangeTypesByRangeNames);
+}
+
+uint64_t MetadataAssemblyRangeData::getNumberOfFields() const
+{
+	return _stringFields.size() + _doubleFields.size() + _int32Fields.size() + _int64Fields.size();
 }
 
 std::map<std::string, std::list<std::string>> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table)

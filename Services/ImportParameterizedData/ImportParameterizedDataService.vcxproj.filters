@@ -67,6 +67,9 @@
     <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
+    <ClCompile Include="include\ProgressUpdater.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -152,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h">
       <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProgressUpdater.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

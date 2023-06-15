@@ -188,6 +188,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\ProgressUpdater.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\CollectionAssembler.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
     <ClInclude Include="include\IndexManager.h" />
+    <ClInclude Include="include\ProgressUpdater.h" />
     <ClInclude Include="include\QuantityContainer.h" />
     <ClInclude Include="include\QuantityContainerCreator.h" />
     <ClInclude Include="include\QuantityDataStorageAccess.h" />

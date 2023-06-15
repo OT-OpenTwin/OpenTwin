@@ -40,8 +40,11 @@ private:
 	std::shared_ptr<IndexManager> ConsiderAllExistingMetadata();
 
 	std::map<std::string, MetadataAssemblyData> GetAllMetadataAssemblies();
-	void AddRequiredTables(MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables);
+	void AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables);
 	void LoadRequiredTables(std::list<string>& requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& loadedTables);
+	void AddFieldsToMSMD(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityMeasurementMetadata> msmd);
+	void AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMeasurementMetadata> msmd);
+
 	void ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 	void ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 	void ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
