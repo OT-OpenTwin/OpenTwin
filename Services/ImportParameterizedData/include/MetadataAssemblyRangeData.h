@@ -19,6 +19,12 @@
 class MetadataAssemblyRangeData
 {
 public:
+	MetadataAssemblyRangeData() {};
+	MetadataAssemblyRangeData(const MetadataAssemblyRangeData& other) = delete;
+	MetadataAssemblyRangeData(const MetadataAssemblyRangeData&& other) = delete;
+	MetadataAssemblyRangeData& operator=(const MetadataAssemblyRangeData& other) = delete;
+	MetadataAssemblyRangeData& operator=(const MetadataAssemblyRangeData&& other) = delete;
+
 	void LoadAllRangeSelectionInformation(const std::list< std::shared_ptr<EntityTableSelectedRanges>>& allRanges, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& allTables);
 
 	const std::map<std::string, std::list<std::string>>*	GetStringFields() const { return &_stringFields; };
