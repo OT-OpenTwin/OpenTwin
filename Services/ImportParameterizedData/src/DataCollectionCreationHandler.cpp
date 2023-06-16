@@ -67,14 +67,10 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		return;
 	}
 
-	//ToDo: Check if existing parameter have the same name, only differing in lower/upper case spelling.
-	//ToDo: Check for overlapping selections with different types
-
 	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
 	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
 
 	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
-	
 	_uiComponent->displayMessage("Start analysis of range selections.\n\n");
 	
 	std::list<const std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
@@ -142,6 +138,18 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		}
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 		Documentation::INSTANCE()->ClearDocumentation();
+		
+		bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
+		if (!isValid)
+		{
+			_uiComponent->displayMessage("Skipped creation of msmd " + msmdName + " due to this issue:\n");
+			_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+			Documentation::INSTANCE()->ClearDocumentation();
+			continue;
+		}
+		//ToDo: Does the order of the selections play a role for the parameter/quantity assignment?
+		//ToDo: Check for overlapping selections with different types
+
 
 		//Adding quantity information and gradually flushing quantity container into the result collection
 		std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') +1, msmdName.size());

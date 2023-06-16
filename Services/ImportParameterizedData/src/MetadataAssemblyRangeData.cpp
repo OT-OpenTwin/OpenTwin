@@ -15,7 +15,7 @@ void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list
 			std::list<std::string>& fieldValues = newField.second;
 			if (allFields.find(fieldKey) != allFields.end())
 			{
-				std::move(fieldValues.begin(), fieldValues.end(), allFields[fieldKey].end());
+				allFields[fieldKey].splice(allFields[fieldKey].end(), fieldValues);
 			}
 			else
 			{

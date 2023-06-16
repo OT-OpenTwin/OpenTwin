@@ -107,7 +107,7 @@ void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurement
 void IndexManager::StoreAllQuantities(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
 {
 	std::string quantityDocumentName = (*existingMetadataEntities.begin())->getQuantityDocumentName();
-	for (auto existingMetadata : existingMetadataEntities)
+	for (auto& existingMetadata : existingMetadataEntities)
 	{
 		std::vector<std::string> allQuantityNames = existingMetadata->getAllQuantityDocumentNames();
 		for (std::string quantityName : allQuantityNames)

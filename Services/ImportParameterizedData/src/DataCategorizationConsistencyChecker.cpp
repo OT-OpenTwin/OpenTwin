@@ -70,3 +70,50 @@ bool DataCategorizationConsistencyChecker::isValidAllParameterAndQuantitiesRefer
 	}
 	return !issueFound;
 }
+
+bool DataCategorizationConsistencyChecker::isValidQuantityAndParameterNumberMatches(MetadataAssemblyRangeData& parameterData, MetadataAssemblyRangeData& quantityData)
+{
+
+	std::map<uint64_t,std::list<std::string>> numberOfParameter;
+	AddFieldNameByFieldvalueSize(parameterData.GetDoubleFields(),numberOfParameter);
+	AddFieldNameByFieldvalueSize(parameterData.GetInt32Fields(),numberOfParameter);
+	AddFieldNameByFieldvalueSize(parameterData.GetInt64Fields(),numberOfParameter);
+	AddFieldNameByFieldvalueSize(parameterData.GetStringFields(),numberOfParameter);
+	
+	std::map<uint64_t, std::list<std::string>> numberOfQuantities;
+	AddFieldNameByFieldvalueSize(quantityData.GetDoubleFields(),numberOfQuantities);
+	AddFieldNameByFieldvalueSize(quantityData.GetInt32Fields(), numberOfQuantities);
+	AddFieldNameByFieldvalueSize(quantityData.GetInt64Fields(), numberOfQuantities);
+	AddFieldNameByFieldvalueSize(quantityData.GetStringFields(),numberOfQuantities);
+	
+	if (numberOfQuantities.size() == 1 && numberOfParameter.size() == 1 && numberOfParameter.begin()->first == numberOfQuantities.begin()->first)
+	{
+		return true;
+	}
+	else
+	{
+		Documentation::INSTANCE()->AddToDocumentation("Quantities and parameter don't have the same number of entries.\n");
+		for (const auto& quantities : numberOfQuantities)
+		{
+			const uint64_t& numberOfEntries = quantities.first;
+			Documentation::INSTANCE()->AddToDocumentation(std::to_string(numberOfEntries) + " entries for the following quantities:\n");
+			const std::list<std::string>& quantityNames = quantities.second;
+			for (const std::string& quantityName : quantityNames)
+			{
+				Documentation::INSTANCE()->AddToDocumentation(quantityName + "\n");
+			}
+		}
+		for (const auto& parameter : numberOfParameter)
+		{
+			const uint64_t& numberOfEntries = parameter.first;
+			Documentation::INSTANCE()->AddToDocumentation(std::to_string(numberOfEntries) + " entries for the following parameter:\n");
+			const std::list<std::string>& quantityNames = parameter.second;
+			for (const std::string& quantityName : quantityNames)
+			{
+				Documentation::INSTANCE()->AddToDocumentation(quantityName + "\n");
+			}
+		}
+		return false;
+	}
+	
+}
