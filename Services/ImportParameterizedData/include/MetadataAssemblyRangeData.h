@@ -37,12 +37,14 @@ public:
 private:
 
 	/// <summary>
-	/// Extracts the selected ranges from the table. All cell values are string values. They are sorted by a key value, which is the corresponding value in either the first row or collumn of the table.
+	/// Extracts the selected ranges from the table. All cell values are string values. 
+	/// They are sorted by a key value, which is the corresponding value in either the first row or collumn of the table.
+	/// Each is contained in a map with its index (row or column) as key.
 	/// </summary>
 	/// <param name="range"></param>
 	/// <param name="table"></param>
 	/// <returns></returns>
-	std::map<std::string, std::list<std::string>> ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table);
+	std::string ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields);
 
 	/// <summary>
 	/// Empties allFields and adds its content after casting the values to the corresponding member attribute.

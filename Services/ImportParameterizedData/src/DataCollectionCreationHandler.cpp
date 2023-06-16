@@ -147,9 +147,8 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			Documentation::INSTANCE()->ClearDocumentation();
 			continue;
 		}
-		//ToDo: Does the order of the selections play a role for the parameter/quantity assignment?
-		//ToDo: Check for overlapping selections with different types
 
+		//ToDo: Check for overlapping selections with different types
 
 		//Adding quantity information and gradually flushing quantity container into the result collection
 		std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') +1, msmdName.size());

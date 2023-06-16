@@ -33,7 +33,7 @@ void ProgressUpdater::SetTotalNumberOfUpdates(uint32_t numberOfUpdates, uint64_t
 
 void ProgressUpdater::TriggerUpdate(int32_t currentStep)
 {
-	if (currentStep != 0 && currentStep != _totalNumberOfSteps && currentStep % _triggerFrequency == 0)
+	if (currentStep != 0 && currentStep != _totalNumberOfSteps && _triggerFrequency != 0 && currentStep % _triggerFrequency == 0)
 	{
 		_uiComponent->setProgress( static_cast<int>(static_cast<float>(currentStep) / _totalNumberOfSteps * 100));
 	}
