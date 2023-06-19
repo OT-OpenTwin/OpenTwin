@@ -32,6 +32,12 @@ const GenericDocument* EntityWithDynamicFields::getDocument(std::string document
 	return &_bsonDocumentsByName[documentName];
 }
 
+void EntityWithDynamicFields::ClearAllDocuments()
+{
+	_bsonDocumentsByName.clear();
+	setModified();
+}
+
 void EntityWithDynamicFields::CreatePlainDocument(std::string documentName)
 {
 	if (_bsonDocumentsByName.find(documentName) == _bsonDocumentsByName.end())

@@ -24,8 +24,9 @@ public:
 	template <class T>
 	void InsertInField(std::string fieldName, std::list<T> values, std::string documentName = "/");
 
-	std::vector<std::string> getDocumentsNames(std::string parentDocument) const;
+	std::vector<std::string> getDocumentsNames(std::string parentDocument = "/") const;
 	const GenericDocument* getDocument(std::string documentName);
+	void ClearAllDocuments();
 
 protected:
 	void CreatePlainDocument(std::string documentName);
@@ -56,4 +57,5 @@ void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<T> 
 		_bsonDocumentsByName.insert({ documentName, newDocument });
 	}
 	_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+	setModified();
 };

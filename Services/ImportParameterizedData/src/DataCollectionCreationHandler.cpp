@@ -67,12 +67,38 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		return;
 	}
 
-	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
-	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
-
-	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
 	_uiComponent->displayMessage("Start analysis of range selections.\n\n");
+
+	//Updating RMD
+	const MetadataAssemblyData* rmdAssemblyData = nullptr;
+	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
+	{
+		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
+		if (metadataAssembly->dataCategory == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
+		{
+			rmdAssemblyData = metadataAssembly;
+			break;
+		}
+	}
+	if (rmdAssemblyData == nullptr) { throw std::exception("RMD categorization entity could not be found."); }
+	_uiComponent->displayMessage("Updating RMD\n");
+	std::list<std::string> requiredTables;
+	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
+	_uiComponent->displayMessage("\nRequired tables:\n");
+	AddRequiredTables(*rmdAssemblyData, requiredTables);
+	requiredTables.unique();
+	LoadRequiredTables(requiredTables, loadedTables);
+	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+	Documentation::INSTANCE()->ClearDocumentation();
+	//Filling a new EntityMeasurementMetadata object with its fields.
+	{
+		MetadataAssemblyRangeData rmdData;
+		rmdData.LoadAllRangeSelectionInformation(rmdAssemblyData->allSelectionRanges, loadedTables);
+		UpdateRMDEntity(rmdData);
+	}
 	
+	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
+	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
 	std::list<const std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
@@ -96,7 +122,6 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		_uiComponent->displayMessage("Create "+ msmdName+":\n");
 		
 		//Load all required tables that are not loaded yet.
-		std::list<std::string> requiredTables;
 		_uiComponent->displayMessage("\nRequired tables:\n");
 		AddRequiredTables(*metadataAssembly, requiredTables); //for msmd
 		AddRequiredTables(*(metadataAssembly->next), requiredTables); //for parameter
@@ -112,7 +137,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 
 		std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));						
 		metadataBuffer->setName(_datasetFolder + "/" + msmdName);
-		AddFieldsToMSMD(rangeData, metadataBuffer);
+		AddFieldsToBaseLevel(rangeData, metadataBuffer);
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 		Documentation::INSTANCE()->ClearDocumentation();
 		//Todo: MetadataAssemblyRangeData not needed anymore! Delete in process!
@@ -147,8 +172,6 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			Documentation::INSTANCE()->ClearDocumentation();
 			continue;
 		}
-
-		//ToDo: Check for overlapping selections with different types
 
 		//Adding quantity information and gradually flushing quantity container into the result collection
 		std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') +1, msmdName.size());
@@ -248,6 +271,13 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		entityVersions.push_back(metadata->getEntityStorageVersion());
 		forceVisible.push_back(false);
 	}
+	if (_rmdEntity != nullptr)
+	{
+		entityIDs.push_back(_rmdEntity->getEntityID());
+		entityVersions.push_back(_rmdEntity->getEntityStorageVersion());
+		forceVisible.push_back(false);
+	}
+
 	_modelComponent->addEntitiesToModel(entityIDs, entityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Created new n-dimensional parameterized data collection");
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 }
@@ -261,14 +291,14 @@ std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExisting
 	ClassFactory classFactory;
 
 	EntityResearchMetadata temp(-1, nullptr, nullptr, nullptr, nullptr, "");
-	std::shared_ptr<EntityResearchMetadata>rmd;
+	
 	std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities;
 	for (auto& entityInfo : entityInfos)
 	{
 		auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
 		if (entBase->getClassName() == temp.getClassName())
 		{
-			rmd.reset(dynamic_cast<EntityResearchMetadata*>(entBase));
+			_rmdEntity.reset(dynamic_cast<EntityResearchMetadata*>(entBase));
 		}
 		else
 		{
@@ -414,6 +444,37 @@ void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeas
 	msmd->InsertToQuantityField("Name", quantityName, abbreviation);
 	std::list<std::string> dataType{ type };
 	msmd->InsertToQuantityField("Datatype", dataType, abbreviation);
+}
+
+void DataCollectionCreationHandler::UpdateRMDEntity(const MetadataAssemblyRangeData& rmdData)
+{
+	std::vector<std::string> allDocumentNames = _rmdEntity->getDocumentsNames();
+
+	bool allFieldsAreSame = true;
+	for (const std::string& documentName : allDocumentNames)
+	{
+		const GenericDocument* document =	_rmdEntity->getDocument(documentName);
+	
+		allFieldsAreSame = FieldsAreAllSame<>(*document->getInt32Fields(), *rmdData.GetInt32Fields());
+		if (!allFieldsAreSame) { break;}
+		allFieldsAreSame = FieldsAreAllSame<>(*document->getInt64Fields(), *rmdData.GetInt64Fields());
+		if (!allFieldsAreSame) { break;}
+		allFieldsAreSame = FieldsAreAllSame<>(*document->getDoubleFields(), *rmdData.GetDoubleFields());
+		if (!allFieldsAreSame) { break;}
+		allFieldsAreSame = FieldsAreAllSame<>(*document->getStringFields(), *rmdData.GetStringFields());
+		if (!allFieldsAreSame) { break;}	
+	}
+
+	if (!allFieldsAreSame)
+	{
+		_rmdEntity->ClearAllDocuments();
+		AddFieldsToBaseLevel(rmdData, _rmdEntity);
+		_rmdEntity->StoreToDataBase();
+	}
+	else
+	{
+		_rmdEntity = nullptr;
+	}
 }
 
 std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex)
@@ -568,7 +629,7 @@ void DataCollectionCreationHandler::LoadRequiredTables(std::list<string>& requir
 	}
 }
 
-void DataCollectionCreationHandler::AddFieldsToMSMD(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityMeasurementMetadata> msmd)
+void DataCollectionCreationHandler::AddFieldsToBaseLevel(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityWithDynamicFields> msmd)
 {
 	Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
 	for (const auto& field : *rangeData.GetStringFields())
@@ -610,14 +671,14 @@ void DataCollectionCreationHandler::AddParameterFieldsToMSMD(MetadataParameterBu
 		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
 		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 	}
-	for (auto field : parameterBundle.getInt32Parameter())
+	for (const auto& field : parameterBundle.getInt32Parameter())
 	{
 		std::list<std::string> parameterName{ field.parameterName };
 		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
 		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
 		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
 	}
-	for (auto field : parameterBundle.getInt64Parameter())
+	for (const auto& field : parameterBundle.getInt64Parameter())
 	{
 		std::list<std::string> parameterName{ field.parameterName };
 		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);

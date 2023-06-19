@@ -9,9 +9,12 @@ void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list
 	for (const auto& range : allRanges)
 	{
 		auto table = allTables[range->getTableName()];
-		const std::string fieldKey = ExtractFieldsFromRange(range, table, allFieldsSorted);
+		const std::vector<std::string> fieldKeys = ExtractFieldsFromRange(range, table, allFieldsSorted);
 		const std::string& type = range->getSelectedType();
-		rangeTypesByRangeNames[fieldKey] = type;
+		for (const std::string fieldKey : fieldKeys)
+		{
+			rangeTypesByRangeNames[fieldKey] = type;
+		}
 	}
 
 	for (auto newField : allFieldsSorted)
@@ -32,9 +35,9 @@ uint64_t MetadataAssemblyRangeData::getNumberOfFields() const
 	return _stringFields.size() + _doubleFields.size() + _int32Fields.size() + _int64Fields.size();
 }
 
-std::string MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields)
+std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields)
 {
-	std::string fieldKey = "";
+	std::vector<std::string> fieldKey;
 	int offsetDueToHeader = 1;
 	uint32_t selection[4];
 	range->getSelectedRange(selection[0], selection[1], selection[2], selection[3]);
@@ -45,11 +48,11 @@ std::string MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<En
 	{
 		for (uint32_t column = selection[2]; column <= selection[3]; column++)
 		{
-			fieldKey = table->getTableData()->getValue(0, column);
+			fieldKey.push_back(table->getTableData()->getValue(0, column));
 			for (uint32_t row = selection[0] + offsetDueToHeader; row <= selection[1] + offsetDueToHeader; row++)
 			{
 				const std::string& value = table->getTableData()->getValue(row, column);
-				outAllSortedFields[fieldKey].insert({row, value});
+				outAllSortedFields[fieldKey.back()].insert({row, value});
 			}
 		}
 	}
@@ -57,14 +60,16 @@ std::string MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<En
 	{
 		for (uint32_t row = selection[0]; row <= selection[1]; row++)
 		{
-			fieldKey = table->getTableData()->getValue(row, 0);
+			fieldKey.push_back(table->getTableData()->getValue(row, 0));
 			for (uint32_t column = selection[2] + offsetDueToHeader; column <= selection[3] + offsetDueToHeader; column++)
 			{
 				const std::string& value = table->getTableData()->getValue(row, column);
-				outAllSortedFields[fieldKey].insert({ column, value });
+				outAllSortedFields[fieldKey.back()].insert({column, value});
 			}
 		}
 	}
+
+
 	return fieldKey;
 }
 

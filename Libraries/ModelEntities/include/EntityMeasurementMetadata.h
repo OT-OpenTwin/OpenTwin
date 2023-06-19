@@ -40,6 +40,11 @@ inline void EntityMeasurementMetadata::InsertToParameterField(std::string fieldN
 template<class T>
 inline void EntityMeasurementMetadata::InsertToQuantityField(std::string fieldName, std::list<T> values, std::string documentName)
 {
-	InsertInField(fieldName, values, _quantityDocument + "/" + documentName);
+	std::string fullDocumentPath = _quantityDocument;
+	if (documentName != "")
+	{
+		fullDocumentPath += "/" + documentName;
+	}
+	InsertInField(fieldName, values, fullDocumentPath);
 }
 

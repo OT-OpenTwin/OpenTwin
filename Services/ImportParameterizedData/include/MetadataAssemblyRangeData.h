@@ -44,7 +44,7 @@ private:
 	/// <param name="range"></param>
 	/// <param name="table"></param>
 	/// <returns></returns>
-	std::string ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields);
+	std::vector<std::string> ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields);
 
 	/// <summary>
 	/// Empties allFields and adds its content after casting the values to the corresponding member attribute.
