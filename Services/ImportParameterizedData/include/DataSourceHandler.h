@@ -15,15 +15,8 @@
 class DataSourceHandler : public BusinessLogicHandler
 {
 public:
-	DataSourceHandler(const std::string dataSourceFolder);
-	void AddSourceFileToModel();
-	void StorePythonScriptAsEntity(std::string fileName);
-
-	void ReserveSourceUIDs(const ot::UIDList& entityID) { _reserveSourceUIDs = entityID; };
-	std::vector<char> ExtractFileContentAsBinary(std::string fileName);
-
+	void AddNewFilesToModel(ot::UIDList& topologyIDs, ot::UIDList& topologyVersions, ot::UIDList& dataIDs, ot::UIDList& dataVersions, std::list<std::string>& fileNames);
+	
 private:
-	ot::UIDList _reserveSourceUIDs;
-	const std::string _dataSourceFolder;
-	std::shared_ptr<EntityParameterizedDataSource> CreateNewSourceEntity(std::string dataType);
+	
 };

@@ -133,6 +133,7 @@ private:
 	ot::MenuButtonDescription _buttonCreateDataCollection;
 
 	const std::string _dataSourcesFolder = "Files";
+	const std::string _scriptsFolder = "Scripts";
 	const std::string _tableFolder = "Tables";
 	const std::string _dataCategorizationFolder = "Data Categorization";
 	const std::string _parameterFolder = "Parameterset";

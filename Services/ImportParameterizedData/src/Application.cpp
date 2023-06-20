@@ -39,7 +39,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, new UiNotifier(), new ModelNotifier())
 {
-	_dataSourceHandler = new DataSourceHandler(_dataSourcesFolder);
+	_dataSourceHandler = new DataSourceHandler();
 	_tableHandler = new TableHandler( _tableFolder);
 	_parametrizedDataHandler = new DataCategorizationHandler( _dataCategorizationFolder, _parameterFolder, _quantityFolder, _tableFolder, _previewTableNAme);
 	_collectionCreationHandler = new DataCollectionCreationHandler(_dataCategorizationFolder,_datasetFolder, _parameterFolder, _quantityFolder, _tableFolder);
@@ -219,32 +219,28 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_Action_CMD_UI_StoreFileInDataBase);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
 				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.csv;*.txt)");
-				
-				ot::UIDList uids;
-				uids.push_back( m_modelComponent->createEntityUID());
-				uids.push_back( m_modelComponent->createEntityUID());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityIDList, uids);
-				_dataSourceHandler->ReserveSourceUIDs(uids);
-				
 				ot::rJSON::add(doc, OT_ACTION_PARAM_NAME, _dataSourcesFolder);
-
 				std::list<std::string> takenNames =	m_modelComponent->getListOfFolderItems(_dataSourcesFolder);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES, takenNames);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importCSVFile");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "addFilesToModel");
 
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonImportPythonScript.GetFullDescription())
 			{
 				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import Python Script");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "Python scripts (*.py)");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importPythonScript");
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_Action_CMD_UI_StoreFileInDataBase);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.py)");
+				ot::rJSON::add(doc, OT_ACTION_PARAM_NAME, _scriptsFolder);
+				std::list<std::string> takenNames = m_modelComponent->getListOfFolderItems(_scriptsFolder);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES, takenNames);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, false);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "addFilesToModel");
+
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonCreateTable.GetFullDescription())
@@ -295,7 +291,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 		{
 			std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-			if (subsequentFunction == "importCSVFile")
+			if (subsequentFunction == "addFilesToModel")
 			{
 				std::list<std::string> fileNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 				
@@ -303,26 +299,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 				ot::UIDList topoVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
 				ot::UIDList dataIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
 				ot::UIDList dataVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
-				std::list<bool> forceVis;
-				for (uint64_t i = 0; i < topoIDs.size(); i++)
-				{
-					forceVis.push_back(false);
-				}
-				m_modelComponent->addEntitiesToModel(topoIDs, topoVers, forceVis,
-					dataIDs, dataVers, topoIDs, "added new source file");
-				std::string displayMessage = "Loaded files: \n";
-				for (const std::string& fileName : fileNames)
-				{
-					displayMessage.append(fileName);
-					displayMessage.append("\n");
-				}
-				m_uiComponent->displayMessage(displayMessage);
-			}
-			else if (subsequentFunction == "importPythonScript")
-			{
-				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				_dataSourceHandler->StorePythonScriptAsEntity(fileName);
-				returnMessage = "Import of " + fileName + " succeeded\n";
+				_dataSourceHandler->AddNewFilesToModel(topoIDs, topoVers, dataIDs, dataVers, fileNames);
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
