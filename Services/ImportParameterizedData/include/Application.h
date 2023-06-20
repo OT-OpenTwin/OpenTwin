@@ -122,6 +122,18 @@ private:
 	ot::MenuButtonDescription _buttonImportCSV;
 	ot::MenuButtonDescription _buttonImportPythonScript;
 	ot::MenuButtonDescription _buttonCreateTable;
+	
+	ot::MenuButtonDescription _buttonTableDeleteRow;
+	ot::MenuButtonDescription _buttonTableAddRowBelow;
+	ot::MenuButtonDescription _buttonTableAddRowAbove;
+	
+	ot::MenuButtonDescription _buttonTableDeleteColumn;
+	ot::MenuButtonDescription _buttonTableAddColumnLeft;
+	ot::MenuButtonDescription _buttonTableAddColumnRight;
+	
+	ot::MenuButtonDescription _buttonTableSave;
+	ot::MenuButtonDescription _buttonTableReset;
+	ot::MenuButtonDescription _buttonTableResetToSelection;
 
 	ot::MenuButtonDescription _buttonCreateMSMDEntry;
 	ot::MenuButtonDescription _buttonCreateRMDEntry;
@@ -151,4 +163,6 @@ private:
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, OT_rJSON_doc _doc);
 	void RequestSelectedRanges();
+	void SetControlstateTableFunctions(bool visible);
+
 };

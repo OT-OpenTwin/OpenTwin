@@ -105,6 +105,18 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonImportCSV.SetDescription(pageName, groupNameImport, "Import File");
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
 	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
+	
+	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row");
+	_buttonTableAddRowBelow.SetDescription(pageName, groupNameTableHandling, "Insert Row Below");
+	_buttonTableAddRowAbove.SetDescription(pageName, groupNameTableHandling, "Insert Row Above");
+	
+	_buttonTableDeleteColumn.SetDescription(pageName, groupNameTableHandling, "Delete Column");
+	_buttonTableAddColumnLeft.SetDescription(pageName, groupNameTableHandling, "Insert Column Left");
+	_buttonTableAddColumnRight.SetDescription(pageName, groupNameTableHandling, "Insert Column Right");
+	
+	_buttonTableSave.SetDescription(pageName, groupNameTableHandling, "Save Changes");;
+	_buttonTableReset.SetDescription(pageName, groupNameTableHandling, "Revert Changes");;
+	_buttonTableResetToSelection.SetDescription(pageName, groupNameTableHandling, "Reset To Selection");;
 
 	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add RMD Entry");
 	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add MSMD Entry");
@@ -122,6 +134,18 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
 	
+	_ui->addMenuButton(_buttonTableAddColumnLeft, modelWrite, "table-column-insert");
+	_ui->addMenuButton(_buttonTableAddColumnRight, modelWrite, "table-column-insert");
+	_ui->addMenuButton(_buttonTableDeleteColumn, modelWrite, "table-column-delete");
+	
+	_ui->addMenuButton(_buttonTableAddRowAbove, modelWrite, "table-row-insert");
+	_ui->addMenuButton(_buttonTableAddRowBelow, modelWrite, "table-row-insert");
+	_ui->addMenuButton(_buttonTableDeleteRow, modelWrite, "table-row-delete");
+
+	_ui->addMenuButton(_buttonTableSave, modelWrite, "table-save");
+	_ui->addMenuButton(_buttonTableReset, modelWrite, "table-refresh");
+	_ui->addMenuButton(_buttonTableResetToSelection, modelWrite, "table-refresh");
+
 	_ui->addMenuButton(_buttonAutomaticCreationMSMD, modelWrite, "BatchProcessing");
 	_ui->addMenuButton(_buttonCreateDataCollection, modelWrite, "database");
 
@@ -133,6 +157,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	}
 
 	uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
+	SetControlstateTableFunctions(false);
 	enableMessageQueuing("uiService", false);
 }
 
@@ -412,6 +437,21 @@ void Application::HandleSelectionChanged()
 			}
 			else if (entityName.find(_previewTableNAme) != std::string::npos)
 			{
+				bool showTableBtns = true;
+				uiComponent()->setControlState(_buttonTableAddColumnLeft.GetFullDescription(), showTableBtns);
+				uiComponent()->setControlState(_buttonTableAddColumnRight.GetFullDescription(), showTableBtns);
+				uiComponent()->setControlState(_buttonTableDeleteColumn.GetFullDescription(), showTableBtns);
+				
+				uiComponent()->setControlState(_buttonTableAddRowAbove.GetFullDescription(), showTableBtns);
+				uiComponent()->setControlState(_buttonTableAddRowBelow.GetFullDescription(), showTableBtns);
+				uiComponent()->setControlState(_buttonTableDeleteRow.GetFullDescription(), showTableBtns);
+				
+				uiComponent()->setControlState(_buttonTableReset.GetFullDescription(), showTableBtns);
+				uiComponent()->setControlState(_buttonTableResetToSelection.GetFullDescription(), showTableBtns);
+				uiComponent()->setControlState(_buttonTableSave.GetFullDescription(), showTableBtns);
+
+				uiComponent()->sendUpdatedControlState();
+				
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
@@ -427,6 +467,14 @@ void Application::HandleSelectionChanged()
 
 				uiComponent()->sendMessage(true, doc);
 			}
+			else
+			{
+				SetControlstateTableFunctions(false);
+			}
+		}
+		else
+		{
+			SetControlstateTableFunctions(false);
 		}
 
 		ot::UIDList potentialRangesID, potentialRangesVersions;
@@ -486,4 +534,21 @@ void Application::RequestSelectedRanges()
 
 
 	uiComponent()->sendMessage(true, doc);
+}
+
+void Application::SetControlstateTableFunctions(bool showTableBtns)
+{
+	uiComponent()->setControlState(_buttonTableAddColumnLeft.GetFullDescription(), showTableBtns);
+	uiComponent()->setControlState(_buttonTableAddColumnRight.GetFullDescription(), showTableBtns);
+	uiComponent()->setControlState(_buttonTableDeleteColumn.GetFullDescription(), showTableBtns);
+
+	uiComponent()->setControlState(_buttonTableAddRowAbove.GetFullDescription(), showTableBtns);
+	uiComponent()->setControlState(_buttonTableAddRowBelow.GetFullDescription(), showTableBtns);
+	uiComponent()->setControlState(_buttonTableDeleteRow.GetFullDescription(), showTableBtns);
+
+	uiComponent()->setControlState(_buttonTableReset.GetFullDescription(), showTableBtns);
+	uiComponent()->setControlState(_buttonTableResetToSelection.GetFullDescription(), showTableBtns);
+	uiComponent()->setControlState(_buttonTableSave.GetFullDescription(), showTableBtns);
+
+	uiComponent()->sendUpdatedControlState();
 }
