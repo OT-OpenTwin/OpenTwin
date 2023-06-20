@@ -878,7 +878,39 @@ std::string ViewerAPI::getTableName(ot::UID _viewerID)
 		return v->getTableViewer()->getTableName();
 	}
 	else {
-		return nullptr;
+		return "";
+	}
+}
+
+void ViewerAPI::AddToSelectedTableRow(bool _insertAbove, ot::UID _viewerID)
+{
+	Viewer* v = viewerManager[_viewerID];
+	if (v != nullptr) {
+		v->getTableViewer()->AddRow(_insertAbove);
+	}
+}
+
+void ViewerAPI::AddToSelectedTableColumn(bool _insertLeft, ot::UID _viewerID)
+{
+	Viewer* v = viewerManager[_viewerID];
+	if (v != nullptr) {
+		v->getTableViewer()->AddColumn(_insertLeft);
+	}
+}
+
+void ViewerAPI::DeleteFromSelectedTableColumn(ot::UID _viewerID)
+{
+	Viewer* v = viewerManager[_viewerID];
+	if (v != nullptr) {
+		v->getTableViewer()->DeleteSelectedColumn();
+	}
+}
+
+void ViewerAPI::DeleteFromSelectedTableRow(ot::UID _viewerID)
+{
+	Viewer* v = viewerManager[_viewerID];
+	if (v != nullptr) {
+		v->getTableViewer()->DeleteSelectedRow();
 	}
 }
 

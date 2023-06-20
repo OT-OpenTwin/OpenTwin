@@ -210,6 +210,11 @@ namespace ViewerAPI
 	__declspec(dllexport) void ChangeColourOfSelection(ot::UID _viewerID, ot::Color backGroundColour);
 	__declspec(dllexport) std::pair<ot::UID, ot::UID> GetActiveTableIdentifyer(ot::UID _viewerID);
 	__declspec(dllexport) std::string getTableName(ot::UID _viewerID);
+	__declspec(dllexport) void AddToSelectedTableRow(bool _insertAbove, ot::UID _viewerID);
+	__declspec(dllexport) void AddToSelectedTableColumn(bool _insertLeft, ot::UID _viewerID);
+	__declspec(dllexport) void DeleteFromSelectedTableColumn(ot::UID _viewerID);
+	__declspec(dllexport) void DeleteFromSelectedTableRow(ot::UID _viewerID);
+
 
 	/********************************************************************************************/
 

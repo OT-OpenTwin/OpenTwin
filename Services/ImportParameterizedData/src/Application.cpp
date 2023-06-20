@@ -314,6 +314,76 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 				m_uiComponent->displayMessage("Creation of dataset finished\n");
 				m_uiComponent->displayMessage("===========================================================================\n\n");
 			}
+			else if (action == _buttonTableAddColumnLeft.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, true);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonTableAddColumnRight.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, false);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonTableDeleteColumn.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonTableAddRowAbove.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, true);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonTableAddRowBelow.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, false);
+				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonTableDeleteRow.GetFullDescription())
+			{
+				OT_rJSON_createDOC(doc);
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow);
+				uiComponent()->sendMessage(true, doc);
+			}
 			else
 			{
 				throw std::exception(OT_ACTION_RETURN_UnknownAction);

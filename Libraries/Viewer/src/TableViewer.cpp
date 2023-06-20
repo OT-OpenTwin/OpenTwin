@@ -126,3 +126,63 @@ void TableViewer::SelectRanges(std::vector<ot::TableRange>& ranges)
 		_table->setRangeSelected(QTableWidgetSelectionRange(range.GetTopRow(), range.GetLeftColumn(), range.GetBottomRow(), range.GetRightColumn()),true);
 	}
 }
+
+void TableViewer::DeleteSelectedRow()
+{
+	QList<QTableWidgetSelectionRange> ranges = _table->selectedRanges();
+	if (ranges.size() != 0)
+	{
+		for (auto range : ranges)
+		{
+			for (int row = range.bottomRow(); row <= range.topRow(); row++)
+			{
+				_table->removeRow(row);
+			}
+		}
+	}
+}
+
+void TableViewer::DeleteSelectedColumn()
+{
+	QList<QTableWidgetSelectionRange> ranges = _table->selectedRanges();
+	if (ranges.size() != 0)
+	{
+		for (auto range : ranges)
+		{
+			for (int column= range.leftColumn(); column <= range.rightColumn(); column++)
+			{
+				_table->removeColumn(column);
+			}
+		}
+	}
+}
+
+void TableViewer::AddRow(bool insertAbove)
+{
+	QList<QTableWidgetSelectionRange> ranges = _table->selectedRanges();
+	if (ranges.size() != 0)
+	{
+		for (auto range : ranges)
+		{
+			for (int row = range.bottomRow(); row <= range.topRow(); row++)
+			{
+				_table->insertRow(row + !insertAbove);
+			}
+		}
+	}
+}
+
+void TableViewer::AddColumn(bool insertLeft)
+{
+	QList<QTableWidgetSelectionRange> ranges = _table->selectedRanges();
+	if (ranges.size() != 0)
+	{
+		for (auto range : ranges)
+		{
+			for (int column = range.leftColumn(); column <= range.rightColumn(); column++)
+			{
+				_table->insertColumn(column + !insertLeft);
+			}
+		}
+	}
+}

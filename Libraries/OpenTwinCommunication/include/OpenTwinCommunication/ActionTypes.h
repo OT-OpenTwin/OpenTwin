@@ -198,6 +198,11 @@
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.ShowTable"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow "UI.VIEW.ADDROW"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow "UI.VIEW.DELETEROW"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn "UI.VIEW.ADDCOLUMN"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn "UI.VIEW.DELETECOLUMN"
+
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection "UI.VIEW.ColourSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges "UI.VIEW.SelectRanges"
 

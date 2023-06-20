@@ -1790,6 +1790,29 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				selectFileForStoring(dialogTitle, fileMask, subsequentFunction, senderURL);
 			}
+			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
+			{
+				bool insertAbove = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
+				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
+			}
+			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
+			{
+				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
+			}
+			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
+			{
+				bool insertLeft = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
+				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ViewerAPI::AddToSelectedTableColumn(insertLeft,visualizationModelID);
+			}
+			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn)
+			{
+				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
+			}
+			
 			else if (action == OT_ACTION_CMD_UI_FillPropertyGrid)
 			{
 				std::string settings = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);

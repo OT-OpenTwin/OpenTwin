@@ -44,6 +44,10 @@ public:
 	std::vector <ot::TableRange> GetSelectedRanges();
 	void ChangeColorOfSelection(ot::Color& background);
 	void SelectRanges(std::vector <ot::TableRange>& ranges);
+	void DeleteSelectedRow();
+	void DeleteSelectedColumn();
+	void AddRow(bool insertAbove);
+	void AddColumn(bool insertLeft);
 
 private:
 	Table* _table = nullptr;
