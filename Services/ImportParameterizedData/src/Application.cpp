@@ -245,11 +245,17 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			}
 			else if (action == _buttonCreateTable.GetFullDescription())
 			{
-				std::list<ot::EntityInformation> selectedEntityInfo;
+				std::list<ot::EntityInformation> selectedEntityInfos;
 				if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-				m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
-
-				_tableHandler->AddTableView(selectedEntityInfo.begin()->getID(), selectedEntityInfo.begin()->getVersion());
+				m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfos);
+				for (const auto& entityInfo : selectedEntityInfos)
+				{
+					const std::string& name = entityInfo.getName();
+					if (name.find(_dataSourcesFolder) != std::string::npos)
+					{
+						_tableHandler->AddTableView(entityInfo.getID(), entityInfo.getVersion());
+					}
+				}
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
@@ -371,59 +377,56 @@ void Application::HandleSelectionChanged()
 		std::list<ot::EntityInformation> selectedEntityInfo;
 		if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
 		m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+		
+		bool showCreateTableBtn = false;
+		for (const auto& entityInfo : selectedEntityInfo)
+		{
+			const std::string& entityName = entityInfo.getName();
+			if (entityName.find(_dataSourcesFolder) != std::string::npos)
+			{
+				showCreateTableBtn = true;
+				break;
+			}
+		}
+		uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), showCreateTableBtn);
+		uiComponent()->sendUpdatedControlState();
 
 		if (m_selectedEntities.size() == 1)
 		{
 			std::string entityName = selectedEntityInfo.begin()->getName();
-			if (entityName.find(_dataSourcesFolder) != std::string::npos)
+			if (entityName.find(_tableFolder) != std::string::npos)
 			{
-				uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), true);
-				uiComponent()->sendUpdatedControlState();
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				OT_rJSON_createDOC(doc);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
+
+				uiComponent()->sendMessage(true, doc);
 			}
-			else
+			else if (entityName.find(_previewTableNAme) != std::string::npos)
 			{
-				uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
-				uiComponent()->sendUpdatedControlState();
-
-				if (entityName.find(_tableFolder) != std::string::npos)
+				if (_visualizationModel == -1)
 				{
-					if (_visualizationModel == -1)
-					{
-						_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-					}
-					OT_rJSON_createDOC(doc);
-					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
-
-					uiComponent()->sendMessage(true, doc);
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				else if (entityName.find(_previewTableNAme) != std::string::npos)
-				{
-					if (_visualizationModel == -1)
-					{
-						_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-					}
-					auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
-					OT_rJSON_createDOC(doc);
-					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel));
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second));
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first));
-					ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "");
+				auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
+				OT_rJSON_createDOC(doc);
+				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel));
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second));
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first));
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "");
 
-					uiComponent()->sendMessage(true, doc);
-				}
+				uiComponent()->sendMessage(true, doc);
 			}
-		}
-		else
-		{
-			uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
-			uiComponent()->sendUpdatedControlState();
 		}
 
 		ot::UIDList potentialRangesID, potentialRangesVersions;

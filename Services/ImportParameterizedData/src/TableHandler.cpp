@@ -47,6 +47,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 
 	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table");
+	_uiComponent->displayMessage("Created table " + fullName + "\n");
 }
 
 std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableData(std::shared_ptr<TableExtractor> extractor, int numberOfRows, int numberOfColumns)
