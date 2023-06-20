@@ -57,5 +57,6 @@ void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<T> 
 		_bsonDocumentsByName.insert({ documentName, newDocument });
 	}
 	_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+
 	setModified();
 };

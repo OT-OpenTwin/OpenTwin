@@ -1056,6 +1056,25 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			std::string keySequence = doc[OT_ACTION_PARAM_UI_KeySequence].GetString();
 			globalModel->keySequenceActivated(keySequence);
 		}
+		else if (action == OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER)
+		{
+			const int numberOfIdentifier = ot::rJSON::getInt(doc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT);
+			ot::UIDList requestedUIDs;
+			for (int i = 0; i < numberOfIdentifier; i++)
+			{
+				requestedUIDs.push_back(globalModel->createEntityUID());
+			}
+			const std::string& requestingService = ot::rJSON::getString(doc, OT_ACTION_PARAM_SENDER_URL);
+			const std::string& subsequentFunction = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_FunctionName);
+			rapidjson::Document replyDoc;
+			replyDoc.SetObject();
+			ot::rJSON::add(replyDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
+			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
+			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_EntityIDList, requestedUIDs);
+			std::string response;
+			//Currently only the ui service uses this function but the ui url is currently not available when this method is being invoked.
+			sendHttpRequest(QUEUE, globalUIserviceURL, replyDoc, response);
+		}
 		else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
 #ifdef _DEBUG
 		OutputDebugStringA("[OPEN TWIN] [DEBUG] Emergency shutdown received. exit(-100)");

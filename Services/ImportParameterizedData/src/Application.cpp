@@ -297,9 +297,26 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 			if (subsequentFunction == "importCSVFile")
 			{
-				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				_dataSourceHandler->AddSourceFileToModel();
-				returnMessage = "Import of " + fileName + " succeeded\n";
+				std::list<std::string> fileNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+				
+				ot::UIDList topoIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
+				ot::UIDList topoVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
+				ot::UIDList dataIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
+				ot::UIDList dataVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
+				std::list<bool> forceVis;
+				for (uint64_t i = 0; i < topoIDs.size(); i++)
+				{
+					forceVis.push_back(false);
+				}
+				m_modelComponent->addEntitiesToModel(topoIDs, topoVers, forceVis,
+					dataIDs, dataVers, topoIDs, "added new source file");
+				std::string displayMessage = "Loaded files: \n";
+				for (const std::string& fileName : fileNames)
+				{
+					displayMessage.append(fileName);
+					displayMessage.append("\n");
+				}
+				m_uiComponent->displayMessage(displayMessage);
 			}
 			else if (subsequentFunction == "importPythonScript")
 			{

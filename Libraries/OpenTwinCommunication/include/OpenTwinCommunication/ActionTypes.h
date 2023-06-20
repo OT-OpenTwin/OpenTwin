@@ -106,6 +106,7 @@
 #define OT_ACTION_CMD_MODEL_CheckParentUpdates "Model.CheckParentUpdates"
 #define OT_ACTION_CMD_MODEL_ActivateVersion "Model.ActivateVersion"
 #define OT_ACTION_CMD_MODEL_AddPropertiesToEntities "Model.Entities.AddProperty"
+#define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
 
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
@@ -317,6 +318,7 @@
 #define OT_ACTION_PARAM_MODEL_EntityVersion_Brep "Model.Entity.BrepVersion"
 #define OT_ACTION_PARAM_MODEL_EntityVersion_Facets "Model.Entity.FacetsVersion"
 #define OT_ACTION_PARAM_MODEL_OverrideGeometry "Model.Entity.OverrideGeometry"
+#define OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT "Model.Entity.Identifier.Amount"
 #define OT_ACTION_PARAM_MODEL_Description "Model.Description"
 #define OT_ACTION_PARAM_MODEL_NewProperties "Model.Entity.NewProperties"
 #define OT_ACTION_PARAM_VIEW_ID "View.ID"

@@ -40,7 +40,7 @@
 #include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
 #include "OTBlockEditor/BlockEditorAPI.h"
 #include "OTBlockEditor/BlockNetworkEditor.h"
-#include "FileHandler.h"
+
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -1556,6 +1556,24 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				m_lockManager->unlock(nullptr, lockFlags);
 			}
+			else if (action == OT_ACTION_CMD_MODEL_ExecuteFunction)
+			{
+				const std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				ot::UIDList identifiers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
+				{
+					rapidjson::Document  reply = m_fileHandler.StoreFileInDataBase(identifiers);
+					std::string response;
+					sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
+					// Check if response is an error or warning
+					OT_ACTION_IF_RESPONSE_ERROR(response) {
+						assert(0); // ERROR
+					}
+					else OT_ACTION_IF_RESPONSE_WARNING(response) {
+						assert(0); // WARNING
+					}
+					}
+			}		
 			else if (action == OT_ACTION_CMD_UI_DisplayMessage)
 			{
 				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
@@ -1657,6 +1675,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					ex.append("\" was not registered before");
 					throw std::exception(ex.c_str());
 				}
+				if (s->second->serviceName() == OT_INFO_SERVICE_TYPE_MODEL)
+				{
+					m_modelServiceURL = s->second->serviceURL();
+				}
 
 				m_modelViewNotifier.push_back(s->second);
 
@@ -1709,31 +1731,25 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			{
 				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
 				std::string fileMask = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-				
 				try
 				{
-					std::string absoluteFilePath = RequestFileName(dialogTitle, fileMask);
-					if (absoluteFilePath != "")
+					const std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
+
+					if (absoluteFilePaths.size() != 0)
 					{
-						ot::UIDList entityIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-						std::string entityPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_NAME);
-						std::list<std::string> takenNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
-						std::string senderName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER);
-						std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-
-						FileHandler handler;
-						std::string fileName = handler.ExtractFileNameFromPath(absoluteFilePath);
-						std::string uniqueEntityName = handler.CreateNewUniqueTopologyName(takenNames, fileName, entityPath);
-						handler.StoreFileInDataBase(absoluteFilePath, uniqueEntityName, entityIDs, senderName);
-
-						std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-						rapidjson::Document returnDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_ExecuteFunction);
-						ot::rJSON::add(returnDoc, OT_ACTION_PARAM_FILE_OriginalName, fileName);
-						ot::rJSON::add(returnDoc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
-
+						
+						rapidjson::Document sendingDoc;
+						sendingDoc.SetObject();
+						int requiredIdentifierPerFile = 4;
+						const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPerFile;
+						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs);
+						const std::string url = uiServiceURL();
+						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_SENDER_URL, url);
+						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_MODEL_FunctionName, m_fileHandler.GetStoreFileFunctionName());
+						ot::rJSON::add(sendingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER);
+						
 						std::string response;
-						sendHttpRequest(EXECUTE, senderURL, returnDoc, response);
-
+						sendHttpRequest(QUEUE, m_modelServiceURL, sendingDoc, response);
 						// Check if response is an error or warning
 						OT_ACTION_IF_RESPONSE_ERROR(response) {
 							assert(0); // ERROR
@@ -1741,6 +1757,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 						else OT_ACTION_IF_RESPONSE_WARNING(response) {
 							assert(0); // WARNING
 						}
+
+						std::list<std::string> takenNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
+						std::string senderName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER);
+						std::string entityPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_NAME);
+						std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+						std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+
+						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath));
 					}
 				}
 				catch (std::exception& e)

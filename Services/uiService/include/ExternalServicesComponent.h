@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include "FileHandler.h"
 
 // Wrapper header
 #include <uiServiceTypes.h>				// Model and View types
@@ -243,7 +244,8 @@ public:
 	// ###################################################################################################
 
 	// File operations
-	std::string RequestFileName(const std::string& dialogTitle, const std::string& fileMask);
+	std::list<std::string> RequestFileNames(const std::string& dialogTitle, const std::string& fileMask);
+
 	/// <summary>
 	/// Opens a file selection dialog. The path of the selected file is send to the service that created the request. Optionally, the content of the file can be send with the http response.
 	/// </summary>
@@ -341,6 +343,8 @@ private:
 	LockManager *									m_lockManager;
 	AppBase *										m_owner;
 
+	std::string										m_modelServiceURL;
+
 	std::map<std::string, ak::UID>					m_serviceToUidMap;
 	std::map<ot::serviceID_t, ot::ServiceBase *>	m_serviceIdMap;
 
@@ -351,6 +355,8 @@ private:
 	WebsocketClient *								m_websocket;
 
 	bool											m_prefetchingDataCompleted;
+
+	FileHandler										m_fileHandler;
 
 	ExternalServicesComponent() = delete;
 	ExternalServicesComponent(ExternalServicesComponent &) = delete;
