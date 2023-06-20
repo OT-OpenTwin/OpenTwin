@@ -13,9 +13,14 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string&
 	return fullFileName;
 }
 
-std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(const std::string& folderName, const std::string& fileName)
+std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(const std::string& folderName, const std::string& fileName, std::list<std::string>& additionallyTakenNames)
 {
 	std::list<std::string> folderContent = _modelComponent->getListOfFolderItems(folderName);
+	for (const std::string& takenName : additionallyTakenNames)
+	{
+		folderContent.push_back(takenName);
+	}
+	
 	int count = 1;
 	std::string fullFileName = folderName + "/" + fileName;
 	while (std::find(folderContent.begin(), folderContent.end(), fullFileName) != folderContent.end())
@@ -23,6 +28,7 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(const
 		fullFileName = folderName + "/" + fileName + "_" + std::to_string(count);
 		count++;
 	}
+	additionallyTakenNames.push_back(fullFileName);
 	return fullFileName;
 }
 

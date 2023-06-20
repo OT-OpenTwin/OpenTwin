@@ -286,19 +286,51 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 	std::list<ot::UID> dataEntityIDList{ };
 	std::list<ot::UID> dataEntityVersionList{ };
 	std::list<ot::UID> dataEntityParentList{ };
+	std::list<std::string> takenNames;
 
 	for (auto categoryEntity : _activeCollectionEntities)
 	{
-		std::vector<std::string> names = CreateNewUniqueTopologyName(categoryEntity->getName(), _selectionRangeName, static_cast<int>(ranges.size()));
+		
 		for (size_t i = 0; i < ranges.size(); i++)
 		{
 			std::unique_ptr<EntityTableSelectedRanges> tableRange
 			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-			tableRange->setName(names[i]);
 			tableRange->AddRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getEntityStorageVersion(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(true);
-
+			std::string name = "";
+			if (tableRange->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
+			{
+				for (int32_t column = ranges[i].GetLeftColumn(); column <= ranges[i].GetRightColumn(); column++)
+				{
+					if (name == "")
+					{
+						name =(tableEntPtr->getTableData()->getValue(0, column));
+					}
+					else
+					{
+						name.append(", ...");
+						break;
+					}
+				}
+			}
+			else
+			{
+				for (int32_t row = ranges[i].GetTopRow(); row <= ranges[i].GetBottomRow(); row++)
+				{
+					if (name == "")
+					{
+						name = (tableEntPtr->getTableData()->getValue(0, row));
+					}
+					else
+					{
+						name.append(", ...");
+						break;
+					}
+				}
+			}
+			name =	CreateNewUniqueTopologyNamePlainPossible(categoryEntity->getName(), name, takenNames);
+			tableRange->setName(name);
 			ot::EntityInformation entityInfo;
 			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
 			if (allScripts.size() > 0)

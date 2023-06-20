@@ -42,7 +42,8 @@ void DataSourceHandler::StorePythonScriptAsEntity(std::string fileName)
 	documentName = documentName.substr(0, documentName.find("."));
 
 	auto newSourceEntity = CreateNewSourceEntity(documentType);
-	std::string fullFileName = CreateNewUniqueTopologyNamePlainPossible("Scripts", documentName);
+	std::list<std::string> takenNames;
+	std::string fullFileName = CreateNewUniqueTopologyNamePlainPossible("Scripts", documentName, takenNames);
 	newSourceEntity->setName(fullFileName);
 	newSourceEntity->setInitiallyHidden(false);
 	newSourceEntity->setFileProperties(path, documentName, documentType);
