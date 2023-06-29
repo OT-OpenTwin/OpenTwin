@@ -288,6 +288,11 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 	std::list<ot::UID> dataEntityParentList{ };
 	std::list<std::string> takenNames;
 
+
+	ot::EntityInformation entityInfo;
+	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
+	_scriptFolderUID = entityInfo.getID();
+
 	for (auto categoryEntity : _activeCollectionEntities)
 	{
 		
@@ -828,6 +833,9 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 		newSelections.back()->AddRange(topRow, bottomRow, leftCollumn, rightColumn);
 
 		std::string scriptName(""), tableName("");
+		ot::EntityInformation entityInfo;
+		_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
+		_scriptFolderUID = entityInfo.getID();
 		for (int i = 0; i < variables->GetVariablesString()->size(); i++)
 		{
 			ot::Variable<std::string>* variable = &(*variables->GetVariablesString())[i];
