@@ -341,6 +341,7 @@ std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAl
 void DataCollectionCreationHandler::ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
 {
 	auto it = allRangeEntities.begin();
+	bool rmdHasSelections = false;
 	while (it != allRangeEntities.end())
 	{
 		std::string rangeName = (*it)->getName();
@@ -357,6 +358,7 @@ void DataCollectionCreationHandler::ExtractRMDAndAllMSMD(std::map<std::string, M
 			if (allMetadataAssembliesByName.find(containerName) == allMetadataAssembliesByName.end())
 			{
 				allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
+				rmdHasSelections = true;
 			}
 		}
 		else if (n == 2)
@@ -368,6 +370,12 @@ void DataCollectionCreationHandler::ExtractRMDAndAllMSMD(std::map<std::string, M
 		}
 		allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
 		it = allRangeEntities.erase(it);
+	}
+
+	if(!rmdHasSelections)
+	{
+		std::string rmdAssemblyName = _baseFolder + "/" + _rmdEntityName;
+		allMetadataAssembliesByName[rmdAssemblyName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
 	}
 }
 
