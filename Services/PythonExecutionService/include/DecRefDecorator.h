@@ -19,11 +19,11 @@ public:
 
 
     // Allow setting of the (optional) argument with PyArg_ParseTupleAndKeywords
-    PyObject** operator&() {
-        Py_XDECREF(_ref);
-        _ref = nullptr;
-        return &_ref;
-    }
+    //PyObject** operator&() {
+    //    Py_XDECREF(_ref);
+    //    _ref = nullptr;
+    //    return &_ref;
+    //}
 
     // Access the argument
     operator PyObject* () const { return _ref; }
