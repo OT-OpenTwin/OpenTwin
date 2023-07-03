@@ -31,13 +31,18 @@
 		void InitializePythonInterpreter();
 		void ClosePythonInterpreter();
 
-		void ExecuteString(const std::string& executionCommand, const std::string& moduleName = "__main__");
-		//void ExecuteString(const std::string& executionCommand, int& outReturn, const std::string& moduleName = "__main__");
+		void Execute(const std::string& executionCommand, const std::string& moduleName = "__main__");
+		
+		void ExecuteFunction(const std::string& functionName, const std::string& moduleName = "__main__");
+		void ExecuteFunction(const std::string& functionName, int64_t& outReturn, const std::string& moduleName = "__main__");
+		void ExecuteFunction(const std::string& functionName, double& outReturn, const std::string& moduleName = "__main__");
+		void ExecuteFunction(const std::string& functionName, std::string& outReturn, const std::string& moduleName = "__main__");
+		void ExecuteFunction(const std::string& functionName, bool& outReturn, const std::string& moduleName = "__main__");
 
-		//void ExecuteFunction(const std::string& functionName, const std::string& moduleName = "__main__");
-		//void ExecuteFunction(const std::string& functionName, int& outReturn, const std::string& moduleName = "__main__");
-
-		//void ExtractGlobalVariables(ot::VariableBundle& outGlobalVariables, const std::string& moduleName = "__main__");
+		void GetGlobalVariableValue(const std::string& varName, int64_t& outReturn, const std::string& moduleName = "__main__");
+		void GetGlobalVariableValue(const std::string& varName, double& outReturn, const std::string& moduleName = "__main__");
+		void GetGlobalVariableValue(const std::string& varName, std::string& outReturn, const std::string& moduleName = "__main__");
+		void GetGlobalVariableValue(const std::string& varName, bool outReturn, const std::string& moduleName = "__main__");
 
 	private:
 		std::string _pythonPath;
@@ -47,11 +52,12 @@
 		static void signalHandlerAbort(int sig);
 		
 		PyObject* GetModule(const std::string& moduleName);
+		PyObject* GetGlobalVariable(const std::string& varName, const std::string& moduleName);
+		PyObject* LoadFunction(const std::string& functionName, const std::string& moduleName = "__main__");
+		
+		inline int64_t getInt64Value(PyObject* pValue, const std::string& varName);
+		inline double getDoubleValue(PyObject* pValue, const std::string& varName);
+		inline std::string getStringValue(PyObject* pValue, const std::string& varName);
+		inline bool getBoolValue(PyObject* pValue, const std::string& varName);
 
-		//void ExtractValueFromGlobalDirectory(ot::Variable<std::string>& variable, PyObject* activeGlobalDirectory);
-		//void ExtractValueFromGlobalDirectory(ot::Variable<double>& variable, PyObject* activeGlobalDirectory);
-		//void ExtractValueFromGlobalDirectory(ot::Variable<float>& variable, PyObject* activeGlobalDirectory);
-		//void ExtractValueFromGlobalDirectory(ot::Variable<int32_t>& variable, PyObject* activeGlobalDirectory);
-		//void ExtractValueFromGlobalDirectory(ot::Variable<int64_t>& variable, PyObject* activeGlobalDirectory);
-		//void ExtractValueFromGlobalDirectory(ot::Variable<bool>& variable, PyObject* activeGlobalDirectory);
 	};

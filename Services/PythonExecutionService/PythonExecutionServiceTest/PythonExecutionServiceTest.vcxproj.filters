@@ -9,8 +9,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixturePythonWrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\TestsPythonWrapper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixturePythonWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

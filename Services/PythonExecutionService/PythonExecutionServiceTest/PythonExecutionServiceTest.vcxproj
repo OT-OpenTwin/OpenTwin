@@ -11,7 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixturePythonWrapper.cpp" />
     <ClCompile Include="src\TestsPythonWrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixturePythonWrapper.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72ea5528-6e0c-43d5-89f1-41329d20878d}</ProjectGuid>
@@ -38,9 +42,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>RELEASEDEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_RELEASEDEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC);C:\OpenTwin\Services\PythonExecutionService\include;$(GOOGLE_TEST_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC);C:\OpenTwin\Services\PythonExecutionService\include;$(GOOGLE_TEST_INC);$(ProjectDir)include</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
     </ClCompile>
@@ -49,7 +53,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-	  <SubSystem>Console</SubSystem>
+      <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);C:\OpenTwin\Services\PythonExecutionService\x64\DebugTest;$(PYTHON310_ROOT)\libs;$(GOOGLE_TEST_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);PythonExecutionService.lib;python310.lib;$(GOOGLE_TEST_LIB);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
