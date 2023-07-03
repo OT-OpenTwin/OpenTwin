@@ -68,6 +68,7 @@ void PythonWrapper::ThrowPythonException()
 
 void PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
 {
+
 	CPythonObjectBorrowed module(GetModule(moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	PyObject* result(PyRun_String(executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
@@ -113,8 +114,7 @@ void PythonWrapper::ExecuteFunction(const std::string& functionName, bool& outRe
 
 PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std::string& moduleName)
 {
-	CPythonObjectBorrowed module(GetModule(moduleName));
-	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
+	CPythonObjectBorrowed module(GetModule(moduleName));	
 	PyObject* function = PyObject_GetAttrString(module, functionName.c_str());
 	if (function == nullptr)
 	{
@@ -190,20 +190,40 @@ void PythonWrapper::GetGlobalVariableValue(const std::string& varName, bool outR
 	
 }
 
+void PythonWrapper::StartExecutionSequence(const std::string& moduleName)
+{
+	_openedModule = GetModule(moduleName);
+	_openedModuleGlobalDictionary = PyModule_GetDict(_openedModule);
+}
+
+void PythonWrapper::EndExecutionSequence()
+{
+	_openedModule = nullptr;
+	_openedModuleGlobalDictionary = nullptr;
+}
+
 PyObject* PythonWrapper::GetModule(const std::string& moduleName)
 {
-	PyObject* module =	PyImport_ImportModule(moduleName.c_str());
-	if (module == nullptr)
+	if (_openedModule != nullptr)
 	{
-		if (moduleName == "__main__")
-		{
-			ThrowPythonException();
-		}
-		PyObject* type, * value, * traceback;
-		PyErr_Fetch(&type, &value, &traceback);
-		module = PyImport_AddModule(moduleName.c_str());
+		return _openedModule;
 	}
-	return module;
+	else
+	{
+		PyObject* module = PyImport_ImportModule(moduleName.c_str());
+		if (module == nullptr)
+		{
+			if (moduleName == "__main__")
+			{
+				ThrowPythonException();
+			}
+			PyObject* type, * value, * traceback;
+			PyErr_Fetch(&type, &value, &traceback);
+			module = PyImport_AddModule(moduleName.c_str());
+		}
+		return module;
+	}
+	
 }
 
 

@@ -23,3 +23,13 @@ int64_t FixturePythonWrapper::GetGlobalVariable(const std::string& varName, cons
 	_wrapper.GetGlobalVariableValue(varName, returnVal,moduleName);
 	return returnVal;
 }
+
+void FixturePythonWrapper::StartExecutionSequence(const std::string& moduleName)
+{
+	_wrapper.StartExecutionSequence(moduleName);
+}
+
+void FixturePythonWrapper::EndExecutionSequence()
+{
+	_wrapper.EndExecutionSequence();
+}

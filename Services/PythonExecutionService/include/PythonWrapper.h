@@ -44,9 +44,15 @@
 		void GetGlobalVariableValue(const std::string& varName, std::string& outReturn, const std::string& moduleName = "__main__");
 		void GetGlobalVariableValue(const std::string& varName, bool outReturn, const std::string& moduleName = "__main__");
 
+		void StartExecutionSequence(const std::string& moduleName = "__main__");
+		void EndExecutionSequence();
+
 	private:
 		std::string _pythonPath;
 		bool _interpreterSuccessfullyInitialized = false;
+		PyObject* _openedModuleGlobalDictionary = nullptr;
+		PyObject* _openedModule = nullptr;
+
 
 		void ThrowPythonException();
 		static void signalHandlerAbort(int sig);
