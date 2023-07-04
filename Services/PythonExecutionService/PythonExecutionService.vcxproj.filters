@@ -33,6 +33,9 @@
     <ClCompile Include="src\PythonWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PythonObjectBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -50,13 +53,16 @@
     <ClInclude Include="include\CPythonObjectNew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DecRefDecorator.h">
+    <ClInclude Include="include\CPythonObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonObjectBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

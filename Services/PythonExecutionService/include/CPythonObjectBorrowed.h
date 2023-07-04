@@ -8,11 +8,11 @@
  * \date   May 2023
  *********************************************************************/
 #pragma once
-#include "DecRefDecorator.h"
-class CPythonObjectBorrowed : public DecRefDecorator
+#include "CPythonObject.h"
+class CPythonObjectBorrowed : public CPythonObject
 {
 public:
-    CPythonObjectBorrowed(PyObject* borrowedRef) : DecRefDecorator(borrowedRef) 
+    CPythonObjectBorrowed(PyObject* borrowedRef) : CPythonObject(borrowedRef)
     {
         Py_XINCREF(_ref);
     }

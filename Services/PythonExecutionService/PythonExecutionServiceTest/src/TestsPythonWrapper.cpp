@@ -34,7 +34,7 @@ TEST_F(FixturePythonWrapper, GetGlobalVariableValue_NewModule)
 }
 TEST_F(FixturePythonWrapper, GetGlobalVariableValue_WrongModule)
 {
-	const std::string modulName = "Example";
+	const std::string modulName = "Bubble";
 	ExecuteString("variable = 13", modulName);
 	EXPECT_ANY_THROW(GetGlobalVariable("variable", getMainModulName()));
 }
@@ -67,58 +67,4 @@ TEST_F(FixturePythonWrapper, FunctionNotExisting)
 		"\treturn variable";
 	ExecuteString(script, getMainModulName());
 	EXPECT_ANY_THROW(ExecuteFunctionWithReturnValue("NotExisting", getMainModulName()));
-}
-
-TEST_F(FixturePythonWrapper, ExecutionSequenceFunctionCallSuccess)
-{
-	const std::string expectedValue = "Hello World";
-	const std::string script = "def example():\n"
-		"\tvariable = \"Hello \"\n"
-		"\tvariable = variable + \"World\"\n"
-		"\treturn variable";
-	ExecuteString(script, getMainModulName());
-	const uint32_t repetitions = 15;
-
-	std::vector<std::string> returnValues;
-	StartExecutionSequence(getMainModulName());
-	EXPECT_NO_THROW(ExecuteFunctionWithReturnValue("example", ""));
-}
-
-TEST_F(FixturePythonWrapper, ExecutionSequenceFunctionCallFailed)
-{
-	const std::string expectedValue = "Hello World";
-	const std::string script = "def example():\n"
-		"\tvariable = \"Hello \"\n"
-		"\tvariable = variable + \"World\"\n"
-		"\treturn variable";
-	ExecuteString(script, getMainModulName());
-	const uint32_t repetitions = 15;
-
-	std::vector<std::string> returnValues;
-	StartExecutionSequence(getMainModulName());
-	EndExecutionSequence();
-	EXPECT_ANY_THROW(ExecuteFunctionWithReturnValue("example", ""));
-}
-
-
-TEST_F(FixturePythonWrapper, ExecutionSequenceResults)
-{
-	const std::string expectedValue = "Hello World";
-	const std::string script = "def example():\n"
-		"\tvariable = \"Hello \"\n"
-		"\tvariable = variable + \"World\"\n"
-		"\treturn variable";
-	ExecuteString(script, getMainModulName());
-	const uint32_t repetitions = 15;
-
-	std::vector<std::string> returnValues;
-	StartExecutionSequence(getMainModulName());
-	for (uint32_t i = 0; i < repetitions; i++)
-	{
-		returnValues.push_back(ExecuteFunctionWithReturnValue("example", ""));
-	}
-	for (uint32_t i = 0; i < repetitions; i++)
-	{
-		EXPECT_EQ(expectedValue, returnValues[i]);
-	}
 }

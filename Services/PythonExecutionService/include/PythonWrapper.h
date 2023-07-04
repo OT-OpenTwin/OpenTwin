@@ -33,37 +33,18 @@
 
 		void Execute(const std::string& executionCommand, const std::string& moduleName = "__main__");
 		
-		void ExecuteFunction(const std::string& functionName, const std::string& moduleName = "__main__");
-		void ExecuteFunction(const std::string& functionName, int64_t& outReturn, const std::string& moduleName = "__main__");
-		void ExecuteFunction(const std::string& functionName, double& outReturn, const std::string& moduleName = "__main__");
-		void ExecuteFunction(const std::string& functionName, std::string& outReturn, const std::string& moduleName = "__main__");
-		void ExecuteFunction(const std::string& functionName, bool& outReturn, const std::string& moduleName = "__main__");
-
-		void GetGlobalVariableValue(const std::string& varName, int64_t& outReturn, const std::string& moduleName = "__main__");
-		void GetGlobalVariableValue(const std::string& varName, double& outReturn, const std::string& moduleName = "__main__");
-		void GetGlobalVariableValue(const std::string& varName, std::string& outReturn, const std::string& moduleName = "__main__");
-		void GetGlobalVariableValue(const std::string& varName, bool outReturn, const std::string& moduleName = "__main__");
-
-		void StartExecutionSequence(const std::string& moduleName = "__main__");
-		void EndExecutionSequence();
+		CPythonObjectNew ExecuteFunction(const std::string& functionName, CPythonObject& parameter, const std::string& moduleName = "__main__");
+		
+		CPythonObjectBorrowed GetGlobalVariable(const std::string& varName, const std::string& moduleName);
 
 	private:
 		std::string _pythonPath;
 		bool _interpreterSuccessfullyInitialized = false;
-		PyObject* _openedModuleGlobalDictionary = nullptr;
-		PyObject* _openedModule = nullptr;
-
 
 		void ThrowPythonException();
 		static void signalHandlerAbort(int sig);
 		
 		PyObject* GetModule(const std::string& moduleName);
-		PyObject* GetGlobalVariable(const std::string& varName, const std::string& moduleName);
 		PyObject* LoadFunction(const std::string& functionName, const std::string& moduleName = "__main__");
 		
-		inline int64_t getInt64Value(PyObject* pValue, const std::string& varName);
-		inline double getDoubleValue(PyObject* pValue, const std::string& varName);
-		inline std::string getStringValue(PyObject* pValue, const std::string& varName);
-		inline bool getBoolValue(PyObject* pValue, const std::string& varName);
-
 	};

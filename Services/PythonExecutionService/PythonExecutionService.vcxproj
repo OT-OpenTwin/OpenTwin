@@ -227,6 +227,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
+    <ClCompile Include="src\PythonObjectBuilder.cpp" />
     <ClCompile Include="src\PythonWrapper.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
@@ -234,9 +235,10 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\CPythonObjectBorrowed.h" />
     <ClInclude Include="include\CPythonObjectNew.h" />
-    <ClInclude Include="include\DecRefDecorator.h" />
+    <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\PythonAPI.h" />
+    <ClInclude Include="include\PythonObjectBuilder.h" />
     <ClInclude Include="include\PythonWrapper.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>

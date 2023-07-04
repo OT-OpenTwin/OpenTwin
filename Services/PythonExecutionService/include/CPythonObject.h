@@ -9,14 +9,25 @@
 #pragma once
 #include <Python.h>
 
-class DecRefDecorator {
+class CPythonObject{
 public:
-    DecRefDecorator(PyObject* ref) : _ref{ ref } {}
+    CPythonObject(PyObject* ref) : _ref{ ref } {}
     Py_ssize_t getRefCount() const { return _ref != nullptr ? Py_REFCNT(_ref) : 0; }
     
-    DecRefDecorator& operator=(const DecRefDecorator& other) = delete;
-    DecRefDecorator(const DecRefDecorator& other) = delete;
+    CPythonObject& operator=(const CPythonObject& other) = delete;
+    CPythonObject(const CPythonObject& other) = delete;
 
+    CPythonObject& operator=(CPythonObject&& other) noexcept
+    {
+        this->_ref = other._ref;
+        other._ref = nullptr;
+    };
+
+    CPythonObject(CPythonObject&& other) noexcept
+    {
+        this->_ref = other._ref;
+        other._ref = nullptr;
+    }
 
     // Allow setting of the (optional) argument with PyArg_ParseTupleAndKeywords
     //PyObject** operator&() {
@@ -35,7 +46,7 @@ public:
         _ref = nullptr;
     };
 
-    ~DecRefDecorator() 
+    ~CPythonObject()
     { 
         Py_XDECREF(_ref); 
     }

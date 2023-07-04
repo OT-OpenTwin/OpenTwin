@@ -13,12 +13,12 @@
 
 
 #pragma once
-#include "DecRefDecorator.h"
+#include "CPythonObject.h"
 
-class CPythonObjectNew : public DecRefDecorator
+class CPythonObjectNew : public CPythonObject
 {	
 public:
-	CPythonObjectNew(PyObject* newRef) : DecRefDecorator(newRef) {}
+	CPythonObjectNew(PyObject* newRef) : CPythonObject(newRef) {}
     void reset(PyObject* ref)
     {
         if (_ref != nullptr)

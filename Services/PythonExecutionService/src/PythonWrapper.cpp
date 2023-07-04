@@ -1,7 +1,6 @@
 #include "PythonWrapper.h"
-
 #include <signal.h>
-
+#include "PythonObjectBuilder.h"
 PythonWrapper::PythonWrapper()
 {
 	std::string pythonRoot;
@@ -68,7 +67,6 @@ void PythonWrapper::ThrowPythonException()
 
 void PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
 {
-
 	CPythonObjectBorrowed module(GetModule(moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	PyObject* result(PyRun_String(executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
@@ -78,43 +76,30 @@ void PythonWrapper::Execute(const std::string& executionCommand, const std::stri
 	}
 }
 
-void PythonWrapper::ExecuteFunction(const std::string& functionName, const std::string& moduleName)
+CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName, CPythonObject& parameter, const std::string& moduleName)
 {
 	CPythonObjectBorrowed function(LoadFunction(functionName, moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, nullptr));
+	CPythonObjectNew returnValue(PyObject_CallObject(function, parameter));
+	return returnValue;
 }
 
-void PythonWrapper::ExecuteFunction(const std::string& functionName, int64_t& outReturn, const std::string& moduleName)
+
+CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
 {
-	CPythonObjectBorrowed function(LoadFunction(functionName, moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, nullptr));
-	outReturn = getInt64Value(returnValue, "return value");
+	CPythonObjectBorrowed module(GetModule(moduleName));
+	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
+	CPythonObjectBorrowed pythonVar(PyDict_GetItemString(globalDirectory, varName.c_str()));
+	if (pythonVar == nullptr)
+	{
+		ThrowPythonException();
+	}
+	return pythonVar;
 }
 
-void PythonWrapper::ExecuteFunction(const std::string& functionName, double& outReturn, const std::string& moduleName)
-{
-	CPythonObjectBorrowed function(LoadFunction(functionName, moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, nullptr));
-	outReturn = getDoubleValue(returnValue, "return value");
-}
-
-void PythonWrapper::ExecuteFunction(const std::string& functionName, std::string& outReturn, const std::string& moduleName)
-{
-	CPythonObjectBorrowed function(LoadFunction(functionName, moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, nullptr));
-	outReturn = getStringValue(returnValue, "return value");
-}
-
-void PythonWrapper::ExecuteFunction(const std::string& functionName, bool& outReturn, const std::string& moduleName)
-{
-	CPythonObjectBorrowed function(LoadFunction(functionName, moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, nullptr));
-	outReturn = getBoolValue(returnValue, "return value");
-}
 
 PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std::string& moduleName)
 {
-	CPythonObjectBorrowed module(GetModule(moduleName));	
+	CPythonObjectBorrowed module(GetModule(moduleName));
 	PyObject* function = PyObject_GetAttrString(module, functionName.c_str());
 	if (function == nullptr)
 	{
@@ -128,114 +113,20 @@ PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std
 }
 
 
-int64_t PythonWrapper::getInt64Value(PyObject* pValue, const std::string& varName)
-{
-	if (PyLong_Check(pValue) != 1)
-	{
-		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
-	}
-	return PyLong_AsLong(pValue);
-}
-
-double PythonWrapper::getDoubleValue(PyObject* pValue, const std::string& varName)
-{
-	if (PyFloat_Check(pValue) != 1)
-	{
-		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
-	}
-	return PyFloat_AsDouble(pValue);
-}
-
-std::string PythonWrapper::getStringValue(PyObject* pValue, const std::string& varName)
-{
-	if (PyUnicode_Check(pValue) != 1)
-	{
-		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
-	}
-	return std::string(PyUnicode_AsUTF8(pValue));
-}
-
-bool PythonWrapper::getBoolValue(PyObject* pValue, const std::string& varName)
-{
-	if (PyBool_Check(pValue) != 1)
-	{
-		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
-	}
-	return static_cast<bool>(PyLong_AsLong(pValue));
-	
-}
-
-void PythonWrapper::GetGlobalVariableValue(const std::string& varName, int64_t& outReturn, const std::string& moduleName)
-{
-	CPythonObjectNew pythonVar(GetGlobalVariable(varName, moduleName));
-	outReturn = getInt64Value(pythonVar, varName);
-}
-
-
-void PythonWrapper::GetGlobalVariableValue(const std::string& varName, double& outReturn, const std::string& moduleName)
-{
-	CPythonObjectNew pythonVar(GetGlobalVariable(varName, moduleName));
-	outReturn = getDoubleValue(pythonVar, varName);
-}
-
-void PythonWrapper::GetGlobalVariableValue(const std::string& varName, std::string& outReturn, const std::string& moduleName)
-{
-	CPythonObjectNew pythonVar(GetGlobalVariable(varName, moduleName));
-
-}
-
-void PythonWrapper::GetGlobalVariableValue(const std::string& varName, bool outReturn, const std::string& moduleName)
-{
-	CPythonObjectNew pythonVar(GetGlobalVariable(varName, moduleName));
-	
-}
-
-void PythonWrapper::StartExecutionSequence(const std::string& moduleName)
-{
-	_openedModule = GetModule(moduleName);
-	_openedModuleGlobalDictionary = PyModule_GetDict(_openedModule);
-}
-
-void PythonWrapper::EndExecutionSequence()
-{
-	_openedModule = nullptr;
-	_openedModuleGlobalDictionary = nullptr;
-}
-
 PyObject* PythonWrapper::GetModule(const std::string& moduleName)
 {
-	if (_openedModule != nullptr)
+	PyObject* module = PyImport_ImportModule(moduleName.c_str());
+	if (module == nullptr)
 	{
-		return _openedModule;
-	}
-	else
-	{
-		PyObject* module = PyImport_ImportModule(moduleName.c_str());
-		if (module == nullptr)
+		if (moduleName == "__main__")
 		{
-			if (moduleName == "__main__")
-			{
-				ThrowPythonException();
-			}
-			PyObject* type, * value, * traceback;
-			PyErr_Fetch(&type, &value, &traceback);
-			module = PyImport_AddModule(moduleName.c_str());
+			ThrowPythonException();
 		}
-		return module;
+		PyObject* type, * value, * traceback;
+		PyErr_Fetch(&type, &value, &traceback);
+		module = PyImport_AddModule(moduleName.c_str());
 	}
-	
+	return module;	
 }
 
-
-PyObject* PythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
-{
-	CPythonObjectBorrowed module(GetModule(moduleName));
-	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
-	PyObject* pythonVar = PyDict_GetItemString(globalDirectory, varName.c_str());
-	if (pythonVar == nullptr)
-	{
-		ThrowPythonException();
-	}
-	return pythonVar;
-}
 
