@@ -101,11 +101,20 @@ TEST_F(FixturePythonWrapper, FunctionNotExisting)
 	EXPECT_ANY_THROW(ExecuteFunctionWithReturnValue("NotExisting", getMainModulName()));
 }
 
-TEST_F(FixturePythonWrapper, PythonExtension)
+TEST_F(FixturePythonWrapper, PythonExtensionWithParameter)
 {
 	const int expectedValue = 20;
 	const std::string module = "InitialTestModule";
 	std::string function = "WithOneParameter";
 	int result = ExecuteFunctionWithParameter(function, 7, module);
+	EXPECT_EQ(expectedValue, result);
+}
+
+TEST_F(FixturePythonWrapper, PythonExtensionWithoutParameter)
+{
+	const std::string expectedValue = "Hello from the extension";
+	const std::string module = "InitialTestModule";
+	std::string function = "WithoutParameter";
+	std::string result = ExecuteFunctionWithReturnValue(function, module);
 	EXPECT_EQ(expectedValue, result);
 }

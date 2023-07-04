@@ -16,9 +16,17 @@ namespace TestingPythonExtensions
         return PyLong_FromLong(command + 13);
     }
 
+    static PyObject* WithoutParameter(PyObject* self, PyObject* args)
+    {
+        return PyUnicode_FromString("Hello from the extension");
+    }
+
+
+
     static PyMethodDef OTMethods[] = {
 
-        {"WithOneParameter",  WithOneParameter, METH_VARARGS, "Execute a shell command."},
+        {"WithOneParameter",  WithOneParameter, METH_VARARGS, "Test function with one parameter."},
+        {"WithoutParameter",  WithoutParameter, METH_NOARGS, "Test function without parameter."},
 
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
