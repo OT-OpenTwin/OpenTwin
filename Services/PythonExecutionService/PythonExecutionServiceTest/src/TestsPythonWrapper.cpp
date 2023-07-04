@@ -1,5 +1,5 @@
 #include "FixturePythonWrapper.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 TEST_F(FixturePythonWrapper, RepeatedExecution)
 {
 	const std::string command = "variable = variable + 1";
@@ -90,7 +90,6 @@ TEST_F(FixturePythonWrapper, FunctionWithMultipleParameter)
 	EXPECT_EQ(expectedValue, returnValue);
 }
 
-
 TEST_F(FixturePythonWrapper, FunctionNotExisting)
 {
 	const std::string expectedValue = "Hello World";
@@ -100,4 +99,13 @@ TEST_F(FixturePythonWrapper, FunctionNotExisting)
 		"\treturn variable";
 	ExecuteString(script, getMainModulName());
 	EXPECT_ANY_THROW(ExecuteFunctionWithReturnValue("NotExisting", getMainModulName()));
+}
+
+TEST_F(FixturePythonWrapper, PythonExtension)
+{
+	const int expectedValue = 20;
+	const std::string module = "InitialTestModule";
+	std::string function = "WithOneParameter";
+	int result = ExecuteFunctionWithParameter(function, 7, module);
+	EXPECT_EQ(expectedValue, result);
 }

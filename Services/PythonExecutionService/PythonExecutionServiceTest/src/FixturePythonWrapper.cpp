@@ -1,9 +1,11 @@
 #include "FixturePythonWrapper.h"
 #include "CPythonObjectNew.h"
 #include "PythonObjectBuilder.h"
+#include "TestingPythonExtensions.h"
 
 FixturePythonWrapper::FixturePythonWrapper()
 {
+	int errorCode = PyImport_AppendInittab("InitialTestModule", TestingPythonExtensions::PyInit_Testing);
 	_wrapper.InitializePythonInterpreter();
 }
 

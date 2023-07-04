@@ -20,5 +20,8 @@
     <ClInclude Include="include\FixturePythonWrapper.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\TestingPythonExtensions.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

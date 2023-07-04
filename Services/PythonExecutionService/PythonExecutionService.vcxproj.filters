@@ -65,5 +65,8 @@
     <ClInclude Include="include\PythonObjectBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PythonExtension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

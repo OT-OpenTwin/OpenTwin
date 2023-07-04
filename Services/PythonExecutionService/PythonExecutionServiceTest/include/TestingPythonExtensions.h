@@ -1,0 +1,41 @@
+#pragma once
+#pragma once
+#include <Python.h>
+#include "PythonObjectBuilder.h"
+
+namespace TestingPythonExtensions
+{
+
+    static PyObject* WithOneParameter(PyObject* self, PyObject* args)
+    {
+        int command;
+        if (!PyArg_ParseTuple(args, "i", &command))
+        {
+            return NULL;
+        }
+        return PyLong_FromLong(command + 13);
+    }
+
+    static PyMethodDef OTMethods[] = {
+
+        {"WithOneParameter",  WithOneParameter, METH_VARARGS, "Execute a shell command."},
+
+        {NULL, NULL, 0, NULL}        /* Sentinel */
+    };
+
+    static struct PyModuleDef TestModule = {
+        PyModuleDef_HEAD_INIT,
+        "InitialTestModule",   /* name of module */
+        NULL, /* module documentation, may be NULL */
+        -1,       /* size of per-interpreter state of the module,
+                     or -1 if the module keeps state in global variables. */
+        OTMethods
+    };
+
+    PyMODINIT_FUNC
+        PyInit_Testing(void)
+    {
+        return PyModule_Create(&TestModule);
+    }
+
+};

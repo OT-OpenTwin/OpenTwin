@@ -1,6 +1,8 @@
 #include "PythonWrapper.h"
 #include <signal.h>
 #include "PythonObjectBuilder.h"
+#include "PythonExtension.h"
+
 PythonWrapper::PythonWrapper()
 {
 	std::string pythonRoot;
@@ -37,7 +39,7 @@ void PythonWrapper::ClosePythonInterpreter()
 void PythonWrapper::InitializePythonInterpreter()
 {
 	std::wstring pyhtonPath(_pythonPath.begin(), _pythonPath.end());
-
+	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
 	Py_SetPath(pyhtonPath.c_str());
 	int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())
 	Py_InitializeEx(skipSignalHandlerRegistration);

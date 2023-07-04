@@ -238,6 +238,7 @@
     <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\PythonAPI.h" />
+    <ClInclude Include="include\PythonExtension.h" />
     <ClInclude Include="include\PythonObjectBuilder.h" />
     <ClInclude Include="include\PythonWrapper.h" />
     <ClInclude Include="include\UiNotifier.h" />

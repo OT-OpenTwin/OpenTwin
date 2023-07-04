@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePythonWrapper.h" />
+    <ClInclude Include="include\TestingPythonExtensions.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72ea5528-6e0c-43d5-89f1-41329d20878d}</ProjectGuid>
