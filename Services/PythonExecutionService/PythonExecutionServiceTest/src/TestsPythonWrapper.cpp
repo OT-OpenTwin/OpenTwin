@@ -58,6 +58,39 @@ TEST_F(FixturePythonWrapper, FunctionWithReturnValue)
 	EXPECT_EQ(expectedValue, returnValue);
 }
 
+TEST_F(FixturePythonWrapper, FunctionWithParameter)
+{
+	const int expectedValue = 26;
+	const std::string script = "def example(value):\n"
+		"\tvalue = value * 2\n"
+		"\treturn value";
+	ExecuteString(script, getMainModulName());
+	int parameter = 13;
+	int returnValue = ExecuteFunctionWithParameter("example",parameter, getMainModulName());
+	EXPECT_EQ(expectedValue, returnValue);
+}
+
+TEST_F(FixturePythonWrapper, FunctionWithMultipleParameter)
+{
+	const int expectedValue = 29;
+	const std::string script = "def example(value1, value2, stringValue):\n"
+		"\tvalue = (value1 + value2) * 2\n"
+		"\tif(stringValue == \"Suppe\"):\n"
+		"\t\tvalue = value + 3\n"
+		"\telse:\n"
+		"\t\tvalue = value + 7\n"
+		"\treturn value";
+	ExecuteString(script, getMainModulName());
+	
+	int parameter1 = 7;
+	int parameter2 = 6;
+	std::string parameter3 = "Suppe";
+
+	int returnValue = ExecuteFunctionWithMultipleParameter("example", parameter1, parameter2, parameter3, getMainModulName());
+	EXPECT_EQ(expectedValue, returnValue);
+}
+
+
 TEST_F(FixturePythonWrapper, FunctionNotExisting)
 {
 	const std::string expectedValue = "Hello World";

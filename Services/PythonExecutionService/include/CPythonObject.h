@@ -40,6 +40,9 @@ public:
     operator PyObject* () const { return _ref; }
     // Test if constructed successfully from the new reference.
     bool ReferenceIsSet() { return _ref != nullptr; }
+
+    void DropOwnership() { _ref = nullptr; }
+
     void FreePythonObject() 
     {
         Py_XDECREF(_ref); 
