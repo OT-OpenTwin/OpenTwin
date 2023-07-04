@@ -133,3 +133,11 @@ TEST_F(FixturePythonWrapper, PythonExtensionWithMultipleParameter)
 	int result = ExecuteFunctionWithMultipleParameter(function,parameter1,parameter2,parameter3, module);
 	EXPECT_EQ(expectedValue, result);
 }
+
+
+TEST_F(FixturePythonWrapper, PythonExtensionFromOtherModule)
+{
+	const std::string script = "import InitialTestModule\n"
+		"value = InitialTestModule.WithoutParameter()";
+	EXPECT_NO_THROW(ExecuteString(script, "someModule"));
+}
