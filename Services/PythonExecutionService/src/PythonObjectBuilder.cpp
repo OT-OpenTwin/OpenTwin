@@ -67,6 +67,28 @@ bool PythonObjectBuilder::getBoolValue(const CPythonObject& pValue, const std::s
 
 }
 
+int32_t PythonObjectBuilder::getInt32ValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
+{
+
+	return PythonObjectBuilder::INSTANCE()->getInt32Value(PyTuple_GetItem(pValue, 0), varName);
+}
+
+double PythonObjectBuilder::getDoubleValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
+{
+	return 0.0;
+}
+
+std::string PythonObjectBuilder::getStringValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
+{
+	return std::string();
+}
+
+bool PythonObjectBuilder::getBoolValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
+{
+	return false;
+}
+
+
 CPythonObjectNew PythonObjectBuilder::setInt32(const int32_t value)
 {
 	CPythonObjectNew returnVal(PyLong_FromLong(static_cast<long>(value)));

@@ -5,15 +5,9 @@
 namespace PythonExtensions
 {
 
-    static PyObject* OT_Test(PyObject* self, PyObject* args)
+    static PyObject* OT_GetPropertyValue(PyObject* self, PyObject* args)
     {
-        int command = PythonObjectBuilder::INSTANCE()->getInt32Value(args, "Argument");
-        
-        if (!PyArg_ParseTuple(args, "i", &command))
-        {
-            return NULL;
-        }
-        return PyLong_FromLong(command + 13);
+         std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
     }
 
     static PyMethodDef OTMethods[] = {
