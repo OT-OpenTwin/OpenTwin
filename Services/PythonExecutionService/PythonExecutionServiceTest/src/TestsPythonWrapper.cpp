@@ -118,3 +118,18 @@ TEST_F(FixturePythonWrapper, PythonExtensionWithoutParameter)
 	std::string result = ExecuteFunctionWithReturnValue(function, module);
 	EXPECT_EQ(expectedValue, result);
 }
+
+
+TEST_F(FixturePythonWrapper, PythonExtensionWithMultipleParameter)
+{
+	const int expectedValue = 33;
+	const std::string module = "InitialTestModule";
+	std::string function = "WithMultipleParameter";
+	
+	int parameter1 = 7;
+	int parameter2 = 6;
+	std::string parameter3 = "Suppe";
+
+	int result = ExecuteFunctionWithMultipleParameter(function,parameter1,parameter2,parameter3, module);
+	EXPECT_EQ(expectedValue, result);
+}

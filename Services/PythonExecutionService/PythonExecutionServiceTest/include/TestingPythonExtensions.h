@@ -21,12 +21,27 @@ namespace TestingPythonExtensions
         return PyUnicode_FromString("Hello from the extension");
     }
 
+    static PyObject* WithMultipleParameter(PyObject* self, PyObject* args)
+    {
 
+        int parameter1 = PythonObjectBuilder::INSTANCE()->getInt32Value(PyTuple_GetItem(args, 0),"Parameter 1");
+        int parameter2 = PythonObjectBuilder::INSTANCE()->getInt32Value(PyTuple_GetItem(args, 1),"Parameter 2");
+        std::string parameter3 = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 2),"Parameter 3");
+
+        int result = (parameter1 + parameter2) * 2;
+        if (parameter3 == "Suppe")
+        {
+            result += 7;
+        }
+        
+        return PythonObjectBuilder::INSTANCE()->setInt32(result);
+    }
 
     static PyMethodDef OTMethods[] = {
 
         {"WithOneParameter",  WithOneParameter, METH_VARARGS, "Test function with one parameter."},
         {"WithoutParameter",  WithoutParameter, METH_NOARGS, "Test function without parameter."},
+        {"WithMultipleParameter",  WithMultipleParameter, METH_VARARGS, "Test function with multiple parameter."},
 
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
