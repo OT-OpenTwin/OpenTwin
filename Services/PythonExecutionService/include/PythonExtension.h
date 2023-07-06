@@ -7,12 +7,20 @@ namespace PythonExtensions
 
     static PyObject* OT_GetPropertyValue(PyObject* self, PyObject* args)
     {
+         auto numberOfArguments = PyTuple_Size(args);
+         const int expectedNumberOfArguments = 2;
+         if (numberOfArguments != expectedNumberOfArguments)
+         {
+             throw std::exception("OT_GetPropertyValue expects two arguments");
+         }
          std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
+
+         return new PyObject();
     }
 
     static PyMethodDef OTMethods[] = {
 
-        {"OT_Test",  OT_Test, METH_VARARGS, "Execute a shell command."},
+        {"OT_GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Execute a shell command."},
 
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
