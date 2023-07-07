@@ -29,6 +29,17 @@ public:
         other._ref = nullptr;
     }
 
+    void reset(CPythonObject&& other)
+    {
+        if (_ref != nullptr)
+        {
+            Py_XDECREF(_ref);
+            _ref = nullptr;
+        }
+        _ref = other._ref;
+        other._ref = nullptr;
+    }
+
     // Allow setting of the (optional) argument with PyArg_ParseTupleAndKeywords
     //PyObject** operator&() {
     //    Py_XDECREF(_ref);

@@ -7,7 +7,7 @@ class PropertyPythonObjectInterface
 public:
 	PropertyPythonObjectInterface(EntityPropertiesBase* property);
 	CPythonObjectNew GetValue();
-	void SetValue(CPythonObject& cpythonObject);
+	void SetValue(const CPythonObject& cpythonObject);
 
 private:
 	EntityPropertiesDouble* _propertyDouble = nullptr;

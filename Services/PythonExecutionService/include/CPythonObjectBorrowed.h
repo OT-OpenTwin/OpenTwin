@@ -16,6 +16,9 @@ public:
     {
         Py_XINCREF(_ref);
     }
+    
+    using CPythonObject::reset;
+
     void reset(PyObject* ref)
     {
         if (_ref != nullptr)

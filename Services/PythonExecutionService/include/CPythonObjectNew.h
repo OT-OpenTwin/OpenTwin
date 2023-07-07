@@ -19,6 +19,9 @@ class CPythonObjectNew : public CPythonObject
 {	
 public:
 	CPythonObjectNew(PyObject* newRef) : CPythonObject(newRef) {}
+
+    using CPythonObject::reset;
+
     void reset(PyObject* ref)
     {
         if (_ref != nullptr)
@@ -28,4 +31,6 @@ public:
         }
         _ref = ref;
     }
+
+
 };

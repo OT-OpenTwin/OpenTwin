@@ -16,8 +16,8 @@ namespace PythonExtensions
          }
          std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args,0,"Parameter 0");
          std::string propertyName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 1, "Parameter 1");
-
-         return new PyObject();
+         CPythonObjectNew returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
+         return returnValue;
     }
 
     static PyMethodDef OTMethods[] = {

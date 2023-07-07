@@ -15,12 +15,21 @@
     <ClCompile Include="src\TestsPythonWrapper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePythonWrapper.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\TestingPythonExtensions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixturePropertyPythonObjectInterface.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

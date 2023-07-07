@@ -28,7 +28,7 @@ public:
 	bool getBoolValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
 
 	CPythonObjectNew setInt32(const int32_t value);
-	CPythonObjectNew setDouble(const double value);
+	CPythonObjectNew setDouble(double value);
 	CPythonObjectNew setString(const std::string& value);
 	CPythonObjectNew setBool(const bool value);
 

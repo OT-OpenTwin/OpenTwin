@@ -79,7 +79,7 @@ CPythonObjectNew PropertyPythonObjectInterface::GetValue()
 	return returnValue;
 }
 
-void PropertyPythonObjectInterface::SetValue(CPythonObject& cpythonObject)
+void PropertyPythonObjectInterface::SetValue(const CPythonObject& cpythonObject)
 {
 	if (_propertyDouble != nullptr)
 	{

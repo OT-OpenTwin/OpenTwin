@@ -116,9 +116,10 @@ CPythonObjectNew PythonObjectBuilder::setInt32(const int32_t value)
 	return returnVal;
 }
 
-CPythonObjectNew PythonObjectBuilder::setDouble(const double value)
+CPythonObjectNew PythonObjectBuilder::setDouble(double value)
 {
-	CPythonObjectNew returnVal(PyFloat_FromDouble(value));
+	PyObject* pvalue = PyFloat_FromDouble(value);
+	CPythonObjectNew returnVal(pvalue);
 	return returnVal;
 }
 

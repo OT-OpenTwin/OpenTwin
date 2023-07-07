@@ -11,10 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp" />
     <ClCompile Include="src\FixturePythonWrapper.cpp" />
+    <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp" />
     <ClCompile Include="src\TestsPythonWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\FixturePropertyPythonObjectInterface.h" />
     <ClInclude Include="include\FixturePythonWrapper.h" />
     <ClInclude Include="include\TestingPythonExtensions.h" />
   </ItemGroup>
