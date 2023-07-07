@@ -4,7 +4,7 @@
 #include "PropertyPythonObjectInterface.h"
 #include "PythonObjectBuilder.h"
 #include "EntityProperties.h"
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsFloat)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyDoubleValueType)
 {
 	const double expectedValue = 13.;
 	
@@ -15,7 +15,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsFloat)
 	EXPECT_EQ(PyFloat_Check(value),1);	
 }
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectDoubleValue)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyDoubleValue)
 {
 	const double expectedValue = 13.;
 	
@@ -26,7 +26,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectDoubleValue)
 	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getDoubleValue(value, ""), expectedValue);
 }
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsLong)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyIntValueType)
 {
 	const int32_t expectedValue = 13;
 	
@@ -37,7 +37,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsLong)
 	EXPECT_EQ(PyLong_Check(value), 1);
 }
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectIntValue)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyIntValue)
 {
 	const int32_t expectedValue = 13;
 	
@@ -49,7 +49,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectIntValue)
 }
 
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsBool)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyBoolValueType)
 {
 	const bool expectedValue = true;
 
@@ -60,7 +60,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsBool)
 	EXPECT_EQ(PyBool_Check(value), 1);
 }
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectBoolValue)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyBoolValue)
 {
 	const bool expectedValue = true;
 
@@ -71,7 +71,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectBoolValue)
 	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getBoolValue(value, ""), expectedValue);
 }
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsString)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyStringValueType)
 {
 	const std::string expectedValue = "Cheese";
 
@@ -82,7 +82,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PythonObjectTypeIsString)
 	EXPECT_EQ(PyUnicode_Check(value), 1);
 }
 
-TEST_F(FixturePropertyPythonObjectInterface, PythonObjectStringValue)
+TEST_F(FixturePropertyPythonObjectInterface, PropertyStringValue)
 {
 	const std::string expectedValue = "Cheese";
 
@@ -115,6 +115,20 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertySelectionValue)
 	handle->createProperty("", "test", { expectedValue }, expectedValue, "", *properties);
 	std::unique_ptr <EntityPropertiesBase> property(properties->getProperty("test"));
 	PropertyPythonObjectInterface interface(property.get());
+	CPythonObjectNew value = interface.GetValue();
+
+	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getStringValue(value, ""), expectedValue);
+}
+
+TEST_F(FixturePropertyPythonObjectInterface, PropertyEntityListNotSupported)
+{
+	const std::string expectedValue = "Cheese";
+
+	std::unique_ptr<EntityPropertiesEntityList> property(new EntityPropertiesEntityList());
+	property->setValueName(expectedValue);
+	property->setValueID(1);
+	PropertyPythonObjectInterface interface(property.get());
+	
 	CPythonObjectNew value = interface.GetValue();
 
 	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getStringValue(value, ""), expectedValue);
