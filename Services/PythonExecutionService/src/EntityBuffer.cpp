@@ -9,11 +9,11 @@ CPythonObjectNew EntityBuffer::GetEntityPropertyValue(const std::string& absolut
 	return interface.GetValue();
 }
 
-void EntityBuffer::UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject* values)
+void EntityBuffer::UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values)
 {
 	EnsurePropertyToBeLoaded(absoluteEntityName, propertyName);
 	PropertyPythonObjectInterface interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
-	interface.SetValue(*values);
+	interface.SetValue(values);
 }
 
 void EntityBuffer::SaveChangedEntities()
@@ -29,6 +29,22 @@ void EntityBuffer::SaveChangedEntities()
 		forceVis.push_back(false);
 	}
 	_modelComponent->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+}
+
+bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
+{
+	if (_bufferedEntities.find(absoluteEntityName) != _bufferedEntities.end())
+	{
+		std::shared_ptr<EntityBase> entity = _bufferedEntities[absoluteEntityName];
+		entity->StoreToDataBase();
+		ot::UIDList topoEntID, topoEntVersion, dataEnt;
+		std::list<bool> forceVis;
+		topoEntID.push_back(entity->getEntityID());
+		topoEntVersion.push_back(entity->getEntityStorageVersion());
+		_modelComponent->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+		return true;
+	}
+	return false;
 }
 
 

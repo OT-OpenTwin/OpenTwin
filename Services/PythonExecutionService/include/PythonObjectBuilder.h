@@ -1,6 +1,8 @@
 #pragma once
 #include <Python.h>
 #include "CPythonObjectNew.h"
+#include "CPythonObjectBorrowed.h"
+
 #include <stdint.h>
 #include <string>
 
@@ -22,6 +24,7 @@ public:
 	std::string getStringValue(const CPythonObject& pValue, const std::string& varName);
 	bool getBoolValue(const CPythonObject& pValue, const std::string& varName);
 
+	CPythonObjectBorrowed getTupleItem(const CPythonObject& pValue, int position, const std::string& varName);
 	int32_t getInt32ValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
 	double getDoubleValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
 	std::string getStringValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);

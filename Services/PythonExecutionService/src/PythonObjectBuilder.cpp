@@ -31,6 +31,7 @@ CPythonObjectNew PythonObjectBuilder::getAssembledTuple()
 	return std::move(_assembly);
 }
 
+
 int32_t PythonObjectBuilder::getInt32Value(const CPythonObject& pValue, const std::string& varName)
 {
 	if (PyLong_Check(pValue) != 1)
@@ -68,6 +69,16 @@ bool PythonObjectBuilder::getBoolValue(const CPythonObject& pValue, const std::s
 
 }
 
+CPythonObjectBorrowed PythonObjectBuilder::getTupleItem(const CPythonObject& pValue, int position, const std::string& varName)
+{
+	CPythonObjectBorrowed tupleEntity(PyTuple_GetItem(pValue, position));
+	if (tupleEntity == nullptr)
+	{
+		throw PythonException("For " + varName + " :");
+	}
+	return tupleEntity;
+}
+
 int32_t PythonObjectBuilder::getInt32ValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
 	PyObject* tupleEntity =	PyTuple_GetItem(pValue, position);
@@ -90,7 +101,6 @@ double PythonObjectBuilder::getDoubleValueFromTuple(const CPythonObject& pValue,
 
 std::string PythonObjectBuilder::getStringValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	
 	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
 	if (tupleEntity == nullptr)
 	{
@@ -108,6 +118,7 @@ bool PythonObjectBuilder::getBoolValueFromTuple(const CPythonObject& pValue, int
 	}
 	return getBoolValue(tupleEntity, varName);
 }
+
 
 
 CPythonObjectNew PythonObjectBuilder::setInt32(const int32_t value)

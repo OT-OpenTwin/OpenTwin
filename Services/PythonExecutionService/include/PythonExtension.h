@@ -20,11 +20,49 @@ namespace PythonExtensions
          return returnValue;
     }
 
+    static PyObject* OT_SetPropertyValue(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 3;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_SetPropertyValue expects three arguments");
+        }
+        std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 0, "Parameter 0");
+        std::string propertyName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 1, "Parameter 1");
+        CPythonObjectBorrowed pvalue = PythonObjectBuilder::INSTANCE()->getTupleItem(args, 1, "Parameter 2");
+
+        EntityBuffer::INSTANCE().UpdateEntityPropertyValue(absoluteEntityName, propertyName,pvalue);
+        return PythonObjectBuilder::INSTANCE()->setBool(true);
+    }
+    static PyObject* OT_Flush(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 0;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_SetPropertyValue expects zero arguments");
+        }
+        EntityBuffer::INSTANCE().SaveChangedEntities();
+        return PythonObjectBuilder::INSTANCE()->setBool(true);
+    }
+    static PyObject* OT_FlushEntity(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 1;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_SetPropertyValue expects one argument");
+        }
+        EntityBuffer::INSTANCE().SaveChangedEntities();
+        return PythonObjectBuilder::INSTANCE()->setBool(true);
+    }
     static PyMethodDef OTMethods[] = {
 
-        {"OT_GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Execute a shell command."},
-
-        {NULL, NULL, 0, NULL}        /* Sentinel */
+        {"OT_GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
+        {"OT_SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
+        {"OT_Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
+        {"OT_FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."}
     };
 
     static struct PyModuleDef OTModule = {
