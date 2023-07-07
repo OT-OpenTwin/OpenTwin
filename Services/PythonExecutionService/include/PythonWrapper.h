@@ -13,6 +13,7 @@
 #include <vector>
 #include "CPythonObjectBorrowed.h"
 #include "CPythonObjectNew.h"
+#include "PythonException.h"
 
 #include "OpenTwinCore/Variable.h"
 
@@ -42,7 +43,6 @@
 		std::string _pythonPath;
 		bool _interpreterSuccessfullyInitialized = false;
 
-		void ThrowPythonException();
 		static void signalHandlerAbort(int sig);
 		
 		PyObject* GetModule(const std::string& moduleName);

@@ -1,4 +1,5 @@
 #include "PythonObjectBuilder.h"
+#include "PythonException.h"
 
 void PythonObjectBuilder::StartTupleAssemply(int size)
 {
@@ -69,23 +70,43 @@ bool PythonObjectBuilder::getBoolValue(const CPythonObject& pValue, const std::s
 
 int32_t PythonObjectBuilder::getInt32ValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-
-	return PythonObjectBuilder::INSTANCE()->getInt32Value(PyTuple_GetItem(pValue, 0), varName);
+	PyObject* tupleEntity =	PyTuple_GetItem(pValue, position);
+	if (tupleEntity == nullptr)
+	{
+		throw PythonException();
+	}
+	return getInt32Value(tupleEntity, varName);
 }
 
 double PythonObjectBuilder::getDoubleValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	return 0.0;
+	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
+	if (tupleEntity == nullptr)
+	{
+		throw PythonException();
+	}
+	return getDoubleValue(tupleEntity, varName);
 }
 
 std::string PythonObjectBuilder::getStringValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	return std::string();
+	
+	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
+	if (tupleEntity == nullptr)
+	{
+		throw PythonException();
+	}
+	return getStringValue(tupleEntity, varName);
 }
 
 bool PythonObjectBuilder::getBoolValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	return false;
+	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
+	if (tupleEntity == nullptr)
+	{
+		throw PythonException();
+	}
+	return getBoolValue(tupleEntity, varName);
 }
 
 

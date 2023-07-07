@@ -32,7 +32,7 @@ void PythonWrapper::ClosePythonInterpreter()
 	int success = Py_FinalizeEx();
 	if (success == -1)
 	{
-		ThrowPythonException();
+		throw PythonException();
 	}
 }
 
@@ -45,7 +45,7 @@ void PythonWrapper::InitializePythonInterpreter()
 	Py_InitializeEx(skipSignalHandlerRegistration);
 	if (Py_IsInitialized() != 1)
 	{
-		ThrowPythonException();
+		throw PythonException();
 	}
 	_interpreterSuccessfullyInitialized = true;
 }
@@ -56,17 +56,6 @@ void PythonWrapper::signalHandlerAbort(int sig)
 	throw std::exception("Abort was called.");
 }
 
-void PythonWrapper::ThrowPythonException()
-{
-	PyObject* type, * value, * traceback;
-	PyErr_Fetch(&type, &value, &traceback);
-	PyErr_NormalizeException(&type, &value, &traceback);
-	PyObject* errorMessagePython = PyObject_Str(value);
-	std::string errorMessage = PyUnicode_AsUTF8(errorMessagePython);
-	Py_DECREF(errorMessagePython);
-	throw std::exception(errorMessage.c_str());
-}
-
 void PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
 {
 	CPythonObjectBorrowed module(GetModule(moduleName));
@@ -74,7 +63,7 @@ void PythonWrapper::Execute(const std::string& executionCommand, const std::stri
 	PyObject* result(PyRun_String(executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 	if (result == nullptr)
 	{
-		ThrowPythonException();
+		throw PythonException();
 	}
 }
 
@@ -84,7 +73,7 @@ CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName,
 	CPythonObjectNew returnValue(PyObject_CallObject(function, parameter));
 	if (!returnValue.ReferenceIsSet())
 	{
-		ThrowPythonException();
+		throw PythonException();
 	}
 	return returnValue;
 }
@@ -97,7 +86,7 @@ CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varNam
 	CPythonObjectBorrowed pythonVar(PyDict_GetItemString(globalDirectory, varName.c_str()));
 	if (pythonVar == nullptr)
 	{
-		ThrowPythonException();
+		throw PythonException();
 	}
 	return pythonVar;
 }
@@ -109,7 +98,7 @@ PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std
 	PyObject* function = PyObject_GetAttrString(module, functionName.c_str());
 	if (function == nullptr)
 	{
-		ThrowPythonException();
+		throw PythonException();
 	}
 	if (PyCallable_Check(function) != 1)
 	{
@@ -126,7 +115,7 @@ PyObject* PythonWrapper::GetModule(const std::string& moduleName)
 	{
 		if (moduleName == "__main__")
 		{
-			ThrowPythonException();
+			throw PythonException();
 		}
 		PyObject* type, * value, * traceback;
 		PyErr_Fetch(&type, &value, &traceback);

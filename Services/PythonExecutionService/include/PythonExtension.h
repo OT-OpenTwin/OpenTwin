@@ -1,6 +1,7 @@
 #pragma once
 #include <Python.h>
 #include "PythonObjectBuilder.h"
+#include "EntityBuffer.h"
 
 namespace PythonExtensions
 {
@@ -13,7 +14,8 @@ namespace PythonExtensions
          {
              throw std::exception("OT_GetPropertyValue expects two arguments");
          }
-         std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
+         std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args,0,"Parameter 0");
+         std::string propertyName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 1, "Parameter 1");
 
          return new PyObject();
     }
