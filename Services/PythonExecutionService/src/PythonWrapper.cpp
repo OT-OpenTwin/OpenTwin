@@ -8,14 +8,12 @@ PythonWrapper::PythonWrapper()
 	std::string pythonRoot;
 #ifdef _RELEASEDEBUG
 	pythonRoot = getenv("PYTHON310_ROOT");
-	pythonRoot += "\\Lib";
 #else
 	pythonRoot = ".\\Python";
 #endif // RELEASEDEBUG
-	_pythonPath =
-		pythonRoot + ";" +
-		pythonRoot + "\\site-packages;" +
-		pythonRoot;
+	_pythonPath.push_back(pythonRoot);
+	_pythonPath.push_back(pythonRoot + "\\Lib");
+	_defaultSitePackagesPath = pythonRoot + "\\site-packages";
 	signal(SIGABRT, &signalHandlerAbort);
 }
 
@@ -38,9 +36,29 @@ void PythonWrapper::ClosePythonInterpreter()
 
 void PythonWrapper::InitializePythonInterpreter()
 {
-	std::wstring pyhtonPath(_pythonPath.begin(), _pythonPath.end());
+	std::wstring allPaths;
+	for (std::string& pathComponent : _pythonPath)
+	{
+		std::wstring temp(pathComponent.begin(), pathComponent.end());
+		allPaths += temp + L";";
+	}
+	//PyStatus status;
+	//PyConfig config;
+	//config.program_name = "OpenTwinPython";
+	//config.isolated = 1;
+	//config.dump_refs = 1; // Dump all objects which are still alive at exit
+	//config.pythonpath_env = pyhtonPath.c_str();
+	//PyConfig_InitIsolatedConfig(&config);
+
+	//status = Py_InitializeFromConfig(&config);
+	//if (PyStatus_Exception(status))
+	//{
+	//	throw std::exception(("Initialization failed: " + std::string(status.err_msg)).c_str());
+	//}
+	//PyConfig_Clear(&config);
+
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
-	Py_SetPath(pyhtonPath.c_str());
+	Py_SetPath(allPaths.c_str());
 	int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())
 	Py_InitializeEx(skipSignalHandlerRegistration);
 	if (Py_IsInitialized() != 1)
@@ -48,6 +66,25 @@ void PythonWrapper::InitializePythonInterpreter()
 		throw PythonException();
 	}
 	_interpreterSuccessfullyInitialized = true;
+}
+
+void PythonWrapper::ResetSysPath()
+{
+	std::string resetPythonPath = "import sys\n"
+		"sys.path.clear()\n";
+	
+	for (std::string& pathComponent : _pythonPath)
+	{
+		resetPythonPath += "sys.path.append(\"" +pathComponent +"\")\n";
+	}
+	Execute(resetPythonPath);
+}
+
+void PythonWrapper::AddToSysPath(const std::string& newPathComponent)
+{
+	const std::string addToPythonPath = "import sys\n"
+		"sys.path.append(\""+newPathComponent+"\")\n";
+	Execute(addToPythonPath);
 }
 
 void PythonWrapper::signalHandlerAbort(int sig)
@@ -78,7 +115,6 @@ CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName,
 	return returnValue;
 }
 
-
 CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
 {
 	CPythonObjectBorrowed module(GetModule(moduleName));
@@ -90,7 +126,6 @@ CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varNam
 	}
 	return pythonVar;
 }
-
 
 PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std::string& moduleName)
 {
@@ -106,7 +141,6 @@ PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std
 	}
 	return function;
 }
-
 
 PyObject* PythonWrapper::GetModule(const std::string& moduleName)
 {

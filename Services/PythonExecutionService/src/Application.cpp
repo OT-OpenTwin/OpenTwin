@@ -206,7 +206,7 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 void Application::ProcessScriptExecution(std::vector<std::string> scripts, std::vector<ot::VariableBundle> allParameter, std::string subsequentFunction, std::string msmdName)
 {
 
-	_pythonAPI.InterpreteString(scripts, allParameter);
+	//_pythonAPI.InterpreteString(scripts, allParameter);
 
 
 	OT_rJSON_createDOC(newDocument);

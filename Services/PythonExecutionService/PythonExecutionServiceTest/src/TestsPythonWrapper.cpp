@@ -134,10 +134,49 @@ TEST_F(FixturePythonWrapper, PythonExtensionWithMultipleParameter)
 	EXPECT_EQ(expectedValue, result);
 }
 
-
 TEST_F(FixturePythonWrapper, PythonExtensionFromOtherModule)
 {
 	const std::string script = "import InitialTestModule\n"
 		"value = InitialTestModule.WithoutParameter()";
+	EXPECT_NO_THROW(ExecuteString(script, "someModule"));
+}
+
+TEST_F(FixturePythonWrapper, PythonExtensionFunctionGetter)
+{
+	const std::string anotherScript = "def add(x,y):\n"
+		"\treturn x + y\n"
+		;
+	ExecuteString(anotherScript, "anotherModule");
+
+	const std::string script = "import InitialTestModule\n"
+		"funct = InitialTestModule.GetFunction(\"anotherModule\",\"add\")\n"
+		"result = funct(3,5)\n"
+		;
+	ExecuteString(script, "someModule");
+
+	int32_t result = GetGlobalVariable("result", "someModule");
+	EXPECT_EQ(result, 8);
+}
+
+TEST_F(FixturePythonWrapper, PythonImportNumpyWithoutExtendedPath)
+{
+	ResetPythonPath();
+	const std::string script = "import sys\n"
+		"print(sys.path)\n"
+		"import numpy\n";
+	EXPECT_ANY_THROW(ExecuteString(script, "someModule"));
+}
+
+
+TEST_F(FixturePythonWrapper, PythonImportNumpyWithExtendedPath)
+{
+	AddNumpyToPath();
+	const std::string checkupScript = "import sys\n"
+		"path = sys.path\n";
+	ExecuteString(checkupScript, "__main__");
+	auto path = GetPathVariable("__main__");
+	
+	std::string script =
+		"import numpy\n";
 	EXPECT_NO_THROW(ExecuteString(script, "someModule"));
 }

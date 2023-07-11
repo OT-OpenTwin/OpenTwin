@@ -1,20 +1,23 @@
 #pragma once
 #include "PythonAPI.h"
-#include <vector>
-#include <string>
-#include "OpenTwinCore/Variable.h"
 #include "PythonWrapper.h"
+#include "EntityParameterizedDataSource.h"
 
 class PythonAPI
 {
 public:
 	PythonAPI();
-	void InterpreteString(const std::string& programm, ot::VariableBundle& variables);
-	void InterpreteString(std::vector<std::string>& programms, std::vector<ot::VariableBundle>& variables);
-	
+	/*Execute()*/
+
 private:
-	PythonWrapper wrapper;
+	PythonWrapper _wrapper;
+	std::map<std::string, std::string> _serviceByServiceName;
+	
 };
 
 
 
+struct ServicePythonModule
+{
+	std::map<ot::UID, EntityParameterizedDataSource*> allImportedScripts;
+};

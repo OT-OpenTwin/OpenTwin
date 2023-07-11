@@ -62,17 +62,22 @@ namespace PythonExtensions
         {"OT_GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
         {"OT_SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
         {"OT_Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
-        {"OT_FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."}
+        {"OT_FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
+        {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 
+    static std::string otModuleDescription = "This module holds functions that call c++ functions, provided by the OpenTwin framework. These functions enable the access to OpenTwin's entities and their properties.";
+    
     static struct PyModuleDef OTModule = {
         PyModuleDef_HEAD_INIT,
         "OpenTwin",   /* name of module */
-        NULL, /* module documentation, may be NULL */
+        otModuleDescription.c_str(), /* module documentation, may be NULL */
         -1,       /* size of per-interpreter state of the module,
                      or -1 if the module keeps state in global variables. */
         OTMethods
     };
+
+
 
     PyMODINIT_FUNC
         PyInit_OpenTwin(void)

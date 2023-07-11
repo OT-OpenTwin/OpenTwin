@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <list>
 
 class PythonObjectBuilder
 {
@@ -29,6 +30,13 @@ public:
 	double getDoubleValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
 	std::string getStringValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
 	bool getBoolValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
+
+	
+	std::list<int32_t> getInt32List(const CPythonObject& pValue, const std::string& varName);
+	std::list<double> getDoubleList(const CPythonObject& pValue, const std::string& varName);
+	std::list<std::string> getStringList(const CPythonObject& pValue, const std::string& varName);
+	std::list<bool> getBoolList(const CPythonObject& pValue, const std::string& varName);
+
 
 	CPythonObjectNew setInt32(const int32_t value);
 	CPythonObjectNew setDouble(double value);

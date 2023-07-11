@@ -1,7 +1,7 @@
 #pragma once
 #include "PythonWrapper.h"
 #include <gtest/gtest.h>
-
+#include <list>
 
 class FixturePythonWrapper : public testing::Test
 {
@@ -15,6 +15,9 @@ public:
 	int ExecuteFunctionWithParameter(const std::string& functionName, int parameter, const std::string& moduleName);
 	int ExecuteFunctionWithMultipleParameter(const std::string& functionName, int parameter1, int parameter2, std::string parameter3, const std::string& moduleName);
 	int32_t GetGlobalVariable(const std::string& varName, const std::string& moduleName);
+	std::list<std::string> GetPathVariable(const std::string& moduleName);
+	void AddNumpyToPath();
+	void ResetPythonPath();
 
 private:
 	PythonWrapper _wrapper;

@@ -11,6 +11,7 @@
 #include <Python.h>
 #include <string>
 #include <vector>
+#include <list>
 #include "CPythonObjectBorrowed.h"
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
@@ -31,6 +32,8 @@
 		~PythonWrapper();
 		
 		void InitializePythonInterpreter();
+		void ResetSysPath();
+		void AddToSysPath(const std::string& newPathComponent);
 		void ClosePythonInterpreter();
 
 		void Execute(const std::string& executionCommand, const std::string& moduleName = "__main__");
@@ -40,7 +43,8 @@
 		CPythonObjectBorrowed GetGlobalVariable(const std::string& varName, const std::string& moduleName);
 
 	private:
-		std::string _pythonPath;
+		std::list<std::string> _pythonPath;
+		std::string _defaultSitePackagesPath;
 		bool _interpreterSuccessfullyInitialized = false;
 
 		static void signalHandlerAbort(int sig);

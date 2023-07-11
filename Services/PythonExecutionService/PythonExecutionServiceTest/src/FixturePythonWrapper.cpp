@@ -44,8 +44,25 @@ int FixturePythonWrapper::ExecuteFunctionWithMultipleParameter(const std::string
 }
 
 
+
 int32_t FixturePythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
 {
 	CPythonObjectBorrowed variable = _wrapper.GetGlobalVariable(varName, moduleName);
 	return PythonObjectBuilder::INSTANCE()->getInt32Value(variable, varName);
+}
+
+std::list<std::string> FixturePythonWrapper::GetPathVariable(const std::string& moduleName)
+{
+	CPythonObjectBorrowed variable = _wrapper.GetGlobalVariable("path", moduleName);
+	return PythonObjectBuilder::INSTANCE()->getStringList(variable, "path");
+}
+
+void FixturePythonWrapper::AddNumpyToPath()
+{
+	_wrapper.AddToSysPath("C:\\ThirdParty\\Python\\Python310\\Lib\\site-packages");
+}
+
+void FixturePythonWrapper::ResetPythonPath()
+{
+	_wrapper.ResetSysPath();
 }

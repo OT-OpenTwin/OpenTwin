@@ -119,6 +119,71 @@ bool PythonObjectBuilder::getBoolValueFromTuple(const CPythonObject& pValue, int
 	return getBoolValue(tupleEntity, varName);
 }
 
+std::list<int32_t> PythonObjectBuilder::getInt32List(const CPythonObject& pValue, const std::string& varName)
+{
+	if (PyList_Check(pValue) != 1)
+	{
+		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
+	}
+	
+	std::list<int32_t> values;
+	for (auto i = 0; i < PyList_Size(pValue); i++)
+	{
+		CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+		values.push_back(getInt32Value(pValue,"ListItem"));
+	}
+	return values;
+}
+
+std::list<double> PythonObjectBuilder::getDoubleList(const CPythonObject& pValue, const std::string& varName)
+{
+	if (PyList_Check(pValue) != 1)
+	{
+		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
+	}
+
+	std::list<double> values;
+	for (auto i = 0; i < PyList_Size(pValue); i++)
+	{
+		CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+		values.push_back(getDoubleValue(pValue, "ListItem"));
+	}
+	return values;
+}
+
+std::list<std::string> PythonObjectBuilder::getStringList(const CPythonObject& pValue, const std::string& varName)
+{
+	if (PyList_Check(pValue) != 1)
+	{
+		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
+	}
+
+	std::list<std::string> values;
+	auto listSize = PyList_Size(pValue);
+	for (auto i = 0; i < listSize; i++)
+	{
+		CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+		values.push_back(getStringValue(listItem, "ListItem"));
+	}
+
+	return values;
+}
+
+std::list<bool> PythonObjectBuilder::getBoolList(const CPythonObject& pValue, const std::string& varName)
+{
+	if (PyList_Check(pValue) != 1)
+	{
+		throw std::exception(("The variable " + varName + " is not of the requested type.").c_str());
+	}
+
+	std::list<bool> values;
+	for (auto i = 0; i < PyList_Size(pValue); i++)
+	{
+		CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+		values.push_back(getBoolValue(pValue, "ListItem"));
+	}
+	return values;
+}
 
 
 CPythonObjectNew PythonObjectBuilder::setInt32(const int32_t value)

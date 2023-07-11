@@ -5,6 +5,17 @@
 
 namespace TestingPythonExtensions
 {
+ 
+    static PyObject* GetFunction(PyObject* self, PyObject* args)
+    {
+        std::string scriptName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
+        std::string functionName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 1), "Parameter 2");
+        PyObject* module = PyImport_ImportModule(scriptName.c_str());
+        assert(module != nullptr);
+        PyObject* function = PyObject_GetAttrString(module, functionName.c_str());
+        assert(function != nullptr);
+        return function;
+    }
 
     static PyObject* WithOneParameter(PyObject* self, PyObject* args)
     {
@@ -42,14 +53,17 @@ namespace TestingPythonExtensions
         {"WithOneParameter",  WithOneParameter, METH_VARARGS, "Test function with one parameter."},
         {"WithoutParameter",  WithoutParameter, METH_NOARGS, "Test function without parameter."},
         {"WithMultipleParameter",  WithMultipleParameter, METH_VARARGS, "Test function with multiple parameter."},
+        {"GetFunction",  GetFunction, METH_VARARGS, "Test function getter."},
 
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 
+    static std::string testModuleDescription = "This module holds functions that are used for unit tests.";
+
     static struct PyModuleDef TestModule = {
         PyModuleDef_HEAD_INIT,
         "InitialTestModule",   /* name of module */
-        NULL, /* module documentation, may be NULL */
+        testModuleDescription.c_str(), /* module documentation, may be NULL */
         -1,       /* size of per-interpreter state of the module,
                      or -1 if the module keeps state in global variables. */
         OTMethods
