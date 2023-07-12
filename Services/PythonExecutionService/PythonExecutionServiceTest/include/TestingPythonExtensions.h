@@ -8,8 +8,9 @@ namespace TestingPythonExtensions
  
     static PyObject* GetFunction(PyObject* self, PyObject* args)
     {
-        std::string scriptName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
-        std::string functionName = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 1), "Parameter 2");
+        PythonObjectBuilder pyObBuilder;
+        std::string scriptName = pyObBuilder.getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
+        std::string functionName = pyObBuilder.getStringValue(PyTuple_GetItem(args, 1), "Parameter 2");
         PyObject* module = PyImport_ImportModule(scriptName.c_str());
         assert(module != nullptr);
         PyObject* function = PyObject_GetAttrString(module, functionName.c_str());
@@ -34,10 +35,10 @@ namespace TestingPythonExtensions
 
     static PyObject* WithMultipleParameter(PyObject* self, PyObject* args)
     {
-
-        int parameter1 = PythonObjectBuilder::INSTANCE()->getInt32Value(PyTuple_GetItem(args, 0),"Parameter 1");
-        int parameter2 = PythonObjectBuilder::INSTANCE()->getInt32Value(PyTuple_GetItem(args, 1),"Parameter 2");
-        std::string parameter3 = PythonObjectBuilder::INSTANCE()->getStringValue(PyTuple_GetItem(args, 2),"Parameter 3");
+        PythonObjectBuilder pyObBuilder;
+        int parameter1 = pyObBuilder.getInt32Value(PyTuple_GetItem(args, 0), "Parameter 1");
+        int parameter2 = pyObBuilder.getInt32Value(PyTuple_GetItem(args, 1),"Parameter 2");
+        std::string parameter3 = pyObBuilder.getStringValue(PyTuple_GetItem(args, 2),"Parameter 3");
 
         int result = (parameter1 + parameter2) * 2;
         if (parameter3 == "Suppe")
@@ -45,7 +46,7 @@ namespace TestingPythonExtensions
             result += 7;
         }
         
-        return PythonObjectBuilder::INSTANCE()->setInt32(result);
+        return pyObBuilder.setInt32(result);
     }
 
     static PyMethodDef OTMethods[] = {

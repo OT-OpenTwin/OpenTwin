@@ -118,6 +118,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(PYTHON310_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +141,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(PYTHON310_INC);$(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild />
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,6 +167,8 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC);$(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -188,6 +193,8 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC);$(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -212,6 +219,8 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -245,6 +254,7 @@
     <ClInclude Include="include\PythonAPI.h" />
     <ClInclude Include="include\PythonException.h" />
     <ClInclude Include="include\PythonExtension.h" />
+    <ClInclude Include="include\PythonLoadedModules.h" />
     <ClInclude Include="include\PythonObjectBuilder.h" />
     <ClInclude Include="include\PythonWrapper.h" />
     <ClInclude Include="include\UiNotifier.h" />

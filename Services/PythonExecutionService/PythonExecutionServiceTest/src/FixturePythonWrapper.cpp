@@ -18,43 +18,48 @@ std::string FixturePythonWrapper::ExecuteFunctionWithReturnValue(const std::stri
 {
 	CPythonObjectNew parameter(nullptr);
 	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, parameter, moduleName);
-	return PythonObjectBuilder::INSTANCE()->getStringValue(returnVal, "return Value");
+	PythonObjectBuilder pyObBuilder;
+	return pyObBuilder.getStringValue(returnVal, "return Value");
 }
 
 int FixturePythonWrapper::ExecuteFunctionWithParameter(const std::string& functionName, int parameter, const std::string& moduleName)
 {
-	PythonObjectBuilder::INSTANCE()->StartTupleAssemply(1);
-	*PythonObjectBuilder::INSTANCE() << PythonObjectBuilder::INSTANCE()->setInt32(parameter);
-	CPythonObjectNew pythonParameter = PythonObjectBuilder::INSTANCE()->getAssembledTuple();
+	PythonObjectBuilder pyObBuilder;
+	pyObBuilder.StartTupleAssemply(1);
+	pyObBuilder << pyObBuilder.setInt32(parameter);
+	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
 
 	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, pythonParameter, moduleName);
-	return PythonObjectBuilder::INSTANCE()->getInt32Value(returnVal, "return Value");
+	return pyObBuilder.getInt32Value(returnVal, "return Value");
 }
 
 int FixturePythonWrapper::ExecuteFunctionWithMultipleParameter(const std::string& functionName, int parameter1, int parameter2, std::string parameter3, const std::string& moduleName)
 {
-	PythonObjectBuilder::INSTANCE()->StartTupleAssemply(3);
-	*PythonObjectBuilder::INSTANCE() << PythonObjectBuilder::INSTANCE()->setInt32(parameter1);
-	*PythonObjectBuilder::INSTANCE() << PythonObjectBuilder::INSTANCE()->setInt32(parameter2);
-	*PythonObjectBuilder::INSTANCE() << PythonObjectBuilder::INSTANCE()->setString(parameter3);
-	CPythonObjectNew pythonParameter = PythonObjectBuilder::INSTANCE()->getAssembledTuple();
+	PythonObjectBuilder pyObBuilder;
+	pyObBuilder.StartTupleAssemply(3);
+	pyObBuilder << pyObBuilder.setInt32(parameter1);
+	pyObBuilder << pyObBuilder.setInt32(parameter2);
+	pyObBuilder << pyObBuilder.setString(parameter3);
+	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
 
 	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, pythonParameter, moduleName);
-	return PythonObjectBuilder::INSTANCE()->getInt32Value(returnVal, "return Value");
+	return pyObBuilder.getInt32Value(returnVal, "return Value");
 }
 
 
 
 int32_t FixturePythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
 {
+	PythonObjectBuilder pyObBuilder;
 	CPythonObjectBorrowed variable = _wrapper.GetGlobalVariable(varName, moduleName);
-	return PythonObjectBuilder::INSTANCE()->getInt32Value(variable, varName);
+	return pyObBuilder.getInt32Value(variable, varName);
 }
 
 std::list<std::string> FixturePythonWrapper::GetPathVariable(const std::string& moduleName)
 {
+	PythonObjectBuilder pyObBuilder;
 	CPythonObjectBorrowed variable = _wrapper.GetGlobalVariable("path", moduleName);
-	return PythonObjectBuilder::INSTANCE()->getStringList(variable, "path");
+	return pyObBuilder.getStringList(variable, "path");
 }
 
 void FixturePythonWrapper::AddNumpyToPath()

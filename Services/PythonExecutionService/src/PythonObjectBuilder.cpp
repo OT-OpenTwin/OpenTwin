@@ -119,6 +119,26 @@ bool PythonObjectBuilder::getBoolValueFromTuple(const CPythonObject& pValue, int
 	return getBoolValue(tupleEntity, varName);
 }
 
+CPythonObjectBorrowed PythonObjectBuilder::getDictItem(const CPythonObject& pValue)
+{
+	if (!PyDict_Check(pValue))
+	{
+		throw std::exception("PythonObjectBuilder received invalid type. Expected type: PyDict.");
+	}
+	return CPythonObjectBorrowed(PyDict_Items(pValue));
+}
+
+
+
+CPythonObjectBorrowed PythonObjectBuilder::getListItem(const CPythonObject& pValue, int position)
+{
+	if (!PyList_Check(pValue))
+	{
+		throw std::exception("PythonObjectBuilder received invalid type. Expected type: PyList.");
+	}
+	return CPythonObjectBorrowed(PyList_GetItem(pValue, position));
+}
+
 std::list<int32_t> PythonObjectBuilder::getInt32List(const CPythonObject& pValue, const std::string& varName)
 {
 	if (PyList_Check(pValue) != 1)
@@ -183,6 +203,31 @@ std::list<bool> PythonObjectBuilder::getBoolList(const CPythonObject& pValue, co
 		values.push_back(getBoolValue(pValue, "ListItem"));
 	}
 	return values;
+}
+
+variable_t PythonObjectBuilder::getVariable(CPythonObject& pValue)
+{
+	if (PyLong_Check(pValue) != 1)
+	{
+
+		return variable_t(static_cast<int32_t>(PyLong_AsLong(pValue)));
+	}
+	else if (PyFloat_Check(pValue) != 1)
+	{
+		return variable_t(static_cast<double>(PyFloat_AsDouble(pValue)));
+	}
+	else if (PyUnicode_Check(pValue) != 1)
+	{
+		return variable_t(PyUnicode_AsUTF8(pValue));
+	}
+	else if (PyBool_Check(pValue) != 1)
+	{
+		return variable_t(static_cast<bool>(PyLong_AsLong(pValue)));
+	}
+	else
+	{
+		throw std::exception("Not supported type by PythonObjectBuilder.");
+	}
 }
 
 

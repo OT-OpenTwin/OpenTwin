@@ -42,13 +42,15 @@
 		
 		CPythonObjectBorrowed GetGlobalVariable(const std::string& varName, const std::string& moduleName);
 
+		CPythonObjectBorrowed GetGlobalDictionary(const std::string& moduleName);
+
 	private:
 		std::list<std::string> _pythonPath;
 		std::string _defaultSitePackagesPath;
 		bool _interpreterSuccessfullyInitialized = false;
 
 		static void signalHandlerAbort(int sig);
-		
+
 		PyObject* GetModule(const std::string& moduleName);
 		PyObject* LoadFunction(const std::string& functionName, const std::string& moduleName = "__main__");
 		

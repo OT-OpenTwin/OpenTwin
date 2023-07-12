@@ -12,12 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp" />
+    <ClCompile Include="src\FixturePythonAPI.cpp" />
     <ClCompile Include="src\FixturePythonWrapper.cpp" />
     <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp" />
+    <ClCompile Include="src\TestPythonAPI.cpp" />
     <ClCompile Include="src\TestsPythonWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePropertyPythonObjectInterface.h" />
+    <ClInclude Include="include\FixturePythonAPI.h" />
     <ClInclude Include="include\FixturePythonWrapper.h" />
     <ClInclude Include="include\TestingPythonExtensions.h" />
   </ItemGroup>
@@ -48,9 +51,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASEDEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC);C:\OpenTwin\Services\PythonExecutionService\include;$(GOOGLE_TEST_INC);$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(PYTHON310_INC);C:\OpenTwin\Services\PythonExecutionService\include;$(GOOGLE_TEST_INC);$(ProjectDir)include;$(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -70,6 +75,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

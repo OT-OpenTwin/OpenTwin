@@ -21,9 +21,9 @@ public:
 	void SaveChangedEntities();
 	bool SaveChangedEntities(std::string absoluteEntityName);
 
-
 private:
 	EntityBuffer() {};
+
 	std::map<std::string, std::shared_ptr<EntityBase>> _bufferedEntities;
 	std::map<std::string, EntityPropertiesBase*> _bufferedEntityProperties;
 	ot::components::ModelComponent* _modelComponent = nullptr;

@@ -83,5 +83,8 @@
     <ClInclude Include="include\PropertyPythonObjectInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PythonLoadedModules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,8 +14,9 @@ namespace PythonExtensions
          {
              throw std::exception("OT_GetPropertyValue expects two arguments");
          }
-         std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args,0,"Parameter 0");
-         std::string propertyName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 1, "Parameter 1");
+         PythonObjectBuilder pyObBuilder;
+         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args,0,"Parameter 0");
+         std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
          CPythonObjectNew returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
          return returnValue;
     }
@@ -28,12 +29,13 @@ namespace PythonExtensions
         {
             throw std::exception("OT_SetPropertyValue expects three arguments");
         }
-        std::string absoluteEntityName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 0, "Parameter 0");
-        std::string propertyName = PythonObjectBuilder::INSTANCE()->getStringValueFromTuple(args, 1, "Parameter 1");
-        CPythonObjectBorrowed pvalue = PythonObjectBuilder::INSTANCE()->getTupleItem(args, 1, "Parameter 2");
+        PythonObjectBuilder pyObBuilder;
+        std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
+        CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 2");
 
         EntityBuffer::INSTANCE().UpdateEntityPropertyValue(absoluteEntityName, propertyName,pvalue);
-        return PythonObjectBuilder::INSTANCE()->setBool(true);
+        return pyObBuilder.setBool(true);
     }
     static PyObject* OT_Flush(PyObject* self, PyObject* args)
     {
@@ -44,7 +46,8 @@ namespace PythonExtensions
             throw std::exception("OT_SetPropertyValue expects zero arguments");
         }
         EntityBuffer::INSTANCE().SaveChangedEntities();
-        return PythonObjectBuilder::INSTANCE()->setBool(true);
+        PythonObjectBuilder pyObBuilder;
+        return pyObBuilder.setBool(true);
     }
     static PyObject* OT_FlushEntity(PyObject* self, PyObject* args)
     {
@@ -55,7 +58,8 @@ namespace PythonExtensions
             throw std::exception("OT_SetPropertyValue expects one argument");
         }
         EntityBuffer::INSTANCE().SaveChangedEntities();
-        return PythonObjectBuilder::INSTANCE()->setBool(true);
+        PythonObjectBuilder pyObBuilder;
+        return pyObBuilder.setBool(true);
     }
     static PyMethodDef OTMethods[] = {
 

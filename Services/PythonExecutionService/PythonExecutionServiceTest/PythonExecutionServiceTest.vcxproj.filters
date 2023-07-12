@@ -21,6 +21,12 @@
     <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestPythonAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixturePythonAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePythonWrapper.h">
@@ -30,6 +36,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FixturePropertyPythonObjectInterface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixturePythonAPI.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

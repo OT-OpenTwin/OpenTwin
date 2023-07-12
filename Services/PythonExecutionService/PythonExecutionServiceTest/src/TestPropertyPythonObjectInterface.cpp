@@ -22,8 +22,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyDoubleGetValue)
 	std::unique_ptr<EntityPropertiesDouble> property(new EntityPropertiesDouble("AProperty", expectedValue));
 	PropertyPythonObjectInterface interface(property.get());
 	CPythonObjectNew value = interface.GetValue();
-
-	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getDoubleValue(value, ""), expectedValue);
+	PythonObjectBuilder pyObBuilder;
+	EXPECT_EQ(pyObBuilder.getDoubleValue(value, ""), expectedValue);
 }
 
 TEST_F(FixturePropertyPythonObjectInterface, PropertyDoubleSetValue)
@@ -32,7 +32,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyDoubleSetValue)
 
 	std::unique_ptr<EntityPropertiesDouble> property(new EntityPropertiesDouble());
 	PropertyPythonObjectInterface interface(property.get());
-	CPythonObjectNew pvalue(PythonObjectBuilder::INSTANCE()->setDouble(expectedValue));
+	PythonObjectBuilder pyObBuilder;
+	CPythonObjectNew pvalue(pyObBuilder.setDouble(expectedValue));
 	interface.SetValue(pvalue);
 	double result = property->getValue();
 	
@@ -58,8 +59,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyIntGetValue)
 	std::unique_ptr<EntityPropertiesInteger> property(new EntityPropertiesInteger("AProperty", expectedValue));
 	PropertyPythonObjectInterface interface(property.get());
 	CPythonObjectNew value = interface.GetValue();
-	
-	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getInt32Value(value, ""), expectedValue);
+	PythonObjectBuilder pyObBuilder;
+	EXPECT_EQ(pyObBuilder.getInt32Value(value, ""), expectedValue);
 }
 
 TEST_F(FixturePropertyPythonObjectInterface, PropertyIntSetValue)
@@ -68,7 +69,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyIntSetValue)
 
 	std::unique_ptr<EntityPropertiesInteger> property(new EntityPropertiesInteger());
 	PropertyPythonObjectInterface interface(property.get());
-	CPythonObjectNew pvalue(PythonObjectBuilder::INSTANCE()->setInt32(expectedValue));
+	PythonObjectBuilder pyObBuilder;
+	CPythonObjectNew pvalue(pyObBuilder.setInt32(expectedValue));
 	interface.SetValue(pvalue);
 	int32_t result = property->getValue();
 
@@ -93,8 +95,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyBoolGetValue)
 	std::unique_ptr<EntityPropertiesBoolean> property(new EntityPropertiesBoolean("AProperty", expectedValue));
 	PropertyPythonObjectInterface interface(property.get());
 	CPythonObjectNew value = interface.GetValue();
-
-	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getBoolValue(value, ""), expectedValue);
+	PythonObjectBuilder pyObBuilder;
+	EXPECT_EQ(pyObBuilder.getBoolValue(value, ""), expectedValue);
 }
 
 TEST_F(FixturePropertyPythonObjectInterface, PropertyBoolSetValue)
@@ -103,7 +105,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyBoolSetValue)
 
 	std::unique_ptr<EntityPropertiesBoolean> property(new EntityPropertiesBoolean());
 	PropertyPythonObjectInterface interface(property.get());
-	CPythonObjectNew pvalue(PythonObjectBuilder::INSTANCE()->setBool(expectedValue));
+	PythonObjectBuilder pyObBuilder;
+	CPythonObjectNew pvalue(pyObBuilder.setBool(expectedValue));
 	interface.SetValue(pvalue);
 	bool result = property->getValue();
 
@@ -128,8 +131,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyStringGetValue)
 	std::unique_ptr<EntityPropertiesString> property(new EntityPropertiesString("AProperty", expectedValue));
 	PropertyPythonObjectInterface interface(property.get());
 	CPythonObjectNew value = interface.GetValue();
-
-	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getStringValue(value, ""), expectedValue);
+	PythonObjectBuilder pyObBuilder;
+	EXPECT_EQ(pyObBuilder.getStringValue(value, ""), expectedValue);
 }
 
 TEST_F(FixturePropertyPythonObjectInterface, PropertyStringSetValue)
@@ -138,7 +141,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyStringSetValue)
 
 	std::unique_ptr<EntityPropertiesString> property(new EntityPropertiesString());
 	PropertyPythonObjectInterface interface(property.get());
-	CPythonObjectNew pvalue(PythonObjectBuilder::INSTANCE()->setString(expectedValue));
+	PythonObjectBuilder pyObBuilder;
+	CPythonObjectNew pvalue(pyObBuilder.setString(expectedValue));
 	interface.SetValue(pvalue);
 	std::string result = property->getValue();
 
@@ -168,8 +172,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertySelectionGetValue)
 	std::unique_ptr <EntityPropertiesBase> property(properties->getProperty("test"));
 	PropertyPythonObjectInterface interface(property.get());
 	CPythonObjectNew value = interface.GetValue();
-
-	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getStringValue(value, ""), expectedValue);
+	PythonObjectBuilder pyObBuilder;
+	EXPECT_EQ(pyObBuilder.getStringValue(value, ""), expectedValue);
 }
 
 TEST_F(FixturePropertyPythonObjectInterface, PropertySelectionSetValue)
@@ -181,7 +185,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertySelectionSetValue)
 	handle->createProperty("", "test", { expectedValue, "Bread"}, "Bread", "", *properties);
 	std::unique_ptr<EntityPropertiesSelection> property(dynamic_cast<EntityPropertiesSelection*>(properties->getProperty("test")));
 	PropertyPythonObjectInterface interface(property.get());
-	CPythonObjectNew pvalue(PythonObjectBuilder::INSTANCE()->setString(expectedValue));
+	PythonObjectBuilder pyObBuilder;
+	CPythonObjectNew pvalue(pyObBuilder.setString(expectedValue));
 	interface.SetValue(pvalue);
 	std::string result = property->getValue();
 
@@ -198,8 +203,8 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyEntityListGetValue)
 	PropertyPythonObjectInterface interface(property.get());
 	
 	CPythonObjectNew value = interface.GetValue();
-
-	EXPECT_EQ(PythonObjectBuilder::INSTANCE()->getStringValue(value, ""), expectedValue);
+	PythonObjectBuilder pyObBuilder;
+	EXPECT_EQ(pyObBuilder.getStringValue(value, ""), expectedValue);
 }
 
 TEST_F(FixturePropertyPythonObjectInterface, PropertyEntityListValueType)
@@ -222,6 +227,7 @@ TEST_F(FixturePropertyPythonObjectInterface, PropertyEntityListSetValue_NotSuppo
 
 	std::unique_ptr<EntityPropertiesEntityList> property(new EntityPropertiesEntityList());
 	PropertyPythonObjectInterface interface(property.get());
-	CPythonObjectNew pvalue(PythonObjectBuilder::INSTANCE()->setString(expectedValue));
+	PythonObjectBuilder pyObBuilder;
+	CPythonObjectNew pvalue(pyObBuilder.setString(expectedValue));
 	EXPECT_ANY_THROW(interface.SetValue(pvalue));
 }

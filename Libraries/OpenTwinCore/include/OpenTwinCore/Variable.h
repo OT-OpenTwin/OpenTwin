@@ -25,19 +25,19 @@ namespace ot
 		void AddVariable(Variable<float> variable) { variablesFloat.push_back(variable); };
 		void AddVariable(Variable<bool> variable) { variablesBool.push_back(variable); };
 
-		std::vector<Variable<std::string>>* GetVariablesString() { return &variablesString; }
-		std::vector<Variable<int32_t>>* GetVariablesInt32() { return &variablesInt32; };
-		std::vector<Variable<int64_t>>* GetVariablesInt64() { return &variablesInt64; };
-		std::vector<Variable<double>>* GetVariablesDouble() { return &variablesDouble; };
-		std::vector<Variable<float>>* GetVariablesFloat() { return &variablesFloat; };
-		std::vector<Variable<bool>>* GetVariablesBool() { return &variablesBool; };
+		std::list<Variable<std::string>>* GetVariablesString() { return &variablesString; }
+		std::list<Variable<int32_t>>* GetVariablesInt32() { return &variablesInt32; };
+		std::list<Variable<int64_t>>* GetVariablesInt64() { return &variablesInt64; };
+		std::list<Variable<double>>* GetVariablesDouble() { return &variablesDouble; };
+		std::list<Variable<float>>* GetVariablesFloat() { return &variablesFloat; };
+		std::list<Variable<bool>>* GetVariablesBool() { return &variablesBool; };
 
 	private:
-		std::vector<Variable<std::string>> variablesString;
-		std::vector<Variable<int32_t>> variablesInt32;
-		std::vector<Variable<int64_t>> variablesInt64;
-		std::vector<Variable<double>> variablesDouble;
-		std::vector<Variable<float>> variablesFloat;
-		std::vector<Variable<bool>> variablesBool;
+		std::list<Variable<std::string>> variablesString;
+		std::list<Variable<int32_t>> variablesInt32;
+		std::list<Variable<int64_t>> variablesInt64;
+		std::list<Variable<double>> variablesDouble;
+		std::list<Variable<float>> variablesFloat;
+		std::list<Variable<bool>> variablesBool;
 	};
 }

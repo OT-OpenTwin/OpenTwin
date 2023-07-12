@@ -127,6 +127,12 @@ CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varNam
 	return pythonVar;
 }
 
+CPythonObjectBorrowed PythonWrapper::GetGlobalDictionary(const std::string& moduleName)
+{
+	CPythonObjectBorrowed module(PyImport_AddModule(moduleName.c_str()));
+	return PyModule_GetDict(module);
+}
+
 PyObject* PythonWrapper::LoadFunction(const std::string& functionName, const std::string& moduleName)
 {
 	CPythonObjectBorrowed module(GetModule(moduleName));

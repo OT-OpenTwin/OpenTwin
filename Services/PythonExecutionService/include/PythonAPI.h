@@ -2,22 +2,23 @@
 #include "PythonAPI.h"
 #include "PythonWrapper.h"
 #include "EntityParameterizedDataSource.h"
+#include <list>
+#include "PythonObjectBuilder.h"
 
 class PythonAPI
 {
+	friend class FixturePythonAPI;
 public:
 	PythonAPI();
-	/*Execute()*/
+
+	std::list<variable_t> Execute(ot::UIDList& scripts, std::list<std::list<variable_t>>& parameterSet);
 
 private:
 	PythonWrapper _wrapper;
-	std::map<std::string, std::string> _serviceByServiceName;
-	
-};
+	std::map<std::string , std::string> _moduleEntrypointByScriptName;
+	std::map<ot::UID, std::string> _scriptNameByUID;
 
-
-
-struct ServicePythonModule
-{
-	std::map<ot::UID, EntityParameterizedDataSource*> allImportedScripts;
+	void EnsureScriptsAreLoaded(ot::UIDList& scripts);
+	CPythonObjectNew CreateParameterSet(std::list<variable_t>& parameterSet);
+	std::string GetModuleEntryPoint(const std::string& moduleName);
 };
