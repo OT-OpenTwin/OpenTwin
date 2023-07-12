@@ -597,71 +597,86 @@ std::map<std::string, ot::UID> DataCategorizationHandler::GetAllScripts()
 
 void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 {
-	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
-	_allRelevantTableSelectionsByMSMD.clear();
-	_allVariableBundlesByMSMD.clear();
-	_allTableNames.clear();
+	//std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
+	//_allRelevantTableSelectionsByMSMD.clear();
+	//_allVariableBundlesByMSMD.clear();
+	//_allTableNames.clear();
 
-	for (const auto& tableSelection : allRelevantTableSelections)
-	{
-		std::string tableSelectionName = tableSelection->getName();
-		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(_msmdFolder), tableSelectionName.size());
-		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
-		_allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
-	}
-	allRelevantTableSelections.clear();
+	//for (const auto& tableSelection : allRelevantTableSelections)
+	//{
+	//	std::string tableSelectionName = tableSelection->getName();
+	//	tableSelectionName = tableSelectionName.substr(tableSelectionName.find(_msmdFolder), tableSelectionName.size());
+	//	std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
+	//	_allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
+	//}
+	//allRelevantTableSelections.clear();
 
-	std::list< std::string> scriptNames;
-	for (const auto& element : _allRelevantTableSelectionsByMSMD)
-	{
-		for (const auto& selection : element.second)
-		{
-			scriptNames.push_back(selection->getScriptName());
-		}
-	}
-	scriptNames.unique();
+	//std::list< std::string> scriptNames;
+	//for (const auto& element : _allRelevantTableSelectionsByMSMD)
+	//{
+	//	for (const auto& selection : element.second)
+	//	{
+	//		scriptNames.push_back(selection->getScriptName());
+	//	}
+	//}
+	//scriptNames.unique();
 
-	std::map<std::string, std::string> pythonScripts = LoadAllPythonScripts(scriptNames);
+	//std::map<std::string, std::string> pythonScripts = LoadAllPythonScripts(scriptNames);
 
 
-	for (auto& element : _allRelevantTableSelectionsByMSMD)
-	{
+	//for (auto& element : _allRelevantTableSelectionsByMSMD)
+	//{
 
-		_allVariableBundlesByMSMD[element.first].reserve(element.second.size());
-		std::vector<std::string> scripts;
-		scripts.reserve(element.second.size());
+	//	_allVariableBundlesByMSMD[element.first].reserve(element.second.size());
+	//	std::vector<std::string> scripts;
+	//	scripts.reserve(element.second.size());
 
-		for (const auto& selection : element.second)
-		{
+	//	for (const auto& selection : element.second)
+	//	{
 
-			uint32_t topRow, bottomRow, leftCollumn, rightColumn;
-			selection->getSelectedRange(topRow, bottomRow, leftCollumn, rightColumn);
-			ot::VariableBundle variables;
-			variables.AddVariable(ot::Variable<int32_t>("TopRow", ot::TypeNames::getInt32TypeName(), topRow));
-			variables.AddVariable(ot::Variable<int32_t>("BottomRow", ot::TypeNames::getInt32TypeName(), bottomRow));
-			variables.AddVariable(ot::Variable<int32_t>("LeftColumn", ot::TypeNames::getInt32TypeName(), leftCollumn));
-			variables.AddVariable(ot::Variable<int32_t>("RightColumn", ot::TypeNames::getInt32TypeName(), rightColumn));
+	//		uint32_t topRow, bottomRow, leftCollumn, rightColumn;
+	//		selection->getSelectedRange(topRow, bottomRow, leftCollumn, rightColumn);
+	//		ot::VariableBundle variables;
+	//		variables.AddVariable(ot::Variable<int32_t>("TopRow", ot::TypeNames::getInt32TypeName(), topRow));
+	//		variables.AddVariable(ot::Variable<int32_t>("BottomRow", ot::TypeNames::getInt32TypeName(), bottomRow));
+	//		variables.AddVariable(ot::Variable<int32_t>("LeftColumn", ot::TypeNames::getInt32TypeName(), leftCollumn));
+	//		variables.AddVariable(ot::Variable<int32_t>("RightColumn", ot::TypeNames::getInt32TypeName(), rightColumn));
 
-			std::string tableName = selection->getTableName();
-			_allTableNames.push_back(tableName);
-			variables.AddVariable(ot::Variable<std::string>("TableName", ot::TypeNames::getStringTypeName(), tableName));
-			std::string scriptName = selection->getScriptName();
-			variables.AddVariable(ot::Variable<std::string>("ScriptName", ot::TypeNames::getStringTypeName(), scriptName));
+	//		std::string tableName = selection->getTableName();
+	//		_allTableNames.push_back(tableName);
+	//		variables.AddVariable(ot::Variable<std::string>("TableName", ot::TypeNames::getStringTypeName(), tableName));
+	//		std::string scriptName = selection->getScriptName();
+	//		variables.AddVariable(ot::Variable<std::string>("ScriptName", ot::TypeNames::getStringTypeName(), scriptName));
 
-			_allVariableBundlesByMSMD[element.first].push_back(variables);
-			std::string script = pythonScripts[scriptName];
-			script = "TopRow=" + std::to_string(topRow) + "\n" +
-				"BottomRow=" + std::to_string(bottomRow) + "\n" +
-				"LeftColumn=" + std::to_string(leftCollumn) + "\n" +
-				"RightColumn=" + std::to_string(rightColumn) + "\n" +
-				"TableName=\"" + tableName + "\"\n" +
-				"ScriptName=\"" + scriptName + "\"\n" +
-				script;
-			scripts.push_back(script);
-		}
+	//		_allVariableBundlesByMSMD[element.first].push_back(variables);
+	//		std::string script = pythonScripts[scriptName];
+	//		script = "TopRow=" + std::to_string(topRow) + "\n" +
+	//			"BottomRow=" + std::to_string(bottomRow) + "\n" +
+	//			"LeftColumn=" + std::to_string(leftCollumn) + "\n" +
+	//			"RightColumn=" + std::to_string(rightColumn) + "\n" +
+	//			"TableName=\"" + tableName + "\"\n" +
+	//			"ScriptName=\"" + scriptName + "\"\n" +
+	//			script;
+	//		scripts.push_back(script);
+	//	}
+		//SendPythonExecutionRequest(scripts, element.first);
+	//}
+	OT_rJSON_createDOC(newDocument);
+	OT_rJSON_createValueArray(scripts);
 
-		SendPythonExecutionRequest(scripts, element.first);
-	}
+	rapidjson::Value strVal;
+	strVal.SetString("Scripts/TestUpdateScript.py", newDocument.GetAllocator());
+	scripts.PushBack(strVal,newDocument.GetAllocator());
+
+	OT_rJSON_createValueArray(parameter);
+
+	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, "createUpdatedSelections");
+	ot::rJSON::add(newDocument, "MSMD", "MSMD1");
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_SENDER_URL, Application::instance()->serviceURL());
+	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, newDocument);
+
 }
 
 void DataCategorizationHandler::SendPythonExecutionRequest(std::vector<std::string>& pythonScripts, const std::string& msmdName)
@@ -812,7 +827,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 		uint32_t topRow(-1), bottomRow(-1), leftCollumn(-1), rightColumn(-1);
 		for (int i = 0; i < variables->GetVariablesInt32()->size(); i++)
 		{
-			ot::Variable<int32_t>* variable = &(*variables->GetVariablesInt32())[i];
+			ot::Variable<int32_t>* variable = nullptr; //= &(*variables->GetVariablesInt32())[i];
 			if (variable->name == "TopRow")
 			{
 				topRow = variable->value;
@@ -838,7 +853,7 @@ void DataCategorizationHandler::CreateUpdatedSelections(OT_rJSON_doc& document)
 		_scriptFolderUID = entityInfo.getID();
 		for (int i = 0; i < variables->GetVariablesString()->size(); i++)
 		{
-			ot::Variable<std::string>* variable = &(*variables->GetVariablesString())[i];
+			ot::Variable<std::string>* variable = nullptr;// = &(*variables->GetVariablesString())[i];
 			if (variable->name == "TableName")
 			{
 				tableName = variable->value;
