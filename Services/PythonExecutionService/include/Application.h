@@ -13,6 +13,7 @@
 #include "OpenTwinFoundation/ApplicationBase.h" // Base class
 #include "PythonAPI.h"
 
+#include "VariableType.h"
 // C++ header
 #include <string>
 
@@ -118,5 +119,5 @@ public:
 private:
 	PythonAPI _pythonAPI;
 
-	void ProcessScriptExecution(std::vector<std::string> scripts, std::vector<ot::VariableBundle> allParameter, std::string subsequentFunction, std::string msmdName);
+	void ProcessScriptExecution(std::list<std::string> scripts, std::list < std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction, const std::string msmdName);
 };

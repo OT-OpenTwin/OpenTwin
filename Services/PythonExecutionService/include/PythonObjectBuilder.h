@@ -7,9 +7,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include <variant>
-
-using variable_t = std::variant<int32_t, int64_t, bool, float, double, const char*>;
+#include "VariableType.h"
 
 
 class PythonObjectBuilder
@@ -55,3 +53,5 @@ private:
 	int _assemblySize = 0;
 	int _currentSize = 0;
 };
+
+

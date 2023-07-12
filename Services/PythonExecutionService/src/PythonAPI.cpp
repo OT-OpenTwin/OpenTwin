@@ -10,23 +10,27 @@ PythonAPI::PythonAPI()
 	_wrapper.InitializePythonInterpreter();
 }
 
-std::list<variable_t> PythonAPI::Execute(ot::UIDList& scripts, std::list<std::list<variable_t>>& parameterSet)
+std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<variable_t>>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
 
 	auto currentParameterSet = parameterSet.begin();
 	std::list<variable_t> returnValues;
 	PythonObjectBuilder pyObBuilder;
-	for (ot::UID& scriptUID : scripts)
+	for (std::string& scriptName : scripts)
 	{
-		std::list<variable_t>& parameterSetForScript = *currentParameterSet;
-		CPythonObjectNew parameterSet = CreateParameterSet(parameterSetForScript);
-		
-		std::string scriptName = _scriptNameByUID[scriptUID];
 		std::string moduleName = (*PythonLoadedModules::INSTANCE()->getModuleNamesByScriptName())[scriptName];
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
+		std::optional <std::list<variable_t>>& parameterSetForScript = *currentParameterSet;
+		CPythonObjectNew parameterSet(nullptr);
+		if (parameterSetForScript.has_value())
+		{
+			parameterSet.reset(CreateParameterSet(parameterSetForScript.value()));
+		}
 		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, parameterSet, moduleName);
+				
+
 		returnValues.emplace_front(pyObBuilder.getVariable(returnValue));
 	}
 		
@@ -35,13 +39,13 @@ std::list<variable_t> PythonAPI::Execute(ot::UIDList& scripts, std::list<std::li
 
 
 
-void PythonAPI::EnsureScriptsAreLoaded(ot::UIDList& scripts)
+void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 {
 	scripts.unique();
-	Application::instance()->prefetchDocumentsFromStorage(scripts);
 	std::list<ot::EntityInformation> entityInfos;
 	auto modelComponent = Application::instance()->modelComponent();
 	modelComponent->getEntityInformation(scripts, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactory classFactory;
 	auto moduleNameByScriptName = PythonLoadedModules::INSTANCE()->getModuleNamesByScriptName();
 	for (auto& entityInfo : entityInfos)
@@ -59,7 +63,6 @@ void PythonAPI::EnsureScriptsAreLoaded(ot::UIDList& scripts)
 			std::string execution(plainData.begin(), plainData.end());
 			_wrapper.Execute(execution, moduleName);
 			(*moduleNameByScriptName)[scriptName] = moduleName;
-			_scriptNameByUID[uid] = scriptName;
 			_moduleEntrypointByScriptName[scriptName] = GetModuleEntryPoint(moduleName);
 		}
 	}

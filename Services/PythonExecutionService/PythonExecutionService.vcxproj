@@ -242,6 +242,7 @@
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
     <ClCompile Include="src\PythonWrapper.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
+    <ClCompile Include="src\VariableType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -258,6 +259,7 @@
     <ClInclude Include="include\PythonObjectBuilder.h" />
     <ClInclude Include="include\PythonWrapper.h" />
     <ClInclude Include="include\UiNotifier.h" />
+    <ClInclude Include="include\VariableType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
