@@ -18,6 +18,7 @@
 #include <string>
 #include "OpenTwinCore/Variable.h"
 #include "OpenTwinCore/TypeNames.h"
+#include "TemplateDefaultManager.h"
 
 Application * g_instance{ nullptr };
 
@@ -54,6 +55,10 @@ Application::~Application()
 
 void Application::run(void)
 {
+	if (EnsureDataBaseConnection())
+	{
+		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
+	}
 	// Add code that should be executed when the service is started and may start its work
 }
 

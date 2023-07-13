@@ -51,7 +51,7 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 	for (auto& entityInfo : entityInfos)
 	{
 		std::string scriptName = entityInfo.getName();
-		if (moduleNameByScriptName->find(scriptName) != moduleNameByScriptName->end())
+		if (moduleNameByScriptName->find(scriptName) == moduleNameByScriptName->end())
 		{
 			ot::UID uid = entityInfo.getID();
 			ot::UID version = entityInfo.getVersion();
@@ -59,6 +59,7 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 
 			auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
 			std::unique_ptr<EntityParameterizedDataSource> script(dynamic_cast<EntityParameterizedDataSource*>(baseEntity));
+			script->loadData();
 			auto plainData = script->getData()->getData();
 			std::string execution(plainData.begin(), plainData.end());
 			_wrapper.Execute(execution, moduleName);
