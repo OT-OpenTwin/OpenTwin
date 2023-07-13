@@ -27,6 +27,12 @@
     <ClCompile Include="src\FixturePythonAPI.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestPythonObjectBuilder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixturePythonObjectBuilder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePythonWrapper.h">
@@ -39,6 +45,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FixturePythonAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixturePythonObjectBuilder.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

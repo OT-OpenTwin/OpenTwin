@@ -4,6 +4,7 @@
 #include "ClassFactory.h"
 
 #include "PythonLoadedModules.h"
+#include "EntityBuffer.h"
 
 PythonAPI::PythonAPI()
 {
@@ -13,7 +14,7 @@ PythonAPI::PythonAPI()
 std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<variable_t>>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
-
+	EntityBuffer::INSTANCE().setModelComponent(Application::instance()->modelComponent());
 	auto currentParameterSet = parameterSet.begin();
 	std::list<variable_t> returnValues;
 	PythonObjectBuilder pyObBuilder;

@@ -108,6 +108,7 @@ CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName,
 {
 	CPythonObjectBorrowed function(LoadFunction(functionName, moduleName)); //Really borrowed?
 	CPythonObjectNew returnValue(PyObject_CallObject(function, parameter));
+	
 	if (!returnValue.ReferenceIsSet())
 	{
 		throw PythonException();

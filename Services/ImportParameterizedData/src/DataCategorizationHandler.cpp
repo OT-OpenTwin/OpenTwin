@@ -670,6 +670,10 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	ot::rJSON::add(newDocument, "Scripts", scripts);
 	
 	OT_rJSON_createValueArray(parameter);
+	rapidjson::Value intParam;
+	intParam.SetInt(13);
+	parameter.PushBack(intParam, newDocument.GetAllocator());
+
 	ot::rJSON::add(newDocument, "Parameter", parameter);
 
 	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);

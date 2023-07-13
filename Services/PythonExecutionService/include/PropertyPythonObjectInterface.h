@@ -6,7 +6,7 @@ class PropertyPythonObjectInterface
 {
 public:
 	PropertyPythonObjectInterface(EntityPropertiesBase* property);
-	CPythonObjectNew GetValue();
+	PyObject* GetValue();
 	void SetValue(const CPythonObject& cpythonObject);
 
 private:

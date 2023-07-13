@@ -16,7 +16,7 @@ public:
 	} 
 	void setModelComponent(ot::components::ModelComponent* modelComponent) { _modelComponent = modelComponent; };
 
-	CPythonObjectNew GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName);
+	PyObject* GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName);
 	void UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values);
 	void SaveChangedEntities();
 	bool SaveChangedEntities(std::string absoluteEntityName);

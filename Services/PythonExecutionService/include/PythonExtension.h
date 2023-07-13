@@ -17,7 +17,7 @@ namespace PythonExtensions
          PythonObjectBuilder pyObBuilder;
          std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args,0,"Parameter 0");
          std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
-         CPythonObjectNew returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
+         PyObject* returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
          return returnValue;
     }
 

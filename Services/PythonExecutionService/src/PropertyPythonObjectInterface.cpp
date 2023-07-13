@@ -39,43 +39,48 @@ PropertyPythonObjectInterface::PropertyPythonObjectInterface(EntityPropertiesBas
 		_propertyEntityList = entListProp;
 		return;
 	}
+
+	throw std::exception("Not supported entity type");
 }
 
-CPythonObjectNew PropertyPythonObjectInterface::GetValue()
+PyObject* PropertyPythonObjectInterface::GetValue()
 {
-	CPythonObjectNew returnValue(nullptr);
+	PyObject* returnValue(nullptr);
 	PythonObjectBuilder pyObBuilder;
 	if (_propertyDouble != nullptr)
 	{
 		const double value = _propertyDouble->getValue();
-		returnValue.reset(pyObBuilder.setDouble(value));
+		returnValue = PyFloat_FromDouble(value);
 	}
 	else if (_propertyInt32 != nullptr)
 	{
 		const int32_t value = _propertyInt32->getValue();
-		returnValue.reset(pyObBuilder.setInt32(value));
+		returnValue = PyLong_FromLong(value);
 	}
 	else if (_propertyBool != nullptr)
 	{
 		const bool value = _propertyBool->getValue();
-		returnValue.reset(pyObBuilder.setBool(value));
+		returnValue = PyBool_FromLong(value);
 	}
 	else if (_propertyString != nullptr)
 	{
 		const std::string value = _propertyString->getValue();
-		returnValue.reset(pyObBuilder.setString(value));
+		returnValue = PyUnicode_FromString(value.c_str());
 	}
 	else if (_propertySelection != nullptr)
 	{
 		const std::string value = _propertySelection->getValue();
-		returnValue.reset(pyObBuilder.setString(value));
+		returnValue = PyUnicode_FromString(value.c_str());
 	}
 	else if (_propertyEntityList != nullptr)
 	{
 		const std::string value = _propertyEntityList->getValueName();
-		returnValue.reset(pyObBuilder.setString(value));
+		returnValue = PyUnicode_FromString(value.c_str());
 	}
-
+	else
+	{
+		assert(0);
+	}
 	return returnValue;
 }
 

@@ -2,7 +2,7 @@
 #include "ClassFactory.h"
 #include "PropertyPythonObjectInterface.h"
 
-CPythonObjectNew EntityBuffer::GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName)
+PyObject* EntityBuffer::GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName)
 {
 	EnsurePropertyToBeLoaded(absoluteEntityName, propertyName);
 	PropertyPythonObjectInterface interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
