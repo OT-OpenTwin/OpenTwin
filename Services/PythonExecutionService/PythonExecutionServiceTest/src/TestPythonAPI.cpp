@@ -4,14 +4,14 @@
 TEST_F(FixturePythonAPI, TestModuleEntryPoint_SingleFunctionInModule)
 {
 	std::string expectedResult = "HelloWorld";
-	std::string script = "def HelloWorld():"
+	std::string script = "import OpenTwin\n"
+		"def HelloWorld():\n"
 		"\tprint(\"Hello World\")\n"
 		;
 	SetupModule(script);
 	std::string entryPoint = GetModuleEntryPoint();
 	EXPECT_EQ(entryPoint, expectedResult);
 }
-
 TEST_F(FixturePythonAPI, TestModuleEntryPoint_MultipleFunctionsInModule)
 {
 	std::string expectedResult = "__main__";

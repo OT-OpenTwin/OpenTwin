@@ -119,5 +119,5 @@ public:
 private:
 	PythonAPI _pythonAPI;
 
-	void ProcessScriptExecution(std::list<std::string> scripts, std::list < std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction, const std::string msmdName);
+	void ProcessScriptExecution(std::list<std::string> scripts, std::list < std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction);
 };

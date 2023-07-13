@@ -76,7 +76,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			if (action == OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS)
 			{
 				std::string subsequentFunction = _doc[OT_ACTION_PARAM_MODEL_FunctionName].GetString();
-				std::string msmdName = _doc["MSMD"].GetString();
 				std::string senderURL = _doc[OT_ACTION_PARAM_SENDER_URL].GetString();
 
 				auto scriptArray = _doc["Scripts"].GetArray();
@@ -121,7 +120,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 					}
 					allParameter.emplace_back(parameter);
 				}
-				std::thread workerThread(&Application::ProcessScriptExecution,this, scripts, allParameter, subsequentFunction, msmdName);
+				std::thread workerThread(&Application::ProcessScriptExecution,this, scripts, allParameter, subsequentFunction);
 				workerThread.detach();
 			}
 		}
@@ -200,24 +199,23 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	return false;
 }
 
-void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction, const std::string msmdName)
+void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction)
 {
 
 	std::list<variable_t> result =	_pythonAPI.Execute(scripts, allParameter);
 		
 	OT_rJSON_createDOC(newDocument);
-	OT_rJSON_createValueArray(parameter);
+	OT_rJSON_createValueArray(rJsonResult);
 	VariableToJSONConverter converter;
 	for (auto& element : result)
 	{
 		rapidjson::Value rJsonVal = converter.Convert(std::move(element));
-		parameter.PushBack(rJsonVal, newDocument.GetAllocator());
+		rJsonResult.PushBack(rJsonVal, newDocument.GetAllocator());
 	}
-	ot::rJSON::add(newDocument, "Parameter", parameter);
+	ot::rJSON::add(newDocument, "Result", rJsonResult);
 
 	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
 	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
-	ot::rJSON::add(newDocument, "MSMD", msmdName);
 	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);
 
 }

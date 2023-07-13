@@ -124,20 +124,26 @@ std::string PythonAPI::GetModuleEntryPoint(const std::string& moduleName)
 		CPythonObjectBorrowed listEntry = pythonObjectBuilder.getListItem(allGlobalDictItems,i);
 		std::string listEntryName = pythonObjectBuilder.getStringValueFromTuple(listEntry, 0, "ListValue");
 
+
 		if (listEntryName == "__builtins__") //Last default entry
 		{
 			firstOfFunctionNames = true;
 		}
 		else if (firstOfFunctionNames)
 		{
-			if (entryPointName == "")
+			CPythonObjectBorrowed listElement(PyDict_GetItemString(globalDictionary, listEntryName.c_str()));
+
+			if (PyFunction_Check(listElement))
 			{
-				entryPointName = listEntryName;
-			}
-			else
-			{
-				entryPointName = "__main__";
-				break;
+				if (entryPointName == "")
+				{
+					entryPointName = listEntryName;
+				}
+				else
+				{
+					entryPointName = "__main__";
+					break;
+				}
 			}
 		}
 	}
