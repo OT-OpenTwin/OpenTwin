@@ -32,22 +32,21 @@ namespace PythonExtensions
         PythonObjectBuilder pyObBuilder;
         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
-        CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 2");
+        CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 2, "Parameter 2");
 
         EntityBuffer::INSTANCE().UpdateEntityPropertyValue(absoluteEntityName, propertyName,pvalue);
-        return pyObBuilder.setBool(true);
+        return PyBool_FromLong(true);
     }
     static PyObject* OT_Flush(PyObject* self, PyObject* args)
     {
-        auto numberOfArguments = PyTuple_Size(args);
-        const int expectedNumberOfArguments = 0;
-        if (numberOfArguments != expectedNumberOfArguments)
+        if (args != nullptr)
         {
             throw std::exception("OT_SetPropertyValue expects zero arguments");
         }
+
         EntityBuffer::INSTANCE().SaveChangedEntities();
         PythonObjectBuilder pyObBuilder;
-        return pyObBuilder.setBool(true);
+        return PyBool_FromLong(true);
     }
     static PyObject* OT_FlushEntity(PyObject* self, PyObject* args)
     {
@@ -63,10 +62,10 @@ namespace PythonExtensions
     }
     static PyMethodDef OTMethods[] = {
 
-        {"OT_GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
-        {"OT_SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
-        {"OT_Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
-        {"OT_FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
+        {"GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
+        {"SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
+        {"Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
+        {"FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 
