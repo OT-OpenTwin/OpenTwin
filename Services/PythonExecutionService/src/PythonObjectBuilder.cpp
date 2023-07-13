@@ -205,7 +205,7 @@ std::list<bool> PythonObjectBuilder::getBoolList(const CPythonObject& pValue, co
 	return values;
 }
 
-variable_t PythonObjectBuilder::getVariable(CPythonObject& pValue)
+std::optional<variable_t> PythonObjectBuilder::getVariable(CPythonObject& pValue)
 {
 	if (PyFloat_Check(pValue))
 	{
@@ -217,11 +217,15 @@ variable_t PythonObjectBuilder::getVariable(CPythonObject& pValue)
 	}
 	else if (PyLong_Check(pValue))
 	{
-		return variable_t(static_cast<int32_t>(PyLong_AsLong(pValue)));
+		return variable_t(static_cast<int64_t>(PyLong_AsLongLong(pValue)));
 	}
 	else if (PyUnicode_Check(pValue))
 	{
 		return variable_t(PyUnicode_AsUTF8(pValue));
+	}
+	else if (Py_None == pValue)
+	{
+		variable_t({});
 	}
 	else
 	{
@@ -229,6 +233,11 @@ variable_t PythonObjectBuilder::getVariable(CPythonObject& pValue)
 	}
 }
 
+CPythonObjectNew PythonObjectBuilder::setInt64(const int64_t value)
+{
+	CPythonObjectNew returnVal(PyLong_FromLongLong(static_cast<long long>(value)));
+	return returnVal;
+}
 
 CPythonObjectNew PythonObjectBuilder::setInt32(const int32_t value)
 {
@@ -239,6 +248,7 @@ CPythonObjectNew PythonObjectBuilder::setInt32(const int32_t value)
 CPythonObjectNew PythonObjectBuilder::setDouble(double value)
 {
 	PyObject* pvalue = PyFloat_FromDouble(value);
+
 	CPythonObjectNew returnVal(pvalue);
 	return returnVal;
 }

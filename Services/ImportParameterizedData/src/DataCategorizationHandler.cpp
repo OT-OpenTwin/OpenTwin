@@ -664,9 +664,18 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	OT_rJSON_createDOC(newDocument);
 	OT_rJSON_createValueArray(scripts);
 
+
 	rapidjson::Value strVal;
 	strVal.SetString("Scripts/TestUpdateScript", newDocument.GetAllocator());
 	scripts.PushBack(strVal,newDocument.GetAllocator());
+	
+	rapidjson::Value strVal2;
+	strVal2.SetString("Scripts/TestUpdateScript_1", newDocument.GetAllocator());
+	scripts.PushBack(strVal2,newDocument.GetAllocator());
+	
+	rapidjson::Value strVal3;
+	strVal3.SetString("Scripts/TestUpdateScript_2", newDocument.GetAllocator());
+	scripts.PushBack(strVal3,newDocument.GetAllocator());
 	ot::rJSON::add(newDocument, "Scripts", scripts);
 	
 	OT_rJSON_createValueArray(parameter);

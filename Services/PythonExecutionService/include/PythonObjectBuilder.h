@@ -8,7 +8,7 @@
 #include <list>
 #include <map>
 #include "VariableType.h"
-
+#include <optional>
 
 class PythonObjectBuilder
 {
@@ -32,17 +32,17 @@ public:
 	bool getBoolValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName);
 
 	CPythonObjectBorrowed getDictItem(const CPythonObject& pValue);
-	
 	CPythonObjectBorrowed getListItem(const CPythonObject& pValue, int position);
+	
 	std::list<int32_t> getInt32List(const CPythonObject& pValue, const std::string& varName);
 	std::list<double> getDoubleList(const CPythonObject& pValue, const std::string& varName);
 	std::list<std::string> getStringList(const CPythonObject& pValue, const std::string& varName);
 	std::list<bool> getBoolList(const CPythonObject& pValue, const std::string& varName);
 
-	//std::map<std::string,std::list<variable_t>> getVariable(CPythonObject& pValue);
-	variable_t getVariable(CPythonObject& pValue);
+	std::optional<variable_t> getVariable(CPythonObject& pValue);
 
 	CPythonObjectNew setInt32(const int32_t value);
+	CPythonObjectNew setInt64(const int64_t value);
 	CPythonObjectNew setDouble(double value);
 	CPythonObjectNew setString(const std::string& value);
 	CPythonObjectNew setBool(const bool value);

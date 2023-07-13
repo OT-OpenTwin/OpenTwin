@@ -31,8 +31,11 @@ std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::l
 		}
 		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, parameterSet, moduleName);
 				
-
-		returnValues.emplace_front(pyObBuilder.getVariable(returnValue));
+		auto vReturnValue = pyObBuilder.getVariable(returnValue);
+		if (vReturnValue.has_value())
+		{
+			returnValues.emplace_front(vReturnValue.value());
+		}
 	}
 		
 	return returnValues;
@@ -108,7 +111,6 @@ CPythonObjectNew PythonAPI::CreateParameterSet(std::list<variable_t>& parameterS
 	}
 	return pObjectBuilder.getAssembledTuple();
 }
-
 
 std::string PythonAPI::GetModuleEntryPoint(const std::string& moduleName)
 {
