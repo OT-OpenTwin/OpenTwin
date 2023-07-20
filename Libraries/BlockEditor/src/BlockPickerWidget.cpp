@@ -105,6 +105,8 @@ void ot::BlockPickerWidget::slotSelectionChanged(void) {
 				// Construct block
 				ot::Block* newBlock = BlockFactory::blockFromConfig(bCfg);
 				if (newBlock) {
+					//newBlock->setFlag(QGraphicsItem::ItemIsMovable, true);
+					
 					PreviewBox box;
 
 					box.scene = new GraphicsScene;
@@ -114,8 +116,11 @@ void ot::BlockPickerWidget::slotSelectionChanged(void) {
 					box.view->setScene(box.scene);
 					box.view->setMaximumSize(m_previewSize);
 					box.view->setMinimumSize(m_previewSize);
+					box.view->setDragMode(QGraphicsView::NoDrag);
 
 					box.scene->addItem(newBlock);
+					
+					box.view->viewAll();
 
 					m_viewLayout->addWidget(box.view);
 					//m_viewLayout->addWidget(box.view, 0, 0);

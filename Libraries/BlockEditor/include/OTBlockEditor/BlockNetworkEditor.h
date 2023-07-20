@@ -25,6 +25,9 @@ namespace ot {
 
 		BlockNetwork* network(void) { return m_network; };
 
+		virtual void dragEnterEvent(QDragEnterEvent* _event) override;
+		virtual void dropEvent(QDropEvent* _event) override;
+
 	protected:
 		virtual void mousePressedMoveEvent(QMouseEvent* _event) override;
 

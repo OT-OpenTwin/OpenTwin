@@ -10,6 +10,9 @@
 
 // Qt header
 #include <QtGui/qpainter.h>
+#include <QtGui/qdrag.h>
+#include <QtWidgets/qgraphicssceneevent.h>
+#include <QtWidgets/qwidget.h>
 
 ot::Block::Block(BlockGraphicsItemGroup* _graphicsItemGroup) : m_gig(_graphicsItemGroup), m_isHighlighted(false), m_highlightColor(250, 28, 28) {
 	OTAssertNullptr(m_gig);
@@ -45,6 +48,19 @@ void ot::Block::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _optio
 		_painter->setPen(m_highlightColor);
 		_painter->setBrush(Qt::NoBrush);
 		_painter->drawRect(this->boundingRect());
+	}
+}
+
+void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	if (_event->button() == Qt::LeftButton) {
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText("Who is you man?!!!!=?!?!?!?!=!=)!=!");
+		mimeData->setData(OT_BLOCK_MIMETYPE_Configuration, m_config);
+		
+		QDrag* drag = new QDrag(_event->widget());
+		drag->setMimeData(mimeData);
+		drag->setPixmap(QPixmap());
+		drag->exec();
 	}
 }
 

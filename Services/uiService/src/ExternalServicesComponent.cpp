@@ -2772,6 +2772,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage].GetObject();
 				pckg.setFromJsonObject(configurationObj);
 				ot::BlockNetworkEditor * newEditor = ot::BlockEditorAPI::createEmptyBlockEditor(owner, pckg);
+				
 				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.editorTitle()), newEditor);
 			}
 			else

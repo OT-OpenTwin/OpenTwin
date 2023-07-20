@@ -11,10 +11,13 @@
 #include "OTGui/LengthLimitation.h"
 
 // Qt header
+#include <QtCore/qmimedata.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qpoint.h>
 #include <QtGui/qcolor.h>
 #include <QtWidgets/qgraphicsitem.h>
+
+#define OT_BLOCK_MIMETYPE_Configuration "Configuration"
 
 class QPainter;
 class QStyleOptionGraphicsItem;
@@ -56,6 +59,8 @@ namespace ot {
 		virtual qreal blockWidth(void) const = 0;
 		virtual qreal blockHeigth(void) const = 0;
 
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+
 		void setGraphicsItemGroup(BlockGraphicsItemGroup* _gig) { m_gig = _gig; };
 		BlockGraphicsItemGroup* graphicsItemGroup(void) { return m_gig; }
 
@@ -73,6 +78,9 @@ namespace ot {
 		LengthLimitation& getWidthLimit(void) { return m_widthLimit; };
 		const LengthLimitation& widthLimit(void) const { return m_widthLimit; };
 
+		void setConfiguration(const QByteArray& _config) { m_config = _config; };
+		const QByteArray& configuration(void) const { return m_config; };
+
 		void attachToGroup(void);
 
 	protected:
@@ -84,6 +92,7 @@ namespace ot {
 		QColor m_highlightColor;
 		LengthLimitation m_heightLimit;
 		LengthLimitation m_widthLimit;
+		QByteArray m_config;
 
 		Block() = delete;
 		Block(const Block&) = delete;

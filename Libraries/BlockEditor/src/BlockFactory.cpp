@@ -25,6 +25,11 @@ namespace ot {
 			if (_config->isUserMoveable()) _block->setFlags(_block->flags() | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 			_block->setWidthLimit(_config->widthLimits());
 			_block->setHeightLimit(_config->heightLimits());
+
+			// Store block configuration (required to create copies of the block)
+			OT_rJSON_createDOC(doc);
+			_config->addToJsonObject(doc, doc);
+			_block->setConfiguration(QByteArray::fromStdString(ot::rJSON::toJSON(doc)));
 		}
 	}
 }
