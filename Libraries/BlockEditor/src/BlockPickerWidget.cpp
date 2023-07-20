@@ -84,6 +84,7 @@ void ot::BlockPickerWidget::clear(void) {
 		m_viewLayout->removeWidget(v.view);
 		delete v.view;
 	}
+	m_views.clear();
 }
 
 // ##############################################################################################################################
@@ -95,6 +96,7 @@ void ot::BlockPickerWidget::slotSelectionChanged(void) {
 		m_viewLayout->removeWidget(v.view);
 		delete v.view;
 	}
+	m_views.clear();
 
 	std::list<PreviewBox> previews;
 
