@@ -26,7 +26,8 @@ int FixturePythonWrapper::ExecuteFunctionWithParameter(const std::string& functi
 {
 	PythonObjectBuilder pyObBuilder;
 	pyObBuilder.StartTupleAssemply(1);
-	pyObBuilder << pyObBuilder.setInt32(parameter);
+	auto value = pyObBuilder.setInt32(parameter);
+	pyObBuilder << &value;
 	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
 
 	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, pythonParameter, moduleName);
@@ -37,15 +38,18 @@ int FixturePythonWrapper::ExecuteFunctionWithMultipleParameter(const std::string
 {
 	PythonObjectBuilder pyObBuilder;
 	pyObBuilder.StartTupleAssemply(3);
-	pyObBuilder << pyObBuilder.setInt32(parameter1);
-	pyObBuilder << pyObBuilder.setInt32(parameter2);
-	pyObBuilder << pyObBuilder.setString(parameter3);
-	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
+	auto param1 = pyObBuilder.setInt32(parameter1);
+	pyObBuilder << &param1;
+	auto param2 = pyObBuilder.setInt32(parameter2);
+	pyObBuilder << &param2;
+	auto param3 = pyObBuilder.setString(parameter3);
+	pyObBuilder << &param3;
 
+	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
+	
 	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, pythonParameter, moduleName);
 	return pyObBuilder.getInt32Value(returnVal, "return Value");
 }
-
 
 
 int32_t FixturePythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)

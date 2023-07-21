@@ -47,6 +47,11 @@ bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
 	return false;
 }
 
+std::shared_ptr<EntityBase> EntityBuffer::GetEntity(const std::string& absoluteEntityName)
+{
+	return LoadEntity(absoluteEntityName);
+}
+
 
 void EntityBuffer::EnsurePropertyToBeLoaded(const std::string& absoluteEntityName, const std::string& propertyName)
 {

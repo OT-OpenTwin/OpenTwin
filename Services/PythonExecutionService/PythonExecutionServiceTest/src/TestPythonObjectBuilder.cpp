@@ -52,3 +52,22 @@ TEST_F(FixturePythonObjectBuilder, StringToVariable)
 	std::string value =std::string(std::get<const char*>(vValue.value()));
 	EXPECT_EQ(expectedValue, value);
 }
+
+TEST_F(FixturePythonObjectBuilder, TupleCreation)
+{
+	PythonObjectBuilder builder;
+	builder.StartTupleAssemply(4);
+	auto val1 = builder.setInt32(1);
+	builder << &val1;
+	auto val2 = builder.setString("Temp");
+	builder << &val2;
+	auto val3 = builder.setBool(true);
+	builder << &val3;
+	auto val4 = builder.setDouble(3.);
+	builder << &val4;
+
+	CPythonObjectNew result(builder.getAssembledTuple());
+	EXPECT_TRUE(PyTuple_Check(result));
+	EXPECT_TRUE(result != nullptr);
+	EXPECT_EQ(PyTuple_Size(result), 4);
+}

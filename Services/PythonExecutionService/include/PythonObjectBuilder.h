@@ -15,9 +15,9 @@ class PythonObjectBuilder
 public:
 
 	PythonObjectBuilder() : _assembly(nullptr) {};
-
+	~PythonObjectBuilder() { Py_XDECREF(_assembly); };
 	void StartTupleAssemply(int size);
-	void operator<<(CPythonObject&& newEntry);
+	void operator<<(CPythonObject* newEntry);
 	CPythonObjectNew getAssembledTuple();
 
 	int32_t getInt32Value(const CPythonObject& pValue, const std::string& varName);
@@ -49,7 +49,7 @@ public:
 
 private:
 	
-	CPythonObjectNew _assembly;
+	PyObject* _assembly = nullptr;
 	int _assemblySize = 0;
 	int _currentSize = 0;
 };

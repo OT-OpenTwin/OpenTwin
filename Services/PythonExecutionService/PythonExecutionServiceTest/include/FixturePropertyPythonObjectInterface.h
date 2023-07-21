@@ -6,7 +6,6 @@ class FixturePropertyPythonObjectInterface : public testing::Test
 {
 public:
 	FixturePropertyPythonObjectInterface();
-
 private:
 	PythonWrapper _wrapper;
 };

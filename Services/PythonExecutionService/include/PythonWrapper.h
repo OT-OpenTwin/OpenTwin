@@ -23,6 +23,7 @@
 	{
 		friend class FixturePythonWrapper;
 	public:
+		/*static PythonWrapper* INSTANCE();*/
 		PythonWrapper();
 		PythonWrapper(const PythonWrapper& other) = delete;
 		PythonWrapper& operator=(const PythonWrapper& other) = delete;
@@ -43,6 +44,7 @@
 		CPythonObjectBorrowed GetGlobalVariable(const std::string& varName, const std::string& moduleName);
 
 		CPythonObjectBorrowed GetGlobalDictionary(const std::string& moduleName);
+		PyObject* GetFunction(const std::string& functionName, const std::string& moduleName = "__main__");
 
 	private:
 		std::list<std::string> _pythonPath;
@@ -52,6 +54,5 @@
 		static void signalHandlerAbort(int sig);
 
 		PyObject* GetModule(const std::string& moduleName);
-		PyObject* LoadFunction(const std::string& functionName, const std::string& moduleName = "__main__");
 		
 	};

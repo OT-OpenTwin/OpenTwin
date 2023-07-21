@@ -20,6 +20,7 @@ public:
 	void UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values);
 	void SaveChangedEntities();
 	bool SaveChangedEntities(std::string absoluteEntityName);
+	std::shared_ptr<EntityBase> GetEntity (const std::string& absoluteEntityName);
 
 private:
 	EntityBuffer() {};

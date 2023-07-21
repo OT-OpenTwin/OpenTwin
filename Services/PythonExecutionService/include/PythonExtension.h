@@ -2,10 +2,14 @@
 #include <Python.h>
 #include "PythonObjectBuilder.h"
 #include "EntityBuffer.h"
+#include "EntityParameterizedDataSource.h"
+#include "PythonModuleAPI.h"
+#include "PythonLoadedModules.h"
+
+//class PythonWrapper;
 
 namespace PythonExtensions
 {
-
     static PyObject* OT_GetPropertyValue(PyObject* self, PyObject* args)
     {
          auto numberOfArguments = PyTuple_Size(args);
@@ -15,10 +19,56 @@ namespace PythonExtensions
              throw std::exception("OT_GetPropertyValue expects two arguments");
          }
          PythonObjectBuilder pyObBuilder;
+         Py_INCREF(args);
          std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args,0,"Parameter 0");
+         Py_INCREF(args);
          std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
+
          PyObject* returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
          return returnValue;
+    }
+
+    static PyObject* OT_GetScript(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 1;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_ExecuteScript expects one argument");
+        }
+        PythonObjectBuilder pyObBuilder;
+        Py_INCREF(args);
+        std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        /*
+        auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
+        EntityParameterizedDataSource* script = dynamic_cast<EntityParameterizedDataSource*>(baseEntity.get());
+        if (script == nullptr)
+        {
+            throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");
+        }*/
+        
+        std::optional<std::string> moduleName =  PythonLoadedModules::INSTANCE()->getModuleName(absoluteScriptName);
+        /*auto instance = PythonWrapper::INSTANCE();*/
+        
+        /*if (!moduleName.has_value())
+        {
+            script->loadData();
+            auto plainData = script->getData()->getData();
+            std::string execution(plainData.begin(), plainData.end());
+
+            instance->Execute(execution, moduleName.value());
+        }*/
+        
+        PythonModuleAPI moduleAPI;
+        std::string entryPoint = moduleAPI.GetModuleEntryPoint(moduleName.value());
+        
+        PyObject* module = PyImport_ImportModule(moduleName.value().c_str());
+        PyObject* function = PyObject_GetAttrString(module, entryPoint.c_str());
+        //PyObject* function = instance->GetFunction(entryPoint, moduleName.value());
+        //return function;
+        Py_DECREF(args);
+        return function;
+       
     }
 
     static PyObject* OT_SetPropertyValue(PyObject* self, PyObject* args)
@@ -29,6 +79,7 @@ namespace PythonExtensions
         {
             throw std::exception("OT_SetPropertyValue expects three arguments");
         }
+
         PythonObjectBuilder pyObBuilder;
         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
@@ -66,6 +117,7 @@ namespace PythonExtensions
         {"SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
         {"Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
         {"FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
+        {"GetScript",  OT_GetScript, METH_VARARGS, "Executes another python script that is stored within OpenTwin."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 

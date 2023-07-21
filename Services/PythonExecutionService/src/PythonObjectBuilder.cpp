@@ -5,19 +5,19 @@ void PythonObjectBuilder::StartTupleAssemply(int size)
 {
 	if (size != 0)
 	{
-		_assembly.reset(PyTuple_New(size));
+		_assembly = (PyTuple_New(size));
 	}
 	_assemblySize = size;
 	_currentSize = 0;
 }
 
-void PythonObjectBuilder::operator<<(CPythonObject&& newEntry)
+void PythonObjectBuilder::operator<<(CPythonObject* newEntry)
 {
 	if (_currentSize < _assemblySize)
 	{
-		int success = PyTuple_SetItem(_assembly,_currentSize,newEntry);
+		int success = PyTuple_SetItem(_assembly,_currentSize,*newEntry);
 		assert(success == 0);
-		newEntry.DropOwnership();
+		newEntry->DropOwnership();
 		_currentSize++;
 	}
 	else
@@ -28,7 +28,9 @@ void PythonObjectBuilder::operator<<(CPythonObject&& newEntry)
 
 CPythonObjectNew PythonObjectBuilder::getAssembledTuple()
 {
-	return std::move(_assembly);
+	CPythonObjectNew returnValue(_assembly);
+	_assembly = nullptr;
+	return returnValue;
 }
 
 
@@ -81,7 +83,7 @@ CPythonObjectBorrowed PythonObjectBuilder::getTupleItem(const CPythonObject& pVa
 
 int32_t PythonObjectBuilder::getInt32ValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	PyObject* tupleEntity =	PyTuple_GetItem(pValue, position);
+	CPythonObjectBorrowed tupleEntity(PyTuple_GetItem(pValue, position));
 	if (tupleEntity == nullptr)
 	{
 		throw PythonException();
@@ -91,7 +93,7 @@ int32_t PythonObjectBuilder::getInt32ValueFromTuple(const CPythonObject& pValue,
 
 double PythonObjectBuilder::getDoubleValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
+	CPythonObjectBorrowed tupleEntity( PyTuple_GetItem(pValue, position));
 	if (tupleEntity == nullptr)
 	{
 		throw PythonException();
@@ -101,7 +103,7 @@ double PythonObjectBuilder::getDoubleValueFromTuple(const CPythonObject& pValue,
 
 std::string PythonObjectBuilder::getStringValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
+	CPythonObjectBorrowed tupleEntity (PyTuple_GetItem(pValue, position));
 	if (tupleEntity == nullptr)
 	{
 		throw PythonException();
@@ -111,7 +113,7 @@ std::string PythonObjectBuilder::getStringValueFromTuple(const CPythonObject& pV
 
 bool PythonObjectBuilder::getBoolValueFromTuple(const CPythonObject& pValue, int position, const std::string& varName)
 {
-	PyObject* tupleEntity = PyTuple_GetItem(pValue, position);
+	CPythonObjectBorrowed tupleEntity(PyTuple_GetItem(pValue, position));
 	if (tupleEntity == nullptr)
 	{
 		throw PythonException();

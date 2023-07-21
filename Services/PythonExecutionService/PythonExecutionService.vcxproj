@@ -239,6 +239,7 @@
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\PropertyPythonObjectInterface.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
+    <ClCompile Include="src\PythonModuleAPI.cpp" />
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
     <ClCompile Include="src\PythonWrapper.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="include\PythonException.h" />
     <ClInclude Include="include\PythonExtension.h" />
     <ClInclude Include="include\PythonLoadedModules.h" />
+    <ClInclude Include="include\PythonModuleAPI.h" />
     <ClInclude Include="include\PythonObjectBuilder.h" />
     <ClInclude Include="include\PythonWrapper.h" />
     <ClInclude Include="include\UiNotifier.h" />

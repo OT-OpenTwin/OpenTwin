@@ -666,24 +666,24 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 
 
 	rapidjson::Value strVal;
-	strVal.SetString("Scripts/TestUpdateScript", newDocument.GetAllocator());
+	strVal.SetString("Scripts/TestScript_UpdateEntity", newDocument.GetAllocator());
 	scripts.PushBack(strVal,newDocument.GetAllocator());
 	
 	rapidjson::Value strVal2;
-	strVal2.SetString("Scripts/TestUpdateScript_1", newDocument.GetAllocator());
+	strVal2.SetString("Scripts/TestScript_ExecuteOtherScript", newDocument.GetAllocator());
 	scripts.PushBack(strVal2,newDocument.GetAllocator());
-	
-	rapidjson::Value strVal3;
-	strVal3.SetString("Scripts/TestUpdateScript_2", newDocument.GetAllocator());
-	scripts.PushBack(strVal3,newDocument.GetAllocator());
-	ot::rJSON::add(newDocument, "Scripts", scripts);
-	
+		
 	OT_rJSON_createValueArray(parameter);
 	rapidjson::Value intParam;
 	intParam.SetInt(13);
 	parameter.PushBack(intParam, newDocument.GetAllocator());
+	
+	rapidjson::Value stringParameter;
+	stringParameter.SetString("Scripts/TestScript_UpdateEntity", newDocument.GetAllocator());
+	parameter.PushBack(stringParameter, newDocument.GetAllocator());
 
 	ot::rJSON::add(newDocument, "Parameter", parameter);
+	ot::rJSON::add(newDocument, "Scripts", scripts);
 
 	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
 	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
