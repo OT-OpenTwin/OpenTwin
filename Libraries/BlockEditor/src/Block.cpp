@@ -11,6 +11,7 @@
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qdrag.h>
+#include <QtWidgets/qstyleoption.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
@@ -59,7 +60,7 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 		
 		QDrag* drag = new QDrag(_event->widget());
 		drag->setMimeData(mimeData);
-		drag->setPixmap(QPixmap());
+		drag->setPixmap(this->toPixmap());
 		drag->exec();
 	}
 }
@@ -67,4 +68,12 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 void ot::Block::attachToGroup(void) {
 	m_gig->addToGroup(this);
 	attachChildsToGroup(m_gig);
+}
+
+QPixmap ot::Block::toPixmap(void) {
+	QPixmap prev(this->boundingRect().size().toSize());
+	QPainter p(&prev);
+	QStyleOptionGraphicsItem opt;
+	this->paint(&p, &opt);
+	return prev;
 }
