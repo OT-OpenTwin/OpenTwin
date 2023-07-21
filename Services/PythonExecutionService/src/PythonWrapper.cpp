@@ -106,7 +106,7 @@ void PythonWrapper::Execute(const std::string& executionCommand, const std::stri
 {
 	CPythonObjectNew module(GetModule(moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
-	PyObject* result(PyRun_String(executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
+	CPythonObjectNew result(PyRun_String(executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 	if (result == nullptr)
 	{
 		throw PythonException();

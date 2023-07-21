@@ -123,20 +123,20 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 				std::list<std::string> scripts
 				{
-					"Scripts/TestScript_UpdateEntity",
-					"Scripts/TestScript_UpdateEntity",
-					"Scripts/TestScript_UpdateEntity",
-					"Scripts/TestScript_UpdateEntity",
+					//"Scripts/TestScript_UpdateEntity",
+					//"Scripts/TestScript_UpdateEntity",
+					//"Scripts/TestScript_UpdateEntity",
+					//"Scripts/TestScript_UpdateEntity",
 					"Scripts/TestScript_ExecuteOtherScript",
 					"Scripts/TestScript_ExecuteOtherScript"
 				};
 
 				std::list<std::optional<std::list<variable_t>>> allParameter
 				{
-					std::list<variable_t>{variable_t(2)},
+					/*std::list<variable_t>{variable_t(2)},
 					std::list<variable_t>{variable_t(3)},
 					std::list<variable_t>{variable_t(4)},
-					std::list<variable_t>{variable_t(5)},
+					std::list<variable_t>{variable_t(5)},*/
 					std::list<variable_t>{variable_t("Scripts/TestScript_UpdateEntity")},
 					std::list<variable_t>{variable_t("Scripts/TestScript_UpdateEntity")}
 				};

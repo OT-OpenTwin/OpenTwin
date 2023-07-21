@@ -48,23 +48,27 @@ namespace PythonExtensions
             {
                 throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");
             }
+
+            PythonLoadedModules::INSTANCE()->AddModuleForEntity(script);
+            moduleName = PythonLoadedModules::INSTANCE()->getModuleName(absoluteScriptName);
+
             script->loadData();
             auto plainData = script->getData()->getData();
             std::string execution(plainData.begin(), plainData.end());
-
-            CPythonObjectNew newModule = PyImport_AddModule(moduleName.value().c_str());
+            CPythonObjectBorrowed  newModule(PyImport_AddModule(moduleName.value().c_str()));
             moduleImported = PyImport_ImportModule(moduleName.value().c_str());
 
-            CPythonObjectBorrowed globalDictionary = PyModule_GetDict(moduleImported);
-            PyObject* result = PyRun_String(execution.c_str(), Py_file_input, globalDictionary, globalDictionary);
+            CPythonObjectBorrowed globalDictionary(PyModule_GetDict(moduleImported));
+            CPythonObjectNew result(PyRun_String(execution.c_str(), Py_file_input, globalDictionary, globalDictionary));
             if (result == nullptr)
             {
                 throw PythonException();
             }
+            
         }
         else
         {
-           moduleImported = PyImport_ImportModule(moduleName.value().c_str());
+            moduleImported = PyImport_ImportModule(moduleName.value().c_str());
         }
 
         std::string entryPoint = PythonModuleAPI::GetModuleEntryPoint(moduleImported);
