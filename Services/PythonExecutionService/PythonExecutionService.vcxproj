@@ -176,7 +176,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>C:\OpenTwin\Libraries\ModelEntities\x64\Debug;$(OT_DEFAULT_SERVICE_LIBPATHD);$(PYTHON310_ROOT)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(PYTHON310_ROOT)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python310.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -237,7 +237,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
-    <ClCompile Include="src\PropertyPythonObjectInterface.cpp" />
+    <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
@@ -252,7 +252,7 @@
     <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\EntityBuffer.h" />
     <ClInclude Include="include\ModelNotifier.h" />
-    <ClInclude Include="include\PropertyPythonObjectInterface.h" />
+    <ClInclude Include="include\PropertyPythonObjectConverter.h" />
     <ClInclude Include="include\PythonAPI.h" />
     <ClInclude Include="include\PythonException.h" />
     <ClInclude Include="include\PythonExtension.h" />

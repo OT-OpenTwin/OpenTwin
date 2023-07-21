@@ -1,3 +1,10 @@
+/*****************************************************************//**
+ * \file   PythonObjectBuilder.h
+ * \brief  Builder to transfer typically used PyObjects to c++ types and vice versa.
+ * 
+ * \author Wagner
+ * \date   July 2023
+ *********************************************************************/
 #pragma once
 #include <Python.h>
 #include "CPythonObjectNew.h"

@@ -1,18 +1,18 @@
 #include "EntityBuffer.h"
 #include "ClassFactory.h"
-#include "PropertyPythonObjectInterface.h"
+#include "PropertyPythonObjectConverter.h"
 
 PyObject* EntityBuffer::GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName)
 {
 	EnsurePropertyToBeLoaded(absoluteEntityName, propertyName);
-	PropertyPythonObjectInterface interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
+	PropertyPythonObjectConverter interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
 	return interface.GetValue();
 }
 
 void EntityBuffer::UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values)
 {
 	EnsurePropertyToBeLoaded(absoluteEntityName, propertyName);
-	PropertyPythonObjectInterface interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
+	PropertyPythonObjectConverter interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
 	interface.SetValue(values);
 }
 

@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   PythonAPI.cpp
+ * \brief  Layer that shall be used from the application.cpp. This class deals with the workflow of loading python script entities, executing them and 
+ *			sending the results back to the service that requested the execution.
+ * 
+ * \author Wagner
+ * \date   July 2023
+ *********************************************************************/
 #include "PythonAPI.h"
 #include "Application.h"
 #include "OpenTwinFoundation/ModelComponent.h"
@@ -9,7 +17,6 @@
 
 PythonAPI::PythonAPI()
 {
-	//PythonWrapper::INSTANCE()->InitializePythonInterpreter();
 	_wrapper.InitializePythonInterpreter();
 }
 
@@ -22,6 +29,7 @@ std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::l
 	PythonObjectBuilder pyObBuilder;
 	for (std::string& scriptName : scripts)
 	{
+		
 		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
@@ -32,22 +40,21 @@ std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::l
 			pythonParameterSet.reset(CreateParameterSet(parameterSetForScript.value()));
 		}
 		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
-				
+
 		auto vReturnValue = pyObBuilder.getVariable(returnValue);
 		if (vReturnValue.has_value())
 		{
 			returnValues.emplace_front(vReturnValue.value());
 		}
 		currentParameterSet++;
+
 	}
-		
 	return returnValues;
 }
 
-
-
 void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 {
+
 	scripts.unique();
 	std::list<ot::EntityInformation> entityInfos;
 	auto modelComponent = Application::instance()->modelComponent();
@@ -67,7 +74,7 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 			script->loadData();
 			auto plainData = script->getData()->getData();
 			std::string execution(plainData.begin(), plainData.end());
-			
+
 			moduleName = PythonLoadedModules::INSTANCE()->AddModuleForEntity(baseEntity);
 			_wrapper.Execute(execution, moduleName.value());
 			PythonModuleAPI moduleAPI;
@@ -80,7 +87,7 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 CPythonObjectNew PythonAPI::CreateParameterSet(std::list<variable_t>& parameterSet)
 {
 	PythonObjectBuilder pObjectBuilder;
-	pObjectBuilder.StartTupleAssemply(parameterSet.size());
+	pObjectBuilder.StartTupleAssemply(static_cast<int>(parameterSet.size()));
 
 	for (variable_t& parameter : parameterSet)
 	{

@@ -12,7 +12,7 @@ class PythonAPI
 public:
 	PythonAPI();
 
-	std::list<variable_t> Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<variable_t>>>& parameterSet);
+	std::list<variable_t> Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<variable_t>>>& parameterSet) noexcept(false);
 
 private:
 	std::map<std::string , std::string> _moduleEntrypointByScriptName;

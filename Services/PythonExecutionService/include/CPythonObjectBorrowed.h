@@ -7,8 +7,10 @@
  * \author Wagner
  * \date   May 2023
  *********************************************************************/
+
 #pragma once
 #include "CPythonObject.h"
+
 class CPythonObjectBorrowed : public CPythonObject
 {
 public:

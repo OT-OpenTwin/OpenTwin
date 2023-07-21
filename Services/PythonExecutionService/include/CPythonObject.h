@@ -6,6 +6,7 @@
  * \author Wagner
  * \date   May 2023
  *********************************************************************/
+
 #pragma once
 #include <Python.h>
 

@@ -39,7 +39,7 @@
     <ClCompile Include="src\EntityBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyPythonObjectInterface.cpp">
+    <ClCompile Include="src\PropertyPythonObjectConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\VariableType.cpp">
@@ -86,7 +86,7 @@
     <ClInclude Include="include\EntityBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PropertyPythonObjectInterface.h">
+    <ClInclude Include="include\PropertyPythonObjectConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonLoadedModules.h">

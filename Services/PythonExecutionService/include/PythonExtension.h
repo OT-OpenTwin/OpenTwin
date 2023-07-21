@@ -1,3 +1,10 @@
+/*****************************************************************//**
+ * \file   PythonExtension.h
+ * \brief  C Python Extension that hold functions for OpenTwin that can be called from a python script.
+ * 
+ * \author Wagner
+ * \date   July 2023
+ *********************************************************************/
 #pragma once
 #include <Python.h>
 #include "PythonObjectBuilder.h"
@@ -92,6 +99,7 @@ namespace PythonExtensions
         EntityBuffer::INSTANCE().UpdateEntityPropertyValue(absoluteEntityName, propertyName,pvalue);
         return PyBool_FromLong(true);
     }
+
     static PyObject* OT_Flush(PyObject* self, PyObject* args)
     {
         if (args != nullptr)
@@ -103,6 +111,7 @@ namespace PythonExtensions
         PythonObjectBuilder pyObBuilder;
         return PyBool_FromLong(true);
     }
+    
     static PyObject* OT_FlushEntity(PyObject* self, PyObject* args)
     {
         auto numberOfArguments = PyTuple_Size(args);
@@ -115,13 +124,14 @@ namespace PythonExtensions
         PythonObjectBuilder pyObBuilder;
         return pyObBuilder.setBool(true);
     }
+    
     static PyMethodDef OTMethods[] = {
 
         {"GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
         {"SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
         {"Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
         {"FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
-        {"GetScript",  OT_GetScript, METH_VARARGS, "Executes another python script that is stored within OpenTwin."},
+        {"GetPythonScript",  OT_GetScript, METH_VARARGS, "Executes another python script that is stored within OpenTwin."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 
