@@ -3462,6 +3462,8 @@ void ExternalServicesComponent::selectFileForStoring(const std::string & dialogT
 
 std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::string& dialogTitle, const std::string& fileMask)
 {
+	std::list<std::string> selectedFilesStd;
+
 	try {
 		QFileDialog dialog(nullptr);
 		dialog.setFileMode(QFileDialog::ExistingFiles);
@@ -3472,7 +3474,6 @@ std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::st
 		if (dialog.exec())
 		{
 			QStringList selectedFiles = dialog.selectedFiles();
-			std::list<std::string> selectedFilesStd;
 			for (QString& file : selectedFiles)
 			{
 				selectedFilesStd.push_back(file.toStdString());
@@ -3484,6 +3485,8 @@ std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::st
 	{
 		throw std::exception(("File could not be loaded due to this exeption: " + std::string(e.what())).c_str());
 	}
+
+	return selectedFilesStd; // This is just to keep the compiler happy.
 }
 
 void ExternalServicesComponent::requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, const std::string &senderURL, bool loadContent)
