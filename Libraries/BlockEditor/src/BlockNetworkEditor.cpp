@@ -39,8 +39,6 @@ void ot::BlockNetworkEditor::mousePressedMoveEvent(QMouseEvent* _event) {
 }
 
 void ot::BlockNetworkEditor::dragEnterEvent(QDragEnterEvent* _event) {
-	OT_LOG_D("BlockNetworkEditor: Drag Enter");
-
 	// Check if the events mime data contains the configuration
 	if (!_event->mimeData()->data(OT_BLOCK_MIMETYPE_Configuration).isEmpty()) {
 		_event->acceptProposedAction();
@@ -48,8 +46,6 @@ void ot::BlockNetworkEditor::dragEnterEvent(QDragEnterEvent* _event) {
 }
 
 void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
-	OT_LOG_D("BlockNetworkEditor: Drop");
-
 	QByteArray cfgRaw = _event->mimeData()->data(OT_BLOCK_MIMETYPE_Configuration);
 	if (cfgRaw.isEmpty()) {
 		return;

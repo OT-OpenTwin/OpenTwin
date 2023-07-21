@@ -15,6 +15,7 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qpoint.h>
 #include <QtGui/qcolor.h>
+#include <QtGui/qpixmap.h>
 #include <QtWidgets/qgraphicsitem.h>
 
 #define OT_BLOCK_MIMETYPE_Configuration "Configuration"
@@ -82,6 +83,8 @@ namespace ot {
 		const QByteArray& configuration(void) const { return m_config; };
 
 		void attachToGroup(void);
+
+		QPixmap toPixmap(void);
 
 	protected:
 		virtual void attachChildsToGroup(BlockGraphicsItemGroup* _gig) {};
