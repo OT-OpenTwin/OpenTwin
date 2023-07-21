@@ -1,3 +1,10 @@
+/*****************************************************************//**
+ * \file   EntityBuffer.h
+ * \brief  Meyer' singleton that buffers all entities and their properties that were used so far.
+ * 
+ * \author Wagner
+ * \date   July 2023
+ *********************************************************************/
 #pragma once
 #include "CPythonObjectNew.h"
 #include "EntityBase.h"
@@ -20,6 +27,7 @@ public:
 	void UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values);
 	void SaveChangedEntities();
 	bool SaveChangedEntities(std::string absoluteEntityName);
+	std::shared_ptr<EntityBase> GetEntity (const std::string& absoluteEntityName);
 
 private:
 	EntityBuffer() {};

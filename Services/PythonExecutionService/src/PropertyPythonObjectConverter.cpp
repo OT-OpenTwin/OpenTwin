@@ -1,7 +1,7 @@
-#include "PropertyPythonObjectInterface.h"
+#include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
 
-PropertyPythonObjectInterface::PropertyPythonObjectInterface(EntityPropertiesBase* property)
+PropertyPythonObjectConverter::PropertyPythonObjectConverter(EntityPropertiesBase* property)
 {
 	auto doubleProp = dynamic_cast<EntityPropertiesDouble*>(property);
 	if ( doubleProp != nullptr)
@@ -43,7 +43,7 @@ PropertyPythonObjectInterface::PropertyPythonObjectInterface(EntityPropertiesBas
 	throw std::exception("Not supported entity type");
 }
 
-PyObject* PropertyPythonObjectInterface::GetValue()
+PyObject* PropertyPythonObjectConverter::GetValue()
 {
 	PyObject* returnValue(nullptr);
 	PythonObjectBuilder pyObBuilder;
@@ -84,7 +84,7 @@ PyObject* PropertyPythonObjectInterface::GetValue()
 	return returnValue;
 }
 
-void PropertyPythonObjectInterface::SetValue(const CPythonObject& cpythonObject)
+void PropertyPythonObjectConverter::SetValue(const CPythonObject& cpythonObject)
 {
 	PythonObjectBuilder pyObBuilder;
 	if (_propertyDouble != nullptr)

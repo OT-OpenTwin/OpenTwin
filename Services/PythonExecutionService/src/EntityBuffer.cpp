@@ -1,18 +1,18 @@
 #include "EntityBuffer.h"
 #include "ClassFactory.h"
-#include "PropertyPythonObjectInterface.h"
+#include "PropertyPythonObjectConverter.h"
 
 PyObject* EntityBuffer::GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName)
 {
 	EnsurePropertyToBeLoaded(absoluteEntityName, propertyName);
-	PropertyPythonObjectInterface interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
+	PropertyPythonObjectConverter interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
 	return interface.GetValue();
 }
 
 void EntityBuffer::UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values)
 {
 	EnsurePropertyToBeLoaded(absoluteEntityName, propertyName);
-	PropertyPythonObjectInterface interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
+	PropertyPythonObjectConverter interface(_bufferedEntityProperties[absoluteEntityName + propertyName]);
 	interface.SetValue(values);
 }
 
@@ -47,6 +47,11 @@ bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
 	return false;
 }
 
+std::shared_ptr<EntityBase> EntityBuffer::GetEntity(const std::string& absoluteEntityName)
+{
+	return LoadEntity(absoluteEntityName);
+}
+
 
 void EntityBuffer::EnsurePropertyToBeLoaded(const std::string& absoluteEntityName, const std::string& propertyName)
 {
@@ -67,9 +72,9 @@ std::shared_ptr<EntityBase> EntityBuffer::LoadEntity(const std::string& absolute
 	if (_bufferedEntities.find(absoluteEntityName) == _bufferedEntities.end())
 	{
 		ot::EntityInformation entityInfo;
-		ClassFactory classFactory;
+		ClassFactory* classFactory = new ClassFactory();
 		_modelComponent->getEntityInformation(absoluteEntityName, entityInfo);
-		EntityBase* entity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		EntityBase* entity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory);
 		_bufferedEntities[absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return _bufferedEntities[absoluteEntityName];

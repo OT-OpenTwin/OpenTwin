@@ -6,6 +6,7 @@
  * \author Wagner
  * \date   May 2023
  *********************************************************************/
+
 #pragma once
 #include <Python.h>
 
@@ -21,6 +22,7 @@ public:
     {
         this->_ref = other._ref;
         other._ref = nullptr;
+        return *this;
     };
 
     CPythonObject(CPythonObject&& other) noexcept

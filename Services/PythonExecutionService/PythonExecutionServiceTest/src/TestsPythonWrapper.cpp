@@ -58,6 +58,22 @@ TEST_F(FixturePythonWrapper, FunctionWithReturnValue)
 	EXPECT_EQ(expectedValue, returnValue);
 }
 
+TEST_F(FixturePythonWrapper, FunctionWithReturnValueRepeated)
+{
+	const std::string expectedValue = "Hello World";
+	const std::string script = "def example():\n"
+		"\tvariable = \"Hello \"\n"
+		"\tvariable = variable + \"World\"\n"
+		"\treturn variable";
+	ExecuteString(script, getMainModulName());
+	for (int i = 0; i < 100; i++)
+	{
+		std::string returnValue = ExecuteFunctionWithReturnValue("example", getMainModulName());
+		EXPECT_EQ(expectedValue, returnValue);
+	}
+}
+
+
 TEST_F(FixturePythonWrapper, FunctionWithParameter)
 {
 	const int expectedValue = 26;
@@ -69,6 +85,22 @@ TEST_F(FixturePythonWrapper, FunctionWithParameter)
 	int returnValue = ExecuteFunctionWithParameter("example",parameter, getMainModulName());
 	EXPECT_EQ(expectedValue, returnValue);
 }
+
+TEST_F(FixturePythonWrapper, FunctionWithParameterRepeated)
+{
+	const int expectedValue = 26;
+	const std::string script = "def example(value):\n"
+		"\tvalue = value * 2\n"
+		"\treturn value";
+	ExecuteString(script, getMainModulName());
+	int parameter = 13;
+	for (int i = 0; i < 100; i++)
+	{
+		int returnValue = ExecuteFunctionWithParameter("example", parameter, getMainModulName());
+		EXPECT_EQ(expectedValue, returnValue);
+	}
+}
+
 
 TEST_F(FixturePythonWrapper, FunctionWithMultipleParameter)
 {
@@ -90,6 +122,29 @@ TEST_F(FixturePythonWrapper, FunctionWithMultipleParameter)
 	EXPECT_EQ(expectedValue, returnValue);
 }
 
+TEST_F(FixturePythonWrapper, FunctionWithMultipleParameterRepeated)
+{
+	const int expectedValue = 29;
+	const std::string script = "def example(value1, value2, stringValue):\n"
+		"\tvalue = (value1 + value2) * 2\n"
+		"\tif(stringValue == \"Suppe\"):\n"
+		"\t\tvalue = value + 3\n"
+		"\telse:\n"
+		"\t\tvalue = value + 7\n"
+		"\treturn value";
+	ExecuteString(script, getMainModulName());
+
+	int parameter1 = 7;
+	int parameter2 = 6;
+	std::string parameter3 = "Suppe";
+	for (int i = 0; i < 100; i++)
+	{
+		int returnValue = ExecuteFunctionWithMultipleParameter("example", parameter1, parameter2, parameter3, getMainModulName());
+		EXPECT_EQ(expectedValue, returnValue);
+	}
+}
+
+
 TEST_F(FixturePythonWrapper, FunctionNotExisting)
 {
 	const std::string expectedValue = "Hello World";
@@ -108,6 +163,22 @@ TEST_F(FixturePythonWrapper, PythonExtensionWithParameter)
 	std::string function = "WithOneParameter";
 	int result = ExecuteFunctionWithParameter(function, 7, module);
 	EXPECT_EQ(expectedValue, result);
+}
+
+TEST_F(FixturePythonWrapper, PythonExtensionWithParameterRepeated)
+{
+	const int expectedValue = 20;
+	const std::string module = "test";
+	std::string function = "ThisIsATest";
+	const std::string script = "import InitialTestModule\n"
+		"def ThisIsATest(x):\n"
+		"\treturn InitialTestModule.WithOneParameter(x)\n";
+	ExecuteString(script, module);
+	for (int i = 0; i < 100; i++)
+	{
+		int result = ExecuteFunctionWithParameter(function, 7, module);
+		EXPECT_EQ(expectedValue, result);
+	}
 }
 
 TEST_F(FixturePythonWrapper, PythonExtensionWithoutParameter)
@@ -134,6 +205,23 @@ TEST_F(FixturePythonWrapper, PythonExtensionWithMultipleParameter)
 	EXPECT_EQ(expectedValue, result);
 }
 
+TEST_F(FixturePythonWrapper, PythonExtensionWithMultipleParameterRepeated)
+{
+	const int expectedValue = 33;
+	std::string function = "ThisIsATest";
+	const std::string script = "import InitialTestModule\n"
+		"def ThisIsATest(x, y, z):\n"
+		"\treturn InitialTestModule.WithMultipleParameter(x,y,z)\n";
+	ExecuteString(script, getMainModulName());
+	
+	for (int i = 0; i < 100; i++)
+	{
+		int result = ExecuteFunctionWithMultipleParameter(function, 7,6, "Suppe", getMainModulName());
+		EXPECT_EQ(expectedValue, result);
+	}
+}
+
+
 TEST_F(FixturePythonWrapper, PythonExtensionFromOtherModule)
 {
 	const std::string script = "import InitialTestModule\n"
@@ -143,19 +231,24 @@ TEST_F(FixturePythonWrapper, PythonExtensionFromOtherModule)
 
 TEST_F(FixturePythonWrapper, PythonExtensionFunctionGetter)
 {
-	const std::string anotherScript = "def add(x,y):\n"
-		"\treturn x + y\n"
+	const std::string anotherScript = "import InitialTestModule\n"
+		"def add(x,y):\n"
+		"\tvalue = InitialTestModule.WithOneParameter(x)\n"
+		"\treturn value + y\n"
 		;
 	ExecuteString(anotherScript, "anotherModule");
 
 	const std::string script = "import InitialTestModule\n"
-		"funct = InitialTestModule.GetFunction(\"anotherModule\",\"add\")\n"
-		"result = funct(3,5)\n"
+		"def main():\n"
+		"\tfunct = InitialTestModule.GetFunction(\"anotherModule\",\"add\")\n"
+		"\treturnValue = funct(3,5)\n"
+		"\treturn str(returnValue)\n"
 		;
-	ExecuteString(script, "someModule");
+	ExecuteString(script, "mainModule");
 
-	int32_t result = GetGlobalVariable("result", "someModule");
-	EXPECT_EQ(result, 8);
+	std::string result = ExecuteFunctionWithReturnValue("main", "mainModule");
+	
+	EXPECT_EQ(result, "21");
 }
 
 TEST_F(FixturePythonWrapper, PythonImportNumpyWithoutExtendedPath)

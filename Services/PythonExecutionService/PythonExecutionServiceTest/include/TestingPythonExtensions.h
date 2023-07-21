@@ -36,9 +36,12 @@ namespace TestingPythonExtensions
     static PyObject* WithMultipleParameter(PyObject* self, PyObject* args)
     {
         PythonObjectBuilder pyObBuilder;
-        int parameter1 = pyObBuilder.getInt32Value(PyTuple_GetItem(args, 0), "Parameter 1");
-        int parameter2 = pyObBuilder.getInt32Value(PyTuple_GetItem(args, 1),"Parameter 2");
-        std::string parameter3 = pyObBuilder.getStringValue(PyTuple_GetItem(args, 2),"Parameter 3");
+        CPythonObjectBorrowed param1(PyTuple_GetItem(args, 0));
+        int parameter1 = pyObBuilder.getInt32Value(param1, "Parameter 1");
+        CPythonObjectBorrowed param2(PyTuple_GetItem(args, 1));
+        int parameter2 = pyObBuilder.getInt32Value(param2,"Parameter 2");
+        CPythonObjectBorrowed param3(PyTuple_GetItem(args, 2));
+        std::string parameter3 = pyObBuilder.getStringValue(param3,"Parameter 3");
 
         int result = (parameter1 + parameter2) * 2;
         if (parameter3 == "Suppe")

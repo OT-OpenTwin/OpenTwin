@@ -1,9 +1,18 @@
+/*****************************************************************//**
+ * \file   PythonAPI.cpp
+ * \brief  Layer that shall be used from the application.cpp. This class deals with the workflow of loading python script entities, executing them and 
+ *			sending the results back to the service that requested the execution.
+ * 
+ * \author Wagner
+ * \date   July 2023
+ *********************************************************************/
 #include "PythonAPI.h"
 #include "Application.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "ClassFactory.h"
 
 #include "PythonLoadedModules.h"
+#include "PythonModuleAPI.h"
 #include "EntityBuffer.h"
 
 PythonAPI::PythonAPI()
@@ -20,52 +29,57 @@ std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::l
 	PythonObjectBuilder pyObBuilder;
 	for (std::string& scriptName : scripts)
 	{
-		std::string moduleName = (*PythonLoadedModules::INSTANCE()->getModuleNamesByScriptName())[scriptName];
+		
+		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
 		std::optional <std::list<variable_t>>& parameterSetForScript = *currentParameterSet;
-		CPythonObjectNew parameterSet(nullptr);
+		CPythonObjectNew pythonParameterSet(nullptr);
 		if (parameterSetForScript.has_value())
 		{
-			parameterSet.reset(CreateParameterSet(parameterSetForScript.value()));
+			pythonParameterSet.reset(CreateParameterSet(parameterSetForScript.value()));
 		}
-		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, parameterSet, moduleName);
-				
+		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 
-		returnValues.emplace_front(pyObBuilder.getVariable(returnValue));
+		auto vReturnValue = pyObBuilder.getVariable(returnValue);
+		if (vReturnValue.has_value())
+		{
+			returnValues.emplace_front(vReturnValue.value());
+		}
+		currentParameterSet++;
+
 	}
-		
 	return returnValues;
 }
 
-
-
 void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 {
+
 	scripts.unique();
 	std::list<ot::EntityInformation> entityInfos;
 	auto modelComponent = Application::instance()->modelComponent();
 	modelComponent->getEntityInformation(scripts, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactory classFactory;
-	auto moduleNameByScriptName = PythonLoadedModules::INSTANCE()->getModuleNamesByScriptName();
+
 	for (auto& entityInfo : entityInfos)
 	{
 		std::string scriptName = entityInfo.getName();
-		if (moduleNameByScriptName->find(scriptName) == moduleNameByScriptName->end())
+		std::optional<std::string> moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName);
+		if (!moduleName.has_value())
 		{
-			ot::UID uid = entityInfo.getID();
-			ot::UID version = entityInfo.getVersion();
-			std::string moduleName = std::to_string(uid) + std::to_string(version);
 
 			auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
 			std::unique_ptr<EntityParameterizedDataSource> script(dynamic_cast<EntityParameterizedDataSource*>(baseEntity));
 			script->loadData();
 			auto plainData = script->getData()->getData();
 			std::string execution(plainData.begin(), plainData.end());
-			_wrapper.Execute(execution, moduleName);
-			(*moduleNameByScriptName)[scriptName] = moduleName;
-			_moduleEntrypointByScriptName[scriptName] = GetModuleEntryPoint(moduleName);
+
+			moduleName = PythonLoadedModules::INSTANCE()->AddModuleForEntity(baseEntity);
+			_wrapper.Execute(execution, moduleName.value());
+			PythonModuleAPI moduleAPI;
+
+			_moduleEntrypointByScriptName[scriptName] = moduleAPI.GetModuleEntryPoint(moduleName.value());
 		}
 	}
 }
@@ -73,33 +87,39 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 CPythonObjectNew PythonAPI::CreateParameterSet(std::list<variable_t>& parameterSet)
 {
 	PythonObjectBuilder pObjectBuilder;
-	pObjectBuilder.StartTupleAssemply(parameterSet.size());
+	pObjectBuilder.StartTupleAssemply(static_cast<int>(parameterSet.size()));
 
 	for (variable_t& parameter : parameterSet)
 	{
 		if (std::holds_alternative<int32_t>(parameter))
 		{
-			pObjectBuilder << pObjectBuilder.setInt32(std::get<int32_t>(parameter));
+			auto value = pObjectBuilder.setInt32(std::get<int32_t>(parameter));
+			pObjectBuilder << &value;
 		}
 		else if (std::holds_alternative<int64_t>(parameter))
 		{
-			pObjectBuilder << pObjectBuilder.setInt32(static_cast<int32_t>(std::get<int64_t>(parameter)));
+			auto value = pObjectBuilder.setInt32(static_cast<int32_t>(std::get<int64_t>(parameter)));
+			pObjectBuilder << &value;
 		}
 		else if (std::holds_alternative<double>(parameter))
 		{
-			pObjectBuilder << pObjectBuilder.setDouble(std::get<double>(parameter));
+			auto value = pObjectBuilder.setDouble(std::get<double>(parameter));
+			pObjectBuilder << &value;
 		}
 		else if (std::holds_alternative<float>(parameter))
 		{
-			pObjectBuilder << pObjectBuilder.setDouble(static_cast<double>(std::get<float>(parameter)));
+			auto value = pObjectBuilder.setDouble(static_cast<double>(std::get<float>(parameter)));
+			pObjectBuilder << &value;
 		}
 		else if (std::holds_alternative<const char*>(parameter))
 		{
-			pObjectBuilder << pObjectBuilder.setString(std::string(std::get<const char*>(parameter)));
+			auto value = pObjectBuilder.setString(std::string(std::get<const char*>(parameter)));
+			pObjectBuilder << &value;
 		}
 		else if (std::holds_alternative<bool>(parameter))
 		{
-			pObjectBuilder << pObjectBuilder.setBool(std::get<bool>(parameter));
+			auto value = pObjectBuilder.setBool(std::get<bool>(parameter));
+			pObjectBuilder << &value;
 		}
 		else
 		{
@@ -107,47 +127,5 @@ CPythonObjectNew PythonAPI::CreateParameterSet(std::list<variable_t>& parameterS
 		}
 	}
 	return pObjectBuilder.getAssembledTuple();
-}
-
-
-std::string PythonAPI::GetModuleEntryPoint(const std::string& moduleName)
-{
-	PythonObjectBuilder pythonObjectBuilder;
-	CPythonObjectBorrowed globalDictionary =_wrapper.GetGlobalDictionary(moduleName);
-	CPythonObjectBorrowed allGlobalDictItems = pythonObjectBuilder.getDictItem(globalDictionary);
-	
-	bool firstOfFunctionNames = false;
-	std::string entryPointName = "";
-	
-	for (int i = 0; i < PyList_Size(allGlobalDictItems); i++)
-	{
-		CPythonObjectBorrowed listEntry = pythonObjectBuilder.getListItem(allGlobalDictItems,i);
-		std::string listEntryName = pythonObjectBuilder.getStringValueFromTuple(listEntry, 0, "ListValue");
-
-
-		if (listEntryName == "__builtins__") //Last default entry
-		{
-			firstOfFunctionNames = true;
-		}
-		else if (firstOfFunctionNames)
-		{
-			CPythonObjectBorrowed listElement(PyDict_GetItemString(globalDictionary, listEntryName.c_str()));
-
-			if (PyFunction_Check(listElement))
-			{
-				if (entryPointName == "")
-				{
-					entryPointName = listEntryName;
-				}
-				else
-				{
-					entryPointName = "__main__";
-					break;
-				}
-			}
-		}
-	}
-	
-	return entryPointName;
 }
 
