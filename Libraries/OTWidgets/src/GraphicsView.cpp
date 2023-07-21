@@ -10,6 +10,26 @@
 #include <QtGui/qevent.h>
 //#include <QtWidgets/qgraphicsscene.h>
 
+//! If this is true, the graphics view will force a minimum size
+#define OT_CFG_ForceMinimumGraphicsViewSize true
+
+#if (OT_CFG_ForceMinimumGraphicsViewSize == true)
+// Only to use in this context
+#define OT_INTERN_MinimumGraphicsViewSizeWidth 500
+// Only to use in this context
+#define OT_INTERN_MinimumGraphicsViewSizeHeight 500
+
+//! @brief Adjust the provided variables according to the GraphicsViews default forced minimum size (if enabled)
+//! @param ___w Width variable
+//! @param ___h Height variable
+#define OT_AdjustMinimumGraphicsViewSize(___w, ___h) if (___w < OT_INTERN_MinimumGraphicsViewSizeWidth) { ___w = OT_INTERN_MinimumGraphicsViewSizeWidth; }; if (___h < OT_INTERN_MinimumGraphicsViewSizeHeight) { ___h = OT_INTERN_MinimumGraphicsViewSizeHeight; }
+
+#else
+//! @brief Adjust the provided variables according to the GraphicsViews default forced minimum size (if enabled)
+//! @param ___w Width variable
+//! @param ___h Height variable
+#define OT_AdjustMinimumGraphicsViewSize(___w, ___h)
+#endif
 ot::GraphicsView::GraphicsView() : m_isPressed(false) {
 	setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 }
@@ -27,6 +47,7 @@ void ot::GraphicsView::resetView(void) {
 	setSceneRect(QRectF());
 	int w = boundingRect.width();
 	int h = boundingRect.height();
+	OT_AdjustMinimumGraphicsViewSize(w, h);
 	QRectF viewRect = boundingRect.marginsAdded(QMarginsF(w, h, w, h));
 	fitInView(viewRect, Qt::AspectRatioMode::KeepAspectRatio);
 	centerOn(viewRect.center());
@@ -38,7 +59,8 @@ void ot::GraphicsView::viewAll(void) {
 	QRectF boundingRect = mapFromScene(s->itemsBoundingRect()).boundingRect();
 	int w = boundingRect.width();
 	int h = boundingRect.height();
-	QRect  viewPortRect = viewport()->rect().marginsRemoved(QMargins(w, h, w, h));
+	OT_AdjustMinimumGraphicsViewSize(w, h);
+	QRect viewPortRect = viewport()->rect().marginsRemoved(QMargins(w, h, w, h));
 
 	if (viewPortRect.width() > boundingRect.width() && viewPortRect.height() > boundingRect.height())
 	{

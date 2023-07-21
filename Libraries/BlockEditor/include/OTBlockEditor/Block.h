@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockEditorAPIExport.h"
+#include "OTBlockEditor/BlockEditorTypes.h"
 #include "OTBlockEditor/BlockGraphicsObject.h"
 #include "OTGui/LengthLimitation.h"
 
@@ -48,7 +49,6 @@ namespace ot {
 	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem, public ot::BlockGraphicsObject {
 		Q_OBJECT
 		Q_INTERFACES(QGraphicsItem)
-
 	public:
 		Block(BlockGraphicsItemGroup* _graphicsItemGroup);
 		virtual ~Block();
@@ -59,7 +59,7 @@ namespace ot {
 
 		virtual qreal blockWidth(void) const = 0;
 		virtual qreal blockHeigth(void) const = 0;
-
+		
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		void setGraphicsItemGroup(BlockGraphicsItemGroup* _gig) { m_gig = _gig; };
@@ -86,10 +86,14 @@ namespace ot {
 
 		QPixmap toPixmap(void);
 
+		void setBlockContextFlags(const BlockContextFlags& _flags) { m_contextFlags = _flags; };
+		const BlockContextFlags& blockContextFlags(void) const { return m_contextFlags; };
+
 	protected:
 		virtual void attachChildsToGroup(BlockGraphicsItemGroup* _gig) {};
 
 	private:
+		BlockContextFlags m_contextFlags;
 		BlockGraphicsItemGroup* m_gig;
 		bool m_isHighlighted;
 		QColor m_highlightColor;

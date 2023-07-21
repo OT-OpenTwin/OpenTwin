@@ -53,15 +53,20 @@ void ot::Block::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _optio
 }
 
 void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	if (_event->button() == Qt::LeftButton) {
-		QMimeData* mimeData = new QMimeData;
-		mimeData->setText("OT_BLOCK");
-		mimeData->setData(OT_BLOCK_MIMETYPE_Configuration, m_config);
-		
-		QDrag* drag = new QDrag(_event->widget());
-		drag->setMimeData(mimeData);
-		drag->setPixmap(this->toPixmap());
-		drag->exec();
+	if (m_contextFlags.flagIsSet(ot::PreviewBlockContext)) {
+		if (_event->button() == Qt::LeftButton) {
+			QMimeData* mimeData = new QMimeData;
+			mimeData->setText("OT_BLOCK");
+			mimeData->setData(OT_BLOCK_MIMETYPE_Configuration, m_config);
+
+			QDrag* drag = new QDrag(_event->widget());
+			drag->setMimeData(mimeData);
+			drag->setPixmap(this->toPixmap());
+			drag->exec();
+		}
+	}
+	else {
+		QGraphicsItem::mousePressEvent(_event);
 	}
 }
 

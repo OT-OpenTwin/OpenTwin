@@ -42,14 +42,19 @@ void ot::BlockNetworkEditor::dragEnterEvent(QDragEnterEvent* _event) {
 	// Check if the events mime data contains the configuration
 	if (!_event->mimeData()->data(OT_BLOCK_MIMETYPE_Configuration).isEmpty()) {
 		_event->acceptProposedAction();
+		OT_LOG_D("Drag enter event accepted for: Block");
 	}
 }
 
 void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
 	QByteArray cfgRaw = _event->mimeData()->data(OT_BLOCK_MIMETYPE_Configuration);
 	if (cfgRaw.isEmpty()) {
+		OT_LOG_D("Drop event reqected: MimeData not matching");
 		return;
 	}
+
+	OT_LOG_D("..");
+
 	// Generate configuration from raw data
 	ot::BlockConfiguration* cfg = nullptr;
 	try {
@@ -73,8 +78,13 @@ void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
 	QPointF position = mapToScene(mapFromGlobal(_event->pos()));
 
 	Block* newBlock = ot::BlockFactory::blockFromConfig(cfg);
+	newBlock->setBlockContextFlags(ot::BlockContextFlags(ot::NetworkBlockContext));
 	newBlock->setPos(position);
 	m_network->addItem(newBlock);
 
+	delete cfg;
+
 	_event->acceptProposedAction();
+
+	OT_LOG_D("Drop event accepted for: Block");
 }

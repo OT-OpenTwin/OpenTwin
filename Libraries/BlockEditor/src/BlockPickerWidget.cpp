@@ -106,6 +106,8 @@ void ot::BlockPickerWidget::slotSelectionChanged(void) {
 			for (auto bCfg : it->second) {
 				// Construct block
 				ot::Block* newBlock = BlockFactory::blockFromConfig(bCfg);
+				newBlock->setBlockContextFlags(ot::BlockContextFlags(ot::PreviewBlockContext));
+
 				if (newBlock) {
 					//newBlock->setFlag(QGraphicsItem::ItemIsMovable, true);
 					

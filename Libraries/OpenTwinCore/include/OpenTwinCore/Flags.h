@@ -4,14 +4,14 @@
 #include "OpenTwinSystem/ArchitectureInfo.h"
 
 #ifdef OT_OS_64Bit
-//! @brief Will add the default bit operations thats are required for bitwise operations
+//! @brief Will add the default bitwise operations for the provided bitfield
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long long) _lhv | (long long)_rhv); }; \
 inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long long) _lhv | (long long)_rhv)); }; \
 inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long long) _lhv & (long long)_rhv); };  \
 inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long long) _lhv & (long long)_rhv)); };  \
 inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long long) _lhv)); };
 #else
-//! @brief Will add the default bit operations thats are required for bitwise operations
+//! @brief Will add the default bitwise operations for the provided bitfield
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long) _lhv | (long)_rhv); }; \
 inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long) _lhv | (long)_rhv)); }; \
 inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long) _lhv & (long)_rhv); };  \

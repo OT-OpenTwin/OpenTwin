@@ -26,6 +26,19 @@ namespace ot {
 	//! @brief Connector location, orientation and logical location on a layer
 	typedef ot::Flags<ot::BlockConnectorLocationFlag> BlockConnectorLocationFlags;
 
+	//! @brief Block context, used for user interaction handling
+	enum BlockContextFlag {
+		NoContextFlags      = 0x0000, //! @brief No Block context (Block will be handled as a regular QGraphicsItem)
+		NetworkBlockContext = 0x0001, //! @brief Block is placed in a network
+		PreviewBlockContext = 0x0002  //! @brief Block is placed in a preview box
+	};
+
+	//! @brief Block context, used for user interaction handling
+	typedef ot::Flags<ot::BlockContextFlag> BlockContextFlags;
+
 }
 
+// Here we add the default bitwise operations for the enums
+
 OT_ADD_FLAG_FUNCTIONS(ot::BlockConnectorLocationFlag);
+OT_ADD_FLAG_FUNCTIONS(ot::BlockContextFlag);
