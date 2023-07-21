@@ -3,9 +3,15 @@
 
 std::string PythonModuleAPI::GetModuleEntryPoint(const std::string& moduleName)
 {
-	PythonObjectBuilder pythonObjectBuilder;
+	
 	CPythonObjectBorrowed module(PyImport_ImportModule(moduleName.c_str()));
+	return GetModuleEntryPoint(module);
+}
+
+std::string PythonModuleAPI::GetModuleEntryPoint(CPythonObject& module)
+{
 	CPythonObjectBorrowed globalDictionary = PyModule_GetDict(module);
+	PythonObjectBuilder pythonObjectBuilder;
 	CPythonObjectBorrowed allGlobalDictItems = pythonObjectBuilder.getDictItem(globalDictionary);
 
 	bool firstOfFunctionNames = false;

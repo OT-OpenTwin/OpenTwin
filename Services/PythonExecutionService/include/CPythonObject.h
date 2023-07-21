@@ -21,6 +21,7 @@ public:
     {
         this->_ref = other._ref;
         other._ref = nullptr;
+        return *this;
     };
 
     CPythonObject(CPythonObject&& other) noexcept

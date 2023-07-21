@@ -31,7 +31,6 @@ std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::l
 		{
 			pythonParameterSet.reset(CreateParameterSet(parameterSetForScript.value()));
 		}
-		//CPythonObjectNew returnValue = PythonWrapper::INSTANCE()->ExecuteFunction(entryPoint, parameterSet, moduleName);
 		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 				
 		auto vReturnValue = pyObBuilder.getVariable(returnValue);

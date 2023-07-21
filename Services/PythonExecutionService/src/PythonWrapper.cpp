@@ -127,7 +127,7 @@ CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName,
 
 CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
 {
-	CPythonObjectNew module(GetModule(moduleName));
+	CPythonObjectNew module = (GetModule(moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectBorrowed pythonVar(PyDict_GetItemString(globalDirectory, varName.c_str()));
 	if (pythonVar == nullptr)
@@ -143,11 +143,11 @@ CPythonObjectBorrowed PythonWrapper::GetGlobalDictionary(const std::string& modu
 	return PyModule_GetDict(module);
 }
 
-PyObject* PythonWrapper::GetFunction(const std::string& functionName, const std::string& moduleName)
+CPythonObjectNew PythonWrapper::GetFunction(const std::string& functionName, const std::string& moduleName)
 {
 
-	CPythonObjectNew module(GetModule(moduleName));
-	PyObject* function = PyObject_GetAttrString(module, functionName.c_str());
+	CPythonObjectNew module = GetModule(moduleName);
+	CPythonObjectNew function(PyObject_GetAttrString(module, functionName.c_str()));
 	if (function == nullptr)
 	{
 		throw PythonException();
@@ -160,11 +160,9 @@ PyObject* PythonWrapper::GetFunction(const std::string& functionName, const std:
 	return function;
 }
 
-PyObject* PythonWrapper::GetModule(const std::string& moduleName)
+CPythonObjectNew PythonWrapper::GetModule(const std::string& moduleName)
 {
 	PythonObjectBuilder builder;
-	//CPythonObjectNew pyModuleName = builder.setString(moduleName);
-	//PyObject* module(PyImport_GetModule(pyModuleName));
 	PyObject* module(PyImport_ImportModule(moduleName.c_str()));
 
 	if (module == nullptr)
@@ -180,7 +178,6 @@ PyObject* PythonWrapper::GetModule(const std::string& moduleName)
 	}
 	else
 	{
-		Py_INCREF(module);
 		return module;	
 	}
 }

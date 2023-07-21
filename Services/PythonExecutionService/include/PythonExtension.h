@@ -19,9 +19,7 @@ namespace PythonExtensions
              throw std::exception("OT_GetPropertyValue expects two arguments");
          }
          PythonObjectBuilder pyObBuilder;
-         Py_INCREF(args);
          std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args,0,"Parameter 0");
-         Py_INCREF(args);
          std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
 
          PyObject* returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
@@ -37,38 +35,40 @@ namespace PythonExtensions
             throw std::exception("OT_ExecuteScript expects one argument");
         }
         PythonObjectBuilder pyObBuilder;
-        Py_INCREF(args);
         std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
-        /*
-        auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
-        EntityParameterizedDataSource* script = dynamic_cast<EntityParameterizedDataSource*>(baseEntity.get());
-        if (script == nullptr)
-        {
-            throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");
-        }*/
         
         std::optional<std::string> moduleName =  PythonLoadedModules::INSTANCE()->getModuleName(absoluteScriptName);
-        /*auto instance = PythonWrapper::INSTANCE();*/
-        
-        /*if (!moduleName.has_value())
+        CPythonObjectNew moduleImported(nullptr);
+
+        if (!moduleName.has_value())
         {
+            auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
+            EntityParameterizedDataSource* script = dynamic_cast<EntityParameterizedDataSource*>(baseEntity.get());
+            if (script == nullptr)
+            {
+                throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");
+            }
             script->loadData();
             auto plainData = script->getData()->getData();
             std::string execution(plainData.begin(), plainData.end());
 
-            instance->Execute(execution, moduleName.value());
-        }*/
-        
-        PythonModuleAPI moduleAPI;
-        std::string entryPoint = moduleAPI.GetModuleEntryPoint(moduleName.value());
-        
-        PyObject* module = PyImport_ImportModule(moduleName.value().c_str());
-        PyObject* function = PyObject_GetAttrString(module, entryPoint.c_str());
-        //PyObject* function = instance->GetFunction(entryPoint, moduleName.value());
-        //return function;
-        Py_DECREF(args);
-        return function;
-       
+            CPythonObjectNew newModule = PyImport_AddModule(moduleName.value().c_str());
+            moduleImported = PyImport_ImportModule(moduleName.value().c_str());
+
+            CPythonObjectBorrowed globalDictionary = PyModule_GetDict(moduleImported);
+            PyObject* result = PyRun_String(execution.c_str(), Py_file_input, globalDictionary, globalDictionary);
+            if (result == nullptr)
+            {
+                throw PythonException();
+            }
+        }
+        else
+        {
+           moduleImported = PyImport_ImportModule(moduleName.value().c_str());
+        }
+
+        std::string entryPoint = PythonModuleAPI::GetModuleEntryPoint(moduleImported);
+        return PyObject_GetAttrString(moduleImported, entryPoint.c_str());   
     }
 
     static PyObject* OT_SetPropertyValue(PyObject* self, PyObject* args)

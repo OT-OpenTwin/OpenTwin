@@ -214,7 +214,7 @@ TEST_F(FixturePythonWrapper, PythonExtensionWithMultipleParameterRepeated)
 		"\treturn InitialTestModule.WithMultipleParameter(x,y,z)\n";
 	ExecuteString(script, getMainModulName());
 	
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		int result = ExecuteFunctionWithMultipleParameter(function, 7,6, "Suppe", getMainModulName());
 		EXPECT_EQ(expectedValue, result);
