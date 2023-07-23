@@ -7,6 +7,7 @@
 #include "OTBlockEditor/Block.h"
 #include "OTBlockEditor/BlockPaintJob.h"
 #include "OpenTwinCore/otAssert.h"
+#include "OpenTwinCore/Logger.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -58,6 +59,7 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 			QMimeData* mimeData = new QMimeData;
 			mimeData->setText("OT_BLOCK");
 			mimeData->setData(OT_BLOCK_MIMETYPE_Configuration, m_config);
+			OT_LOG_D("Added config to mime data with length: " + std::to_string(m_config.count()));
 
 			QDrag* drag = new QDrag(_event->widget());
 			drag->setMimeData(mimeData);
@@ -76,9 +78,11 @@ void ot::Block::attachToGroup(void) {
 }
 
 QPixmap ot::Block::toPixmap(void) {
-	QPixmap prev(this->boundingRect().size().toSize());
+	QSize size = this->boundingRect().size().toSize();
+	QPixmap prev(size);
 	QPainter p(&prev);
 	QStyleOptionGraphicsItem opt;
+	p.fillRect(QRect(QPoint(0, 0), size), Qt::gray);
 	this->paint(&p, &opt);
 	return prev;
 }

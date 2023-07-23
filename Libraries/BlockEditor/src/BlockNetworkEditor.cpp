@@ -44,16 +44,16 @@ void ot::BlockNetworkEditor::dragEnterEvent(QDragEnterEvent* _event) {
 		_event->acceptProposedAction();
 		OT_LOG_D("Drag enter event accepted for: Block");
 	}
+	GraphicsView::dragEnterEvent(_event);
 }
 
 void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
+	OT_LOG_D("Test1..");
 	QByteArray cfgRaw = _event->mimeData()->data(OT_BLOCK_MIMETYPE_Configuration);
 	if (cfgRaw.isEmpty()) {
 		OT_LOG_D("Drop event reqected: MimeData not matching");
 		return;
 	}
-
-	OT_LOG_D("..");
 
 	// Generate configuration from raw data
 	ot::BlockConfiguration* cfg = nullptr;
