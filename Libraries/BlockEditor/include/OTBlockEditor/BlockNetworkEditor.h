@@ -17,7 +17,7 @@ namespace ot {
 	class Block;
 	class BlockNetwork;
 
-	class BLOCK_EDITOR_API_EXPORT BlockNetworkEditor : public GraphicsView {
+	class BLOCK_EDITOR_API_EXPORT BlockNetworkEditor : public QGraphicsView {
 		Q_OBJECT
 	public:
 		BlockNetworkEditor();
@@ -27,9 +27,9 @@ namespace ot {
 
 		virtual void dragEnterEvent(QDragEnterEvent* _event) override;
 		virtual void dropEvent(QDropEvent* _event) override;
-
+		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 	protected:
-		virtual void mousePressedMoveEvent(QMouseEvent* _event) override;
+		//virtual void mousePressedMoveEvent(QMouseEvent* _event) override;
 
 	private:
 		BlockNetwork* m_network;

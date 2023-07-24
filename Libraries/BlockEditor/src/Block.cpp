@@ -64,7 +64,9 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 			QDrag* drag = new QDrag(_event->widget());
 			drag->setMimeData(mimeData);
 			drag->setPixmap(this->toPixmap());
+			OT_LOG_D("Drag handler: Run");
 			drag->exec();
+			OT_LOG_D("Drag handler: Done");
 		}
 	}
 	else {

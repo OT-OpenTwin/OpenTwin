@@ -25,7 +25,7 @@ ot::BlockNetworkEditor::BlockNetworkEditor() {
 	m_network = new BlockNetwork;
 	setScene(m_network);
 
-	setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+	setDragMode(QGraphicsView::DragMode::NoDrag);
 }
 
 ot::BlockNetworkEditor::~BlockNetworkEditor() {
@@ -34,9 +34,9 @@ ot::BlockNetworkEditor::~BlockNetworkEditor() {
 
 // ########################################################################################################
 
-void ot::BlockNetworkEditor::mousePressedMoveEvent(QMouseEvent* _event) {
-	m_network->update();
-}
+//void ot::BlockNetworkEditor::mousePressedMoveEvent(QMouseEvent* _event) {
+	//m_network->update();
+//}
 
 void ot::BlockNetworkEditor::dragEnterEvent(QDragEnterEvent* _event) {
 	// Check if the events mime data contains the configuration
@@ -44,7 +44,9 @@ void ot::BlockNetworkEditor::dragEnterEvent(QDragEnterEvent* _event) {
 		_event->acceptProposedAction();
 		OT_LOG_D("Drag enter event accepted for: Block");
 	}
-	GraphicsView::dragEnterEvent(_event);
+	else {
+		QGraphicsView::dragEnterEvent(_event);
+	}
 }
 
 void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
@@ -79,7 +81,7 @@ void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
 
 	Block* newBlock = ot::BlockFactory::blockFromConfig(cfg);
 	newBlock->setBlockContextFlags(ot::BlockContextFlags(ot::NetworkBlockContext));
-	newBlock->setPos(position);
+	//newBlock->setPos(position);
 	m_network->addItem(newBlock);
 
 	delete cfg;
@@ -87,4 +89,15 @@ void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
 	_event->acceptProposedAction();
 
 	OT_LOG_D("Drop event accepted for: Block");
+}
+
+void ot::BlockNetworkEditor::dragMoveEvent(QDragMoveEvent* _event) {
+	// Check if the events mime data contains the configuration
+	if (!_event->mimeData()->data(OT_BLOCK_MIMETYPE_Configuration).isEmpty()) {
+		_event->acceptProposedAction();
+		OT_LOG_D("Drag move event accepted for: Block");
+	}
+	else {
+		QGraphicsView::dragMoveEvent(_event);
+	}
 }
