@@ -21,7 +21,11 @@ public:
 		PyErr_Fetch(&type, &value, &traceback);
 		PyErr_NormalizeException(&type, &value, &traceback);
 		PyObject* errorMessagePython = PyObject_Str(value);
-		message += PyUnicode_AsUTF8(errorMessagePython);
+		std::string exceptionCause = PyUnicode_AsUTF8(errorMessagePython);
+		if (exceptionCause != "<NULL>")
+		{
+			message += exceptionCause;
+		}
 		Py_DECREF(errorMessagePython);
 	}
 

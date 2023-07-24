@@ -99,7 +99,8 @@ void PythonWrapper::AddToSysPath(const std::string& newPathComponent)
 void PythonWrapper::signalHandlerAbort(int sig)
 {
 	signal(SIGABRT, &signalHandlerAbort);
-	throw std::exception("Abort was called.");
+	throw PythonException("Abort was called.");
+	//throw std::exception("Abort was called.");
 }
 
 void PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
