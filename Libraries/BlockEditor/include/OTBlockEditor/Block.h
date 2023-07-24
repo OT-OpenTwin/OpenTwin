@@ -26,15 +26,19 @@ class QStyleOptionGraphicsItem;
 class QWidget;
 
 namespace ot {
-
+	
+	class Block;
 	class BlockConnector;
 
 	class BLOCK_EDITOR_API_EXPORT BlockGraphicsItemGroup : public QGraphicsItemGroup {
 	public:
-		BlockGraphicsItemGroup() {};
+		BlockGraphicsItemGroup(ot::Block* _block);
 		virtual ~BlockGraphicsItemGroup() {};
 
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+
 	private:
+		ot::Block* m_block;
 
 		BlockGraphicsItemGroup(const BlockGraphicsItemGroup&) = delete;
 		BlockGraphicsItemGroup& operator = (const BlockGraphicsItemGroup&) = delete;

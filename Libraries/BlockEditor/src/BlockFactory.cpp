@@ -25,6 +25,7 @@ namespace ot {
 			if (_config->isUserMoveable()) _block->setFlags(_block->flags() | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 			_block->setWidthLimit(_config->widthLimits());
 			_block->setHeightLimit(_config->heightLimits());
+			_block->setPos(0., 0.);
 
 			// Store block configuration (required to create copies of the block)
 			OT_rJSON_createDOC(doc);
@@ -47,7 +48,8 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 	}
 
 	// Create default block
-	ot::DefaultBlock* newBlock = new ot::DefaultBlock(new BlockGraphicsItemGroup);
+	ot::DefaultBlock* newBlock = new ot::DefaultBlock(nullptr);
+	ot::intern::applyGeneralBlockSetting(newBlock, _config);
 
 	// Add layers
 	for (auto layer : _config->layers()) {
@@ -60,7 +62,6 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 		}
 	}
 
-	ot::intern::applyGeneralBlockSetting(newBlock, _config);
 	newBlock->attachToGroup();
 
 	return newBlock;
