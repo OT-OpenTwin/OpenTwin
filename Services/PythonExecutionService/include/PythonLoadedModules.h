@@ -36,7 +36,8 @@ public:
 		ot::UID version = baseEntity->getEntityStorageVersion();
 		std::string moduleName = std::to_string(uid) + std::to_string(version);
 		/*std::string moduleName = baseEntity->getName();
-		_moduleNamesByScriptName[baseEntity->getName()] = moduleName;*/
+		*/
+		_moduleNamesByScriptName[baseEntity->getName()] = moduleName;
 		return moduleName;
 	};
 
