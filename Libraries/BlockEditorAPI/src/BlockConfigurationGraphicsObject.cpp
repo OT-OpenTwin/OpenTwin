@@ -12,6 +12,8 @@ ot::BlockConfigurationGraphicsObject::BlockConfigurationGraphicsObject(const std
 {}
 
 void ot::BlockConfigurationGraphicsObject::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	BlockConfigurationObject::addToJsonObject(_document, _object);
+
 	OT_rJSON_createValueObject(marginsObj);
 	m_margins.addToJsonObject(_document, marginsObj);
 
@@ -30,6 +32,8 @@ void ot::BlockConfigurationGraphicsObject::addToJsonObject(OT_rJSON_doc& _docume
 }
 
 void ot::BlockConfigurationGraphicsObject::setFromJsonObject(OT_rJSON_val& _object) {
+	BlockConfigurationObject::setFromJsonObject(_object);
+
 	OT_rJSON_checkMember(_object, JSOM_MEMBER_Orientation, String);
 	OT_rJSON_checkMember(_object, JSOM_MEMBER_Margins, Object);
 	OT_rJSON_checkMember(_object, JSOM_MEMBER_IsUserMoveable, Bool);

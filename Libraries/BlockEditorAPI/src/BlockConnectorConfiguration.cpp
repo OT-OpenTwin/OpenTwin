@@ -1,8 +1,12 @@
+//! @file BlockConnectorConfiguration.h
+//! @author Alexander Kuester (alexk95)
+//! @date July 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // OpenTwin header
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
 
-#define JSON_MEMBER_Name "Name"
 #define JSON_MEMBER_Title "Title"
 #define JSON_MEMBER_TitleOrientation "TitleOrientation"
 #define JSON_MEMBER_Style "Style"
@@ -34,7 +38,6 @@ void ot::BlockConnectorConfiguration::addToJsonObject(OT_rJSON_doc& _document, O
 
 void ot::BlockConnectorConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 	BlockConfigurationGraphicsObject::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_TitleOrientation, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Style, String);

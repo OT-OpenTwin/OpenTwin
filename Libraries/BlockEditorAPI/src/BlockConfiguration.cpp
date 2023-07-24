@@ -20,8 +20,9 @@ ot::BlockConfiguration::~BlockConfiguration() {
 }
 
 void ot::BlockConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	otAssert(!m_layers.empty(), "Exporting invalid block configuration:\n\tNo layers provided");
-
+	if (m_layers.empty()) {
+		OT_LOG_WA("Exporting invalid block configuration:\n\tNo layers provided");
+	}
 	BlockConfigurationGraphicsObject::addToJsonObject(_document, _object);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Type, type());
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Title, m_title);

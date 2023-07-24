@@ -88,6 +88,8 @@ ot::BlockConnectorConfiguration* ot::BorderLayoutBlockConnectorManagerConfigurat
 }
 
 void ot::BorderLayoutBlockConnectorManagerConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	ot::BlockConnectorManagerConfiguration::addToJsonObject(_document, _object);
+
 	OT_rJSON_createValueArray(topArr);
 	OT_rJSON_createValueArray(leftArr);
 	OT_rJSON_createValueArray(rightArr);
@@ -121,6 +123,8 @@ void ot::BorderLayoutBlockConnectorManagerConfiguration::addToJsonObject(OT_rJSO
 }
 
 void ot::BorderLayoutBlockConnectorManagerConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
+	ot::BlockConnectorManagerConfiguration::setFromJsonObject(_object);
+
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_TopItems, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_LeftItems, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RightItems, Array);

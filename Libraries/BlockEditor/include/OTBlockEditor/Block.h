@@ -24,37 +24,17 @@
 class QPainter;
 class QStyleOptionGraphicsItem;
 class QWidget;
+class QGraphicsScene;
 
 namespace ot {
 	
-	class Block;
 	class BlockConnector;
-
-	class BLOCK_EDITOR_API_EXPORT BlockGraphicsItemGroup : public QGraphicsItemGroup {
-	public:
-		BlockGraphicsItemGroup(ot::Block* _block);
-		virtual ~BlockGraphicsItemGroup() {};
-
-		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
-
-	private:
-		ot::Block* m_block;
-
-		BlockGraphicsItemGroup(const BlockGraphicsItemGroup&) = delete;
-		BlockGraphicsItemGroup& operator = (const BlockGraphicsItemGroup&) = delete;
-	};
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem, public ot::BlockGraphicsObject {
 		Q_OBJECT
 		Q_INTERFACES(QGraphicsItem)
 	public:
-		Block(BlockGraphicsItemGroup* _graphicsItemGroup);
+		Block();
 		virtual ~Block();
 
 		virtual QRectF boundingRect(void) const override;
@@ -65,10 +45,9 @@ namespace ot {
 		virtual qreal blockHeigth(void) const = 0;
 		
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
-
-		void setGraphicsItemGroup(BlockGraphicsItemGroup* _gig) { m_gig = _gig; };
-		BlockGraphicsItemGroup* graphicsItemGroup(void) { return m_gig; }
-
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
+		
 		void setHighlighted(bool _isHighlighted = true) { m_isHighlighted = _isHighlighted; };
 		bool isHighlighted(void) const { return m_isHighlighted; };
 
@@ -86,26 +65,26 @@ namespace ot {
 		void setConfiguration(const QByteArray& _config) { m_config = _config; };
 		const QByteArray& configuration(void) const { return m_config; };
 
-		void attachToGroup(void);
-
 		QPixmap toPixmap(void);
 
 		void setBlockContextFlags(const BlockContextFlags& _flags) { m_contextFlags = _flags; };
 		const BlockContextFlags& blockContextFlags(void) const { return m_contextFlags; };
 
+		void placeOnScene(QGraphicsScene* _scene);
+
 	protected:
-		virtual void attachChildsToGroup(BlockGraphicsItemGroup* _gig) {};
+		virtual void placeChildsOnScene(QGraphicsScene* _scene) {};
 
 	private:
 		BlockContextFlags m_contextFlags;
-		BlockGraphicsItemGroup* m_gig;
 		bool m_isHighlighted;
 		QColor m_highlightColor;
 		LengthLimitation m_heightLimit;
 		LengthLimitation m_widthLimit;
 		QByteArray m_config;
+		bool m_isPressed;
+		QPointF m_lastPos;
 
-		Block() = delete;
 		Block(const Block&) = delete;
 		Block& operator = (const Block&) = delete;
 	};

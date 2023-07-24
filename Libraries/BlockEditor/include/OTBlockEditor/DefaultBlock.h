@@ -18,7 +18,7 @@ namespace ot {
 	class BLOCK_EDITOR_API_EXPORT DefaultBlock : public ot::Block {
 		Q_OBJECT
 	public:
-		DefaultBlock(BlockGraphicsItemGroup* _graphicsItemGroup);
+		DefaultBlock();
 		virtual ~DefaultBlock();
 
 		virtual qreal blockWidth(void) const override;
@@ -33,12 +33,11 @@ namespace ot {
 		const std::list<BlockLayer*>& layers(void) const { return m_layers; };
 
 	protected:
-		virtual void attachChildsToGroup(BlockGraphicsItemGroup* _gig) override;
+		virtual void placeChildsOnScene(QGraphicsScene* _scene) override;
 
 	private:
 		std::list<BlockLayer*> m_layers;
 
-		DefaultBlock() = delete;
 		DefaultBlock(const DefaultBlock&) = delete;
 		DefaultBlock& operator = (const DefaultBlock&) = delete;
 	};

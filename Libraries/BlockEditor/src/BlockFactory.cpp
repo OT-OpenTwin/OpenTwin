@@ -48,7 +48,7 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 	}
 
 	// Create default block
-	ot::DefaultBlock* newBlock = new ot::DefaultBlock(nullptr);
+	ot::DefaultBlock* newBlock = new ot::DefaultBlock;
 	ot::intern::applyGeneralBlockSetting(newBlock, _config);
 
 	// Add layers
@@ -61,8 +61,6 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 			OT_LOG_W("Failed to create layer from configuration, skipping layer");
 		}
 	}
-
-	newBlock->attachToGroup();
 
 	return newBlock;
 }

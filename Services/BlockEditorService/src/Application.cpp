@@ -14,6 +14,8 @@
 // Open twin header
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
+#include "OTBlockEditorAPI/BorderLayoutBlockConnectorManagerConfiguration.h"
+#include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
 #include "OTBlockEditorAPI/BlockCategoryConfiguration.h"
 #include "OTBlockEditorAPI/BlockLayers.h"
 #include "OTBlockEditorAPI/BlockConfiguration.h"
@@ -90,6 +92,26 @@ ot::BlockConfiguration* createTestBlockConfig(const ot::Color& _color) {
 
 	// Add text layer
 	block->addLayer(layer0);
+
+	// Create a connetor manager to place on the layer
+	ot::BlockConnectorManagerConfiguration* layer0cm = new ot::BorderLayoutBlockConnectorManagerConfiguration;
+	layer0->setConnectorManager(layer0cm);
+
+	// Create a "input" on the left
+	ot::BlockConnectorConfiguration* layer0c1 = new ot::BlockConnectorConfiguration;
+	layer0c1->setStyle(ot::ConnectorCircle);
+	layer0c1->setFillColor(ot::Color(255, 0, 0));
+	layer0c1->setBorderColor(ot::Color(0, 0, 255));
+
+	// Create a "output" on the right
+	ot::BlockConnectorConfiguration* layer0c2 = new ot::BlockConnectorConfiguration;
+	layer0c2->setStyle(ot::ConnectorTriangleDown);
+	layer0c1->setFillColor(ot::Color(0, 0, 255));
+	layer0c1->setBorderColor(ot::Color(255, 0, 0));
+
+	// Add the connectors
+	layer0cm->addConnector(layer0c1, ot::BlockConnectorManagerConfiguration::LEFT);
+	layer0cm->addConnector(layer0c2, ot::BlockConnectorManagerConfiguration::RIGHT);
 
 	// ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###
 

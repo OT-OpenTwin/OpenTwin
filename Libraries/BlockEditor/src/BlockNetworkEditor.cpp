@@ -77,9 +77,8 @@ void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
 
 	Block* newBlock = ot::BlockFactory::blockFromConfig(cfg);
 	newBlock->setBlockContextFlags(ot::BlockContextFlags(ot::NetworkBlockContext));
-	QGraphicsItem* gi = newBlock->graphicsItemGroup();
-	gi->setPos(position);
-	m_network->addItem(gi);
+	newBlock->setPos(position);
+	m_network->addItem(newBlock);
 
 	delete cfg;
 

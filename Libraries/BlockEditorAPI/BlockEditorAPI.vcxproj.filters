@@ -81,6 +81,9 @@
     <ClCompile Include="src\BlockEditorConfigurationPackage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockConfigurationObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h">

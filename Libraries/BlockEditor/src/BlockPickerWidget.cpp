@@ -122,7 +122,7 @@ void ot::BlockPickerWidget::slotSelectionChanged(void) {
 					box.view->setMinimumSize(m_previewSize);
 					box.view->setDragMode(QGraphicsView::NoDrag);
 
-					box.scene->addItem(newBlock->graphicsItemGroup());
+					box.scene->addItem(newBlock);
 					
 					box.view->viewAll();
 

@@ -16,6 +16,7 @@
     <ClCompile Include="src\BlockConfiguration.cpp" />
     <ClCompile Include="src\BlockConfigurationFactory.cpp" />
     <ClCompile Include="src\BlockConfigurationGraphicsObject.cpp" />
+    <ClCompile Include="src\BlockConfigurationObject.cpp" />
     <ClCompile Include="src\BlockConnectorConfiguration.cpp" />
     <ClCompile Include="src\BlockEditorAPITypes.cpp" />
     <ClCompile Include="src\BlockEditorConfigurationPackage.cpp" />

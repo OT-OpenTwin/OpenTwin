@@ -13,26 +13,11 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qdrag.h>
 #include <QtWidgets/qstyleoption.h>
+#include <QtWidgets/qgraphicsscene.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::BlockGraphicsItemGroup::BlockGraphicsItemGroup(ot::Block* _block) : m_block(_block) {};
-
-void ot::BlockGraphicsItemGroup::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	m_block->mousePressEvent(_event);
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-ot::Block::Block(BlockGraphicsItemGroup* _graphicsItemGroup) : m_gig(_graphicsItemGroup), m_isHighlighted(false), m_highlightColor(250, 28, 28) {
-	if (m_gig == nullptr) {
-		m_gig = new BlockGraphicsItemGroup(this);
-	}
-}
+ot::Block::Block() : m_isHighlighted(false), m_highlightColor(250, 28, 28), m_isPressed(false) {}
 
 ot::Block::~Block() {}
 
@@ -83,14 +68,34 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 			OT_LOG_D("Drag handler: Done");
 		}
 	}
+	else if (m_contextFlags.flagIsSet(ot::NetworkBlockContext)) {
+		if (_event->button() == Qt::LeftButton && flags() & QGraphicsItem::ItemIsMovable) {
+			m_lastPos = pos();
+			m_isPressed = true;
+		}
+	}
 	else {
 		QGraphicsItem::mousePressEvent(_event);
 	}
 }
 
-void ot::Block::attachToGroup(void) {
-	m_gig->addToGroup(this);
-	attachChildsToGroup(m_gig);
+void ot::Block::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	if (m_contextFlags.flagIsSet(ot::NetworkBlockContext) && m_isPressed) {
+		QPointF delta = _event->pos() - m_lastPos;
+		moveBy(delta.x(), delta.y());
+		m_lastPos = _event->pos();
+	}
+	else {
+		QGraphicsItem::mouseMoveEvent(_event);
+	}
+}
+
+void ot::Block::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	if (_event->button() == Qt::LeftButton) {
+		m_isPressed = false;
+	}
+	
+	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
 QPixmap ot::Block::toPixmap(void) {
@@ -101,4 +106,9 @@ QPixmap ot::Block::toPixmap(void) {
 	p.fillRect(QRect(QPoint(0, 0), size), Qt::gray);
 	this->paint(&p, &opt);
 	return prev;
+}
+
+void ot::Block::placeOnScene(QGraphicsScene* _scene) {
+	_scene->addItem(this);
+	placeChildsOnScene(_scene);
 }

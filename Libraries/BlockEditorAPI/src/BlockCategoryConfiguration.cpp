@@ -5,7 +5,6 @@
 #include "OTBlockEditorAPI/BlockConfiguration.h"
 #include "OTBlockEditorAPI/BlockConfigurationFactory.h"
 
-#define JSON_MEMBER_Name "Name"
 #define JSON_MEMBER_Title "Title"
 #define JSON_MEMBER_IconSubPath "IconSubPath"
 #define JSON_MEMBER_Childs "Childs"
@@ -23,7 +22,7 @@ ot::BlockCategoryConfiguration::~BlockCategoryConfiguration() {
 }
 
 void ot::BlockCategoryConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, JSON_MEMBER_Name, this->name());
+	BlockConfigurationObject::addToJsonObject(_document, _object);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_Title, this->title());
 	ot::rJSON::add(_document, _object, JSON_MEMBER_IconSubPath, m_iconSubPath);
 
@@ -45,13 +44,12 @@ void ot::BlockCategoryConfiguration::addToJsonObject(OT_rJSON_doc& _document, OT
 }
 
 void ot::BlockCategoryConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, JSON_MEMBER_Name, String);
+	BlockConfigurationObject::setFromJsonObject(_object);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_IconSubPath, String);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Childs, Array);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_Items, Array);
 
-	this->setName(_object[JSON_MEMBER_Name].GetString());
 	this->setTitle(_object[JSON_MEMBER_Title].GetString());
 	m_iconSubPath = _object[JSON_MEMBER_IconSubPath].GetString();
 
@@ -74,7 +72,6 @@ void ot::BlockCategoryConfiguration::setFromJsonObject(OT_rJSON_val& _object) {
 			throw std::exception("Fatal: Unknown error");
 		}
 	}
-
 
 	OT_rJSON_val itemArr = _object[JSON_MEMBER_Items].GetArray();
 	for (rapidjson::SizeType i = 0; i < itemArr.Size(); i++) {

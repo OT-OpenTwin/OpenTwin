@@ -13,7 +13,10 @@
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Queue.h"
 
-ot::DefaultBlock::DefaultBlock(BlockGraphicsItemGroup* _graphicsItemGroup) : ot::Block(_graphicsItemGroup) {
+// Qt header
+#include <QtWidgets/qgraphicsscene.h>
+
+ot::DefaultBlock::DefaultBlock() {
 
 }
 
@@ -85,13 +88,11 @@ void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
 	m_layers.push_back(_layer);
 }
 
-void ot::DefaultBlock::attachChildsToGroup(BlockGraphicsItemGroup* _gig) {
-	for (BlockLayer * layer : m_layers) {
-		ot::BlockConnectorManager * connectorManager = layer->getConnectorManager();
-		if (connectorManager) {
-			for (BlockConnector * connector : connectorManager->getAllConnectors()) {
-				_gig->addToGroup(connector);
-			}
+void ot::DefaultBlock::placeChildsOnScene(QGraphicsScene* _scene) {
+	for (auto l : m_layers) {
+		ot::BlockConnectorManager * cm = l->getConnectorManager();
+		for (auto c : cm->getAllConnectors()) {
+			_scene->addItem(c);
 		}
 	}
 }
