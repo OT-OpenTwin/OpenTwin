@@ -22,23 +22,19 @@ namespace ot {
 		enum CleanupFlag {
 			DeleteAtEnd = 0x00, //! @brief Queue keeps ownership. Delete the object when the queue will be cleaned
 			DeleteAfter = 0x01, //! @brief Queue keeps ownership. Delete the data object after the the execution of the call rather than after the whole queue
-			NoDelete    = 0x03  //! @brief Creator keeps ownership. Data object won't be deleted when the queue will perform its garbage collection clear (overrides all)
+			NoDelete    = 0x03, //! @brief Creator keeps ownership. Data object won't be deleted when the queue will perform its garbage collection clear (overrides all)
+			Multiuse    = 0x04  //! @brief Must be set if the object is passed to the queue multilple times (a requeue does not count as multiuse)
 		};
-
-		//! @brief Queue data flags
-		typedef ot::Flags<CleanupFlag> CleanupFlags;
-		
+				
 		QueueDestroyableObject() : m_cleanupFlags(DeleteAtEnd) {};
 		QueueDestroyableObject(CleanupFlag _cleanupFlags) : m_cleanupFlags(_cleanupFlags) {};
-		QueueDestroyableObject(const CleanupFlags& _cleanupFlags) : m_cleanupFlags(_cleanupFlags) {};
 		virtual ~QueueDestroyableObject() {};
 
-		void setCleanupFlags(CleanupFlag _flags) { m_cleanupFlags.replaceWith(_flags); };
-		void setCleanupFlags(const CleanupFlags& _flags) { m_cleanupFlags = _flags; };
-		const CleanupFlags& cleanupFlags(void) const { return m_cleanupFlags; };
+		void setCleanupFlags(CleanupFlag _flags) { m_cleanupFlags = _flags; };
+		CleanupFlag cleanupFlags(void) const { return m_cleanupFlags; };
 
 	private:
-		CleanupFlags m_cleanupFlags;
+		CleanupFlag m_cleanupFlags;
 
 		QueueDestroyableObject(const QueueDestroyableObject&) = delete;
 		QueueDestroyableObject& operator = (const QueueDestroyableObject&) = delete;
@@ -52,7 +48,7 @@ namespace ot {
 
 	class __declspec(dllexport) QueueData :  public QueueDestroyableObject {
 	public:
-		QueueData(const CleanupFlags& _cleanupFlags = CleanupFlags(DeleteAtEnd)) : QueueDestroyableObject(_cleanupFlags) {};
+		QueueData(CleanupFlag _cleanupFlags = DeleteAtEnd) : QueueDestroyableObject(_cleanupFlags) {};
 		virtual ~QueueData() {};
 
 	private:
@@ -81,7 +77,7 @@ namespace ot {
 		};
 		typedef ot::Flags<QueueObject::QueueResultFlag> QueueResultFlags;
 
-		QueueObject(const CleanupFlags& _cleanupFlags = CleanupFlags(DeleteAtEnd)) : QueueDestroyableObject(_cleanupFlags) {};
+		QueueObject(CleanupFlag _cleanupFlags = DeleteAtEnd) : QueueDestroyableObject(_cleanupFlags) {};
 		virtual ~QueueObject() {};
 
 		//! @brief Is called when this object is activated by the queue
@@ -165,7 +161,7 @@ namespace ot {
 		void clearGarbage(void);
 
 		std::list<std::pair<QueueObject*, QueueData*>> m_queue;
-		std::list<QueueDestroyableObject*> m_garbage;
+		std::list<std::pair<QueueDestroyableObject*, bool>> m_garbage;
 		unsigned int m_garbageCounter;
 
 		SimpleQueue(const SimpleQueue&) = delete;
