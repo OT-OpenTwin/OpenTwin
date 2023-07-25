@@ -8,76 +8,132 @@
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/Logger.h"
 
-ot::SimpleQueue::SimpleQueue() {
+
+#ifndef OT_CFG_QueueUseGarbageLimit
+//! @brief If set to true the garbage collection will clear when reaching the QueueGarbageLimit
+#define OT_CFG_QueueUseGarbageLimit false
+#endif
+
+#ifndef OT_CFG_QueueGarbageLimit
+//! @brief The maximum ammount of garbage in the garbage collection (0 = max)
+//! Only has effect if OT_CFG_QueueUseGarbageLimit is set to true
+#define OT_CFG_QueueGarbageLimit 0
+#endif
+
+ot::SimpleQueue::SimpleQueue() : m_garbageCounter(0) {
 
 }
 
 ot::SimpleQueue::~SimpleQueue() {
-	clear();
+	clearGarbage();
 }
 
-void ot::SimpleQueue::queue(QueueObject* _obj, QueueData* _args) noexcept {
+void ot::SimpleQueue::queue(QueueObject* _obj, QueueData* _arg) noexcept {
 	otAssert(_obj, "nullptr provided for queue");
-	m_queue.push_back(std::pair<QueueObject*, QueueData*>(_obj, _args));
+	m_queue.push_back(std::pair<QueueObject*, QueueData*>(_obj, _arg));
 }
 
-void ot::SimpleQueue::queueNext(QueueObject* _obj, QueueData* _args) noexcept {
+void ot::SimpleQueue::queueNext(QueueObject* _obj, QueueData* _arg) noexcept {
 	otAssert(_obj, "nullptr provided for queue");
-	m_queue.push_front(std::pair<QueueObject*, QueueData*>(_obj, _args));
+	m_queue.push_front(std::pair<QueueObject*, QueueData*>(_obj, _arg));
 }
 
 bool ot::SimpleQueue::executeQueue(void) {
+	std::pair<QueueObject*, QueueData*> itm = std::pair<QueueObject*, QueueData*>(nullptr, nullptr);
 	while (!m_queue.empty()) {
 		try {
 			// Grab next queue item
-			std::pair<QueueObject*, QueueData*> itm = m_queue.front();
+			itm = m_queue.front();
 			m_queue.pop_front();
 			
 			// Execute
 			QueueObject::QueueResultFlags result = itm.first->activateFromQueue(this, itm.second);
 
-			// Check if memory should be cleared
-			bool memClr = true;
-			if (result.flagIsSet(QueueObject::NoMemClear)) memClr = false;
+			if (result.flagIsSet(QueueObject::JobFailed)) {
+				OT_LOG_W("Job failed, ignoring");
+			}
 
+			// Check how to proceed after the call
 			if (result.flagIsSet(QueueObject::CancelQueue)) {
-				OT_LOG_WA("Queue cancel result from queue object. Cancelling queue");
-				if (memClr) memClear(itm);
-				clear();
+				OT_LOG_D("Queue cancel result from queue object. Exiting queue");
+
+				// memclear
+				checkAndDestroy(itm.first);
+				checkAndDestroy(itm.second);
+				clearQueue();
+
 				return false;
 			}
+			else if (result.flagIsSet(QueueObject::FinishQueue)) {
+				OT_LOG_D("Queue finish result from queue object. Exiting queue");
+
+				// memclear
+				checkAndDestroy(itm.first);
+				checkAndDestroy(itm.second);
+				clearQueue();
+
+				return true;
+			}
 			else if (result.flagIsSet(QueueObject::Requeue)) {
-				memClr = false;
 				m_queue.push_back(itm);
 			}
 
-			// Clear memory if needed
-			if (memClr) memClear(itm);
+			// memclear
+			checkAndDestroy(itm.first);
+			checkAndDestroy(itm.second);
 		}
 		catch (const std::exception& _e) {
 			otAssert(0, "Failed to execute queue: Exception caught");
 			OT_LOG_E(std::string("Failed to execute queue: ") + _e.what());
-			clear();
+			
+			// memclear
+			checkAndDestroy(itm.first);
+			checkAndDestroy(itm.second);
+			clearQueue();
+
 			return false;
 		}
 		catch (...) {
 			OT_LOG_EA("Failed to execute queue: Unknown error");
-			clear();
+			clearQueue();
 			return false;
 		}
 	}
 	return true;
 }
 
-void ot::SimpleQueue::clear(void) {
-	for (auto obj : m_queue) memClear(obj);
+void ot::SimpleQueue::clearQueue(void) {
+	for (auto obj : m_queue) {
+		checkAndDestroy(obj.first);
+		checkAndDestroy(obj.second);
+	}
 	m_queue.clear();
 }
 
-void ot::SimpleQueue::memClear(const std::pair<QueueObject*, QueueData*>& _entry) {
-	if (_entry.first) delete _entry.first;
-	if (_entry.second) {
-		// Delete data object if needed
-		if (!_entry.second->isNoDeleteByQueue()) delete _entry.second;
+void ot::SimpleQueue::checkAndDestroy(QueueDestroyableObject* _obj) {
+	// Check if the default cleanup should be avoided (creator keeps ownership)
+	if (_obj->cleanupFlags().flagIsSet(QueueDestroyableObject::NoDelete)) {
+		return;
 	}
+
+	// Check if an instant delete is requested
+	if (_obj->cleanupFlags().flagIsSet(QueueDestroyableObject::DeleteAfter)) {
+		delete _obj;
+		return;
+	}
+
+	// Add object to garbage collection
+	m_garbage.push_back(_obj);
+
+#if (OT_CFG_QueueUseGarbageLimit == true)
+	if (++m_garbageCounter == OT_CFG_QueueGarbageLimit) {
+		clearGarbage();
+	}
+#endif
+}
+
+void ot::SimpleQueue::clearGarbage(void) {
+	for (auto o : m_garbage) delete o;
+	m_garbage.clear();
+	m_garbageCounter = 0;
 }

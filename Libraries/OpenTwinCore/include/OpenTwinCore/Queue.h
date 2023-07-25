@@ -16,23 +16,47 @@
 
 namespace ot {
 
-	class __declspec(dllexport) QueueData {
+	class __declspec(dllexport) QueueDestroyableObject {
 	public:
-		QueueData() : m_noDeleteByQueue(false) {};
-		virtual ~QueueData() {};
+		//! @brief Describes how the object will be destroyed after
+		enum CleanupFlag {
+			DeleteAtEnd = 0x00, //! @brief Queue keeps ownership. Delete the object when the queue will be cleaned
+			DeleteAfter = 0x01, //! @brief Queue keeps ownership. Delete the data object after the the execution of the call rather than after the whole queue
+			NoDelete    = 0x03  //! @brief Creator keeps ownership. Data object won't be deleted when the queue will perform its garbage collection clear (overrides all)
+		};
 
-		//! @brief If set the creator keeps the ownership when adding this data object to the queue.
-		//! This function can be called when adding this object to the queue (simplified use) and processing the queue before destroying the data object.
-		//! If the data object is destroyed by the user, the user has to take care of cleaning up the queue.
-		//! @param _isNoDelete False if the data object should be destroyed by the queue when needed.
-		QueueData* noDeleteByQueue(bool _isNoDelete = true) { m_noDeleteByQueue = _isNoDelete; return this; };
+		//! @brief Queue data flags
+		typedef ot::Flags<CleanupFlag> CleanupFlags;
+		
+		QueueDestroyableObject() : m_cleanupFlags(DeleteAtEnd) {};
+		QueueDestroyableObject(CleanupFlag _cleanupFlags) : m_cleanupFlags(_cleanupFlags) {};
+		QueueDestroyableObject(const CleanupFlags& _cleanupFlags) : m_cleanupFlags(_cleanupFlags) {};
+		virtual ~QueueDestroyableObject() {};
 
-		//! @brief If false the data object should be destroyed by the queue when needed, otherwise the creator has the ownership.
-		bool isNoDeleteByQueue(void) const { return m_noDeleteByQueue; };
+		void setCleanupFlags(CleanupFlag _flags) { m_cleanupFlags.replaceWith(_flags); };
+		void setCleanupFlags(const CleanupFlags& _flags) { m_cleanupFlags = _flags; };
+		const CleanupFlags& cleanupFlags(void) const { return m_cleanupFlags; };
 
 	private:
-		bool m_noDeleteByQueue;
+		CleanupFlags m_cleanupFlags;
 
+		QueueDestroyableObject(const QueueDestroyableObject&) = delete;
+		QueueDestroyableObject& operator = (const QueueDestroyableObject&) = delete;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class __declspec(dllexport) QueueData :  public QueueDestroyableObject {
+	public:
+		QueueData(const CleanupFlags& _cleanupFlags = CleanupFlags(DeleteAtEnd)) : QueueDestroyableObject(_cleanupFlags) {};
+		virtual ~QueueData() {};
+
+	private:
+		
 		QueueData(const QueueData&) = delete;
 		QueueData& operator = (const QueueData&) = delete;
 	};
@@ -45,18 +69,19 @@ namespace ot {
 
 	class AbstractQueue;
 
-	class __declspec(dllexport) QueueObject {
+	class __declspec(dllexport) QueueObject : public QueueDestroyableObject {
 	public:
 		//! @brief Return value for the activate call
 		enum QueueResultFlag {
 			Ok          = 0x00, //! @brief Everything ok, continue
-			Requeue     = 0x01, //! @brief Add this object back to the queue with the same data
-			CancelQueue = 0x02, //! @brief Cancel queue
-			NoMemClear  = 0x04
+			JobFailed   = 0x01, //! @brief Execution failed, ignore and continue
+			Requeue     = 0x02, //! @brief Add this object back to the queue with the same data
+			CancelQueue = 0x04, //! @brief Exit the queue (now) with error
+			FinishQueue = 0x08  //! @brief Exit the queue (now) with ok
 		};
 		typedef ot::Flags<QueueObject::QueueResultFlag> QueueResultFlags;
 
-		QueueObject() {};
+		QueueObject(const CleanupFlags& _cleanupFlags = CleanupFlags(DeleteAtEnd)) : QueueDestroyableObject(_cleanupFlags) {};
 		virtual ~QueueObject() {};
 
 		//! @brief Is called when this object is activated by the queue
@@ -69,6 +94,7 @@ namespace ot {
 	};
 }
 
+OT_ADD_FLAG_FUNCTIONS(ot::QueueDestroyableObject::CleanupFlag);
 OT_ADD_FLAG_FUNCTIONS(ot::QueueObject::QueueResultFlag);
 
 namespace ot {	
@@ -115,23 +141,32 @@ namespace ot {
 
 		//! @brief Add the provided object to the queue
 		//! @param _obj The object to add to the queue
-		//! @param _args The arguments object that should be provided to the objects activate call
-		virtual void queue(QueueObject* _obj, QueueData* _args = (QueueData*)nullptr) noexcept override;
+		//! @param _arg The arguments object that will be passed to the objects activate call
+		virtual void queue(QueueObject* _obj, QueueData* _arg = (QueueData*)nullptr) noexcept override;
 
 		//! @brief Add the provided object to the front of the queue
 		//! @param _obj The object to add to the queue
-		//! @param _args The arguments object that should be provided to the objects activate call
-		virtual void queueNext(QueueObject* _obj, QueueData* _args = (QueueData*)nullptr) noexcept override;
+		//! @param _arg The arguments object that will be passed to the objects activate call
+		virtual void queueNext(QueueObject* _obj, QueueData* _arg = (QueueData*)nullptr) noexcept override;
 
 		//! @brief Execute the queue
 		virtual bool executeQueue(void) override;
 
+		//! @brief Clear the queue
+		void clearQueue(void);
+
 	protected:
-		std::list<std::pair<QueueObject*, QueueData *>> m_queue;
+
+		//! @brief Will clear the memory according to the objects cleanup flags
+		//! @note Note that the provided object might be destroyed after calling this function
+		void checkAndDestroy(QueueDestroyableObject* _obj);
 
 	private:
-		void clear(void);
-		inline void memClear(const std::pair<QueueObject*, QueueData*>& _entry);
+		void clearGarbage(void);
+
+		std::list<std::pair<QueueObject*, QueueData*>> m_queue;
+		std::list<QueueDestroyableObject*> m_garbage;
+		unsigned int m_garbageCounter;
 
 		SimpleQueue(const SimpleQueue&) = delete;
 		SimpleQueue& operator = (const SimpleQueue&) = delete;
