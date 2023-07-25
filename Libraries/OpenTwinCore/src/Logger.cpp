@@ -262,18 +262,46 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 	}
 }
 
-ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!")
+void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
+	if (_str == "DEFAULT_LOG") m_logFlags.setFlag(ot::DEFAULT_LOG);
+	else if (_str == "DETAILED_LOG") m_logFlags.setFlag(ot::DETAILED_LOG);
+	else if (_str == "WARNING_LOG") m_logFlags.setFlag(ot::WARNING_LOG);
+	else if (_str == "ERROR_LOG") m_logFlags.setFlag(ot::ERROR_LOG);
+	else if (_str == "INBOUND_MESSAGE_LOG") m_logFlags.setFlag(ot::INBOUND_MESSAGE_LOG);
+	else if (_str == "QUEUED_INBOUND_MESSAGE_LOG") m_logFlags.setFlag(ot::QUEUED_INBOUND_MESSAGE_LOG);
+	else if (_str == "ONEWAY_TLS_INBOUND_MESSAGE_LOG") m_logFlags.setFlag(ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG);
+	else if (_str == "OUTGOING_MESSAGE_LOG") m_logFlags.setFlag(ot::OUTGOING_MESSAGE_LOG);
+	else if (_str == "ALL_GENERAL_LOG_FLAGS") m_logFlags.setFlag(ot::ALL_GENERAL_LOG_FLAGS);
+	else if (_str == "ALL_INCOMING_MESSAGE_LOG_FLAGS") m_logFlags.setFlag(ot::ALL_INCOMING_MESSAGE_LOG_FLAGS);
+	else if (_str == "ALL_OUTGOING_MESSAGE_LOG_FLAGS") m_logFlags.setFlag(ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS);
+	else if (_str == "ALL_MESSAGE_LOG_FLAGS") m_logFlags.setFlag(ot::ALL_MESSAGE_LOG_FLAGS);
+	else if (_str == "ALL_LOG_FLAGS") m_logFlags.setFlag(ot::ALL_LOG_FLAGS);
+	else if (_str == "NO_LOG") {}
+	else {
+		OT_LOG_WA("Unknown log flag");
+	}
+}
+
+ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!"), m_logFlags(WARNING_LOG | ERROR_LOG)
 {
-	char buffer[128];
+	char buffer[4096];
 	size_t bufferLen;
 	getenv_s(&bufferLen, buffer, sizeof(buffer) - 1, "OPEN_TWIN_LOGGING_MODE");
 	std::string type(buffer);
+	if (!type.empty()) {
+		m_logFlags.replaceWith(NO_LOG);
 
-	if (type == "all" || type == "All" || type == "ALL") { m_logFlags = ot::ALL_LOG_FLAGS; }
-	else if (type == "io" || type == "IO") { m_logFlags = ot::INBOUND_MESSAGE_LOG | ot::QUEUED_INBOUND_MESSAGE_LOG | ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG | ot::OUTGOING_MESSAGE_LOG; }
-	else if (type == "general" || type == "General" || type == "GENERAL") { m_logFlags = ot::DEFAULT_LOG | ot::WARNING_LOG | ot::ERROR_LOG; }
-	else if (type == "none") { m_logFlags = ot::NO_LOG; }
-	else { m_logFlags = ot::WARNING_LOG | ot::ERROR_LOG; }
+		auto ix = type.find('|');
+		while (ix != std::string::npos) {
+			std::string sub = type.substr(0, ix);
+			type = type.substr(ix + 1);
+			
+			if (!sub.empty()) applyEnvFlag(sub);
+		}
+
+		// Last entry
+		if (!type.empty()) applyEnvFlag(type);
+	}
 }
 
 ot::LogDispatcher::~LogDispatcher() {

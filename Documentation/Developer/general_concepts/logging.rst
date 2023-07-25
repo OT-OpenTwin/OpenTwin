@@ -33,15 +33,15 @@ When a service is started the logger should be setup by providing at least the c
         ...
     }
 
-If you want to be able to use the central logging system you should setup the ServiceLogNotifier.
-This notifier will register itself at the LogDispatcher when calling the initialize function.
-Also the initialize for the LogDispatcher will be called when the LogNotifier initialization is performed.
+If you want to use the central logging system you need to initialize the ServiceLogNotifier.
+This notifier will register itself at the LogDispatcher aswell as call the initialize for the LogDispatcher upon initialization.
 
 .. code-block:: c++
 
     #include "OpenTwinCommunication/ServiceLogNotifier.h"
 
     char * init(const char * _serviceURL, const char * _localDirectoryServiceURL, const char * _unused1, const char * _unused2) {
+    // Note that the _DEBUG must be defined in your projects debug configuration    
     #ifdef _DEBUG
         ot::ServiceLogNotifier::initialize("MyServiceName", "LoggingServiceURL", true);
     #else 
@@ -69,14 +69,34 @@ When creating the Service Logger instance, it sets the logging options from the 
 
     * - OPEN_TWIN_LOGGING_MODE
       - Sets the active log flags that determine which log messages will be generated.
+        
+        A union of multiple flags can be created by splitting them with a '|' character (without any blank space)
 
-        * All: *Any log*
+        * DEFAULT_LOG: *General log*
         
-        * Default: *Only warning and error logs*
+        * DETAILED_LOG: *Detailed log*
         
-        * IO: *Only inbound and outbound messages will be logged*
-        
-        * None: *No log*
+        * WARNING_LOG: *Warning log*
+
+        * ERROR_LOG: *Error log*
+
+        * INBOUND_MESSAGE_LOG *Execute enpoint message received log*
+
+        * QUEUED_INBOUND_MESSAGE_LOG *Queue endpoint message received log*
+
+        * ONEWAY_TLS_INBOUND_MESSAGE_LOG *One way tls endpoint message received log*
+
+        * OUTGOING_MESSAGE_LOG *Outgoing message log*
+
+        * ALL_GENERAL_LOG_FLAGS *All general log flags will be set (Default, Detailed, Warning, Error)*
+
+        * ALL_INCOMING_MESSAGE_LOG_FLAGS *All flags for incoming messages will be set*
+
+        * ALL_OUTGOING_MESSAGE_LOG_FLAGS *All flags for outgoing message will be set*
+
+        * ALL_MESSAGE_LOG_FLAGS *All flags for incoming and outgoing messages will be set*
+
+        * ALL_LOG_FLAGS *All log flags will be set*
 
 .. note::
    The environment variables are optional. Also the variables will be set when running OpenTwin by using the batch files provided with OpenTwin.

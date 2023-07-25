@@ -10,13 +10,14 @@
 
 #pragma once
 
+// OpenTwin header
 #include "OpenTwinCore/CoreAPIExport.h"
-
 #include "OpenTwinCore/Flags.h"
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/Serializable.h"
 
+// std header
 #include <string>
 #include <ostream>
 #include <list>
@@ -44,18 +45,18 @@
 
 #endif
 
-//! @brief Log a info message according to the service logger configuration.
+//! @brief Log a information message according to the service logger configuration.
 //! Information messages should contain general information.
 //! @param ___text The log message.
 #define OT_LOG_I(___text) OT_LOG(___text, ot::DEFAULT_LOG)
 
-//! @brief Log a info message according to the service logger configuration and otAssert with the provided message.
+//! @brief Log a information message according to the service logger configuration and otAssert with the provided message.
 //! Note that the provided text should be a C-String
 //! Information messages should contain general information.
 //! @param ___text The log message.
 #define OT_LOG_IA(___text) otAssert(0, ___text); OT_LOG(___text, ot::DEFAULT_LOG)
 
-//! @brief Log a info message according to the service logger configuration and assert.
+//! @brief Log a information message according to the service logger configuration and assert.
 //! Information messages should contain general information.
 //! @param ___text The log message.
 #define OT_LOG_IAS(___text) assert(0); OT_LOG(___text, ot::DEFAULT_LOG)
@@ -108,16 +109,20 @@ namespace ot {
 
 	//! @brief Log message verbouse level
 	enum LogFlag {
-		NO_LOG                          = 0x00,		//! @brief Mask used to unset all log types
-		DEFAULT_LOG                     = 0x01,		//! @brief Information log (few logs)
-		DETAILED_LOG                    = 0x02,		//! @brief Detailed log (more logs)
-		WARNING_LOG                     = 0x04,		//! @brief Warning log
-		ERROR_LOG                       = 0x08,		//! @brief Error log
-		INBOUND_MESSAGE_LOG             = 0x10,		//! @brief Execute endpoint log
-		QUEUED_INBOUND_MESSAGE_LOG      = 0x20,		//! @brief Queue endpoint log
-		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 0x40,		//! @brief OneWay-TLS endpoint log
-		OUTGOING_MESSAGE_LOG            = 0x80,		//! @brief Message out log
-		ALL_LOG_FLAGS                   = 0xFF		//! @brief Mask used to set all log types
+		NO_LOG                          = 0x0000, //! @brief No log flags
+		DEFAULT_LOG                     = 0x0001, //! @brief Information log (few logs)
+		DETAILED_LOG                    = 0x0002, //! @brief Detailed log (more logs)
+		WARNING_LOG                     = 0x0004, //! @brief Warning log
+		ERROR_LOG                       = 0x0008, //! @brief Error log
+		INBOUND_MESSAGE_LOG             = 0x0010, //! @brief Execute endpoint log
+		QUEUED_INBOUND_MESSAGE_LOG      = 0x0020, //! @brief Queue endpoint log
+		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 0x0040, //! @brief OneWay-TLS endpoint log
+		OUTGOING_MESSAGE_LOG            = 0x0080, //! @brief Message out log
+		ALL_GENERAL_LOG_FLAGS           = 0x000F, //! @brief Mask used to set all general log flags
+		ALL_INCOMING_MESSAGE_LOG_FLAGS  = 0x0070, //! @brief Mask used to set all incoming message log flags
+		ALL_OUTGOING_MESSAGE_LOG_FLAGS  = 0x0080, //! @brief Mask used to set all outgoing message log flags
+		ALL_MESSAGE_LOG_FLAGS           = 0x00F0, //! @brief Mask used to set all incoming and outgoing message log flags
+		ALL_LOG_FLAGS                   = 0xFFFF, //! @brief Mask used to set all log flags
 	};
 }
 OT_ADD_FLAG_FUNCTIONS(ot::LogFlag);
@@ -196,6 +201,7 @@ namespace ot {
 	//! @brief Used to receive every log message that is generated
 	class OT_CORE_API_EXPORT AbstractLogNotifier {
 	public:
+		AbstractLogNotifier() : m_deleteLater(false) {};
 		virtual ~AbstractLogNotifier() {};
 
 		//! @brief Will set the delete later flag
@@ -270,6 +276,8 @@ namespace ot {
 		void dispatch(const LogMessage& _message);
 
 	private:
+		void applyEnvFlag(const std::string& _str);
+
 		Flags<LogFlag>					m_logFlags;			//! @brief Allowed messages flags
 		std::string						m_serviceName;		//! @brief Service/Application name
 
