@@ -298,7 +298,7 @@ namespace ot {
 		UID getPrefetchedEntityVersion(UID entityID);
 
 		// ##########################################################################################################################################
-
+		void __serviceConnected(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id);
 	protected:
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response);
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response);
@@ -345,6 +345,7 @@ namespace ot {
 
 		std::map<UID, UID>								m_prefetchedEntityVersions;
 
+		
 	private:
 
 		friend intern::ExternalServicesComponent;
@@ -358,7 +359,6 @@ namespace ot {
 		OT_HANDLER(handleBlockEditorConnectionDropped, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionDropped, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleBlockEditorConnectionRemoved, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionRemoved, ot::SECURE_MESSAGE_TYPES);
 
-		void __serviceConnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
 		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
 		
 		std::string __processMessage(const std::string & _message, OT_rJSON_doc &doc, serviceID_t _senderID);

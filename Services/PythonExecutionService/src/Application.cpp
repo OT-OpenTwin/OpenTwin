@@ -219,23 +219,125 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	return false;
 }
 
+
+#include "OpenTwinSystem/OperatingSystem.h"
+#include "openTwinSystem/Application.h"
+#include "OpenTwinCommunication/Msg.h"
+
+bool CheckAlive(OT_PROCESS_HANDLE& handle)
+{
+#if defined(OT_OS_WINDOWS)
+	// Checking the exit code of the service
+	DWORD exitCode = STILL_ACTIVE;
+	bool isAlive;
+	if (GetExitCodeProcess(handle, &exitCode))
+	{
+		if (exitCode != STILL_ACTIVE) {
+			isAlive = false;
+			CloseHandle(handle);
+			handle = OT_INVALID_PROCESS_HANDLE;
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	else {
+		
+		isAlive = false;
+		CloseHandle(handle);
+		handle = OT_INVALID_PROCESS_HANDLE;
+	}
+	return isAlive;
+#else
+	assert(0);
+	OT_LOG_E("Function is implemented only for Windows OS");
+	return false;
+#endif // OT_OS_WINDOWS
+
+}
+
 void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction)
 {
 
-	std::list<variable_t> result =	_pythonAPI.Execute(scripts, allParameter);
-		
-	OT_rJSON_createDOC(newDocument);
-	OT_rJSON_createValueArray(rJsonResult);
-	VariableToJSONConverter converter;
-	for (auto& element : result)
-	{
-		rapidjson::Value rJsonVal = converter.Convert(std::move(element));
-		rJsonResult.PushBack(rJsonVal, newDocument.GetAllocator());
-	}
-	ot::rJSON::add(newDocument, "Result", rJsonResult);
+	std::string envName = "OPENTWIN_DEV_ROOT"; // Not available here !! "OT_LOCALDIRECTORYSERVICE_CONFIGURATION";
+	const char* configurationEnv = ot::os::getEnvironmentVariable(envName.c_str());
+	/*if (configurationEnv == nullptr) { assert(0); }
+	OT_rJSON_parseDOC(configurationDoc, configurationEnv);*/
 
-	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
-	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
+	std:: string launcherPath, servicesLibraryPath;
+
+	launcherPath = std::string(configurationEnv) + "\\Deployment\\open_twin.exe";
+	servicesLibraryPath = std::string(configurationEnv) + "\\Deployment\\PythonExecution.dll";
+	/*if (configurationDoc.IsObject())
+	{
+		launcherPath = ot::rJSON::getString(configurationDoc, "LauncherPath");
+		servicesLibraryPath = ot::rJSON::getString(configurationDoc, "ServicesLibraryPath");
+	}*/
+	
+	int startPort = 7800;
+	const int maxAttempts = 3;
+	bool pingSuccess = false;
+	int counter = 0;
+
+	while (!pingSuccess)
+	{
+		std::string _url = m_serviceURL.substr(0, m_serviceURL.find(':')+1) + std::to_string(startPort+counter);
+		ot::app::RunResult result = ot::app::GeneralError;
+		OT_PROCESS_HANDLE _processHandle;
+
+		std::string commandLine = launcherPath + " \"" + servicesLibraryPath + "\" \"" + m_serviceURL + "\" \"" + _url + "\" \"\"";
+		result = ot::app::runApplication(launcherPath, commandLine, _processHandle, false, 0);
+
+		assert(result == ot::app::OK); // Was able to start process. TOT
+
+		for (int attempts = 0; attempts < maxAttempts; attempts++)
+		{
+			if (CheckAlive(_processHandle))
+			{
+				OT_rJSON_createDOC(pingDoc);
+				ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
+				std::string pingCommand = ot::rJSON::toJSON(pingDoc);
+				std::string response;
+				if (ot::msg::send("", _url, ot::EXECUTE, pingCommand, response, 1000))
+				{
+					pingSuccess = true;
+					break;
+				}
+			}
+			if (_processHandle == OT_INVALID_PROCESS_HANDLE)
+			{
+				//What happened ?
+			}
+		}
+		//delete _processHandle;
+		//_processHandle = nullptr;
+	}
+
+	
+
+	//Nun healthcheck
+
+	//if(CheckAllive())
+	/*
+	* Ping	
+	*/
+
+
+	//std::list<variable_t> result =	_pythonAPI.Execute(scripts, allParameter);
+	//	
+	//OT_rJSON_createDOC(newDocument);
+	//OT_rJSON_createValueArray(rJsonResult);
+	//VariableToJSONConverter converter;
+	//for (auto& element : result)
+	//{
+	//	rapidjson::Value rJsonVal = converter.Convert(std::move(element));
+	//	rJsonResult.PushBack(rJsonVal, newDocument.GetAllocator());
+	//}
+	//ot::rJSON::add(newDocument, "Result", rJsonResult);
+
+	//ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
+	//ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
 	/*Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);*/
 
 }
