@@ -33,13 +33,21 @@ namespace ot {
 		LengthLimitation& getWidthLimit(void) { return m_widthLimit; };
 		const LengthLimitation& widthLimit(void) const { return m_widthLimit; };
 
-		QSizeF fitIntoLimits(const QSizeF& _size) const;
+		//! @brief Will apply the currently set LengthLimitation on the provided size
+		//! @param _size The size to adjust
+		QSizeF applyLimits(const QSizeF& _size) const;
+
+		//! @brief Will calculate and return the size of the block graphics object
+		virtual QSizeF calculateSize(void) const = 0;
+
+		//! @brief Will add the currently set margins to the provided size
+		//! @param _size The size increase
+		QSizeF addMargins(const QSizeF& _size) const;
 
 	private:
 		QMarginsF        m_margins;
 		LengthLimitation m_heightLimit;
 		LengthLimitation m_widthLimit;
-		
 	};
 
 }

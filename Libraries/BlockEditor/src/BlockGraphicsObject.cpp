@@ -13,7 +13,7 @@ void ot::BlockGraphicsObject::setMargins(const ot::MarginsD& _margins) {
 	m_margins.setTop(_margins.top());
 }
 
-QSizeF ot::BlockGraphicsObject::fitIntoLimits(const QSizeF& _size) const {
+QSizeF ot::BlockGraphicsObject::applyLimits(const QSizeF& _size) const {
 	QSizeF r(_size);
 
 	// Width min
@@ -45,4 +45,11 @@ QSizeF ot::BlockGraphicsObject::fitIntoLimits(const QSizeF& _size) const {
 	}
 
 	return r;
+}
+
+QSizeF ot::BlockGraphicsObject::addMargins(const QSizeF& _size) const {
+	return QSizeF(
+		_size.width() + m_margins.left() + m_margins.right(), 
+		_size.height() + m_margins.top() + m_margins.bottom()
+	);
 }

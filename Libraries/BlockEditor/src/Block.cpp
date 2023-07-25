@@ -23,24 +23,9 @@ ot::Block::~Block() {}
 
 QRectF ot::Block::boundingRect(void) const {
 	QPointF p(pos());
-	qreal w(blockWidth());
-	qreal h(blockHeigth());
+	QSizeF s(calculateSize());
 
-	if (m_widthLimit.isMinSet()) {
-		if (m_widthLimit.min() > w) w = m_widthLimit.min();
-	}
-	if (m_widthLimit.isMaxSet()) {
-		if (m_widthLimit.max() < w) w = m_widthLimit.max();
-	}
-
-	if (m_heightLimit.isMinSet()) {
-		if (m_heightLimit.min() > h) h = m_heightLimit.min();
-	}
-	if (m_heightLimit.isMaxSet()) {
-		if (m_heightLimit.max() < h) h = m_heightLimit.max();
-	}
-
-	return QRectF(QPointF(p.x() - (w / 2), p.y() - (h / 2)), QSizeF(w, h));
+	return QRectF(QPointF(p.x() - (s.width() / 2.), p.y() - (s.height() / 2.)), s);
 }
 
 void ot::Block::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {

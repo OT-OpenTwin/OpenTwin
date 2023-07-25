@@ -21,8 +21,8 @@ namespace ot {
 		DefaultBlock();
 		virtual ~DefaultBlock();
 
-		virtual qreal blockWidth(void) const override;
-		virtual qreal blockHeigth(void) const override;
+		//! @brief Will calculate and return the size of the block graphics object
+		virtual QSizeF calculateSize(void) const override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) override;
 

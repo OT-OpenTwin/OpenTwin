@@ -5,10 +5,15 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockPaintJob.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OpenTwinCore/Logger.h"
 
 ot::BlockPaintJob::QueueResultFlags ot::BlockPaintJob::activateFromQueue(ot::AbstractQueue* _queue, ot::QueueData* _args) {
 	ot::BlockPaintJobArg* args = dynamic_cast<ot::BlockPaintJobArg*>(_args);
-	otAssert(args, "Invalid paint job data type");
-	return runPaintJob(_queue, args);
+	if (args == nullptr) {
+		OT_LOG_EA("Invalid paint job data type");
+		return BlockPaintJob::JobFailed;
+	}
+	else {
+		return runPaintJob(_queue, args);
+	}
 }

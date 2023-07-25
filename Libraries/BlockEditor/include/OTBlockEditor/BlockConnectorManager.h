@@ -18,9 +18,9 @@ namespace ot {
 	class BlockConnector;
 	class BlockGraphicsItemGroup;
 
-	class BlockConnectorManager : public ot::BlockPaintJob {
+	class __declspec(dllexport) BlockConnectorManager : public ot::BlockPaintJob {
 	public:
-		BlockConnectorManager(BlockLayer * _layer) : m_layer(_layer) {};
+		BlockConnectorManager(BlockLayer* _layer) : BlockPaintJob(NoDelete), m_layer(_layer) {};
 		virtual ~BlockConnectorManager() {};
 
 		BlockLayer* getBlockLayer(void) { return m_layer; };
@@ -41,7 +41,7 @@ namespace ot {
 		BlockConnectorManager& operator = (const BlockConnectorManager&) = delete;
 	};
 
-	class BorderLayoutBlockConnectorManager : public BlockConnectorManager {
+	class BLOCK_EDITOR_API_EXPORT BorderLayoutBlockConnectorManager : public BlockConnectorManager {
 	public:
 		BorderLayoutBlockConnectorManager(BlockLayer* _layer);
 		virtual ~BorderLayoutBlockConnectorManager();

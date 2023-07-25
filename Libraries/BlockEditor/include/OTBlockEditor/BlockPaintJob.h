@@ -20,7 +20,7 @@ namespace ot {
 
 	class __declspec(dllexport) BlockPaintJobArg : public ot::QueueData {
 	public:
-		BlockPaintJobArg(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) : m_rect(_rect), m_painter(_painter), m_option(_option), m_widget(_widget) {};
+		BlockPaintJobArg(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget, CleanupFlag _cleanupFlags = DeleteAtEnd) : QueueData(_cleanupFlags), m_rect(_rect), m_painter(_painter), m_option(_option), m_widget(_widget) {};
 		virtual ~BlockPaintJobArg() {};
 
 		void setRect(const QRectF& _rect) { m_rect = _rect; };
@@ -54,7 +54,7 @@ namespace ot {
 
 	class BLOCK_EDITOR_API_EXPORT BlockPaintJob : public ot::QueueObject {
 	public:
-		BlockPaintJob() {};
+		BlockPaintJob(CleanupFlag _cleanupFlags = DeleteAtEnd) : QueueObject(_cleanupFlags) {};
 		virtual ~BlockPaintJob() {};
 
 		virtual QueueResultFlags activateFromQueue(AbstractQueue* _queue, QueueData* _args) override;

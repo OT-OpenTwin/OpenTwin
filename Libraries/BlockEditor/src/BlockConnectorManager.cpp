@@ -48,5 +48,5 @@ std::list<ot::BlockConnector*> ot::BorderLayoutBlockConnectorManager::getAllConn
 
 ot::BorderLayoutBlockConnectorManager::QueueResultFlags ot::BorderLayoutBlockConnectorManager::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
 	
-	return Ok | NoMemClear;
+	return Ok;
 }

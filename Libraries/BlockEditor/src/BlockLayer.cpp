@@ -8,7 +8,7 @@
 #include "OTBlockEditor/DefaultBlock.h"
 #include "OTBlockEditor/BlockConnectorManager.h"
 
-ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : m_block(_block), m_connectorManager(_connectorManager), m_orientation(ot::OrientCenter) {
+ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : BlockPaintJob(NoDelete), m_block(_block), m_connectorManager(_connectorManager), m_orientation(ot::OrientCenter) {
 
 };
 
@@ -18,13 +18,17 @@ ot::BlockLayer::~BlockLayer() {
 
 ot::BlockLayer::QueueResultFlags ot::BlockLayer::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
 	paintLayer(_arg->rect(), _arg->painter(), _arg->styleOption(), _arg->widget());
-	//ToDo: Check if the connector needs to be painted manually
-	//if (m_connectorManager) _queue->queue(m_connectorManager);
-	return Ok | NoMemClear;
+	
+	// If a connector manager is set, queue it
+	if (m_connectorManager) {
+		_queue->queue(m_connectorManager, _arg);
+	}
+
+	return Ok;
 }
 
-QSizeF ot::BlockLayer::layerSizeHint(void) const {
-	return fitIntoLimits(QSizeF(60., 40.));
+QSizeF ot::BlockLayer::calculateSize(void) const {
+	return applyLimits(QSizeF(60., 40.));
 }
 
 

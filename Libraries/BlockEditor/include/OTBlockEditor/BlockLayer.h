@@ -31,9 +31,8 @@ namespace ot {
 		virtual QueueResultFlags runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) override;
 		virtual void paintLayer(const QRectF& _rect, QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) = 0;
 
-		//! @brief Calculate the ideal size for this layer.
-		//! The block will add the stretching factor if the block is bigger than the layer
-		virtual QSizeF layerSizeHint(void) const;
+		//! @brief Will calculate and return the size of the block graphics object
+		virtual QSizeF calculateSize(void) const override;
 
 		void setConnectorManger(BlockConnectorManager* _connectorManager);
 		BlockConnectorManager* getConnectorManager(void) { return m_connectorManager; };

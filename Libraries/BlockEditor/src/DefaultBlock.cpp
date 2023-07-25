@@ -24,23 +24,13 @@ ot::DefaultBlock::~DefaultBlock() {
 	for (auto l : m_layers) delete l;
 }
 
-qreal ot::DefaultBlock::blockWidth(void) const {
-	double w = 0.;
-	for (auto l : m_layers) {
-		QSizeF sh = l->layerSizeHint();
-		if (sh.width() > w) w = sh.width();
-	}
-	return w;
-}
+QSizeF ot::DefaultBlock::calculateSize(void) const {
+	QSizeF s(10., 10.);
 
-qreal ot::DefaultBlock::blockHeigth(void) const {
-	double h = 0.;
-	QSizeF sh;
-	for (auto l : m_layers) {
-		sh = l->layerSizeHint();
-		if (sh.height() > h) h = sh.height();
-	}
-	return h;
+	// Determine max width and height
+	for (auto l : m_layers) { s = s.expandedTo(l->calculateSize()); }
+
+	return s;
 }
 
 void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget) {
@@ -56,9 +46,9 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 	// Add every layer as a paintjob, from bottom to top
 	// The layers will queue the connectors if needed
 	// The arg pointer will be removed my the queue
-	for (auto l : m_layers) { 
+	for (auto l : m_layers) {
 		paintQueue.queue(l, new BlockPaintJobArg(
-			ot::calculateChildRect(boundingRect(), l->layerOrientation(), l->layerSizeHint()).marginsRemoved(l->margins()),
+			ot::calculateChildRect(boundingRect(), l->calculateSize(), l->layerOrientation()),
 			_painter, 
 			_option,
 			_widget)

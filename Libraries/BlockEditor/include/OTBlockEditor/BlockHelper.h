@@ -14,6 +14,8 @@
 
 namespace ot {
 
-	BLOCK_EDITOR_API_EXPORT QRectF calculateChildRect(const QRectF& _parentRect, ot::Orientation _childOrientation,const QSizeF& _childSize);
+	BLOCK_EDITOR_API_EXPORT QRect calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Orientation _childOrientation);
+
+	BLOCK_EDITOR_API_EXPORT QRectF calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Orientation _childOrientation);
 
 }

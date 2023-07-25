@@ -55,6 +55,9 @@
     <Filter Include="Source Files\API">
       <UniqueIdentifier>{ef9537d1-3f19-4e3d-bd93-632342b75eb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{cad547ef-8de5-45cd-aea1-0d0bdae9e0be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -190,9 +193,6 @@
     <ClInclude Include="include\OTBlockEditor\BlockGraphicsObject.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockHelper.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPI.h">
       <Filter>Header Files\API</Filter>
     </ClInclude>
@@ -201,6 +201,9 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockConnectorFactory.h">
       <Filter>Header Files\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\BlockHelper.h">
+      <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
