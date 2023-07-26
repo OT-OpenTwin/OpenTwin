@@ -242,6 +242,8 @@
     <ClCompile Include="src\PythonModuleAPI.cpp" />
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
     <ClCompile Include="src\PythonWrapper.cpp" />
+    <ClCompile Include="src\SubprocessDebugConfigurator.cpp" />
+    <ClCompile Include="src\SubprocessHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\VariableType.cpp" />
   </ItemGroup>
@@ -250,6 +252,7 @@
     <ClInclude Include="include\CPythonObjectBorrowed.h" />
     <ClInclude Include="include\CPythonObjectNew.h" />
     <ClInclude Include="include\CPythonObject.h" />
+    <ClInclude Include="include\SubprocessDebugConfigurator.h" />
     <ClInclude Include="include\EntityBuffer.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\PropertyPythonObjectConverter.h" />
@@ -260,6 +263,7 @@
     <ClInclude Include="include\PythonModuleAPI.h" />
     <ClInclude Include="include\PythonObjectBuilder.h" />
     <ClInclude Include="include\PythonWrapper.h" />
+    <ClInclude Include="include\SubprocessHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\VariableType.h" />
   </ItemGroup>

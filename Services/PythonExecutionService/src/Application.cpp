@@ -257,8 +257,15 @@ bool CheckAlive(OT_PROCESS_HANDLE& handle)
 
 }
 
+#include "SubprocessHandler.h"
+
 void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction)
 {
+
+	SubprocessHandler handler;
+	handler.Create(m_serviceURL);
+
+	handler.Close();
 
 	std::string envName = "OPENTWIN_DEV_ROOT"; // Not available here !! "OT_LOCALDIRECTORYSERVICE_CONFIGURATION";
 	const char* configurationEnv = ot::os::getEnvironmentVariable(envName.c_str());
