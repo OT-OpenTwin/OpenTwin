@@ -380,5 +380,8 @@ namespace ot {
 		//! @brief Will return the JSON string created from the provided document
 		//! @param _doc The document
 		OT_CORE_API_EXPORT std::string toJSON(OT_rJSON_val & _doc);
+
+
+		OT_CORE_API_EXPORT OT_rJSON_doc fromJSON(const std::string& jsonString);
 	}
 }

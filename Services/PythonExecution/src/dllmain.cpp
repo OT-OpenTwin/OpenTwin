@@ -26,12 +26,16 @@ extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
-		return "";
+		//return MinimalSubService::INSTANCE().performAction(_json, _senderIP);
+		char* ret = new char { 0 };
+		return ret;
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
 	{
-		return "";
+		//return MinimalSubService::INSTANCE().performAction(_json, _senderIP);
+		char* ret = new char{ 0 };
+		return ret;
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void)
@@ -51,9 +55,9 @@ extern "C" {
 	};
 
 	// This function is called once upon startup of this service
-	_declspec(dllexport) int init(const char * _siteID, const char * _ownIP, const char * _sessionServiceIP, const char * _sessionID)
+	_declspec(dllexport) int init(const char * _siteID, const char * _urlOwn, const char * _urlMasterService, const char * _sessionID)
 	{
-		MinimalSubService::INSTANCE().Initialize(_ownIP, _sessionServiceIP, _sessionServiceIP, _sessionID);
+		MinimalSubService::INSTANCE().Initialize(_urlOwn, _urlMasterService);
 		return 0;
 	};
 }

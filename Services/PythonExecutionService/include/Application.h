@@ -14,6 +14,7 @@
 #include "PythonAPI.h"
 
 #include "VariableType.h"
+#include "SubprocessHandler.h"
 // C++ header
 #include <string>
 
@@ -117,7 +118,7 @@ public:
 	virtual bool settingChanged(ot::AbstractSettingsItem * _item);
 
 private:
+	SubprocessHandler _subprocessHandler;
 	PythonAPI _pythonAPI;
-
 	void ProcessScriptExecution(std::list<std::string> scripts, std::list < std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction);
 };

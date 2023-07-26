@@ -52,6 +52,7 @@ Application::~Application()
 // ##################################################################################################################################################################################################################
 
 // Required functions
+#include "SubprocessDebugConfigurator.h"
 
 void Application::run(void)
 {
@@ -59,7 +60,11 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
-	// Add code that should be executed when the service is started and may start its work
+	SubprocessDebugConfigurator configurator;
+	auto modelService =	m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
+	std::string urlModelservice	= modelService.service->serviceURL();
+	configurator.CreateConfiguration(m_serviceURL, "127.0.0.1:7800", urlModelservice, m_databaseURL, m_serviceID,m_sessionID);
+
 }
 
 #include <rapidjson/document.h>
@@ -67,6 +72,13 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
+
+	OT_rJSON_createDOC(message);
+	
+	ot::rJSON::add(message, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
+	ot::rJSON::add(message, OT_ACTION_PARAM_MODEL_ActionName, "HelloWorld");
+	std::string response;
+	sendHttpRequest(ot::MessageType::EXECUTE,"127.0.0.1:7800",message,response);
 	try
 	{
 		std::string returnMessage = "";
@@ -261,66 +273,7 @@ bool CheckAlive(OT_PROCESS_HANDLE& handle)
 
 void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction)
 {
-
-	SubprocessHandler handler;
-	handler.Create(m_serviceURL);
-
-	handler.Close();
-
-	std::string envName = "OPENTWIN_DEV_ROOT"; // Not available here !! "OT_LOCALDIRECTORYSERVICE_CONFIGURATION";
-	const char* configurationEnv = ot::os::getEnvironmentVariable(envName.c_str());
-	/*if (configurationEnv == nullptr) { assert(0); }
-	OT_rJSON_parseDOC(configurationDoc, configurationEnv);*/
-
-	std:: string launcherPath, servicesLibraryPath;
-
-	launcherPath = std::string(configurationEnv) + "\\Deployment\\open_twin.exe";
-	servicesLibraryPath = std::string(configurationEnv) + "\\Deployment\\PythonExecution.dll";
-	/*if (configurationDoc.IsObject())
-	{
-		launcherPath = ot::rJSON::getString(configurationDoc, "LauncherPath");
-		servicesLibraryPath = ot::rJSON::getString(configurationDoc, "ServicesLibraryPath");
-	}*/
 	
-	int startPort = 7800;
-	const int maxAttempts = 3;
-	bool pingSuccess = false;
-	int counter = 0;
-
-	while (!pingSuccess)
-	{
-		std::string _url = m_serviceURL.substr(0, m_serviceURL.find(':')+1) + std::to_string(startPort+counter);
-		ot::app::RunResult result = ot::app::GeneralError;
-		OT_PROCESS_HANDLE _processHandle;
-
-		std::string commandLine = launcherPath + " \"" + servicesLibraryPath + "\" \"" + m_serviceURL + "\" \"" + _url + "\" \"\"";
-		result = ot::app::runApplication(launcherPath, commandLine, _processHandle, false, 0);
-
-		assert(result == ot::app::OK); // Was able to start process. TOT
-
-		for (int attempts = 0; attempts < maxAttempts; attempts++)
-		{
-			if (CheckAlive(_processHandle))
-			{
-				OT_rJSON_createDOC(pingDoc);
-				ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-				std::string pingCommand = ot::rJSON::toJSON(pingDoc);
-				std::string response;
-				if (ot::msg::send("", _url, ot::EXECUTE, pingCommand, response, 1000))
-				{
-					pingSuccess = true;
-					break;
-				}
-			}
-			if (_processHandle == OT_INVALID_PROCESS_HANDLE)
-			{
-				//What happened ?
-			}
-		}
-		//delete _processHandle;
-		//_processHandle = nullptr;
-	}
-
 	
 
 	//Nun healthcheck

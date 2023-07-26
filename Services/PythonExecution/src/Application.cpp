@@ -50,12 +50,24 @@ Application::~Application()
 
 void Application::run(void)
 {
+	if (!EnsureDataBaseConnection())
+	{
+		assert(0);
+	}
+	
 	// Add code that should be executed when the service is started and may start its work
 }
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
-	return ""; // Return empty string if the request does not expect a return
+	std::string returnMessage = "";
+	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+	{
+		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+
+	}
+
+	return returnMessage;
 }
 
 std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
