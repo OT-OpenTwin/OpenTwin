@@ -1,6 +1,8 @@
 #include "OpenTwinSystem/OperatingSystem.h"
 #include "OpenTwinSystem/ArchitectureInfo.h"
 
+#include <codecvt>
+
 #if defined(OT_OS_WINDOWS)
 #include <Windows.h>
 #include <TCHAR.h>
@@ -99,6 +101,26 @@ char * ot::os::getEnvironmentVariable(const char * _variableName) {
 		return nullptr;
 	}
 	return ret;
+#endif
+}
+
+
+OT_SYS_API_EXPORT std::string ot::os::getExecutablePath()
+{
+#if defined(OT_OS_WINDOWS)
+	TCHAR buffer[MAX_PATH] = { 0 };
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	
+	//Separate directory path from executable name
+	std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
+	std::wstring path = (std::wstring(buffer).substr(0, pos));
+	
+	//Only UTF8 character are supported by OpenTwin so far.
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+	return myconv.to_bytes(path);
+		
+#else
+	#error "Not supported yet"
 #endif
 }
 

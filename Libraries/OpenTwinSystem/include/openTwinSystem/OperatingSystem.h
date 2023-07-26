@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OpenTwinSystem/SystemAPIExport.h"
+#include <string>
 
 namespace ot {
 	namespace os {
@@ -12,5 +13,6 @@ namespace ot {
 		OT_SYS_API_EXPORT unsigned long long getAvailableVirtualMemory(void);
 
 		OT_SYS_API_EXPORT char * getEnvironmentVariable(const char * _variableName);
+		OT_SYS_API_EXPORT std::string getExecutablePath();
 	}
 }
