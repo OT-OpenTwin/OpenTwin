@@ -24,6 +24,9 @@
     <ClCompile Include="src\MinimalSubService.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActionHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\MinimalSubService.h">
@@ -36,6 +39,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\UiNotifier.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ActionHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

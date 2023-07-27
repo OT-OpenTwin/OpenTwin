@@ -235,37 +235,18 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
-    <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
-    <ClCompile Include="src\PythonAPI.cpp" />
-    <ClCompile Include="src\PythonModuleAPI.cpp" />
-    <ClCompile Include="src\PythonObjectBuilder.cpp" />
-    <ClCompile Include="src\PythonWrapper.cpp" />
     <ClCompile Include="src\SubprocessDebugConfigurator.cpp" />
     <ClCompile Include="src\SubprocessHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
-    <ClCompile Include="src\VariableType.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\CPythonObjectBorrowed.h" />
-    <ClInclude Include="include\CPythonObjectNew.h" />
-    <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\SubprocessDebugConfigurator.h" />
-    <ClInclude Include="include\EntityBuffer.h" />
     <ClInclude Include="include\ModelNotifier.h" />
-    <ClInclude Include="include\PropertyPythonObjectConverter.h" />
-    <ClInclude Include="include\PythonAPI.h" />
-    <ClInclude Include="include\PythonException.h" />
-    <ClInclude Include="include\PythonExtension.h" />
-    <ClInclude Include="include\PythonLoadedModules.h" />
-    <ClInclude Include="include\PythonModuleAPI.h" />
-    <ClInclude Include="include\PythonObjectBuilder.h" />
-    <ClInclude Include="include\PythonWrapper.h" />
     <ClInclude Include="include\SubprocessHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
-    <ClInclude Include="include\VariableType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

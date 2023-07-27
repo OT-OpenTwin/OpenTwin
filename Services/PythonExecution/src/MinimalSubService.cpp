@@ -1,5 +1,5 @@
 #include "MinimalSubService.h"
-
+#include "OpenTwinCore/rJSON.h"
 
 int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)
 {
@@ -13,15 +13,24 @@ int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)
 	return 0;
 }
 
-const char* MinimalSubService::performAction(const char* _json, const char* _senderIP)
-{
-	char ret[1]{ 0 };
-	return ret;
-}
-
 void MinimalSubService::RequestInitializationByMasterService()
 {
+	OT_rJSON_createDOC(message);
 
+	ot::rJSON::add(message, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
+	ot::rJSON::add(message, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_Request_Initialization);
+	std::string response;
+	Application::instance()->SendHttpRequest(ot::MessageType::EXECUTE, _urlMasterService, message, response);
+
+	OT_rJSON_doc doc = ot::rJSON::fromJSON(response);
+	std::string urlModelService = doc["ModelService.URL"].GetString();
+	std::string sessionID = doc["Session.ID"].GetString();
+	std::string urlDataBase = doc["DataBase.URL"].GetString();
+	std::string userName = doc["DataBase.Username"].GetString();
+	std::string pwd = doc["DataBase.PWD"].GetString();
+	int serviceID = doc["Service.ID"].GetInt();
+	
+	Initialize(urlModelService, serviceID, sessionID, urlDataBase, userName, pwd);
 
 }
 
@@ -53,14 +62,15 @@ void MinimalSubService::InitializeFromConfig()
 		sessionID = config["Session.ID"].GetString();
 		urlDataBase = config["DataBase.URL"].GetString();
 		userName = config["DataBase.Username"].GetString();
-		pwd = config["Database.PWD"].GetString();
+		pwd = config["DataBase.PWD"].GetString();
 	}
 	else
 	{
 		assert(0);
 	}
 	stream.close();
-	Initialize(urlModelService, serviceID, sessionID, urlDataBase, userName, pwd);
+	RequestInitializationByMasterService();
+	//Initialize(urlModelService, serviceID, sessionID, urlDataBase, userName, pwd);
 }
 
 void MinimalSubService::Initialize(const std::string& urlModelService, const int serviceID, const std::string& sessionID, const std::string& urlDataBase, const std::string& userName, const std::string& pwd)

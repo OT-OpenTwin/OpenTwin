@@ -175,6 +175,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\MinimalSubService.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\MinimalSubService.h" />
     <ClInclude Include="include\ModelNotifier.h" />

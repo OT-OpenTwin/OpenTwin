@@ -18,11 +18,11 @@ public:
 		static MinimalSubService instance;
 		return instance;
 	}
-	int Startup(const char* urlOwn, const char* urlMasterService);
-	const char* performAction(const char* _json, const char* _senderIP);
 	const char* getMasterServiceURl() { return _urlMasterService.c_str(); };
 	const char* getServiceURL() { return _urlOwn.c_str(); };
 
+	int Startup(const char* urlOwn, const char* urlMasterService);
+	void Initialize(const std::string& urlModelService, const int serviceID, const std::string& sessionID, const std::string& urlDataBase, const std::string& userName, const std::string& pwd);
 private:
 	MinimalSubService() {};
 	std::string _urlOwn = "";
@@ -30,6 +30,5 @@ private:
 	
 	void RequestInitializationByMasterService();
 	void InitializeFromConfig();
-	void Initialize(const std::string& urlModelService, const int serviceID, const std::string& sessionID, const std::string& urlDataBase, const std::string& userName, const std::string& pwd);
 
 };

@@ -5,6 +5,7 @@
 // C++ header
 #include <Windows.h>
 #include "MinimalSubService.h"
+#include "ActionHandler.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -22,20 +23,20 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
+ActionHandler* actionHandler = nullptr;
+
 extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
-		//return MinimalSubService::INSTANCE().performAction(_json, _senderIP);
-		char* ret = new char { 0 };
-		return ret;
+		assert(actionHandler != nullptr);
+		return actionHandler->Handle(_json,_senderIP);
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
 	{
-		//return MinimalSubService::INSTANCE().performAction(_json, _senderIP);
-		char* ret = new char{ 0 };
-		return ret;
+		assert(actionHandler != nullptr);
+		return actionHandler->Handle(_json, _senderIP);
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void)
@@ -58,6 +59,7 @@ extern "C" {
 	_declspec(dllexport) int init(const char * _siteID, const char * _urlOwn, const char * _urlMasterService, const char * _sessionID)
 	{
 		MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
+		actionHandler = new ActionHandler(MinimalSubService::INSTANCE().getMasterServiceURl());
 		return 0;
 	};
 }
