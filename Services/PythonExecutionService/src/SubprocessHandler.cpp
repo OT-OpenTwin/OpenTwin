@@ -5,6 +5,8 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCommunication/Msg.h"
 #include <assert.h>
+#include <condition_variable>
+#include <chrono>
 
 SubprocessHandler::SubprocessHandler()
 {
@@ -27,22 +29,7 @@ SubprocessHandler::SubprocessHandler()
 	}
 
 	_launcherPath = baseDirectory + "\\Deployment\\open_twin.exe";
-
-#ifdef _RELEASEDEBUG
 	_subprocessPath = baseDirectory + "\\Deployment\\PythonExecution.dll";
-#else
-	//envName = "OT_PYTHON_EXECUTION_ROOT";
-	//envValue = ot::os::getEnvironmentVariable(envName.c_str());
-	//assert(envValue != "");
-	//_subprocessPath = envValue;
-
-	//envName = "OT_DLLD";
-	//envValue = ot::os::getEnvironmentVariable(envName.c_str());
-	//assert(envValue != "");
-	//_subprocessPath += envValue + "PythonExecution.dll";
-	
-#endif // _RELEASEDEBUG
-
 	
 	OT_rJSON_createDOC(pingDoc);
 	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
@@ -66,40 +53,35 @@ void SubprocessHandler::Create(const std::string& urlThisProcess)
 
 void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 {
-	bool pingSuccess = false;
+	std::mutex mtx;
+	std::unique_lock<std::mutex> lock(mtx);
+	using namespace std::chrono_literals;
+
 	int counter = 0;
-	while (!pingSuccess)
+	while(true)
 	{
 		std::string urlSubprocess = urlThisService.substr(0, urlThisService.find(':') + 1) + std::to_string(_startPort + counter);
-		std::string commandLine = _launcherPath + " \"" + _subprocessPath + "\" \"" + urlThisService + "\" \"" + urlSubprocess + "\" \"\"";
+		std::string commandLine = _launcherPath + " \"" + _subprocessPath + "\" \"1\" \"" + urlSubprocess + "\" \"" + urlThisService+ "\" \"unused\"";
 		
 		ot::app::RunResult result = ot::app::GeneralError;
 		result = ot::app::runApplication(_launcherPath, commandLine, _subprocess, false, 0);
 
 		assert(result == ot::app::OK); //ToDo: When would this case occue?
-
-		OT_rJSON_createDOC(pingDoc);
-		ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-		std::string pingCommand = ot::rJSON::toJSON(pingDoc);
-
-		for (int pingAttempt = 0; pingAttempt < _maxPingAttempts; pingAttempt++)
+		
+		if (CheckAlive(_subprocess))
 		{
-			if (CheckAlive(_subprocess))
+			auto now = std::chrono::system_clock::now();
+			bool receivedNotification = _receivedInitializationRequest.wait_until(lock, now + 5s, [this]() {return this->getReceivedInitializationRequest(); });
+			if (receivedNotification)
 			{
-				std::string response;
-				if (ot::msg::send("", urlSubprocess, ot::EXECUTE, pingCommand, response, 1000))
-				{
-					pingSuccess = true;
-					break;
-				}
-			}
-			if (_subprocess == OT_INVALID_PROCESS_HANDLE)
-			{
-				//ToDo: When would this case occue?
+				_urlSubprocess = urlSubprocess;
+				break;
 			}
 		}
+
+		CloseProcess(urlSubprocess);
+		counter++;
 	}
-	_urlSubprocess = _urlSubprocess;
 }
 
 
@@ -137,19 +119,22 @@ bool SubprocessHandler::CheckAlive(OT_PROCESS_HANDLE& handle)
 
 bool SubprocessHandler::PingSubprocess()
 {
-	for (int pingAttempt = 0; pingAttempt < _maxPingAttempts; pingAttempt++)
-	{
-		std::string response;
-		if (ot::msg::send("", _urlSubprocess, ot::EXECUTE, _pingCommand, response, 1000))
-		{
-			return true;
-		}
-	}
+	//for (int pingAttempt = 0; pingAttempt < _maxPingAttempts; pingAttempt++)
+	//{
+	//	std::string response;
+	//	if (ot::msg::send("", _urlSubprocess, ot::EXECUTE, _pingCommand, response, 1000))
+	//	{
+	//		return true;
+	//	}
+	//}
 	return false;
 }
 
-bool SubprocessHandler::Close()
+bool SubprocessHandler::CloseProcess(const std::string& url)
 {
+	CloseHandle(_subprocess);
+	_subprocess = OT_INVALID_PROCESS_HANDLE;
+
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShutdown);
 	std::string response;
@@ -158,4 +143,15 @@ bool SubprocessHandler::Close()
 		return true;
 	}
 	return false;
+}
+
+void SubprocessHandler::setReceivedInitializationRequest()
+{
+	_receivedInitializationRequestAlready = true;
+	_receivedInitializationRequest.notify_all();
+}
+
+bool SubprocessHandler::Close()
+{
+	return CloseProcess(_urlSubprocess);
 }

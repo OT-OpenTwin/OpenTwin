@@ -1,5 +1,6 @@
 #include "MinimalSubService.h"
 #include "OpenTwinCore/rJSON.h"
+#include <thread>
 
 int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)
 {
@@ -8,7 +9,9 @@ int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)
 #else
 	_urlOwn = urlOwn;
 	_urlMasterService = urlMasterService;
-	RequestInitializationByMasterService();
+	
+	std::thread workerThread(&MinimalSubService::RequestInitializationByMasterService, this);
+	workerThread.detach();
 #endif
 	return 0;
 }
@@ -21,6 +24,15 @@ void MinimalSubService::RequestInitializationByMasterService()
 	ot::rJSON::add(message, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_Request_Initialization);
 	std::string response;
 	Application::instance()->SendHttpRequest(ot::MessageType::EXECUTE, _urlMasterService, message, response);
+
+	std::ofstream o;
+	o.open("C:\\OpenTwin\\Services\\PythonExecution\\x64\\Release\\log.txt", std::ios_base::app);
+	if (o.is_open())
+	{
+		o << " Write to " << _urlMasterService << " response " << response;
+		o.flush();
+		o.close();
+	}
 
 	OT_rJSON_doc doc = ot::rJSON::fromJSON(response);
 	std::string urlModelService = doc["ModelService.URL"].GetString();
@@ -69,8 +81,7 @@ void MinimalSubService::InitializeFromConfig()
 		assert(0);
 	}
 	stream.close();
-	RequestInitializationByMasterService();
-	//Initialize(urlModelService, serviceID, sessionID, urlDataBase, userName, pwd);
+	Initialize(urlModelService, serviceID, sessionID, urlDataBase, userName, pwd);
 }
 
 void MinimalSubService::Initialize(const std::string& urlModelService, const int serviceID, const std::string& sessionID, const std::string& urlDataBase, const std::string& userName, const std::string& pwd)

@@ -40,7 +40,11 @@ Application::Application()
 
 Application::~Application()
 {
-
+	if(_subprocessHandler != nullptr)
+	{
+		delete _subprocessHandler;
+		_subprocessHandler = nullptr;
+	}
 }
 
 // ##################################################################################################################################################################################################################
@@ -53,6 +57,7 @@ Application::~Application()
 
 // Required functions
 #include "SubprocessDebugConfigurator.h"
+#include "SubprocessHandler.h"
 
 void Application::run(void)
 {
@@ -60,10 +65,20 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
+#ifdef DEBUG
 	SubprocessDebugConfigurator configurator;
 	auto modelService =	m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
 	std::string urlModelservice	= modelService.service->serviceURL();
-	configurator.CreateConfiguration(m_serviceURL, "127.0.0.1:7800", urlModelservice, m_databaseURL, m_serviceID,m_sessionID);
+	int startPort = SubprocessHandler::getStartPort();
+	std::string subserviceURL =  m_serviceURL.substr(0, m_serviceURL.find(":")+1) + std::to_string(startPort);
+	configurator.CreateConfiguration(m_serviceURL, subserviceURL, urlModelservice, m_databaseURL, m_serviceID,m_sessionID);
+#else
+	_subprocessHandler = new SubprocessHandler();
+	std::thread workerThread(&SubprocessHandler::Create,_subprocessHandler, m_serviceURL);
+	workerThread.detach();
+	
+#endif // DEBUG
+
 
 }
 
@@ -151,6 +166,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			}
 			else if (action == OT_ACTION_CMD_PYTHON_Request_Initialization)
 			{
+				_subprocessHandler->setReceivedInitializationRequest();
 				auto modelService = m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
 				std::string urlModelservice = modelService.service->serviceURL();
 				std::string userName = DataBase::GetDataBase()->getUserName();

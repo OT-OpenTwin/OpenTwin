@@ -116,7 +116,7 @@ public:
 	virtual bool settingChanged(ot::AbstractSettingsItem * _item);
 
 private:
-	SubprocessHandler _subprocessHandler;
+	SubprocessHandler* _subprocessHandler = nullptr;
 
 	//void ProcessScriptExecution(std::list<std::string> scripts, std::list < std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction);
 };
