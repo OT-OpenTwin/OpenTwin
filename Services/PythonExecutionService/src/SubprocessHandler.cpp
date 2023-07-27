@@ -31,15 +31,15 @@ SubprocessHandler::SubprocessHandler()
 #ifdef _RELEASEDEBUG
 	_subprocessPath = baseDirectory + "\\Deployment\\PythonExecution.dll";
 #else
-	envName = "OT_PYTHON_EXECUTION_ROOT";
-	envValue = ot::os::getEnvironmentVariable(envName.c_str());
-	assert(envValue != "");
-	_subprocessPath = envValue;
+	//envName = "OT_PYTHON_EXECUTION_ROOT";
+	//envValue = ot::os::getEnvironmentVariable(envName.c_str());
+	//assert(envValue != "");
+	//_subprocessPath = envValue;
 
-	envName = "OT_DLLD";
-	envValue = ot::os::getEnvironmentVariable(envName.c_str());
-	assert(envValue != "");
-	_subprocessPath += envValue + "PythonExecution.dll";
+	//envName = "OT_DLLD";
+	//envValue = ot::os::getEnvironmentVariable(envName.c_str());
+	//assert(envValue != "");
+	//_subprocessPath += envValue + "PythonExecution.dll";
 	
 #endif // _RELEASEDEBUG
 

@@ -57,7 +57,7 @@ extern "C" {
 	// This function is called once upon startup of this service
 	_declspec(dllexport) int init(const char * _siteID, const char * _urlOwn, const char * _urlMasterService, const char * _sessionID)
 	{
-		MinimalSubService::INSTANCE().Initialize(_urlOwn, _urlMasterService);
+		MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
 		return 0;
 	};
 }

@@ -135,4 +135,14 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	return false;
 }
 
+void Application::ServiceConnected(const std::string& _name, const std::string& _type, const std::string& _url, unsigned short _id)
+{
+	__serviceConnected(_name, _type, _url, _id);
+}
+
+bool Application::SendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response)
+{
+	return sendHttpRequest(_operation, _url, _doc, _response);
+}
+
 // ##################################################################################################################################################################################################################

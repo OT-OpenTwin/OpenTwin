@@ -298,7 +298,6 @@ namespace ot {
 		UID getPrefetchedEntityVersion(UID entityID);
 
 		// ##########################################################################################################################################
-		void __serviceConnected(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id);
 	protected:
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response);
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response);
@@ -346,6 +345,7 @@ namespace ot {
 		std::map<UID, UID>								m_prefetchedEntityVersions;
 
 		
+		void __serviceConnected(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id);
 	private:
 
 		friend intern::ExternalServicesComponent;
@@ -360,7 +360,6 @@ namespace ot {
 		OT_HANDLER(handleBlockEditorConnectionRemoved, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionRemoved, ot::SECURE_MESSAGE_TYPES);
 
 		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
-		
 		std::string __processMessage(const std::string & _message, OT_rJSON_doc &doc, serviceID_t _senderID);
 		void __shuttingDown(bool _requestedAsCommand);
 		void __addUiPlugin(components::UiPluginComponent * _component);
