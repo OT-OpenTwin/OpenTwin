@@ -8,7 +8,8 @@
 #include <condition_variable>
 #include <chrono>
 
-SubprocessHandler::SubprocessHandler()
+SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
+	:_urlThisProcess(urlThisService)
 {
 	std::string envName = "OPENTWIN_DEV_ROOT";
 	const char* envValue = ot::os::getEnvironmentVariable(envName.c_str());
@@ -61,7 +62,7 @@ void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 	while(true)
 	{
 		std::string urlSubprocess = urlThisService.substr(0, urlThisService.find(':') + 1) + std::to_string(_startPort + counter);
-		std::string commandLine = _launcherPath + " \"" + _subprocessPath + "\" \"1\" \"" + urlSubprocess + "\" \"" + urlThisService+ "\" \"unused\"";
+		std::string commandLine = _launcherPath + " \"" + _subprocessPath + "\" \"" + urlSubprocess + "\" \"" + urlThisService+ "\" \"unused\" \"unused\" ";
 		
 		ot::app::RunResult result = ot::app::GeneralError;
 		result = ot::app::runApplication(_launcherPath, commandLine, _subprocess, false, 0);
@@ -90,7 +91,6 @@ bool SubprocessHandler::CheckAlive(OT_PROCESS_HANDLE& handle)
 #if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
 	if (handle == OT_INVALID_PROCESS_HANDLE) return false;
-
 	
 	DWORD exitCode = STILL_ACTIVE;
 	
@@ -132,17 +132,17 @@ bool SubprocessHandler::PingSubprocess()
 
 bool SubprocessHandler::CloseProcess(const std::string& url)
 {
-	CloseHandle(_subprocess);
-	_subprocess = OT_INVALID_PROCESS_HANDLE;
 
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShutdown);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
 	std::string response;
-	if (ot::msg::send("", _urlSubprocess, ot::EXECUTE, ot::rJSON::toJSON(doc), response, 1000))
-	{
-		return true;
-	}
-	return false;
+	ot::msg::send("", url, ot::EXECUTE, ot::rJSON::toJSON(doc), response, 0);
+	
+	CloseHandle(_subprocess);
+	_subprocess = OT_INVALID_PROCESS_HANDLE;
+
+	return true;
 }
 
 void SubprocessHandler::setReceivedInitializationRequest()

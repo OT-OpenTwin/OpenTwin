@@ -56,10 +56,19 @@ extern "C" {
 	};
 
 	// This function is called once upon startup of this service
-	_declspec(dllexport) int init(const char * _siteID, const char * _urlOwn, const char * _urlMasterService, const char * _sessionID)
+	_declspec(dllexport) int init(const char * _urlOwn, const char * _urlMasterService, const char * unused1, const char * unused2)
 	{
 		MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
 		actionHandler = new ActionHandler(_urlMasterService);
+		std::ofstream o;
+		o.open("C:\\OpenTwin\\Services\\PythonExecution\\x64\\Release", std::ios::out);
+		if (o.is_open())
+		{
+			o << "MasterService" << _urlMasterService << " ownURL: " << _urlOwn;
+			o.flush();
+			o.close();
+		}
+
 		return 0;
 	};
 }

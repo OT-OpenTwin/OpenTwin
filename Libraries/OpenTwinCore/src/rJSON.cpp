@@ -29,6 +29,11 @@ void ot::rJSON::memberCheck(OT_rJSON_val & _doc, const char * _member) {
 	}
 }
 
+OT_CORE_API_EXPORT bool ot::rJSON::memberExists(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc.HasMember(_member);
+}
+
 // ##########################################################################################################
 
 // Document Getter

@@ -8,7 +8,7 @@ class SubprocessHandler
 {
 
 public:
-	SubprocessHandler();
+	SubprocessHandler(const std::string& urlThisService);
 	
 	SubprocessHandler& operator=(const SubprocessHandler& other) = delete;
 	SubprocessHandler& operator=(SubprocessHandler&& other) = delete;
@@ -18,6 +18,7 @@ public:
 	void Create(const std::string& urlThisProcess);
 
 	static int getStartPort() { return _startPort; }
+	void setSubprocessURL(const std::string& urlSubprocess) { _urlSubprocess = urlSubprocess; };
 	void setReceivedInitializationRequest();
 	bool getReceivedInitializationRequest() { return _receivedInitializationRequestAlready; };
 	bool Close();
@@ -35,6 +36,7 @@ private:
 	std::string _subprocessPath = "";
 	
 	std::string _urlSubprocess = "";
+	std::string _urlThisProcess = "";
 
 	OT_PROCESS_HANDLE _subprocess = nullptr;
 

@@ -1,66 +1,59 @@
 #include "ActionHandler.h"
 #include "OpenTwinCommunication/ActionTypes.h"
-
+#pragma warning(disable : 4996)
 
 #pragma once
 
-ActionHandler::ActionHandler(std::string urlMasterService)
+ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
 {
-	_handlingFunction[OT_ACTION_CMD_PYTHON_Initialization] = std::bind(&ActionHandler::Initialize, this, std::placeholders::_1);
-	_handlingFunction[OT_ACTION_CMD_ShutdownRequestedByService] = std::bind(&ActionHandler::ShutdownProcess, this, std::placeholders::_1);
+	_handlingFunction[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::ShutdownProcess, this, std::placeholders::_1);
 }
 
 const char* ActionHandler::Handle(const char* json, const char* senderIP)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
-	
-	char* returnValue = new char{0};
+	std::string returnMessage;
 	OT_rJSON_doc doc = ot::rJSON::fromJSON(json);
-	std::string senderURL(senderIP);
-	
-	if (senderURL != _urlMasterService)
+	if (ot::rJSON::memberExists(doc, OT_ACTION_PARAM_SENDER_URL))
 	{
-		SendAccessDeniedMessage(senderURL);
-	}
-	else
-	{
-		std::string action = ot::rJSON::getString(doc, OT_ACTION_MEMBER);
-		if (_handlingFunction.find(action) != _handlingFunction.end())
+		std::string senderURL = ot::rJSON::getString(doc, OT_ACTION_PARAM_SENDER_URL);
+		
+		if (senderURL != _urlMasterService)
 		{
-			auto function = _handlingFunction[action];
-			try
-			{
-				function(doc);
-			}
-			catch (std::exception& e)
-			{
-				//Exit? vorher noch ne message zurück?
-			}
+			returnMessage = "Access denied.";
 		}
 		else
 		{
-			assert(0); // Action not supported
+			std::string action = ot::rJSON::getString(doc, OT_ACTION_MEMBER);
+			if (_handlingFunction.find(action) != _handlingFunction.end())
+			{
+				auto function = _handlingFunction[action];
+				try
+				{
+					returnMessage = function(doc);
+				}
+				catch (std::exception& e)
+				{
+					returnMessage = "Exception: " + std::string(e.what());
+					//Exit? vorher noch ne message zurück?
+				}
+			}
+			else
+			{
+				returnMessage = "Action " + action + " not supported.";
+				assert(0); // Action not supported
+			}
 		}
 	}
-		
 	
-
+	char* returnValue = new char[returnMessage.size() + 1];
+	std::strcpy(returnValue, returnMessage.c_str());
 
     return returnValue;
 }
 
-void ActionHandler::SendAccessDeniedMessage(const std::string& senderURL)
-{
-
-}
-
-void ActionHandler::Initialize(OT_rJSON_doc& doc)
-{
-		
-}
-
-void ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
+std::string ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
 {
 	exit(1);
 }
