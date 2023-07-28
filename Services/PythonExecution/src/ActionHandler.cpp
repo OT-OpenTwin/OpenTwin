@@ -1,5 +1,7 @@
 #include "ActionHandler.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OpenTwinCore/ReturnMessage.h"
+#include "OpenTwinCore/Variable.h"
+
 #pragma warning(disable : 4996)
 
 #pragma once
@@ -7,7 +9,11 @@
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
 {
-	_handlingFunction[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::ShutdownProcess, this, std::placeholders::_1);
+	_checkParameterFunctions[OT_ACTION_CMD_ServiceShutdown] =_noParameterCheck;
+	_handlingFunctions[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::ShutdownProcess, this, std::placeholders::_1);
+	
+	_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE] = std::bind(&ActionHandler::CheckParameterExecute, this, std::placeholders::_1);
+	_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE] = std::bind(&ActionHandler::Execute, this, std::placeholders::_1);
 }
 
 const char* ActionHandler::Handle(const char* json, const char* senderIP)
@@ -21,28 +27,33 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		
 		if (senderURL != _urlMasterService)
 		{
-			returnMessage = "Access denied.";
+			returnMessage = ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, "Access denied.");
 		}
 		else
 		{
 			std::string action = ot::rJSON::getString(doc, OT_ACTION_MEMBER);
-			if (_handlingFunction.find(action) != _handlingFunction.end())
+			if (_handlingFunctions.find(action) != _handlingFunctions.end())
 			{
-				auto function = _handlingFunction[action];
-				try
+				auto& checkParameter = _checkParameterFunctions[action];
+				auto checkResult = checkParameter(doc);
+				if (checkResult.getStatus() == OT_ACTION_RETURN_VALUE_OK)
 				{
-					returnMessage = function(doc);
+					auto& handlingFunction = _handlingFunctions[action];
+					handlingFunction(doc);
 				}
-				catch (std::exception& e)
+				else
 				{
-					returnMessage = "Exception: " + std::string(e.what());
-					//Exit? vorher noch ne message zurück?
+					returnMessage = checkResult;
 				}
+				
+				
+
+				//std::thread workerThread(&Application::ProcessScriptExecution,this, scripts, allParameter, subsequentFunction);
 			}
 			else
 			{
-				returnMessage = "Action " + action + " not supported.";
 				assert(0); // Action not supported
+				returnMessage = ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, "Action " + action + " not supported.");
 			}
 		}
 	}
@@ -53,7 +64,46 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
     return returnValue;
 }
 
-std::string ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
+void ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
 {
 	exit(1);
+}
+
+void ActionHandler::Execute(OT_rJSON_doc& doc)
+{
+
+	auto scriptArray = doc[OT_ACTION_CMD_PYTHON_Scripts].GetArray();
+	std::list<std::string> scripts;
+	
+	for (auto& element : scriptArray)
+	{
+		scripts.emplace_back(element.GetString());
+	}
+
+	auto parameterArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
+	std::list<std::optional<std::list<ot::variable_t>>> allParameter;
+
+	ot::JSONToVariableConverter converter;
+	for (uint32_t i = 0; i < parameterArray.Size(); i++)
+	{
+		//ot::variable_t var = converter(parameterArray[i]);
+		//allParameter.emplace_back();
+	}
+		
+	std::list<ot::variable_t> result =	_pythonAPI.Execute(scripts, allParameter);
+	
+
+	//Answer to the PYthonExecutionService
+}
+
+ot::ReturnMessage ActionHandler::CheckParameterExecute(OT_rJSON_doc& doc)
+{
+	if (!ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Scripts) || !ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Parameter))
+	{
+		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, "Either the scripts or parameter are not contained in the message");
+	}
+	else
+	{
+		return _noParameterCheck(doc);
+	}
 }

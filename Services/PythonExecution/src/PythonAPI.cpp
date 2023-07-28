@@ -20,12 +20,12 @@ PythonAPI::PythonAPI()
 	_wrapper.InitializePythonInterpreter();
 }
 
-std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<variable_t>>>& parameterSet)
+std::list<ot::variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<ot::variable_t>>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
 	EntityBuffer::INSTANCE().setModelComponent(Application::instance()->modelComponent());
 	auto currentParameterSet = parameterSet.begin();
-	std::list<variable_t> returnValues;
+	std::list<ot::variable_t> returnValues;
 	PythonObjectBuilder pyObBuilder;
 	for (std::string& scriptName : scripts)
 	{
@@ -33,7 +33,7 @@ std::list<variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::l
 		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
-		std::optional <std::list<variable_t>>& parameterSetForScript = *currentParameterSet;
+		std::optional <std::list<ot::variable_t>>& parameterSetForScript = *currentParameterSet;
 		CPythonObjectNew pythonParameterSet(nullptr);
 		if (parameterSetForScript.has_value())
 		{
@@ -84,12 +84,12 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 	}
 }
 
-CPythonObjectNew PythonAPI::CreateParameterSet(std::list<variable_t>& parameterSet)
+CPythonObjectNew PythonAPI::CreateParameterSet(std::list<ot::variable_t>& parameterSet)
 {
 	PythonObjectBuilder pObjectBuilder;
 	pObjectBuilder.StartTupleAssemply(static_cast<int>(parameterSet.size()));
 
-	for (variable_t& parameter : parameterSet)
+	for (ot::variable_t& parameter : parameterSet)
 	{
 		if (std::holds_alternative<int32_t>(parameter))
 		{

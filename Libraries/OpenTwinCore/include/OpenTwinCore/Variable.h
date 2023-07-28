@@ -9,6 +9,7 @@
 #include <variant>
 #include <stdint.h>
 #include "OpenTwinCore/rJSONHelper.h"
+#include "openTwinCore/CoreAPIExport.h"
 
 namespace ot
 {

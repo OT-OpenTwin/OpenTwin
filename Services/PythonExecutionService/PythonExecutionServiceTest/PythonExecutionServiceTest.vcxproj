@@ -11,21 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp" />
-    <ClCompile Include="src\FixturePythonAPI.cpp" />
-    <ClCompile Include="src\FixturePythonObjectBuilder.cpp" />
-    <ClCompile Include="src\FixturePythonWrapper.cpp" />
-    <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp" />
-    <ClCompile Include="src\TestPythonAPI.cpp" />
-    <ClCompile Include="src\TestPythonObjectBuilder.cpp" />
-    <ClCompile Include="src\TestsPythonWrapper.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\FixturePropertyPythonObjectInterface.h" />
-    <ClInclude Include="include\FixturePythonAPI.h" />
-    <ClInclude Include="include\FixturePythonObjectBuilder.h" />
-    <ClInclude Include="include\FixturePythonWrapper.h" />
-    <ClInclude Include="include\TestingPythonExtensions.h" />
+    <ClCompile Include="src\test.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72ea5528-6e0c-43d5-89f1-41329d20878d}</ProjectGuid>

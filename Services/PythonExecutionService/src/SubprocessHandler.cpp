@@ -40,7 +40,7 @@ void SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter)
 {
 	if (CheckAlive(_subprocess) && PingSubprocess())
 	{
-		ot::rJSON::add(scriptsAndParameter, OT_ACTION_MEMBER, OT_ACTION_CMD_PYTHON_FORWARD_EXECUTE);
+		ot::rJSON::add(scriptsAndParameter, OT_ACTION_MEMBER, OT_ACTION_CMD_PYTHON_EXECUTE);
 		ot::rJSON::add(scriptsAndParameter, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
 		std::string response;
 		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, ot::rJSON::toJSON(scriptsAndParameter), response, 0))
