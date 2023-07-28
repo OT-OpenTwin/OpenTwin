@@ -115,5 +115,8 @@
     <ClInclude Include="include\OpenTwinCore\Owner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\ReturnMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
