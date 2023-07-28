@@ -96,7 +96,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS)
+			if (action == OT_ACTION_CMD_PYTHON_EXECUTE)
 			{
 				//std::string subsequentFunction = _doc[OT_ACTION_PARAM_MODEL_FunctionName].GetString();
 				//std::string senderURL = _doc[OT_ACTION_PARAM_SENDER_URL].GetString();

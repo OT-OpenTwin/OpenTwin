@@ -4,7 +4,7 @@
 
 int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)
 {
-#ifdef _DEBUG
+#ifdef _RELEASEDEBUG
 	InitializeFromConfig();
 #else
 	_urlOwn = urlOwn;

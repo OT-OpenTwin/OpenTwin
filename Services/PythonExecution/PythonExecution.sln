@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1267
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PythonExecution", "PythonExecution.vcxproj", "{36E113AE-6F93-42FC-AB88-97721543A1DF}"
 EndProject
@@ -22,12 +22,12 @@ Global
 		ReleaseTest|x86 = ReleaseTest|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Debug|x64.ActiveCfg = Debug|x64
-		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Debug|x64.Build.0 = Debug|x64
+		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Debug|x64.ActiveCfg = ReleaseDebug|x64
+		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Debug|x64.Build.0 = ReleaseDebug|x64
 		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Debug|x86.ActiveCfg = Debug|x64
 		{36E113AE-6F93-42FC-AB88-97721543A1DF}.DebugTest|x64.ActiveCfg = DebugTest|x64
 		{36E113AE-6F93-42FC-AB88-97721543A1DF}.DebugTest|x64.Build.0 = DebugTest|x64
-		{36E113AE-6F93-42FC-AB88-97721543A1DF}.DebugTest|x86.ActiveCfg = DebugTest|x64
+		{36E113AE-6F93-42FC-AB88-97721543A1DF}.DebugTest|x86.ActiveCfg = Debug|x64
 		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Release|x64.ActiveCfg = Release|x64
 		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Release|x64.Build.0 = Release|x64
 		{36E113AE-6F93-42FC-AB88-97721543A1DF}.Release|x86.ActiveCfg = Release|x64

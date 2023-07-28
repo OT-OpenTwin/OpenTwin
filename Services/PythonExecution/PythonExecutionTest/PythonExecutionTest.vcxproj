@@ -10,6 +10,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp" />
+    <ClCompile Include="src\FixturePythonAPI.cpp" />
+    <ClCompile Include="src\FixturePythonObjectBuilder.cpp" />
+    <ClCompile Include="src\FixturePythonWrapper.cpp" />
+    <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp" />
+    <ClCompile Include="src\TestPythonAPI.cpp" />
+    <ClCompile Include="src\TestPythonObjectBuilder.cpp" />
+    <ClCompile Include="src\TestsPythonWrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixturePropertyPythonObjectInterface.h" />
+    <ClInclude Include="include\FixturePythonAPI.h" />
+    <ClInclude Include="include\FixturePythonObjectBuilder.h" />
+    <ClInclude Include="include\FixturePythonWrapper.h" />
+    <ClInclude Include="include\TestingPythonExtensions.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72ea5528-6e0c-43d5-89f1-41329d20878d}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -24,9 +41,6 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <ItemGroup>
-    <ClCompile Include="test.cpp" />
-  </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
@@ -36,16 +50,17 @@
       <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>
       </MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);$(PYTHON310_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHR);$(PYTHON310_ROOT)\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python310.lib;PythonExecution.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -54,16 +69,17 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(PYTHON310_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(GOOGLE_TEST_LIBPATHR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(PYTHON310_ROOT)\libs;$(GOOGLE_TEST_LIBPATHR);$(SolutionDir)$(OT_LIBTESTR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);PythonExecution.lib;python310.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

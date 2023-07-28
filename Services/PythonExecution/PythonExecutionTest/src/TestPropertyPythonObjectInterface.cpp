@@ -1,7 +1,7 @@
 #pragma once
 #include <gtest/gtest.h>
 #include "FixturePropertyPythonObjectInterface.h"
-#include "PropertyPythonObjectInterface.h"
+#include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
 #include "EntityProperties.h"
 TEST_F(FixturePropertyPythonObjectInterface, PropertyDoubleValueType)

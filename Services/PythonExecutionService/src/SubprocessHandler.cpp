@@ -1,12 +1,11 @@
 #include "SubprocessHandler.h"
+
 #include "openTwinSystem/Application.h"
 #include "openTwinSystem/OperatingSystem.h"
 #include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCommunication/Msg.h"
 #include <assert.h>
-#include <condition_variable>
-#include <chrono>
+
 
 SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
 	:_urlThisProcess(urlThisService)
@@ -37,6 +36,25 @@ SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
 	_pingCommand = ot::rJSON::toJSON(pingDoc);
 }
 
+void SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter)
+{
+	if (CheckAlive(_subprocess) && PingSubprocess())
+	{
+		ot::rJSON::add(scriptsAndParameter, OT_ACTION_MEMBER, OT_ACTION_CMD_PYTHON_FORWARD_EXECUTE);
+		ot::rJSON::add(scriptsAndParameter, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
+		std::string response;
+		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, ot::rJSON::toJSON(scriptsAndParameter), response, 0))
+		{
+			assert(0); //What now?
+		}
+	}
+	else
+	{
+		Close();
+		RunWithNextFreeURL(_urlThisProcess);
+	}
+}
+
 void SubprocessHandler::Create(const std::string& urlThisProcess)
 {	
 	assert(_launcherPath != "" && _subprocessPath != "");
@@ -56,7 +74,6 @@ void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 {
 	std::mutex mtx;
 	std::unique_lock<std::mutex> lock(mtx);
-	using namespace std::chrono_literals;
 
 	int counter = 0;
 	while(true)
@@ -67,12 +84,12 @@ void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 		ot::app::RunResult result = ot::app::GeneralError;
 		result = ot::app::runApplication(_launcherPath, commandLine, _subprocess, false, 0);
 
-		assert(result == ot::app::OK); //ToDo: When would this case occue?
+		assert(result == ot::app::OK); //ToDo: When would this case occure?
 		
 		if (CheckAlive(_subprocess))
 		{
 			auto now = std::chrono::system_clock::now();
-			bool receivedNotification = _receivedInitializationRequest.wait_until(lock, now + 5s, [this]() {return this->getReceivedInitializationRequest(); });
+			bool receivedNotification = _waitForInitializationRequest.wait_until(lock, now + _processCreationTimeOut, [this]() {return this->getReceivedInitializationRequest(); });
 			if (receivedNotification)
 			{
 				_urlSubprocess = urlSubprocess;
@@ -119,20 +136,19 @@ bool SubprocessHandler::CheckAlive(OT_PROCESS_HANDLE& handle)
 
 bool SubprocessHandler::PingSubprocess()
 {
-	//for (int pingAttempt = 0; pingAttempt < _maxPingAttempts; pingAttempt++)
-	//{
-	//	std::string response;
-	//	if (ot::msg::send("", _urlSubprocess, ot::EXECUTE, _pingCommand, response, 1000))
-	//	{
-	//		return true;
-	//	}
-	//}
+	for (int pingAttempt = 0; pingAttempt < _maxPingAttempts; pingAttempt++)
+	{
+		std::string response;
+		if (ot::msg::send("", _urlSubprocess, ot::EXECUTE, _pingCommand, response, 1000))
+		{
+			return true;
+		}
+	}
 	return false;
 }
 
 bool SubprocessHandler::CloseProcess(const std::string& url)
 {
-
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShutdown);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
@@ -147,8 +163,8 @@ bool SubprocessHandler::CloseProcess(const std::string& url)
 
 void SubprocessHandler::setReceivedInitializationRequest()
 {
-	_receivedInitializationRequestAlready = true;
-	_receivedInitializationRequest.notify_all();
+	_receivedInitializationRequest = true;
+	_waitForInitializationRequest.notify_all();
 }
 
 bool SubprocessHandler::Close()
