@@ -1,4 +1,3 @@
-#include <iostream>
 #include "gtest/gtest.h"
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/ReturnMessage.h"

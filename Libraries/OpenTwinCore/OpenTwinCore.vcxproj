@@ -29,6 +29,7 @@
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Size2D.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
+    <ClCompile Include="src\Variable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h" />

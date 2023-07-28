@@ -5,7 +5,7 @@
 
 namespace ot
 {
-	OT_CORE_API_EXPORT class ReturnMessage
+	class ReturnMessage
 	{
 	public:
 		ReturnMessage(const std::string& status, const std::string& what)
