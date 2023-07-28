@@ -8,6 +8,7 @@ ActionHandler::ActionHandler(std::string urlMasterService)
 	:_urlMasterService(urlMasterService)
 {
 	_handlingFunction[OT_ACTION_CMD_PYTHON_Initialization] = std::bind(&ActionHandler::Initialize, this, std::placeholders::_1);
+	_handlingFunction[OT_ACTION_CMD_ShutdownRequestedByService] = std::bind(&ActionHandler::ShutdownProcess, this, std::placeholders::_1);
 }
 
 const char* ActionHandler::Handle(const char* json, const char* senderIP)
@@ -56,6 +57,10 @@ void ActionHandler::SendAccessDeniedMessage(const std::string& senderURL)
 
 void ActionHandler::Initialize(OT_rJSON_doc& doc)
 {
-	
-	
+		
+}
+
+void ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
+{
+	exit(1);
 }

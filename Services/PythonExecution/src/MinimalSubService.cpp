@@ -25,15 +25,6 @@ void MinimalSubService::RequestInitializationByMasterService()
 	std::string response;
 	Application::instance()->SendHttpRequest(ot::MessageType::EXECUTE, _urlMasterService, message, response);
 
-	std::ofstream o;
-	o.open("C:\\OpenTwin\\Services\\PythonExecution\\x64\\Release\\log.txt", std::ios_base::app);
-	if (o.is_open())
-	{
-		o << " Write to " << _urlMasterService << " response " << response;
-		o.flush();
-		o.close();
-	}
-
 	OT_rJSON_doc doc = ot::rJSON::fromJSON(response);
 	std::string urlModelService = doc["ModelService.URL"].GetString();
 	std::string sessionID = doc["Session.ID"].GetString();

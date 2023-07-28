@@ -20,4 +20,5 @@ private:
 	void SendAccessDeniedMessage(const std::string& senderURL);
 
 	void Initialize(OT_rJSON_doc& doc);
+	void ShutdownProcess(OT_rJSON_doc& doc);
 };
