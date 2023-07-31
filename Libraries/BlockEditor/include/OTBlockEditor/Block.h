@@ -15,6 +15,7 @@
 #include <QtCore/qmimedata.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qpoint.h>
+#include <QtCore/qlist.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qpixmap.h>
 #include <QtWidgets/qgraphicsitem.h>
@@ -45,6 +46,10 @@ namespace ot {
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 		
+		//! @brief Will calculate and return the rectangle of the block graphics object
+		//! Top->Bottom calculation (Uses calculateSize())
+		virtual QRectF rect(void) const override { return boundingRect(); };
+
 		void setHighlighted(bool _isHighlighted = true) { m_isHighlighted = _isHighlighted; };
 		bool isHighlighted(void) const { return m_isHighlighted; };
 
@@ -69,6 +74,8 @@ namespace ot {
 
 		void placeOnScene(QGraphicsScene* _scene);
 
+		void addMoveChild(QGraphicsItem* _item);
+
 	protected:
 		virtual void placeChildsOnScene(QGraphicsScene* _scene) {};
 
@@ -81,6 +88,7 @@ namespace ot {
 		QByteArray m_config;
 		bool m_isPressed;
 		QPointF m_lastPos;
+		QList<QGraphicsItem*> m_moveChilds;
 
 		Block(const Block&) = delete;
 		Block& operator = (const Block&) = delete;

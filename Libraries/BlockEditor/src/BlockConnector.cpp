@@ -5,13 +5,18 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockConnector.h"
+#include "OTBlockEditor/BlockPaintJob.h"
+#include "OpenTwinCore/Logger.h"
+#include "OpenTwinCore/otAssert.h"
 
 // Qt header
 #include <QtGui/qfontmetrics.h>
+#include <QtGui/qpen.h>
+#include <QtGui/qpainter.h>
 
 ot::BlockConnector::BlockConnector()
 	: BlockPaintJob(NoDelete), m_titleOrientation(ot::OrientCenter), m_style(ot::ConnectorCircle),
-	m_fillColor(128, 128, 128), m_borderColor(0, 0, 0), m_connectorSize(20),
+	m_fillColor(128, 128, 128), m_borderColor(0, 0, 0), m_connectorSize(12),
 	m_titleFont("Arial"), m_titleMargins(5, 5, 5, 5)
 {
 	m_titleFont.setPixelSize(12);
@@ -22,13 +27,65 @@ ot::BlockConnector::~BlockConnector() {
 }
 
 QRectF ot::BlockConnector::boundingRect(void) const {
-	return QRectF();
+	QPointF p(scenePos());
+	QSizeF s(calculateSize());
+
+	return QRectF(QPointF(p.x() - (s.width() / 2.), p.y() - (s.height() / 2.)), s);
 }
 
 ot::QueueObject::QueueResultFlags ot::BlockConnector::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
+	BlockPaintJobArg* arg = dynamic_cast<BlockPaintJobArg*>(_arg);
+	if (arg == nullptr) {
+		OT_LOG_EA("Block paint job arg cast failed");
+		return QueueObject::JobFailed;
+	}
 
+	// Setup painter
+	QPen p;
+	p.setColor(m_borderColor);
+	p.setWidth(1);
+	arg->painter()->setPen(p);
+	arg->painter()->setBrush(QBrush(m_fillColor));
 
-	return QueueObject::JobFailed;
+	QRectF r(rect());
+
+	// Paint symbol
+	switch (m_style)
+	{
+	case ot::ConnectorNone: return QueueObject::Ok;
+	case ot::ConnectorImage:
+		otAssert(0, "Not implemented yet");
+		break;
+	case ot::ConnectorPoint:
+		arg->painter()->drawPoint(r.center());
+		break;
+	case ot::ConnectorCircle:
+		arg->painter()->drawEllipse(r.center(), m_connectorSize / 2., m_connectorSize / 2.);
+		break;
+	case ot::ConnectorTriangleIn:
+		otAssert(0, "Not implemented yet");
+		break;
+	case ot::ConnectorTriangleOut:
+		otAssert(0, "Not implemented yet");
+		break;
+	case ot::ConnectorTriangleUp:
+		otAssert(0, "Not implemented yet");
+		break;
+	case ot::ConnectorTriangleRight:
+		otAssert(0, "Not implemented yet");
+		break;
+	case ot::ConnectorTriangleDown:
+		otAssert(0, "Not implemented yet");
+		break;
+	case ot::ConnectorTriangleLeft:
+		otAssert(0, "Not implemented yet");
+		break;
+	default:
+		otAssert(0, "Not implemented yet");
+		break;
+	}
+
+	return QueueObject::Ok;
 }
 
 QSizeF ot::BlockConnector::calculateSize(void) const {
@@ -97,4 +154,8 @@ QSizeF ot::BlockConnector::calculateSize(void) const {
 
 	// Add margins and apply the limits
 	return applyLimits(addMargins(s));
+}
+
+QRectF ot::BlockConnector::rect(void) const {
+	return this->boundingRect();
 }

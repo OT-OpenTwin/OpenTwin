@@ -34,11 +34,17 @@ namespace ot {
 		//! @brief Will calculate and return the size of the block graphics object
 		virtual QSizeF calculateSize(void) const override;
 
+		//! @brief Will calculate and return the rectangle of the block graphics object
+		//! Top->Bottom calculation (Uses calculateSize())
+		virtual QRectF rect(void) const override;
+
 		void setConnectorManger(BlockConnectorManager* _connectorManager);
 		BlockConnectorManager* getConnectorManager(void) { return m_connectorManager; };
 
 		void setLayerOrientation(ot::Orientation _orient) { m_orientation = _orient; };
 		ot::Orientation layerOrientation(void) const { return m_orientation; };
+
+		ot::DefaultBlock* getBlock(void) { return m_block; };
 
 	private:
 		ot::DefaultBlock* m_block;

@@ -11,8 +11,8 @@
 #include "QtMetaTypes.h"
 
 // Service header
-#include <uiServiceTypes.h>				// Model and View types
-#include <welcomeScreen.h>
+#include "uiServiceTypes.h"				// Model and View types
+#include "welcomeScreen.h"
 
 // AK header
 #include <akCore/aException.h>

@@ -3,11 +3,13 @@
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-
 // OpenTwin header
 #include "OTBlockEditor/BlockFactory.h"
+#include "OTBlockEditor/BlockLayer.h"
+#include "OTBlockEditor/BlockConnectorManager.h"
 #include "OTBlockEditor/LayerFactory.h"
 #include "OTBlockEditor/DefaultBlock.h"
+#include "OTBlockEditor/BlockConnector.h"
 
 #include "OTBlockEditorAPI/BlockConfiguration.h"
 #include "OTBlockEditorAPI/BlockLayerConfiguration.h"
@@ -59,6 +61,19 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 		}
 		else {
 			OT_LOG_W("Failed to create layer from configuration, skipping layer");
+		}
+	}
+	
+	// Calculate connectors
+	for (auto layer : newBlock->layers()) {
+		if (layer->getConnectorManager()) {
+			// Calculate child positions
+			layer->getConnectorManager()->positionChilds();
+
+			// Add potential move childs to the block
+			for (auto c : layer->getConnectorManager()->getAllConnectors()) {
+				newBlock->addMoveChild(c);
+			}
 		}
 	}
 

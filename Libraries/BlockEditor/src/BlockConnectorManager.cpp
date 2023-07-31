@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTBlockEditor/BlockConnectorManager.h"
+#include "OTBlockEditor/BlockConnector.h"
 #include "OTBlockEditor/Block.h"
 #include "OpenTwinCore/otAssert.h"
 
@@ -47,6 +48,14 @@ std::list<ot::BlockConnector*> ot::BorderLayoutBlockConnectorManager::getAllConn
 }
 
 ot::BorderLayoutBlockConnectorManager::QueueResultFlags ot::BorderLayoutBlockConnectorManager::runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) {
-	
+	for (auto c : this->getAllConnectors()) { 
+		c->runPaintJob(_queue, _arg);
+	}
 	return Ok;
+}
+
+void ot::BorderLayoutBlockConnectorManager::positionChilds(void) {
+	for (auto c : this->getAllConnectors()) {
+		c->setPos(10., 10.);
+	}
 }

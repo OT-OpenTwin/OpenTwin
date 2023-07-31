@@ -22,7 +22,7 @@ ot::Block::Block() : m_isHighlighted(false), m_highlightColor(250, 28, 28), m_is
 ot::Block::~Block() {}
 
 QRectF ot::Block::boundingRect(void) const {
-	QPointF p(pos());
+	QPointF p(scenePos());
 	QSizeF s(calculateSize());
 
 	return QRectF(QPointF(p.x() - (s.width() / 2.), p.y() - (s.height() / 2.)), s);
@@ -55,7 +55,7 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	}
 	else if (m_contextFlags.flagIsSet(ot::NetworkBlockContext)) {
 		if (_event->button() == Qt::LeftButton && flags() & QGraphicsItem::ItemIsMovable) {
-			m_lastPos = pos();
+			m_lastPos = mapToScene(_event->pos());
 			m_isPressed = true;
 		}
 	}
@@ -66,9 +66,16 @@ void ot::Block::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 void ot::Block::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_contextFlags.flagIsSet(ot::NetworkBlockContext) && m_isPressed) {
-		QPointF delta = _event->pos() - m_lastPos;
+		QPointF delta = mapToScene(_event->pos()) - m_lastPos;
+		
+		// Move grouped childs
+		for (auto c : m_moveChilds) {
+			c->moveBy(delta.x(), delta.y());
+		}
+		
+		// Move block
 		moveBy(delta.x(), delta.y());
-		m_lastPos = _event->pos();
+		m_lastPos = mapToScene(_event->pos());
 	}
 	else {
 		QGraphicsItem::mouseMoveEvent(_event);
@@ -96,4 +103,8 @@ QPixmap ot::Block::toPixmap(void) {
 void ot::Block::placeOnScene(QGraphicsScene* _scene) {
 	_scene->addItem(this);
 	placeChildsOnScene(_scene);
+}
+
+void ot::Block::addMoveChild(QGraphicsItem* _item) {
+	m_moveChilds.append(_item);
 }

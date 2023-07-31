@@ -49,7 +49,7 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 	for (auto l : m_layers) {
 		paintQueue.queue(l, new BlockPaintJobArg(
 			ot::calculateChildRect(boundingRect(), l->calculateSize(), l->layerOrientation()),
-			_painter, 
+			_painter,
 			_option,
 			_widget)
 		);
@@ -60,6 +60,8 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 		OT_LOG_EA("Failed to execute paintjob queue");
 	}
 
+	// Call the base class paint function to handle mouse and move highlights
+	ot::Block::paint(_painter, _option, _widget);
 }
 
 void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
@@ -81,8 +83,10 @@ void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
 void ot::DefaultBlock::placeChildsOnScene(QGraphicsScene* _scene) {
 	for (auto l : m_layers) {
 		ot::BlockConnectorManager * cm = l->getConnectorManager();
-		for (auto c : cm->getAllConnectors()) {
-			_scene->addItem(c);
+		if (cm) {
+			for (auto c : cm->getAllConnectors()) {
+				_scene->addItem(c);
+			}
 		}
 	}
 }

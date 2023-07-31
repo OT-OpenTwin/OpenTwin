@@ -41,6 +41,10 @@ namespace ot {
 		//! @brief Will calculate and return the size of the block graphics object
 		virtual QSizeF calculateSize(void) const override;
 
+		//! @brief Will calculate and return the rectangle of the block graphics object
+		//! Top->Bottom calculation (Uses calculateSize())
+		virtual QRectF rect(void) const override;
+
 		void setTitle(const QString& _title) { m_title = _title; };
 		const QString& title(void) const { return m_title; };
 

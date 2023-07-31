@@ -33,6 +33,9 @@ namespace ot {
 		//! @brief Return all connectors that are owned by this manager
 		virtual std::list<BlockConnector*> getAllConnectors(void) const = 0;
 
+		//! @brief Will position the connectors according to their parent block
+		virtual void positionChilds(void) = 0;
+
 	private:
 		BlockLayer* m_layer;
 
@@ -55,6 +58,9 @@ namespace ot {
 		virtual std::list<BlockConnector*> getAllConnectors(void) const override;
 
 		virtual QueueResultFlags runPaintJob(AbstractQueue* _queue, BlockPaintJobArg* _arg) override;
+
+		//! @brief Will position the connectors according to their parent block
+		virtual void positionChilds(void) override;
 
 	private:
 		std::list<ot::BlockConnector*> m_top; //! @brief Connectors at the top of the box

@@ -8,6 +8,8 @@
 #include "OTBlockEditor/BlockConnectorManager.h"
 #include "OTBlockEditor/BlockConnectorFactory.h"
 #include "OTBlockEditor/BlockConnector.h"
+#include "OTBlockEditor/BlockLayer.h"
+#include "OTBlockEditor/DefaultBlock.h"
 #include "OTBlockEditorAPI/BlockConnectorManagerConfiguration.h"
 #include "OTBlockEditorAPI/BorderLayoutBlockConnectorManagerConfiguration.h"
 #include "OpenTwinCore/otAssert.h"
@@ -31,8 +33,6 @@ ot::BlockConnectorManager* ot::BlockConnectorManagerFactory::connectorManagerFro
 	}
 
 	if (cm == nullptr) return cm;
-
-
 
 	return cm;
 }
