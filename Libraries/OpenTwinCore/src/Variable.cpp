@@ -1,7 +1,9 @@
-#include "VariableType.h"
+#include "openTwinCore/Variable.h"
 
-rapidjson::Value VariableToJSONConverter::Convert(variable_t&& value)
+
+rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t && value)
 {
+	
 	if (std::holds_alternative<int32_t>(value))
 	{
 		rapidjson::Value rJValue;
@@ -36,12 +38,35 @@ rapidjson::Value VariableToJSONConverter::Convert(variable_t&& value)
 	{
 		rapidjson::Value rJValue;
 		std::string temp = std::string(std::get<const char*>(value));
-		
+
 		return rJValue;
 	}
 	else
 	{
-		throw std::exception("Not supported type by PythonObjectBuilder.");
+		throw std::exception("Not supported type for variable_t to rapidjson::Value conversion.");
 	}
+}
 
+ot::variable_t ot::JSONToVariableConverter::operator()(rapidjson::Value& value)
+{
+	if (value.IsString())
+	{
+		return value.GetString();
+	}
+	else if (value.IsInt())
+	{
+		return value.GetInt();
+	}
+	else if (value.IsDouble())
+	{
+		return value.GetDouble();
+	}
+	else if (value.IsBool())
+	{
+		return value.GetBool();
+	}
+	else
+	{
+		throw std::exception("Not supported type for rapidjson::Value to variable_t conversion.");
+	}
 }

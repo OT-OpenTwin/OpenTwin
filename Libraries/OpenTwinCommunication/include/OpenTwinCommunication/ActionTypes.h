@@ -206,7 +206,13 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection "UI.VIEW.ColourSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges "UI.VIEW.SelectRanges"
 
-#define OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS "Python.Execute.String"
+#define OT_ACTION_CMD_PYTHON_EXECUTE "Python.Execute"
+#define OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS "Python.Execute.Results"
+#define OT_ACTION_CMD_PYTHON_Scripts "Python.Execute.Results"
+#define OT_ACTION_CMD_PYTHON_Parameter "Python.Execute.Results"
+
+#define OT_ACTION_CMD_PYTHON_Request_Initialization "Python.Request.Initialize"
+#define OT_ACTION_CMD_PYTHON_Initialization "Python.Initialize"
 
 
 #define OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor "UI.BlockEditor.CreateEmpty"

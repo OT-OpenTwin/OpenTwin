@@ -16,8 +16,6 @@
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
 
-#include "OpenTwinCore/Variable.h"
-
 
 	class  PythonWrapper
 	{

@@ -22,7 +22,7 @@
 #include "EntityTableSelectedRanges.h"
 #include "OpenTwinCore/Variable.h"
 
-
+#include <optional>
 #include <map>
 #include <string>
 #include <memory>
@@ -74,7 +74,7 @@ private:
 	ot::Color _backgroundColour;
 
 	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
-	std::map<std::string, std::vector<ot::VariableBundle>> _allVariableBundlesByMSMD;
+	std::map<std::string, std::list<std::optional<std::list<ot::variable_t>>>> _allVariablesByMSMD;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
 

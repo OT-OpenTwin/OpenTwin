@@ -1,43 +1,30 @@
+/*****************************************************************//**
+ * \file   VariableType.h
+ * \brief  Classes that convert from the JSON format that is being used for the inter service communication to the internally used variant and vice versa.
+ * 
+ * \author Wagner
+ * \date   July 2023
+ *********************************************************************/
 #pragma once
-#include <string>
-#include <vector>
+#include <variant>
 #include <stdint.h>
+#include "OpenTwinCore/rJSONHelper.h"
+#include "openTwinCore/CoreAPIExport.h"
 
 namespace ot
 {
-	template <class T>
-	struct Variable
-	{
-		Variable(std::string name, std::string type) :name(name), type(type) {};
-		Variable(std::string name, std::string type, T value) :name(name), type(type), value(value) {};
-		std::string name;
-		std::string type;
-		T value;
-	};
+	using variable_t = std::variant<int32_t, int64_t, bool, float, double, const char*>;
 
-	class VariableBundle
+	class VariableToJSONConverter
 	{
 	public:
-		void AddVariable(Variable<std::string> variable) { variablesString.push_back(variable); };
-		void AddVariable(Variable<int32_t> variable) { variablesInt32.push_back(variable); };
-		void AddVariable(Variable <int64_t> variable) { variablesInt64.push_back(variable); };
-		void AddVariable(Variable<double> variable) { variablesDouble.push_back(variable); };
-		void AddVariable(Variable<float> variable) { variablesFloat.push_back(variable); };
-		void AddVariable(Variable<bool> variable) { variablesBool.push_back(variable); };
-
-		std::list<Variable<std::string>>* GetVariablesString() { return &variablesString; }
-		std::list<Variable<int32_t>>* GetVariablesInt32() { return &variablesInt32; };
-		std::list<Variable<int64_t>>* GetVariablesInt64() { return &variablesInt64; };
-		std::list<Variable<double>>* GetVariablesDouble() { return &variablesDouble; };
-		std::list<Variable<float>>* GetVariablesFloat() { return &variablesFloat; };
-		std::list<Variable<bool>>* GetVariablesBool() { return &variablesBool; };
-
-	private:
-		std::list<Variable<std::string>> variablesString;
-		std::list<Variable<int32_t>> variablesInt32;
-		std::list<Variable<int64_t>> variablesInt64;
-		std::list<Variable<double>> variablesDouble;
-		std::list<Variable<float>> variablesFloat;
-		std::list<Variable<bool>> variablesBool;
+		__declspec(dllexport) rapidjson::Value operator() (variable_t&& value);
 	};
+
+	class JSONToVariableConverter
+	{
+	public:
+		__declspec(dllexport) variable_t operator() (rapidjson::Value& value);
+	};
+
 }

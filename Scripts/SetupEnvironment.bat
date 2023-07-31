@@ -62,6 +62,7 @@ SET OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\Impor
 SET OT_GETDP_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\GetDPService
 SET OT_UI_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\uiService
 SET OT_PYTHON_EXECUTION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PythonExecutionService
+SET OT_PYTHON_EXECUTION_ROOT=%OPENTWIN_DEV_ROOT%\Services\PythonExecution
 SET OT_BLOCKEDITORSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\BlockEditorService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################

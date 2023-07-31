@@ -12,7 +12,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\test.cpp">
+    <ClCompile Include="src\TestrJSON.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="TestVariable.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

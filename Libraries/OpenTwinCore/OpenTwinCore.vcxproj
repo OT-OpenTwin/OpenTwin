@@ -29,6 +29,7 @@
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Size2D.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
+    <ClCompile Include="src\Variable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="include\OpenTwinCore\Point2D.h" />
     <ClInclude Include="include\OpenTwinCore\Point3D.h" />
     <ClInclude Include="include\OpenTwinCore\Queue.h" />
+    <ClInclude Include="include\OpenTwinCore\ReturnMessage.h" />
     <ClInclude Include="include\OpenTwinCore\rJSON.h" />
     <ClInclude Include="include\OpenTwinCore\rJSONHelper.h" />
     <ClInclude Include="include\OpenTwinCore\Serializable.h" />

@@ -14,7 +14,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include "VariableType.h"
+#include "OpenTwinCore/Variable.h"
 #include <optional>
 
 class PythonObjectBuilder
@@ -46,7 +46,7 @@ public:
 	std::list<std::string> getStringList(const CPythonObject& pValue, const std::string& varName);
 	std::list<bool> getBoolList(const CPythonObject& pValue, const std::string& varName);
 
-	std::optional<variable_t> getVariable(CPythonObject& pValue);
+	std::optional<ot::variable_t> getVariable(CPythonObject& pValue);
 
 	CPythonObjectNew setInt32(const int32_t value);
 	CPythonObjectNew setInt64(const int64_t value);

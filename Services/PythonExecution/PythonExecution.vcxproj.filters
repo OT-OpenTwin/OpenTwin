@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4153e905-4397-4c3d-82bb-3ee2f0c68452}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{f4917014-dbcd-43f9-b205-146a31995749}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Backbone">
+      <UniqueIdentifier>{8236214a-815b-4f68-84d0-ff9b387a7dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Backbone">
+      <UniqueIdentifier>{4167f33b-5aa2-49d7-95a1-659034d8f24c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ModelNotifier.cpp">
+      <Filter>src\Backbone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UiNotifier.cpp">
+      <Filter>src\Backbone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionHandler.cpp">
+      <Filter>src\Backbone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src\Backbone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src\Backbone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MinimalSubService.cpp">
+      <Filter>src\Backbone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityBuffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyPythonObjectConverter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PythonAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PythonModuleAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PythonObjectBuilder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PythonWrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\UiNotifier.h">
+      <Filter>include\Backbone</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ActionHandler.h">
+      <Filter>include\Backbone</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Application.h">
+      <Filter>include\Backbone</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MinimalSubService.h">
+      <Filter>include\Backbone</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelNotifier.h">
+      <Filter>include\Backbone</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CPythonObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CPythonObjectBorrowed.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CPythonObjectNew.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityBuffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyPythonObjectConverter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonException.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonExtension.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonLoadedModules.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonModuleAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonObjectBuilder.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

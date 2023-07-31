@@ -29,6 +29,11 @@ void ot::rJSON::memberCheck(OT_rJSON_val & _doc, const char * _member) {
 	}
 }
 
+OT_CORE_API_EXPORT bool ot::rJSON::memberExists(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc.HasMember(_member);
+}
+
 // ##########################################################################################################
 
 // Document Getter
@@ -552,4 +557,11 @@ std::string ot::rJSON::toJSON(OT_rJSON_val & _doc) {
 
 	// Return string
 	return buffer.GetString();
+}
+
+OT_CORE_API_EXPORT OT_rJSON_doc ot::rJSON::fromJSON(const std::string& jsonString)
+{
+	OT_rJSON_createDOC(doc);
+	doc.Parse(jsonString.c_str());
+	return doc;
 }

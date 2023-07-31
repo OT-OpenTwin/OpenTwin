@@ -59,6 +59,8 @@ namespace ot {
 		//! @throw std::exception if the specified member is missing in the provided document
 		OT_CORE_API_EXPORT void memberCheck(OT_rJSON_val & _doc, const char * _member);
 
+		OT_CORE_API_EXPORT bool memberExists(OT_rJSON_val & _doc, const char * _member);
+
 		// ##########################################################################################################
 		
 		// Document Getter
@@ -380,5 +382,8 @@ namespace ot {
 		//! @brief Will return the JSON string created from the provided document
 		//! @param _doc The document
 		OT_CORE_API_EXPORT std::string toJSON(OT_rJSON_val & _doc);
+
+
+		OT_CORE_API_EXPORT OT_rJSON_doc fromJSON(const std::string& jsonString);
 	}
 }
