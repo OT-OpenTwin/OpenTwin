@@ -82,7 +82,7 @@ private:
 	QVBoxLayout *				m_filterByServiceLayout;
 	QGroupBox *					m_filterByServiceBox;
 
-	QCheckBox *					m_msgTypeFilterDebug;
+	QCheckBox *					m_msgTypeFilterDetailed;
 	QCheckBox *					m_msgTypeFilterInfo;
 	QCheckBox *					m_msgTypeFilterWarning;
 	QCheckBox *					m_msgTypeFilterError;

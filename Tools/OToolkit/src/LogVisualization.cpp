@@ -26,7 +26,7 @@
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qmenubar.h>
 
-#define TABLE_TXT_DEBUG "Debug"
+#define TABLE_TXT_DETAILED "Detailed"
 #define TABLE_TXT_INFO "Info"
 #define TABLE_TXT_WARNING "Warning"
 #define TABLE_TXT_ERROR "Error"
@@ -83,7 +83,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 
 	m_table = new QTableWidget(0, tCount);
 
-	m_msgTypeFilterDebug = new QCheckBox("Debug");
+	m_msgTypeFilterDetailed = new QCheckBox("Detailed");
 	m_msgTypeFilterInfo = new QCheckBox("Info");
 	m_msgTypeFilterWarning = new QCheckBox("Warning");
 	m_msgTypeFilterError = new QCheckBox("Error");
@@ -105,7 +105,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	m_filterLayout->addWidget(m_filterByMessageTypeBox, 0);
 	m_filterLayout->addWidget(m_filterByServiceBox, 1);
 
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterDebug);
+	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterDetailed);
 	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterInfo);
 	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterWarning);
 	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
@@ -128,7 +128,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	m_splitter->addWidget(m_table);
 
 	// Setup controls
-	m_msgTypeFilterDebug->setChecked(true);
+	m_msgTypeFilterDetailed->setChecked(true);
 	m_msgTypeFilterInfo->setChecked(true);
 	m_msgTypeFilterWarning->setChecked(true);
 	m_msgTypeFilterError->setChecked(true);
@@ -167,7 +167,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 
 	m_autoScrollToBottom->setChecked(s.value("LogVisualization.AutoScrollToBottom", true).toBool());
 
-	m_msgTypeFilterDebug->setChecked(s.value("LogVisualization.FilterActive.Debug", true).toBool());
+	m_msgTypeFilterDetailed->setChecked(s.value("LogVisualization.FilterActive.Detailed", true).toBool());
 	m_msgTypeFilterInfo->setChecked(s.value("LogVisualization.FilterActive.Info", true).toBool());
 	m_msgTypeFilterWarning->setChecked(s.value("LogVisualization.FilterActive.Warning", true).toBool());
 	m_msgTypeFilterError->setChecked(s.value("LogVisualization.FilterActive.Error", true).toBool());
@@ -204,7 +204,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	updateCountLabels();
 	
 	// Connect checkbox color signals
-	connect(m_msgTypeFilterDebug, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
+	connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
 	connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
 	connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
 	connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
@@ -218,7 +218,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	connect(m_btnClear, &QPushButton::clicked, this, &LogVisualization::slotClear);
 	connect(m_btnClearAll, &QPushButton::clicked, this, &LogVisualization::slotClearAll);
 
-	connect(m_msgTypeFilterDebug, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
+	connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
 	connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
 	connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
 	connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
@@ -240,7 +240,7 @@ LogVisualization::~LogVisualization() {
 
 	s.setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
 
-	s.setValue("LogVisualization.FilterActive.Debug", m_msgTypeFilterDebug->isChecked());
+	s.setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
 	s.setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
 	s.setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
 	s.setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
@@ -349,7 +349,7 @@ void LogVisualization::slotUpdateCheckboxColors(void) {
 	QString green("QCheckBox { color: #20c020; }");
 	QString def("");
 
-	m_msgTypeFilterDebug->setStyleSheet(m_msgTypeFilterDebug->isChecked() ? green : red);
+	m_msgTypeFilterDetailed->setStyleSheet(m_msgTypeFilterDetailed->isChecked() ? green : red);
 	m_msgTypeFilterInfo->setStyleSheet(m_msgTypeFilterInfo->isChecked() ? green : red);
 	m_msgTypeFilterWarning->setStyleSheet(m_msgTypeFilterWarning->isChecked() ? green : red);
 	m_msgTypeFilterError->setStyleSheet(m_msgTypeFilterError->isChecked() ? green : red);
@@ -371,43 +371,43 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	QString serviceName = QString::fromStdString(_msg.serviceName());
 
 	QTableWidgetItem * iconItm = new QTableWidgetItem("");
-	if (_msg.flags().flagIsSet(ot::WARNING_LOG)) iconItm->setIcon(QIcon(":/images/Warning.png"));
-	else if (_msg.flags().flagIsSet(ot::ERROR_LOG)) iconItm->setIcon(QIcon(":/images/Error.png"));
+	if (_msg.flags() & ot::WARNING_LOG) iconItm->setIcon(QIcon(":/images/Warning.png"));
+	else if (_msg.flags() & ot::ERROR_LOG) iconItm->setIcon(QIcon(":/images/Error.png"));
 	else iconItm->setIcon(QIcon(":/images/Info.png"));
 	iniTableItem(r, tIcon, iconItm);
 
 	QString typeString;
-	if (_msg.flags().flagIsSet(ot::DETAILED_LOG)) {
+	if (_msg.flags() & ot::DETAILED_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_DEBUG);
+		typeString.append(TABLE_TXT_DETAILED);
 	}
-	if (_msg.flags().flagIsSet(ot::DEFAULT_LOG)) {
+	if (_msg.flags() & ot::DEFAULT_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_INFO);
 	}
-	if (_msg.flags().flagIsSet(ot::ERROR_LOG)) {
+	if (_msg.flags() & ot::ERROR_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_ERROR);
 		m_errorCount++;
 	}
-	if (_msg.flags().flagIsSet(ot::WARNING_LOG)) {
+	if (_msg.flags() & ot::WARNING_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_WARNING);
 		m_warningCount++;
 	}
-	if (_msg.flags().flagIsSet(ot::INBOUND_MESSAGE_LOG)) {
+	if (_msg.flags() & ot::INBOUND_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_IN);
 	}
-	if (_msg.flags().flagIsSet(ot::QUEUED_INBOUND_MESSAGE_LOG)) {
+	if (_msg.flags() & ot::QUEUED_INBOUND_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_QUEUE);
 	}
-	if (_msg.flags().flagIsSet(ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG)) {
+	if (_msg.flags() & ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_OW_TLS);
 	}
-	if (_msg.flags().flagIsSet(ot::OUTGOING_MESSAGE_LOG)) {
+	if (_msg.flags() & ot::OUTGOING_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_OUT);
 	}
@@ -451,7 +451,9 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 }
 
 void LogVisualization::appendLogMessages(const QList<ot::LogMessage>& _messages) {
-
+	for (auto m : _messages) {
+		appendLogMessage(m); 
+	}
 }
 
 QWidget * LogVisualization::widget(void) {
@@ -468,7 +470,7 @@ void LogVisualization::checkEntryFilter(int _row) {
 
 	bool typePass = false;
 	QTableWidgetItem * typeItm = m_table->item(_row, tType);
-	if (m_msgTypeFilterDebug->isChecked() && typeItm->text().contains(TABLE_TXT_DEBUG)) typePass = true;
+	if (m_msgTypeFilterDetailed->isChecked() && typeItm->text().contains(TABLE_TXT_DETAILED)) typePass = true;
 	else if (m_msgTypeFilterInfo->isChecked() && typeItm->text().contains(TABLE_TXT_INFO)) typePass = true;
 	else if (m_msgTypeFilterWarning->isChecked() && typeItm->text().contains(TABLE_TXT_WARNING)) typePass = true;
 	else if (m_msgTypeFilterError->isChecked() && typeItm->text().contains(TABLE_TXT_ERROR)) typePass = true;
