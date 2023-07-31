@@ -19,6 +19,7 @@
 #include "OpenTwinCore/Variable.h"
 #include "OpenTwinCore/TypeNames.h"
 #include "TemplateDefaultManager.h"
+#include "SubprocessDebugConfigurator.h"
 
 Application * g_instance{ nullptr };
 
@@ -56,8 +57,6 @@ Application::~Application()
 // ##################################################################################################################################################################################################################
 
 // Required functions
-#include "SubprocessDebugConfigurator.h"
-#include "SubprocessHandler.h"
 
 void Application::run(void)
 {
@@ -263,46 +262,6 @@ void Application::settingsSynchronized(ot::SettingsData * _dataset) {
 bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	return false;
 }
-
-
-#include "OpenTwinSystem/OperatingSystem.h"
-#include "openTwinSystem/Application.h"
-#include "OpenTwinCommunication/Msg.h"
-
-bool CheckAlive(OT_PROCESS_HANDLE& handle)
-{
-#if defined(OT_OS_WINDOWS)
-	// Checking the exit code of the service
-	DWORD exitCode = STILL_ACTIVE;
-	bool isAlive;
-	if (GetExitCodeProcess(handle, &exitCode))
-	{
-		if (exitCode != STILL_ACTIVE) {
-			isAlive = false;
-			CloseHandle(handle);
-			handle = OT_INVALID_PROCESS_HANDLE;
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-	else {
-		
-		isAlive = false;
-		CloseHandle(handle);
-		handle = OT_INVALID_PROCESS_HANDLE;
-	}
-	return isAlive;
-#else
-	assert(0);
-	OT_LOG_E("Function is implemented only for Windows OS");
-	return false;
-#endif // OT_OS_WINDOWS
-
-}
-
-#include "SubprocessHandler.h"
 
 //void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction)
 //{

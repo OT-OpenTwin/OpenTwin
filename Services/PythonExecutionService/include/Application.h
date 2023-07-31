@@ -117,6 +117,4 @@ public:
 
 private:
 	SubprocessHandler* _subprocessHandler = nullptr;
-
-	//void ProcessScriptExecution(std::list<std::string> scripts, std::list < std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction);
 };
