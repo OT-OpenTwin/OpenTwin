@@ -4,9 +4,9 @@
 #include <assert.h>
 #include <fstream>
 #include "DataBase.h"
+
 void SubprocessDebugConfigurator::CreateConfiguration(const std::string& urlThisService, const std::string& urlSubProcess, const std::string& urlModelService, const std::string& urlDataBase, const int serviceID, const std::string& sessionID)
 {
-	/*Bsp.: {"Site.ID":"1", "Service.URL" : "127.0.0.1:8094", "SessionService.URL" : "127.0.0.1:8093", "LocalDirectoryService.URL" : "", "Session.ID" : "test:Data-2023719-174349-24"}*/
 	std::string filePath = GetConfigurationFilePath() + "\\pythonexecution.cfg";
 	std::ofstream fileWriter;
 	fileWriter.open(filePath, std::ios::out);

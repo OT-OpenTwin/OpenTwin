@@ -13,7 +13,7 @@ class SubprocessHandler
 
 public:
 	SubprocessHandler(const std::string& urlThisService);
-	
+	~SubprocessHandler();
 	SubprocessHandler& operator=(const SubprocessHandler& other) = delete;
 	SubprocessHandler& operator=(SubprocessHandler&& other) = delete;
 	SubprocessHandler(const SubprocessHandler& other) =  delete;

@@ -36,6 +36,11 @@ SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
 	_pingCommand = ot::rJSON::toJSON(pingDoc);
 }
 
+SubprocessHandler::~SubprocessHandler()
+{
+	Close();
+}
+
 void SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter)
 {
 	if (CheckAlive(_subprocess) && PingSubprocess())
