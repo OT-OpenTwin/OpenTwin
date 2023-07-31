@@ -25,5 +25,10 @@ TEST(VariableTest, JSONToVariable)
 	EXPECT_EQ(var.GetInt(), std::get<int>(result));
 }
 
-
-
+TEST(VariableTest, JSONToVariableNotSupportedType)
+{
+	rapidjson::Value var;
+	ot::JSONToVariableConverter converter;
+	
+	EXPECT_ANY_THROW(converter(var));
+}

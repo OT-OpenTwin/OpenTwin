@@ -39,16 +39,12 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 				if (checkResult.getStatus() == OT_ACTION_RETURN_VALUE_OK)
 				{
 					auto& handlingFunction = _handlingFunctions[action];
-					handlingFunction(doc);
+					returnMessage = handlingFunction(doc);
 				}
 				else
 				{
 					returnMessage = checkResult;
 				}
-				
-				
-
-				//std::thread workerThread(&Application::ProcessScriptExecution,this, scripts, allParameter, subsequentFunction);
 			}
 			else
 			{
@@ -64,36 +60,69 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
     return returnValue;
 }
 
-void ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
 {
 	exit(1);
 }
 
-void ActionHandler::Execute(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 {
-
-	auto scriptArray = doc[OT_ACTION_CMD_PYTHON_Scripts].GetArray();
-	std::list<std::string> scripts;
-	
-	for (auto& element : scriptArray)
+	try
 	{
-		scripts.emplace_back(element.GetString());
+		//Extract script entity names from json doc
+		auto scriptArray = doc[OT_ACTION_CMD_PYTHON_Scripts].GetArray();
+		std::list<std::string> scripts;
+
+		for (auto& element : scriptArray)
+		{
+			scripts.emplace_back(element.GetString());
+		}
+
+		//Extract parameter array from json doc
+		auto parameterArrayArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
+		std::list<std::optional<std::list<ot::variable_t>>> allParameter;
+
+		ot::JSONToVariableConverter converterJ2V;
+		for (uint32_t i = 0; i < parameterArrayArray.Size(); i++)
+		{
+			if (parameterArrayArray[i].IsNull())
+			{
+				allParameter.push_back({});
+			}
+			else
+			{
+				auto parameterArray = parameterArrayArray[i].GetArray();
+				//Todo: support of lists/maps as parameter
+				std::list<ot::variable_t> scriptParameter;
+				for (uint32_t i = 0; i < parameterArray.Size(); i++)
+				{
+					auto paramerter = converterJ2V(parameterArray[i]);
+					scriptParameter.emplace_back(paramerter);
+				}
+				allParameter.emplace_back(scriptParameter);
+			}
+		}
+
+		//Execute
+		std::list<ot::variable_t> result = _pythonAPI.Execute(scripts, allParameter);
+
+		//Wrapp result in json string
+		OT_rJSON_createDOC(returnValues);
+		OT_rJSON_createValueArray(rJsonResult);
+		ot::VariableToJSONConverter converterV2J;
+
+		for (ot::variable_t& var : result)
+		{
+			rJsonResult.PushBack(converterV2J(std::move(var)), returnValues.GetAllocator());
+		}
+
+		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_OK, ot::rJSON::toJSON(returnValues));
+	}
+	catch (std::exception& e)
+	{
+		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, e.what());
 	}
 
-	auto parameterArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
-	std::list<std::optional<std::list<ot::variable_t>>> allParameter;
-
-	ot::JSONToVariableConverter converter;
-	for (uint32_t i = 0; i < parameterArray.Size(); i++)
-	{
-		//ot::variable_t var = converter(parameterArray[i]);
-		//allParameter.emplace_back();
-	}
-		
-	std::list<ot::variable_t> result =	_pythonAPI.Execute(scripts, allParameter);
-	
-
-	//Answer to the PYthonExecutionService
 }
 
 ot::ReturnMessage ActionHandler::CheckParameterExecute(OT_rJSON_doc& doc)

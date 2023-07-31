@@ -18,13 +18,13 @@ namespace ot
 	class VariableToJSONConverter
 	{
 	public:
-		rapidjson::Value operator() (variable_t&& value);
+		__declspec(dllexport) rapidjson::Value operator() (variable_t&& value);
 	};
 
 	class JSONToVariableConverter
 	{
 	public:
-		variable_t operator() (rapidjson::Value& value);
+		__declspec(dllexport) variable_t operator() (rapidjson::Value& value);
 	};
 
 }
