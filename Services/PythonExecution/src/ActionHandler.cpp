@@ -50,7 +50,10 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 			}
 		}
 	}
-	
+	else
+	{
+		returnMessage = ot::ReturnMessage(ot::ReturnStatus::Failed(), "Message requires a senderURL which is missing.");
+	}
 	char* returnValue = new char[returnMessage.size() + 1];
 	std::strcpy(returnValue, returnMessage.c_str());
 
@@ -110,7 +113,7 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 
 		for (ot::variable_t& var : result)
 		{
-			rJsonResult.PushBack(converterV2J(std::move(var)), returnValues.GetAllocator());
+			rJsonResult.PushBack(converterV2J(var), returnValues.GetAllocator());
 		}
 
 		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_OK, ot::rJSON::toJSON(returnValues));

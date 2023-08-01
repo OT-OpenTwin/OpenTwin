@@ -5,8 +5,6 @@
 #include "PreviewAssemblerRMD.h"
 
 #include "Documentation.h"
-
-
 #include <algorithm>
 
 
@@ -595,9 +593,10 @@ std::map<std::string, ot::UID> DataCategorizationHandler::GetAllScripts()
 	return scriptUIDsByName;
 }
 
+#include "OpenTwinFoundation/PythonServiceInterface.h"
 void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 {
-
+	
 	//std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
 	//_allRelevantTableSelectionsByMSMD.clear();
 	//_allVariableBundlesByMSMD.clear();
@@ -662,28 +661,16 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	//	}
 		//SendPythonExecutionRequest(scripts, element.first);
 	//}
-	OT_rJSON_createDOC(newDocument);
+	auto pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
+	ot::PythonServiceInterface interface(pythonService->serviceURL());
 	
-	OT_rJSON_createValueArray(scripts);
-	rapidjson::Value strVal;
-	strVal.SetString("Scripts/TestScript_UpdateEntity", newDocument.GetAllocator());
-	scripts.PushBack(strVal,newDocument.GetAllocator());
-		
-	OT_rJSON_createValueArray(allparameter);
-	OT_rJSON_createValueArray(parameter);
-	rapidjson::Value intParam;
-	intParam.SetInt(13);
-	parameter.PushBack(intParam, newDocument.GetAllocator());
-	allparameter.PushBack(parameter, newDocument.GetAllocator());
+	ot::PythonServiceInterface::scriptParameter testScriptParameter;
+	std::list<ot::variable_t> parameter;
+	parameter.push_back(13);
+	testScriptParameter = parameter;
 
-	ot::rJSON::add(newDocument, OT_ACTION_CMD_PYTHON_Parameter, allparameter);
-	ot::rJSON::add(newDocument, OT_ACTION_CMD_PYTHON_Scripts, scripts);
-
-	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE);
-	
-	std::string returnValue = Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, newDocument);
-
+	interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntity", testScriptParameter);
+	ot::ReturnMessage returnValue =  interface.SendExecutionOrder();
 }
 
 void DataCategorizationHandler::SendPythonExecutionRequest(std::vector<std::string>& pythonScripts, const std::string& msmdName)

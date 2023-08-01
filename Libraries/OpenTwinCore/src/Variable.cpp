@@ -1,7 +1,7 @@
 #include "openTwinCore/Variable.h"
 
 
-rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t && value)
+rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t & value)
 {
 	
 	if (std::holds_alternative<int32_t>(value))

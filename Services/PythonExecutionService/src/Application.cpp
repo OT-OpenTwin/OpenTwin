@@ -86,6 +86,8 @@ void Application::run(void)
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 #include "DataBase.h"
+#include "OpenTwinCore/ReturnMessage.h"
+
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	try
@@ -111,7 +113,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 					}
 					else
 					{
-						return "";
+						return ot::ReturnMessage(ot::ReturnStatus::Failed(),"Scripts and parameter are not of expected type.");
 					}
 				}
 										
