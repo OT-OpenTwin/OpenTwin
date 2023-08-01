@@ -7,3 +7,5 @@
 //! @brief Dll import
 #define OT_CORE_API_EXPORT __declspec(dllimport)
 #endif // OPENTWINCORE_EXPORTS
+
+#define OT_CORE_API_EXPORTONLY __declspec(dllexport)
