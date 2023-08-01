@@ -302,6 +302,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getEntityStorageVersion(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(true);
 			std::string name = "";
+
 			if (tableRange->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 			{
 				for (int32_t column = ranges[i].GetLeftColumn(); column <= ranges[i].GetRightColumn(); column++)
@@ -332,6 +333,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 					}
 				}
 			}
+			std::replace(name.begin(), name.end(), '/', '\\');
 			name =	CreateNewUniqueTopologyNamePlainPossible(categoryEntity->getName(), name, takenNames);
 			tableRange->setName(name);
 			ot::EntityInformation entityInfo;
