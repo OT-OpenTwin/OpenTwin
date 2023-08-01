@@ -73,12 +73,12 @@ void ot::BlockNetworkEditor::dropEvent(QDropEvent* _event) {
 	}
 
 	// Store current event position to position the new block at this pos
-	QPointF position = mapToScene(mapFromGlobal(_event->pos()));
+	QPointF position = this->mapToScene(mapToGlobal(_event->pos()));
 
 	Block* newBlock = ot::BlockFactory::blockFromConfig(cfg);
 	newBlock->setBlockContextFlags(ot::BlockContextFlags(ot::NetworkBlockContext));
-	newBlock->setPos(position);
-	m_network->addItem(newBlock);
+	newBlock->finalize(m_network);
+	//newBlock->moveBy(position.x(), position.y());
 
 	delete cfg;
 

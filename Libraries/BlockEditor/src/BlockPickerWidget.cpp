@@ -16,7 +16,7 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OpenTwinCore/otAssert.h"
 
-// Qt Header
+// Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qgraphicsview.h>
@@ -122,7 +122,7 @@ void ot::BlockPickerWidget::slotSelectionChanged(void) {
 					box.view->setMinimumSize(m_previewSize);
 					box.view->setDragMode(QGraphicsView::NoDrag);
 
-					box.scene->addItem(newBlock);
+					newBlock->finalize(box.scene);
 					
 					box.view->viewAll();
 

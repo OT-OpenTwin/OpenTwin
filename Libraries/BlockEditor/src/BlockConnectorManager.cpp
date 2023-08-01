@@ -56,6 +56,6 @@ ot::BorderLayoutBlockConnectorManager::QueueResultFlags ot::BorderLayoutBlockCon
 
 void ot::BorderLayoutBlockConnectorManager::positionChilds(void) {
 	for (auto c : this->getAllConnectors()) {
-		c->setPos(10., 10.);
+		c->setPos(120., 0.);
 	}
 }

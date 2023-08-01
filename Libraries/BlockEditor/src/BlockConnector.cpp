@@ -48,6 +48,7 @@ ot::QueueObject::QueueResultFlags ot::BlockConnector::runPaintJob(AbstractQueue*
 	arg->painter()->setBrush(QBrush(m_fillColor));
 
 	QRectF r(rect());
+	OT_LOG_D("Rect on: (" + std::to_string(r.x()) + "; " + std::to_string(r.y()) + ")");
 
 	// Paint symbol
 	switch (m_style)

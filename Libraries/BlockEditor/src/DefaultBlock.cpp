@@ -46,9 +46,12 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 	// Add every layer as a paintjob, from bottom to top
 	// The layers will queue the connectors if needed
 	// The arg pointer will be removed my the queue
+	QRectF r = boundingRect();
+	OT_LOG_D("Rect on: (" + std::to_string(r.x()) + "; " + std::to_string(r.y()) + ")");
+
 	for (auto l : m_layers) {
 		paintQueue.queue(l, new BlockPaintJobArg(
-			ot::calculateChildRect(boundingRect(), l->calculateSize(), l->layerOrientation()),
+			ot::calculateChildRect(r, l->calculateSize(), l->layerOrientation()),
 			_painter,
 			_option,
 			_widget)
@@ -62,6 +65,21 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 
 	// Call the base class paint function to handle mouse and move highlights
 	ot::Block::paint(_painter, _option, _widget);
+}
+
+QSizeF ot::DefaultBlock::sizeHint(Qt::SizeHint _which, const QSizeF& _constraint) const {
+	switch (_which)
+	{
+	case Qt::MinimumSize: return calculateSize().expandedTo(_constraint);
+	case Qt::PreferredSize: return calculateSize().expandedTo(_constraint);
+	case Qt::MaximumSize: return calculateSize().boundedTo(_constraint);
+	case Qt::MinimumDescent: return calculateSize().expandedTo(_constraint);
+	case Qt::NSizeHints: return calculateSize().expandedTo(_constraint);
+	default:
+		otAssert(0, "Unknown size hint requested");
+		return calculateSize();
+		break;
+	}
 }
 
 void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
@@ -80,12 +98,33 @@ void ot::DefaultBlock::addLayer(BlockLayer* _layer) {
 	m_layers.push_back(_layer);
 }
 
+void ot::DefaultBlock::finalize(void) {
+	setPos(0., 0.);
+
+	for (auto l : m_layers) {
+		if (l->getConnectorManager()) {
+			l->getConnectorManager()->positionChilds();
+		}
+	}
+}
+
 void ot::DefaultBlock::placeChildsOnScene(QGraphicsScene* _scene) {
 	for (auto l : m_layers) {
 		ot::BlockConnectorManager * cm = l->getConnectorManager();
 		if (cm) {
 			for (auto c : cm->getAllConnectors()) {
 				_scene->addItem(c);
+			}
+		}
+	}
+}
+
+void ot::DefaultBlock::moveChildsBy(const QPointF& _delta) {
+	for (auto l : m_layers) {
+		ot::BlockConnectorManager* cm = l->getConnectorManager();
+		if (cm) {
+			for (auto c : cm->getAllConnectors()) {
+				c->moveBy(_delta.x(), _delta.y());
 			}
 		}
 	}

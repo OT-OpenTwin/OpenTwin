@@ -64,13 +64,9 @@ ot::Block* ot::BlockFactory::blockFromConfig(ot::BlockConfiguration* _config) {
 		}
 	}
 	
-	// Calculate connectors
+	// Add connectors to the block (grouping) so they will be moved together with the block
 	for (auto layer : newBlock->layers()) {
 		if (layer->getConnectorManager()) {
-			// Calculate child positions
-			layer->getConnectorManager()->positionChilds();
-
-			// Add potential move childs to the block
 			for (auto c : layer->getConnectorManager()->getAllConnectors()) {
 				newBlock->addMoveChild(c);
 			}

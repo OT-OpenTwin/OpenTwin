@@ -100,11 +100,21 @@ QPixmap ot::Block::toPixmap(void) {
 	return prev;
 }
 
-void ot::Block::placeOnScene(QGraphicsScene* _scene) {
+void ot::Block::finalize(QGraphicsScene* _scene) {
 	_scene->addItem(this);
 	placeChildsOnScene(_scene);
+	this->finalize();
 }
 
 void ot::Block::addMoveChild(QGraphicsItem* _item) {
 	m_moveChilds.append(_item);
+}
+
+void ot::Block::moveToWithChilds(const QPointF& _p) {
+	this->moveByWithChilds(pos() - _p);
+}
+
+void ot::Block::moveByWithChilds(const QPointF& _delta) {
+	this->moveBy(_delta.x(), _delta.y());
+	moveChildsBy(_delta);
 }

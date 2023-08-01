@@ -9,6 +9,7 @@
 #include "OTBlockEditor/BlockEditorAPIExport.h"
 #include "OTBlockEditor/BlockEditorTypes.h"
 #include "OTBlockEditor/BlockGraphicsObject.h"
+#include "OTWidgets/GraphicsItem.h"
 #include "OTGui/LengthLimitation.h"
 
 // Qt header
@@ -18,7 +19,6 @@
 #include <QtCore/qlist.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qpixmap.h>
-#include <QtWidgets/qgraphicsitem.h>
 
 #define OT_BLOCK_MIMETYPE_Configuration "Configuration"
 
@@ -31,9 +31,8 @@ namespace ot {
 	
 	class BlockConnector;
 
-	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem, public ot::BlockGraphicsObject {
+	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public ot::GraphicsItem, public ot::BlockGraphicsObject{
 		Q_OBJECT
-		Q_INTERFACES(QGraphicsItem)
 	public:
 		Block();
 		virtual ~Block();
@@ -72,12 +71,20 @@ namespace ot {
 		void setBlockContextFlags(const BlockContextFlags& _flags) { m_contextFlags = _flags; };
 		const BlockContextFlags& blockContextFlags(void) const { return m_contextFlags; };
 
-		void placeOnScene(QGraphicsScene* _scene);
+		//! @brief Will add the block and all related childs to the scene
+		//! Any calculations required for child positioning will be performed
+		void finalize(QGraphicsScene* _scene);
 
 		void addMoveChild(QGraphicsItem* _item);
 
+		void moveToWithChilds(const QPointF& _p);
+
+		void moveByWithChilds(const QPointF& _delta);
+
 	protected:
 		virtual void placeChildsOnScene(QGraphicsScene* _scene) {};
+		virtual void moveChildsBy(const QPointF& _delta) = 0;
+		virtual void finalize(void) = 0;
 
 	private:
 		BlockContextFlags m_contextFlags;

@@ -19,6 +19,12 @@
     <ClCompile Include="src\TreeWidgetFilter.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsLayout.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -55,6 +61,12 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetTypes.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsLayout.h">
+      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
