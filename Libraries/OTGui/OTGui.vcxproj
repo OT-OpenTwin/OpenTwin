@@ -14,6 +14,10 @@
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\FillPainter2D.h" />
     <ClInclude Include="include\OTGui\Font.h" />
+    <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
     <ClInclude Include="include\OTGui\Layout.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
@@ -28,6 +32,10 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FillPainter2D.cpp" />
     <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsTextItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
     <ClCompile Include="src\LengthLimitation.cpp" />
     <ClCompile Include="src\LinearGradientPainter2D.cpp" />

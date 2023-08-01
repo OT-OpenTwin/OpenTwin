@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Painter2D">
       <UniqueIdentifier>{1ff6a0d7-763f-486d-80c8-fbf5a4d9c97d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{c7503f04-c876-4ee1-b8a3-86c009fbdff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{2b046295-918f-44dc-b4b0-3f6fd20038b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GuiTypes.h">
@@ -54,6 +60,18 @@
     <ClInclude Include="include\OTGui\Layout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -85,6 +103,18 @@
     </ClCompile>
     <ClCompile Include="src\Font.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsImageItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsRectangularItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsTextItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
