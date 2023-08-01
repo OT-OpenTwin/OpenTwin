@@ -30,7 +30,8 @@ void ot::RectangularBlockLayer::paintLayer(const QRectF& _rect, QPainter* _paint
 
 void ot::RectangularBlockLayer::setBorder(const ot::Border& _border) {
 	m_borderColor = QColor(_border.color().r(), _border.color().g(), _border.color().b(), _border.color().a());
-	m_borderWidth = _border.width();
+	// Border aint gonna be painted here anyway soon
+	m_borderWidth = _border.top();
 }
 
 void ot::RectangularBlockLayer::setBorder(const QColor& _color, int _borderWidth) {
