@@ -241,7 +241,6 @@
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\SubprocessDebugConfigurator.h" />
     <ClInclude Include="include\ModelNotifier.h" />

@@ -12,7 +12,7 @@ namespace ot
 			:_status(status), _what(what), _returnMessage("{\"Status\":\"" + status + "\",\"What\":\"" + what + "\"}") {}
 		ReturnMessage(OT_rJSON_doc& doc)
 		: _status(ot::rJSON::getString(doc,"Status")), _what(ot::rJSON::getString(doc,"What")), _returnMessage(ot::rJSON::toJSON(doc)) {}
-		
+	
 		operator std::string () const { return _returnMessage; }
 		std::string getWhat() const { return _what; }
 		std::string getStatus() const { return _status; }
@@ -22,5 +22,4 @@ namespace ot
 		const std::string _what;
 		const std::string _returnMessage;
 	};
-
 }

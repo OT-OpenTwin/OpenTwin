@@ -88,82 +88,33 @@ void Application::run(void)
 #include "DataBase.h"
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
-
 	try
 	{
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
+			
 			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == OT_ACTION_CMD_PYTHON_EXECUTE)
 			{
-				//std::string subsequentFunction = _doc[OT_ACTION_PARAM_MODEL_FunctionName].GetString();
-				//std::string senderURL = _doc[OT_ACTION_PARAM_SENDER_URL].GetString();
+				if (ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Scripts) && ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Parameter))
+				{
+					if (_doc[OT_ACTION_CMD_PYTHON_Scripts].IsArray() && _doc[OT_ACTION_CMD_PYTHON_Parameter].IsArray())
+					{
 
-				////auto scriptArray = _doc["Scripts"].GetArray();
-				////
-				////std::list<std::string> scripts;
-				////for (auto& element : scriptArray)
-				////{
-				////	scripts.push_back(element.GetString());
-				////}
-
-				////auto parameterArray = _doc["Parameter"].GetArray();
-
-				////std::list<std::optional<std::list<variable_t>>> allParameter;
-				////
-				////for (uint32_t i = 0; i < parameterArray.Size(); i++)
-				////{
-				////	std::list<variable_t> parameter;
-				////	if (parameterArray[i].IsString())
-				////	{
-				////		parameter.emplace_back(parameterArray[i].GetString());
-				////	}
-				////	else if (parameterArray[i].IsInt())
-				////	{
-				////		parameter.emplace_back(parameterArray[i].GetInt());
-				////	}
-				////	else if (parameterArray[i].IsDouble())
-				////	{
-				////		parameter.emplace_back(parameterArray[i].GetDouble());
-				////	}
-				////	else if (parameterArray[i].IsBool())
-				////	{
-				////		parameter.emplace_back(parameterArray[i].GetBool());
-				////	}
-				////	else if (parameterArray[i].IsArray())
-				////	{
-				////		//ToDo
-				////	}
-				////	else if (parameterArray[i].IsNull())
-				////	{
-				////		allParameter.push_back({});
-				////		continue;
-				////	}
-				////	allParameter.emplace_back(parameter);
-				////}
-
-				//std::list<std::string> scripts
-				//{
-				//	//"Scripts/TestScript_UpdateEntity",
-				//	//"Scripts/TestScript_UpdateEntity",
-				//	//"Scripts/TestScript_UpdateEntity",
-				//	//"Scripts/TestScript_UpdateEntity",
-				//	"Scripts/TestScript_ExecuteOtherScript",
-				//	"Scripts/TestScript_ExecuteOtherScript"
-				//};
-
-				//std::list<std::optional<std::list<variable_t>>> allParameter
-				//{
-				//	/*std::list<variable_t>{variable_t(2)},
-				//	std::list<variable_t>{variable_t(3)},
-				//	std::list<variable_t>{variable_t(4)},
-				//	std::list<variable_t>{variable_t(5)},*/
-				//	std::list<variable_t>{variable_t("Scripts/TestScript_UpdateEntity")},
-				//	std::list<variable_t>{variable_t("Scripts/TestScript_UpdateEntity")}
-				//};
-				//std::thread workerThread(&Application::ProcessScriptExecution,this, scripts, allParameter, subsequentFunction);
-				//workerThread.detach();
+						OT_rJSON_createDOC(subprocessDoc);
+						auto& scripts = _doc[OT_ACTION_CMD_PYTHON_Scripts];
+						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Scripts, scripts);
+						auto& parameter = _doc[OT_ACTION_CMD_PYTHON_Parameter];
+						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Parameter, parameter);
+						return _subprocessHandler->SendExecutionOrder(subprocessDoc);					
+					}
+					else
+					{
+						return "";
+					}
+				}
+										
 			}
 			else if (action == OT_ACTION_CMD_PYTHON_Request_Initialization)
 			{
@@ -175,7 +126,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 
 				OT_rJSON_createDOC(message);
-				
 				ot::rJSON::add(message, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
 				ot::rJSON::add(message, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_Initialization);
 				ot::rJSON::add(message, "ModelService.URL", urlModelservice);
@@ -185,7 +135,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 				ot::rJSON::add(message, "DataBase.Username", userName);
 				ot::rJSON::add(message, "DataBase.URL", m_databaseURL);
 				returnMessage = ot::rJSON::toJSON(message);
-
 			}
 		}
 		return returnMessage;
@@ -262,37 +211,6 @@ void Application::settingsSynchronized(ot::SettingsData * _dataset) {
 bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	return false;
 }
-
-//void Application::ProcessScriptExecution(std::list<std::string> scripts, std::list<std::optional<std::list<variable_t>>> allParameter, const std::string subsequentFunction)
-//{
-	
-	
-
-	//Nun healthcheck
-
-	//if(CheckAllive())
-	/*
-	* Ping	
-	*/
-
-
-	//std::list<variable_t> result =	_pythonAPI.Execute(scripts, allParameter);
-	//	
-	//OT_rJSON_createDOC(newDocument);
-	//OT_rJSON_createValueArray(rJsonResult);
-	//VariableToJSONConverter converter;
-	//for (auto& element : result)
-	//{
-	//	rapidjson::Value rJsonVal = converter.Convert(std::move(element));
-	//	rJsonResult.PushBack(rJsonVal, newDocument.GetAllocator());
-	//}
-	//ot::rJSON::add(newDocument, "Result", rJsonResult);
-
-	//ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
-	//ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
-	/*Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, newDocument);*/
-
-//}
 
 
 // ##################################################################################################################################################################################################################

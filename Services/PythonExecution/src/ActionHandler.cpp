@@ -1,10 +1,7 @@
+#pragma once
 #include "ActionHandler.h"
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinCore/Variable.h"
-
-#pragma warning(disable : 4996)
-
-#pragma once
 
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
@@ -31,7 +28,7 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		}
 		else
 		{
-			std::string action = ot::rJSON::getString(doc, OT_ACTION_MEMBER);
+			std::string action = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (_handlingFunctions.find(action) != _handlingFunctions.end())
 			{
 				auto& checkParameter = _checkParameterFunctions[action];

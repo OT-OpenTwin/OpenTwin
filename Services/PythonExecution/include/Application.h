@@ -117,4 +117,5 @@ public:
 
 	void ServiceConnected(const std::string& _name, const std::string& _type, const std::string& _url, unsigned short _id);
 	bool SendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response);
+
 };

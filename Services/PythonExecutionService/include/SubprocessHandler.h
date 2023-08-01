@@ -24,7 +24,7 @@ public:
 	static int getStartPort() { return _startPort; }
 	void setSubprocessURL(const std::string& urlSubprocess) { _urlSubprocess = urlSubprocess; };
 	
-	void SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter);
+	std::string SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter);
 	void Create(const std::string& urlThisProcess);
 	bool Close();
 

@@ -208,8 +208,8 @@
 
 #define OT_ACTION_CMD_PYTHON_EXECUTE "Python.Execute"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS "Python.Execute.Results"
-#define OT_ACTION_CMD_PYTHON_Scripts "Python.Execute.Results"
-#define OT_ACTION_CMD_PYTHON_Parameter "Python.Execute.Results"
+#define OT_ACTION_CMD_PYTHON_Scripts "Python.Scripts"
+#define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
 
 #define OT_ACTION_CMD_PYTHON_Request_Initialization "Python.Request.Initialize"
 #define OT_ACTION_CMD_PYTHON_Initialization "Python.Initialize"

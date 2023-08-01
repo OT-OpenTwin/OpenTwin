@@ -597,6 +597,7 @@ std::map<std::string, ot::UID> DataCategorizationHandler::GetAllScripts()
 
 void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 {
+
 	//std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
 	//_allRelevantTableSelectionsByMSMD.clear();
 	//_allVariableBundlesByMSMD.clear();
@@ -662,35 +663,26 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 		//SendPythonExecutionRequest(scripts, element.first);
 	//}
 	OT_rJSON_createDOC(newDocument);
+	
 	OT_rJSON_createValueArray(scripts);
-
-
 	rapidjson::Value strVal;
 	strVal.SetString("Scripts/TestScript_UpdateEntity", newDocument.GetAllocator());
 	scripts.PushBack(strVal,newDocument.GetAllocator());
-	
-	rapidjson::Value strVal2;
-	strVal2.SetString("Scripts/TestScript_ExecuteOtherScript", newDocument.GetAllocator());
-	scripts.PushBack(strVal2,newDocument.GetAllocator());
 		
+	OT_rJSON_createValueArray(allparameter);
 	OT_rJSON_createValueArray(parameter);
 	rapidjson::Value intParam;
 	intParam.SetInt(13);
 	parameter.PushBack(intParam, newDocument.GetAllocator());
-	
-	rapidjson::Value stringParameter;
-	stringParameter.SetString("Scripts/TestScript_UpdateEntity", newDocument.GetAllocator());
-	parameter.PushBack(stringParameter, newDocument.GetAllocator());
+	allparameter.PushBack(parameter, newDocument.GetAllocator());
 
-	ot::rJSON::add(newDocument, "Parameter", parameter);
-	ot::rJSON::add(newDocument, "Scripts", scripts);
+	ot::rJSON::add(newDocument, OT_ACTION_CMD_PYTHON_Parameter, allparameter);
+	ot::rJSON::add(newDocument, OT_ACTION_CMD_PYTHON_Scripts, scripts);
 
 	ot::rJSON::add(newDocument, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-	//ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE_STRINGS);
-	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_FunctionName, "createUpdatedSelections");
-	ot::rJSON::add(newDocument, "MSMD", "MSMD1");
-	ot::rJSON::add(newDocument, OT_ACTION_PARAM_SENDER_URL, Application::instance()->serviceURL());
-	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, newDocument);
+	ot::rJSON::add(newDocument, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE);
+	
+	std::string returnValue = Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, newDocument);
 
 }
 

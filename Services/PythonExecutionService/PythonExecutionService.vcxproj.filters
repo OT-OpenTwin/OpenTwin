@@ -50,8 +50,5 @@
     <ClInclude Include="include\SubprocessHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ActionHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
