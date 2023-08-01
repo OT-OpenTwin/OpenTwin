@@ -231,7 +231,6 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 {
 	std::mutex onlyOneActionPerTime;
 	std::lock_guard<std::mutex> lock (onlyOneActionPerTime);
-
 	try
 	{
 		std::string returnMessage = "";

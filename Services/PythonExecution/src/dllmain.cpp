@@ -60,7 +60,7 @@ extern "C" {
 	_declspec(dllexport) int init(const char * _urlOwn, const char * _urlMasterService, const char * unused1, const char * unused2)
 	{
 		MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
-		actionHandler = new ActionHandler(_urlMasterService);
+		actionHandler = new ActionHandler(MinimalSubService::INSTANCE().getMasterServiceURl());
 
 		return 0;
 	};

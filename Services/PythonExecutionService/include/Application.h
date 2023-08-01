@@ -13,6 +13,7 @@
 #include "OpenTwinFoundation/ApplicationBase.h" // Base class
 
 #include "SubprocessHandler.h"
+
 // C++ header
 #include <string>
 

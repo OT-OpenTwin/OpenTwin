@@ -5,11 +5,12 @@
 #include "PythonObjectBuilder.h"
 #include "PythonAPI.h"
 #include "PythonModuleAPI.h"
+#include "OpenTwinCore/Variable.h"
 
 class FixturePythonAPI : public testing::Test
 {
 public:
-	CPythonObjectNew CreateParameterSet(std::list<variable_t>& parameterSet) { return _api.CreateParameterSet(parameterSet); };
+	CPythonObjectNew CreateParameterSet(std::list<ot::variable_t>& parameterSet) { return _api.CreateParameterSet(parameterSet); };
 	std::string GetModuleEntryPoint() { 
 		PythonModuleAPI moduleAPI;
 		return moduleAPI.GetModuleEntryPoint(_moduleName); 

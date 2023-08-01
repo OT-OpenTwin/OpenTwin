@@ -227,7 +227,7 @@ std::optional<ot::variable_t> PythonObjectBuilder::getVariable(CPythonObject& pV
 	}
 	else if (Py_None == pValue)
 	{
-		ot::variable_t({});
+		return ot::variable_t({});
 	}
 	else
 	{

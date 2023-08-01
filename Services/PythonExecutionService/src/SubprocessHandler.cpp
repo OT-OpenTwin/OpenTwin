@@ -4,7 +4,11 @@
 #include "openTwinSystem/OperatingSystem.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/Msg.h"
+#include "OpenTwinCore/ReturnMessage.h"
+#include "OpenTwinCore/TypeNames.h"
+
 #include <assert.h>
+
 
 
 SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
@@ -41,22 +45,27 @@ SubprocessHandler::~SubprocessHandler()
 	Close();
 }
 
-void SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter)
+std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter)
 {
-	if (CheckAlive(_subprocess) && PingSubprocess())
+	if (/*CheckAlive(_subprocess) && */PingSubprocess())
 	{
-		ot::rJSON::add(scriptsAndParameter, OT_ACTION_MEMBER, OT_ACTION_CMD_PYTHON_EXECUTE);
+		ot::rJSON::add(scriptsAndParameter, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE);
 		ot::rJSON::add(scriptsAndParameter, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
+		
 		std::string response;
-		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, ot::rJSON::toJSON(scriptsAndParameter), response, 0))
+		std::string messageBody =  ot::rJSON::toJSON(scriptsAndParameter);
+		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, messageBody, response, 0))
 		{
 			assert(0); //What now?
 		}
+		return response;
 	}
 	else
 	{
 		Close();
 		RunWithNextFreeURL(_urlThisProcess);
+		ot::ReturnMessage message(OT_ACTION_RETURN_VALUE_FAILED, "Process not reachable.");
+		return message;
 	}
 }
 

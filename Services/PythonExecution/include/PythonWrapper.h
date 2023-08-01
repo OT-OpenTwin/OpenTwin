@@ -21,7 +21,6 @@
 	{
 		friend class FixturePythonWrapper;
 	public:
-		/*static PythonWrapper* INSTANCE();*/
 		PythonWrapper();
 		PythonWrapper(const PythonWrapper& other) = delete;
 		PythonWrapper& operator=(const PythonWrapper& other) = delete;
