@@ -5,7 +5,7 @@
 
 #include "ClassFactory.h"
 #include "EntityParameterizedDataTable.h"
-
+#include <chrono>
 TableHandler::TableHandler(const std::string tableFolder) : _tableFolder(tableFolder)
 {}
 
@@ -23,13 +23,30 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	topoEnt->setName(fullName);
 	std::string type = sourceFile->getFileType();
 	auto tableExtractor = FileToTableExtractorFactory::GetInstance()->Create(sourceFile->getFileType());
+	
+
+	auto tp1 = std::chrono::system_clock::now();
 	tableExtractor->ExtractFromEntitySource(sourceFile);
-	TableStatisticAnalyser analyser(tableExtractor.get());
-	int numberOfColumns = static_cast<int>(analyser.CountColumns());
-	int numberOfRows = static_cast<int>(analyser.CountRows());
-	   
-	auto tableData = ExtractTableData(tableExtractor,numberOfRows,numberOfColumns);
+
+	auto tp2 = std::chrono::system_clock::now();
+	
+	//TableStatisticAnalyser analyser(tableExtractor.get());
+	//int numberOfColumns = static_cast<int>(analyser.CountColumns());
+	//int numberOfRows = static_cast<int>(analyser.CountRows());
+	
+	auto tableData = ExtractTableData(tableExtractor);
+
+	auto tp3 = std::chrono::system_clock::now();
+
+
 	tableData->StoreToDataBase();
+
+	auto tp4 = std::chrono::system_clock::now();
+	_uiComponent->displayMessage("Total duration: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4 - tp1).count()) + " mys\n");
+	_uiComponent->displayMessage("Extraction from source entity: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp2- tp1).count()) + " mys\n");
+	_uiComponent->displayMessage("Table data created: " +std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp3-tp2).count()) + " mys\n");
+	_uiComponent->displayMessage("Table data stored: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4- tp3).count()) + " mys\n");
+
 
 	topoEnt->setTableData(tableData);
 	topoEnt->SetTableDimensions(static_cast<unsigned int> (tableData->getNumberOfRows()), static_cast<unsigned int> (tableData->getNumberOfColumns()));
@@ -50,10 +67,9 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	_uiComponent->displayMessage("Created table " + fullName + "\n");
 }
 
-std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableData(std::shared_ptr<TableExtractor> extractor, int numberOfRows, int numberOfColumns)
+std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableData(std::shared_ptr<TableExtractor> extractor)
 {
-	std::vector<std::vector<std::string>> processedTableData;
-	processedTableData.reserve(numberOfRows);
+	std::list<std::vector<std::string>> processedTableData;
 	
 	while (extractor->HasNextLine())
 	{
@@ -62,12 +78,22 @@ std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableDa
 		TrimTrailingControlCharacter(line);
 		if (!IsEmptyLine(line))
 		{
-			processedTableData.push_back(line);
+			processedTableData.emplace_back(line);
 		}
 	}
-	processedTableData.shrink_to_fit();
+	
 	ClassFactory classFactory;
 	auto tableData = std::make_shared<EntityResultTableData<std::string>>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	uint64_t numberOfColumns = 0;
+	for (auto it = processedTableData.begin(); it != processedTableData.end();it++)
+	{
+		const uint64_t temp = it->size();
+		if (temp > numberOfColumns)
+		{
+			numberOfColumns = temp;
+		}
+	}
+	
 	tableData->setNumberOfColumns(numberOfColumns);
 	tableData->setNumberOfRows(processedTableData.size());
 	unsigned int lineCounter(0);

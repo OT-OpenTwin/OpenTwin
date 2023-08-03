@@ -35,7 +35,7 @@ private:
 	 * \param numberOfColumns
 	 * \return Tabledata
 	 */
-	std::shared_ptr<EntityResultTableData<std::string>>	ExtractTableData(std::shared_ptr<TableExtractor> extractor, int numberOfRows, int numberOfColumns);
+	std::shared_ptr<EntityResultTableData<std::string>>	ExtractTableData(std::shared_ptr<TableExtractor> extractor);
 	void TrimTrailingControlCharacter(std::vector<std::string>& line);
 	bool IsEmptyLine(std::vector<std::string>& line);
 };

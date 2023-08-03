@@ -31,7 +31,7 @@ void TableExtractorCSV::ExtractFromEntitySource(EntityParameterizedDataSource * 
 	_rowDelimiter =	csvSource->getRowDelimiter()[0];
 	_columnDelimiter = csvSource->getColumnDelimiter()[0];
 	source->loadData();
-	std::vector<char> fileContent =	source->getData()->getData();
+	const std::vector<char>& fileContent =	source->getData()->getData();
 	//In wstring
 	_fileContentStream.str(std::string(fileContent.begin(), fileContent.end()));
 }
@@ -67,6 +67,9 @@ void TableExtractorCSV::ResetIterator()
 
 void TableExtractorCSV::Split(std::string & line, std::vector<std::string>& lineSegments)
 {
+	std::string::difference_type maxColumns = std::count(line.begin(), line.end(), _columnDelimiter);
+	lineSegments.reserve(maxColumns);
+	
 	std::string temp(""), composed("");
 	std::istringstream stream(line);
 
@@ -94,6 +97,8 @@ void TableExtractorCSV::Split(std::string & line, std::vector<std::string>& line
 		composed.erase(remove(composed.begin(), composed.end(), '"'), composed.end());
 		lineSegments.push_back(composed);
 	}
+
+	lineSegments.shrink_to_fit();
 }
 
 static FileToTableExtractorRegistrar<TableExtractorCSV> textFiles("txt");
