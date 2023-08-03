@@ -29,14 +29,14 @@ Service::Service(
 void Service::setVisible(void) {
 	if (!m_isVisible) {
 		m_isVisible = true;
-		m_session->broadcastAction(this, OT_ACTION_CMD_ServiceConnected);
+		m_session->broadcastAction(this, OT_ACTION_CMD_ServiceConnected, true);
 	}
 }
 
 void Service::setHidden(void) {
 	if (m_isVisible) {
 		m_isVisible = false;
-		m_session->broadcastAction(this, OT_ACTION_CMD_ServiceDisconnected);
+		m_session->broadcastAction(this, OT_ACTION_CMD_ServiceDisconnected, true);
 	}
 }
 

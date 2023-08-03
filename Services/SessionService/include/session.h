@@ -118,20 +118,24 @@ public:
 	//! @brief Will send a broadcast message to all services of this session
 	//! @param _sender The sender of this message
 	//! @param _message The message text
-	void broadcastMessage(Service * _sender, const std::string& _message);
+	//! @param _async If true the massage(s) will be send from a worker thread
+	void broadcastMessage(Service * _sender, const std::string& _message, bool _async = false);
 
 	//! @brief Will send a broadcast message to all services of this session
 	//! @param _sender The sender of this message
 	//! @param _command The command to send
-	void broadcastAction(Service * _sender, const std::string& _command);
+	//! @param _async If true the massage(s) will be send from a worker thread
+	void broadcastAction(Service * _sender, const std::string& _command, bool _async = false);
 
 	//! @brief Will broadcast the provided message to all services in this session
 	//! @param _sender The sender of this message
 	//! @param _message The message
+	//! @param _async If true the massage(s) will be send from a worker thread
 	void broadcast(
 		Service *					_sender,
 		OT_rJSON_doc &				_message,
-		bool						_shutdown
+		bool						_shutdown,
+		bool                        _async = false
 	);
 
 	//! @brief Will shutdown the session

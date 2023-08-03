@@ -187,7 +187,7 @@ void Session::addServiceListToDocument(OT_rJSON_doc & _doc) {
 	ot::rJSON::add(_doc, OT_ACTION_PARAM_SESSION_SERVICES, serviceList);
 }
 
-void Session::broadcastMessage(Service * _sender, const std::string& _message) {
+void Session::broadcastMessage(Service * _sender, const std::string& _message, bool _async) {
 	OT_BROADCASTMESSAGE_CREATE(theMessageDoc);
 	ot::rJSON::add(theMessageDoc, OT_ACTION_PARAM_MESSAGE, _message);
 
@@ -196,20 +196,20 @@ void Session::broadcastMessage(Service * _sender, const std::string& _message) {
 		OT_BROADCASTMESSAGE_ADDSENDERDATA(theMessageDoc, _sender);
 	}
 
-	broadcast(_sender, theMessageDoc, false);
+	broadcast(_sender, theMessageDoc, false, _async);
 }
 
-void Session::broadcastAction(Service * _sender, const std::string& _command) {
+void Session::broadcastAction(Service * _sender, const std::string& _command, bool _async) {
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, _command);
 	if (_sender != nullptr)
 	{
 		OT_BROADCASTACTION_ADDSENDERDATA(doc, _sender);
 	}
-	broadcast(_sender, doc, false);
+	broadcast(_sender, doc, false, _async);
 }
 
-void Session::broadcast(Service * _sender, OT_rJSON_doc& _message, bool _shutdown) {
+void Session::broadcast(Service * _sender, OT_rJSON_doc& _message, bool _shutdown, bool _async) {
 	std::string msg{ OT_rJSON_toJSON(_message) };
 	OT_LOG_D("Sending broadcast message in session (id = \"" + m_id + "\"): " + msg);
 	
@@ -223,7 +223,9 @@ void Session::broadcast(Service * _sender, OT_rJSON_doc& _message, bool _shutdow
 			if (senderIP != itm.second->url()) {
 				// Send the message to the current reciever
 				response.clear();
-				if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, 3000, _shutdown)) {
+				if (_async) {
+					ot::msg::sendAsync(senderIP, itm.second->url(), ot::QUEUE, msg, 3000);
+				} else if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, 3000, _shutdown)) {
 					OT_LOG_E("Failed to send broadcast message to: " + itm.second->url());
 				}
 			}
