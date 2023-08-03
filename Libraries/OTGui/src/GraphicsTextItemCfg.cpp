@@ -11,6 +11,10 @@
 #define OT_JSON_MEMBER_TextFont "TextFont"
 #define OT_JSON_MEMBER_TextColor "TextColor"
 
+//OT_RegisterSFO_GraphicsTextItemCfg
+
+static ot::SimpleFactoryRegistrar<ot::GraphicsTextItemCfg> SimpleFactoryRegistrar("GraphicsTextItemCfg");
+
 ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const std::string& _text, const ot::Color& _textColor) 
 	: m_text(_text), m_textColor(_textColor) {}
 
@@ -18,6 +22,7 @@ ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
 
 void ot::GraphicsTextItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, "GraphicsTextItemCfg");
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Text, m_text);
 

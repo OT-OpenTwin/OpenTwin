@@ -9,12 +9,15 @@
 
 #define OT_JSON_MEMBER_ImagePath "ImagePath"
 
+OT_RegisterSimpleFactoryObject(ot::GraphicsImageItemCfg, "GraphicsImageItemCfg");
+
 ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath) : m_imageSubPath(_imageSubPath) {}
 
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
 void ot::GraphicsImageItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, "GraphicsTextItemCfg");
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_ImagePath, m_imageSubPath);
 }

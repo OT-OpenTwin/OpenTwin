@@ -12,15 +12,20 @@
 #include "UiNotifier.h"
 
 // Open twin header
+#include "OpenTwinCore/Owner.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
+#include "OpenTwinCommunication/Msg.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/LinearGradientPainter2D.h"
+#include "OTGui/GraphicsTextItemCfg.h"
+#include "OTGui/GraphicsCollectionCfg.h"
+#include "OTGui/GraphicsEditorPackage.h"
 #include "OTBlockEditorAPI/BorderLayoutBlockConnectorManagerConfiguration.h"
 #include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
 #include "OTBlockEditorAPI/BlockCategoryConfiguration.h"
 #include "OTBlockEditorAPI/BlockLayers.h"
 #include "OTBlockEditorAPI/BlockConfiguration.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/LinearGradientPainter2D.h"
 
 Application * g_instance{ nullptr };
 
@@ -147,14 +152,67 @@ std::list<ot::BlockCategoryConfiguration*> createTestCategories() {
 	return rootItems;
 }
 
+ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
+	ot::GraphicsTextItemCfg* b = new ot::GraphicsTextItemCfg;
+	b->setGraphicsItemName(_name);
+	b->setText(_name);
+	b->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
+
+	return b;
+}
+
 std::string Application::createEmptyTestEditor(void) {
 	if (m_uiComponent) {
-		ot::BlockEditorConfigurationPackage pckg("AlwaysNumberOne", "Block Editor");
+		/*ot::BlockEditorConfigurationPackage pckg("AlwaysNumberOne", "Block Editor");
 		pckg.setTopLevelBlockCategories(createTestCategories());
 
 		if (!ot::BlockConfigurationAPI::createEmptyBlockEditor(this, m_uiComponent->serviceURL(), pckg)) {
 			m_uiComponent->displayMessage("Failed to create empty block editor");
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to create empty block editor";
+		}*/
+
+		ot::GraphicsEditorPackage pckg;
+		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("A");
+		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1");
+		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2");
+		a->addChildCollection(a1);
+		a1->addItem(createTestBlock("Alpha 1"));
+		a1->addItem(createTestBlock("Alpha 2"));
+		a->addChildCollection(a2);
+		a2->addItem(createTestBlock("Beta 1"));
+		pckg.addCollection(a);
+
+		ot::GraphicsCollectionCfg* b = new ot::GraphicsCollectionCfg("B");
+		ot::GraphicsCollectionCfg* b1 = new ot::GraphicsCollectionCfg("1");
+		ot::GraphicsCollectionCfg* b2 = new ot::GraphicsCollectionCfg("2");
+		b->addChildCollection(b1);
+		b1->addItem(createTestBlock("Gamma 1"));
+		b1->addItem(createTestBlock("Gamma 2"));
+		b->addChildCollection(b2);
+		b2->addItem(createTestBlock("Delta 1"));
+		b2->addItem(createTestBlock("Delta 2"));
+		b2->addItem(createTestBlock("Delta 3"));
+		b2->addItem(createTestBlock("Delta 4"));
+		pckg.addCollection(b);
+
+		OT_rJSON_createDOC(doc);
+		OT_rJSON_createValueObject(pckgObj);
+		pckg.addToJsonObject(doc, pckgObj);
+
+		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, pckgObj);
+		ot::GlobalOwner::instance().addToJsonObject(doc, doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, ot::rJSON::toJSON(doc), response)) {
+			m_uiComponent->displayDebugMessage("Failed to send\n");
+			OT_LOG_E("Fuck");
+			return OT_ACTION_RETURN_VALUE_FAILED;
+		}
+
+		if (response != OT_ACTION_RETURN_VALUE_OK) {
+			m_uiComponent->displayDebugMessage("Invalid response\n");
+			OT_LOG_E("Fuck 2");
 		}
 	}
 	return OT_ACTION_RETURN_VALUE_OK;

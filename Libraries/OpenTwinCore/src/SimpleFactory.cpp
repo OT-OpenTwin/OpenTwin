@@ -2,10 +2,14 @@
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Logger.h"
 
+void ot::SimpleFactoryObject::addSimpleFactoryObjectNameToJson(OT_rJSON_doc& _doc, OT_rJSON_val& _jsonObj) const {
+	ot::rJSON::add(_doc, _jsonObj, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectName());
+}
+
 ot::SimpleFactoryObject* ot::SimpleFactory::create(const std::string& _key) {
 	auto it = m_data.find(_key);
 	if (it == m_data.end()) {
-		OT_LOG_WAS("Class with key \"" + _key + "\" was not registered");
+		OT_LOG_EAS("Class with key \"" + _key + "\" was not registered");
 		return nullptr;
 	}
 	return it->second();

@@ -28,8 +28,6 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		virtual std::string graphicsItemTypeName(void) const { return "GraphicsRectangularItemCfg"; };
-
 		void setCornerRadius(int _px) { m_cornerRadius = _px; };
 		int cornerRadius(void) const { return m_cornerRadius; };
 
@@ -51,6 +49,4 @@ namespace ot {
 		GraphicsRectangularItemCfg(GraphicsRectangularItemCfg&) = delete;
 		GraphicsRectangularItemCfg& operator = (GraphicsRectangularItemCfg&) = delete;
 	};
-
-	OT_RegisterSimpleFactoryObject(GraphicsRectangularItemCfg);
 }

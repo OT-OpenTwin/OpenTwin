@@ -25,8 +25,6 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		virtual std::string graphicsItemTypeName(void) const { return "GraphicsImageItemCfg"; };
-
 		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
 		const std::string& imagePath(void) const { return m_imageSubPath; };
 
@@ -36,6 +34,4 @@ namespace ot {
 		GraphicsImageItemCfg(GraphicsImageItemCfg&) = delete;
 		GraphicsImageItemCfg& operator = (GraphicsImageItemCfg&) = delete;
 	};
-
-	OT_RegisterSimpleFactoryObject(GraphicsImageItemCfg);
 }

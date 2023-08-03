@@ -40,7 +40,7 @@
 #include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
 #include "OTBlockEditor/BlockEditorAPI.h"
 #include "OTBlockEditor/BlockNetworkEditor.h"
-
+#include "OTGui/GraphicsEditorPackage.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2768,11 +2768,15 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, Object);
 				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
 
-				ot::BlockEditorConfigurationPackage pckg;
+				//ot::BlockEditorConfigurationPackage pckg;
 				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage].GetObject();
+
+				ot::GraphicsEditorPackage pckg;
 				pckg.setFromJsonObject(configurationObj);
-				ot::BlockNetworkEditor * newEditor = ot::BlockEditorAPI::createEmptyBlockEditor(owner, pckg);
-				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.editorTitle()), newEditor);
+
+				//pckg.setFromJsonObject(configurationObj);
+				//ot::BlockNetworkEditor * newEditor = ot::BlockEditorAPI::createEmptyBlockEditor(owner, pckg);
+				//AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.editorTitle()), newEditor);
 			}
 			else
 			{

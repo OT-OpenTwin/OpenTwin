@@ -14,6 +14,10 @@
 #define OT_JSON_MEMBER_BorderWidth "BorderWidth"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
+namespace ot {
+	OT_RegisterSimpleFactoryObject(GraphicsRectangularItemCfg, "GraphicsRectangularItemCfg");
+}
+
 ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter, const ot::Color& _borderColor, int _borderWidth, int _cornerRadius) 
 	: m_backgroundPainter(_backgroundPainter), m_borderColor(_borderColor), m_borderWidth(_borderWidth), m_cornerRadius(_cornerRadius)
 {
@@ -26,6 +30,7 @@ ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
 
 void ot::GraphicsRectangularItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, "GraphicsRectangularItemCfg");
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CornerRadius, m_cornerRadius);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BorderWidth, m_borderWidth);

@@ -27,8 +27,6 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		virtual std::string graphicsItemTypeName(void) const { return "GraphicsTextItemCfg"; };
-
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& text(void) const { return m_text; };
 
@@ -46,6 +44,6 @@ namespace ot {
 		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
 		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;
 	};
-
-	OT_RegisterSimpleFactoryObject(GraphicsTextItemCfg);
 }
+
+#define OT_RegisterSFO_GraphicsTextItemCfg OT_RegisterSimpleFactoryObject(ot::GraphicsItemCfg, "GraphicsItemCfg");

@@ -1,5 +1,4 @@
-//! @file GraphicsItemCfg.h
-//! 
+//! @file GraphicsCollectionCfg.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -8,22 +7,22 @@
 
 // OpenTwin header
 #include "OTGui/OTGuiAPIExport.h"
-#include "OTGui/Border.h"
-#include "OTGui/Margins.h"
-#include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Serializable.h"
 
 // std header
 #include <string>
+#include <list>
 
 #pragma warning(disable:4251)
 
 namespace ot {
-	
-	class OT_GUI_API_EXPORT GraphicsItemCfg : ot::Serializable, public ot::SimpleFactoryObject {
+	class GraphicsItemCfg;
+
+	class OT_GUI_API_EXPORT GraphicsCollectionCfg : public ot::Serializable {
 	public:
-		GraphicsItemCfg();
-		virtual ~GraphicsItemCfg();
+		GraphicsCollectionCfg();
+		GraphicsCollectionCfg(const std::string& _collectionName);
+		virtual ~GraphicsCollectionCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -35,19 +34,20 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		void setGraphicsItemName(const std::string& _name) { m_name = _name; };
-		const std::string& graphicsItemName(void) const { return m_name; };
+		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& name(void) const { return m_name; };
 
-		void setBorder(const Border& _border) { m_border = _border; };
-		const Border& border(void) const { return m_border; };
+		void addChildCollection(GraphicsCollectionCfg* _child);
+		const std::list<GraphicsCollectionCfg*>& childCollections(void) const { return m_collections; };
 
-		void setMargin(const Margins& _margin) { m_margins = _margin; };
-		const Margins& margin(void) const { return m_margins; };
+		void addItem(GraphicsItemCfg* _item);
+		const std::list<GraphicsItemCfg*>& items(void) const { return m_items; };
 
 	private:
-		std::string m_name;
-		Border m_border;
-		Margins m_margins;
+		void memFree(void);
 
+		std::list<GraphicsCollectionCfg*> m_collections;
+		std::list<GraphicsItemCfg*> m_items;
+		std::string m_name;
 	};
 }

@@ -14,6 +14,8 @@
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\FillPainter2D.h" />
     <ClInclude Include="include\OTGui\Font.h" />
+    <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsEditorPackage.h" />
     <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
@@ -32,6 +34,8 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FillPainter2D.cpp" />
     <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\GraphicsCollectionCfg.cpp" />
+    <ClCompile Include="src\GraphicsEditorPackage.cpp" />
     <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfg.cpp" />
     <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />
