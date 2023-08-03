@@ -64,23 +64,6 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
-#ifdef _DEBUG
-	SubprocessDebugConfigurator configurator;
-	auto modelService =	m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
-	std::string urlModelservice	= modelService.service->serviceURL();
-	int startPort = SubprocessHandler::getStartPort();
-	std::string subserviceURL =  m_serviceURL.substr(0, m_serviceURL.find(":")+1) + std::to_string(startPort);
-	configurator.CreateConfiguration(m_serviceURL, subserviceURL, urlModelservice, m_databaseURL, m_serviceID,m_sessionID);
-	_subprocessHandler = new SubprocessHandler(m_serviceURL);
-	_subprocessHandler->setSubprocessURL(subserviceURL);
-#else
-	_subprocessHandler = new SubprocessHandler(m_serviceURL);
-	std::thread workerThread(&SubprocessHandler::Create,_subprocessHandler, m_serviceURL);
-	workerThread.detach();
-	
-#endif // DEBUG
-
-
 }
 
 #include <rapidjson/document.h>
@@ -170,7 +153,21 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
+#ifdef _DEBUG
+	SubprocessDebugConfigurator configurator;
+	auto modelService = m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
+	std::string urlModelservice = modelService.service->serviceURL();
+	int startPort = SubprocessHandler::getStartPort();
+	std::string subserviceURL = m_serviceURL.substr(0, m_serviceURL.find(":") + 1) + std::to_string(startPort);
+	configurator.CreateConfiguration(m_serviceURL, subserviceURL, urlModelservice, m_databaseURL, m_serviceID, m_sessionID);
+	_subprocessHandler = new SubprocessHandler(m_serviceURL);
+	_subprocessHandler->setSubprocessURL(subserviceURL);
+#else
+	_subprocessHandler = new SubprocessHandler(m_serviceURL);
+	std::thread workerThread(&SubprocessHandler::Create, _subprocessHandler, m_serviceURL);
+	workerThread.detach();
 
+#endif // DEBUG
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

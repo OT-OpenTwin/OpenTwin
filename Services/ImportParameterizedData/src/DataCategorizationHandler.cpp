@@ -674,7 +674,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	//interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntity", testScriptParameter);
 	//interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntityWithoutParameter", {});
 	//interface.AddScriptWithParameter("Scripts/TestScript_Abort", {});
-	interface.AddScriptWithParameter("Scripts/TestScript_Throw", {});
+	interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntityWithoutParameter", {});
 	//interface.AddScriptWithParameter("Scripts/TestScript_Exit", {});
 	//interface.AddScriptWithParameter("Scripts/TestScript_ModuleNotFound",< {});
 	//interface.AddScriptWithParameter("Scripts/TestScript_ExtensionException", {});
