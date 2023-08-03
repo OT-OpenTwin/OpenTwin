@@ -895,6 +895,10 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 			return ot::rJSON::toJSON(newDoc);
 		}
+		else if (action == OT_ACTION_CMD_MODEL_UpdatePropertyGrid)
+		{
+			globalModel->updatePropertyGrid();
+		}
 		else if (action == OT_ACTION_CMD_MODEL_GetCurrentVersion)
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");

@@ -271,7 +271,7 @@ public:
 
 private:
 	double priority;
-	EntityGeometry *geometryItem;
+	EntityGeometry *geometryItem = nullptr;
 };
 
 class CartesianMeshCreation

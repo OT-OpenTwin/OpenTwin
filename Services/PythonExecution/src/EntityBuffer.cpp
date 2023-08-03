@@ -29,6 +29,7 @@ void EntityBuffer::SaveChangedEntities()
 		forceVis.push_back(false);
 	}
 	_modelComponent->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+	_modelComponent->updatePropertyGrid();
 }
 
 bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)

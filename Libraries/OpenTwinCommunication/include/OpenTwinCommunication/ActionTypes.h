@@ -90,6 +90,7 @@
 #define OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing "Model.Entities.ForMeshing"
 #define OT_ACTION_CMD_MODEL_GetEntityProperties "Model.Entities.GetProperties"
 #define OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName "Model.Entities.GetPropertiesFromName"
+#define OT_ACTION_CMD_MODEL_UpdatePropertyGrid "Model.UpdatePropertyGrid"
 #define OT_ACTION_CMD_MODEL_GetCurrentVersion "Model.Version.GetCurrent"
 #define OT_ACTION_CMD_MODEL_ExecuteAction "Model.Event.ExecuteAction"
 #define OT_ACTION_CMD_MODEL_ExecuteFunction "Model.Event.ExecuteFunction"

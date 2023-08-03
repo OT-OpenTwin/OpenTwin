@@ -53,8 +53,8 @@ SessionService::SessionService()
 	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
 	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
-	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_BlockEditorService, OT_INFO_SERVICE_TYPE_BlockEditorService));
-	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
+	//DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_BlockEditorService, OT_INFO_SERVICE_TYPE_BlockEditorService));
+	//DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
 	m_mandatoryServicesMap.insert_or_assign("Default", DefaultSessionServices);
 }
 
@@ -473,7 +473,7 @@ std::string SessionService::handleRegisterNewService(OT_rJSON_doc& _commandDoc) 
 	// Add service to health check (this is done when the service was started in debug mode)
 	OT_rJSON_ifMember(_commandDoc, OT_ACTION_PARAM_PROCESS_ID) {
 		// todo: add service to local health check (service was started in debug mode)
-		assert(0);
+		assert(0); //Shouldn't be relevant
 		//m_serviceStarter.addServiceToHealthCheck(theService->url(), ot::rJSON::getString(_commandDoc, OT_ACTION_PARAM_PROCESS_ID), theSession->id());
 	}
 

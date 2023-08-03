@@ -725,6 +725,26 @@ void ot::components::ModelComponent::getEntityProperties(const std::string &enti
 	}
 }
 
+void ot::components::ModelComponent::updatePropertyGrid()
+{
+	OT_rJSON_createDOC(requestDoc);
+	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertyGrid);
+
+	std::string response;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+		std::cout << "ERROR: Failed to get entity properties: Failed to send HTTP request" << std::endl;
+		return;
+	}
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		std::cout << "ERROR: Failed to get entity properties: " << response << std::endl;
+		return;
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		std::cout << "ERROR: Failed to get entity properties: " << response << std::endl;
+		return;
+	}
+}
+
 // #########################################################################################################
 
 // Entity management helper functions
