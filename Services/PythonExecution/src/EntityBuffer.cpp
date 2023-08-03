@@ -74,6 +74,10 @@ std::shared_ptr<EntityBase> EntityBuffer::LoadEntity(const std::string& absolute
 		ot::EntityInformation entityInfo;
 		ClassFactory* classFactory = new ClassFactory();
 		_modelComponent->getEntityInformation(absoluteEntityName, entityInfo);
+		if (entityInfo.getName() == "")
+		{
+			throw std::exception(("Requested entity " + absoluteEntityName + " does not exist.").c_str());
+		}
 		EntityBase* entity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory);
 		_bufferedEntities[absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}

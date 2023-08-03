@@ -671,8 +671,15 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	parameter.push_back(13);
 	testScriptParameter = parameter;
 
-	interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntity", testScriptParameter);
+	//interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntity", testScriptParameter);
+	//interface.AddScriptWithParameter("Scripts/TestScript_UpdateEntityWithoutParameter", {});
+	//interface.AddScriptWithParameter("Scripts/TestScript_Abort", {});
+	interface.AddScriptWithParameter("Scripts/TestScript_Throw", {});
+	//interface.AddScriptWithParameter("Scripts/TestScript_Exit", {});
+	//interface.AddScriptWithParameter("Scripts/TestScript_ModuleNotFound",< {});
+	//interface.AddScriptWithParameter("Scripts/TestScript_ExtensionException", {});
 	ot::ReturnMessage returnValue =  interface.SendExecutionOrder();
+	_uiComponent->displayMessage(returnValue);
 }
 
 void DataCategorizationHandler::SendPythonExecutionRequest(std::vector<std::string>& pythonScripts, const std::string& msmdName)

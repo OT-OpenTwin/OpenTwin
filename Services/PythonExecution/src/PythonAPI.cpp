@@ -59,6 +59,23 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 	std::list<ot::EntityInformation> entityInfos;
 	auto modelComponent = Application::instance()->modelComponent();
 	modelComponent->getEntityInformation(scripts, entityInfos);
+	
+	if (entityInfos.size() != scripts.size())
+	{
+		std::string missingScripts = "";
+		for (std::string& scriptName : scripts)
+		{
+			bool found = false;
+			for (auto& entity : entityInfos)
+			{
+				if (entity.getName() == scriptName) { found = true; break; }
+			}
+			if (!found) { missingScripts += scriptName + ", "; }
+		}
+		missingScripts = missingScripts.substr(0, missingScripts.size() - 2);
+		throw std::exception(("Python execution aborted since the following scripts were not found: " + missingScripts).c_str());
+	}
+
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactory classFactory;
 
