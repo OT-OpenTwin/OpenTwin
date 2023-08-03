@@ -28,7 +28,7 @@
 #define OT_ACTION_PARAM_LOG_Time_Local "Log.Time.Local"
 #define OT_ACTION_PARAM_LOG_Time_Global "Log.Time.Global"
 
-ot::LogMessage::LogMessage() {}
+ot::LogMessage::LogMessage() : m_flags(ot::NO_LOG) {}
 
 ot::LogMessage::LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, LogFlag _flags)
 	: m_serviceName(_serviceName), m_functionName(_functionName), m_text(_text), m_flags(_flags)
