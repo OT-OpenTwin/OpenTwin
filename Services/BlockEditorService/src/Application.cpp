@@ -216,11 +216,11 @@ std::string Application::createEmptyTestEditor(void) {
 
 		std::string response;
 		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, ot::rJSON::toJSON(doc), response)) {
-			m_uiComponent->displayDebugMessage("Failed to send\n");
 			return OT_ACTION_RETURN_VALUE_FAILED;
 		}
 
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
+			OT_LOG_E("Invalid response from UI");
 			m_uiComponent->displayDebugMessage("Invalid response\n");
 		}
 	}

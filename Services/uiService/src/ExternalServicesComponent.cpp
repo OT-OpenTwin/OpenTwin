@@ -29,6 +29,7 @@
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Color.h"
 #include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/IpConverter.h"
 #include "OpenTwinCommunication/Msg.h"
@@ -41,6 +42,7 @@
 #include "OTBlockEditor/BlockEditorAPI.h"
 #include "OTBlockEditor/BlockNetworkEditor.h"
 #include "OTGui/GraphicsEditorPackage.h"
+#include "OTWidgets/GraphicsItem.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2775,8 +2777,20 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				pckg.setFromJsonObject(configurationObj);
 
 				//pckg.setFromJsonObject(configurationObj);
-				//ot::BlockNetworkEditor * newEditor = ot::BlockEditorAPI::createEmptyBlockEditor(owner, pckg);
-				//AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.editorTitle()), newEditor);
+				ot::BlockNetworkEditor * newEditor = new ot::BlockNetworkEditor;
+				{
+					ot::GraphicsRectangularItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsRectangularItem>("GraphicsRectangularItem");
+
+					if (itm) {
+						itm->setRect(0., 0., 50, 30);
+						newEditor->scene()->addItem(itm);
+					}
+					else {
+						OT_LOG_E("Factory fail");
+					}
+				}
+				
+				AppBase::instance()->addTabToCentralView("Test", newEditor);
 			}
 			else
 			{

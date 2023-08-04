@@ -7,8 +7,6 @@
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
-OT_RegisterSimpleFactoryObject(ot::GraphicsImageItemCfg, "GraphicsImageItemCfg");
-
 #define OT_JSON_MEMBER_ImagePath "ImagePath"
 
 ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath) : m_imageSubPath(_imageSubPath) {}
@@ -27,3 +25,6 @@ void ot::GraphicsImageItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_ImagePath, String);
 	m_imageSubPath = _object[OT_JSON_MEMBER_ImagePath].GetString();
 }
+
+// Register at class factory
+static ot::SimpleFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg("GraphicsImageItemCfg");

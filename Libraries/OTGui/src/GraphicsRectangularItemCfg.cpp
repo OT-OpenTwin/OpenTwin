@@ -9,8 +9,6 @@
 #include "OTGui/Painter2DFactory.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
-OT_RegisterSimpleFactoryObject(ot::GraphicsRectangularItemCfg, "GraphicsRectangularItemCfg");
-
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BorderColor "BorderColor"
 #define OT_JSON_MEMBER_BorderWidth "BorderWidth"
@@ -80,3 +78,6 @@ void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter
 	if (m_backgroundPainter) delete m_backgroundPainter;
 	m_backgroundPainter = _painter;
 }
+
+// Register at class factory
+static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg("GraphicsRectangularItemCfg");

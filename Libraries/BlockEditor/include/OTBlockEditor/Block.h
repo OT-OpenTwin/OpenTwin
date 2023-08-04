@@ -31,8 +31,9 @@ namespace ot {
 	
 	class BlockConnector;
 
-	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public ot::GraphicsItem, public ot::BlockGraphicsObject{
+	class BLOCK_EDITOR_API_EXPORT Block : public QObject, public QGraphicsItem, public ot::GraphicsItem, public ot::BlockGraphicsObject{
 		Q_OBJECT
+		Q_INTERFACES(QGraphicsItem)
 	public:
 		Block();
 		virtual ~Block();

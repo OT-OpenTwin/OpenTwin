@@ -140,9 +140,6 @@
     <QtMoc Include="include\OTBlockEditor\BlockPickerDockWidget.h">
       <Filter>Header Files\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTBlockEditor\DefaultBlock.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
     <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h">
       <Filter>Header Files\General</Filter>
     </QtMoc>
@@ -204,6 +201,9 @@
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockHelper.h">
       <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTBlockEditor\DefaultBlock.h">
+      <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

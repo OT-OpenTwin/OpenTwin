@@ -258,7 +258,7 @@
     <ClInclude Include="include\OTBlockEditor\PainterFactory.h" />
     <ClInclude Include="include\OTBlockEditor\RectangularBlockLayer.h" />
     <ClInclude Include="include\OTBlockEditor\TextBlockLayer.h" />
-    <QtMoc Include="include\OTBlockEditor\DefaultBlock.h" />
+    <ClInclude Include="include\OTBlockEditor\DefaultBlock.h" />
     <QtMoc Include="include\OTBlockEditor\BlockPickerDockWidget.h" />
     <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h" />
     <QtMoc Include="include\OTBlockEditor\BlockNetwork.h" />

@@ -15,8 +15,8 @@ namespace ot {
 
 	class BlockLayer;
 
-	class BLOCK_EDITOR_API_EXPORT DefaultBlock : public ot::Block {
-		Q_OBJECT
+	class BLOCK_EDITOR_API_EXPORT DefaultBlock : public QGraphicsLayoutItem, public ot::Block {
+		//Q_OBJECT
 	public:
 		DefaultBlock();
 		virtual ~DefaultBlock();

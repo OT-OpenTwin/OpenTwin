@@ -20,7 +20,7 @@
 //! @brief Add the specified class to the simple factory
 //! @param ___class The class to register
 //! @param ___key The key by which the object will be created
-#define OT_RegisterSimpleFactoryObject(___class, ___key) static ot::SimpleFactoryRegistrar<___class> SimpleFactoryRegistrar(___key)
+#define OT_RegisterSimpleFactoryObject(___name, ___class, ___key) static ot::SimpleFactoryRegistrar<___class> ___name(___key)
 
 //! @brief Key used in a json object to determine the simple factory object key
 #define OT_SimpleFactoryJsonKey "OTSimpleFactoryObject.Key"

@@ -7,8 +7,6 @@
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
-OT_RegisterSimpleFactoryObject(ot::GraphicsTextItemCfg, "GraphicsTextItemCfg");
-
 #define OT_JSON_MEMBER_Text "Text"
 #define OT_JSON_MEMBER_TextFont "TextFont"
 #define OT_JSON_MEMBER_TextColor "TextColor"
@@ -49,3 +47,6 @@ void ot::GraphicsTextItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	m_textFont.setFromJsonObject(fontObj);
 	m_textColor.setFromJsonObject(colorObj);
 }
+
+// Register at class factory
+static ot::SimpleFactoryRegistrar<ot::GraphicsTextItemCfg> rectItemCfg("GraphicsTextItemCfg");
