@@ -45,5 +45,3 @@ namespace ot {
 		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;
 	};
 }
-
-#define OT_RegisterSFO_GraphicsTextItemCfg OT_RegisterSimpleFactoryObject(ot::GraphicsItemCfg, "GraphicsItemCfg");

@@ -7,13 +7,11 @@
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
+OT_RegisterSimpleFactoryObject(ot::GraphicsTextItemCfg, "GraphicsTextItemCfg");
+
 #define OT_JSON_MEMBER_Text "Text"
 #define OT_JSON_MEMBER_TextFont "TextFont"
 #define OT_JSON_MEMBER_TextColor "TextColor"
-
-//OT_RegisterSFO_GraphicsTextItemCfg
-
-static ot::SimpleFactoryRegistrar<ot::GraphicsTextItemCfg> SimpleFactoryRegistrar("GraphicsTextItemCfg");
 
 ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const std::string& _text, const ot::Color& _textColor) 
 	: m_text(_text), m_textColor(_textColor) {}

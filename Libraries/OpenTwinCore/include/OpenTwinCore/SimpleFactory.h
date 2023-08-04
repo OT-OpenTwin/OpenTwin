@@ -17,20 +17,16 @@
 #include <map>
 #include <functional>
 
-//! @brief Add the specified object to the simple factory
-//! Note that the class name should be provided without a namespace
-//! Example:
-//! namespace ot {
-//!     OT_RegisterSimpleFactoryObject(foo);
-//! }
-//! 
-//! Instead of:
-//! OT_RegisterSimpleFactoryObject(ot::foo);
+//! @brief Add the specified class to the simple factory
+//! @param ___class The class to register
+//! @param ___key The key by which the object will be created
 #define OT_RegisterSimpleFactoryObject(___class, ___key) static ot::SimpleFactoryRegistrar<___class> SimpleFactoryRegistrar(___key)
-//#define OT_RegisterSimpleFactoryObject(___class, ___key) static ot::SimpleFactoryRegistrar<___class> ___class##SimpleFactoryRegistrar(___key)
 
 //! @brief Key used in a json object to determine the simple factory object key
 #define OT_SimpleFactoryJsonKey "OTSimpleFactoryObject.Key"
+
+//! @brief Add the SimpleFactoryObject key to the provided json object
+#define OT_AddSimpleFactoryObjectKey(___document, ___obj, ___key) ot::rJSON::add(___document, ___obj, OT_SimpleFactoryJsonKey, ___key);
 
 #pragma warning(disable:4251)
 
@@ -42,17 +38,9 @@ namespace ot {
 	public:
 		SimpleFactoryObject() = default;
 		SimpleFactoryObject(const SimpleFactoryObject&) = default;
-		virtual ~SimpleFactoryObject() {};
+		virtual ~SimpleFactoryObject() = default;
 
 		SimpleFactoryObject& operator = (const SimpleFactoryObject&) = default;
-
-		void addSimpleFactoryObjectNameToJson(OT_rJSON_doc& _doc, OT_rJSON_val& _jsonObj) const;
-
-		void setSimpleFactoryObjectName(const std::string& _name) { m_sfoname = _name; };
-		const std::string& simpleFactoryObjectName(void) const { return m_sfoname; };
-
-	private:
-		std::string m_sfoname;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -64,12 +52,10 @@ namespace ot {
 	class SimpleFactory;
 
 	template <class T>
-	class OT_CORE_API_EXPORTONLY SimpleFactoryRegistrar {
-	public:
-		SimpleFactoryRegistrar(std::string _name) {
-			ot::SimpleFactory::instance().add(_name, [](void)->SimpleFactoryObject* {return new T(); });
+	struct SimpleFactoryRegistrar {
+		SimpleFactoryRegistrar(std::string _key) {
+			ot::SimpleFactory::instance().add(_key, [](void)->SimpleFactoryObject* {return new T(); });
 		}
-		virtual ~SimpleFactoryRegistrar() {};
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

@@ -9,14 +9,12 @@
 #include "OTGui/Painter2DFactory.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
+OT_RegisterSimpleFactoryObject(ot::GraphicsRectangularItemCfg, "GraphicsRectangularItemCfg");
+
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BorderColor "BorderColor"
 #define OT_JSON_MEMBER_BorderWidth "BorderWidth"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
-
-namespace ot {
-	OT_RegisterSimpleFactoryObject(GraphicsRectangularItemCfg, "GraphicsRectangularItemCfg");
-}
 
 ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter, const ot::Color& _borderColor, int _borderWidth, int _cornerRadius) 
 	: m_backgroundPainter(_backgroundPainter), m_borderColor(_borderColor), m_borderWidth(_borderWidth), m_cornerRadius(_cornerRadius)

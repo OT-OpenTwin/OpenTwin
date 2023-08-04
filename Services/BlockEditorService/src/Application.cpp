@@ -19,6 +19,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/GraphicsTextItemCfg.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTBlockEditorAPI/BorderLayoutBlockConnectorManagerConfiguration.h"
@@ -161,6 +162,16 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	return b;
 }
 
+ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
+	ot::GraphicsRectangularItemCfg* b = new ot::GraphicsRectangularItemCfg;
+	b->setGraphicsItemName(_name);
+	b->setBorderColor(ot::Color(255, 0, 128));
+	b->setBorderWidth(2);
+	b->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
+
+	return b;
+}
+
 std::string Application::createEmptyTestEditor(void) {
 	if (m_uiComponent) {
 		/*ot::BlockEditorConfigurationPackage pckg("AlwaysNumberOne", "Block Editor");
@@ -177,7 +188,7 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2");
 		a->addChildCollection(a1);
 		a1->addItem(createTestBlock("Alpha 1"));
-		a1->addItem(createTestBlock("Alpha 2"));
+		a1->addItem(createTestBlock2("Alpha 2"));
 		a->addChildCollection(a2);
 		a2->addItem(createTestBlock("Beta 1"));
 		pckg.addCollection(a);
@@ -206,13 +217,11 @@ std::string Application::createEmptyTestEditor(void) {
 		std::string response;
 		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, ot::rJSON::toJSON(doc), response)) {
 			m_uiComponent->displayDebugMessage("Failed to send\n");
-			OT_LOG_E("Fuck");
 			return OT_ACTION_RETURN_VALUE_FAILED;
 		}
 
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
 			m_uiComponent->displayDebugMessage("Invalid response\n");
-			OT_LOG_E("Fuck 2");
 		}
 	}
 	return OT_ACTION_RETURN_VALUE_OK;
