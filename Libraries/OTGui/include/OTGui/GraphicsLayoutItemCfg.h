@@ -14,6 +14,10 @@
 #include <list>
 #include <vector>
 
+#define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg "OT_GraphicsVBoxLayoutItemCfg"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg "OT_GraphicsHBoxLayoutItemCfg"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg "OT_GraphicsGridLayoutItemCfg"
+
 namespace ot {
 
 	class OT_GUI_API_EXPORTONLY GraphicsLayoutItemCfg : public GraphicsItemCfg {

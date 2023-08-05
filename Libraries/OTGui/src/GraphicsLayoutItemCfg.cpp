@@ -154,7 +154,7 @@ void ot::GraphicsBoxLayoutItemCfg::clearItems(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::GraphicsVBoxLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, "GraphicsVBoxLayoutItemCfg");
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -164,7 +164,7 @@ void ot::GraphicsVBoxLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJ
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::GraphicsHBoxLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, "GraphicsHBoxLayoutItemCfg");
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -327,7 +327,7 @@ void ot::GraphicsGridLayoutItemCfg::addChildItem(int _row, int _column, ot::Grap
 }
 
 void ot::GraphicsGridLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, "GraphicsGridLayoutItemCfg");
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg);
 }
 
 void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {
@@ -348,6 +348,6 @@ void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {
 // Register registrar
 
 //static ot::SimpleFactoryRegistrar<ot::GraphicsBoxLayoutItemCfg> box("GraphicsBoxLayoutItemCfg");
-static ot::SimpleFactoryRegistrar<ot::GraphicsVBoxLayoutItemCfg> vbox("GraphicsVBoxLayoutItemCfg");
-static ot::SimpleFactoryRegistrar<ot::GraphicsHBoxLayoutItemCfg> hbox("GraphicsHBoxLayoutItemCfg");
-static ot::SimpleFactoryRegistrar<ot::GraphicsGridLayoutItemCfg> grid("GraphicsGridLayoutItemCfg");
+static ot::SimpleFactoryRegistrar<ot::GraphicsVBoxLayoutItemCfg> vbox(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg);
+static ot::SimpleFactoryRegistrar<ot::GraphicsHBoxLayoutItemCfg> hbox(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg);
+static ot::SimpleFactoryRegistrar<ot::GraphicsGridLayoutItemCfg> grid(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg);

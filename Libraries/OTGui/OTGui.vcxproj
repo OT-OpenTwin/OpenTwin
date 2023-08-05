@@ -16,11 +16,8 @@
     <ClInclude Include="include\OTGui\Font.h" />
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsEditorPackage.h" />
-    <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h" />
-    <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
-    <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
     <ClInclude Include="include\OTGui\Layout.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
@@ -37,11 +34,8 @@
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\GraphicsCollectionCfg.cpp" />
     <ClCompile Include="src\GraphicsEditorPackage.cpp" />
-    <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfg.cpp" />
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp" />
-    <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />
-    <ClCompile Include="src\GraphicsTextItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
     <ClCompile Include="src\LengthLimitation.cpp" />
     <ClCompile Include="src\LinearGradientPainter2D.cpp" />

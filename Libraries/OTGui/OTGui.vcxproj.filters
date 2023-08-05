@@ -66,16 +66,7 @@
     <ClInclude Include="include\OTGui\GraphicsEditorPackage.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h">
@@ -119,16 +110,7 @@
     <ClCompile Include="src\GraphicsEditorPackage.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsImageItemCfg.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsItemCfg.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsRectangularItemCfg.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsTextItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp">
