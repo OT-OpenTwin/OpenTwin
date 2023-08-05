@@ -22,6 +22,7 @@
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTBlockEditorAPI/BorderLayoutBlockConnectorManagerConfiguration.h"
 #include "OTBlockEditorAPI/BlockConnectorConfiguration.h"
 #include "OTBlockEditorAPI/BlockCategoryConfiguration.h"
@@ -154,12 +155,26 @@ std::list<ot::BlockCategoryConfiguration*> createTestCategories() {
 }
 
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
-	ot::GraphicsTextItemCfg* b = new ot::GraphicsTextItemCfg;
-	b->setGraphicsItemName(_name);
-	b->setText(_name);
-	b->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
+	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
 
-	return b;
+	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
+	title->setGraphicsItemName(_name);
+	title->setText(_name);
+	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
+
+	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
+
+	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
+	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
+
+	midLayout->addChildItem(leftRect);
+	midLayout->addStrech(1);
+	midLayout->addChildItem(rightRect);
+
+	centralLayout->addChildItem(title);
+	centralLayout->addChildItem(midLayout, 1);
+
+	return centralLayout;
 }
 
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
