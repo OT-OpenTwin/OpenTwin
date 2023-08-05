@@ -48,8 +48,8 @@ namespace ot {
 		void setTitle(const QString& _title) { m_title = _title; };
 		const QString& title(void) const { return m_title; };
 
-		void setTitleOrientation(ot::Orientation _orientation) { m_titleOrientation = _orientation; };
-		ot::Orientation titleOrientation(void) const { return m_titleOrientation; };
+		void setTitleAlignment(ot::Alignment _align) { m_titleAlignment = _align; };
+		ot::Alignment titleAlignment(void) const { return m_titleAlignment; };
 
 		void setConnectorStyle(ot::BlockConnectorStyle _style) { m_style = _style; };
 		ot::BlockConnectorStyle connectorStyle(void) const { return m_style; };
@@ -68,7 +68,7 @@ namespace ot {
 		int m_connectorSize;
 		QString m_title;
 		QMarginsF m_titleMargins;
-		ot::Orientation m_titleOrientation;
+		ot::Alignment m_titleAlignment;
 		ot::BlockConnectorStyle m_style;
 		QColor m_fillColor;
 		QColor m_borderColor;

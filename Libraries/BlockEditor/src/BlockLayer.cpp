@@ -9,7 +9,7 @@
 #include "OTBlockEditor/BlockConnectorManager.h"
 #include "OTBlockEditor/BlockHelper.h"
 
-ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : BlockPaintJob(NoDelete), m_block(_block), m_connectorManager(_connectorManager), m_orientation(ot::OrientCenter) {
+ot::BlockLayer::BlockLayer(ot::DefaultBlock* _block, BlockConnectorManager* _connectorManager) : BlockPaintJob(NoDelete), m_block(_block), m_connectorManager(_connectorManager), m_alignment(ot::AlignCenter) {
 
 };
 
@@ -33,7 +33,7 @@ QSizeF ot::BlockLayer::calculateSize(void) const {
 }
 
 QRectF ot::BlockLayer::rect(void) const {
-	return ot::calculateChildRect(m_block->rect(), calculateSize(), m_orientation);
+	return ot::calculateChildRect(m_block->rect(), calculateSize(), m_alignment);
 }
 
 void ot::BlockLayer::setConnectorManger(BlockConnectorManager* _connectorManager) {

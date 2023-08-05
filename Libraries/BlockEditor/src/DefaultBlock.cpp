@@ -51,7 +51,7 @@ void ot::DefaultBlock::paint(QPainter* _painter, const QStyleOptionGraphicsItem*
 
 	for (auto l : m_layers) {
 		paintQueue.queue(l, new BlockPaintJobArg(
-			ot::calculateChildRect(r, l->calculateSize(), l->layerOrientation()),
+			ot::calculateChildRect(r, l->calculateSize(), l->layerAlignment()),
 			_painter,
 			_option,
 			_widget)

@@ -29,8 +29,8 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		void setOrientation(Orientation _orientation) { m_orientation = _orientation; };
-		Orientation orientation(void) const { return m_orientation; };
+		void setAlignment(Alignment _orientation) { m_alignment = _orientation; };
+		Alignment alignment(void) const { return m_alignment; };
 
 		void setMargins(MarginsD& _margins) { m_margins = _margins; };
 		void setMargins(double _top, double _right, double _bottom, double _left);
@@ -46,7 +46,7 @@ namespace ot {
 		const LengthLimitation& widthLimits(void) const { return m_widthLimits; };
 
 	private:
-		Orientation			m_orientation;
+		Alignment			m_alignment;
 		MarginsD			m_margins;
 		bool				m_isUserMoveable;
 		LengthLimitation	m_heightLimits;

@@ -42,7 +42,7 @@ ot::BlockLayer* ot::LayerFactory::blockLayerFromConfig(ot::DefaultBlock* _block,
 	layer->setMargins(_config->margins());
 	layer->setHeightLimit(_config->heightLimits());
 	layer->setWidthLimit(_config->widthLimits());
-	layer->setLayerOrientation(_config->orientation());
+	layer->setLayerAlignment(_config->alignment());
 
 	if (_config->getConnectorManager()) {
 		layer->setConnectorManger(BlockConnectorManagerFactory::connectorManagerFromConfig(layer, _config->getConnectorManager()));

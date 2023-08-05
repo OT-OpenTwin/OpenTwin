@@ -2,37 +2,37 @@
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/Logger.h"
 
-std::string ot::toString(ot::Orientation _orientation) {
-	switch (_orientation)
+std::string ot::toString(ot::Alignment _Alignment) {
+	switch (_Alignment)
 	{
-	case ot::Orientation::OrientCenter: return "Center";
-	case ot::Orientation::OrientTop: return "Top";
-	case ot::Orientation::OrientTopRight: return "TopRight";
-	case ot::Orientation::OrientRight: return "Right";
-	case ot::Orientation::OrientBottomRight: return "BottomRight";
-	case ot::Orientation::OrientBottom: return "Bottom";
-	case ot::Orientation::OrientBottomLeft: return "BottomLeft";
-	case ot::Orientation::OrientLeft: return "Left";
-	case ot::Orientation::OrientTopLeft: return "TopLeft";
+	case ot::Alignment::AlignCenter: return "AlignCenter";
+	case ot::Alignment::AlignTop: return "AlignTop";
+	case ot::Alignment::AlignTopRight: return "AlignTopRight";
+	case ot::Alignment::AlignRight: return "AlignRight";
+	case ot::Alignment::AlignBottomRight: return "AlignBottomRight";
+	case ot::Alignment::AlignBottom: return "AlignBottom";
+	case ot::Alignment::AlignBottomLeft: return "AlignBottomLeft";
+	case ot::Alignment::AlignLeft: return "AlignLeft";
+	case ot::Alignment::AlignTopLeft: return "AlignTopLeft";
 	default:
-		OT_LOG_EA("Unknown orientation provided");
-		throw std::exception("Unknown orientation provided");
+		OT_LOG_EA("Unknown Alignment provided");
+		throw std::exception("Unknown Alignment provided");
 	}
 }
 
-ot::Orientation ot::stringToOrientation(const std::string& _string) {
-	if (_string == toString(ot::Orientation::OrientCenter)) return ot::Orientation::OrientCenter;
-	else if (_string == toString(ot::Orientation::OrientTop)) return ot::Orientation::OrientTop;
-	else if (_string == toString(ot::Orientation::OrientTopRight)) return ot::Orientation::OrientTopRight;
-	else if (_string == toString(ot::Orientation::OrientRight)) return ot::Orientation::OrientRight;
-	else if (_string == toString(ot::Orientation::OrientBottomRight)) return ot::Orientation::OrientBottomRight;
-	else if (_string == toString(ot::Orientation::OrientBottom)) return ot::Orientation::OrientBottom;
-	else if (_string == toString(ot::Orientation::OrientBottomLeft)) return ot::Orientation::OrientBottomLeft;
-	else if (_string == toString(ot::Orientation::OrientLeft)) return ot::Orientation::OrientLeft;
-	else if (_string == toString(ot::Orientation::OrientTopLeft)) return ot::Orientation::OrientTopLeft;
+ot::Alignment ot::stringToAlignment(const std::string& _string) {
+	if (_string == toString(ot::Alignment::AlignCenter)) return ot::Alignment::AlignCenter;
+	else if (_string == toString(ot::Alignment::AlignTop)) return ot::Alignment::AlignTop;
+	else if (_string == toString(ot::Alignment::AlignTopRight)) return ot::Alignment::AlignTopRight;
+	else if (_string == toString(ot::Alignment::AlignRight)) return ot::Alignment::AlignRight;
+	else if (_string == toString(ot::Alignment::AlignBottomRight)) return ot::Alignment::AlignBottomRight;
+	else if (_string == toString(ot::Alignment::AlignBottom)) return ot::Alignment::AlignBottom;
+	else if (_string == toString(ot::Alignment::AlignBottomLeft)) return ot::Alignment::AlignBottomLeft;
+	else if (_string == toString(ot::Alignment::AlignLeft)) return ot::Alignment::AlignLeft;
+	else if (_string == toString(ot::Alignment::AlignTopLeft)) return ot::Alignment::AlignTopLeft;
 	else {
-		OT_LOG_EA("Unknown orientation provided");
-		throw std::exception("Unknown orientation provided");
+		OT_LOG_EA("Unknown Alignment provided");
+		throw std::exception("Unknown Alignment provided");
 	}
 }
 

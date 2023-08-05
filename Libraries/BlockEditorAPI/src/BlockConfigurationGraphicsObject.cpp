@@ -1,14 +1,14 @@
 #include "OTBlockEditorAPI/BlockConfigurationGraphicsObject.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
-#define JSOM_MEMBER_Orientation "Orientation"
+#define JSOM_MEMBER_Alignment "Alignment"
 #define JSOM_MEMBER_Margins "Margins"
 #define JSOM_MEMBER_IsUserMoveable "IsUserMoveable"
 #define JSON_MEMBER_HeightLimits "HeightLimits"
 #define JSON_MEMBER_WidthLimits "WidthLimits"
 
 ot::BlockConfigurationGraphicsObject::BlockConfigurationGraphicsObject(const std::string& _name)
-	: BlockConfigurationObject(_name), m_orientation(OrientCenter), m_isUserMoveable(false)
+	: BlockConfigurationObject(_name), m_alignment(AlignCenter), m_isUserMoveable(false)
 {}
 
 void ot::BlockConfigurationGraphicsObject::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
@@ -24,7 +24,7 @@ void ot::BlockConfigurationGraphicsObject::addToJsonObject(OT_rJSON_doc& _docume
 	m_widthLimits.addToJsonObject(_document, widthObj);
 
 
-	ot::rJSON::add(_document, _object, JSOM_MEMBER_Orientation, toString(m_orientation));
+	ot::rJSON::add(_document, _object, JSOM_MEMBER_Alignment, toString(m_alignment));
 	ot::rJSON::add(_document, _object, JSOM_MEMBER_Margins, marginsObj);
 	ot::rJSON::add(_document, _object, JSOM_MEMBER_IsUserMoveable, m_isUserMoveable);
 	ot::rJSON::add(_document, _object, JSON_MEMBER_HeightLimits, heightObj);
@@ -34,7 +34,7 @@ void ot::BlockConfigurationGraphicsObject::addToJsonObject(OT_rJSON_doc& _docume
 void ot::BlockConfigurationGraphicsObject::setFromJsonObject(OT_rJSON_val& _object) {
 	BlockConfigurationObject::setFromJsonObject(_object);
 
-	OT_rJSON_checkMember(_object, JSOM_MEMBER_Orientation, String);
+	OT_rJSON_checkMember(_object, JSOM_MEMBER_Alignment, String);
 	OT_rJSON_checkMember(_object, JSOM_MEMBER_Margins, Object);
 	OT_rJSON_checkMember(_object, JSOM_MEMBER_IsUserMoveable, Bool);
 	OT_rJSON_checkMember(_object, JSON_MEMBER_HeightLimits, Object);
@@ -44,7 +44,7 @@ void ot::BlockConfigurationGraphicsObject::setFromJsonObject(OT_rJSON_val& _obje
 	OT_rJSON_val heightObj = _object[JSON_MEMBER_HeightLimits].GetObject();
 	OT_rJSON_val widthObj = _object[JSON_MEMBER_WidthLimits].GetObject();
 
-	m_orientation = stringToOrientation(_object[JSOM_MEMBER_Orientation].GetString());
+	m_alignment = stringToAlignment(_object[JSOM_MEMBER_Alignment].GetString());
 	m_margins.setFromJsonObject(marginsObj);
 	m_isUserMoveable = _object[JSOM_MEMBER_IsUserMoveable].GetBool();
 	m_heightLimits.setFromJsonObject(heightObj);

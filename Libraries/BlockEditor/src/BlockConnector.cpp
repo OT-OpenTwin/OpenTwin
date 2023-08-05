@@ -15,7 +15,7 @@
 #include <QtGui/qpainter.h>
 
 ot::BlockConnector::BlockConnector()
-	: BlockPaintJob(NoDelete), m_titleOrientation(ot::OrientCenter), m_style(ot::ConnectorCircle),
+	: BlockPaintJob(NoDelete), m_titleAlignment(ot::AlignCenter), m_style(ot::ConnectorCircle),
 	m_fillColor(128, 128, 128), m_borderColor(0, 0, 0), m_connectorSize(12),
 	m_titleFont("Arial"), m_titleMargins(5, 5, 5, 5)
 {
@@ -97,30 +97,30 @@ QSizeF ot::BlockConnector::calculateSize(void) const {
 	int tw = m.width(m_title) + m_titleMargins.left() + m_titleMargins.right();
 	int th = m.height() + m_titleMargins.top() + m_titleMargins.bottom();
 
-	// Add or adjust the size according to the title orientation
-	switch (m_titleOrientation)
+	// Add or adjust the size according to the title alignment
+	switch (m_titleAlignment)
 	{
-	case ot::OrientCenter:
+	case ot::AlignCenter:
 		if (tw > s.width()) { s.setWidth(tw); }
 		if (th > s.height()) { s.setHeight(th); }
 		break;
 
-	case ot::OrientTop:
-	case ot::OrientBottom:
+	case ot::AlignTop:
+	case ot::AlignBottom:
 		if (tw > s.width()) { s.setWidth(tw); }
 		s.setHeight(s.height() + th);
 		break;
 
-	case ot::OrientLeft:
-	case ot::OrientRight:
+	case ot::AlignLeft:
+	case ot::AlignRight:
 		s.setWidth(s.width() + tw);
 		if (th > s.height()) { s.setHeight(th); }
 		break;
 
-	case ot::OrientTopRight:
-	case ot::OrientTopLeft:
-	case ot::OrientBottomRight:
-	case ot::OrientBottomLeft:
+	case ot::AlignTopRight:
+	case ot::AlignTopLeft:
+	case ot::AlignBottomRight:
+	case ot::AlignBottomLeft:
 		s.setWidth(s.width() + tw);
 		s.setHeight(s.height() + th);
 		break;

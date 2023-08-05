@@ -41,15 +41,15 @@ namespace ot {
 		void setConnectorManger(BlockConnectorManager* _connectorManager);
 		BlockConnectorManager* getConnectorManager(void) { return m_connectorManager; };
 
-		void setLayerOrientation(ot::Orientation _orient) { m_orientation = _orient; };
-		ot::Orientation layerOrientation(void) const { return m_orientation; };
+		void setLayerAlignment(ot::Alignment _align) { m_alignment = _align; };
+		ot::Alignment layerAlignment(void) const { return m_alignment; };
 
 		ot::DefaultBlock* getBlock(void) { return m_block; };
 
 	private:
 		ot::DefaultBlock* m_block;
 		BlockConnectorManager* m_connectorManager;
-		ot::Orientation m_orientation;
+		ot::Alignment m_alignment;
 		BlockLayer() = delete;
 		BlockLayer(const BlockLayer&) = delete;
 		BlockLayer& operator = (const BlockLayer&) = delete;

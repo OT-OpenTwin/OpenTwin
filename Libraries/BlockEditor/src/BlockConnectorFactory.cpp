@@ -15,7 +15,7 @@ ot::BlockConnector* ot::BlockConnectorFactory::blockConnectorFromConfig(ot::Bloc
 	ot::BlockConnector* newConnector = new ot::BlockConnector;
 
 	newConnector->setTitle(QString::fromStdString(_config->title()));
-	newConnector->setTitleOrientation(_config->titleOrientation());
+	newConnector->setTitleAlignment(_config->titleAlignment());
 	newConnector->setConnectorStyle(_config->style());
 	newConnector->setFillColor(QColor(_config->fillColor().rInt(), _config->fillColor().gInt(), _config->fillColor().bInt(), _config->fillColor().aInt()));
 	newConnector->setBorderColor(QColor(_config->borderColor().rInt(), _config->borderColor().gInt(), _config->borderColor().bInt(), _config->borderColor().aInt()));
