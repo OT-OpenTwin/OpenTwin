@@ -36,6 +36,26 @@ ot::Alignment ot::stringToAlignment(const std::string& _string) {
 	}
 }
 
+std::string ot::toString(Orientation _orientation) {
+	switch (_orientation)
+	{
+	case ot::Horizontal: return "Horizontal";
+	case ot::Vertical: return "Vertical";
+	default:
+		OT_LOG_EA("Unknown Orientation provided");
+		throw std::exception("Unknown Orientation provided");
+	}
+}
+
+ot::Orientation ot::stringToOrientation(const std::string& _string) {
+	if (_string == toString(ot::Orientation::Horizontal)) return ot::Orientation::Horizontal;
+	else if (_string == toString(ot::Orientation::Vertical)) return ot::Orientation::Vertical;
+	else {
+		OT_LOG_EA("Unknown Orientation provided");
+		throw std::exception("Unknown Orientation provided");
+	}
+}
+
 std::string ot::toString(ot::FontFamily _fontFamily) {
 	switch (_fontFamily)
 	{

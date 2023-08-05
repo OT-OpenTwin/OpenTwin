@@ -8,6 +8,7 @@
 
 namespace ot {
 
+	//! @brief Alignment
 	enum Alignment {
 		AlignCenter,
 		AlignTop,
@@ -18,6 +19,12 @@ namespace ot {
 		AlignBottomLeft,
 		AlignLeft,
 		AlignTopLeft
+	};
+
+	//! @brief Orientation
+	enum Orientation {
+		Horizontal,
+		Vertical
 	};
 
 	//! @brief Generally available font families
@@ -37,6 +44,9 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(Alignment _Alignation);
 	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
+
+	OT_GUI_API_EXPORT std::string toString(Orientation _orientation);
+	OT_GUI_API_EXPORT Orientation stringToOrientation(const std::string& _string);
 
 	OT_GUI_API_EXPORT std::string toString(FontFamily _fontFamily);
 	OT_GUI_API_EXPORT FontFamily stringToFontFamily(const std::string& _string);
