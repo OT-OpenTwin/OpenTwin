@@ -13,9 +13,9 @@
 #include <QtWidgets/qgraphicslinearlayout.h>
 #include <QtWidgets/qgraphicsgridlayout.h>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem "OT_GraphicsVBoxLayoutItem"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem "OT_GraphicsHBoxLayoutItem"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem "OT_GraphicsGridLayoutItem"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem "OT_GILayV"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem "OT_GILayH"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem "OT_GILayG"
 
 namespace ot {
 
@@ -23,6 +23,8 @@ namespace ot {
 	public:
 		GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsBoxLayoutItem() {};
+
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 	private:
 		GraphicsBoxLayoutItem() = delete;
@@ -44,9 +46,10 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem); };
 
-		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 	private:
+		QSizeF m_size;
 
 		GraphicsVBoxLayoutItem(const GraphicsVBoxLayoutItem&) = delete;
 		GraphicsVBoxLayoutItem& operator = (const GraphicsVBoxLayoutItem&) = delete;
@@ -66,9 +69,11 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem); };
 
-		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 	private:
+		QSizeF m_size;
+
 		GraphicsHBoxLayoutItem(const GraphicsHBoxLayoutItem&) = delete;
 		GraphicsHBoxLayoutItem& operator = (const GraphicsHBoxLayoutItem&) = delete;
 	};
@@ -87,9 +92,11 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem); };
 
-		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 	private:
+		QSizeF m_size;
+
 		GraphicsGridLayoutItem(const GraphicsGridLayoutItem&) = delete;
 		GraphicsGridLayoutItem& operator = (const GraphicsGridLayoutItem&) = delete;
 	};

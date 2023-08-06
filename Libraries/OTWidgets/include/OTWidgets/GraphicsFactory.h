@@ -6,6 +6,9 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTWidgets/OTWidgetsAPIExport.h"
+
 namespace ot {
 
 	class GraphicsItem;
@@ -15,7 +18,7 @@ namespace ot {
 
 		//! @brief Will create a graphics item from the provided configuration
 		//! @param _config The graphics item configuration
-		ot::GraphicsItem* itemFromConfig(ot::GraphicsItemCfg* _config);
+		OT_WIDGETS_API_EXPORT ot::GraphicsItem* itemFromConfig(ot::GraphicsItemCfg* _config);
 	}
 
 }

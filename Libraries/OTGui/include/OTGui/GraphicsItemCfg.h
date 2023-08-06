@@ -11,17 +11,18 @@
 #include "OTGui/Border.h"
 #include "OTGui/Margins.h"
 #include "OTGui/Font.h"
+#include "OpenTwinCore/Size2D.h"
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Serializable.h"
 
 // std header
 #include <string>
 
-#pragma warning(disable:4251)
+#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GICText"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GICRectangular"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GraphicsTextItemCfg"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GraphicsImageItemCfg"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GraphicsRectangularItemCfg"
+#pragma warning(disable:4251)
 
 namespace ot {
 
@@ -48,6 +49,9 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_tile = _title; };
 		const std::string& title(void) const { return m_tile; };
 
+		void setSize(const ot::Size2D& _size) { m_size = _size; };
+		const ot::Size2D& size(void) const { return m_size; };
+
 		void setBorder(const Border& _border) { m_border = _border; };
 		const Border& border(void) const { return m_border; };
 
@@ -57,9 +61,9 @@ namespace ot {
 	private:
 		std::string m_name;
 		std::string m_tile;
+		Size2D m_size;
 		Border m_border;
 		Margins m_margins;
-
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -146,7 +150,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
 	public:
-		GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr, const ot::Color& _borderColor = ot::Color(), int _borderWidth = 2, int _cornerRadius = 0);
+		GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr, int _cornerRadius = 0);
 		virtual ~GraphicsRectangularItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -164,20 +168,12 @@ namespace ot {
 
 		void setCornerRadius(int _px) { m_cornerRadius = _px; };
 		int cornerRadius(void) const { return m_cornerRadius; };
-
-		void setBorderColor(const ot::Color& _color) { m_borderColor = _color; };
-		const ot::Color& borderColor(void) const { return m_borderColor; };
-
-		void setBorderWidth(int _px) { m_borderWidth = _px; };
-		int borderWidth(void) const { return m_borderWidth; };
-
+		
 		void setBackgroundPainer(ot::Painter2D* _painter);
 		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
 
 	private:
 		int m_cornerRadius;
-		ot::Color m_borderColor;
-		int m_borderWidth;
 		ot::Painter2D* m_backgroundPainter;
 
 		GraphicsRectangularItemCfg(GraphicsRectangularItemCfg&) = delete;

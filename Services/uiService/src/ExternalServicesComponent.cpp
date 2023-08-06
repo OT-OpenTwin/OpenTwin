@@ -42,7 +42,11 @@
 #include "OTBlockEditor/BlockEditorAPI.h"
 #include "OTBlockEditor/BlockNetworkEditor.h"
 #include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsLayoutItem.h"
+#include "OTWidgets/GraphicsFactory.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2779,14 +2783,40 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				//pckg.setFromJsonObject(configurationObj);
 				ot::BlockNetworkEditor * newEditor = new ot::BlockNetworkEditor;
 				{
-					ot::GraphicsRectangularItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsRectangularItem>("GraphicsRectangularItem");
+					//ot::GraphicsRectangularItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsRectangularItem>("GraphicsRectangularItem");
+
+					ot::GraphicsVBoxLayoutItemCfg* root = new ot::GraphicsVBoxLayoutItemCfg;
+					ot::GraphicsHBoxLayoutItemCfg* mid = new ot::GraphicsHBoxLayoutItemCfg;
+
+					ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
+					title->setText("Hello World");
+
+					ot::GraphicsRectangularItemCfg* left = new ot::GraphicsRectangularItemCfg;
+					left->setSize(ot::Size2D(20, 20));
+
+					ot::GraphicsRectangularItemCfg* right = new ot::GraphicsRectangularItemCfg;
+					right->setSize(ot::Size2D(10, 10));
+
+					mid->addChildItem(left);
+					mid->addStrech(1);
+					mid->addChildItem(right);
+
+					root->addChildItem(title);
+					root->addChildItem(mid);
+
+					ot::GraphicsItem* itm = ot::GraphicsFactory::itemFromConfig(root);
 
 					if (itm) {
-						itm->setRect(0., 0., 50, 30);
-						newEditor->scene()->addItem(itm);
+						QGraphicsItem* citm = dynamic_cast<QGraphicsItem*>(itm);
+						if (citm == nullptr) {
+							OT_LOG_EA("Cast fail");
+						}
+						else {
+							newEditor->scene()->addItem(citm);
+						}
 					}
 					else {
-						OT_LOG_E("Factory fail");
+						OT_LOG_EA("Factory fail");
 					}
 				}
 				
@@ -4156,7 +4186,7 @@ ak::UID ExternalServicesComponent::getServiceUiUid(ot::ServiceBase * _service) {
 ot::ServiceBase * ExternalServicesComponent::getService(ot::serviceID_t _serviceID) {
 	auto service{ m_serviceIdMap.find(_serviceID) };
 	if (service == m_serviceIdMap.end()) {
-		assert(0);
+//		assert(0);
 		std::string ex("A service with the id \"");
 		ex.append(std::to_string(_serviceID));
 		ex.append("\" was not registered before");

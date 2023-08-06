@@ -14,9 +14,9 @@
 #include <list>
 #include <vector>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg "OT_GraphicsVBoxLayoutItemCfg"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg "OT_GraphicsHBoxLayoutItemCfg"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg "OT_GraphicsGridLayoutItemCfg"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg "OT_GICLayV"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg "OT_GICLayH"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg "OT_GICLayG"
 
 namespace ot {
 
@@ -52,6 +52,10 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsBoxLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
+		//! @brief Holds the item and its strech factor in the box
+		//! If no item is set then its a stretch only
+		typedef std::pair<GraphicsItemCfg*, int> itemStrechPair_t;
+
 		GraphicsBoxLayoutItemCfg(ot::Orientation _orientation = ot::Horizontal);
 		virtual ~GraphicsBoxLayoutItemCfg();
 
@@ -68,12 +72,12 @@ namespace ot {
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) override;
 		void addChildItem(ot::GraphicsItemCfg* _item, int _stretch);
 		void addStrech(int _stretch = 1);
+		const std::list<itemStrechPair_t>& items(void) const { return m_items; };
 
 	private:
 		void clearItems(void);
 
 		ot::Orientation m_orientation;
-		typedef std::pair<GraphicsItemCfg*, int> itemStrechPair_t;
 		std::list<itemStrechPair_t> m_items; //! @brief Items and their stretch in the box (nullptr = stretch only)
 		
 		GraphicsBoxLayoutItemCfg(const GraphicsBoxLayoutItemCfg&) = delete;

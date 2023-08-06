@@ -22,7 +22,7 @@
     <ClCompile Include="src\GraphicsItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsLayout.cpp">
+    <ClCompile Include="src\GraphicsLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsFactory.cpp">
@@ -68,7 +68,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsLayout.h">
+    <ClInclude Include="include\OTWidgets\GraphicsLayoutItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h">
