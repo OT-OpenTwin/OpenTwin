@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\KeyMap.cpp" />
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Queue.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="include\OpenTwinCore\Flags.h" />
     <ClInclude Include="include\OpenTwinCore\CoreTypes.h" />
     <ClInclude Include="include\OpenTwinCore\FlagsHelper.h" />
+    <ClInclude Include="include\OpenTwinCore\KeyMap.h" />
     <ClInclude Include="include\OpenTwinCore\ObjectManagerTemplate.h" />
     <ClInclude Include="include\OpenTwinCore\otAssert.h" />
     <ClInclude Include="include\OpenTwinCore\OTClassHelper.h" />

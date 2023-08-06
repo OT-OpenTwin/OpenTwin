@@ -28,9 +28,9 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _which, const QSizeF& _constraint) const override;
 
-		virtual std::string simpleFactoryObjectKey(void) const override { return "DefaultBlock"; }
+		virtual std::string simpleFactoryObjectKey(void) const override { return "DefaultBlock"; };
 
-		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override {};
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override { return true; };
 
 		//! @brief Add the provided layer at the top of the block
 		//! Block takes ownership of the layer
