@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\GraphicsFactory.cpp" />
     <ClCompile Include="src\GraphicsItem.cpp" />
     <ClCompile Include="src\GraphicsLayout.cpp" />
     <ClCompile Include="src\GraphicsScene.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsLayout.h" />
     <ClInclude Include="include\OTWidgets\LineEdit.h" />

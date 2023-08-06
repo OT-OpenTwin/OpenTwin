@@ -30,7 +30,7 @@ ot::GraphicsLayoutItemCfg::~GraphicsLayoutItemCfg() {
 
 void ot::GraphicsLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
-	this->addFactoryKey(_document, _object);
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
 }
 
 void ot::GraphicsLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
@@ -72,8 +72,6 @@ void ot::GraphicsBoxLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_r
 	}
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Items, itemArr);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Orientation, ot::toString(m_orientation));
-
-	this->addFactoryKey(_document, _object);
 }
 
 void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
@@ -145,26 +143,6 @@ void ot::GraphicsBoxLayoutItemCfg::clearItems(void) {
 		if (i.first) delete i.first;
 	}
 	m_items.clear();
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-void ot::GraphicsVBoxLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg);
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-void ot::GraphicsHBoxLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -324,10 +302,6 @@ void ot::GraphicsGridLayoutItemCfg::addChildItem(int _row, int _column, ot::Grap
 	}
 
 	m_items[_row][_column] = _item;
-}
-
-void ot::GraphicsGridLayoutItemCfg::addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg);
 }
 
 void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {

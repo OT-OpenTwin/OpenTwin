@@ -18,8 +18,6 @@
 #include "OpenTwinCommunication/Msg.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
-#include "OTGui/GraphicsTextItemCfg.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -158,7 +156,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
 
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
-	title->setGraphicsItemName(_name);
+	title->setName(_name);
 	title->setText(_name);
 	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
 
@@ -179,7 +177,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	ot::GraphicsRectangularItemCfg* b = new ot::GraphicsRectangularItemCfg;
-	b->setGraphicsItemName(_name);
+	b->setName(_name);
 	b->setBorderColor(ot::Color(255, 0, 128));
 	b->setBorderWidth(2);
 	b->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));

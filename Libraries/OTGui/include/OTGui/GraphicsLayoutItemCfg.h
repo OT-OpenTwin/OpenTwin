@@ -38,8 +38,7 @@ namespace ot {
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) = 0;
 
 	protected:
-		virtual void addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const = 0;
-
+		
 	private:
 		GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg&) = delete;
 		GraphicsLayoutItemCfg& operator = (const GraphicsLayoutItemCfg&) = delete;
@@ -92,8 +91,8 @@ namespace ot {
 		GraphicsVBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Vertical) {};
 		virtual ~GraphicsVBoxLayoutItemCfg() {};
 
-	protected:
-		virtual void addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg); };
 
 	private:
 		GraphicsVBoxLayoutItemCfg(const GraphicsVBoxLayoutItemCfg&) = delete;
@@ -111,8 +110,8 @@ namespace ot {
 		GraphicsHBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Horizontal) {};
 		virtual ~GraphicsHBoxLayoutItemCfg() {};
 
-	protected:
-		virtual void addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg); };
 
 	private:
 		GraphicsHBoxLayoutItemCfg(const GraphicsHBoxLayoutItemCfg&) = delete;
@@ -140,11 +139,11 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg); };
+
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) override;
 		void addChildItem(int _row, int _column, ot::GraphicsItemCfg* _item);
-
-	protected:
-		virtual void addFactoryKey(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
 
 	private:
 		void clearAndResize(void);

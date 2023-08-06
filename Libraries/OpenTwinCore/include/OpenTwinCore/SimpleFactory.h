@@ -41,6 +41,9 @@ namespace ot {
 		virtual ~SimpleFactoryObject() = default;
 
 		SimpleFactoryObject& operator = (const SimpleFactoryObject&) = default;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const = 0;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

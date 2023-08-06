@@ -13,24 +13,19 @@
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
 
+#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GraphicsRectangularItem"
+
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsItem {
-		Q_INTERFACES(QGraphicsItem)
+	class GraphicsItemCfg;
+
+	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
-		GraphicsItem(QGraphicsItem* _parentItem = (QGraphicsItem *)nullptr);
+		GraphicsItem();
 		virtual ~GraphicsItem();
-		/*
-		virtual QRectF boundingRect(void) const override = 0;
 
-		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _option, QWidget* _widget = (QWidget*)nullptr) override = 0;
+		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) = 0;
 
-		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override = 0;
-		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override = 0;
-		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override = 0;
-		
-		virtual QSizeF sizeHint(Qt::SizeHint _which, const QSizeF& _constraint) const override = 0;
-		*/
 	private:
 
 	};
@@ -41,25 +36,18 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public QGraphicsRectItem, public ot::SimpleFactoryObject {
+	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public QGraphicsRectItem, public GraphicsItem {
 	public:
+		GraphicsRectangularItem();
+		virtual ~GraphicsRectangularItem();
+
+		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
 
 	private:
 
 	};
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	class OT_WIDGETS_API_EXPORT GraphicsEllipseItem : public QGraphicsEllipseItem, public ot::SimpleFactoryObject {
-	public:
-
-	private:
-
-	};
-
 
 }

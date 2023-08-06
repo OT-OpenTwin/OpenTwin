@@ -38,6 +38,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Title, m_tile);
+	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
 }
 
 void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
@@ -69,7 +70,6 @@ ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
 
 void ot::GraphicsTextItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg);
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Text, m_text);
 
@@ -111,8 +111,7 @@ ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
 void ot::GraphicsImageItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg);
-
+	
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_ImagePath, m_imageSubPath);
 }
 
@@ -140,8 +139,7 @@ ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
 
 void ot::GraphicsRectangularItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg);
-
+	
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CornerRadius, m_cornerRadius);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BorderWidth, m_borderWidth);
 
