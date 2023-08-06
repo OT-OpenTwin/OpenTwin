@@ -19,15 +19,15 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsBoxLayout : public QGraphicsLinearLayout, public ot::GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsBoxLayoutItem : public QGraphicsLinearLayout, public ot::GraphicsItem {
 	public:
-		GraphicsBoxLayout(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
-		virtual ~GraphicsBoxLayout() {};
+		GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
+		virtual ~GraphicsBoxLayoutItem() {};
 
 	private:
-		GraphicsBoxLayout() = delete;
-		GraphicsBoxLayout(const GraphicsBoxLayout&) = delete;
-		GraphicsBoxLayout& operator = (const GraphicsBoxLayout&) = delete;
+		GraphicsBoxLayoutItem() = delete;
+		GraphicsBoxLayoutItem(const GraphicsBoxLayoutItem&) = delete;
+		GraphicsBoxLayoutItem& operator = (const GraphicsBoxLayoutItem&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -36,10 +36,10 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsVBoxLayout : public GraphicsBoxLayout {
+	class OT_WIDGETS_API_EXPORT GraphicsVBoxLayoutItem : public GraphicsBoxLayoutItem {
 	public:
-		GraphicsVBoxLayout(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
-		virtual ~GraphicsVBoxLayout() {};
+		GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
+		virtual ~GraphicsVBoxLayoutItem() {};
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem); };
@@ -48,8 +48,8 @@ namespace ot {
 
 	private:
 
-		GraphicsVBoxLayout(const GraphicsVBoxLayout&) = delete;
-		GraphicsVBoxLayout& operator = (const GraphicsVBoxLayout&) = delete;
+		GraphicsVBoxLayoutItem(const GraphicsVBoxLayoutItem&) = delete;
+		GraphicsVBoxLayoutItem& operator = (const GraphicsVBoxLayoutItem&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -58,10 +58,10 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsHBoxLayout : public GraphicsBoxLayout {
+	class OT_WIDGETS_API_EXPORT GraphicsHBoxLayoutItem : public GraphicsBoxLayoutItem {
 	public:
-		GraphicsHBoxLayout(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
-		virtual ~GraphicsHBoxLayout() {};
+		GraphicsHBoxLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
+		virtual ~GraphicsHBoxLayoutItem() {};
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem); };
@@ -69,8 +69,8 @@ namespace ot {
 		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 	private:
-		GraphicsHBoxLayout(const GraphicsHBoxLayout&) = delete;
-		GraphicsHBoxLayout& operator = (const GraphicsHBoxLayout&) = delete;
+		GraphicsHBoxLayoutItem(const GraphicsHBoxLayoutItem&) = delete;
+		GraphicsHBoxLayoutItem& operator = (const GraphicsHBoxLayoutItem&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -79,10 +79,10 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsGridLayout : public QGraphicsGridLayout, public ot::GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsGridLayoutItem : public QGraphicsGridLayout, public ot::GraphicsItem {
 	public:
-		GraphicsGridLayout(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
-		virtual ~GraphicsGridLayout() {};
+		GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
+		virtual ~GraphicsGridLayoutItem() {};
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem); };
@@ -90,8 +90,8 @@ namespace ot {
 		virtual void setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 	private:
-		GraphicsGridLayout(const GraphicsGridLayout&) = delete;
-		GraphicsGridLayout& operator = (const GraphicsGridLayout&) = delete;
+		GraphicsGridLayoutItem(const GraphicsGridLayoutItem&) = delete;
+		GraphicsGridLayoutItem& operator = (const GraphicsGridLayoutItem&) = delete;
 	};
 
 }

@@ -6,8 +6,21 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsLayout.h"
+#include "OTGui/GraphicsLayoutItemCfg.h"
 
-ot::GraphicsBoxLayout::GraphicsBoxLayout(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) {}
+ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) {}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsVBoxLayoutItem::GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem) : GraphicsBoxLayoutItem(Qt::Vertical, _parentItem) {}
+
+void ot::GraphicsVBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -15,9 +28,9 @@ ot::GraphicsBoxLayout::GraphicsBoxLayout(Qt::Orientation _orientation, QGraphics
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsVBoxLayout::GraphicsVBoxLayout(QGraphicsLayoutItem* _parentItem) : GraphicsBoxLayout(Qt::Vertical, _parentItem) {}
+ot::GraphicsHBoxLayoutItem::GraphicsHBoxLayoutItem(QGraphicsLayoutItem* _parentItem) : GraphicsBoxLayoutItem(Qt::Horizontal, _parentItem) {}
 
-void ot::GraphicsVBoxLayout::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+void ot::GraphicsHBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 }
 
@@ -27,20 +40,8 @@ void ot::GraphicsVBoxLayout::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsHBoxLayout::GraphicsHBoxLayout(QGraphicsLayoutItem* _parentItem) : GraphicsBoxLayout(Qt::Horizontal, _parentItem) {}
+ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) {}
 
-void ot::GraphicsHBoxLayout::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-ot::GraphicsGridLayout::GraphicsGridLayout(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) {}
-
-void ot::GraphicsGridLayout::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+void ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 }
