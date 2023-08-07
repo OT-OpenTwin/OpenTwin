@@ -36,6 +36,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\TestPerformanceTest.cpp" />
     <ClCompile Include="src\TestrJSON.cpp" />
     <ClCompile Include="TestVariable.cpp" />
   </ItemGroup>

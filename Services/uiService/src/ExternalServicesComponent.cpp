@@ -1743,7 +1743,6 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 					if (absoluteFilePaths.size() != 0)
 					{
-						
 						rapidjson::Document sendingDoc;
 						sendingDoc.SetObject();
 						int requiredIdentifierPerFile = 4;
@@ -1769,7 +1768,6 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 						std::string entityPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_NAME);
 						std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 						std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-
 						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath));
 					}
 				}

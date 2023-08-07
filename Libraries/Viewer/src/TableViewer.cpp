@@ -6,6 +6,7 @@
 #include <QTableWidgetSelectionRange>
 #include <memory>
 #include <qheaderview.h>
+#include "OpenTwinCore/Logger.h"
 
 TableViewer::TableViewer(QWidget* parent) 
 {
@@ -24,12 +25,17 @@ std::vector<ot::TableRange> TableViewer::GetSelectedRanges()
 	return rangesInternalType;
 }
 
+#include "OpenTwinCore/PerformanceTests.h"
 
 bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityParameterizedDataTable::HeaderOrientation orientation)
 {
+	OT_LOG_D("Test");
 	if (_tableID != table->getEntityID() || _tableVersion != table->getEntityStorageVersion() || orientation != _tableOrientation)
 	{
+		//TakeTime(t1);
+		std::chrono::system_clock::time_point t1 = std::chrono::system_clock::now();
 		auto tableData = table->getTableData();
+		std::chrono::system_clock::time_point t2 = std::chrono::system_clock::now();
 		if (tableData != nullptr)
 		{
 			_table->clear();
@@ -77,7 +83,15 @@ bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityP
 				}
 				itemRowIndex++;
 			}
+			std::chrono::system_clock::time_point t3 = std::chrono::system_clock::now();
 			_table->resizeColumnsToContents();
+			std::chrono::system_clock::time_point t4 = std::chrono::system_clock::now();
+			
+			
+			OT_LOG_D("Loading table data: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count()));
+			OT_LOG_D("Build qtable: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count()));
+			OT_LOG_D("Resized qtable: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count()));
+			
 			_tableName = table->getName();
 			_tableID = table->getEntityID();
 			_tableVersion = table->getEntityStorageVersion();

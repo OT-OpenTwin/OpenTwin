@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Viewer", "Viewer.vcxproj", "{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}"
 EndProject
@@ -18,6 +18,8 @@ Global
 		DebugTest|x86 = DebugTest|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		ReleasePerfTest|x64 = ReleasePerfTest|x64
+		ReleasePerfTest|x86 = ReleasePerfTest|x86
 		ReleaseTest|x64 = ReleaseTest|x64
 		ReleaseTest|x86 = ReleaseTest|x86
 	EndGlobalSection
@@ -28,9 +30,13 @@ Global
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.DebugTest|x64.ActiveCfg = DebugTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.DebugTest|x64.Build.0 = DebugTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.DebugTest|x86.ActiveCfg = DebugTest|x64
-		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.ActiveCfg = Release|x64
-		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.Build.0 = Release|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.ActiveCfg = ReleaseTest|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.Build.0 = ReleaseTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x86.ActiveCfg = Release|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleasePerfTest|x64.ActiveCfg = ReleasePerfTest|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleasePerfTest|x64.Build.0 = ReleasePerfTest|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleasePerfTest|x86.ActiveCfg = ReleasePerfTest|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleasePerfTest|x86.Build.0 = ReleasePerfTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleaseTest|x64.ActiveCfg = ReleaseTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleaseTest|x64.Build.0 = ReleaseTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleaseTest|x86.ActiveCfg = ReleaseTest|x64
@@ -44,6 +50,9 @@ Global
 		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.Release|x64.ActiveCfg = Release|x64
 		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.Release|x86.ActiveCfg = Release|Win32
 		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.Release|x86.Build.0 = Release|Win32
+		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.ReleasePerfTest|x64.ActiveCfg = Release|x64
+		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.ReleasePerfTest|x86.ActiveCfg = Release|Win32
+		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.ReleasePerfTest|x86.Build.0 = Release|Win32
 		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.ReleaseTest|x64.ActiveCfg = Release|x64
 		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.ReleaseTest|x64.Build.0 = Release|x64
 		{84C30BAA-CBC2-4DBA-BDCF-0905F2C8F998}.ReleaseTest|x86.ActiveCfg = Release|Win32

@@ -6,7 +6,7 @@
 
 TEST(rJSONTests, ReturnMessageToJSON) 
 {
-	ot::ReturnMessage returnMessage("OK", "This was ok");
+	ot::ReturnMessage returnMessage(ot::ReturnStatus::Ok(), "This was ok");
 	auto doc =	ot::rJSON::fromJSON(returnMessage);
 	EXPECT_TRUE(ot::rJSON::memberExists(doc, "Status"));
 	EXPECT_TRUE(ot::rJSON::memberExists(doc, "What"));

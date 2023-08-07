@@ -131,6 +131,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenTwinCore\KeyMap.h">
+    <ClInclude Include="include\OpenTwinCore\PerformanceTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
