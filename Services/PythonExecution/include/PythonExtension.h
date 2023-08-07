@@ -124,10 +124,28 @@ namespace PythonExtensions
         PythonObjectBuilder pyObBuilder;
         return pyObBuilder.setBool(true);
     }
-    
+
+    static PyObject* OT_GetTableCell(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 3;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_SetPropertyValue expects one argument");
+        }
+        PythonObjectBuilder pyObBuilder;
+        std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        int32_t row = pyObBuilder.getInt32ValueFromTuple(args, 1, "Parameter 1");
+        int32_t column = pyObBuilder.getInt32ValueFromTuple(args, 2, "Parameter 2");
+
+        PyObject* returnValue = EntityBuffer::INSTANCE().GetTableCellValue(absoluteEntityName, row, column);
+        return returnValue;
+    }
+        
     static PyMethodDef OTMethods[] = {
 
         {"GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
+        {"GetTableCellValue",  OT_GetTableCell, METH_VARARGS, "Get the value of a cell from a requested entity."},
         {"SetPropertyValue",  OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
         {"Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
         {"FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
