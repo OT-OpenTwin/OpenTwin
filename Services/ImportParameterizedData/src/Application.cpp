@@ -23,6 +23,8 @@
 #include "TemplateDefaultManager.h"
 #include <string>
 #include "ClassFactory.h"
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 
 Application * g_instance{ nullptr };
 
@@ -65,8 +67,6 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 	//_parametrizedDataHandler->Init();
 }
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
@@ -400,6 +400,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 				ot::UIDList dataIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
 				ot::UIDList dataVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
 				_dataSourceHandler->AddNewFilesToModel(topoIDs, topoVers, dataIDs, dataVers, fileNames);
+				m_modelComponent->updatePropertyGrid();
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
@@ -422,11 +423,6 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			{
 				std::string tableName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
 				_parametrizedDataHandler->SetColourOfRanges(tableName);
-			}
-			else if (subsequentFunction == "createUpdatedSelections")
-			{
-
-				_parametrizedDataHandler->CreateUpdatedSelections(_doc);
 			}
 			else
 			{

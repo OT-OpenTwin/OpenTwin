@@ -113,7 +113,7 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 
 		for (ot::variable_t& var : result)
 		{
-			rJsonResult.PushBack(converterV2J(var), returnValues.GetAllocator());
+			rJsonResult.PushBack(converterV2J(var,returnValues), returnValues.GetAllocator());
 		}
 
 		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_OK, ot::rJSON::toJSON(returnValues));

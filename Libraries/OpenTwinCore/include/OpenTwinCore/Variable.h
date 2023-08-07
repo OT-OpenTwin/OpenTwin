@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "OpenTwinCore/rJSONHelper.h"
 #include "openTwinCore/CoreAPIExport.h"
+#include "OpenTwinCore/rJSON.h"
 
 namespace ot
 {
@@ -18,7 +19,7 @@ namespace ot
 	class VariableToJSONConverter
 	{
 	public:
-		__declspec(dllexport) rapidjson::Value operator() (variable_t& value);
+		__declspec(dllexport) rapidjson::Value operator() (variable_t& value, OT_rJSON_doc& emebeddingDocument);
 	};
 
 	class JSONToVariableConverter

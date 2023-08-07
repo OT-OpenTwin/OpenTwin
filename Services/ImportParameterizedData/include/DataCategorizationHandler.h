@@ -21,6 +21,7 @@
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"
 #include "OpenTwinCore/Variable.h"
+#include "OpenTwinFoundation/PythonServiceInterface.h"
 
 #include <optional>
 #include <map>
@@ -40,7 +41,6 @@ public:
 	void AddSelectionsAsQuantity(std::list<ot::UID> selectedEntities);
 	void StoreSelectionRanges(ot::UID tableEntityID, ot::UID tableEntityVersion, std::vector<ot::TableRange> ranges);
 	void CreateNewScriptDescribedMSMD();
-	void CreateUpdatedSelections(OT_rJSON_doc& document);
 	
 	std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
 
@@ -78,6 +78,8 @@ private:
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
 
+	ot::PythonServiceInterface* _pythonInterface = nullptr;
+
 	void ModelComponentWasSet() override;
 
 	void AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category);
@@ -101,8 +103,6 @@ private:
 	std::map<std::string, std::pair<ot::UID, ot::UID>> GetAllTables();
 	std::map<std::string, ot::UID> GetAllScripts();
 	
-	void SendPythonExecutionRequest(std::vector<std::string>& pythonScripts,const std::string& msmdName);
-	void UpdateVariables(OT_rJSON_doc& document);
+	std::tuple<std::list<std::string>, std::list<std::string>> CreateNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& allRelevantTableSelectionsByMSMD);
 	
-	std::vector<std::string> _allTableNames;
 };

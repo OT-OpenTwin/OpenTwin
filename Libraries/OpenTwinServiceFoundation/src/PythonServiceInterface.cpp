@@ -46,7 +46,7 @@ OT_rJSON_doc ot::PythonServiceInterface::AssembleMessage()
 			OT_rJSON_createValueArray(parameter);
 			for (auto& singleParameter : currentParameterSet.value())
 			{
-				parameter.PushBack(converter(singleParameter),doc.GetAllocator());
+				parameter.PushBack(converter(singleParameter,doc),doc.GetAllocator());
 			}
 			allparameter.PushBack(parameter, doc.GetAllocator());
 		}

@@ -1,7 +1,7 @@
 #include "openTwinCore/Variable.h"
 
 
-rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t & value)
+rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t & value, OT_rJSON_doc& emebeddingDocument)
 {
 	
 	if (std::holds_alternative<int32_t>(value))
@@ -37,8 +37,8 @@ rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t & value)
 	else if (std::holds_alternative<const char*>(value))
 	{
 		rapidjson::Value rJValue;
-		std::string temp = std::string(std::get<const char*>(value));
-
+		const char* temp = std::get<const char*>(value);
+		rJValue.SetString(temp, emebeddingDocument.GetAllocator());
 		return rJValue;
 	}
 	else
