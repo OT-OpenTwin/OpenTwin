@@ -16,14 +16,18 @@ void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile)
     std::map<std::string, std::string> materialNameToAliasMap;
     buildMaterialAliases(materialsToObjectsMap, materialNameToAliasMap);
 
+    // Now we build (alias) names for each potential definition
+    std::map<std::string, std::string> potentialNameToAliasMap;
+    buildPotentialAliases(potentialDefinitions, potentialNameToAliasMap);
+
     // Write the groups defining the regions
-    writeGroups(_controlFile, materialsToObjectsMap, materialNameToAliasMap);
+    writeGroups(_controlFile, materialsToObjectsMap, materialNameToAliasMap, potentialDefinitions, potentialNameToAliasMap);
 
     // Write the functions defining the materials
     writeFunctions(_controlFile, materialNameToAliasMap);
 
     // Write the constraints defining the boundary conditions and potentials
-    writeConstraints(_controlFile);
+    writeConstraints(_controlFile, potentialDefinitions, potentialNameToAliasMap);
 
     // Write the function space
     writeFunctionSpace(_controlFile);
@@ -99,7 +103,20 @@ void SolverElectrostatics::buildMaterialAliases(std::map<std::string, std::list<
     }
 }
 
-void SolverElectrostatics::writeGroups(std::ofstream& controlFile, std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap)
+void SolverElectrostatics::buildPotentialAliases(std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
+{
+    // Now we create an alias name "potential#n" for each potential definition
+    int count = 1;
+    for (auto material : potentialDefinitions)
+    {
+        potentialNameToAliasMap[material.first] = "potential" + std::to_string(count);
+        count++;
+    }
+}
+
+void SolverElectrostatics::writeGroups(std::ofstream& controlFile, 
+                                       std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap,
+                                       std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
 {
     controlFile << "Group{\n\n";
 
@@ -111,18 +128,25 @@ void SolverElectrostatics::writeGroups(std::ofstream& controlFile, std::map<std:
         if (!isPECMaterial(material.first))
         {
             std::string groupName = materialNameToAliasMap[material.first];
-            std::list<int> groupItemList = meshGroupIdList(material.second);
+            std::list<int> groupItemList = meshVolumeGroupIdList(material.second);
             std::string groupList = getGroupList(groupItemList);
 
             controlFile << "   " << groupName << " = Region[{" << groupList << "}]; \n";
             volumeGroupNames.push_back(groupName);
         }
     }
+    controlFile << "\n";
 
     // Write the regions for potential definitions (surface groups)
-    controlFile <<
-        "   Electrode1 = Region[{4}];\n"   //    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        "   Electrode2 = Region[{6}];\n\n"; //    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    for (auto potential : potentialDefinitions)
+    {
+        std::string potentialName = potentialNameToAliasMap[potential.first];
+        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{potential.first});
+        std::string groupList = getGroupList(groupItemList);
+
+        controlFile << "   " << potentialName << " = Region[{" << groupList << "}]; \n";
+    }
+    controlFile << "\n";
 
     // Write the background surface region
     controlFile <<
@@ -139,7 +163,7 @@ void SolverElectrostatics::writeGroups(std::ofstream& controlFile, std::map<std:
         "}\n\n";
 }
 
-std::list<int> SolverElectrostatics::meshGroupIdList(const std::list<std::string>& itemNames)
+std::list<int> SolverElectrostatics::meshVolumeGroupIdList(const std::list<std::string>& itemNames)
 {
     std::list<int> groupList;
 
@@ -149,6 +173,22 @@ std::list<int> SolverElectrostatics::meshGroupIdList(const std::list<std::string
         std::string plainItemName = "*" + item.substr(meshDataName.size() + 1);  // We add *, since this is a volume group
 
         int groupID = (int) groupNameToIdMap[plainItemName];
+        groupList.push_back(groupID);
+    }
+
+    return groupList;
+}
+
+std::list<int> SolverElectrostatics::meshSurfaceGroupIdList(const std::list<std::string>& itemNames)
+{
+    std::list<int> groupList;
+
+    for (auto item : itemNames)
+    {
+        // First we strip the name of the mesh
+        std::string plainItemName = "#" + item.substr(meshDataName.size() + 1);  // We add #, since this is a surface group
+
+        int groupID = (int)groupNameToIdMap[plainItemName];
         groupList.push_back(groupID);
     }
 
@@ -211,15 +251,23 @@ void SolverElectrostatics::writeFunctions(std::ofstream& controlFile, std::map<s
     controlFile << "}\n\n";
 }
 
-void SolverElectrostatics::writeConstraints(std::ofstream& controlFile)
+void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
 {
-    /////// TODO //////////////////////////////////////////
     controlFile <<
         "Constraint {\n"
         "  { Name Dirichlet_Ele; Type Assign;\n"
-        "    Case {\n"
-        "      { Region Electrode1; Value 100; }\n"
-        "      { Region Electrode2; Value - 100; }\n"
+        "    Case {\n";
+
+    for (auto potential : potentialDefinitions)
+    {
+        std::string potentialName = potentialNameToAliasMap[potential.first];
+        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{potential.first});
+        std::string groupList = getGroupList(groupItemList);
+
+        controlFile << "      { Region " << potentialName << "; Value " << potential.second << "; }\n";
+    }
+
+    controlFile <<
         "      { Region SurfInf; Value 0; }\n"
         "    }\n"
         "  }\n"
