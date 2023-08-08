@@ -51,9 +51,11 @@ void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile)
     writePostOperation(_controlFile);
 }
 
-void SolverElectrostatics::runSolver(const std::string& tempDirPath)
+std::string SolverElectrostatics::runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent)
 {
-    runSolverExe("model", "EleSta_v", "Map", tempDirPath);
+    runSolverExe("model", "EleSta_v", "Map", tempDirPath, uiComponent);
+
+    return solverOutput.str();
 }
 
 void SolverElectrostatics::convertResults(const std::string& tempDirPath)

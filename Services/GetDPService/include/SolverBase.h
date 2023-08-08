@@ -7,8 +7,16 @@
 #include <map>
 #include <list>
 #include <string>
+#include <sstream>
+#include <windows.h> 
 
 class EntityBase;
+
+namespace ot {
+	namespace components {
+		class UiComponent;
+	}
+}
 
 #include "EntityProperties.h"
 
@@ -22,15 +30,16 @@ public:
 				 std::map<std::string, EntityProperties>& _materialProperties);
 
 	virtual void writeInputFile(std::ofstream& controlFile) = 0;
-	virtual void runSolver(const std::string& tempDirPath) = 0;
+	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) = 0;
 	virtual void convertResults(const std::string& tempDirPath) = 0;
 
-	void runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory);
+	void runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent);
 
 protected:
-	bool runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory);
+	bool runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory, ot::components::UiComponent* uiComponent);
 	std::string readEnvironmentVariable(const std::string& variableName);
 	bool isPECMaterial(const std::string& materialName);
+	void ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent);
 
 	EntityBase* solverEntity;
 	std::string meshDataName;
@@ -38,4 +47,6 @@ protected:
 	std::map<ot::UID, EntityProperties> entityProperties;
 	std::map<std::string, size_t> groupNameToIdMap;
 	std::map<std::string, EntityProperties> materialProperties;
+
+	std::stringstream solverOutput;
 };

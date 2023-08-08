@@ -1,5 +1,7 @@
 #include "SolverBase.h"
 
+#include "OpenTwinFoundation/UiComponent.h"
+
 #include <windows.h> // winapi
 #include <UserEnv.h>
 #include <codecvt>
@@ -29,7 +31,7 @@ bool SolverBase::isPECMaterial(const std::string& materialName)
 	return false;
 }
 
-void SolverBase::runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory)
+void SolverBase::runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent)
 {
 	std::string exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT");
 	if (exePath.empty())
@@ -53,7 +55,7 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 
 	std::string commandLine = "\"" + exePath + "\\getdp.exe\"" + " model -solve " + solvTarget + " -post " + postTarget;
 
-	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory))
+	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory, uiComponent))
 	{
 		throw std::string("ERROR: Unable to run GETDP executable. Command line: " + commandLine);
 	}
@@ -61,7 +63,7 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 
 #pragma comment(lib, "userenv.lib")
 
-bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory)
+bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory, ot::components::UiComponent* uiComponent)
 {
 	HANDLE hToken = NULL;
 	BOOL ok = OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &hToken);
@@ -84,21 +86,53 @@ bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std:
 	STARTUPINFO info;
 	PROCESS_INFORMATION processInfo;
 
-	ZeroMemory(&info, sizeof(info));
-	info.cb = sizeof(info);
-	ZeroMemory(&processInfo, sizeof(processInfo));
+	HANDLE g_hChildStd_OUT_Rd = NULL;
+	HANDLE g_hChildStd_OUT_Wr = NULL;
+
+	SECURITY_ATTRIBUTES saAttr;
+
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
 
 	bool success = true;
 
-	if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, penv, wd, &info, &processInfo))
+	if (!CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0))
 	{
-		WaitForSingleObject(processInfo.hProcess, INFINITE);
-		CloseHandle(processInfo.hProcess);
-		CloseHandle(processInfo.hThread);
+		success = false;
 	}
 	else
 	{
-		success = false;
+		if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
+		{
+			CloseHandle(g_hChildStd_OUT_Wr);
+			success = false;
+		}
+		else
+		{
+			ZeroMemory(&info, sizeof(info));
+			info.cb = sizeof(info);
+			info.hStdError = g_hChildStd_OUT_Wr;
+			info.hStdOutput = g_hChildStd_OUT_Wr;
+			info.dwFlags |= STARTF_USESTDHANDLES;
+
+			ZeroMemory(&processInfo, sizeof(processInfo));
+
+			if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, penv, wd, &info, &processInfo))
+			{
+				CloseHandle(g_hChildStd_OUT_Wr);
+				ReadFromPipe(g_hChildStd_OUT_Rd, uiComponent);
+
+				WaitForSingleObject(processInfo.hProcess, INFINITE);
+				CloseHandle(processInfo.hProcess);
+				CloseHandle(processInfo.hThread);
+			}
+			else
+			{
+				CloseHandle(g_hChildStd_OUT_Wr);
+				success = false;
+			}
+		}
 	}
 
 	delete[] cl;
@@ -107,6 +141,36 @@ bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std:
 	DestroyEnvironmentBlock(penv);
 
 	return success;
+}
+
+void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent)
+
+// Read output from the child process's pipe for STDOUT
+// and write to the parent process's pipe for STDOUT. 
+// Stop when there is no more data. 
+{
+	#define BUFSIZE 4096 
+
+	DWORD dwRead, dwWritten;
+	CHAR chBuf[BUFSIZE];
+	BOOL bSuccess = FALSE;
+	HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	for (;;)
+	{
+		bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
+		if (!bSuccess || dwRead == 0) break;
+
+		std::string text(chBuf, dwRead);
+
+		solverOutput << text;
+		uiComponent->displayMessage(text);
+
+		bSuccess = WriteFile(hParentStdOut, chBuf,
+			dwRead, &dwWritten, NULL);
+
+		if (!bSuccess) break;
+	}
 }
 
 std::string SolverBase::readEnvironmentVariable(const std::string& variableName)

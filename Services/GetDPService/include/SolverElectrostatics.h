@@ -8,7 +8,7 @@ public:
 	virtual ~SolverElectrostatics() {}
 
 	virtual void writeInputFile(std::ofstream& controlFile) override;
-	virtual void runSolver(const std::string& tempDirPath) override;
+	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) override;
 	virtual void convertResults(const std::string& tempDirPath) override;
 
 private:

@@ -15,6 +15,7 @@
 #include "Types.h"
 
 #include "OpenTwinFoundation/ModelComponent.h"
+#include "OpenTwinFoundation/UiComponent.h"
 
 #include <windows.h> // winapi
 
@@ -84,6 +85,8 @@ std::string GetDPLauncher::startSolver(const std::string &dataBaseURL, const std
 	std::map<std::string, size_t> groupNameToIdMap;
 	readGroupsFromMesh(meshFileName, groupNameToIdMap);
 
+	application->uiComponent()->setProgressInformation("Solver running: " + problemType, true);
+
 	try
 	{
 		// Build the solver input file in the temp folder
@@ -95,7 +98,7 @@ std::string GetDPLauncher::startSolver(const std::string &dataBaseURL, const std
 		controlFile.close();
 
 		// Run the solver
-		solver->runSolver(tempDirPath);
+		outputText = solver->runSolver(tempDirPath, application->uiComponent());
 
 		// Convert the results
 		solver->convertResults(tempDirPath);
@@ -104,6 +107,8 @@ std::string GetDPLauncher::startSolver(const std::string &dataBaseURL, const std
 	{
 		outputText = "ERROR: " + error;
 	}
+
+	application->uiComponent()->closeProgressInformation();
 
 	// Delete the solver object
 	delete solver;
