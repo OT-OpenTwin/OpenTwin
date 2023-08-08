@@ -250,7 +250,7 @@
     <ClInclude Include="include\EntityFile.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityParameterizedDataSourceCSV.h">
+    <ClInclude Include="include\EntityFileCSV.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityResultTableData.hpp">
@@ -299,6 +299,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityMeasurementMetadata.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityFileText.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
@@ -480,7 +483,7 @@
     <ClCompile Include="src\EntityFile.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityParameterizedDataSourceCSV.cpp">
+    <ClCompile Include="src\EntityFileCSV.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityParameterizedDataTable.cpp">
@@ -515,6 +518,9 @@
     </ClCompile>
     <ClCompile Include="src\GenericBsonDocument.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityFileText.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

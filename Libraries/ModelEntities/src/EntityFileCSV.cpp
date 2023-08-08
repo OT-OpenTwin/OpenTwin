@@ -1,31 +1,32 @@
-#include "EntityParameterizedDataSourceCSV.h"
+#include "EntityFileCSV.h"
 
 #include <OpenTwinCommunication/ActionTypes.h>
 
-EntityParameterizedDataSourceCSV::EntityParameterizedDataSourceCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
-: EntityFile(ID,parent,obs,ms,factory,owner){}
+EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+: EntityFileText(ID,parent,obs,ms,factory,owner){}
 
-std::string EntityParameterizedDataSourceCSV::getRowDelimiter()
+std::string EntityFileCSV::getRowDelimiter()
 {
 	auto rowDelim = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Row Delimiter"));
 	_rowDelimiter = rowDelim->getValue();
 	return _rowDelimiter;
 }
 
-std::string EntityParameterizedDataSourceCSV::getColumnDelimiter()
+std::string EntityFileCSV::getColumnDelimiter()
 {
 	auto delim = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Column Delimiter"));
 	_columnDelimiter = delim->getValue();
 	return _columnDelimiter;
 }
 
-void EntityParameterizedDataSourceCSV::setSpecializedProperties()
+void EntityFileCSV::setSpecializedProperties()
 {
+	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", _rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", _columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 }
 
-void EntityParameterizedDataSourceCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
 	EntityFile::AddStorageData(storage);
 	storage.append(
@@ -34,7 +35,7 @@ void EntityParameterizedDataSourceCSV::AddStorageData(bsoncxx::builder::basic::d
 	);
 }
 
-void EntityParameterizedDataSourceCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
 	_rowDelimiter = doc_view["RowDelimiter"].get_utf8().value.to_string();

@@ -7,7 +7,7 @@
  *********************************************************************/
 #include <sstream>
 #include "TableExtractor.h"
-#include "EntityParameterizedDataSourceCSV.h"
+#include "EntityFileCSV.h"
 
 class TableExtractorCSV : public TableExtractor
 {

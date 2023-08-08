@@ -1,7 +1,7 @@
 #include "FileHandler.h"
 #include <fstream>
 #include <exception>
-#include "EntityParameterizedDataSourceCSV.h"
+#include "EntityFileCSV.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)
@@ -104,7 +104,7 @@ std::shared_ptr<EntityFile> FileHandler::CreateNewSourceEntity(const std::string
 	EntityFile* newSource = nullptr;
 	if (dataType == "txt" || dataType == "csv" || dataType == "CSV")
 	{
-		newSource = new EntityParameterizedDataSourceCSV(entityID, nullptr, nullptr, nullptr, nullptr, owner);
+		newSource = new EntityFileCSV(entityID, nullptr, nullptr, nullptr, nullptr, owner);
 	}
 	else
 	{

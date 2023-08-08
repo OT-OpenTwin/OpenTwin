@@ -25,6 +25,7 @@
     <ClInclude Include="include\EntityMeasurementMetadata.h" />
     <ClInclude Include="include\EntityResearchMetadata.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
+    <ClInclude Include="include\EntityFileText.h" />
     <ClInclude Include="include\GenericBsonDocument.h" />
     <ClInclude Include="include\ClassFactory.h" />
     <ClInclude Include="include\DataBase.h" />
@@ -60,7 +61,7 @@
     <ClInclude Include="include\EntityWithDynamicFields.h" />
     <ClInclude Include="include\EntityParameterizedDataPreviewTable.h" />
     <ClInclude Include="include\EntityFile.h" />
-    <ClInclude Include="include\EntityParameterizedDataSourceCSV.h" />
+    <ClInclude Include="include\EntityFileCSV.h" />
     <ClInclude Include="include\EntityParameterizedDataTable.h" />
     <ClInclude Include="include\EntityPlot1D.h" />
     <ClInclude Include="include\EntityProperties.h" />
@@ -118,6 +119,7 @@
     <ClCompile Include="src\EntityContainer.cpp" />
     <ClCompile Include="src\EntityCompressedVector.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
+    <ClCompile Include="src\EntityFileText.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />
     <ClCompile Include="src\EntityMeasurementMetadata.cpp" />
     <ClCompile Include="src\EntityMeshCartesian.cpp" />
@@ -142,7 +144,7 @@
     <ClCompile Include="src\EntityWithDynamicFields.cpp" />
     <ClCompile Include="src\EntityParameterizedDataPreviewTable.cpp" />
     <ClCompile Include="src\EntityFile.cpp" />
-    <ClCompile Include="src\EntityParameterizedDataSourceCSV.cpp" />
+    <ClCompile Include="src\EntityFileCSV.cpp" />
     <ClCompile Include="src\EntityParameterizedDataTable.cpp" />
     <ClCompile Include="src\EntityPlot1D.cpp" />
     <ClCompile Include="src\EntityProperties.cpp" />

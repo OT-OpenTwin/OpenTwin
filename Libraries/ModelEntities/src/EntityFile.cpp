@@ -9,11 +9,6 @@ EntityFile::EntityFile(ot::UID ID, EntityBase * parent, EntityObserver * obs, Mo
 {
 }
 
-EntityFile::~EntityFile()
-{
-	clearData();
-}
-
 bool EntityFile::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
 {
 	return false;
@@ -51,9 +46,7 @@ void EntityFile::addVisualizationNodes(void)
 
 		getObserver()->sendMessageToViewer(doc);
 	}
-
 	EntityBase::addVisualizationNodes();
-
 }
 
 void EntityFile::setFileProperties(std::string path, std::string fileName, std::string fileType)
@@ -64,12 +57,20 @@ void EntityFile::setFileProperties(std::string path, std::string fileName, std::
 	setProperties();
 }
 
-void EntityFile::clearData()
+std::shared_ptr<EntityBinaryData> EntityFile::getData()
+{
+	EnsureDataIsLoaded();
+	return _data;
+}
+
+void EntityFile::EnsureDataIsLoaded()
 {
 	if (_data == nullptr)
 	{
-		delete _data;
-		_data = nullptr;
+		std::map<ot::UID, EntityBase*> entitymap;
+		auto entityBase = readEntityFromEntityIDAndVersion(this, _dataUID, _dataVersion, entitymap);
+		assert(entityBase != nullptr);
+		_data.reset(dynamic_cast<EntityBinaryData*>(entityBase));
 	}
 }
 
@@ -88,6 +89,12 @@ void EntityFile::setProperties()
 	setSpecializedProperties();
 }
 
+void EntityFile::setData(ot::UID dataID, ot::UID dataVersion)
+{
+	_dataUID = dataID;
+	_dataVersion = dataVersion;
+}
+
 void EntityFile::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
 	// We store the parent class information first 
@@ -102,7 +109,6 @@ void EntityFile::AddStorageData(bsoncxx::builder::basic::document & storage)
 	);
 }
 
-
 void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -111,18 +117,4 @@ void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view
 	_fileType = doc_view["FileType"].get_utf8().value.to_string();
 	_dataUID = doc_view["DataUID"].get_int64();
 	_dataVersion = doc_view["DataVersionID"].get_int64();
-}
-
-//Owner ist aktuell VisualizationService
-void EntityFile::setData(ot::UID dataID, ot::UID dataVersion)
-{
-	_dataUID = dataID;
-	_dataVersion = dataVersion;
-}
-
-void EntityFile::loadData()
-{
-	clearData();
-	std::map<ot::UID, EntityBase*> entitymap;
-	_data = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _dataUID, _dataVersion, entitymap));
 }

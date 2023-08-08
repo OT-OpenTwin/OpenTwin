@@ -1,6 +1,6 @@
 #include "TableExtractorCSV.h"
 #include "FileToTableExtractorRegistrar.h"
-#include "EntityParameterizedDataSourceCSV.h"
+#include "EntityFileCSV.h"
 
 #include <algorithm>
 #include <exception>
@@ -22,15 +22,15 @@ void TableExtractorCSV::SetColumnDelimiter(const char delimiter)
 
 void TableExtractorCSV::ExtractFromEntitySource(EntityFile* source)
 {
-	auto csvSource = dynamic_cast<EntityParameterizedDataSourceCSV*>(source);
+	auto csvSource = dynamic_cast<EntityFileCSV*>(source);
 	if (csvSource == nullptr)
 	{
-		//This class deals specifically with EntityParameterizedDataSourceCSV.
+		//This class deals specifically with EntityFileCSV.
 		assert(0);
 	}
 	_rowDelimiter =	csvSource->getRowDelimiter()[0];
 	_columnDelimiter = csvSource->getColumnDelimiter()[0];
-	source->loadData();
+
 	const std::vector<char>& fileContent =	source->getData()->getData();
 	//In wstring
 	_fileContentStream.str(std::string(fileContent.begin(), fileContent.end()));

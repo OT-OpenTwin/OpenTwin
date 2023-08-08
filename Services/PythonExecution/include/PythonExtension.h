@@ -59,7 +59,6 @@ namespace PythonExtensions
             PythonLoadedModules::INSTANCE()->AddModuleForEntity(script);
             moduleName = PythonLoadedModules::INSTANCE()->getModuleName(absoluteScriptName);
 
-            script->loadData();
             auto plainData = script->getData()->getData();
             std::string execution(plainData.begin(), plainData.end());
             CPythonObjectBorrowed  newModule(PyImport_AddModule(moduleName.value().c_str()));

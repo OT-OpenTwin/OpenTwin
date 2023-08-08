@@ -1,15 +1,15 @@
 #pragma once
-#include "EntityFile.h"
+#include "EntityFileText.h"
 
-class __declspec(dllexport) EntityParameterizedDataSourceCSV : public EntityFile
+class __declspec(dllexport) EntityFileCSV : public EntityFileText
 {
 public:
-	EntityParameterizedDataSourceCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
 	void setRowDelimiter(std::string delim) { _rowDelimiter = delim; };
 	void setColumnDelimiter(std::string delim) { _columnDelimiter = delim; };
 	std::string getRowDelimiter() ;
 	std::string getColumnDelimiter();
-	virtual std::string getClassName(void) override { return "EntityParameterizedDataSourceCSV"; };
+	virtual std::string getClassName(void) override { return "EntityFileCSV"; };
 
 private:
 	void setSpecializedProperties() override;
