@@ -5,9 +5,10 @@
 
 TEST(VariableTest, VariableToJSON)
 {
+	OT_rJSON_createDOC(doc);
 	ot::variable_t var = 5;
 	ot::VariableToJSONConverter converter;
-	rapidjson::Value result = converter(std::move(var));
+	rapidjson::Value result = converter(var,doc);
 	EXPECT_TRUE(result.IsInt());
 	EXPECT_EQ(result.GetInt(), std::get<int>(var));
 }

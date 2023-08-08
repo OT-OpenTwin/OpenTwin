@@ -36,9 +36,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixtureTextEncoding.cpp" />
     <ClCompile Include="src\TestPerformanceTest.cpp" />
     <ClCompile Include="src\TestrJSON.cpp" />
+    <ClCompile Include="src\TestTextEncoding.cpp" />
     <ClCompile Include="TestVariable.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="TestEncodingTypeFiles\ANSI.txt" />
+    <Text Include="TestEncodingTypeFiles\UTF16_BE_BOM.txt" />
+    <Text Include="TestEncodingTypeFiles\UTF16_LE_BOM.txt" />
+    <Text Include="TestEncodingTypeFiles\UTF8.txt" />
+    <Text Include="TestEncodingTypeFiles\UTF8_BOM.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixtureTextEncoding.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -62,7 +74,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>OPENTWINCORE_EXPORTS;X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PROJECT_DIR=R"($(ProjectDir))";OPENTWINCORE_EXPORTS;X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>
       </MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

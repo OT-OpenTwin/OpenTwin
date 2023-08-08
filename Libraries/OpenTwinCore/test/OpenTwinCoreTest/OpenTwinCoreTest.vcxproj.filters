@@ -10,6 +10,9 @@
     <Filter Include="include">
       <UniqueIdentifier>{620e486c-8c36-47f2-9f48-b14bf8efee25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Files">
+      <UniqueIdentifier>{9db49253-b02d-4e79-be45-448ea12fa768}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\TestrJSON.cpp">
@@ -21,5 +24,33 @@
     <ClCompile Include="src\TestPerformanceTest.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\FixtureTextEncoding.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestTextEncoding.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="TestEncodingTypeFiles\ANSI.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="TestEncodingTypeFiles\UTF8.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="TestEncodingTypeFiles\UTF8_BOM.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="TestEncodingTypeFiles\UTF16_BE_BOM.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="TestEncodingTypeFiles\UTF16_LE_BOM.txt">
+      <Filter>Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FixtureTextEncoding.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
