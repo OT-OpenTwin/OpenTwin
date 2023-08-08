@@ -67,7 +67,6 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 	//_parametrizedDataHandler->Init();
 }
-
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc));

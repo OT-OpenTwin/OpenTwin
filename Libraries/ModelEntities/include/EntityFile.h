@@ -3,11 +3,11 @@
 #include "EntityBase.h"
 #include "EntityBinaryData.h"
 
-class __declspec(dllexport) EntityParameterizedDataSource : public EntityBase
+class __declspec(dllexport) EntityFile: public EntityBase
 {
 	public:
-	EntityParameterizedDataSource(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
-	~EntityParameterizedDataSource();
+		EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	~EntityFile();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };

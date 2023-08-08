@@ -99,18 +99,18 @@ void FileHandler::SetNewFileImportRequest(const std::string&& senderURL, const s
 	_entityPath				= entityPath;
 }
 
-std::shared_ptr<EntityParameterizedDataSource> FileHandler::CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner)
+std::shared_ptr<EntityFile> FileHandler::CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner)
 {
-	EntityParameterizedDataSource* newSource = nullptr;
+	EntityFile* newSource = nullptr;
 	if (dataType == "txt" || dataType == "csv" || dataType == "CSV")
 	{
 		newSource = new EntityParameterizedDataSourceCSV(entityID, nullptr, nullptr, nullptr, nullptr, owner);
 	}
 	else
 	{
-		newSource = new EntityParameterizedDataSource(entityID, nullptr, nullptr, nullptr, nullptr, owner);
+		newSource = new EntityFile(entityID, nullptr, nullptr, nullptr, nullptr, owner);
 	}
-	return std::shared_ptr<EntityParameterizedDataSource>(newSource);
+	return std::shared_ptr<EntityFile>(newSource);
 }
 
 rapidjson::Document FileHandler::CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers)

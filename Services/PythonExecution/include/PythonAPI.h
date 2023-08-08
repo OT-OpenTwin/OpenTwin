@@ -3,7 +3,7 @@
 #include <list>
 #include "PythonAPI.h"
 #include "PythonWrapper.h"
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 #include "PythonObjectBuilder.h"
 
 class PythonAPI

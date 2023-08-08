@@ -3,7 +3,7 @@
 #include <OpenTwinCommunication/ActionTypes.h>
 
 EntityParameterizedDataSourceCSV::EntityParameterizedDataSourceCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
-: EntityParameterizedDataSource(ID,parent,obs,ms,factory,owner){}
+: EntityFile(ID,parent,obs,ms,factory,owner){}
 
 std::string EntityParameterizedDataSourceCSV::getRowDelimiter()
 {
@@ -27,7 +27,7 @@ void EntityParameterizedDataSourceCSV::setSpecializedProperties()
 
 void EntityParameterizedDataSourceCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
-	EntityParameterizedDataSource::AddStorageData(storage);
+	EntityFile::AddStorageData(storage);
 	storage.append(
 		bsoncxx::builder::basic::kvp("RowDelimiter",_rowDelimiter),
 		bsoncxx::builder::basic::kvp("ColumnDelimiter",_columnDelimiter)
@@ -36,7 +36,7 @@ void EntityParameterizedDataSourceCSV::AddStorageData(bsoncxx::builder::basic::d
 
 void EntityParameterizedDataSourceCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
-	EntityParameterizedDataSource::readSpecificDataFromDataBase(doc_view, entityMap);
+	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
 	_rowDelimiter = doc_view["RowDelimiter"].get_utf8().value.to_string();
 	_columnDelimiter = doc_view["ColumnDelimiter"].get_utf8().value.to_string();
 }

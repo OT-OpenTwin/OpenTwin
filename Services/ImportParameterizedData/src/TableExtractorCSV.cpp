@@ -20,7 +20,7 @@ void TableExtractorCSV::SetColumnDelimiter(const char delimiter)
 }
 
 
-void TableExtractorCSV::ExtractFromEntitySource(EntityParameterizedDataSource * source)
+void TableExtractorCSV::ExtractFromEntitySource(EntityFile* source)
 {
 	auto csvSource = dynamic_cast<EntityParameterizedDataSourceCSV*>(source);
 	if (csvSource == nullptr)

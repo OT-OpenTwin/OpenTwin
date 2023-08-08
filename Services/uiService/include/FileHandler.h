@@ -11,7 +11,7 @@
 #include <list>
 #include <memory>
 #include "OpenTwinCore/CoreTypes.h"
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 #include "OpenTwinCore/rJSON.h"
 
 class FileHandler
@@ -55,7 +55,7 @@ private:
 	/// <param name="fileDestinationPath"></param>
 	/// <returns> Unique name for topology entity. </returns>
 	std::string CreateNewUniqueTopologyName(const std::string& fileName);
-	std::shared_ptr<EntityParameterizedDataSource> CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner);
+	std::shared_ptr<EntityFile> CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner);
 
 	rapidjson::Document	CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers);
 };

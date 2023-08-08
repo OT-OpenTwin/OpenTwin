@@ -12,10 +12,10 @@ TableHandler::TableHandler(const std::string tableFolder) : _tableFolder(tableFo
 void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 {	
 	ClassFactory classFactory;
-	auto sourceFile = dynamic_cast<EntityParameterizedDataSource*>(_modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersionID, classFactory));
+	auto sourceFile = dynamic_cast<EntityFile*>(_modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersionID, classFactory));
 	if (sourceFile == nullptr)
 	{
-		assert(0); // Only EntityParameterizedDataSource should reach here.
+		assert(0); // Only EntityFile should reach here.
 	}
 	auto topoEnt = new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	std::list<std::string> takenNames;

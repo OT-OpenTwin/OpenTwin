@@ -44,7 +44,7 @@
 #include "EntitySignalType.h"
 #include "EntityParameter.h"
 #include "EntityUnits.h"
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 #include "EntityParameterizedDataSourceCSV.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityParameterizedDataCategorization.h"
@@ -257,9 +257,9 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	{
 		return new EntityUnits(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityParameterizedDataSource")
+	else if (entityType == "EntityFile")
 	{
-		return new EntityParameterizedDataSource(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityFile(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else if (entityType == "EntityParameterizedDataSourceCSV")
 	{

@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 #include "BusinessLogicHandler.h"
 
 class DataSourceHandler : public BusinessLogicHandler

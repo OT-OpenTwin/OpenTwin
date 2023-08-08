@@ -59,7 +59,7 @@
     <ClInclude Include="include\EntityParameterizedDataCategorization.h" />
     <ClInclude Include="include\EntityWithDynamicFields.h" />
     <ClInclude Include="include\EntityParameterizedDataPreviewTable.h" />
-    <ClInclude Include="include\EntityParameterizedDataSource.h" />
+    <ClInclude Include="include\EntityFile.h" />
     <ClInclude Include="include\EntityParameterizedDataSourceCSV.h" />
     <ClInclude Include="include\EntityParameterizedDataTable.h" />
     <ClInclude Include="include\EntityPlot1D.h" />
@@ -141,7 +141,7 @@
     <ClCompile Include="src\EntityResearchMetadata.cpp" />
     <ClCompile Include="src\EntityWithDynamicFields.cpp" />
     <ClCompile Include="src\EntityParameterizedDataPreviewTable.cpp" />
-    <ClCompile Include="src\EntityParameterizedDataSource.cpp" />
+    <ClCompile Include="src\EntityFile.cpp" />
     <ClCompile Include="src\EntityParameterizedDataSourceCSV.cpp" />
     <ClCompile Include="src\EntityParameterizedDataTable.cpp" />
     <ClCompile Include="src\EntityPlot1D.cpp" />

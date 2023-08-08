@@ -552,7 +552,7 @@ std::map<std::string, std::string> DataCategorizationHandler::LoadAllPythonScrip
 	for (const ot::EntityInformation& entityInfo : entityInfos)
 	{
 		auto entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-		auto script = dynamic_cast<EntityParameterizedDataSource*>(entityBase);
+		auto script = dynamic_cast<EntityFile*>(entityBase);
 		script->loadData();
 		const std::vector<char> scriptContentRaw = script->getData()->getData();
 		pythonScripts[entityInfo.getName()] = std::string(scriptContentRaw.begin(), scriptContentRaw.end());

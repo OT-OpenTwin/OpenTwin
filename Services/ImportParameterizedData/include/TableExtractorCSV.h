@@ -15,7 +15,7 @@ public:
 	~TableExtractorCSV();
 	TableExtractorCSV() {};
 
-	void ExtractFromEntitySource(EntityParameterizedDataSource * source) override;
+	void ExtractFromEntitySource(EntityFile * source) override;
 	/**
 	 * Directly sets the content of a file to fileContentStream. Only for testing purposes.
 	 * 

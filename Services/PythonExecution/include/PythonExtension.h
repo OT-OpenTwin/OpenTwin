@@ -9,7 +9,7 @@
 #include <Python.h>
 #include "PythonObjectBuilder.h"
 #include "EntityBuffer.h"
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 #include "PythonModuleAPI.h"
 #include "PythonLoadedModules.h"
 
@@ -50,7 +50,7 @@ namespace PythonExtensions
         if (!moduleName.has_value())
         {
             auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
-            EntityParameterizedDataSource* script = dynamic_cast<EntityParameterizedDataSource*>(baseEntity.get());
+            EntityFile* script = dynamic_cast<EntityFile*>(baseEntity.get());
             if (script == nullptr)
             {
                 throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");

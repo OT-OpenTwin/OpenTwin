@@ -1,25 +1,25 @@
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <OpenTwinCommunication/ActionTypes.h>
 
-EntityParameterizedDataSource::EntityParameterizedDataSource(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner) :
+EntityFile::EntityFile(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner) :
 	EntityBase(ID,parent,obs,ms,factory,owner)
 {
 }
 
-EntityParameterizedDataSource::~EntityParameterizedDataSource()
+EntityFile::~EntityFile()
 {
 	clearData();
 }
 
-bool EntityParameterizedDataSource::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
+bool EntityFile::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
 {
 	return false;
 }
 
-bool EntityParameterizedDataSource::updateFromProperties(void)
+bool EntityFile::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());
@@ -32,7 +32,7 @@ bool EntityParameterizedDataSource::updateFromProperties(void)
 	return false;
 }
 
-void EntityParameterizedDataSource::addVisualizationNodes(void)
+void EntityFile::addVisualizationNodes(void)
 {
 	if (!getName().empty())
 	{
@@ -56,7 +56,7 @@ void EntityParameterizedDataSource::addVisualizationNodes(void)
 
 }
 
-void EntityParameterizedDataSource::setFileProperties(std::string path, std::string fileName, std::string fileType)
+void EntityFile::setFileProperties(std::string path, std::string fileName, std::string fileType)
 {
 	_path = path;
 	_fileName = fileName;
@@ -64,7 +64,7 @@ void EntityParameterizedDataSource::setFileProperties(std::string path, std::str
 	setProperties();
 }
 
-void EntityParameterizedDataSource::clearData()
+void EntityFile::clearData()
 {
 	if (_data == nullptr)
 	{
@@ -73,7 +73,7 @@ void EntityParameterizedDataSource::clearData()
 	}
 }
 
-void EntityParameterizedDataSource::setProperties()
+void EntityFile::setProperties()
 {
 	auto filePathProperty = new EntityPropertiesString("Path", _path);
 	filePathProperty->setReadOnly(true);
@@ -88,7 +88,7 @@ void EntityParameterizedDataSource::setProperties()
 	setSpecializedProperties();
 }
 
-void EntityParameterizedDataSource::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityFile::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
 	// We store the parent class information first 
 	EntityBase::AddStorageData(storage);
@@ -103,7 +103,7 @@ void EntityParameterizedDataSource::AddStorageData(bsoncxx::builder::basic::docu
 }
 
 
-void EntityParameterizedDataSource::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	_fileName = doc_view["FileName"].get_utf8().value.to_string();
@@ -114,13 +114,13 @@ void EntityParameterizedDataSource::readSpecificDataFromDataBase(bsoncxx::docume
 }
 
 //Owner ist aktuell VisualizationService
-void EntityParameterizedDataSource::setData(ot::UID dataID, ot::UID dataVersion)
+void EntityFile::setData(ot::UID dataID, ot::UID dataVersion)
 {
 	_dataUID = dataID;
 	_dataVersion = dataVersion;
 }
 
-void EntityParameterizedDataSource::loadData()
+void EntityFile::loadData()
 {
 	clearData();
 	std::map<ot::UID, EntityBase*> entitymap;

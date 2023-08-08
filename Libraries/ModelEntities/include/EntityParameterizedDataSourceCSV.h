@@ -1,7 +1,7 @@
 #pragma once
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 
-class __declspec(dllexport) EntityParameterizedDataSourceCSV : public EntityParameterizedDataSource
+class __declspec(dllexport) EntityParameterizedDataSourceCSV : public EntityFile
 {
 public:
 	EntityParameterizedDataSourceCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);

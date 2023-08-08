@@ -247,7 +247,7 @@
     <ClInclude Include="include\PropertiesComponentSelection.h">
       <Filter>Header Files\PropertyBundleDescription</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityParameterizedDataSource.h">
+    <ClInclude Include="include\EntityFile.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityParameterizedDataSourceCSV.h">
@@ -477,7 +477,7 @@
     <ClCompile Include="src\PropertyBundleDataHandleVis2D3D.cpp">
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityParameterizedDataSource.cpp">
+    <ClCompile Include="src\EntityFile.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityParameterizedDataSourceCSV.cpp">

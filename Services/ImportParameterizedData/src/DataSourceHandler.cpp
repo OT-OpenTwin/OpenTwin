@@ -27,3 +27,4 @@ void DataSourceHandler::AddNewFilesToModel(ot::UIDList& topologyIDs, ot::UIDList
 	}
 	_uiComponent->displayMessage(displayMessage);
 }
+

@@ -9,7 +9,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "EntityParameterizedDataSource.h"
+#include "EntityFile.h"
 
 class TableExtractor
 {
@@ -17,7 +17,7 @@ public:
 	TableExtractor() {};
 	virtual ~TableExtractor() {};
 	
-	virtual void ExtractFromEntitySource(EntityParameterizedDataSource * source) = 0;
+	virtual void ExtractFromEntitySource(EntityFile* source) = 0;
 
 	virtual void GetNextLine(std::vector<std::string> & line)=0;
 	virtual void GetNextLine(std::string & entireLine)=0;
