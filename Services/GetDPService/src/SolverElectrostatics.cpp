@@ -29,14 +29,14 @@ void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile)
     // Write the constraints defining the boundary conditions and potentials
     writeConstraints(_controlFile, potentialDefinitions, potentialNameToAliasMap);
 
-    // Write the function space
-    writeFunctionSpace(_controlFile);
-
     // Write the Jacobian
     writeJacobian(_controlFile);
 
     // Write the integration rules
     writeIntegration(_controlFile);
+
+    // Write the function space
+    writeFunctionSpace(_controlFile);
 
     // Write the formulation
     writeFormulation(_controlFile);
@@ -60,6 +60,11 @@ std::string SolverElectrostatics::runSolver(const std::string& tempDirPath, ot::
 
 void SolverElectrostatics::convertResults(const std::string& tempDirPath)
 {
+    // We first need to convert the potential result file to a vtk file
+    convertPotential(tempDirPath);
+
+    // Now we convert the electric field results to a vtk file
+    convertEfield(tempDirPath);
 }
 
 void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap)
@@ -152,16 +157,11 @@ void SolverElectrostatics::writeGroups(std::ofstream& controlFile,
 
     // Write the background surface region
     controlFile <<
-        "   SurfInf = Region[{" << groupNameToIdMap["#Background"] << "}]; \n\n";
+        "   SurfInf = Region[{" << groupNameToIdMap["$BOUNDARY"] << "}]; \n\n";
 
     // Write a list of all non-pec volumes = computation domain
-    controlFile << 
-        "   Vol_Ele = Region[{" << getGroupList(volumeGroupNames) << "}]; \n";
-
-    // Define some further groups which are later on used for solving
     controlFile <<
-        "   Sur_Neu_Ele = Region[{}];\n\n"
-        "   Dom_Hgrad_v_Ele = Region[{Vol_Ele, Sur_Neu_Ele}];\n"
+        "   DomainCC_Ele = Region[{" << getGroupList(volumeGroupNames) << "}]; \n"
         "}\n\n";
 }
 
@@ -233,9 +233,7 @@ std::string SolverElectrostatics::getGroupList(const std::list<std::string>& lis
 
 void SolverElectrostatics::writeFunctions(std::ofstream& controlFile, std::map<std::string, std::string>& materialNameToAliasMap)
 {
-    controlFile <<
-        "Function {\n"
-        "   eps0 = 8.854187818e-12;\n";
+    controlFile << "Function {\n";
 
     for (auto material : materialNameToAliasMap)
     {
@@ -245,7 +243,7 @@ void SolverElectrostatics::writeFunctions(std::ofstream& controlFile, std::map<s
 
             if (permittivity != nullptr)
             {
-                controlFile << "   epsilon[" << material.second << "] = " << permittivity->getValue() << " * eps0;\n";
+                controlFile << "   epsr[" << material.second << "] = " << permittivity->getValue() << "; \n";
             }
         }
     }
@@ -257,7 +255,7 @@ void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map
 {
     controlFile <<
         "Constraint {\n"
-        "  { Name Dirichlet_Ele; Type Assign;\n"
+        "  { Name ElectricScalarPotential; Type Assign;\n"
         "    Case {\n";
 
     for (auto potential : potentialDefinitions)
@@ -270,7 +268,7 @@ void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map
     }
 
     controlFile <<
-        "      { Region SurfInf; Value 0; }\n"
+        "      { Region SurfInf; Value 0.; }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
@@ -279,14 +277,22 @@ void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map
 void SolverElectrostatics::writeFunctionSpace(std::ofstream& controlFile)
 {
     controlFile <<
+        "eps0 = 8.854187818e-12;\n\n"
+        "Group{\n"
+        "  DefineGroup[Domain_Ele, DomainCC_Ele, DomainC_Ele];\n"
+        "}\n\n"
+        "Function{\n"
+        "  DefineFunction[epsr];\n"
+        "}\n\n"
         "FunctionSpace{\n"
         "  { Name Hgrad_v_Ele; Type Form0;\n"
         "    BasisFunction {\n"
         "      { Name sn; NameOfCoef vn; Function BF_Node;\n"
-        "        Support Dom_Hgrad_v_Ele; Entity NodesOf[All]; }\n"
+        "        Support DomainCC_Ele; Entity NodesOf[All]; }\n"
         "    }\n"
         "    Constraint {\n"
-        "      { NameOfCoef vn; EntityType NodesOf; NameOfConstraint Dirichlet_Ele; }\n"
+        "      { NameOfCoef vn; EntityType NodesOf;\n"
+        "        NameOfConstraint ElectricScalarPotential; }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
@@ -295,15 +301,15 @@ void SolverElectrostatics::writeFunctionSpace(std::ofstream& controlFile)
 void SolverElectrostatics::writeJacobian(std::ofstream& controlFile)
 {
     controlFile <<
-        "Jacobian {\n"
-        "  { Name Vol;\n"
-        "    Case {\n"
-        "      { Region All; Jacobian Vol; }\n"
-        "    }\n"
-        "  }\n"
-        "  { Name Sur;\n"
-        "    Case {\n"
-        "      { Region All; Jacobian Sur; }\n"
+        "Group{ \n"
+        "  DefineGroup[DomainInf]; \n"
+        "  DefineVariable[Val_Rint, Val_Rext]; \n"
+        "}\n\n"
+        "Jacobian{ \n"
+        "  { Name Vol; \n"
+        "    Case { { Region DomainInf; \n"
+        "             Jacobian VolSphShell {Val_Rint, Val_Rext}; }\n"
+        "           { Region All; Jacobian Vol; }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
@@ -313,31 +319,40 @@ void SolverElectrostatics::writeIntegration(std::ofstream& controlFile)
 {
     controlFile <<
         "Integration {\n"
-        "  { Name Int;\n"
-        "    Case{ { Type Gauss;\n"
-        "            Case { { GeoElement Line; NumberOfPoints  4; }\n"
-        "                   { GeoElement Triangle; NumberOfPoints  4; }\n"
-        "                   { GeoElement Quadrangle; NumberOfPoints  4; }\n"
-        "                   { GeoElement Tetrahedron; NumberOfPoints  15; }\n"
-        "                   { GeoElement Hexahedron; NumberOfPoints  34; }\n"
-        "                   { GeoElement Prism; NumberOfPoints  21; } }\n"
-        "          }\n"
-        "    }\n"
-        "  }\n"
+        "   { Name GradGrad; \n"
+        "     Case{ {Type Gauss; \n"
+        "            Case { { GeoElement Triangle;    NumberOfPoints  4; }\n"
+        "                   { GeoElement Quadrangle;  NumberOfPoints  4; }\n"
+        "                   { GeoElement Tetrahedron; NumberOfPoints  4; }\n"
+        "                   { GeoElement Hexahedron;  NumberOfPoints  6; }\n"
+        "                   { GeoElement Prism;       NumberOfPoints  9; } }\n"
+        "           }\n"
+        "         }\n"
+        "   }\n"
+        "   { Name CurlCurl; \n"
+        "     Case{ {Type Gauss; \n"
+        "            Case { { GeoElement Triangle;    NumberOfPoints  4; }\n"
+        "                   { GeoElement Quadrangle;  NumberOfPoints  4; }\n"
+        "                   { GeoElement Tetrahedron; NumberOfPoints  4; }\n"
+        "                   { GeoElement Hexahedron;  NumberOfPoints  6; }\n"
+        "                   { GeoElement Prism;       NumberOfPoints  9; } }\n"
+        "            }\n"
+        "         }\n"
+        "   }\n"
         "}\n\n";
 }
 
 void SolverElectrostatics::writeFormulation(std::ofstream& controlFile)
 {
     controlFile <<
-        "Formulation {\n"
-        "  { Name Electrostatics_v; Type FemEquation; \n"
+        "Formulation{\n"
+        "  { Name Electrostatics_v; Type FemEquation;\n"
         "    Quantity {\n"
         "      { Name v; Type Local; NameOfSpace Hgrad_v_Ele; }\n"
         "    }\n"
         "    Equation {\n"
-        "      Integral { [epsilon[] * Dof{d v} , {d v}] ;\n"
-        "        In Vol_Ele; Jacobian Vol; Integration Int; }\n"
+        "      Galerkin { [epsr[] * Dof{d v} , {d v}] ; In DomainCC_Ele;\n"
+        "                 Jacobian Vol; Integration GradGrad; }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
@@ -346,7 +361,7 @@ void SolverElectrostatics::writeFormulation(std::ofstream& controlFile)
 void SolverElectrostatics::writeResolution(std::ofstream& controlFile)
 {
     controlFile <<
-        "Resolution { \n"
+        "Resolution{\n"
         "  { Name EleSta_v;\n"
         "    System {\n"
         "      { Name Sys_Ele; NameOfFormulation Electrostatics_v; }\n"
@@ -354,32 +369,35 @@ void SolverElectrostatics::writeResolution(std::ofstream& controlFile)
         "    Operation {\n"
         "      Generate[Sys_Ele]; Solve[Sys_Ele]; SaveSolution[Sys_Ele];\n"
         "    }\n"
-        "  }\n"
+        " }\n"
         "}\n\n";
 }
 
 void SolverElectrostatics::writePostProcessing(std::ofstream& controlFile)
 {
     controlFile <<
-        "PostProcessing { \n"
-        "  { Name EleSta_v; NameOfFormulation Electrostatics_v; \n"
-        "    Quantity { \n"
-        "      { Name v; Value { \n"
-        "          Term { [{v}] ; In Dom_Hgrad_v_Ele; Jacobian Vol; } \n"
+        "PostProcessing{\n"
+        "  { Name EleSta_v; NameOfFormulation Electrostatics_v;\n"
+        "    Quantity {\n"
+        "      { Name v;\n"
+        "        Value {\n"
+        "          Local { [{v}] ; In DomainCC_Ele; Jacobian Vol; }\n"
         "        }\n"
         "      }\n"
-        "      { Name e; Value { \n"
-        "          Term { [-{d v}] ; In Dom_Hgrad_v_Ele; Jacobian Vol; } \n"
+        "      { Name e;\n"
+        "        Value {\n"
+        "          Local { [-{d v}] ; In DomainCC_Ele; Jacobian Vol; }\n"
         "        }\n"
         "      }\n"
-        "      { Name d; Value { \n"
-        "          Term { [-epsilon[] * {d v}] ; In Dom_Hgrad_v_Ele; Jacobian Vol; } \n"
+        "      { Name d;\n"
+        "        Value {\n"
+        "          Local { [-eps0 * epsr[] * {d v}] ; In DomainCC_Ele;\n"
+        "                                             Jacobian Vol; }\n"
         "        }\n"
-        "      }\n\n"
-        "      { Name W; Value { Local { [{v}] ; In Dom_Hgrad_v_Ele; } } }\n"
+        "      }\n"
         "    }\n"
         "  }\n"
-        "}\n\n";
+        " }\n\n";
 }
 
 void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
@@ -388,9 +406,129 @@ void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
         "PostOperation { \n"
         "  { Name Map; NameOfPostProcessing EleSta_v; \n"
         "     Operation { \n"
-        "       Print[v, OnElementsOf Vol_Ele, Format Table, File \"potential.pos\"]; \n"
-        "       Print[e, OnElementsOf Vol_Ele, Format Table, File \"efield.pos\"]; \n"
+        "       Print[v, OnElementsOf DomainCC_Ele, Format Table, File \"potential.pos\"]; \n"
+        "       Print[e, OnElementsOf DomainCC_Ele, Format Table, File \"efield.pos\"]; \n"
         "     } \n"
         "  } \n"
         "} \n\n";
+}
+
+void SolverElectrostatics::convertPotential(const std::string& tempDirPath)
+{
+    // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
+    std::string potentialFileName = tempDirPath + "\\potential.pos";
+    std::ifstream potentialFile(potentialFileName);
+
+    std::map<std::string, size_t> nodeToIndexMap;
+    std::list<std::string> nodeList;
+    std::list<std::string> potentialList;
+    std::list<std::vector<size_t>> cellList;
+
+    size_t nodeIndex = 0;
+
+    // Now read the file line by line
+    const int elementsPerRow = 21;
+
+    std::vector<std::string> elements;
+    elements.resize(elementsPerRow);
+
+    bool fileEndReached = false;
+    while (!fileEndReached)
+    {
+        for (int index = 0; index < elementsPerRow; index++)
+        {
+            if (!(potentialFile >> elements[index]))
+            {
+                // We have reached the end of the file
+                fileEndReached = true;
+                break;
+            }
+        }
+
+        if (!fileEndReached)
+        {
+            // Now we process the line
+            std::string n1 = elements[ 2] + " " + elements[ 3] + " " + elements[ 4];
+            std::string n2 = elements[ 5] + " " + elements[ 6] + " " + elements[ 7];
+            std::string n3 = elements[ 8] + " " + elements[ 9] + " " + elements[10];
+            std::string n4 = elements[11] + " " + elements[12] + " " + elements[13];
+
+            size_t indexN1 = getOrAddNode(n1, elements[17], nodeToIndexMap, nodeList, potentialList, nodeIndex);
+            size_t indexN2 = getOrAddNode(n2, elements[18], nodeToIndexMap, nodeList, potentialList, nodeIndex);
+            size_t indexN3 = getOrAddNode(n3, elements[19], nodeToIndexMap, nodeList, potentialList, nodeIndex);
+            size_t indexN4 = getOrAddNode(n4, elements[20], nodeToIndexMap, nodeList, potentialList, nodeIndex);
+
+            std::vector<size_t> cell{ indexN1, indexN2, indexN3, indexN4 };
+            cellList.push_back(cell);
+        }
+    }
+
+    potentialFile.close();
+
+    // Now write the vtk file information based on the intermediate data structures
+    std::string vtkFileName = tempDirPath + "\\potential.vtu";
+    std::ofstream vtkFile(vtkFileName);
+
+    vtkFile << "# vtk DataFile Version 2.0" << std::endl;
+    vtkFile << "Electrostatic potential" << std::endl;
+    vtkFile << "ASCII" << std::endl;
+    vtkFile << "DATASET UNSTRUCTURED_GRID" << std::endl << std::endl;
+
+    vtkFile << "POINTS " << nodeList.size() << " float" << std::endl;
+    for (auto node : nodeList)
+    {
+        vtkFile << node << std::endl;
+    }
+
+    vtkFile << std::endl << "CELLS " << cellList.size() << " " << 5 * cellList.size() << std::endl;
+    for (auto cell : cellList)
+    {
+        vtkFile << "4 " << cell[0] << " " << cell[1] << " " << cell[2] << " " << cell[3] << std::endl;
+    }
+
+    vtkFile << std::endl << "CELL_TYPES " << cellList.size() << std::endl;
+    for (auto cell : cellList)
+    {
+        vtkFile << "10" << std::endl;
+    }
+
+    vtkFile << std::endl << "POINT_DATA " << nodeList.size() << std::endl;
+    vtkFile << "SCALARS scalars float 1" << std::endl;
+    vtkFile << "LOOKUP_TABLE default" << std::endl;
+
+    for (auto potential : potentialList)
+    {
+        vtkFile << potential << std::endl;
+    }
+
+    vtkFile.close();
+}
+
+size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::string& potential, 
+                                          std::map<std::string, size_t> &nodeToIndexMap, std::list<std::string> &nodeList, std::list<std::string> &potentialList,
+                                          size_t &nodeIndex)
+{
+    size_t index = 0;
+
+    if (nodeToIndexMap.count(node) == 0)
+    {
+        index = nodeIndex;
+        nodeIndex++;
+
+        nodeToIndexMap[node] = index;
+
+        nodeList.push_back(node);
+        potentialList.push_back(potential);
+    }
+    else
+    {
+        index = nodeToIndexMap[node];
+    }
+
+    return index;
+}
+
+void SolverElectrostatics::convertEfield(const std::string& tempDirPath)
+{
+
 }
