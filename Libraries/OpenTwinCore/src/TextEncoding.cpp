@@ -1,4 +1,5 @@
 #include "OpenTwinCore/TextEncoding.h"
+#include <codecvt>
 
 ot::TextEncoding ot::EncodingGuesser::operator()(std::vector<unsigned char>& fileContent)
 {
@@ -120,4 +121,42 @@ ot::EncodingGuesser::type7or8Byte ot::EncodingGuesser::CheckUtf8_7bits_8bits(std
 	if (rv)
 		return utf8NoBOM;
 	return ascii8bits;
+}
+
+
+std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<unsigned char>& fileContent)
+{
+	//#include <boost/locale.hpp>
+//std::string ansi_to_utf8(const std::string& str)
+//{
+//	return boost::locale::conv::to_utf<char>(str, "Latin1");
+//}
+	//Source: https://stackoverflow.com/questions/4059775/convert-iso-8859-1-strings-to-utf-8-in-c-c
+
+	std::string out;
+	for (unsigned char& ch:fileContent)
+	{
+		if (ch < 0x80) {
+			out.push_back(ch);
+		}
+		else {
+			out.push_back(0xc0 | ch >> 6);
+			out.push_back(0x80 | (ch & 0x3f));
+		}
+	}
+	return out;
+}
+
+
+std::string ot::EncodingConverter_UTF16ToUTF8::operator()(std::vector<unsigned char>& fileContent)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	std::string out;
+	char16_t* ch = (char16_t*) &fileContent[0];
+	for (int i = 1; i < fileContent.size()/2; i++)
+	{
+		out+= convert.to_bytes(ch);
+		ch++;
+	}
+	return out;
 }

@@ -1,11 +1,13 @@
 #pragma once
 #include <vector>
+#include <string>
 
+#include "OpenTwinCore/CoreAPIExport.h"
 namespace ot
 {
 	enum TextEncoding {	UTF8 = 0, UTF8_BOM = 1 , ANSI= 2, UTF16_LEBOM = 3, UTF16_BEBOM= 4, UNKNOWN = 5	};
 
-	class EncodingGuesser
+	class OT_CORE_API_EXPORT EncodingGuesser
 	{
 	public:
 		using utf8 = unsigned char;
@@ -18,5 +20,16 @@ namespace ot
 
 		enum type7or8Byte { utf8NoBOM = 0, ascii7bits = 1, ascii8bits = 2 };
 		type7or8Byte CheckUtf8_7bits_8bits(std::vector<unsigned char>& fileContent);
+	};
+
+	class OT_CORE_API_EXPORT EncodingConverter_ISO88591ToUTF8
+	{
+	public:
+		std::string operator()(std::vector<unsigned char>& fileContent);
+	};
+	class OT_CORE_API_EXPORT EncodingConverter_UTF16ToUTF8
+	{
+	public:
+		std::string operator()(std::vector<unsigned char>& fileContent);
 	};
 }
