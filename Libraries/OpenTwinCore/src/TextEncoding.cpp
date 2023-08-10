@@ -130,7 +130,7 @@ ot::EncodingGuesser::type7or8Byte ot::EncodingGuesser::CheckUtf8_7bits_8bits(utf
 }
 
 
-std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<unsigned char>& fileContent)
+std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<char>& fileContent)
 {
 	//#include <boost/locale.hpp>
 //std::string ansi_to_utf8(const std::string& str)
@@ -140,14 +140,15 @@ std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<unsigne
 	//Source: https://stackoverflow.com/questions/4059775/convert-iso-8859-1-strings-to-utf-8-in-c-c
 
 	std::string out;
-	for (unsigned char& ch:fileContent)
+	unsigned char* ch = (unsigned char*)&fileContent[0];
+	for (uint32_t i = 0; i < fileContent.size(); i++)
 	{
-		if (ch < 0x80) {
-			out.push_back(ch);
+		if (ch[i] < 0x80) {
+			out.push_back(ch[i]);
 		}
 		else {
-			out.push_back(0xc0 | ch >> 6);
-			out.push_back(0x80 | (ch & 0x3f));
+			out.push_back(0xc0 | ch[i] >> 6);
+			out.push_back(0x80 | (ch[i] & 0x3f));
 		}
 	}
 	return out;

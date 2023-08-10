@@ -1,9 +1,19 @@
+/*****************************************************************//**
+ * \file   TextEncoding.h
+ * \brief  MongoDB uses only UTF-8 and some errors occured if the characters with different encoding standard were stored.
+ *			These clases allow a detection of the encoding style and a conversion to UTF-8. 
+ *			The detection class can only find the next best match and does not guarantee the correct detection of the intended standard. Thus, the detected standard should be propagated to the user, to allow a change.
+ * 
+ * \author Wagner
+ * \date   August 2023
+ *********************************************************************/
 #pragma once
 #include <vector>
 #include <string>
 #include <map>
 
 #include "OpenTwinCore/CoreAPIExport.h"
+#pragma warning(disable : 4251)
 namespace ot
 {
 	class OT_CORE_API_EXPORT TextEncoding
@@ -37,7 +47,7 @@ namespace ot
 	class OT_CORE_API_EXPORT EncodingConverter_ISO88591ToUTF8
 	{
 	public:
-		std::string operator()(std::vector<unsigned char>& fileContent);
+		std::string operator()(std::vector<char>& fileContent);
 	};
 	class OT_CORE_API_EXPORT EncodingConverter_UTF16ToUTF8
 	{

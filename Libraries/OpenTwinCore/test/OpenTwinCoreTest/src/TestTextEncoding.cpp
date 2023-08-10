@@ -25,13 +25,7 @@ TEST_F(FixtureTextEncoding, ISO88591ToUTF8)
 
 	ot::EncodingConverter_ISO88591ToUTF8 converter;
 
-	std::vector<unsigned char> temp;
-	for (auto& ch : fileContent)
-	{
-		temp.push_back((unsigned char)ch);
-	}
-
-	std::string isValue = converter(temp);
+	std::string isValue = converter(fileContent);
 	ot::EncodingGuesser guesser;
 	auto encoding =	guesser(isValue.c_str(),isValue.size());
 
