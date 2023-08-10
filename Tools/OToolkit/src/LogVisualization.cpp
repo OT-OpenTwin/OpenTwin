@@ -25,6 +25,9 @@
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qmenubar.h>
+#include <QtWidgets/qplaintextedit.h>
+#include <QtWidgets/qshortcut.h>
+#include <QtWidgets/qapplication.h>
 
 #define TABLE_TXT_DETAILED "Detailed"
 #define TABLE_TXT_INFO "Info"
@@ -232,6 +235,8 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 
 	connect(m_autoScrollToBottom, &QCheckBox::stateChanged, this, &LogVisualization::slotAutoScrollToBottomChanged);
 
+	connect(m_table, &QTableWidget::itemDoubleClicked, this, &LogVisualization::slotViewCellContent);
+
 	LOGVIS_LOG("LogVisualization initialization completed.");
 }
 
@@ -360,6 +365,17 @@ void LogVisualization::slotUpdateCheckboxColors(void) {
 	m_autoScrollToBottom->setStyleSheet(m_autoScrollToBottom->isChecked() ? red : def);
 }
 
+void LogVisualization::slotViewCellContent(QTableWidgetItem* _itm) {
+	size_t i = 0;
+	for (auto itm : m_messages) {
+		if (i++ == _itm->row()) {
+			LogVisualizationItemViewDialog dia(itm, i, widget());
+			dia.exec();
+			return;
+		}
+	}
+}
+
 void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	if (m_ignoreNewMessages->isChecked()) { return; };
 
@@ -371,47 +387,21 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	QString serviceName = QString::fromStdString(_msg.serviceName());
 
 	QTableWidgetItem * iconItm = new QTableWidgetItem("");
-	if (_msg.flags() & ot::WARNING_LOG) iconItm->setIcon(QIcon(":/images/Warning.png"));
-	else if (_msg.flags() & ot::ERROR_LOG) iconItm->setIcon(QIcon(":/images/Error.png"));
-	else iconItm->setIcon(QIcon(":/images/Info.png"));
-	iniTableItem(r, tIcon, iconItm);
-
-	QString typeString;
-	if (_msg.flags() & ot::DETAILED_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_DETAILED);
-	}
-	if (_msg.flags() & ot::DEFAULT_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_INFO);
-	}
-	if (_msg.flags() & ot::ERROR_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_ERROR);
-		m_errorCount++;
-	}
 	if (_msg.flags() & ot::WARNING_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_WARNING);
+		iconItm->setIcon(QIcon(":/images/Warning.png"));
 		m_warningCount++;
 	}
-	if (_msg.flags() & ot::INBOUND_MESSAGE_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_MSG_IN);
+	else if (_msg.flags() & ot::ERROR_LOG) {
+		iconItm->setIcon(QIcon(":/images/Error.png"));
+		m_errorCount++;
 	}
-	if (_msg.flags() & ot::QUEUED_INBOUND_MESSAGE_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_MSG_QUEUE);
+	else {
+		iconItm->setIcon(QIcon(":/images/Info.png"));
 	}
-	if (_msg.flags() & ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_MSG_OW_TLS);
-	}
-	if (_msg.flags() & ot::OUTGOING_MESSAGE_LOG) {
-		if (!typeString.isEmpty()) typeString.append(" | ");
-		typeString.append(TABLE_TXT_MSG_OUT);
-	}
-	iniTableItem(r, tType, new QTableWidgetItem(typeString));
+	iniTableItem(r, tIcon, iconItm);
+
+	
+	iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
 	iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.globalSystemTime())));
 	iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.localSystemTime())));
 	iniTableItem(r, tService, new QTableWidgetItem(serviceName));
@@ -460,6 +450,44 @@ QWidget * LogVisualization::widget(void) {
 	return m_splitter;
 }
 
+QString LogVisualization::logMessageTypeString(const ot::LogMessage& _msg) {
+	QString typeString;
+	if (_msg.flags() & ot::DETAILED_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_DETAILED);
+	}
+	if (_msg.flags() & ot::DEFAULT_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_INFO);
+	}
+	if (_msg.flags() & ot::ERROR_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_ERROR);
+	}
+	if (_msg.flags() & ot::WARNING_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_WARNING);
+	}
+	if (_msg.flags() & ot::INBOUND_MESSAGE_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_MSG_IN);
+	}
+	if (_msg.flags() & ot::QUEUED_INBOUND_MESSAGE_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_MSG_QUEUE);
+	}
+	if (_msg.flags() & ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_MSG_OW_TLS);
+	}
+	if (_msg.flags() & ot::OUTGOING_MESSAGE_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_MSG_OUT);
+	}
+
+	return typeString;
+}
+
 void LogVisualization::iniTableItem(int _row, int _column, QTableWidgetItem * _itm) {
 	//_itm->setFlags(_itm->flags() & (~Qt::ItemIsEditable) & (~Qt::ItemIsSelectable));
 	m_table->setItem(_row, _column, _itm);
@@ -506,4 +534,142 @@ void LogVisualization::updateCountLabels(void) {
 	m_messageCountLabel->setText("Log count: " + QString::number(m_messages.size()));
 	m_warningCountLabel->setText("Warnings: " + QString::number(m_warningCount));
 	m_errorCountLabel->setText("Errors: " + QString::number(m_errorCount));
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMessage& _msg, size_t _index, QWidget* _parent) : QDialog(_parent) {
+	// Create layouts
+	m_centralLayout = new QVBoxLayout;
+	m_dataLayout = new QGridLayout;
+	m_bigVLayout = new QVBoxLayout;
+	m_buttonLayout = new QHBoxLayout;
+
+	// Create controls
+	m_timeL = new QLabel("Time (Global):");
+	m_time = new QLineEdit(QString::fromStdString(_msg.globalSystemTime()));
+	m_time->setReadOnly(true);
+
+	m_timeLocalL = new QLabel("Time (Local):");
+	m_timeLocal = new QLineEdit(QString::fromStdString(_msg.localSystemTime()));
+	m_timeLocal->setReadOnly(true);
+
+	m_senderNameL = new QLabel("Sender:");
+	m_senderName = new QLineEdit(QString::fromStdString(_msg.serviceName()));
+	m_senderName->setReadOnly(true);
+
+	m_messageTypeL = new QLabel("Type:");
+	m_messageType = new QLineEdit(LogVisualization::logMessageTypeString(_msg));
+	m_messageType->setReadOnly(true);
+
+	m_functionL = new QLabel("Function:");
+	m_function = new QLineEdit(QString::fromStdString(_msg.functionName()));
+	m_function->setReadOnly(true);
+
+	m_messageL = new QLabel("Message text:");
+	m_message = new QPlainTextEdit(QString::fromStdString(_msg.text()));
+	m_message->setReadOnly(true);
+
+	m_okButton = new QPushButton("Ok");
+	m_okButton->setMinimumWidth(100);
+	connect(m_okButton, &QPushButton::clicked, this, &LogVisualizationItemViewDialog::close);
+
+	// Create shortcuts
+	m_closeShortcut = new QShortcut(QKeySequence("Esc"), this);
+	connect(m_closeShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::close);
+
+	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this);
+	connect(m_recenterShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::slotRecenter);
+
+	// Setup layouts
+	this->setLayout(m_centralLayout);
+	m_centralLayout->addLayout(m_dataLayout, 0);
+	m_centralLayout->addLayout(m_bigVLayout, 1);
+	m_centralLayout->addLayout(m_buttonLayout, 0);
+
+	m_dataLayout->addWidget(m_timeL, 0, 0);
+	m_dataLayout->addWidget(m_time, 0, 1);
+	m_dataLayout->addWidget(m_timeLocalL, 1, 0);
+	m_dataLayout->addWidget(m_timeLocal, 1, 1);
+	m_dataLayout->addWidget(m_senderNameL, 2, 0);
+	m_dataLayout->addWidget(m_senderName, 2, 1);
+	m_dataLayout->addWidget(m_messageTypeL, 3, 0);
+	m_dataLayout->addWidget(m_messageType, 3, 1);
+
+	m_bigVLayout->addWidget(m_functionL, 0);
+	m_bigVLayout->addWidget(m_function, 0);
+	m_bigVLayout->addWidget(m_messageL, 0);
+	m_bigVLayout->addWidget(m_message, 1);
+
+	m_buttonLayout->addStretch(1);
+	m_buttonLayout->addWidget(m_okButton);
+	m_buttonLayout->addStretch(1);
+
+	// Setup window
+	setWindowTitle("MessageViewer (Message #" + QString::number(_index) + ") | OToolkit");
+	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
+	setWindowIcon(AppBase::instance()->windowIcon());
+
+	setMinimumSize(400, 300);
+	setFocusPolicy(Qt::ClickFocus);
+	
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	move(s.value("LogVisualizationItemViewDialog.X", 0).toInt(), s.value("LogVisualizationItemViewDialog.Y", 0).toInt());
+	resize(s.value("LogVisualizationItemViewDialog.W", 800).toInt(), s.value("LogVisualizationItemViewDialog.H", 600).toInt());
+}
+
+LogVisualizationItemViewDialog::~LogVisualizationItemViewDialog() {
+	
+}
+
+bool LogVisualizationItemViewDialog::eventFilter(QObject* _obj, QEvent* _event)
+{
+	if (_event->type() == QEvent::MouseButtonPress)
+	{
+		QMessageBox m(QMessageBox::Warning, "A", "B");
+		m.exec();
+		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
+		if (!geometry().contains(mouseEvent->globalPos()))
+		{
+			close(); // Close the dialog
+			return true; // Event handled
+		}
+		if (mouseEvent->globalPos().x() > (this->pos().x() + this->width())) {
+			close(); // Close the dialog
+			return true; // Event handled
+		}
+	}
+	return QDialog::eventFilter(_obj, _event); // Pass the event to the base class
+}
+
+bool LogVisualizationItemViewDialog::event(QEvent* _event)
+{
+	return QDialog::event(_event); // Pass the event to the base class
+}
+
+void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {
+	if (!geometry().contains(_event->globalPos())) {
+		close();
+	}
+	else {
+		QDialog::mousePressEvent(_event);
+	}
+}
+
+void LogVisualizationItemViewDialog::slotRecenter(void) {
+	this->move(0, 0);
+	this->resize(800, 600);
+}
+
+void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	s.setValue("LogVisualizationItemViewDialog.X", pos().x());
+	s.setValue("LogVisualizationItemViewDialog.Y", pos().y());
+	s.setValue("LogVisualizationItemViewDialog.W", size().width());
+	s.setValue("LogVisualizationItemViewDialog.H", size().height());
+
 }

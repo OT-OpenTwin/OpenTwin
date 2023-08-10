@@ -15,6 +15,7 @@ class QMenuBar;
 class QDockWidget;
 class QTextEdit;
 class QAction;
+class QApplication;
 
 #define OTOOLKIT_LOG(___sender, ___message) AppBase::instance()->log(___sender, ___message)
 #define OTOOLKIT_LOGW(___sender, ___message) AppBase::instance()->logWarning(___sender, ___message)
@@ -35,6 +36,9 @@ public:
 	void log(const QString& _sender, const QString& _message);
 	void logWarning(const QString& _sender, const QString& _message);
 	void logError(const QString& _sender, const QString& _message);
+
+	void setApplicationInstance(QApplication* _app) { m_app = _app; };
+	QApplication* applicationInstance(void) { return m_app; };
 
 public slots:
 	void slotProcessMessage(const QString& _message);
@@ -67,4 +71,5 @@ private:
 	QAction *			m_outputAction;
 	QAction *			m_settingsAction;
 	QAction *			m_exitAction;
+	QApplication* m_app;
 };

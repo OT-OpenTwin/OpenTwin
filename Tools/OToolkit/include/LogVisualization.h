@@ -9,6 +9,7 @@
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtCore/qlist.h>
+#include <QtWidgets/qdialog.h>
 
 class QSplitter;
 class QWidget;
@@ -17,6 +18,7 @@ class QHBoxLayout;
 class QGridLayout;
 class QGroupBox;
 class QPushButton;
+class QPlainTextEdit;
 class QTableWidget;
 class QTableWidgetItem;
 class QLabel;
@@ -25,6 +27,7 @@ class QCheckBox;
 class QListWidget;
 class QLineEdit;
 class QAction;
+class QShortcut;
 
 class LogVisualization : public QObject, public OToolkitAPI::AbstractTool {
 	Q_OBJECT
@@ -45,6 +48,8 @@ public:
 
 	QWidget * widget(void);
 
+	static QString logMessageTypeString(const ot::LogMessage& _msg);
+
 public slots:
 	void slotConnect(void);
 
@@ -55,6 +60,7 @@ public slots:
 	void slotDeselectAllServices(void);
 	void slotAutoScrollToBottomChanged(void);
 	void slotUpdateCheckboxColors(void);
+	void slotViewCellContent(QTableWidgetItem* _itm);
 
 private:
 	void iniTableItem(int _row, int _column, QTableWidgetItem * _itm);
@@ -110,4 +116,46 @@ private:
 
 	// Tool Bar
 	QAction *					m_connectButton;
+};
+
+class LogVisualizationItemViewDialog : public QDialog {
+	Q_OBJECT
+public:
+	LogVisualizationItemViewDialog(const ot::LogMessage& _msg, size_t _index, QWidget * _parent);
+	virtual ~LogVisualizationItemViewDialog();
+
+	virtual void closeEvent(QCloseEvent* _event) override;
+
+	virtual void mousePressEvent(QMouseEvent* _event) override;
+
+	virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
+
+	virtual bool event(QEvent* _event) override;
+
+private slots:
+	void slotRecenter(void);
+
+private:
+	QShortcut* m_closeShortcut;
+	QShortcut* m_recenterShortcut;
+	QVBoxLayout* m_centralLayout;
+	QGridLayout* m_dataLayout;
+	QVBoxLayout* m_bigVLayout;
+	QHBoxLayout* m_buttonLayout;
+
+	QLabel* m_timeL;
+	QLineEdit* m_time;
+	QLabel* m_timeLocalL;
+	QLineEdit* m_timeLocal;
+	QLabel* m_senderNameL;
+	QLineEdit* m_senderName;
+	QLabel* m_messageTypeL;
+	QLineEdit* m_messageType;
+
+	QLabel* m_functionL;
+	QLineEdit* m_function;
+	QLabel* m_messageL;
+	QPlainTextEdit* m_message;
+
+	QPushButton* m_okButton;
 };

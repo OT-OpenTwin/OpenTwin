@@ -59,7 +59,9 @@ void mainApplicationThread()
 		}
 
 		ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
+		AppBase::instance()->setApplicationInstance(&application);
 		AppBase::instance()->setUrl(QString::fromStdString(g_serviceURL));
+
 		g_starting = false;
 		AppBase::instance()->sb()->setInfo("OToolkit running at: " + QString::fromStdString(g_serviceURL));
 

@@ -188,7 +188,7 @@ void AppBase::slotLog(const QString& _sender, const QString& _message, int _type
 	m_output->append("");
 }
 
-AppBase::AppBase() : m_mainThread(QThread::currentThreadId()) {
+AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	setObjectName("OToolkit_MainWindow");
 
 	// Create controls
@@ -204,6 +204,7 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()) {
 	QFont f = m_output->font();
 	f.setFamily("Consolas");
 	m_output->setFont(f);
+	m_output->setReadOnly(true);
 
 	// Setup window
 	setCentralWidget(m_tabWidget);
