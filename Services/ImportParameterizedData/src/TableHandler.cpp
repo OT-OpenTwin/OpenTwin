@@ -17,13 +17,12 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	{
 		assert(0); // Only EntityFile should reach here.
 	}
-	auto topoEnt = new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	auto topoEnt = std::unique_ptr< EntityParameterizedDataTable>(new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	std::list<std::string> takenNames;
 	std::string fullName = CreateNewUniqueTopologyNamePlainPossible(_tableFolder, sourceFile->getFileName(), takenNames);
 	topoEnt->setName(fullName);
 	std::string type = sourceFile->getFileType();
 	auto tableExtractor = FileToTableExtractorFactory::GetInstance()->Create(sourceFile->getFileType());
-	
 
 	auto tp1 = std::chrono::system_clock::now();
 	tableExtractor->ExtractFromEntitySource(sourceFile);
