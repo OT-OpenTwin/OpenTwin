@@ -4,8 +4,9 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTBlockEditor/BlockHelper.h"
-#include "OpenTwinCore/otAssert.h"
+
+
+/*
 
 QRect ot::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
 	switch (_childAlignment)
@@ -150,3 +151,5 @@ QRectF ot::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSiz
 		return _parentRect;
 	}
 }
+
+*/

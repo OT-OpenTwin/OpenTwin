@@ -4,10 +4,14 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsFactory.h"
 
 // Qt header
 #include <QtGui/qevent.h>
+#include <QtCore/qmimedata.h>
 //#include <QtWidgets/qgraphicsscene.h>
 
 //! If this is true, the graphics view will force a minimum size
@@ -138,4 +142,86 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 	QGraphicsView::resizeEvent(_event);
 
 	viewAll();
+}
+
+void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
+	// Check if the events mime data contains the configuration
+	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty()) {
+		_event->acceptProposedAction();
+	}
+	else {
+		GraphicsView::dragEnterEvent(_event);
+	}
+}
+
+void ot::GraphicsView::dropEvent(QDropEvent* _event) {
+	QByteArray cfgRaw = _event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration);
+	if (cfgRaw.isEmpty()) {
+		OT_LOG_W("Drop event reqected: MimeData not matching");
+		return;
+	}
+
+	// Generate configuration from raw data
+	ot::GraphicsItemCfg* cfg = nullptr;
+	try {
+		OT_rJSON_parseDOC(cfgDoc, cfgRaw.toStdString().c_str());
+		OT_rJSON_val cfgObj = cfgDoc.GetObject();
+		cfg = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(cfgObj);
+	}
+	catch (const std::exception& e) {
+		OT_LOG_EAS(e.what());
+		delete cfg;
+		return;
+	}
+	catch (...) {
+		OT_LOG_EA("Unknown error");
+		delete cfg;
+		return;
+	}
+
+	if (cfg == nullptr) {
+		OT_LOG_WA("No config created");
+		delete cfg;
+		return;
+	}
+
+	// Store current event position to position the new item at this pos
+	QPointF position = this->mapToScene(mapToGlobal(_event->pos()));
+
+	// Create graphics item from configuration
+	ot::GraphicsItem* newItem = nullptr;
+	try {
+		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
+		newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemNetworkContext);
+		newItem->finalizeAsRootItem(scene());
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+		delete newItem;
+		delete cfg;
+		return;
+	}
+	catch (...) {
+		OT_LOG_EA("Unknown error occured");
+		delete newItem;
+		delete cfg;
+		return;
+	}
+
+	//newBlock->moveBy(position.x(), position.y());
+
+	delete cfg;
+
+	_event->acceptProposedAction();
+}
+
+void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
+	// Check if the events mime data contains the configuration
+	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty()) {
+		_event->acceptProposedAction();
+		OT_LOG_D("Drag move event accepted for: Block");
+	}
+	else {
+		GraphicsView::dragMoveEvent(_event);
+	}
 }

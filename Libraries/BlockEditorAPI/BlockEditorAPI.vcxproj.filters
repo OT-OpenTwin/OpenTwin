@@ -16,134 +16,20 @@
     <Filter Include="Header Files\BlockLayers">
       <UniqueIdentifier>{2527c096-3817-41dd-8608-a5cd70ca6ebe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\BlockLayers">
-      <UniqueIdentifier>{4bd3b4ad-9f6f-4d53-b818-abcd5d2494d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\ConnectorManagers">
-      <UniqueIdentifier>{572803dd-5890-4a35-8ec8-09abd9399410}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\ConnectorManagers">
-      <UniqueIdentifier>{0186d4d8-ca14-49c2-af03-017312d92a1e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockCategoryConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FlowBlockConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnectorConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockEditorAPITypes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConfigurationFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConfigurationGraphicsObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockLayerConfiguration.cpp">
-      <Filter>Source Files\BlockLayers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImageBlockLayerConfiguration.cpp">
-      <Filter>Source Files\BlockLayers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TextBlockLayerConfiguration.cpp">
-      <Filter>Source Files\BlockLayers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RectangleBlockLayerConfiguration.cpp">
-      <Filter>Source Files\BlockLayers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockLayerConfigurationFactory.cpp">
-      <Filter>Source Files\BlockLayers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnectorManagerConfiguration.cpp">
-      <Filter>Source Files\ConnectorManagers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnectorManagerConfigurationFactory.cpp">
-      <Filter>Source Files\ConnectorManagers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BorderLayoutBlockConnectorManagerConfiguration.cpp">
-      <Filter>Source Files\ConnectorManagers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConfigurationAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockEditorConfigurationPackage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConfigurationObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPIAPIExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPITypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\FlowBlockConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationGraphicsObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h">
-      <Filter>Header Files\BlockLayers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\ImageBlockLayerConfiguration.h">
-      <Filter>Header Files\BlockLayers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\TextBlockLayerConfiguration.h">
-      <Filter>Header Files\BlockLayers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\RectangleBlockLayerConfiguration.h">
-      <Filter>Header Files\BlockLayers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockLayers.h">
-      <Filter>Header Files\BlockLayers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h">
-      <Filter>Header Files\BlockLayers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorManagerConfiguration.h">
-      <Filter>Header Files\ConnectorManagers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorManagerConfigurationFactory.h">
-      <Filter>Header Files\ConnectorManagers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutBlockConnectorManagerConfiguration.h">
-      <Filter>Header Files\ConnectorManagers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationAPI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockEditorConfigurationPackage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

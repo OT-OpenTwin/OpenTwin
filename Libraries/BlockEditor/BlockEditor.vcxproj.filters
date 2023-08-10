@@ -22,188 +22,21 @@
       <Extensions>qrc;*</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="Header Files\General">
-      <UniqueIdentifier>{a27c9e98-1f74-405f-96d9-0f178044643e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\General">
-      <UniqueIdentifier>{59a5c102-8576-417f-9f87-f668cc42cd7a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Widgets">
-      <UniqueIdentifier>{0c74f659-965c-429b-b5fb-b3e120735cd7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Widgets">
-      <UniqueIdentifier>{53558a27-6c40-49ab-9557-084c80f32569}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Factories">
-      <UniqueIdentifier>{b47b0c1e-7c9c-4eea-92ef-7423e45d6925}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Factories">
-      <UniqueIdentifier>{8aa10979-32ed-4aab-8204-4b71009f579c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Layers">
-      <UniqueIdentifier>{5c2c5b24-c1db-4b63-9f47-bdd77cf7a78a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Layers">
-      <UniqueIdentifier>{1c0cceb0-7df9-4bca-8b9e-a64dc876adb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Helper">
-      <UniqueIdentifier>{35d8128f-7fb0-4e19-8679-793786c1eeee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\API">
-      <UniqueIdentifier>{b3f5883b-7c2d-4d97-88db-5b58d45ea0d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\API">
-      <UniqueIdentifier>{ef9537d1-3f19-4e3d-bd93-632342b75eb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Helper">
-      <UniqueIdentifier>{cad547ef-8de5-45cd-aea1-0d0bdae9e0be}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Block.cpp">
-      <Filter>Source Files\General</Filter>
+    <ClCompile Include="src\BlockHelper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\dllmain.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnection.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnector.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockPickerWidget.cpp">
-      <Filter>Source Files\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockPickerDockWidget.cpp">
-      <Filter>Source Files\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockFactory.cpp">
-      <Filter>Source Files\Factories</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DefaultBlock.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockLayer.cpp">
-      <Filter>Source Files\Layers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImageBlockLayer.cpp">
-      <Filter>Source Files\Layers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TextBlockLayer.cpp">
-      <Filter>Source Files\Layers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RectangularBlockLayer.cpp">
-      <Filter>Source Files\Layers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockPaintJob.cpp">
-      <Filter>Source Files\Factories</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnectorManager.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LayerFactory.cpp">
-      <Filter>Source Files\Factories</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PainterFactory.cpp">
-      <Filter>Source Files\Factories</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockNetwork.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockNetworkEditor.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockGraphicsObject.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockHelper.cpp">
-      <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockEditorAPI.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnectorManagerFactory.cpp">
-      <Filter>Source Files\Factories</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnectorFactory.cpp">
-      <Filter>Source Files\Factories</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\OTBlockEditor\Block.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTBlockEditor\BlockPickerDockWidget.h">
-      <Filter>Header Files\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTBlockEditor\BlockNetworkEditor.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTBlockEditor\BlockNetwork.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTBlockEditor\BlockConnector.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\OTBlockEditor\BlockConnection.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockEditorAPIExport.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockFactory.h">
-      <Filter>Header Files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockLayer.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\ImageBlockLayer.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\TextBlockLayer.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\RectangularBlockLayer.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockPaintJob.h">
-      <Filter>Header Files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockConnectorManager.h">
-      <Filter>Header Files\General</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTBlockEditor\BlockEditorTypes.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\LayerFactory.h">
-      <Filter>Header Files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\PainterFactory.h">
-      <Filter>Header Files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockGraphicsObject.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockEditorAPI.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockConnectorManagerFactory.h">
-      <Filter>Header Files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockConnectorFactory.h">
-      <Filter>Header Files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockHelper.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\DefaultBlock.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTBlockEditor\BlockPickerWidget.h">
-      <Filter>Header Files\Widgets</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -27,6 +27,8 @@ namespace ot {
 		//! @brief Returns the currently set grid size
 		int gridSize(void) const { return m_gridSize; };
 
+		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) override;
+
 	protected:
 		virtual void drawBackground(QPainter* _painter, const QRectF& _rect) override;
 

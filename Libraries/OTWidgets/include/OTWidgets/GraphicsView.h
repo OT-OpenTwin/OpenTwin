@@ -32,6 +32,10 @@ namespace ot {
 		virtual void keyReleaseEvent(QKeyEvent* _event) override;
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
+		virtual void dragEnterEvent(QDragEnterEvent* _event) override;
+		virtual void dropEvent(QDropEvent* _event) override;
+		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
+
 	protected:
 		virtual void mousePressedMoveEvent(QMouseEvent* _event) {};
 

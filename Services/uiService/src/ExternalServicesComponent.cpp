@@ -38,9 +38,6 @@
 #include "OpenTwinFoundation/Dispatcher.h"
 #include "OpenTwinFoundation/TableRange.h"
 #include "OpenTwinFoundation/ContextMenu.h"
-#include "OTBlockEditorAPI/BlockEditorConfigurationPackage.h"
-#include "OTBlockEditor/BlockEditorAPI.h"
-#include "OTBlockEditor/BlockNetworkEditor.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -48,6 +45,8 @@
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsPicker.h"
+#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsScene.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2781,7 +2780,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsEditorPackage pckg("", "");
 				pckg.setFromJsonObject(configurationObj);
 
-				ot::BlockNetworkEditor* newEditor = new ot::BlockNetworkEditor;
+				ot::GraphicsView* newEditor = new ot::GraphicsView;
+				ot::GraphicsScene* newScene = new ot::GraphicsScene;
+				newEditor->setScene(newScene);
+				
 				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.title()), newEditor);
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);

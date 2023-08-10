@@ -11,47 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BlockConfigurationAPI.cpp" />
-    <ClCompile Include="src\BlockCategoryConfiguration.cpp" />
-    <ClCompile Include="src\BlockConfiguration.cpp" />
-    <ClCompile Include="src\BlockConfigurationFactory.cpp" />
-    <ClCompile Include="src\BlockConfigurationGraphicsObject.cpp" />
-    <ClCompile Include="src\BlockConfigurationObject.cpp" />
-    <ClCompile Include="src\BlockConnectorConfiguration.cpp" />
     <ClCompile Include="src\BlockEditorAPITypes.cpp" />
-    <ClCompile Include="src\BlockEditorConfigurationPackage.cpp" />
-    <ClCompile Include="src\BlockLayerConfiguration.cpp" />
-    <ClCompile Include="src\BlockLayerConfigurationFactory.cpp" />
-    <ClCompile Include="src\BorderLayoutBlockConnectorManagerConfiguration.cpp" />
-    <ClCompile Include="src\BlockConnectorManagerConfiguration.cpp" />
-    <ClCompile Include="src\BlockConnectorManagerConfigurationFactory.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\FlowBlockConfiguration.cpp" />
-    <ClCompile Include="src\ImageBlockLayerConfiguration.cpp" />
-    <ClCompile Include="src\RectangleBlockLayerConfiguration.cpp" />
-    <ClCompile Include="src\TextBlockLayerConfiguration.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationAPI.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockCategoryConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationFactory.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationGraphicsObject.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConfigurationObject.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorConfiguration.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPIAPIExport.h" />
     <ClInclude Include="include\OTBlockEditorAPI\BlockEditorAPITypes.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockEditorConfigurationPackage.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockLayerConfigurationFactory.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockLayers.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BorderLayoutBlockConnectorManagerConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorManagerConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\BlockConnectorManagerConfigurationFactory.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\FlowBlockConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\ImageBlockLayerConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\RectangleBlockLayerConfiguration.h" />
-    <ClInclude Include="include\OTBlockEditorAPI\TextBlockLayerConfiguration.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

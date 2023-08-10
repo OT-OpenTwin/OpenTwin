@@ -15,6 +15,7 @@
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
+#define OT_GRAPHICSITEM_MIMETYPE_Configuration "GraphicsItem.Configuration"
 
 namespace ot {
 

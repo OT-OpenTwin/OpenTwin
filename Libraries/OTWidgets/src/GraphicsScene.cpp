@@ -8,6 +8,8 @@
 
 // Qt header
 #include <QtGui/qpainter.h>
+#include <QtGui/qevent.h>
+#include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsScene::GraphicsScene() : m_gridSize(10) {}
 
@@ -30,4 +32,10 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 		}
 	}
 	_painter->drawPoints(points.data(), points.size());
+}
+
+void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
+	QList<QGraphicsItem*> selectedItems = items(_event->scenePos());
+
+	QGraphicsScene::mouseDoubleClickEvent(_event);
 }
