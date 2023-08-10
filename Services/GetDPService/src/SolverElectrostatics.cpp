@@ -609,7 +609,6 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
 
             for (auto node : nodeList)
             {
-                std::string potential = nodeToPotentialMap[node];
                 vtkFile << nodeToPotentialMap[node] << std::endl;
             }
         }
@@ -647,5 +646,146 @@ size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::st
 
 void SolverElectrostatics::convertEfield(const std::string& tempDirPath)
 {
+    // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
+    std::string potentialFileName = tempDirPath + "\\efield.pos";
+    std::ifstream potentialFile(potentialFileName);
 
+    std::map<std::string, size_t> nodeToIndexMap;
+    std::list<std::string> nodeList;
+    std::list<std::vector<size_t>> cellList;
+    std::list<std::string> vectorList;
+    std::list<double> magnitudeList;
+
+    size_t nodeIndex = 0;
+
+    // Now read the file line by line
+    const int elementsPerRow = 29;
+
+    std::vector<std::string> elements;
+    elements.resize(elementsPerRow);
+
+    bool fileEndReached = false;
+    while (!fileEndReached)
+    {
+        for (int index = 0; index < elementsPerRow; index++)
+        {
+            if (!(potentialFile >> elements[index]))
+            {
+                // We have reached the end of the file
+                fileEndReached = true;
+                break;
+            }
+        }
+
+        if (!fileEndReached)
+        {
+            // Now we process the line
+            std::string n1 = elements[2] + " " + elements[3] + " " + elements[4];
+            std::string n2 = elements[5] + " " + elements[6] + " " + elements[7];
+            std::string n3 = elements[8] + " " + elements[9] + " " + elements[10];
+            std::string n4 = elements[11] + " " + elements[12] + " " + elements[13];
+
+            size_t indexN1 = getOrAddCellNode(n1, nodeToIndexMap, nodeList, nodeIndex);
+            size_t indexN2 = getOrAddCellNode(n2, nodeToIndexMap, nodeList, nodeIndex);
+            size_t indexN3 = getOrAddCellNode(n3, nodeToIndexMap, nodeList, nodeIndex);
+            size_t indexN4 = getOrAddCellNode(n4, nodeToIndexMap, nodeList, nodeIndex);
+
+            double x1 = atof(elements[17].c_str());
+            double y1 = atof(elements[18].c_str());
+            double z1 = atof(elements[19].c_str());
+
+            double x2 = atof(elements[20].c_str());
+            double y2 = atof(elements[21].c_str());
+            double z2 = atof(elements[22].c_str());
+
+            double x3 = atof(elements[23].c_str());
+            double y3 = atof(elements[24].c_str());
+            double z3 = atof(elements[25].c_str());
+
+            double x4 = atof(elements[26].c_str());
+            double y4 = atof(elements[27].c_str());
+            double z4 = atof(elements[28].c_str());
+
+            double xAverage = 0.25 * (x1 + x2 + x3 + x4);
+            double yAverage = 0.25 * (y1 + y2 + y3 + y4);
+            double zAverage = 0.25 * (z1 + z2 + z3 + z4);
+
+            double magnitude = sqrt(xAverage * xAverage + yAverage * yAverage + zAverage * zAverage);
+
+            std::string averageVector = std::to_string(xAverage) + " " + std::to_string(yAverage) + " " + std::to_string(zAverage);
+
+            std::vector<size_t> cell{ indexN1, indexN2, indexN3, indexN4 };
+            cellList.push_back(cell);
+            vectorList.push_back(averageVector);
+            magnitudeList.push_back(magnitude);
+        }
+    }
+
+    potentialFile.close();
+
+    // Now write the vtk file information based on the intermediate data structures
+    std::string vtkFileName = tempDirPath + "\\efield.vtu";
+    std::ofstream vtkFile(vtkFileName);
+
+    vtkFile << "# vtk DataFile Version 2.0" << std::endl;
+    vtkFile << "Electrostatic field strength" << std::endl;
+    vtkFile << "ASCII" << std::endl;
+    vtkFile << "DATASET UNSTRUCTURED_GRID" << std::endl << std::endl;
+
+    vtkFile << "POINTS " << nodeList.size() << " float" << std::endl;
+    for (auto node : nodeList)
+    {
+        vtkFile << node << std::endl;
+    }
+
+    vtkFile << std::endl << "CELLS " << cellList.size() << " " << 5 * cellList.size() << std::endl;
+    for (auto cell : cellList)
+    {
+        vtkFile << "4 " << cell[0] << " " << cell[1] << " " << cell[2] << " " << cell[3] << std::endl;
+    }
+
+    vtkFile << std::endl << "CELL_TYPES " << cellList.size() << std::endl;
+    for (auto cell : cellList)
+    {
+        vtkFile << "10" << std::endl;
+    }
+
+    vtkFile << std::endl << "CELL_DATA " << vectorList.size() << std::endl;
+    vtkFile << "SCALARS scalars float 1" << std::endl;
+    vtkFile << "LOOKUP_TABLE default" << std::endl;
+
+    for (auto magnitude : magnitudeList)
+    {
+        vtkFile << magnitude << std::endl;
+    }
+
+    vtkFile << "VECTORS vectors float" << std::endl;
+
+    for (auto vector : vectorList)
+    {
+        vtkFile << vector << std::endl;
+    }
+
+    vtkFile.close();
+}
+
+size_t SolverElectrostatics::getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex)
+{
+    size_t index = 0;
+
+    if (nodeToIndexMap.count(node) == 0)
+    {
+        index = nodeIndex;
+        nodeIndex++;
+
+        nodeToIndexMap[node] = index;
+
+        nodeList.push_back(node);
+    }
+    else
+    {
+        index = nodeToIndexMap[node];
+    }
+
+    return index;
 }

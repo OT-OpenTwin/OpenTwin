@@ -36,4 +36,5 @@ private:
 	void convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap);
 	void convertEfield(const std::string& tempDirPath);
 	size_t getOrAddNode(const std::string& node, const std::string& potential, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, std::list<std::string>& potentialList, size_t& nodeIndex, std::map<std::string, std::string>& nodeToPotentialMap);
+	size_t getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex);
 };
