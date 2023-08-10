@@ -134,12 +134,7 @@ void ot::components::UiComponent::addMenuButton(
 
 void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButtonDescription,  const Flags<ui::lockType>& _lockTypes, const std::string & _iconName, const std::string & _iconFolder, const std::string & _keySequence, const ContextMenu & _contextMenu)
 {
-	addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
-}
-
-void ot::components::UiComponent::addMenuButton(ot::MenuButtonDescription& _menuButtonDescription, const std::string& _subgroupName, const Flags<ui::lockType>& _lockTypes, const std::string& _iconName, const std::string& _iconFolder, const std::string& _keySequence, const ContextMenu& _contextMenu)
-{
-	addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _subgroupName,_menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
+	addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetSubgroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
 }
 
 void ot::components::UiComponent::addMenuButton(

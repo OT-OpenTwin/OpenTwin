@@ -114,16 +114,6 @@ namespace ot {
 				const std::string &			_keySequence = std::string(""),
 				const ContextMenu&			_contextMenu = ContextMenu("")
 			);
-			void addMenuButton(
-				ot::MenuButtonDescription& _menuButtonDescription,
-				const std::string& _subgroupName,
-				const Flags<ui::lockType>& _lockTypes,
-				const std::string& _iconName,
-				const std::string& _iconFolder = std::string("Default"),
-				const std::string& _keySequence = std::string(""),
-				const ContextMenu& _contextMenu = ContextMenu("")
-			);
-
 
 
 			//! @brief Will add a new ToolButton in the specified menu sub group at the UI

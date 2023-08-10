@@ -94,8 +94,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	const std::string groupNameImport = "Import";
 	const std::string groupNameTableHandling = "Table Handling";
 	const std::string groupNameParameterizedDataCreation = "Creation of Parameterized Data Collection";
+	const std::string subgroupNameTableHandlingRow = "Row";
+	const std::string subgroupNameTableHandlingColumn = "Column";
+	const std::string subgroupNameTableHandlingState = "State";
 	_ui->addMenuGroup(pageName, groupNameImport);
 	_ui->addMenuGroup(pageName, groupNameTableHandling);
+	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingRow);
+	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingColumn);
+	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingState);
 	_ui->addMenuGroup(pageName, groupNameParameterizedDataCreation);
 
 	ot::Flags<ot::ui::lockType> modelWrite;
@@ -105,26 +111,27 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
 	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
 	
-	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row");
-	_buttonTableAddRowBelow.SetDescription(pageName, groupNameTableHandling, "Insert Row Below");
-	_buttonTableAddRowAbove.SetDescription(pageName, groupNameTableHandling, "Insert Row Above");
+	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row", "", subgroupNameTableHandlingRow);
+	_buttonTableAddRowBelow.SetDescription(pageName, groupNameTableHandling, "Insert Row Below", "", subgroupNameTableHandlingRow);
+	_buttonTableAddRowAbove.SetDescription(pageName, groupNameTableHandling, "Insert Row Above", "", subgroupNameTableHandlingRow);
 	
-	_buttonTableDeleteColumn.SetDescription(pageName, groupNameTableHandling, "Delete Column");
-	_buttonTableAddColumnLeft.SetDescription(pageName, groupNameTableHandling, "Insert Column Left");
-	_buttonTableAddColumnRight.SetDescription(pageName, groupNameTableHandling, "Insert Column Right");
+	_buttonTableDeleteColumn.SetDescription(pageName, groupNameTableHandling,"Delete Column", "", subgroupNameTableHandlingColumn);
+	_buttonTableAddColumnLeft.SetDescription(pageName, groupNameTableHandling, "Insert Column Left", "", subgroupNameTableHandlingColumn);
+	_buttonTableAddColumnRight.SetDescription(pageName, groupNameTableHandling, "Insert Column Right", "", subgroupNameTableHandlingColumn);
 	
-	_buttonTableSave.SetDescription(pageName, groupNameTableHandling, "Save Changes");;
-	_buttonTableReset.SetDescription(pageName, groupNameTableHandling, "Revert Changes");;
-	_buttonTableResetToSelection.SetDescription(pageName, groupNameTableHandling, "Reset To Selection");;
+	_buttonTableSave.SetDescription(pageName, groupNameTableHandling, "Save Changes", "", subgroupNameTableHandlingState);;
+	_buttonTableReset.SetDescription(pageName, groupNameTableHandling, "Revert Changes", "", subgroupNameTableHandlingState);;
+	_buttonTableResetToSelection.SetDescription(pageName, groupNameTableHandling, "Reset To Selection", "", subgroupNameTableHandlingState);;
 
-	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add RMD Entry");
+	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Add RMD Entry");
 	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add MSMD Entry");
 	_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Parameter Entry");
 	_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Quantity Entry");
 	_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Create next MSMD");
 
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
-	
+
+
 	_ui->addMenuButton(_buttonImportCSV, modelWrite, "TextVisible");
 	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
 	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
@@ -141,7 +148,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonTableAddRowBelow, modelWrite, "table-row-insert");
 	_ui->addMenuButton(_buttonTableDeleteRow, modelWrite, "table-row-delete");
 
-	_ui->addMenuButton(_buttonTableSave, modelWrite, "table-save");
+	_ui->addMenuButton(_buttonTableSave,  modelWrite, "table-save");
 	_ui->addMenuButton(_buttonTableReset, modelWrite, "table-refresh");
 	_ui->addMenuButton(_buttonTableResetToSelection, modelWrite, "table-refresh");
 
