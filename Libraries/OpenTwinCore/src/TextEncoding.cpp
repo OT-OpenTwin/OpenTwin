@@ -130,7 +130,7 @@ ot::EncodingGuesser::type7or8Byte ot::EncodingGuesser::CheckUtf8_7bits_8bits(utf
 }
 
 
-std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<char>& fileContent)
+std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(const std::vector<char>& fileContent)
 {
 	//#include <boost/locale.hpp>
 //std::string ansi_to_utf8(const std::string& str)
@@ -155,7 +155,7 @@ std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<char>& 
 }
 
 
-std::string ot::EncodingConverter_UTF16ToUTF8::operator()(std::vector<char>& fileContent)
+std::string ot::EncodingConverter_UTF16ToUTF8::operator()(const std::vector<char>& fileContent)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 	std::string out;

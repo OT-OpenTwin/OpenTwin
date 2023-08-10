@@ -16,6 +16,25 @@ void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard encoding
 		selectionProperty->setValue(encoding.getString(_encoding));
 		selectionProperty->setNeedsUpdate();
 	}
+	else
+	{
+		throw std::exception("Property \"Text Encoding\" could not be loaded");
+	}
+}
+
+ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding() 
+{
+	EntityPropertiesBase* base = getProperties().getProperty("Text Encoding");
+	if (base != nullptr)
+	{
+		auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(base);
+		ot::TextEncoding encoding;
+		return encoding.getType(selectionProperty->getValue());
+	}
+	else
+	{
+		throw std::exception("Property \"Text Encoding\" could not be loaded");
+	}
 }
 
 void EntityFileText::setSpecializedProperties()

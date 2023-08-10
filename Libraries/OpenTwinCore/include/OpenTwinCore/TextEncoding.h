@@ -47,11 +47,11 @@ namespace ot
 	class OT_CORE_API_EXPORT EncodingConverter_ISO88591ToUTF8
 	{
 	public:
-		std::string operator()(std::vector<char>& fileContent);
+		std::string operator()(const std::vector<char>& fileContent);
 	};
 	class OT_CORE_API_EXPORT EncodingConverter_UTF16ToUTF8
 	{
 	public:
-		std::string operator()(std::vector<char>& fileContent);
+		std::string operator()(const std::vector<char>& fileContent);
 	};
 }

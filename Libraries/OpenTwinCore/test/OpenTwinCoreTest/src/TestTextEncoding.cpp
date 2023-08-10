@@ -32,7 +32,7 @@ TEST_F(FixtureTextEncoding, ISO88591ToUTF8)
 	EXPECT_EQ(encoding, ot::TextEncoding::EncodingStandard::UTF8);
 }
 
-TEST_F(FixtureTextEncoding, UTF16ToUTF8)
+TEST_F(FixtureTextEncoding, UTF16BEBOMToUTF8)
 {
 	auto fileContent = ReadFile(ot::TextEncoding::UTF16_BEBOM);
 
@@ -43,6 +43,19 @@ TEST_F(FixtureTextEncoding, UTF16ToUTF8)
 	auto encoding = guesser(isValue.c_str(), isValue.size());
 
 	EXPECT_EQ(encoding, ot::TextEncoding::UTF8);
+}
+
+TEST_F(FixtureTextEncoding, UTF16LEBOMToUTF8BOM)
+{
+	auto fileContent = ReadFile(ot::TextEncoding::UTF16_LEBOM);
+
+	ot::EncodingConverter_UTF16ToUTF8 converter;
+	std::string isValue = converter(fileContent);
+
+	ot::EncodingGuesser guesser;
+	auto encoding = guesser(isValue.c_str(), isValue.size());
+
+	EXPECT_EQ(encoding, ot::TextEncoding::UTF8_BOM);
 }
 
 TEST_F(FixtureTextEncoding, EncodingStandardToString)

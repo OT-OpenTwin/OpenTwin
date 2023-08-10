@@ -11,6 +11,7 @@ public:
 	virtual std::string getClassName(void) override { return "EntityFileText"; };
 
 	void setTextEncoding(ot::TextEncoding::EncodingStandard encoding);
+	ot::TextEncoding::EncodingStandard getTextEncoding();
 
 protected:
 	void setSpecializedProperties() override;

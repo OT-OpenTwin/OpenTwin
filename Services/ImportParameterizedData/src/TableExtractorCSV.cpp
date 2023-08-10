@@ -32,8 +32,22 @@ void TableExtractorCSV::ExtractFromEntitySource(EntityFile* source)
 	_columnDelimiter = csvSource->getColumnDelimiter()[0];
 
 	const std::vector<char>& fileContent =	source->getData()->getData();
-	//In wstring
-	_fileContentStream.str(std::string(fileContent.begin(), fileContent.end()));
+	
+	ot::TextEncoding::EncodingStandard selectedEncodingStandard = csvSource->getTextEncoding();
+	if (selectedEncodingStandard == ot::TextEncoding::EncodingStandard::ANSI)
+	{
+		ot::EncodingConverter_ISO88591ToUTF8 converter;
+		_fileContentStream.str(converter(fileContent));
+	}
+	else if (selectedEncodingStandard == ot::TextEncoding::EncodingStandard::UTF16_BEBOM || selectedEncodingStandard == ot::TextEncoding::EncodingStandard::UTF16_LEBOM)
+	{
+		ot::EncodingConverter_UTF16ToUTF8 converter;
+		_fileContentStream.str(converter(fileContent));
+	}
+	else
+	{
+		_fileContentStream.str(std::string(fileContent.begin(), fileContent.end()));
+	}
 }
 
 void TableExtractorCSV::SetFileContent(std::vector<char> fileContent)
