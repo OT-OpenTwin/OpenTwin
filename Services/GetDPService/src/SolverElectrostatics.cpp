@@ -407,13 +407,33 @@ void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
         "  { Name Map; NameOfPostProcessing EleSta_v; \n"
         "     Operation { \n"
         "       Print[v, OnElementsOf DomainCC_Ele, Format Table, File \"potential.pos\"]; \n"
-        "       Print[e, OnElementsOf DomainCC_Ele, Format Table, File \"efield.pos\"]; \n"
+        "       Print[e, OnElementsOf DomainCC_Ele, Format Table, File \"efield.pos\"]; \n";
+
+    for (auto item : groupNameToIdMap)
+    {
+        // Now we create a file with the potential on the surface of this object
+        if (item.first[0] == '#')
+        {
+            controlFile <<
+                "       Print[v, OnElementsOf Region[{" << item.second << "}], Format Table, File \"potential#" << item.second << ".pos\"]; \n";
+        }
+    }
+
+    controlFile <<
         "     } \n"
         "  } \n"
         "} \n\n";
 }
 
 void SolverElectrostatics::convertPotential(const std::string& tempDirPath)
+{
+    std::map<std::string, std::string> nodeToPotentialMap;
+
+    convertGlobalPotential(tempDirPath, nodeToPotentialMap);
+    convertSurfacePotentials(tempDirPath, nodeToPotentialMap);
+}
+
+void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\potential.pos";
@@ -453,10 +473,10 @@ void SolverElectrostatics::convertPotential(const std::string& tempDirPath)
             std::string n3 = elements[ 8] + " " + elements[ 9] + " " + elements[10];
             std::string n4 = elements[11] + " " + elements[12] + " " + elements[13];
 
-            size_t indexN1 = getOrAddNode(n1, elements[17], nodeToIndexMap, nodeList, potentialList, nodeIndex);
-            size_t indexN2 = getOrAddNode(n2, elements[18], nodeToIndexMap, nodeList, potentialList, nodeIndex);
-            size_t indexN3 = getOrAddNode(n3, elements[19], nodeToIndexMap, nodeList, potentialList, nodeIndex);
-            size_t indexN4 = getOrAddNode(n4, elements[20], nodeToIndexMap, nodeList, potentialList, nodeIndex);
+            size_t indexN1 = getOrAddNode(n1, elements[17], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
+            size_t indexN2 = getOrAddNode(n2, elements[18], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
+            size_t indexN3 = getOrAddNode(n3, elements[19], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
+            size_t indexN4 = getOrAddNode(n4, elements[20], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
 
             std::vector<size_t> cell{ indexN1, indexN2, indexN3, indexN4 };
             cellList.push_back(cell);
@@ -504,9 +524,101 @@ void SolverElectrostatics::convertPotential(const std::string& tempDirPath)
     vtkFile.close();
 }
 
+void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap)
+{
+    for (auto item : groupNameToIdMap)
+    {
+        // Now we create a file with the potential on the surface of this object
+        if (item.first[0] == '#')
+        {
+            std::string potentialFileName = tempDirPath + "\\potential#" + std::to_string(item.second) + ".pos";
+            std::ifstream potentialFile(potentialFileName);
+
+            std::map<std::string, size_t> nodeToIndexMap;
+            std::list<std::string> nodeList;
+            std::list<std::string> potentialList;
+            std::list<std::vector<size_t>> cellList;
+
+            const int elementsPerRow = 17;
+
+            std::vector<std::string> elements;
+            elements.resize(elementsPerRow);
+
+            size_t nodeIndex = 0;
+
+            bool fileEndReached = false;
+            while (!fileEndReached)
+            {
+                for (int index = 0; index < elementsPerRow; index++)
+                {
+                    if (!(potentialFile >> elements[index]))
+                    {
+                        // We have reached the end of the file
+                        fileEndReached = true;
+                        break;
+                    }
+                }
+
+                if (!fileEndReached)
+                {
+                    // Now we process the line
+                    std::string n1 = elements[2] + " " + elements[3] + " " + elements[4];
+                    std::string n2 = elements[5] + " " + elements[6] + " " + elements[7];
+                    std::string n3 = elements[8] + " " + elements[9] + " " + elements[10];
+
+                    size_t indexN1 = getOrAddNode(n1, "", nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
+                    size_t indexN2 = getOrAddNode(n2, "", nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
+                    size_t indexN3 = getOrAddNode(n3, "", nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
+
+                    std::vector<size_t> cell{ indexN1, indexN2, indexN3 };
+                    cellList.push_back(cell);
+                }
+            }
+
+            potentialFile.close();
+
+            std::string vtkFileName = tempDirPath + "\\potential#" + std::to_string(item.second) + ".vtu";
+            std::ofstream vtkFile(vtkFileName);
+
+            vtkFile << "# vtk DataFile Version 2.0" << std::endl;
+            vtkFile << "Electrostatic potential" << std::endl;
+            vtkFile << "ASCII" << std::endl;
+            vtkFile << "DATASET UNSTRUCTURED_GRID" << std::endl << std::endl;
+
+            vtkFile << "POINTS " << nodeList.size() << " float" << std::endl;
+            for (auto node : nodeList)
+            {
+                vtkFile << node << std::endl;
+            }
+
+            vtkFile << std::endl << "CELLS " << cellList.size() << " " << 4 * cellList.size() << std::endl;
+            for (auto cell : cellList)
+            {
+                vtkFile << "3 " << cell[0] << " " << cell[1] << " " << cell[2] << std::endl;
+            }
+
+            vtkFile << std::endl << "CELL_TYPES " << cellList.size() << std::endl;
+            for (auto cell : cellList)
+            {
+                vtkFile << "5" << std::endl;
+            }
+
+            vtkFile << std::endl << "POINT_DATA " << nodeList.size() << std::endl;
+            vtkFile << "SCALARS scalars float 1" << std::endl;
+            vtkFile << "LOOKUP_TABLE default" << std::endl;
+
+            for (auto node : nodeList)
+            {
+                std::string potential = nodeToPotentialMap[node];
+                vtkFile << nodeToPotentialMap[node] << std::endl;
+            }
+        }
+    }
+}
+
 size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::string& potential, 
                                           std::map<std::string, size_t> &nodeToIndexMap, std::list<std::string> &nodeList, std::list<std::string> &potentialList,
-                                          size_t &nodeIndex)
+                                          size_t &nodeIndex, std::map<std::string, std::string>& nodeToPotentialMap)
 {
     size_t index = 0;
 
@@ -519,6 +631,11 @@ size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::st
 
         nodeList.push_back(node);
         potentialList.push_back(potential);
+
+        if (!potential.empty())
+        {
+            nodeToPotentialMap[node] = potential;
+        }
     }
     else
     {
