@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "OpenTwinCore/Variable.h"
 #include <string>
-
+/*
 TEST(VariableTest, VariableToJSON)
 {
 	OT_rJSON_createDOC(doc);
@@ -33,3 +33,4 @@ TEST(VariableTest, JSONToVariableNotSupportedType)
 	
 	EXPECT_ANY_THROW(converter(var));
 }
+*/

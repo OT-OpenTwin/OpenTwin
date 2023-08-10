@@ -1,14 +1,55 @@
-//! @file GraphicsLayout.h
+//! @file GraphicsLayoutItem.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-
 // OpenTwin header
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
+
+// Qt header
+#include <QtWidgets/qgraphicswidget.h>
+
+ot::GraphicsLayoutItem::GraphicsLayoutItem() : m_layoutWrap(nullptr) {}
+
+ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
+
+void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+	std::list<QGraphicsLayoutItem*> lst;
+	this->getAllItems(lst);
+
+	for (auto itm : lst) {
+		// Finalize child
+		ot::GraphicsItem* gi = dynamic_cast<ot::GraphicsItem*>(itm);
+		if (gi) gi->finalizeItem(_scene, _group, false);
+	}
+
+	if (_isRoot) {
+		otAssert(m_layoutWrap == nullptr, "Should not be happening");
+
+		QGraphicsLayout* lay = dynamic_cast<QGraphicsLayout *>(this);
+		if (lay == nullptr) {
+			OT_LOG_EA("OT::GraphicsLayoutItem cast to QGraphicsLayout failed");
+		}
+		else {
+			// Add wrapped layout item
+			m_layoutWrap = new QGraphicsWidget;
+			m_layoutWrap->setLayout(lay);
+
+			_scene->addItem(m_layoutWrap);
+			if (_group) _group->addToGroup(m_layoutWrap);
+		}
+	}	
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) {}
 
@@ -40,6 +81,12 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	}
 
 	return true;
+}
+
+void ot::GraphicsBoxLayoutItem::getAllItems(std::list<QGraphicsLayoutItem *>& _items) const {
+	for (int i = 0; i < this->count(); i++) {
+		if (this->itemAt(i)) _items.push_back(this->itemAt(i));
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -78,6 +125,14 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 
 	return true;
+}
+
+void ot::GraphicsGridLayoutItem::getAllItems(std::list<QGraphicsLayoutItem*>& _items) const {
+	for (int r = 0; r < this->rowCount(); r++) {
+		for (int c = 0; c < this->columnCount(); c++) {
+			if (this->itemAt(r, c)) _items.push_back(this->itemAt(r, c));
+		}
+	}
 }
 
 // Register at class factory

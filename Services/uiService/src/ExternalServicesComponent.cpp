@@ -47,6 +47,7 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/GraphicsPicker.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2770,57 +2771,20 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
 			}
-			else if (action == OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor) {
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, Object);
+			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor) {
+				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
 
 				//ot::BlockEditorConfigurationPackage pckg;
-				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage].GetObject();
+				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
 
-				ot::GraphicsEditorPackage pckg;
+				ot::GraphicsEditorPackage pckg("", "");
 				pckg.setFromJsonObject(configurationObj);
 
-				//pckg.setFromJsonObject(configurationObj);
-				ot::BlockNetworkEditor * newEditor = new ot::BlockNetworkEditor;
-				{
-					//ot::GraphicsRectangularItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsRectangularItem>("GraphicsRectangularItem");
+				ot::BlockNetworkEditor* newEditor = new ot::BlockNetworkEditor;
+				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.title()), newEditor);
 
-					ot::GraphicsVBoxLayoutItemCfg* root = new ot::GraphicsVBoxLayoutItemCfg;
-					ot::GraphicsHBoxLayoutItemCfg* mid = new ot::GraphicsHBoxLayoutItemCfg;
-
-					ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
-					title->setText("Hello World");
-
-					ot::GraphicsRectangularItemCfg* left = new ot::GraphicsRectangularItemCfg;
-					left->setSize(ot::Size2D(20, 20));
-
-					ot::GraphicsRectangularItemCfg* right = new ot::GraphicsRectangularItemCfg;
-					right->setSize(ot::Size2D(10, 10));
-
-					mid->addChildItem(left);
-					mid->addStrech(1);
-					mid->addChildItem(right);
-
-					root->addChildItem(title);
-					root->addChildItem(mid);
-
-					ot::GraphicsItem* itm = ot::GraphicsFactory::itemFromConfig(root);
-
-					if (itm) {
-						QGraphicsItem* citm = dynamic_cast<QGraphicsItem*>(itm);
-						if (citm == nullptr) {
-							OT_LOG_EA("Cast fail");
-						}
-						else {
-							newEditor->scene()->addItem(citm);
-						}
-					}
-					else {
-						OT_LOG_EA("Factory fail");
-					}
-				}
-				
-				AppBase::instance()->addTabToCentralView("Test", newEditor);
+				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
 			else
 			{

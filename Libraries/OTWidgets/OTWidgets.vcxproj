@@ -23,6 +23,7 @@
     <ClCompile Include="src\GraphicsFactory.cpp" />
     <ClCompile Include="src\GraphicsItem.cpp" />
     <ClCompile Include="src\GraphicsLayoutItem.cpp" />
+    <ClCompile Include="src\GraphicsPicker.cpp" />
     <ClCompile Include="src\GraphicsScene.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsLayoutItem.h" />
+    <QtMoc Include="include\OTWidgets\GraphicsPicker.h" />
     <ClInclude Include="include\OTWidgets\LineEdit.h" />
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h" />
     <ClInclude Include="include\OTWidgets\TreeWidget.h" />

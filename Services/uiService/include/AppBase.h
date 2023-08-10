@@ -55,7 +55,8 @@ class UiPluginManager;
 class ToolBar;
 namespace ak { class aNotifier; class aColorStyle; class aWindow; }
 namespace ot { class AbstractSettingsItem; }
-namespace ot { class BlockPickerDockWidget; }
+namespace ot { class GraphicsPicker; }
+namespace ot { class GraphicsPickerDockWidget; }
 struct structModelViewInfo
 {
 	ViewerUIDtype	view;
@@ -443,6 +444,8 @@ public:
 
 	int findPropertyID(const QString & _propertyName);
 
+	ot::GraphicsPicker* globalGraphicsPicker(void);
+
 	// ######################################################################################################################
 
 	// Prompt
@@ -589,7 +592,7 @@ private:
 	ak::UID						m_viewerUid;					//! The UID of the viewer
 	ak::UID						m_modelUid;					//! The UID of the model
 	ak::UID						m_timerRestoreStateAfterTabChange;
-	ot::BlockPickerDockWidget * m_blockPickerDock;
+	ot::GraphicsPickerDockWidget* m_graphicsPickerDock;
 
 	std::string					m_currentStateWindow;
 	std::string					m_currentStateColorStyle;

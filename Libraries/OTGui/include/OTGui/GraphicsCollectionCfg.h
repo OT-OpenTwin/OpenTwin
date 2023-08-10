@@ -21,7 +21,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsCollectionCfg : public ot::Serializable {
 	public:
 		GraphicsCollectionCfg();
-		GraphicsCollectionCfg(const std::string& _collectionName);
+		GraphicsCollectionCfg(const std::string& _collectionName, const std::string& _collectionTitle);
 		virtual ~GraphicsCollectionCfg();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -37,6 +37,9 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& name(void) const { return m_name; };
 
+		void setTitle(const std::string& _title) { m_title = _title; };
+		const std::string& title(void) const { return m_title; };
+
 		void addChildCollection(GraphicsCollectionCfg* _child);
 		const std::list<GraphicsCollectionCfg*>& childCollections(void) const { return m_collections; };
 
@@ -49,5 +52,6 @@ namespace ot {
 		std::list<GraphicsCollectionCfg*> m_collections;
 		std::list<GraphicsItemCfg*> m_items;
 		std::string m_name;
+		std::string m_title;
 	};
 }

@@ -20,7 +20,9 @@ ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _conf
 		return nullptr;
 	}
 
-	ot::GraphicsItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItem>(ot::GlobalKeyMap::instance().get(_configuration->simpleFactoryObjectKey()));
+	ot::GraphicsItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItem>(
+		ot::GlobalKeyMap::instance().get(
+			_configuration->simpleFactoryObjectKey()));
 	if (itm == nullptr) {
 		OT_LOG_EA("Failed to create item from config");
 		return nullptr;

@@ -67,7 +67,9 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
 
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
+	leftRect->setSize(ot::Size2D(20, 20));
 	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
+	rightRect->setSize(ot::Size2D(30, 30));
 
 	midLayout->addChildItem(leftRect);
 	midLayout->addStrech(1);
@@ -80,12 +82,26 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 }
 
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
-	ot::GraphicsRectangularItemCfg* b = new ot::GraphicsRectangularItemCfg;
-	b->setName(_name);
-	b->setBorder(ot::Border(ot::Color(255, 0, 128), 2));
-	b->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
+	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
 
-	return b;
+	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
+	title->setName(_name);
+	title->setText(_name);
+	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
+
+	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
+
+	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
+	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
+
+	midLayout->addChildItem(leftRect);
+	midLayout->addStrech(1);
+	midLayout->addChildItem(rightRect);
+
+	centralLayout->addChildItem(title);
+	centralLayout->addChildItem(midLayout, 1);
+
+	return centralLayout;
 }
 
 std::string Application::createEmptyTestEditor(void) {
@@ -98,36 +114,22 @@ std::string Application::createEmptyTestEditor(void) {
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to create empty block editor";
 		}*/
 
-		ot::GraphicsEditorPackage pckg;
-		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("A");
-		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1");
-		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2");
+		ot::GraphicsEditorPackage pckg("TestPackage", "Test title");
+		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("A", "A");
+		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1", "1");
+		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
 		a->addChildCollection(a1);
 		a1->addItem(createTestBlock("Alpha 1"));
-		a1->addItem(createTestBlock2("Alpha 2"));
 		a->addChildCollection(a2);
-		a2->addItem(createTestBlock("Beta 1"));
+		a2->addItem(createTestBlock2("Alpha 2"));
 		pckg.addCollection(a);
-
-		ot::GraphicsCollectionCfg* b = new ot::GraphicsCollectionCfg("B");
-		ot::GraphicsCollectionCfg* b1 = new ot::GraphicsCollectionCfg("1");
-		ot::GraphicsCollectionCfg* b2 = new ot::GraphicsCollectionCfg("2");
-		b->addChildCollection(b1);
-		b1->addItem(createTestBlock("Gamma 1"));
-		b1->addItem(createTestBlock("Gamma 2"));
-		b->addChildCollection(b2);
-		b2->addItem(createTestBlock("Delta 1"));
-		b2->addItem(createTestBlock("Delta 2"));
-		b2->addItem(createTestBlock("Delta 3"));
-		b2->addItem(createTestBlock("Delta 4"));
-		pckg.addCollection(b);
 
 		OT_rJSON_createDOC(doc);
 		OT_rJSON_createValueObject(pckgObj);
 		pckg.addToJsonObject(doc, pckgObj);
 
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage, pckgObj);
+		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 		ot::GlobalOwner::instance().addToJsonObject(doc, doc);
 
 		std::string response;

@@ -19,7 +19,7 @@ namespace ot {
 	
 	class OT_GUI_API_EXPORT GraphicsEditorPackage : public ot::Serializable {
 	public:
-		GraphicsEditorPackage();
+		GraphicsEditorPackage(const std::string& _packageName, const std::string& _editorTitle);
 		virtual ~GraphicsEditorPackage();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -35,11 +35,17 @@ namespace ot {
 		void addCollection(GraphicsCollectionCfg* _collection);
 		const std::list<GraphicsCollectionCfg*>& collections(void) const { return m_collections; };
 
+		const std::string& name(void) const { return m_name; };
+		const std::string& title(void) const { return m_title; };
+
 	private:
 		void memFree(void);
 
 		std::list< GraphicsCollectionCfg*> m_collections;
+		std::string m_name;
+		std::string m_title;
 
+		GraphicsEditorPackage() = delete;
 		GraphicsEditorPackage(const GraphicsEditorPackage&) = delete;
 		GraphicsEditorPackage& operator = (const GraphicsEditorPackage&) = delete;
 	};

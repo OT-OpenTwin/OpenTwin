@@ -234,7 +234,7 @@
     <ClCompile Include="src\TextBlockLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\OTBlockEditor\BlockPickerWidget.h" />
+    <ClInclude Include="include\OTBlockEditor\BlockPickerWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTBlockEditor\Block.h" />

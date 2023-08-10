@@ -28,6 +28,9 @@
     <ClCompile Include="src\GraphicsFactory.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsPicker.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -84,6 +87,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h">
       <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\GraphicsPicker.h">
+      <Filter>include\Graphics</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

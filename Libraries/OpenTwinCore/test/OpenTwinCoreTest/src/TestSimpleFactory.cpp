@@ -30,5 +30,13 @@ TEST(SimpleFactoryTests, CreateValid)
 
 TEST(SimpleFactoryTests, CreateInvalid)
 {
-	EXPECT_ANY_THROW(ot::SimpleFactory::instance().create("C"));
+	EXPECT_TRUE(ot::SimpleFactory::instance().create("C") == nullptr);
+}
+
+TEST(SimpleFactoryTests, All)
+{
+	EXPECT_NO_THROW(ot::SimpleFactoryRegistrar<TesterB> regA("B"));
+	EXPECT_NO_THROW(ot::SimpleFactory::instance().create("B"));
+	EXPECT_TRUE(ot::SimpleFactory::instance().create("B")->simpleFactoryObjectKey() == "B");
+	EXPECT_TRUE(ot::SimpleFactory::instance().create("B") != nullptr);
 }

@@ -7,6 +7,8 @@
 #ifndef OT_SINGLETON_H
 #define OT_SINGLETON_H
 
+#include "OpenTwinCore/CoreAPIExport.h"
+
 //! @brief Required macro for classes implementing the Singleton interface
 //! "The class that is provided as T should add this macro to their class declaration"
 //! Provide the Singleton type as arg(s)
@@ -16,7 +18,7 @@ namespace ot {
 
 	//! @brief Default singleton template
 	//! "The class that is provided as T should add the OT_SINGLETON macro to their class declaration"
-	template <class T> class Singleton {
+	template <class T> class OT_CORE_API_EXPORTONLY Singleton {
 	public:
 		//! @brief Returns the single instance of the class.
 		//! This method provides access to the single instance of the template parameter class.

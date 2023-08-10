@@ -1,5 +1,5 @@
 #include "openTwinCore/Variable.h"
-
+/*
 
 rapidjson::Value ot::VariableToJSONConverter::operator()(ot::variable_t & value, OT_rJSON_doc& emebeddingDocument)
 {
@@ -70,3 +70,4 @@ ot::variable_t ot::JSONToVariableConverter::operator()(rapidjson::Value& value)
 		throw std::exception("Not supported type for rapidjson::Value to variable_t conversion.");
 	}
 }
+*/

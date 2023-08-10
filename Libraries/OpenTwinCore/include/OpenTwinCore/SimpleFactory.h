@@ -34,7 +34,7 @@ namespace ot {
 
 	//! @brief Base class for any class that may be created by the simple factory
 	//! Note that the OT_SimpleFactoryObject macro should be used to register the class in the factory
-	class OT_CORE_API_EXPORT SimpleFactoryObject {
+	class OT_CORE_API_EXPORTONLY SimpleFactoryObject {
 	public:
 		SimpleFactoryObject() = default;
 		SimpleFactoryObject(const SimpleFactoryObject&) = default;
@@ -52,7 +52,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
-	class OT_CORE_API_EXPORT SimpleFactory : public ot::Singleton<SimpleFactory> {
+	class OT_CORE_API_EXPORTONLY SimpleFactory : public ot::Singleton<SimpleFactory> {
 		OT_SINGLETON(SimpleFactory)
 	public:
 

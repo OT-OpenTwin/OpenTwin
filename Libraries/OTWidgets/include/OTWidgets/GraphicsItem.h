@@ -22,14 +22,63 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
+		enum GraphicsItemFlag {
+			NoFlags        = 0x00, //! @brief No graphics item flags
+			ItemIsMoveable = 0x01, //! @brief The item can be moved by a user
+			ItemPreviewContext = 0x10, //! @brief Item is placed in a preview (preview box)
+			ItemNetworkContext = 0x20 //! @brief Item is placed in a network (editor)
+		};
+
 		GraphicsItem();
 		virtual ~GraphicsItem();
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) = 0;
 
-	private:
+		void setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags);
+		ot::GraphicsItem::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
 
+		void setConfiguration(const std::string& _jsonDocument) { m_configuration = _jsonDocument; };
+		const std::string& configuration(void) const { return m_configuration; };
+
+		virtual void finalizeAsRootItem(QGraphicsScene * _scene);
+
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) = 0;
+
+	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
+
+	private:
+		std::string m_configuration;
+		GraphicsItemFlag m_flags;
+		QGraphicsItemGroup* m_group;
 	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	//class OT_WIDGETS_API_EXPORT GraphicsItemPair : public ot::GraphicsItem {
+	//public:
+	//	GraphicsItemPair();
+	//	virtual ~GraphicsItemPair();
+
+	//	virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+	//	//! @brief Returns the key that is used to create an instance of this class in the simple factory
+	//	virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
+
+	//	virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
+
+	//	virtual void setGeometry(const QRectF& rect) override;
+
+	//	virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
+
+	//private:
+
+	//};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -49,9 +98,9 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
 
-		virtual void setGeometry(const QRectF& rect) {
-			setPos(rect.topLeft());
-		}
+		virtual void setGeometry(const QRectF& rect) override;
+
+		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
 
 	private:
 		QSizeF m_size;
@@ -76,9 +125,9 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
 
-		virtual void setGeometry(const QRectF& rect) {
-			setPos(rect.topLeft());
-		}
+		virtual void setGeometry(const QRectF& rect) override;
+
+		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
 
 	private:
 		QSizeF m_size;

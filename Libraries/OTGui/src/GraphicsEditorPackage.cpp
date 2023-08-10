@@ -9,11 +9,12 @@
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
+#define OT_JSON_Member_Name "Name"
+#define OT_JSON_Member_Title "Title"
 #define OT_JSON_Member_Collections "Collections"
 
-ot::GraphicsEditorPackage::GraphicsEditorPackage() {
-
-}
+ot::GraphicsEditorPackage::GraphicsEditorPackage(const std::string& _packageName, const std::string& _editorTitle) 
+	: m_name(_packageName), m_title(_editorTitle) {}
 
 ot::GraphicsEditorPackage::~GraphicsEditorPackage() {
 	this->memFree();
@@ -26,13 +27,21 @@ void ot::GraphicsEditorPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSO
 		c->addToJsonObject(_document, collectionObj);
 		collectionArr.PushBack(collectionObj, _document.GetAllocator());
 	}
+	ot::rJSON::add(_document, _object, OT_JSON_Member_Name, m_name);
+	ot::rJSON::add(_document, _object, OT_JSON_Member_Title, m_title);
 	ot::rJSON::add(_document, _object, OT_JSON_Member_Collections, collectionArr);
 }
 
 void ot::GraphicsEditorPackage::setFromJsonObject(OT_rJSON_val& _object) {
 	this->memFree();
 
+	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
+	OT_rJSON_checkMember(_object, OT_JSON_Member_Title, String);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Collections, Array);
+
+	m_name = _object[OT_JSON_Member_Name].GetString();
+	m_title = _object[OT_JSON_Member_Title].GetString();
+
 	OT_rJSON_val collectionArr = _object[OT_JSON_Member_Collections].GetArray();
 	for (rapidjson::SizeType i = 0; i < collectionArr.Size(); i++) {
 		OT_rJSON_checkArrayEntryType(collectionArr, i, Object);

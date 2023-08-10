@@ -30,12 +30,10 @@ ot::GraphicsLayoutItemCfg::~GraphicsLayoutItemCfg() {
 
 void ot::GraphicsLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	GraphicsItemCfg::addToJsonObject(_document, _object);
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
 }
 
 void ot::GraphicsLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
-
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -101,26 +99,26 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 				itm = ot::SimpleFactory::instance().createType<GraphicsItemCfg>(itemObj);
 				if (itm) {
 					itm->setFromJsonObject(itemObj);
+					m_items.push_back(itemStrechPair_t(itm, pairObj[OT_JSON_MEMBER_Stretch].GetInt()));
 				}
 				else {
-					otAssert(0, "Factory failed");
+					OT_LOG_EA("Factory failed");
 				}
-				m_items.push_back(itemStrechPair_t(itm, pairObj[OT_JSON_MEMBER_Stretch].GetInt()));
 			}
 			catch (const std::exception& _e) {
+				OT_LOG_E("Error occured");
 				if (itm) delete itm;
 				throw _e;
 			}
 			catch (...) {
-				if (itm) delete itm;
 				OT_LOG_EA("Unknown error occured");
+				if (itm) delete itm;
 				throw std::exception("Unknown error");
 			}
 		}
 		else {
 			OT_LOG_EA("Invalid JSON Object type");
 		}
-		
 	}
 }
 

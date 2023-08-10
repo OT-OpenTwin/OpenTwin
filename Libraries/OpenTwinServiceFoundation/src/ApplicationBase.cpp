@@ -436,11 +436,13 @@ std::string ot::ApplicationBase::handleContextMenuItemCheckedChanged(OT_rJSON_do
 	}
 }
 
-std::string ot::ApplicationBase::handleBlockEditorBlockDropped(OT_rJSON_doc& _document) {
+std::string ot::ApplicationBase::handleGraphicsEditorItemDropped(OT_rJSON_doc& _document) {
+	return OT_ACTION_RETURN_INDICATOR_Error "Foundation: Not implemented";
+	/*
 	if (m_uiNotifier) {
-		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_EditorName);
-		std::string blockName = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockName);
-		std::string blockID = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockId);
+		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		std::string blockName = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_BlockName);
+		std::string blockID = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_BlockId);
 
 		std::string errorMessage = blockEditorBlockDropped(blockEditorName, blockName, blockID);
 		if (errorMessage.empty()) return OT_ACTION_RETURN_VALUE_OK;
@@ -450,12 +452,14 @@ std::string ot::ApplicationBase::handleBlockEditorBlockDropped(OT_rJSON_doc& _do
 		otAssert(0, "No UI connected");
 		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
 	}
+	*/
 }
 
-std::string ot::ApplicationBase::handleBlockEditorBlockRemoved(OT_rJSON_doc& _document) {
-	if (m_uiNotifier) {
-		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_EditorName);
-		std::string blockID = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockId);
+std::string ot::ApplicationBase::handleGraphicsEditorItemRemoved(OT_rJSON_doc& _document) {
+	return OT_ACTION_RETURN_INDICATOR_Error "Foundation: Not implemented";
+	/*if (m_uiNotifier) {
+		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		std::string blockID = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_BlockId);
 
 		blockEditorBlockRemoved(blockEditorName, blockID);
 		return OT_ACTION_RETURN_VALUE_OK;
@@ -463,17 +467,20 @@ std::string ot::ApplicationBase::handleBlockEditorBlockRemoved(OT_rJSON_doc& _do
 	else {
 		otAssert(0, "No UI connected");
 		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
-	}
+	}*/
 }
 
-std::string ot::ApplicationBase::handleBlockEditorConnectionDropped(OT_rJSON_doc& _document) {
+std::string ot::ApplicationBase::handleGraphicsEditorConnectionDropped(OT_rJSON_doc& _document) {
+	return OT_ACTION_RETURN_INDICATOR_Error "Foundation: Not implemented";
+	/*
 	if (m_uiNotifier) {
-		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_EditorName);
-		std::string blockFrom = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockFrom);
-		std::string connectorFrom = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_ConnectorFrom);
-		std::string blockTo = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockTo);
-		std::string connectorTo = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_ConnectorTo);
-
+		otAssert(0, "");
+		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		std::string blockFrom = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+		std::string connectorFrom = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectorFrom);
+		std::string blockTo = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_BlockTo);
+		std::string connectorTo = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectorTo);
+		
 		std::string errorMessage = blockEditorConnectionDropped(blockEditorName, blockFrom, connectorFrom, blockTo, connectorTo);
 		if (errorMessage.empty()) return OT_ACTION_RETURN_VALUE_OK;
 		else return errorMessage;
@@ -481,16 +488,17 @@ std::string ot::ApplicationBase::handleBlockEditorConnectionDropped(OT_rJSON_doc
 	else {
 		otAssert(0, "No UI connected");
 		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
-	}
+	}*/
 }
 
-std::string ot::ApplicationBase::handleBlockEditorConnectionRemoved(OT_rJSON_doc& _document) {
-	if (m_uiNotifier) {
-		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_EditorName);
-		std::string blockFrom = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockFrom);
-		std::string connectorFrom = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_ConnectorFrom);
-		std::string blockTo = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_BlockTo);
-		std::string connectorTo = rJSON::getString(_document, OT_ACTION_PARAM_BLOCKEDITOR_ConnectorTo);
+std::string ot::ApplicationBase::handleGraphicsEditorConnectionRemoved(OT_rJSON_doc& _document) {
+	return OT_ACTION_RETURN_INDICATOR_Error "Foundation: Not implemented";
+	/*if (m_uiNotifier) {
+		std::string blockEditorName = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		std::string blockFrom = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_BlockFrom);
+		std::string connectorFrom = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectorFrom);
+		std::string blockTo = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_BlockTo);
+		std::string connectorTo = rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectorTo);
 
 		blockEditorConnectionRemoved(blockEditorName, blockFrom, connectorFrom, blockTo, connectorTo);
 		return OT_ACTION_RETURN_VALUE_OK;
@@ -498,7 +506,7 @@ std::string ot::ApplicationBase::handleBlockEditorConnectionRemoved(OT_rJSON_doc
 	else {
 		otAssert(0, "No UI connected");
 		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
-	}
+	}*/
 }
 
 void ot::ApplicationBase::__serviceConnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {

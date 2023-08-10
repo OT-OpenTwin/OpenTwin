@@ -120,7 +120,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(SolutionDir)\$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinCore.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

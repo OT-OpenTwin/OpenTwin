@@ -344,20 +344,19 @@ namespace ot {
 
 		std::map<UID, UID>								m_prefetchedEntityVersions;
 
-		
 		void __serviceConnected(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id);
-	private:
 
+	private:
 		friend intern::ExternalServicesComponent;
 
 		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleContextMenuItemClicked, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemClicked, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleContextMenuItemCheckedChanged, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleBlockEditorBlockDropped, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_BlockDropped, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleBlockEditorBlockRemoved, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_BlockRemoved, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleBlockEditorConnectionDropped, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionDropped, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleBlockEditorConnectionRemoved, ApplicationBase, OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionRemoved, ot::SECURE_MESSAGE_TYPES);
+		OT_HANDLER(handleGraphicsEditorItemDropped, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped, ot::SECURE_MESSAGE_TYPES);
+		OT_HANDLER(handleGraphicsEditorItemRemoved, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemRemoved, ot::SECURE_MESSAGE_TYPES);
+		OT_HANDLER(handleGraphicsEditorConnectionDropped, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped, ot::SECURE_MESSAGE_TYPES);
+		OT_HANDLER(handleGraphicsEditorConnectionRemoved, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionRemoved, ot::SECURE_MESSAGE_TYPES);
 
 		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
 		std::string __processMessage(const std::string & _message, OT_rJSON_doc &doc, serviceID_t _senderID);

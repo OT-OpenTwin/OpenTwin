@@ -55,9 +55,7 @@
 #include "OpenTwinCommunication/UiTypes.h"
 #include "OpenTwinFoundation/SettingsData.h"
 #include "OpenTwinFoundation/OTObject.h"
-#include "OTBlockEditor/BlockEditorAPI.h"
-#include "OTBlockEditor/BlockPickerWidget.h"
-#include "OTBlockEditor/BlockPickerDockWidget.h"
+#include "OTWidgets/GraphicsPicker.h"
 #include "DataBase.h"
 
 // C++ header
@@ -132,7 +130,7 @@ AppBase::AppBase()
 	m_contextMenuManager(nullptr),
 	m_logInManager(nullptr),
 	m_uiPluginManager(nullptr),
-	m_blockPickerDock(nullptr)
+	m_graphicsPickerDock(nullptr)
 {
 	m_tabViewWidget = invalidUID;
 
@@ -304,7 +302,7 @@ int AppBase::run() {
 			uiAPI::dock::setVisible(m_docks.output, false);
 			uiAPI::dock::setVisible(m_docks.properties, false);
 			uiAPI::dock::setVisible(m_docks.projectNavigation, false);
-			m_blockPickerDock->setVisible(false);
+			m_graphicsPickerDock->setVisible(false);
 		}
 
 		// Create shortcut manager
@@ -421,7 +419,7 @@ void AppBase::notify(
 				uiAPI::dock::setVisible(m_docks.output, true);
 				uiAPI::dock::setVisible(m_docks.projectNavigation, true);
 				uiAPI::dock::setVisible(m_docks.properties, true);
-				m_blockPickerDock->setVisible(true);
+				m_graphicsPickerDock->setVisible(true);
 			}
 			else {
 				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow);
@@ -464,7 +462,7 @@ void AppBase::notify(
 					uiAPI::dock::setVisible(m_docks.properties, false);
 					uiAPI::dock::setVisible(m_docks.projectNavigation, false);
 					uiAPI::dock::setVisible(m_docks.debug, false);
-					m_blockPickerDock->setVisible(false);
+					m_graphicsPickerDock->setVisible(false);
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
 					m_widgetIsWelcome = true;
 					m_welcomeScreen->refreshProjectNames();
@@ -1247,7 +1245,7 @@ void AppBase::createUi(void) {
 			m_docks.output = uiAPI::createDock(m_uid, TITLE_DOCK_OUTPUT);
 			m_docks.properties = uiAPI::createDock(m_uid, TITLE_DOCK_PROPERTIES);
 			m_docks.projectNavigation = uiAPI::createDock(m_uid, TITLE_DOCK_PROJECTNAVIGATION);
-			m_blockPickerDock = new ot::BlockPickerDockWidget("Block Picker");
+			m_graphicsPickerDock = new ot::GraphicsPickerDockWidget("Block Picker");
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
@@ -1331,16 +1329,16 @@ void AppBase::createUi(void) {
 			uiAPI::window::tabifyDock(m_mainWindow, m_docks.output, m_docks.debug);
 			{
 				aWindowManager* m = uiAPI::object::get<ak::aWindowManager>(m_mainWindow);
-				m->tabifyDock(uiAPI::object::get<ak::aDockWidget>(m_docks.projectNavigation), m_blockPickerDock);
-				m_blockPickerDock->setHidden(true);
-				ot::BlockEditorAPI::setGlobalBlockPickerWidget(m_blockPickerDock->pickerWidget());
+				m->tabifyDock(uiAPI::object::get<ak::aDockWidget>(m_docks.projectNavigation), m_graphicsPickerDock);
+				m_graphicsPickerDock->setHidden(true);
+				//ot::BlockEditorAPI::setGlobalBlockPickerWidget(m_graphicsPickerDock->pickerWidget());
 			}
 			// Add docks to dock watcher
 			m_ttb->addDockWatch(m_docks.debug);
 			m_ttb->addDockWatch(m_docks.output);
 			m_ttb->addDockWatch(m_docks.properties);
 			m_ttb->addDockWatch(m_docks.projectNavigation);
-			m_ttb->addDockWatch(m_blockPickerDock);
+			m_ttb->addDockWatch(m_graphicsPickerDock);
 
 			//Note
 			uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
@@ -1358,7 +1356,7 @@ void AppBase::createUi(void) {
 			uiAPI::object::get<aDockWidget>(m_docks.output)->setObjectName(OBJ_ALIAS_DockOutput);
 			uiAPI::object::get<aDockWidget>(m_docks.properties)->setObjectName(OBJ_ALIAS_DockProperties);
 			uiAPI::object::get<aDockWidget>(m_docks.projectNavigation)->setObjectName(OBJ_ALIAS_DockTree);
-			m_blockPickerDock->setObjectName(OBJ_ALIAS_BlockPicker);
+			m_graphicsPickerDock->setObjectName(OBJ_ALIAS_BlockPicker);
 
 			// #######################################################################
 
@@ -2050,6 +2048,11 @@ void AppBase::setPropertyValueDouble(ak::ID _itemID, double _value) {
 
 int AppBase::findPropertyID(const QString & _propertyName) {
 	return uiAPI::propertyGrid::findItemID(m_widgets.properties, _propertyName);
+}
+
+ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
+	OTAssertNullptr(m_graphicsPickerDock);
+	return m_graphicsPickerDock->pickerWidget();
 }
 
 // ######################################################################################################################

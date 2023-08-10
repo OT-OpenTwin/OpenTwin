@@ -216,12 +216,11 @@
 #define OT_ACTION_CMD_PYTHON_Initialization "Python.Initialize"
 
 
-#define OT_ACTION_CMD_UI_BLOCKEDITOR_CreateEmptyBlockEditor "UI.BlockEditor.CreateEmpty"
-//#define OT_ACTION_CMD_UI_BLOCKEDITOR_CreateBlockEditor "UI.BlockEditor.Create"
-#define OT_ACTION_CMD_UI_BLOCKEDITOR_BlockDropped "UI.BlockEditor.Block.Dropped"
-#define OT_ACTION_CMD_UI_BLOCKEDITOR_BlockRemoved "UI.BlockEditor.Block.Removed"
-#define OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionDropped "UI.BlockEditor.Connection.Dropped"
-#define OT_ACTION_CMD_UI_BLOCKEDITOR_ConnectionRemoved "UI.BlockEditor.Connection.Removed"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor "UI.GraphicsEditor.CreateEmpty"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped "UI.GraphicsEditor.Item.Dropped"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemRemoved "UI.GraphicsEditor.Item.Removed"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped "UI.GraphicsEditor.Connection.Dropped"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionRemoved "UI.GraphicsEditor.Connection.Removed"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
@@ -484,16 +483,13 @@
 #define OT_ACTION_PARAM_CARTESIANMESH_MeshEntityID "CartesianMesh.MeshEntityID"
 #define OT_ACTION_PARAM_CARTESIANMESH_ModelStateVersion "CartesianMesh.ModelVersion"
 
-#define OT_ACTION_PARAM_BLOCKEDITOR_ConfigurationPackage "BlockEditor.ConfigurationPackage"
-#define OT_ACTION_PARAM_BLOCKEDITOR_Categories "BlockEditor.Categories"
-#define OT_ACTION_PARAM_BLOCKEDITOR_EditorName "BlockEditor.Name"
-#define OT_ACTION_PARAM_BLOCKEDITOR_EditorTitle "BlockEditor.Title"
-#define OT_ACTION_PARAM_BLOCKEDITOR_BlockName "BlockEditor.Block.Name"
-#define OT_ACTION_PARAM_BLOCKEDITOR_BlockId "BlockEditor.Block.ID"
-#define OT_ACTION_PARAM_BLOCKEDITOR_BlockFrom "BlockEditor.BlockFrom.ID"
-#define OT_ACTION_PARAM_BLOCKEDITOR_ConnectorFrom "BlockEditor.ConnectorFrom.ID"
-#define OT_ACTION_PARAM_BLOCKEDITOR_BlockTo "BlockEditor.BlockTo.ID"
-#define OT_ACTION_PARAM_BLOCKEDITOR_ConnectorTo "BlockEditor.ConnectorTo.ID"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_Package "GraphicsEditor.Package"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_Categories "GraphicsEditor.Categories"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName "GraphicsEditor.Name"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_EditorTitle "GraphicsEditor.Title"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName "GraphicsEditor.Item.Name"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId "GraphicsEditor.Item.ID"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIdTo "GraphicsEditor.Target.ID"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

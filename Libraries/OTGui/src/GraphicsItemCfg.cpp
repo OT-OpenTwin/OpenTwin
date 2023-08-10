@@ -10,6 +10,8 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
+#define OT_JSON_MEMBER_Top "Top"
+#define OT_JSON_MEMBER_Bottom "Bottom"
 #define OT_JSON_MEMBER_Name "Name"// <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Text "Text"//  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                           ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Size "Size"//   <^^\\ '## < ##' \\ ^^^^^^O^                                                                                         ^O^^^^^^// '## w ##' //^^3
@@ -61,6 +63,51 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	m_size.setFromJsonObject(sizeObj);
 	m_border.setFromJsonObject(borderObj);
 	m_margins.setFromJsonObject(marginObj);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsItemPairCfg::GraphicsItemPairCfg() : m_bottom(nullptr), m_top(nullptr) {}
+
+ot::GraphicsItemPairCfg::GraphicsItemPairCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem) : m_bottom(_bottomItem), m_top(_topItem) {}
+
+ot::GraphicsItemPairCfg::~GraphicsItemPairCfg() {
+	if (m_top) delete m_top;
+	if (m_bottom) delete m_bottom;
+}
+
+void ot::GraphicsItemPairCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	OTAssertNullptr(m_top);
+	OTAssertNullptr(m_bottom);
+
+	OT_rJSON_createValueObject(topObj);
+	m_top->addToJsonObject(_document, topObj);
+
+	OT_rJSON_createValueObject(bottomObj);
+	m_bottom->addToJsonObject(_document, bottomObj);
+
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Top, topObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Bottom, bottomObj);
+}
+
+void ot::GraphicsItemPairCfg::setFromJsonObject(OT_rJSON_val & _object) {
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Top, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Bottom, Object);
+
+	OT_rJSON_val topObj = _object[OT_JSON_MEMBER_Top].GetObject();
+	OT_rJSON_val bottomObj = _object[OT_JSON_MEMBER_Bottom].GetObject();
+
+	if (m_top) delete m_top;
+	if (m_bottom) delete m_bottom;
+	m_top = nullptr;
+	m_bottom = nullptr;
+
+	m_top = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(topObj);
+	m_bottom = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(bottomObj);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -187,6 +234,7 @@ void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter
 }
 
 // Register at class factory
+static ot::SimpleFactoryRegistrar<ot::GraphicsItemPairCfg> itemPairCfg(OT_SimpleFactoryJsonKeyValue_GraphicsItemPairCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItemCfg> textItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg);

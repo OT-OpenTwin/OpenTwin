@@ -13,18 +13,35 @@
 #include <QtWidgets/qgraphicslinearlayout.h>
 #include <QtWidgets/qgraphicsgridlayout.h>
 
+class QGraphicsWidget;
+
 #define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem "OT_GILayV"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem "OT_GILayH"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem "OT_GILayG"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsBoxLayoutItem : public QGraphicsLinearLayout, public ot::GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsLayoutItem : public ot::GraphicsItem {
+	public:
+		GraphicsLayoutItem();
+		virtual ~GraphicsLayoutItem();
+		
+		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup * _group, bool _isRoot) override;
+
+		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;
+
+	private:
+		QGraphicsWidget* m_layoutWrap;
+	};
+
+	class OT_WIDGETS_API_EXPORT GraphicsBoxLayoutItem : public QGraphicsLinearLayout, public ot::GraphicsLayoutItem {
 	public:
 		GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsBoxLayoutItem() {};
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
 	private:
 		GraphicsBoxLayoutItem() = delete;
@@ -84,7 +101,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsGridLayoutItem : public QGraphicsGridLayout, public ot::GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsGridLayoutItem : public QGraphicsGridLayout, public ot::GraphicsLayoutItem {
 	public:
 		GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsGridLayoutItem() {};
@@ -93,6 +110,8 @@ namespace ot {
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem); };
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
 	private:
 		QSizeF m_size;

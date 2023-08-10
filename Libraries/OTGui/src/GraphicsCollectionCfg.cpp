@@ -6,12 +6,13 @@
 #include "OpenTwinCore/Logger.h"
 
 #define OT_JSON_Member_Name "Name"
-#define OT_JSON_Member_Collections "Collections"
+#define OT_JSON_Member_Title "Title"
 #define OT_JSON_Member_Items "Items"
+#define OT_JSON_Member_Collections "Collections"
 
 ot::GraphicsCollectionCfg::GraphicsCollectionCfg() {}
 
-ot::GraphicsCollectionCfg::GraphicsCollectionCfg(const std::string& _collectionName) : m_name(_collectionName) {
+ot::GraphicsCollectionCfg::GraphicsCollectionCfg(const std::string& _collectionName, const std::string& _collectionTitle) : m_name(_collectionName), m_title(_collectionTitle) {
 
 }
 
@@ -21,6 +22,7 @@ ot::GraphicsCollectionCfg::~GraphicsCollectionCfg() {
 
 void ot::GraphicsCollectionCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	ot::rJSON::add(_document, _object, OT_JSON_Member_Name, m_name);
+	ot::rJSON::add(_document, _object, OT_JSON_Member_Title, m_title);
 
 	OT_rJSON_createValueArray(collectionArr);
 	for (auto c : m_collections) {
@@ -43,10 +45,12 @@ void ot::GraphicsCollectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	this->memFree();
 
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
+	OT_rJSON_checkMember(_object, OT_JSON_Member_Title, String);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Collections, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Items, Array);
 
 	m_name = _object[OT_JSON_Member_Name].GetString();
+	m_title = _object[OT_JSON_Member_Title].GetString();
 
 	OT_rJSON_val collectionArr = _object[OT_JSON_Member_Collections].GetArray();
 	for (rapidjson::SizeType i = 0; i < collectionArr.Size(); i++) {

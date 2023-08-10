@@ -18,6 +18,7 @@
 // std header
 #include <string>
 
+#define OT_SimpleFactoryJsonKeyValue_GraphicsItemPairCfg "OT_GICPair"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GICText"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GICRectangular"
@@ -64,6 +65,40 @@ namespace ot {
 		Size2D m_size;
 		Border m_border;
 		Margins m_margins;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_GUI_API_EXPORT GraphicsItemPairCfg : public ot::GraphicsItemCfg {
+	public:
+		GraphicsItemPairCfg();
+		GraphicsItemPairCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem);
+		virtual ~GraphicsItemPairCfg();
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsItemPairCfg); };
+
+		ot::GraphicsItemCfg* bottomItem(void) { return m_bottom; };
+		ot::GraphicsItemCfg* topItem(void) { return m_top; };
+
+	private:
+		ot::GraphicsItemCfg* m_bottom;
+		ot::GraphicsItemCfg* m_top;
+
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

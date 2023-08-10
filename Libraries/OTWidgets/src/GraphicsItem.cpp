@@ -10,13 +10,25 @@
 #include "OpenTwinCore/KeyMap.h"
 
 #include <QtGui/qfont.h>
+#include <QtWidgets/qgraphicsscene.h>
 
-ot::GraphicsItem::GraphicsItem() {
+ot::GraphicsItem::GraphicsItem() : m_flags(GraphicsItem::NoFlags), m_group(nullptr) {
 	
 }
 
 ot::GraphicsItem::~GraphicsItem() {
 	
+}
+
+void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	m_flags = _flags;
+	this->graphicsItemFlagsChanged(_flags);
+}
+
+void ot::GraphicsItem::finalizeAsRootItem(QGraphicsScene* _scene) {
+	otAssert(m_group == nullptr, "Group item already created");
+	m_group = new QGraphicsItemGroup;
+	this->finalizeItem(_scene, m_group, true);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -44,6 +56,15 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	setRect(0., 0., m_size.width(), m_size.height());
 
 	return true;
+}
+
+void ot::GraphicsRectangularItem::setGeometry(const QRectF& rect) {
+	setPos(rect.topLeft());
+}
+
+void ot::GraphicsRectangularItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+	_scene->addItem(this);
+	if (_group) _group->addToGroup(this);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -80,6 +101,15 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	this->setPlainText(QString::fromStdString(cfg->text()));
 
 	return true;
+}
+
+void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
+	setPos(rect.topLeft());
+}
+
+void ot::GraphicsTextItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+	_scene->addItem(this);
+	if (_group) _group->addToGroup(this);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
