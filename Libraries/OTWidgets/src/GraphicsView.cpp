@@ -34,7 +34,7 @@
 //! @param ___h Height variable
 #define OT_AdjustMinimumGraphicsViewSize(___w, ___h)
 #endif
-ot::GraphicsView::GraphicsView() : m_isPressed(false) {
+ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true) {
 	setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 }
 
@@ -78,6 +78,7 @@ void ot::GraphicsView::viewAll(void) {
 
 void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 {
+	if (!m_wheelEnabled) return;
 	const ViewportAnchor anchor = transformationAnchor();
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	int angle = _event->angleDelta().y();

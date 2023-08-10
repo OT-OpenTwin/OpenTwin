@@ -12,6 +12,7 @@
 #include <QtCore/qlist.h>
 #include <QtCore/qjsonobject.h>
 #include <QtWidgets/qtreewidget.h>
+#include <QtWidgets/qdialog.h>
 
 class Terminal;
 class JSONEditor;
@@ -117,6 +118,24 @@ private:
 
 // #####################################################################################################################################################################################
 
+class TerminalCollectionExportDialog : public QDialog {
+public:
+	TerminalCollectionExportDialog();
+	virtual ~TerminalCollectionExportDialog();
+
+private:
+	QVBoxLayout* m_centralLayout;
+	QGridLayout* m_dataLayout;
+	QHBoxLayout* m_buttonLayout;
+	QHBoxLayout* m_directorySelect;
+};
+
+// #####################################################################################################################################################################################
+
+// #####################################################################################################################################################################################
+
+// #####################################################################################################################################################################################
+
 class Terminal : public QObject, public OToolkitAPI::AbstractTool {
 	Q_OBJECT
 public:
@@ -174,6 +193,9 @@ private:
 	void removeRequest(TerminalRequest * _request);
 	void applyRequest(TerminalRequest* _request);
 	void applyAndSendRequest(TerminalRequest* _request);
+
+	void exportToFile(TerminalCollectionFilter* _filter);
+	void importFromFile(TerminalCollectionFilter* _filter);
 
 	// ################################################################################################################################
 

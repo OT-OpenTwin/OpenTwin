@@ -2771,6 +2771,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor) {
+				OT_LOG_D("GraphicsEditor requested with: " + ot::rJSON::toJSON(_doc));
+
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
 

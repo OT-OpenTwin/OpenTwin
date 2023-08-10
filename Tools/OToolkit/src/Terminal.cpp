@@ -236,6 +236,20 @@ void TerminalRequest::addToJsonObject(QJsonObject& _object) const {
 
 // #####################################################################################################################################################################################
 
+TerminalCollectionExportDialog::TerminalCollectionExportDialog() {
+
+}
+
+TerminalCollectionExportDialog::~TerminalCollectionExportDialog() {
+
+}
+
+// #####################################################################################################################################################################################
+
+// #####################################################################################################################################################################################
+
+// #####################################################################################################################################################################################
+
 Terminal::Terminal() : m_exportLock(false) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
@@ -897,6 +911,14 @@ void Terminal::applyRequest(TerminalRequest* _request) {
 void Terminal::applyAndSendRequest(TerminalRequest* _request) {
 	applyRequest(_request);
 	slotSendMessage();
+}
+
+void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
+	
+}
+
+void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
+
 }
 
 // ################################################################################################################################

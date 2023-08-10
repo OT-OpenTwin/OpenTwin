@@ -133,7 +133,9 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GlobalOwner::instance().addToJsonObject(doc, doc);
 
 		std::string response;
-		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, ot::rJSON::toJSON(doc), response)) {
+		std::string req = ot::rJSON::toJSON(doc);
+		OT_LOG_D("GraphicsEditor requested with: " + req);
+		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
 			return OT_ACTION_RETURN_VALUE_FAILED;
 		}
 
