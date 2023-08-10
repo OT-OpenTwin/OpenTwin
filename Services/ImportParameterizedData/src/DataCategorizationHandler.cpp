@@ -619,10 +619,10 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 		for (auto& selection : selections)
 		{
 			std::string selectionName = selection->getName();
-			int position = selectionName.find_first_of("/");
-			position = selectionName.find("/",position);
-			position = selectionName.find("/", position+ 1);
-			position = selectionName.find("/", position+ 1);
+			int position = static_cast<uint32_t>(selectionName.find_first_of("/"));
+			position = static_cast<uint32_t>(selectionName.find("/",static_cast<uint64_t>(position)));
+			position = static_cast<uint32_t>(selectionName.find("/", static_cast<uint64_t>(position+ 1)));
+			position = static_cast<uint32_t>(selectionName.find("/", static_cast<uint64_t>(position+ 1)));
 
 			std::string postfix = selectionName.substr(position, selectionName.size());
 			std::string newSelectionName=	prefix + postfix;
