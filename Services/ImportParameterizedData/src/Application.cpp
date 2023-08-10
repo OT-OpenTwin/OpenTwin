@@ -119,7 +119,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonTableAddColumnLeft.SetDescription(pageName, groupNameTableHandling, "Insert Column Left", "", subgroupNameTableHandlingColumn);
 	_buttonTableAddColumnRight.SetDescription(pageName, groupNameTableHandling, "Insert Column Right", "", subgroupNameTableHandlingColumn);
 	
-	_buttonTableSave.SetDescription(pageName, groupNameTableHandling, "Save Changes", "", subgroupNameTableHandlingState);;
+	_buttonTableSave.SetDescription(pageName, groupNameTableHandling, "Apply Changes", "", subgroupNameTableHandlingState);;
 	_buttonTableReset.SetDescription(pageName, groupNameTableHandling, "Revert Changes", "", subgroupNameTableHandlingState);;
 	_buttonTableResetToSelection.SetDescription(pageName, groupNameTableHandling, "Reset To Selection", "", subgroupNameTableHandlingState);;
 
