@@ -114,7 +114,8 @@ bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std:
 			info.cb = sizeof(info);
 			info.hStdError = g_hChildStd_OUT_Wr;
 			info.hStdOutput = g_hChildStd_OUT_Wr;
-			info.dwFlags |= STARTF_USESTDHANDLES;
+			info.dwFlags |= (STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW);
+			info.wShowWindow = SW_HIDE;
 
 			ZeroMemory(&processInfo, sizeof(processInfo));
 
@@ -151,10 +152,9 @@ void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiCompo
 {
 	#define BUFSIZE 4096 
 
-	DWORD dwRead, dwWritten;
+	DWORD dwRead;
 	CHAR chBuf[BUFSIZE];
 	BOOL bSuccess = FALSE;
-	HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	for (;;)
 	{
@@ -165,9 +165,6 @@ void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiCompo
 
 		solverOutput << text;
 		uiComponent->displayMessage(text);
-
-		bSuccess = WriteFile(hParentStdOut, chBuf,
-			dwRead, &dwWritten, NULL);
 
 		if (!bSuccess) break;
 	}

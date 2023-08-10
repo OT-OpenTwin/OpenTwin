@@ -36,9 +36,10 @@ GetDPLauncher::~GetDPLauncher()
 
 }
 
-std::string GetDPLauncher::startSolver(const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent)
+std::string GetDPLauncher::startSolver(std::string &logFileText, const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent)
 {
 	std::string outputText;
+	logFileText.clear();
 
 	// Find the name of the temporary directory where we run the solver and create the directory
 	std::string tempDirPath = getUniqueTempDir();
@@ -98,7 +99,7 @@ std::string GetDPLauncher::startSolver(const std::string &dataBaseURL, const std
 		controlFile.close();
 
 		// Run the solver
-		outputText = solver->runSolver(tempDirPath, application->uiComponent());
+		logFileText = solver->runSolver(tempDirPath, application->uiComponent());
 
 		// Convert the results
 		solver->convertResults(tempDirPath);

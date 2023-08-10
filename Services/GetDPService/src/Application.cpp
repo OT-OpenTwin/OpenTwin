@@ -435,7 +435,8 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	GetDPLauncher getDPSolver(this);
 
-	std::string output = getDPSolver.startSolver(DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->serviceURL(),
+	std::string logFileText;
+	std::string output = getDPSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->serviceURL(),
 												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 
@@ -448,7 +449,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getName() + "/Output", output);
+	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getName() + "/Output", logFileText + output);
 
 	topologyEntityIDList.push_back(text->getEntityID());
 	topologyEntityVersionList.push_back(text->getEntityStorageVersion());

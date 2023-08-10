@@ -25,7 +25,7 @@ public:
 	GetDPLauncher(Application *app);
 	virtual ~GetDPLauncher();
 
-	std::string startSolver(const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent);
+	std::string startSolver(std::string& logFileText, const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent);
 
 private:
 	std::string extractMesh(EntityBase* solverEntity, const std::string& tempDirPath, ot::UID & meshDataID, std::string& currentMeshDataName);
