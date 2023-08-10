@@ -137,6 +137,11 @@ void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButt
 	addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
 }
 
+void ot::components::UiComponent::addMenuButton(ot::MenuButtonDescription& _menuButtonDescription, const std::string& _subgroupName, const Flags<ui::lockType>& _lockTypes, const std::string& _iconName, const std::string& _iconFolder, const std::string& _keySequence, const ContextMenu& _contextMenu)
+{
+	addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _subgroupName,_menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
+}
+
 void ot::components::UiComponent::addMenuButton(
 	const std::string &			_pageName,
 	const std::string &			_groupName,

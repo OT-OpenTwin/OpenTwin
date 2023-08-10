@@ -1848,8 +1848,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
 				std::string groupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
 				std::string subgroupName = "";
-				try { subgroupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
-				catch (...) {}
+				if (ot::rJSON::memberExists(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName))
+				{
+					subgroupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+				}
 				std::string buttonName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				std::string text = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 				std::string iconName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconName);
