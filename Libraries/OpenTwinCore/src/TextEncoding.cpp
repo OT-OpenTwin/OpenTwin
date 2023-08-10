@@ -1,26 +1,27 @@
 #include "OpenTwinCore/TextEncoding.h"
 #include <codecvt>
 
-ot::TextEncoding ot::EncodingGuesser::operator()(std::vector<unsigned char>& fileContent)
+ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const char* fileContent, int64_t numberOfBytes)
 {
-	uint64_t numberOfBytes = fileContent.size();
-	ot::TextEncoding encoding = ot::TextEncoding::UNKNOWN;
-	
+	using EncodingStandard = ot::TextEncoding::EncodingStandard;
+
+	EncodingStandard encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
+	utf8* firstChar = (unsigned char*)(fileContent);
 	// detect UTF-16 big-endian with BOM
-	if (numberOfBytes > 2 && fileContent[0] == bigEndian_Bom[0] && fileContent[1] == bigEndian_Bom[1])
+	if (numberOfBytes > 2 && firstChar[0] == bigEndian_Bom[0] && firstChar[1] == bigEndian_Bom[1])
 	{
-		encoding = ot::TextEncoding::UTF16_BEBOM;
+		encoding = EncodingStandard::UTF16_BEBOM;
 	}
 	// detect UTF-16 little-endian with BOM
-	else if (numberOfBytes > 2 && fileContent[0] == littleEndian_Bom[0] && fileContent[1] == littleEndian_Bom[1])
+	else if (numberOfBytes > 2 && firstChar[0] == littleEndian_Bom[0] && firstChar[1] == littleEndian_Bom[1])
 	{
-		encoding = ot::TextEncoding::UTF16_LEBOM;
+		encoding = EncodingStandard::UTF16_LEBOM;
 	}
 	// detect UTF-8 with BOM
-	else if (numberOfBytes > 3 && fileContent[0] == utf8_Bom[0] &&
-		fileContent[1] == utf8_Bom[1] && fileContent[2] == utf8_Bom[2])
+	else if (numberOfBytes > 3 && firstChar[0] == utf8_Bom[0] &&
+		firstChar[1] == utf8_Bom[1] && firstChar[2] == utf8_Bom[2])
 	{
-		encoding = ot::TextEncoding::UTF8_BOM;
+		encoding = EncodingStandard::UTF8_BOM;
 	}
 	//Code uses windows API
 	// try to detect UTF-16 little-endian without BOM
@@ -31,32 +32,37 @@ ot::TextEncoding ot::EncodingGuesser::operator()(std::vector<unsigned char>& fil
 	}*/
 	else
 	{
-		type7or8Byte detectedEncoding = CheckUtf8_7bits_8bits(fileContent);
-		
+		type7or8Byte detectedEncoding = CheckUtf8_7bits_8bits(firstChar, numberOfBytes);
+
 		if (detectedEncoding == utf8NoBOM)
 		{
-			encoding = UTF8;
+			encoding = EncodingStandard::UTF8;
 		}
 		else if (detectedEncoding == ascii8bits)
 		{
-			encoding = ANSI;
+			encoding = EncodingStandard::ANSI;
 		}
-		else 
+		else
 		{
-			encoding = UTF8;
+			encoding = EncodingStandard::UTF8;
 		}
-		
+
 	}
 	return encoding;
 }
 
+ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const std::vector<char>& fileContent)
+{
+	uint64_t numberOfBytes = fileContent.size();
+	return operator()(&fileContent[0], numberOfBytes);
+}
 
-ot::EncodingGuesser::type7or8Byte ot::EncodingGuesser::CheckUtf8_7bits_8bits(std::vector<unsigned char>& fileContent)
+ot::EncodingGuesser::type7or8Byte ot::EncodingGuesser::CheckUtf8_7bits_8bits(utf8* fileContent, int64_t numberOfBytes)
 {
 	int rv = 1;
 	int ASCII7only = 1;
-	utf8* sx = &fileContent[0];
-	utf8* endx = sx + fileContent.size();
+	utf8* sx = fileContent;
+	utf8* endx = sx + numberOfBytes;
 
 	while (sx < endx)
 	{
@@ -148,7 +154,7 @@ std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(std::vector<unsigne
 }
 
 
-std::string ot::EncodingConverter_UTF16ToUTF8::operator()(std::vector<unsigned char>& fileContent)
+std::string ot::EncodingConverter_UTF16ToUTF8::operator()(std::vector<char>& fileContent)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 	std::string out;
@@ -159,4 +165,28 @@ std::string ot::EncodingConverter_UTF16ToUTF8::operator()(std::vector<unsigned c
 		ch++;
 	}
 	return out;
+}
+
+std::string ot::TextEncoding::getString(ot::TextEncoding::EncodingStandard type) const
+{
+	if (_encodingStandardToString.find(type) == _encodingStandardToString.end())
+	{
+		throw std::exception("Encoding standard not found");
+	}
+	else
+	{
+		return (*_encodingStandardToString.find(type)).second;
+	}
+}
+
+ot::TextEncoding::EncodingStandard ot::TextEncoding::getType(const std::string& type) const
+{
+	if (_stringToEncodingStandard.find(type) == _stringToEncodingStandard.end())
+	{
+		throw std::exception("Encoding standard not found");
+	}
+	else
+	{
+		return (*_stringToEncodingStandard.find(type)).second;
+	}
 }

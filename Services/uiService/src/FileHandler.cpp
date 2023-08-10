@@ -3,6 +3,7 @@
 #include <exception>
 #include "EntityFileCSV.h"
 #include "OpenTwinCommunication/ActionTypes.h"
+#include "OpenTwinCore/TextEncoding.h"
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)
 {
@@ -39,17 +40,25 @@ rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& identifi
 		std::string documentType = documentName.substr(documentName.find(".") + 1);
 		documentName = documentName.substr(0, documentName.find("."));
 
-		auto newSourceEntity = CreateNewSourceEntity(documentType, *uid, _senderName);
+		auto newFile = CreateNewSourceEntity(documentType, *uid, _senderName);
 		topoID.push_back(*uid);
 		uid++;
 
 
 		std::string entityName = CreateNewUniqueTopologyName(documentName);
-		newSourceEntity->setName(entityName);
-		newSourceEntity->setInitiallyHidden(false);
-		newSourceEntity->setFileProperties(directoryPath, documentName, documentType);
+		newFile->setName(entityName);
+		newFile->setInitiallyHidden(false);
+		newFile->setFileProperties(directoryPath, documentName, documentType);
 		auto memBlock = ExtractFileContentAsBinary(absoluteFilePath);
-		std::unique_ptr <EntityBinaryData> newData(new EntityBinaryData(*uid, newSourceEntity.get(), nullptr, nullptr, nullptr, _senderName));
+		std::unique_ptr <EntityBinaryData> newData(new EntityBinaryData(*uid, newFile.get(), nullptr, nullptr, nullptr, _senderName));
+
+		EntityFileText* newTextFile = dynamic_cast<EntityFileText*>(newFile.get());
+		if (newTextFile!= nullptr)
+		{
+			ot::EncodingGuesser encoding;
+			newTextFile->setTextEncoding(encoding(memBlock));
+			newTextFile = nullptr;
+		}
 		dataID.push_back(*uid);
 		uid++;
 		
@@ -58,8 +67,8 @@ rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& identifi
 		dataVers.push_back(*uid);
 		uid++;
 
-		newSourceEntity->setData(newData->getEntityID(), newData->getEntityStorageVersion());
-		newSourceEntity->StoreToDataBase(*uid);
+		newFile->setData(newData->getEntityID(), newData->getEntityStorageVersion());
+		newFile->StoreToDataBase(*uid);
 		topoVers.push_back(*uid);
 		uid++;
 	}

@@ -1,7 +1,7 @@
 #include "FixtureTextEncoding.h"
 #include <fstream>
 
-std::vector<unsigned char> FixtureTextEncoding::ReadFile(ot::TextEncoding encoding)
+std::vector<char> FixtureTextEncoding::ReadFile(ot::TextEncoding::EncodingStandard encoding)
 {
 	std::string projectDir = PROJECT_DIR;
 	projectDir += "TestEncodingTypeFiles\\";
@@ -28,7 +28,7 @@ std::vector<unsigned char> FixtureTextEncoding::ReadFile(ot::TextEncoding encodi
 	}
 	else
 	{
-		return std::vector<unsigned char>();
+		return std::vector<char>();
 	}
 	
 	std::ifstream file(projectDir, std::ios::binary | std::ios::ate);
@@ -41,7 +41,7 @@ std::vector<unsigned char> FixtureTextEncoding::ReadFile(ot::TextEncoding encodi
 		file.seekg(0, std::ios::beg);
 		file.read(memBlock.get(), size);
 		file.close();
-		std::vector<unsigned char> memBlockVector(memBlock.get(), memBlock.get() + size);
+		std::vector<char> memBlockVector(memBlock.get(), memBlock.get() + size);
 		return memBlockVector;
 	}
 	else

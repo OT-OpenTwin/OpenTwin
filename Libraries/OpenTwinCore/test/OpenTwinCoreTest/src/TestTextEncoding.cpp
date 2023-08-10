@@ -13,6 +13,7 @@ TEST_P(FixtureTextEncoding, IdentifyEncoding)
 	auto encoding	= GetParam();
 	auto fileContent = ReadFile(encoding);
 	ot::EncodingGuesser guesser;
+	
 	auto identifiedEncoding  = 	guesser(fileContent);
 
 	EXPECT_EQ(identifiedEncoding, encoding);
@@ -21,17 +22,20 @@ TEST_P(FixtureTextEncoding, IdentifyEncoding)
 TEST_F(FixtureTextEncoding, ISO88591ToUTF8)
 {
 	auto fileContent = ReadFile(ot::TextEncoding::ANSI);
-	
-	ot::EncodingConverter_ISO88591ToUTF8 converter;
-	std::string isValue = converter(fileContent);
-	
-	ot::EncodingGuesser guesser;
-	unsigned char* temp = (unsigned char*)&isValue[0];
-	std::vector<unsigned char> tempAsVector;
-	tempAsVector.assign(temp, temp + isValue.size());
-	auto encoding =	guesser(tempAsVector);
 
-	EXPECT_EQ(encoding, ot::TextEncoding::UTF8);
+	ot::EncodingConverter_ISO88591ToUTF8 converter;
+
+	std::vector<unsigned char> temp;
+	for (auto& ch : fileContent)
+	{
+		temp.push_back((unsigned char)ch);
+	}
+
+	std::string isValue = converter(temp);
+	ot::EncodingGuesser guesser;
+	auto encoding =	guesser(isValue.c_str(),isValue.size());
+
+	EXPECT_EQ(encoding, ot::TextEncoding::EncodingStandard::UTF8);
 }
 
 TEST_F(FixtureTextEncoding, UTF16ToUTF8)
@@ -42,13 +46,17 @@ TEST_F(FixtureTextEncoding, UTF16ToUTF8)
 	std::string isValue = converter(fileContent);
 
 	ot::EncodingGuesser guesser;
-	unsigned char* temp = (unsigned char*)&isValue[0];
-	std::vector<unsigned char> tempAsVector;
-	tempAsVector.assign(temp, temp + isValue.size());
-	auto encoding = guesser(tempAsVector);
+	auto encoding = guesser(isValue.c_str(), isValue.size());
 
 	EXPECT_EQ(encoding, ot::TextEncoding::UTF8);
 }
 
+TEST_F(FixtureTextEncoding, EncodingStandardToString)
+{
+	ot::TextEncoding encoding;
+	std::string encodingString =  encoding.getString(ot::TextEncoding::UTF8);
+	EXPECT_EQ(encodingString, "UTF-8");
+}
 
-INSTANTIATE_TEST_CASE_P(TestAllEncodingIdentifications, FixtureTextEncoding, ::testing::Values(ot::TextEncoding::ANSI, ot::TextEncoding::UTF8, ot::TextEncoding::UTF8_BOM,ot::TextEncoding::UTF16_BEBOM, ot::TextEncoding::UTF16_LEBOM));
+
+INSTANTIATE_TEST_CASE_P(TestAllEncodingIdentifications, FixtureTextEncoding, ::testing::Values(ot::TextEncoding::EncodingStandard::ANSI, ot::TextEncoding::EncodingStandard::UTF8, ot::TextEncoding::EncodingStandard::UTF8_BOM,ot::TextEncoding::EncodingStandard::UTF16_BEBOM, ot::TextEncoding::EncodingStandard::UTF16_LEBOM));

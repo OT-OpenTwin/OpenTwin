@@ -2,9 +2,9 @@
 #include <gtest/gtest.h>
 #include "OpenTwinCore/TextEncoding.h"
 
-class FixtureTextEncoding : public testing::TestWithParam<ot::TextEncoding>
+class FixtureTextEncoding : public testing::TestWithParam<ot::TextEncoding::EncodingStandard>
 {
 public:
-	std::vector<unsigned char> ReadFile(ot::TextEncoding encoding);
+	std::vector<char> ReadFile(ot::TextEncoding::EncodingStandard encoding);
 
 };

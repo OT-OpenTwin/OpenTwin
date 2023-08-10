@@ -10,7 +10,7 @@ public:
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityFileText"; };
 
-	void setTextEncoding(ot::TextEncoding encoding);
+	void setTextEncoding(ot::TextEncoding::EncodingStandard encoding);
 
 protected:
 	void setSpecializedProperties() override;
@@ -18,5 +18,5 @@ protected:
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-	ot::TextEncoding _encoding = ot::TextEncoding::UNKNOWN;
+	ot::TextEncoding::EncodingStandard _encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
 };
