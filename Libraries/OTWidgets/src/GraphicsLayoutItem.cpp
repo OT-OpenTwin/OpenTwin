@@ -25,6 +25,9 @@ void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemG
 		// Finalize child
 		ot::GraphicsItem* gi = dynamic_cast<ot::GraphicsItem*>(itm);
 		if (gi) gi->finalizeItem(_scene, _group, false);
+		else {
+			OT_LOG_EA("Failed to cast GrahicsLayoutItem child to GraphicsItem");
+		}
 	}
 
 	if (_isRoot) {
@@ -39,10 +42,10 @@ void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemG
 			m_layoutWrap = new QGraphicsWidget;
 			m_layoutWrap->setLayout(lay);
 
-			_scene->addItem(m_layoutWrap);
 			if (_group) _group->addToGroup(m_layoutWrap);
+			_scene->addItem(m_layoutWrap);
 		}
-	}	
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -29,6 +29,7 @@ void ot::GraphicsItem::finalizeAsRootItem(QGraphicsScene* _scene) {
 	otAssert(m_group == nullptr, "Group item already created");
 	m_group = new QGraphicsItemGroup;
 	this->finalizeItem(_scene, m_group, true);
+	_scene->addItem(m_group);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

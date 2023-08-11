@@ -57,6 +57,14 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 }
 
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
+	ot::GraphicsRectangularItemCfg* cfg = new ot::GraphicsRectangularItemCfg;
+	cfg->setSize(ot::Size2D(100, 60));
+	cfg->setName(_name);
+
+	return cfg;
+}
+
+ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
 
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
@@ -119,7 +127,7 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1", "1");
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
 		a->addChildCollection(a1);
-		a1->addItem(createTestBlock("Alpha 1"));
+		a1->addItem(createTestBlock3("Alpha 1"));
 		a->addChildCollection(a2);
 		a2->addItem(createTestBlock2("Alpha 2"));
 		pckg.addCollection(a);
