@@ -67,8 +67,6 @@ SET OT_BLOCKEDITORSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\BlockEditorService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths
-SET OT_BLOCKEDITOR_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\BlockEditor
-SET OT_BLOCKEDITORAPI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI
 SET OT_CADMODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
 SET OT_DATASTORAGE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\DataStorage
 SET OT_MODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
