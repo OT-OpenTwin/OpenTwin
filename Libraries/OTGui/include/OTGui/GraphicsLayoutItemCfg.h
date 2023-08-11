@@ -50,7 +50,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT GraphicsBoxLayoutItemCfg : public GraphicsLayoutItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsBoxLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
 		//! @brief Holds the item and its strech factor in the box
 		//! If no item is set then its a stretch only
@@ -128,7 +128,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
 		virtual ~GraphicsGridLayoutItemCfg() {};

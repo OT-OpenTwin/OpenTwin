@@ -8,7 +8,6 @@
 
 // OpenTwin header
 #include "OpenTwinCore/CoreAPIExport.h"
-#include "OpenTwinCore/Singleton.h"
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
@@ -52,9 +51,10 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
-	class OT_CORE_API_EXPORTONLY SimpleFactory : public ot::Singleton<SimpleFactory> {
-		OT_SINGLETON(SimpleFactory)
+	class OT_CORE_API_EXPORTONLY SimpleFactory {
+		
 	public:
+		static SimpleFactory& instance(void);
 
 		//! @brief Create an object according to the provided key
 		//! @param _key The key to the object

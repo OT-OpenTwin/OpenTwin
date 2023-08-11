@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Singleton.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/CoreAPIExport.h"
 #include "OpenTwinCore/rJSON.h"
@@ -61,9 +60,10 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_CORE_API_EXPORT GlobalOwner : public ot::Owner<ot::serviceID_t>, public ot::Singleton<ot::GlobalOwner> {
-		OT_SINGLETON(ot::GlobalOwner)
+	class OT_CORE_API_EXPORT GlobalOwner : public ot::Owner<ot::serviceID_t> {
 	public:
+		static GlobalOwner& instance(void);
+
 		//! @brief Retreives the global owner id from the provided json object
 		//! @param _object The json object containing the global owner id
 		//! @param _id Where to write data to

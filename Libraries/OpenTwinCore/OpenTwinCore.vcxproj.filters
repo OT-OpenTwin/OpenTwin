@@ -114,9 +114,6 @@
     <ClInclude Include="include\OpenTwinCore\ServiceBase.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OpenTwinCore\Singleton.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OpenTwinCore\Size2D.h">
       <Filter>include</Filter>
     </ClInclude>

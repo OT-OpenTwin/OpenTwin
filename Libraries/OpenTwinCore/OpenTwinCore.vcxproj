@@ -62,7 +62,6 @@
     <ClInclude Include="include\OpenTwinCore\ServiceBase.h" />
     <ClInclude Include="include\OpenTwinCore\Logger.h" />
     <ClInclude Include="include\OpenTwinCore\SimpleFactory.h" />
-    <ClInclude Include="include\OpenTwinCore\Singleton.h" />
     <ClInclude Include="include\OpenTwinCore\Size2D.h" />
     <ClInclude Include="include\OpenTwinCore\StringHelper.h" />
     <ClInclude Include="include\OpenTwinCore\TemplateTypeName.h" />

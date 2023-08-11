@@ -2,6 +2,12 @@
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Logger.h"
 
+
+ot::SimpleFactory& ot::SimpleFactory::instance(void) {
+	static SimpleFactory g_instance;
+	return g_instance;
+}
+
 ot::SimpleFactoryObject* ot::SimpleFactory::create(const std::string& _key) {
 	auto it = m_data.find(_key);
 	if (it == m_data.end()) {

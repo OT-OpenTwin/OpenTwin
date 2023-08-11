@@ -57,9 +57,6 @@
     <ClInclude Include="include\OTGui\Font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\Layout.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>

@@ -10,6 +10,11 @@
 
 #define OT_JSON_MEMBER_GlobalOwnerId "goid_"
 
+ot::GlobalOwner& ot::GlobalOwner::instance(void) {
+	static GlobalOwner g_instance;
+	return g_instance;
+}
+
 bool ot::GlobalOwner::getIdFromJson(OT_rJSON_val& _object, ot::serviceID_t& _id) {
 	if (!_object.HasMember(OT_JSON_MEMBER_GlobalOwnerId)) {
 		OT_LOG_EA("JSON object member Global Owner Id \"" OT_JSON_MEMBER_GlobalOwnerId "\" is missing");

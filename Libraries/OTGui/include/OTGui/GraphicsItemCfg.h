@@ -29,7 +29,7 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORT GraphicsItemCfg : ot::Serializable, public ot::SimpleFactoryObject {
+	class OT_GUI_API_EXPORTONLY GraphicsItemCfg : public ot::Serializable, public ot::SimpleFactoryObject {
 	public:
 		GraphicsItemCfg();
 		virtual ~GraphicsItemCfg();
@@ -73,7 +73,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT GraphicsItemPairCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsItemPairCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsItemPairCfg();
 		GraphicsItemPairCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem);
@@ -107,7 +107,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT GraphicsTextItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsTextItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
 		virtual ~GraphicsTextItemCfg();
@@ -149,7 +149,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT GraphicsImageItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsImageItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsImageItemCfg(const std::string& _imageSubPath = std::string());
 		virtual ~GraphicsImageItemCfg();
@@ -183,7 +183,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr, int _cornerRadius = 0);
 		virtual ~GraphicsRectangularItemCfg();

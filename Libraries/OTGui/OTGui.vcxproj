@@ -27,7 +27,6 @@
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
-    <ClInclude Include="include\OTGui\Layout.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />

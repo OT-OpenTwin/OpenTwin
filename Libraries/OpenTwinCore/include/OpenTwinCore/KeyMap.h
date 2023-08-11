@@ -8,7 +8,6 @@
 
 // OpenTwin header
 #include "OpenTwinCore/CoreAPIExport.h"
-#include "OpenTwinCore/Singleton.h"
 
 // std header
 #include <map>
@@ -59,8 +58,9 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_CORE_API_EXPORT GlobalKeyMap : public ot::KeyMap, public ot::Singleton<GlobalKeyMap> {
-		OT_SINGLETON(GlobalKeyMap)
+	class OT_CORE_API_EXPORT GlobalKeyMap : public ot::KeyMap {
+	public:
+		static GlobalKeyMap& instance(void);
 	private:
 		GlobalKeyMap() {};
 		virtual ~GlobalKeyMap() {};

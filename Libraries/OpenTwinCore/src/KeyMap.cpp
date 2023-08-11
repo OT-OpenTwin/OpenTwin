@@ -33,6 +33,11 @@ std::string ot::KeyMap::get(const std::string& _key) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+ot::GlobalKeyMap& ot::GlobalKeyMap::instance(void) {
+	static GlobalKeyMap g_instance;
+	return g_instance;
+}
+
 ot::GlobalKeyMapRegistrar::GlobalKeyMapRegistrar(const std::string& _key, const std::string& _value) {
 #ifdef _DEBUG
 	if (ot::GlobalKeyMap::instance().contains(_key)) {
