@@ -24,6 +24,7 @@
 #include <QtWidgets/qtreewidget.h>
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qshortcut.h>
+#include <QtWidgets/qfiledialog.h>
 
 // Std header
 #include <thread>
@@ -83,6 +84,7 @@ TerminalCollectionItem * TerminalCollectionItem::createFromJsonObject(Terminal *
 		if (!newItm->setFromJsonObject(_object)) {
 			delete newItm;
 			newItm = nullptr;
+			TERMINAL_LOGE("Creating empty terminal collection filter failed");
 		}
 	}
 	else if (type == INFO_ITEM_TYPE_Request) {
@@ -90,9 +92,11 @@ TerminalCollectionItem * TerminalCollectionItem::createFromJsonObject(Terminal *
 		if (!newItm->setFromJsonObject(_object)) {
 			delete newItm;
 			newItm = nullptr;
+			TERMINAL_LOGE("Creating empty terminal collection request failed");
 		}
 	}
 	else {
+		TERMINAL_LOGE("Unknown terminal collection item type");
 		otAssert(0, "Unknown item type");
 	}
 	return newItm;
@@ -130,9 +134,26 @@ bool TerminalCollectionFilter::setFromJsonObject(const QJsonObject& _object) {
 	for (int i = 0; i < childArr.count(); i++) {
 		if (!childArr[i].isObject()) return false;
 		QJsonObject obj = childArr[i].toObject();
-		TerminalCollectionItem * newChild = TerminalCollectionItem::createFromJsonObject(ownerTerminal(), obj);
+		if (!obj.contains(OT_JSON_COLLECTION_ItemType)) {
+			TERMINAL_LOGE("Terminal collection item type member is missing");
+			return false;
+		}
+		if (!obj[OT_JSON_COLLECTION_ItemType].isString()) {
+			TERMINAL_LOGE("Terminal collection item type member invalid type");
+			return false;
+		}
+		if (obj[OT_JSON_COLLECTION_ItemType].toString() != INFO_ITEM_TYPE_Filter &&
+			obj[OT_JSON_COLLECTION_ItemType].toString() != INFO_ITEM_TYPE_Request) 
+		{
+			TERMINAL_LOGE("Unknown terminal colellection item");
+			return false;
+		}
+		TerminalCollectionItem* newChild = TerminalCollectionItem::createFromJsonObject(ownerTerminal(), obj);
 		if (newChild) {
 			addChild(newChild);
+		}
+		else {
+			TERMINAL_LOGE("Failed to create terminal collection item");
 		}
 	}
 	return true;
@@ -151,6 +172,7 @@ void TerminalCollectionFilter::addToJsonObject(QJsonObject& _object) const {
 			childArr.push_back(obj);
 		}
 		else {
+			TERMINAL_LOGE("Invalid treewidget item, cast to terminal collectio item failed");
 			otAssert(0, "Invalid item");
 		}
 	}
@@ -211,7 +233,7 @@ bool TerminalRequest::setFromJsonObject(const QJsonObject& _object) {
 	TERMINAL_JSON_MEM_CHECK(_object, OT_JSON_REQUEST_Message, String, return false);
 	TERMINAL_JSON_MEM_CHECK(_object, OT_JSON_REQUEST_Endpoint, String, return false);
 	
-	if (_object[OT_JSON_COLLECTION_ItemType].toString() != INFO_ITEM_TYPE_Filter) return false;
+	if (_object[OT_JSON_COLLECTION_ItemType].toString() != INFO_ITEM_TYPE_Request) return false;
 	setTitle(_object[OT_JSON_COLLECTION_ItemName].toString());
 
 	m_url = _object[OT_JSON_REQUEST_Url].toString();
@@ -228,20 +250,6 @@ void TerminalRequest::addToJsonObject(QJsonObject& _object) const {
 	_object[OT_JSON_REQUEST_Url] = m_url;
 	_object[OT_JSON_REQUEST_Message] = m_messageBody;
 	_object[OT_JSON_REQUEST_Endpoint] = QString::fromStdString(ot::toString(m_endpoint));
-}
-
-// #####################################################################################################################################################################################
-
-// #####################################################################################################################################################################################
-
-// #####################################################################################################################################################################################
-
-TerminalCollectionExportDialog::TerminalCollectionExportDialog() {
-
-}
-
-TerminalCollectionExportDialog::~TerminalCollectionExportDialog() {
-
 }
 
 // #####################################################################################################################################################################################
@@ -576,19 +584,19 @@ void Terminal::slotNavigationItemChanged(QTreeWidgetItem* _item, int _column) {
 }
 
 void Terminal::slotLoadRequestCollection(void) {
-	TERMINAL_LOG("Importing OTerminal request collection...");
+	TERMINAL_LOG("Loading OTerminal request collection...");
 
 	QSettings s("OpenTwin", applicationName());
 
 	QByteArray bArr = s.value("Terminal.RequestCollection", QByteArray()).toByteArray();
 	if (bArr.isEmpty()) {
-		TERMINAL_LOGW("Skipping import of Terminal request collection: No collection found");
+		TERMINAL_LOGW("Skipping load of Terminal request collection: No collection found");
 		return;
 	}
 	QJsonDocument requestConfigDoc = QJsonDocument::fromJson(bArr);
 	if (!requestConfigDoc.isObject()) {
-		AppBase::instance()->sb()->setErrorInfo("Failed to import request collection");
-		TERMINAL_LOGE("Terminal request collection import failed: JSON document is not an object");
+		AppBase::instance()->sb()->setErrorInfo("Failed to load request collection");
+		TERMINAL_LOGE("Terminal request collection load failed: JSON document is not an object");
 		return;
 	}
 
@@ -600,24 +608,24 @@ void Terminal::slotLoadRequestCollection(void) {
 
 	// Check version
 	if (obj[OT_JSON_COLLECTION_Version].toString() != INFO_COLLECTION_VERSION) {
-		AppBase::instance()->sb()->setErrorInfo("Failed to import request collection");
-		TERMINAL_LOGE("Terminal request collection import failed: Invalid version");
+		AppBase::instance()->sb()->setErrorInfo("Failed to load request collection");
+		TERMINAL_LOGE("Terminal request collection load failed: Invalid version");
 		return;
 	}
 
 	QJsonObject rootObject = obj[OT_JSON_COLLECTION_Data].toObject();
 	if (m_requestsRootFilter->setFromJsonObject(rootObject)) {
-		TERMINAL_LOG("Terminal request collection imported successfully.");
+		TERMINAL_LOG("Terminal request collection loaded successfully.");
 	}
 	else {
-		TERMINAL_LOGE("Terminal request collection import failed (Check previous messages).");
+		TERMINAL_LOGE("Terminal request collection load failed (Check previous messages).");
 	}
 }
 
 void Terminal::slotSaveRequestCollection(void) {
 	if (m_exportLock) return;
 
-	TERMINAL_LOG("Exporting OTerminal request collection...");
+	TERMINAL_LOG("Saving OTerminal request collection...");
 
 	QJsonObject obj;
 	obj[OT_JSON_COLLECTION_Version] = INFO_COLLECTION_VERSION;
@@ -631,7 +639,7 @@ void Terminal::slotSaveRequestCollection(void) {
 	QSettings s("OpenTwin", applicationName());
 	s.setValue("Terminal.RequestCollection", doc.toJson());
 
-	TERMINAL_LOG("Terminal request collection exported successfully.");
+	TERMINAL_LOG("Terminal request collection saved successfully.");
 }
 
 // ################################################################################################################################
@@ -848,8 +856,7 @@ void Terminal::removeFilter(TerminalCollectionFilter * _filter) {
 			m_exportLock = false;
 		}
 		else {
-			otAssert(0, "No parent item");
-			TERMINAL_LOGE("Parent item not found");
+			TERMINAL_LOGE("Parent item not found to remove from");
 		}
 	}
 
@@ -914,7 +921,33 @@ void Terminal::applyAndSendRequest(TerminalRequest* _request) {
 }
 
 void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
-	
+	if (m_exportLock) return;
+
+	QJsonObject obj;
+	obj[OT_JSON_COLLECTION_Version] = INFO_COLLECTION_VERSION;
+
+	QJsonObject rootObject;
+	_filter->addToJsonObject(obj);
+	obj[OT_JSON_COLLECTION_Data] = rootObject;
+
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	QString fn = QFileDialog::getSaveFileName(widget(), "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	if (fn.isEmpty()) {
+		return;
+	}
+
+	QJsonObject docObj;
+	QJsonDocument doc(docObj);
+	QFile f(fn);
+	if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		TERMINAL_LOGE("Failed to open file for writing. File:\n" + fn);
+		return;
+	}
+
+	f.write(doc.toJson());
+	f.close();
+
+	TERMINAL_LOG("Collection exported successfully to file: " + fn);
 }
 
 void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
