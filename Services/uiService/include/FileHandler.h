@@ -23,7 +23,7 @@ public:
 	FileHandler& operator=(const FileHandler& other) = delete;
 	FileHandler& operator=(const FileHandler&& other) = delete;
 
-	rapidjson::Document StoreFileInDataBase(const ot::UIDList& identifier);
+	rapidjson::Document StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions);
 	
 	/// <summary>
 	/// Extracts the file name from the absolute path and trims the file type as well.

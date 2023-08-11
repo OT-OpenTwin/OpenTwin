@@ -1,6 +1,8 @@
 #include "TableExtractorCSV.h"
 #include "FileToTableExtractorRegistrar.h"
 #include "EntityFileCSV.h"
+#include "OpenTwinCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OpenTwinCore/EncodingConverter_UTF16ToUTF8.h"
 
 #include <algorithm>
 #include <exception>
@@ -42,7 +44,7 @@ void TableExtractorCSV::ExtractFromEntitySource(EntityFile* source)
 	else if (selectedEncodingStandard == ot::TextEncoding::EncodingStandard::UTF16_BEBOM || selectedEncodingStandard == ot::TextEncoding::EncodingStandard::UTF16_LEBOM)
 	{
 		ot::EncodingConverter_UTF16ToUTF8 converter;
-		_fileContentStream.str(converter(fileContent));
+		_fileContentStream.str(converter(selectedEncodingStandard,fileContent));
 	}
 	else
 	{

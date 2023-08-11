@@ -1566,9 +1566,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			{
 				const std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 				ot::UIDList identifiers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				ot::UIDList versions = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
 				if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
 				{
-					rapidjson::Document  reply = m_fileHandler.StoreFileInDataBase(identifiers);
+					rapidjson::Document  reply = m_fileHandler.StoreFileInDataBase(identifiers,versions);
 					std::string response;
 					sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
 					// Check if response is an error or warning
@@ -1745,8 +1746,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					{
 						rapidjson::Document sendingDoc;
 						sendingDoc.SetObject();
-						int requiredIdentifierPerFile = 4;
-						const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPerFile;
+						int requiredIdentifierPairsPerFile = 2;
+						const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPairsPerFile;
 						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs);
 						const std::string url = uiServiceURL();
 						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_SENDER_URL, url);

@@ -5,8 +5,7 @@
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCore/TextEncoding.h"
 #include "OpenTwinCore/EncodingGuesser.h"
-#include "OpenTwinCore/EncodingConverter_ISO88591ToUTF8.h"
-#include "OpenTwinCore/EncodingConverter_UTF16ToUTF8.h"
+
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)
 {
@@ -29,11 +28,14 @@ std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fil
 	}
 }
 
-rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& identifier)
+rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions)
 {
-	assert(identifier.size() == _filePaths.size() * 4);
+	assert(entityIDs.size() == _filePaths.size() * 2);
+	assert(entityVersions.size() == _filePaths.size() * 2);
 
-	auto uid = identifier.begin();
+	auto uid = entityIDs.begin();
+	auto version = entityVersions.begin();
+
 	ot::UIDList topoID, topoVers, dataID, dataVers;
 
 	for (const std::string absoluteFilePath : _filePaths)
@@ -66,14 +68,14 @@ rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& identifi
 		uid++;
 		
 		newData->setData(memBlock.data(), memBlock.size());
-		//newData->StoreToDataBase(*uid);
-		dataVers.push_back(*uid);
-		uid++;
+		newData->StoreToDataBase(*version);
+		dataVers.push_back(*version);
+		version++;
 
 		newFile->setData(newData->getEntityID(), newData->getEntityStorageVersion());
-		//newFile->StoreToDataBase(*uid);
-		topoVers.push_back(*uid);
-		uid++;
+		newFile->StoreToDataBase(*version);
+		topoVers.push_back(*version);
+		version++;
 	}
 
 	return CreateReplyMessage(topoID,topoVers,dataID,dataVers);
