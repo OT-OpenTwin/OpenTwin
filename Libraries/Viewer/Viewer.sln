@@ -30,8 +30,8 @@ Global
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.DebugTest|x64.ActiveCfg = DebugTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.DebugTest|x64.Build.0 = DebugTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.DebugTest|x86.ActiveCfg = DebugTest|x64
-		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.ActiveCfg = ReleaseTest|x64
-		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.Build.0 = ReleaseTest|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.ActiveCfg = Release|x64
+		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x64.Build.0 = Release|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.Release|x86.ActiveCfg = Release|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleasePerfTest|x64.ActiveCfg = ReleasePerfTest|x64
 		{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}.ReleasePerfTest|x64.Build.0 = ReleasePerfTest|x64
