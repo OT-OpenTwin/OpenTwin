@@ -122,7 +122,7 @@ namespace ot {
 		ALL_INCOMING_MESSAGE_LOG_FLAGS  = 0x0070, //! @brief Mask used to set all incoming message log flags
 		ALL_OUTGOING_MESSAGE_LOG_FLAGS  = 0x0080, //! @brief Mask used to set all outgoing message log flags
 		ALL_MESSAGE_LOG_FLAGS           = 0x00F0, //! @brief Mask used to set all incoming and outgoing message log flags
-		ALL_LOG_FLAGS                   = 0xFFFF, //! @brief Mask used to set all log flags
+		ALL_LOG_FLAGS                   = 0xFFFF  //! @brief Mask used to set all log flags
 	};
 }
 OT_ADD_FLAG_FUNCTIONS(ot::LogFlag);
