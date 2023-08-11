@@ -6,47 +6,36 @@ ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const char* f
 	using EncodingStandard = ot::TextEncoding::EncodingStandard;
 
 	EncodingStandard encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
-	utf8* firstChar = (unsigned char*)(fileContent);
+	byte* firstChar = (unsigned char*)(fileContent);
 	// detect UTF-16 big-endian with BOM
-	if (numberOfBytes > 2 && firstChar[0] == bigEndian_Bom[0] && firstChar[1] == bigEndian_Bom[1])
+	if (numberOfBytes > 2 && firstChar[0] == bigEndianBom[0] && firstChar[1] == bigEndianBom[1])
 	{
 		encoding = EncodingStandard::UTF16_BEBOM;
 	}
 	// detect UTF-16 little-endian with BOM
-	else if (numberOfBytes > 2 && firstChar[0] == littleEndian_Bom[0] && firstChar[1] == littleEndian_Bom[1])
+	else if (numberOfBytes > 2 && firstChar[0] == littleEndianBom[0] && firstChar[1] == littleEndianBom[1])
 	{
 		encoding = EncodingStandard::UTF16_LEBOM;
 	}
 	// detect UTF-8 with BOM
-	else if (numberOfBytes > 3 && firstChar[0] == utf8_Bom[0] &&
-		firstChar[1] == utf8_Bom[1] && firstChar[2] == utf8_Bom[2])
+	else if (numberOfBytes > 3 && firstChar[0] == utf8Bom[0] &&
+		firstChar[1] == utf8Bom[1] && firstChar[2] == utf8Bom[2])
 	{
 		encoding = EncodingStandard::UTF8_BOM;
 	}
-	//Code uses windows API
-	// try to detect UTF-16 little-endian without BOM
-	/*else if (numberOfBytes > 2 && numberOfBytes -1 % 2 == 0 && fileContent[0] != 0 && fileContent[1] == 0 && IsTextUnicode(fileContent, static_cast<int32_t>(numberOfBytes), &uniTest))
-	{
-		m_eEncoding = uni16LE_NoBOM;
-		m_nSkip = 0;
-	}*/
+
 	else
 	{
-		type7or8Byte detectedEncoding = CheckUtf8_7bits_8bits(firstChar, numberOfBytes);
-
-		if (detectedEncoding == utf8NoBOM)
-		{
-			encoding = EncodingStandard::UTF8;
-		}
-		else if (detectedEncoding == ascii8bits)
+		bool isISOEncoding = CheckIfISO(firstChar, numberOfBytes);
+				
+		if (isISOEncoding)
 		{
 			encoding = EncodingStandard::ANSI;
 		}
 		else
 		{
-			encoding = EncodingStandard::UTF8;
+			encoding = EncodingStandard::UTF8; 
 		}
-
 	}
 	return encoding;
 }
@@ -57,88 +46,81 @@ ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const std::ve
 	return operator()(&fileContent[0], numberOfBytes);
 }
 
-ot::EncodingGuesser::type7or8Byte ot::EncodingGuesser::CheckUtf8_7bits_8bits(utf8* fileContent, int64_t numberOfBytes)
+bool ot::EncodingGuesser::CheckIfISO(byte* fileContent, int64_t numberOfBytes)
 {
-	int rv = 1;
-	int ASCII7only = 1;
-	utf8* sx = fileContent;
-	utf8* endx = sx + numberOfBytes;
+	bool rv = true;
+	bool ASCII7only = true;
+	byte* currentByte = fileContent;
+	byte* lastByte = currentByte + numberOfBytes;
 
-	while (sx < endx)
+	bool isISOEncoding = false;
+	while (currentByte < lastByte)
 	{
-		if (*sx == '\0')
-		{											// For detection, we'll say that NUL means not UTF8
-			ASCII7only = 0;
-			rv = 0;
+		if (*currentByte == '\0')
+		{
+			isISOEncoding = true;
 			break;
 		}
-		else if ((*sx & 0x80) == 0x0)
-		{			// 0nnnnnnn If the byte's first hex code begins with 0-7, it is an ASCII character.
-			++sx;
+		else if ((*currentByte & 0x80) == 0x0) // ASCII character are going until 0x7F, thus a char is ASCII if the msb of the byte is not set 
+		{			
+			++currentByte;
 		}
-		else if ((*sx & (0x80 + 0x40)) == 0x80)
-		{											  // 10nnnnnn 8 through B cannot be first hex codes
-			ASCII7only = 0;
-			rv = 0;
+		else if ((*currentByte & (0x80 + 0x40)) == 0x80) // The first Hexcode cannot be 8 through B for UTF-8 
+		{											  
+			isISOEncoding = true;
 			break;
 		}
-		else if ((*sx & (0x80 + 0x40 + 0x20)) == (0x80 + 0x40))
-		{					  // 110xxxvv 10nnnnnn, 11 bit character
-			ASCII7only = 0;
-			if (std::distance(sx, endx) < 2) {
-				rv = 0; break;
+		else if ((*currentByte & (0x80 + 0x40 + 0x20)) == (0x80 + 0x40))// 11 bit character
+		{					  
+
+			if (std::distance(currentByte, lastByte) < 2) {
+				isISOEncoding = true;
+				break;
 			}
-			if ((sx[1] & (0x80 + 0x40)) != 0x80) {
-				rv = 0; break;
+			if ((currentByte[1] & (0x80 + 0x40)) != 0x80) {
+				isISOEncoding = true;
+				break;
 			}
-			sx += 2;
+			currentByte += 2;
 		}
-		else if ((*sx & (0x80 + 0x40 + 0x20 + 0x10)) == (0x80 + 0x40 + 0x20))
-		{								// 1110qqqq 10xxxxvv 10nnnnnn, 16 bit character
-			ASCII7only = 0;
-			if (std::distance(sx, endx) < 3) {
-				rv = 0; break;
+		else if ((*currentByte & (0x80 + 0x40 + 0x20 + 0x10)) == (0x80 + 0x40 + 0x20)) // 16 bit character
+		{								
+			
+			if (std::distance(currentByte, lastByte) < 3) {
+				isISOEncoding = true;
+				break;
 			}
-			if ((sx[1] & (0x80 + 0x40)) != 0x80 || (sx[2] & (0x80 + 0x40)) != 0x80) {
-				rv = 0; break;
+			if ((currentByte[1] & (0x80 + 0x40)) != 0x80 || (currentByte[2] & (0x80 + 0x40)) != 0x80) {
+				isISOEncoding = true;
+				break;
 			}
-			sx += 3;
+			currentByte += 3;
 		}
-		else if ((*sx & (0x80 + 0x40 + 0x20 + 0x10 + 0x8)) == (0x80 + 0x40 + 0x20 + 0x10))
-		{								// 11110qqq 10xxxxvv 10nnnnnn 10mmmmmm, 21 bit character
-			ASCII7only = 0;
-			if (std::distance(sx, endx) < 4) {
-				rv = 0; break;
+		else if ((*currentByte & (0x80 + 0x40 + 0x20 + 0x10 + 0x8)) == (0x80 + 0x40 + 0x20 + 0x10)) // 21 bit character
+		{								
+			
+			if (std::distance(currentByte, lastByte) < 4) {
+				isISOEncoding = true;
+				break;
 			}
-			if ((sx[1] & (0x80 + 0x40)) != 0x80 || (sx[2] & (0x80 + 0x40)) != 0x80 || (sx[3] & (0x80 + 0x40)) != 0x80) {
-				rv = 0; break;
+			if ((currentByte[1] & (0x80 + 0x40)) != 0x80 || (currentByte[2] & (0x80 + 0x40)) != 0x80 || (currentByte[3] & (0x80 + 0x40)) != 0x80) {
+				isISOEncoding = true;
+				break;
 			}
-			sx += 4;
+			currentByte += 4;
 		}
 		else
 		{
-			ASCII7only = 0;
-			rv = 0;
+			isISOEncoding = true;
 			break;
 		}
 	}
-	if (ASCII7only)
-		return ascii7bits;
-	if (rv)
-		return utf8NoBOM;
-	return ascii8bits;
+	return isISOEncoding;
 }
 
 
 std::string ot::EncodingConverter_ISO88591ToUTF8::operator()(const std::vector<char>& fileContent)
 {
-	//#include <boost/locale.hpp>
-//std::string ansi_to_utf8(const std::string& str)
-//{
-//	return boost::locale::conv::to_utf<char>(str, "Latin1");
-//}
-	//Source: https://stackoverflow.com/questions/4059775/convert-iso-8859-1-strings-to-utf-8-in-c-c
-
 	std::string out;
 	unsigned char* ch = (unsigned char*)&fileContent[0];
 	for (uint32_t i = 0; i < fileContent.size(); i++)

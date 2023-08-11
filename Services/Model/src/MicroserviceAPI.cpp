@@ -1063,10 +1063,11 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		else if (action == OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER)
 		{
 			const int numberOfIdentifier = ot::rJSON::getInt(doc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT);
-			ot::UIDList requestedUIDs;
+			ot::UIDList requestedUIDs, requestedVersions;
 			for (int i = 0; i < numberOfIdentifier; i++)
 			{
 				requestedUIDs.push_back(globalModel->createEntityUID());
+				requestedVersions.push_back(globalModel->createEntityUID());
 			}
 			const std::string& requestingService = ot::rJSON::getString(doc, OT_ACTION_PARAM_SENDER_URL);
 			const std::string& subsequentFunction = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_FunctionName);
@@ -1075,6 +1076,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			ot::rJSON::add(replyDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
 			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
 			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_EntityIDList, requestedUIDs);
+			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, requestedVersions);
 			std::string response;
 			//Currently only the ui service uses this function but the ui url is currently not available when this method is being invoked.
 			sendHttpRequest(QUEUE, globalUIserviceURL, replyDoc, response);

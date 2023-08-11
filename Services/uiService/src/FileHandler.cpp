@@ -63,12 +63,12 @@ rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& identifi
 		uid++;
 		
 		newData->setData(memBlock.data(), memBlock.size());
-		newData->StoreToDataBase(*uid);
+		//newData->StoreToDataBase(*uid);
 		dataVers.push_back(*uid);
 		uid++;
 
 		newFile->setData(newData->getEntityID(), newData->getEntityStorageVersion());
-		newFile->StoreToDataBase(*uid);
+		//newFile->StoreToDataBase(*uid);
 		topoVers.push_back(*uid);
 		uid++;
 	}
