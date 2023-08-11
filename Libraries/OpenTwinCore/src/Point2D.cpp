@@ -15,8 +15,8 @@ void ot::Point2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object
 
 void ot::Point2D::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, "t", String);
-	OT_rJSON_checkMember(_object, "x", Double);
-	OT_rJSON_checkMember(_object, "y", Double);
+	OT_rJSON_checkMember(_object, "x", Int);
+	OT_rJSON_checkMember(_object, "y", Int);
 	otAssert(_object["t"] == "i", "Invalid Point2D type");
 	m_x = _object["x"].GetInt();
 	m_y = _object["y"].GetInt();

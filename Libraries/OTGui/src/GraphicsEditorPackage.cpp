@@ -54,7 +54,7 @@ void ot::GraphicsEditorPackage::setFromJsonObject(OT_rJSON_val& _object) {
 		catch (const std::exception& _e) {
 			OT_LOG_E(_e.what());
 			this->memFree();
-			return;
+			throw _e;
 		}
 	}
 }

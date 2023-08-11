@@ -62,8 +62,10 @@ void ot::GraphicsCollectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 			m_collections.push_back(newChild);
 		}
 		catch (...) {
+			OT_LOG_E("Failed to create child collection. Abort");
 			delete newChild;
-			OT_LOG_E("Failed to create child collection. Skipping");
+			this->memFree();
+			throw std::exception("Failed to create graphics collection");
 		}
 	}
 
@@ -72,22 +74,22 @@ void ot::GraphicsCollectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 		OT_rJSON_checkArrayEntryType(itemArr, i, Object);
 		OT_rJSON_val itemObj = itemArr[i].GetObject();
 
+		GraphicsItemCfg* itm = nullptr;
 		try {
-			GraphicsItemCfg* itm = ot::SimpleFactory::instance().createType<GraphicsItemCfg>(itemObj);
-			if (itm) {
-				m_items.push_back(itm);
-			}
-			else {
-				OT_LOG_W("Failed to create item by factory. Skipping");
-			}
+			
+			itm = ot::SimpleFactory::instance().createType<GraphicsItemCfg>(itemObj);
+			itm->setFromJsonObject(itemObj);
+			m_items.push_back(itm);
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E("Failed to create item by factory. " + std::string(_e.what()) + ". Abort");
+			if (itm) delete itm;
 			this->memFree();
 			throw std::exception("Failed to create graphics item");
 		}
 		catch (...) {
 			OT_LOG_E("Failed to create item by factory. Unknown error. Abort");
+			if (itm) delete itm;
 			this->memFree();
 			throw std::exception("Failed to create graphics item");
 		}

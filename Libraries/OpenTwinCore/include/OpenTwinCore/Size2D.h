@@ -12,7 +12,7 @@
 namespace ot {
 
 	template <class T>
-	class Size2DTemplate : public ot::Serializable {
+	class OT_CORE_API_EXPORTONLY Size2DTemplate : public ot::Serializable {
 	public:
 		Size2DTemplate() : m_w((T)0), m_h((T)0) {};
 		Size2DTemplate(T _w, T _h) : m_w(_w), m_h(_h) {};
@@ -22,6 +22,9 @@ namespace ot {
 		Size2DTemplate& operator = (const Size2DTemplate<T>& _other) { m_w = _other.m_w; m_h = _other.m_h; return *this; };
 		bool operator == (const Size2DTemplate<T>& _other) const { return m_w == _other.m_w && m_h == _other.m_h; };
 		bool operator != (const Size2DTemplate<T>& _other) const { return m_w != _other.m_w || m_h != _other.m_h; };
+
+		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override {};
+		virtual void setFromJsonObject(OT_rJSON_val& _object) override {};
 
 		//! @brief Set width
 		//! @param _w Width to set
@@ -43,7 +46,7 @@ namespace ot {
 	};
 
 	//! @brief 2D Size with integer values
-	class OT_CORE_API_EXPORT Size2D : public Size2DTemplate<int> {
+	class OT_CORE_API_EXPORTONLY Size2D : public Size2DTemplate<int> {
 	public:
 		Size2D() : Size2DTemplate(0, 0) {};
 		Size2D(int _w, int _h) : Size2DTemplate(_w, _h) {};
@@ -64,7 +67,7 @@ namespace ot {
 	};
 
 	//! @brief 2D Size with float values
-	class OT_CORE_API_EXPORT Size2DF : public Size2DTemplate<float> {
+	class OT_CORE_API_EXPORTONLY Size2DF : public Size2DTemplate<float> {
 	public:
 		Size2DF() : Size2DTemplate(0, 0) {};
 		Size2DF(float _w, float _h) : Size2DTemplate(_w, _h) {};
@@ -85,7 +88,7 @@ namespace ot {
 	};
 
 	//! @brief 2D Size with double values
-	class OT_CORE_API_EXPORT Size2DD : public Size2DTemplate<double> {
+	class OT_CORE_API_EXPORTONLY Size2DD : public Size2DTemplate<double> {
 	public:
 		Size2DD() : Size2DTemplate(0, 0) {};
 		Size2DD(double _w, double _h) : Size2DTemplate(_w, _h) {};

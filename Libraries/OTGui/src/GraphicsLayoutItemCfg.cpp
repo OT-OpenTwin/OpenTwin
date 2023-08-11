@@ -319,7 +319,6 @@ void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {
 
 // Register registrar
 
-//static ot::SimpleFactoryRegistrar<ot::GraphicsBoxLayoutItemCfg> box("GraphicsBoxLayoutItemCfg");
 static ot::SimpleFactoryRegistrar<ot::GraphicsVBoxLayoutItemCfg> vboxCfg(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsHBoxLayoutItemCfg> hboxCfg(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsGridLayoutItemCfg> gridCfg(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg);

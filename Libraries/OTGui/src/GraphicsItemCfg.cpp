@@ -12,17 +12,17 @@
 
 #define OT_JSON_MEMBER_Top "Top"
 #define OT_JSON_MEMBER_Bottom "Bottom"
-#define OT_JSON_MEMBER_Name "Name"// <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
-#define OT_JSON_MEMBER_Text "Text"//  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                           ^O^^^^^^// '## w ##' //^^3
-#define OT_JSON_MEMBER_Size "Size"//   <^^\\ '## < ##' \\ ^^^^^^O^                                                                                         ^O^^^^^^// '## w ##' //^^3
-#define OT_JSON_MEMBER_Title "Title"//   <^^\\ '## w ##' \\ ^^^^^^O^                 .                '                          .                        ^O^^^^^^// '## W ##' //^^3
-#define OT_JSON_MEMBER_Border "Border"//    <^^\\ '## w ##' \\ ^^^^^^O^                            .              .                  .                     ^O^^^^^^// '## w ##' //^^3
-#define OT_JSON_MEMBER_Margin "Margin"//     <^^\\  ## o ##' \\ ^^^^^^O^                                   '                                                  ^O^^^^^^// '## m ##' //^^3
-#define OT_JSON_MEMBER_TextFont "TextFont"//      <^^\\  ## x ##  \\ ^^^^^^O^                                                       '                    '        ^O^^^^^^ // '## m ##' //^^3
-#define OT_JSON_MEMBER_TextColor "TextColor"//        <^^\\  ## < ##  \\ ^^^^^^O^           .                       '                          .                          ^O^^^^^^  // '## > ##. //^^3
-#define OT_JSON_MEMBER_ImagePath "ImagePath"//         < ^^\\ '## < ##' \\  ^^^^^^O^                                                                                                   ^O^^^^^^  // .## > ##..//^^ 3
-#define OT_JSON_MEMBER_CornerRadius "CornerRadius"//          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                          ^O^^^^^^   //.:## > ##:.//^^  3
-#define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"//         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                      ^O^^^^^^   //.:## > ##:.//^^   3
+#define OT_JSON_MEMBER_Name "Name" // <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
+#define OT_JSON_MEMBER_Text "Text" //  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                           ^O^^^^^^// '## w ##' //^^3
+#define OT_JSON_MEMBER_Size "Size" //   <^^\\ '## < ##' \\ ^^^^^^O^                                                                                         ^O^^^^^^// '## w ##' //^^3
+#define OT_JSON_MEMBER_Title "Title" //   <^^\\ '## w ##' \\ ^^^^^^O^                 .                '                          .                        ^O^^^^^^// '## W ##' //^^3
+#define OT_JSON_MEMBER_Border "Border" //    <^^\\ '## w ##' \\ ^^^^^^O^                            .              .                  .                     ^O^^^^^^// '## w ##' //^^3
+#define OT_JSON_MEMBER_Margin "Margin" //     <^^\\  ## o ##' \\ ^^^^^^O^                                   '                                                  ^O^^^^^^// '## m ##' //^^3
+#define OT_JSON_MEMBER_TextFont "TextFont" //      <^^\\  ## x ##  \\ ^^^^^^O^                                                       '                    '        ^O^^^^^^ // '## m ##' //^^3
+#define OT_JSON_MEMBER_TextColor "TextColor" //        <^^\\  ## < ##  \\ ^^^^^^O^           .                       '                          .                          ^O^^^^^^  // '## > ##. //^^3
+#define OT_JSON_MEMBER_ImagePath "ImagePath" //         < ^^\\ '## < ##' \\  ^^^^^^O^                                                                                                   ^O^^^^^^  // .## > ##..//^^ 3
+#define OT_JSON_MEMBER_CornerRadius "CornerRadius" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                          ^O^^^^^^   //.:## > ##:.//^^  3
+#define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                      ^O^^^^^^   //.:## > ##:.//^^   3
 
 ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10) {}
 
