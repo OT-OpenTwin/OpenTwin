@@ -798,21 +798,24 @@ bool ViewerAPI::setTable(ot::UID _viewerID, ot::UID entityID, ot::UID entityVers
 	{
 		DataBase* temp = DataBase::GetDataBase();
 		auto entityBase = temp->GetEntityFromEntityIDandVersion(entityID, entityVersion);
-		std::unique_ptr<EntityParameterizedDataTable> tableTopoEnt((dynamic_cast<EntityParameterizedDataTable*>(entityBase)));
+		std::shared_ptr<EntityParameterizedDataTable> tableTopoEnt((dynamic_cast<EntityParameterizedDataTable*>(entityBase)));
+		tableTopoEnt->getTableData();
+		bool refresh = false;
+
 		if (tableTopoEnt != nullptr)
 		{
-			tableTopoEnt->getTableData();
-			return v->getTableViewer()->CreateNewTable(tableTopoEnt.get(), tableTopoEnt->getSelectedHeaderOrientation());
+			
+			refresh = v->getTableViewer()->CreateNewTable(tableTopoEnt, tableTopoEnt->getSelectedHeaderOrientation());
 		}
 		else
 		{
-			std::unique_ptr<EntityResultTable<std::string>> generalTableTopoEnt((dynamic_cast<EntityResultTable<std::string>*>(entityBase)));
+			std::shared_ptr<EntityResultTable<std::string>> generalTableTopoEnt((dynamic_cast<EntityResultTable<std::string>*>(entityBase)));
 			if (generalTableTopoEnt != nullptr)
 			{
-				return v->getTableViewer()->CreateNewTable(generalTableTopoEnt.get());
+				refresh = v->getTableViewer()->CreateNewTable(generalTableTopoEnt);
 			}
 		}
-		return false;
+		return refresh;
 	}
 	else
 	{

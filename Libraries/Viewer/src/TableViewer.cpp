@@ -25,11 +25,9 @@ std::vector<ot::TableRange> TableViewer::GetSelectedRanges()
 	return rangesInternalType;
 }
 
-#include "OpenTwinCore/PerformanceTests.h"
 
-bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityParameterizedDataTable::HeaderOrientation orientation)
+bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>> table, EntityParameterizedDataTable::HeaderOrientation orientation)
 {
-	OT_LOG_D("Test");
 	if (_tableID != table->getEntityID() || _tableVersion != table->getEntityStorageVersion() || orientation != _tableOrientation)
 	{
 		//TakeTime(t1);
@@ -38,7 +36,9 @@ bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityP
 		std::chrono::system_clock::time_point t2 = std::chrono::system_clock::now();
 		if (tableData != nullptr)
 		{
+			std::chrono::system_clock::time_point t3 = std::chrono::system_clock::now();
 			_table->clear();
+			std::chrono::system_clock::time_point t4 = std::chrono::system_clock::now();
 			_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 			unsigned int numberOfColumns = tableData->getNumberOfColumns();
 			unsigned int numberOfRows = tableData->getNumberOfRows();
@@ -69,7 +69,7 @@ bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityP
 					_table->setVerticalHeaderItem(r, item);
 				}
 			}
-
+			std::chrono::system_clock::time_point t5 = std::chrono::system_clock::now();
 			unsigned int itemRowIndex(0);
 			for (unsigned int r = rowStart; r < numberOfRows; r++)
 			{
@@ -83,14 +83,20 @@ bool TableViewer::CreateNewTable(EntityResultTable<std::string> * table, EntityP
 				}
 				itemRowIndex++;
 			}
-			std::chrono::system_clock::time_point t3 = std::chrono::system_clock::now();
+			std::chrono::system_clock::time_point t6 = std::chrono::system_clock::now();
 			_table->resizeColumnsToContents();
-			std::chrono::system_clock::time_point t4 = std::chrono::system_clock::now();
+			std::chrono::system_clock::time_point t7 = std::chrono::system_clock::now();
 			
 			
-			OT_LOG_D("Loading table data: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count()));
-			OT_LOG_D("Build qtable: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count()));
-			OT_LOG_D("Resized qtable: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count()));
+			std::string durationTableLoad = std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count());
+			std::string durationClearTable = std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count());
+			std::string durationSetTableItems = std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t6 - t5).count());
+			std::string durationSetTableResize = std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(t7 - t6).count());
+				
+			OT_LOG_D("Loading table data: " + durationTableLoad);
+			OT_LOG_D("Clear table data: " + durationClearTable);
+			OT_LOG_D("Build qtable: " + durationSetTableItems);
+			OT_LOG_D("Resized qtable: " + durationSetTableResize);
 			
 			_tableName = table->getName();
 			_tableID = table->getEntityID();

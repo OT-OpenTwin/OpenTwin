@@ -20,7 +20,8 @@ EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityOb
 
 template <class T>
 EntityResultTable<T>::~EntityResultTable()
-{}
+{
+}
 
 template <class T>
 bool EntityResultTable<T>::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
@@ -155,7 +156,11 @@ void EntityResultTable<T>::EnsureTableDataLoaded()
 				auto tempPtr = dynamic_cast<EntityResultTableData<T>*>(readEntityFromEntityIDAndVersion(this, tableDataStorageId, tableDataStorageVersion, entitymap));
 				if (tempPtr != nullptr)
 				{
-					tableData = std::make_shared<EntityResultTableData<T>>(*tempPtr);
+					tableData = std::shared_ptr <EntityResultTableData<T>>(tempPtr);
+				}
+				else
+				{
+					throw std::exception("Failed to load the Table Data.");
 				}
 			}
 		}
