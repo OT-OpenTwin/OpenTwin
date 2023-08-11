@@ -43,6 +43,15 @@
     <ClCompile Include="src\TextEncoding.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingGuesser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h">
@@ -130,7 +139,16 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenTwinCore\TextEncoding.h">
-      <Filter>include</Filter>
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\EncodingGuesser.h">
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\EncodingConverter_ISO88591ToUTF8.h">
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\EncodingConverter_UTF16ToUTF8.h">
+      <Filter>include\TextEncoding</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +157,9 @@
     </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{f95c9d0a-a228-4afe-8a7a-69a62477e479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\TextEncoding">
+      <UniqueIdentifier>{73977dab-7521-4c1c-a2a9-e677cd97e934}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,5 +1,7 @@
 #include "FixtureTextEncoding.h"
-
+#include "OpenTwinCore/EncodingGuesser.h"
+#include "OpenTwinCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OpenTwinCore/EncodingConverter_UTF16ToUTF8.h"
 TEST_F(FixtureTextEncoding, ReadFileUTF8)
 {
 	auto fileContent = ReadFile(ot::TextEncoding::UTF8);
@@ -37,7 +39,7 @@ TEST_F(FixtureTextEncoding, UTF16BEBOMToUTF8)
 	auto fileContent = ReadFile(ot::TextEncoding::UTF16_BEBOM);
 
 	ot::EncodingConverter_UTF16ToUTF8 converter;
-	std::string isValue = converter(fileContent);
+	std::string isValue = converter(ot::TextEncoding::UTF16_BEBOM,fileContent);
 
 	ot::EncodingGuesser guesser;
 	auto encoding = guesser(isValue.c_str(), isValue.size());
@@ -45,18 +47,43 @@ TEST_F(FixtureTextEncoding, UTF16BEBOMToUTF8)
 	EXPECT_EQ(encoding, ot::TextEncoding::UTF8);
 }
 
+TEST_F(FixtureTextEncoding, UTF16BEBOMToUTF8_TextCompare)
+{
+	auto fileContent = ReadFile(ot::TextEncoding::UTF16_BEBOM);
+
+	ot::EncodingConverter_UTF16ToUTF8 converter;
+	std::string isValue = converter(ot::TextEncoding::UTF16_BEBOM, fileContent);
+
+	const std::string expectedValue = "Das ist ein UTF-16 BE BOM Dokument";
+
+	EXPECT_EQ(expectedValue, isValue);
+}
+
 TEST_F(FixtureTextEncoding, UTF16LEBOMToUTF8BOM)
 {
 	auto fileContent = ReadFile(ot::TextEncoding::UTF16_LEBOM);
 
 	ot::EncodingConverter_UTF16ToUTF8 converter;
-	std::string isValue = converter(fileContent);
+	std::string isValue = converter(ot::TextEncoding::UTF16_LEBOM,fileContent);
 
 	ot::EncodingGuesser guesser;
 	auto encoding = guesser(isValue.c_str(), isValue.size());
 
-	EXPECT_EQ(encoding, ot::TextEncoding::UTF8_BOM);
+	EXPECT_EQ(encoding, ot::TextEncoding::UTF8);
 }
+
+TEST_F(FixtureTextEncoding, UTF16LEBOMToUTF8_TextCompare)
+{
+	auto fileContent = ReadFile(ot::TextEncoding::UTF16_LEBOM);
+
+	ot::EncodingConverter_UTF16ToUTF8 converter;
+	std::string isValue = converter(ot::TextEncoding::UTF16_LEBOM, fileContent);
+
+	const std::string expectedValue = "Das ist ein UTF-16 LE BOM Dokument";
+
+	EXPECT_EQ(expectedValue, isValue);
+}
+
 
 TEST_F(FixtureTextEncoding, EncodingStandardToString)
 {

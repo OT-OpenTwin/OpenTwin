@@ -4,6 +4,9 @@
 #include "EntityFileCSV.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCore/TextEncoding.h"
+#include "OpenTwinCore/EncodingGuesser.h"
+#include "OpenTwinCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OpenTwinCore/EncodingConverter_UTF16ToUTF8.h"
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)
 {

@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
+    <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
+    <ClCompile Include="src\EncodingGuesser.cpp" />
     <ClCompile Include="src\KeyMap.cpp" />
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
@@ -37,6 +40,9 @@
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h" />
     <ClInclude Include="include\OpenTwinCore\CoreAPIExport.h" />
+    <ClInclude Include="include\OpenTwinCore\EncodingConverter_ISO88591ToUTF8.h" />
+    <ClInclude Include="include\OpenTwinCore\EncodingConverter_UTF16ToUTF8.h" />
+    <ClInclude Include="include\OpenTwinCore\EncodingGuesser.h" />
     <ClInclude Include="include\OpenTwinCore\Flags.h" />
     <ClInclude Include="include\OpenTwinCore\CoreTypes.h" />
     <ClInclude Include="include\OpenTwinCore\FlagsHelper.h" />
@@ -147,6 +153,7 @@
       <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,6 +175,7 @@
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -194,6 +202,7 @@
       <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -219,6 +228,7 @@
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
