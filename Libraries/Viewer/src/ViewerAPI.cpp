@@ -821,6 +821,7 @@ bool ViewerAPI::setTable(ot::UID _viewerID, ot::UID entityID, ot::UID entityVers
 	}
 }
 
+
 void ViewerAPI::setTableSelection(ot::UID _viewerID, std::vector<ot::TableRange> ranges)
 {
 	Viewer * v = viewerManager[_viewerID];

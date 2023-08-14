@@ -36,6 +36,12 @@ void EntityParameterizedDataTable::createProperties(HeaderOrientation defaultOri
 	filePathProperty->setReadOnly(true);
 	getProperties().createProperty(filePathProperty, "Source file");
 
+	if (defaultOrientation == HeaderOrientation::vertical)
+	{
+		_minRow = 0;
+		_minCol = 1;
+	}
+
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { _headerSettingHorizontal,_headerSettingVertical }, GetHeaderOrientation(defaultOrientation) , _defaulCategory, getProperties());
 
 	EntityResultTable<std::string>::createProperties();
@@ -94,7 +100,7 @@ void EntityParameterizedDataTable::readSpecificDataFromDataBase(bsoncxx::documen
 	_numberOfUniquesInColumns.clear();
 	_numberOfUniquesInColumns.reserve(dataArray.length());
 
-	for (auto data : dataArray)
+	for (auto& data : dataArray)
 	{
 		_numberOfUniquesInColumns.push_back(static_cast<uint32_t>(data.get_int32()));
 	}

@@ -31,9 +31,9 @@ public:
 	TableViewer& operator=(TableViewer& other) = delete;
 
 	Table* getTable() const { return _table; }
-	ot::UID getTableID() const { return _tableID; }
-	ot::UID getTableVersion() const { return _tableVersion; }
-	std::string getTableName() const { return _tableName; }
+	ot::UID getTableID() const { return _activeTable->getEntityID(); }
+	ot::UID getTableVersion() const { return _activeTable->getEntityStorageVersion(); }
+	std::string getTableName() const { return _activeTable->getName(); }
 
 	/**
 	 * Takes a table entity changes the size and filling of the table member variable.
@@ -50,11 +50,17 @@ public:
 	void AddColumn(bool insertLeft);
 
 private:
-	Table* _table = nullptr;
 	const int _defaultNumberOfRows = 60;
 	const int _defaultNumberOfColumns = 30;
-	ot::UID _tableID = -1;
-	ot::UID _tableVersion = -1;
-	std::string _tableName;
+	std::shared_ptr <EntityResultTable<std::string>> _activeTable = nullptr;
+	Table* _table = nullptr;
+
 	EntityParameterizedDataTable::HeaderOrientation	_tableOrientation = EntityParameterizedDataTable::HeaderOrientation::horizontal;
+	uint32_t _shownMinCol = 0;
+	uint32_t _shownMaxCol = 0;
+	uint32_t _shownMinRow = 0;
+	uint32_t _shownMaxRow = 0;
+
+	void SetTableData();
+	void SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart, uint32_t& outRowEnd, uint32_t& outColumnEnd, uint64_t numberOfColumns, uint64_t numberOfRows);
 };

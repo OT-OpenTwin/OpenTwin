@@ -45,10 +45,10 @@ public:
 protected:
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	int _minCol = 0;
+	int _minRow = 1;
 
 private:
-	int _minCol = 0;
-	int _minRow = 0;
 	int _maxCol = 50;
 	int _maxRow = 50;
 	virtual int getSchemaVersion(void) { return 1; };

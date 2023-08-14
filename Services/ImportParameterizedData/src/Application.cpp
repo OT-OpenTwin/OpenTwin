@@ -441,11 +441,15 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
 			if (entityInfos.begin()->getName().find(_tableFolder) != std::string::npos)
 			{
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
 				OT_rJSON_createDOC(doc);
 				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
 				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
 				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long) entityInfos.begin()->getVersion());
+				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getVersion());
 				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID());
 				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
 
