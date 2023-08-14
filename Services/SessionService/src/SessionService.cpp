@@ -170,6 +170,9 @@ bool SessionService::runMandatoryServices(
 			OT_LOG_E("Failed to run service in debug mode (Name = \"" + s.serviceName() + "\"; Type = \"" + s.serviceType() + "\")");
 			return false;
 		}
+		else {
+			_session->addRequestedService(s.serviceName(), s.serviceType());
+		}
 	}
 
 	// Send release mode services to the GDS
@@ -569,7 +572,6 @@ std::string SessionService::handleCreateNewSession(OT_rJSON_doc& _commandDoc)
 		OT_LOG_D("Session created without relay service (for session creator)");
 		theService = theSession->registerService(senderIP, serviceName, serviceType, newID);
 	}
-	theService->setHidden();
 
 	m_masterLock.unlock();
 

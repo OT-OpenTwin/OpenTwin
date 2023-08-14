@@ -3087,7 +3087,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 	app->lockWelcomeScreen(true);
 
 	try {
-		OT_LOG_I("Open project requested (Project name = \"" + projectName + ")");
+		OT_LOG_D("Open project requested (Project name = \"" + projectName + ")");
 
 		m_lockManager->lock(app, ot::ui::tlAll);
 
@@ -3123,7 +3123,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		}
 		m_sessionServiceURL = response;
 
-		OT_LOG_I("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
+		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
 #endif
 
 		app->setCurrentProjectName(projectName);
@@ -3191,7 +3191,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 			if (m_websocket) delete m_websocket;
 			m_websocket = new WebsocketClient(websocketIP);
 
-			OT_LOG_I("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
+			OT_LOG_D("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
 		}
 		response = "";
 
@@ -3213,7 +3213,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		ot::rJSON::add(checkCommandDoc, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
 		std::string checkCommandString = ot::rJSON::toJSON(checkCommandDoc);
 
-		OT_LOG_I("Waiting for Startup Completed");
+		OT_LOG_D("Waiting for Startup Completed");
 
 		do
 		{
@@ -3225,6 +3225,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 				startupReady = true;
 			}
 			else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+				OT_LOG_W("Startup not ready");
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1s);
 			}
@@ -3235,7 +3236,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 			}
 		} while (!startupReady);
 
-		OT_LOG_I("Startup is completed");
+		OT_LOG_D("Startup is completed");
 
 		// Set service visible (will notify others that the UI is available)
 		OT_rJSON_createDOC(visibilityCommand);
@@ -3270,6 +3271,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 			auto oldService = m_serviceIdMap.find(senderID);
 			if (oldService == m_serviceIdMap.end()) {
+				OT_LOG_D(">> " + senderName);
 				m_serviceIdMap.insert_or_assign(senderID, new ot::ServiceBase{ senderName, senderType, senderURL, senderID });
 			}
 		}

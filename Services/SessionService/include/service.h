@@ -71,7 +71,7 @@ public:
 	//! @param _isVisible if true the service will appear as visible
 	void setVisible(void);
 
-	//! @brief Will set the visible state of the service to true and notify all other services in the same session
+	//! @brief Will set the visible state of the service to false and notify all other services in the same session
 	void setHidden(void);
 
 	// ######################################################################################
