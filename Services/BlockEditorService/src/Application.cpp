@@ -127,9 +127,10 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1", "1");
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
 		a->addChildCollection(a1);
-		a1->addItem(createTestBlock3("Alpha 1"));
+		a1->addItem(createTestBlock("Alpha 1"));
+		a1->addItem(createTestBlock3("Alpha 2"));
 		a->addChildCollection(a2);
-		a2->addItem(createTestBlock2("Alpha 2"));
+		a2->addItem(createTestBlock2("Alpha 3"));
 		pckg.addCollection(a);
 
 		OT_rJSON_createDOC(doc);

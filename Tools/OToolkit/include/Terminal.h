@@ -72,6 +72,8 @@ public:
 	bool hasAnyChildWith(const QString& _title) const;
 	bool hasChild(TerminalCollectionItem * _item) const;
 
+	bool merge(TerminalCollectionFilter* _newData, bool _isFirst);
+
 private:
 	
 	TerminalCollectionFilter() = delete;

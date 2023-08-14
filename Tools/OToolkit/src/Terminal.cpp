@@ -210,6 +210,90 @@ bool TerminalCollectionFilter::hasChild(TerminalCollectionItem * _item) const {
 	return false;
 }
 
+bool TerminalCollectionFilter::merge(TerminalCollectionFilter* _newData, bool _isFirst) {
+	TERMINAL_LOG("0> Merging into \"" + this->text(0) + "\"");
+
+	if (_newData->text(0) != this->text(0)) {
+		if (_isFirst) {
+			TERMINAL_LOG("0> Naming mismatch, resolving child");
+
+			// Child exists
+			for (int i = 0; i < this->childCount(); i++) {
+				if (this->child(i)->text(0) == _newData->text(0)) {
+					// Ensure the child item is a filter item aswell
+					TerminalCollectionFilter* actualFilter = dynamic_cast<TerminalCollectionFilter*>(this->child(i));
+					if (actualFilter) {
+						TERMINAL_LOG("0> Forwarding merge to child item");
+						return actualFilter->merge(_newData, false);
+					}
+				}
+			}
+
+			// Child is new child
+		}
+	}
+
+	if (_isFirst) {
+		if (_newData->text(0) == this->text(0)) {
+			// Child merge only
+		}
+		else {
+			for (int i = 0; i < this->childCount(); i++) {
+				if (this->child(i)->text(0) == _newData->text(0)) {
+					// Ensure the child item is a filter item aswell
+					TerminalCollectionFilter* actualFilter = dynamic_cast<TerminalCollectionFilter*>(this->child(i));
+					if (actualFilter) {
+						return actualFilter->merge(_newData, false);
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < _newData->childCount(); i++) {
+		bool found = false;
+		int x = 0;
+		for (; x < this->childCount(); x++) {
+			if (this->child(x)->text(0) == _newData->child(i)->text(0)) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			QJsonObject expObj;
+			TerminalCollectionItem* itm = dynamic_cast<TerminalCollectionItem*>(_newData->child(i));
+			if (itm == nullptr) {
+				TERMINAL_LOGE("Terminal collection item cast failed for pre export");
+				return false;
+			}
+
+			itm->addToJsonObject(expObj);
+
+			TerminalCollectionItem* newChild = TerminalCollectionItem::createFromJsonObject(ownerTerminal(), expObj);
+			if (newChild == nullptr) {
+				TERMINAL_LOGE("Terminal collection item import failed from creation");
+				return false;
+			}
+			addChild(newChild);
+		}
+		else {
+			// Merge childs
+			TerminalCollectionFilter* itm = dynamic_cast<TerminalCollectionFilter*>(this->child(x));
+			TerminalCollectionFilter* itmM = dynamic_cast<TerminalCollectionFilter*>(this->child(i));
+
+			if (itm && itmM) {
+				if (!itm->merge(itmM, false)) {
+					TERMINAL_LOGE("Child merge failed");
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
 // #####################################################################################################################################################################################
 
 // #####################################################################################################################################################################################
@@ -771,10 +855,10 @@ void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter *
 		addNewRequestFromCurrent(_filter);
 	}
 	else if (result == actionImport) {
-
+		importFromFile(_filter);
 	}
 	else if (result == actionExport) {
-
+		exportToFile(_filter);
 	}
 }
 
@@ -923,12 +1007,12 @@ void Terminal::applyAndSendRequest(TerminalRequest* _request) {
 void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 	if (m_exportLock) return;
 
-	QJsonObject obj;
-	obj[OT_JSON_COLLECTION_Version] = INFO_COLLECTION_VERSION;
+	QJsonObject docObj;
+	docObj[OT_JSON_COLLECTION_Version] = INFO_COLLECTION_VERSION;
 
 	QJsonObject rootObject;
-	_filter->addToJsonObject(obj);
-	obj[OT_JSON_COLLECTION_Data] = rootObject;
+	_filter->addToJsonObject(rootObject);
+	docObj[OT_JSON_COLLECTION_Data] = rootObject;
 
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 	QString fn = QFileDialog::getSaveFileName(widget(), "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
@@ -936,7 +1020,6 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 		return;
 	}
 
-	QJsonObject docObj;
 	QJsonDocument doc(docObj);
 	QFile f(fn);
 	if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
@@ -951,7 +1034,61 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 }
 
 void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	QString fn = QFileDialog::getOpenFileName(widget(), "Import OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	if (fn.isEmpty()) return;
 
+	QFile f(fn);
+	if (!f.open(QIODevice::ReadOnly)) {
+		TERMINAL_LOGE("Failed to open file for reading. File:\n" + fn);
+		return;
+	}
+
+	TERMINAL_LOG("Importing collection from file: " + fn);
+
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
+	if (err.error != QJsonParseError::NoError) {
+		TERMINAL_LOGE("Failed to parse terminal collection (json): " + err.errorString());
+		return;
+	}
+
+	if (!doc.isObject()) {
+		TERMINAL_LOGE("Terminal collection file is broke: Document is not an object");
+		return;
+	}
+
+	TerminalCollectionFilter* impRoot = new TerminalCollectionFilter(this, "");
+
+	QJsonObject docObj = doc.object();
+	if (!docObj.contains(OT_JSON_COLLECTION_Version) || !docObj.contains(OT_JSON_COLLECTION_Data)) {
+		TERMINAL_LOGE("Terminal collection broken: Missing member(s)");
+		return;
+	}
+	if (!docObj[OT_JSON_COLLECTION_Version].isString() || !docObj[OT_JSON_COLLECTION_Data].isObject()) {
+		TERMINAL_LOGE("Terminal collection broken: Invalid member type");
+		return;
+	}
+
+	if (docObj[OT_JSON_COLLECTION_Version].toString() != INFO_COLLECTION_VERSION) {
+		TERMINAL_LOGW("Terminal collection import failed: Invalid collection version");
+		return;
+	}
+
+	QJsonObject obj = docObj[OT_JSON_COLLECTION_Data].toObject();
+
+	if (!impRoot->setFromJsonObject(obj)) {
+		TERMINAL_LOGE("Terminal collection import failed");
+		return;
+	}
+
+	if (_filter->merge(impRoot, true)) {
+		TERMINAL_LOG("Terminal collection import successful");
+		s.setValue("Terminal.LastCollection", fn);
+	}
+	else {
+		TERMINAL_LOGE("Terminal collection import failed");
+	}
 }
 
 // ################################################################################################################################

@@ -16,7 +16,7 @@ namespace OToolkitAPI {
 
 	class AbstractTool {
 	public:
-		AbstractTool() {};
+		AbstractTool() : m_toolId(0) {};
 		virtual ~AbstractTool() {};
 
 		OToolkitAPI::ToolID toolId(void) const { return m_toolId; };
