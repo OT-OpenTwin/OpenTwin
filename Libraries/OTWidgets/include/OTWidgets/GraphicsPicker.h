@@ -76,7 +76,7 @@ namespace ot {
 		QWidget* m_viewLayoutW;
 		QGridLayout* m_viewLayout;
 
-		std::map<QTreeWidgetItem*, std::list<GraphicsItemCfg*>> m_previewData;
+		std::map<QTreeWidgetItem*, std::list<GraphicsItemCfg*> *> m_previewData;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

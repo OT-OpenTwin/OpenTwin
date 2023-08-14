@@ -82,7 +82,8 @@ void ot::GraphicsPicker::add(const std::list<ot::GraphicsCollectionCfg*>& _topLe
 void ot::GraphicsPicker::clear(void) {
 	m_navigation->treeWidget()->clear();
 	for (auto d : m_previewData) {
-		for (auto e : d.second) delete e;
+		for (auto e : *d.second) delete e;
+		delete d.second;
 	}
 	m_previewData.clear();
 	for (auto v : m_views) {
@@ -108,7 +109,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 	for (auto itm : m_navigation->treeWidget()->selectedItems()) {
 		auto it = m_previewData.find(itm);
 		if (it != m_previewData.end()) {
-			for (auto bCfg : it->second) {
+			for (auto bCfg : *it->second) {
 				// Construct block
 				ot::GraphicsItem* newItem = ot::GraphicsFactory::itemFromConfig(bCfg);
 				
@@ -207,6 +208,7 @@ void ot::GraphicsPicker::addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _p
 	QTreeWidgetItem* treeItem = nullptr;
 	for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
 		if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_item->title()).toLower()) {
+			OT_LOG_W("A graphics item with the name \"" + _item->title() + "\" is already a child of the collection \"" + _parentNavigationItem->text(intern::ntTitle).toStdString() + "\"");
 			treeItem = _parentNavigationItem->child(i);
 			break;
 		}
@@ -222,21 +224,27 @@ void ot::GraphicsPicker::addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _p
 
 		ot::GraphicsItemCfg* config = nullptr;
 		try {
-			config = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(_item->simpleFactoryObjectKey());
+			config = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(obj);
 			if (config) {
+				config->setFromJsonObject(obj);
 				_parentNavigationItem->addChild(treeItem);
 				treeItem->setHidden(true);
 				this->storePreviewData(_parentNavigationItem, config);
+			}
+			else {
+				OT_LOG_EA("Failed to create item configuration");
 			}
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_EAS("Error while creating graphics object from configuration" + std::string(_e.what()));
 			delete treeItem;
+			if (config) delete config;
 			return;
 		}
 		catch (...) {
 			OT_LOG_EA("Error while creating graphics item from configuration: Unknown error");
 			delete treeItem;
+			if (config) delete config;
 			return;
 		}
 	}
@@ -251,13 +259,13 @@ void ot::GraphicsPicker::addItems(const std::list<ot::GraphicsItemCfg*>& _items,
 void ot::GraphicsPicker::storePreviewData(QTreeWidgetItem* _item, GraphicsItemCfg* _config) {
 	auto it = m_previewData.find(_item);
 	if (it != m_previewData.end()) {
-		it->second.push_back(_config);
+		it->second->push_back(_config);
 	}
 	else {
-		m_previewData.insert_or_assign(_item, std::list<GraphicsItemCfg*>());
-		storePreviewData(_item, _config);
+		auto lst = new std::list<GraphicsItemCfg*>;
+		lst->push_back(_config);
+		m_previewData.insert_or_assign(_item, lst);
 	}
-
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

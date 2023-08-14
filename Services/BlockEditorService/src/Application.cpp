@@ -60,7 +60,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	ot::GraphicsRectangularItemCfg* cfg = new ot::GraphicsRectangularItemCfg;
 	cfg->setSize(ot::Size2D(100, 60));
 	cfg->setName(_name);
-
+	cfg->setTitle(_name);
 	return cfg;
 }
 
