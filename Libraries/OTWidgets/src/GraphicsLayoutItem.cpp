@@ -13,7 +13,7 @@
 // Qt header
 #include <QtWidgets/qgraphicswidget.h>
 
-ot::GraphicsLayoutItem::GraphicsLayoutItem() : m_layoutWrap(nullptr) {}
+ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutWrap(nullptr) {}
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 
@@ -45,6 +45,12 @@ void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemG
 			if (_group) _group->addToGroup(m_layoutWrap);
 			_scene->addItem(m_layoutWrap);
 		}
+	}
+}
+
+void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (m_layoutWrap) {
+		m_layoutWrap->paint(_painter, _opt, _widget);
 	}
 }
 

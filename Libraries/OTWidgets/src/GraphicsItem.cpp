@@ -9,10 +9,16 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
+#include <QtCore/qmimedata.h>
+#include <QtGui/qdrag.h>
 #include <QtGui/qfont.h>
+#include <QtGui/qpainter.h>
 #include <QtWidgets/qgraphicsscene.h>
+#include <QtWidgets/qstyleoption.h>
+#include <QtWidgets/qgraphicssceneevent.h>
+#include <QtWidgets/qwidget.h>
 
-ot::GraphicsItem::GraphicsItem() : m_flags(GraphicsItem::NoFlags), m_group(nullptr) {
+ot::GraphicsItem::GraphicsItem(bool _isLayout) : m_flags(GraphicsItem::NoFlags), m_group(nullptr), m_isLayout(_isLayout) {
 	
 }
 
@@ -27,9 +33,46 @@ void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _
 
 void ot::GraphicsItem::finalizeAsRootItem(QGraphicsScene* _scene) {
 	otAssert(m_group == nullptr, "Group item already created");
-	m_group = new QGraphicsItemGroup;
-	this->finalizeItem(_scene, m_group, true);
-	_scene->addItem(m_group);
+	if (m_isLayout) {
+		m_group = new QGraphicsItemGroup;
+		this->finalizeItem(_scene, m_group, true);
+		_scene->addItem(m_group);
+	}
+	else {
+		this->finalizeItem(_scene, m_group, true);
+	}
+	
+}
+
+void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect) {
+	if (m_flags & ot::GraphicsItem::ItemPreviewContext) {
+		// Start drag since its a preview item
+		otAssert(!m_configuration.empty(), "No configuration set");
+
+		if (_event->button() == Qt::LeftButton) {
+			// Add configuration to mime data
+			QMimeData* mimeData = new QMimeData;
+			mimeData->setText("OT_BLOCK");
+			mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_Configuration, QByteArray::fromStdString(m_configuration));
+			
+			// Create drag
+			QDrag* drag = new QDrag(_event->widget());
+			drag->setMimeData(mimeData);
+
+			// Create preview
+			QPixmap prev(_rect.size().toSize());
+			QPainter p(&prev);
+			QStyleOptionGraphicsItem opt;
+			p.fillRect(QRect(QPoint(0, 0), _rect.size().toSize()), Qt::gray);
+
+			// Paint
+			this->callPaint(&p, &opt, _event->widget());
+
+			// Run drag
+			drag->setPixmap(prev);
+			drag->exec();
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -38,7 +81,7 @@ void ot::GraphicsItem::finalizeAsRootItem(QGraphicsScene* _scene) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsRectangularItem::GraphicsRectangularItem() : m_size(200, 100) {
+ot::GraphicsRectangularItem::GraphicsRectangularItem() : ot::GraphicsItem(false), m_size(200, 100) {
 
 }
 
@@ -68,13 +111,21 @@ void ot::GraphicsRectangularItem::finalizeItem(QGraphicsScene* _scene, QGraphics
 	if (_group) _group->addToGroup(this);
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
+void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsTextItem::GraphicsTextItem() {
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsTextItem::GraphicsTextItem() : ot::GraphicsItem(false) {
 
 }
 
@@ -111,6 +162,14 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
 void ot::GraphicsTextItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
 	_scene->addItem(this);
 	if (_group) _group->addToGroup(this);
+}
+
+void ot::GraphicsTextItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleItemClickEvent(_event, boundingRect());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

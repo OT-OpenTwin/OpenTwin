@@ -30,7 +30,7 @@ namespace ot {
 			ItemNetworkContext = 0x20 //! @brief Item is placed in a network (editor)
 		};
 
-		GraphicsItem();
+		GraphicsItem(bool _isLayout = false);
 		virtual ~GraphicsItem();
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) = 0;
@@ -48,11 +48,15 @@ namespace ot {
 
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
+
+		void handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect);
 
 	private:
 		std::string m_configuration;
 		GraphicsItemFlag m_flags;
 		QGraphicsItemGroup* m_group;
+		bool m_isLayout;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -103,6 +107,11 @@ namespace ot {
 
 		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
 
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+
+	protected:
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
 	private:
 		QSizeF m_size;
 
@@ -129,6 +138,11 @@ namespace ot {
 		virtual void setGeometry(const QRectF& rect) override;
 
 		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
+
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+
+	protected:
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 	private:
 		QSizeF m_size;
