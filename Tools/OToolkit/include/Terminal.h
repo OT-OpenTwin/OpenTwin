@@ -75,7 +75,8 @@ public:
 	bool merge(TerminalCollectionFilter* _newData, bool _isFirst);
 
 private:
-	
+	bool createChildFromMerge(TerminalCollectionItem* _itemToMerge);
+
 	TerminalCollectionFilter() = delete;
 	TerminalCollectionFilter(TerminalCollectionFilter&) = delete;
 	TerminalCollectionFilter& operator = (TerminalCollectionFilter&) = delete;
@@ -161,7 +162,7 @@ private:
 	void initializeServices(void);
 	void initializeDefaultServices(void);
 	void setWaitingMode(bool _isWaiting);
-	
+
 	// ################################################################################################################################
 
 	// Private: Context Menu handling

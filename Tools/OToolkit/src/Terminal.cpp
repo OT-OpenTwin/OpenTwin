@@ -25,6 +25,7 @@
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
 
 // Std header
 #include <thread>
@@ -213,7 +214,10 @@ bool TerminalCollectionFilter::hasChild(TerminalCollectionItem * _item) const {
 bool TerminalCollectionFilter::merge(TerminalCollectionFilter* _newData, bool _isFirst) {
 	TERMINAL_LOG("0> Merging into \"" + this->text(0) + "\"");
 
+	//ToDo: Add correct column index
 	if (_newData->text(0) != this->text(0)) {
+		// Import group is not the current group
+
 		if (_isFirst) {
 			TERMINAL_LOG("0> Naming mismatch, resolving child");
 
@@ -228,70 +232,85 @@ bool TerminalCollectionFilter::merge(TerminalCollectionFilter* _newData, bool _i
 					}
 				}
 			}
-
-			// Child is new child
 		}
+
+		return this->createChildFromMerge(_newData);
+
 	}
-
-	if (_isFirst) {
-		if (_newData->text(0) == this->text(0)) {
-			// Child merge only
-		}
-		else {
-			for (int i = 0; i < this->childCount(); i++) {
-				if (this->child(i)->text(0) == _newData->text(0)) {
-					// Ensure the child item is a filter item aswell
-					TerminalCollectionFilter* actualFilter = dynamic_cast<TerminalCollectionFilter*>(this->child(i));
-					if (actualFilter) {
-						return actualFilter->merge(_newData, false);
-					}
+	else {
+		// Merge childs
+		for (int i = 0; i < _newData->childCount(); i++) {
+			QTreeWidgetItem* itm = nullptr;
+			for (int x = 0; x < this->childCount(); x++) {
+				if (_newData->child(i)->text(0) == this->child(x)->text(0)) {
+					itm = this->child(x);
+					break;
 				}
 			}
-		}
-	}
 
-	for (int i = 0; i < _newData->childCount(); i++) {
-		bool found = false;
-		int x = 0;
-		for (; x < this->childCount(); x++) {
-			if (this->child(x)->text(0) == _newData->child(i)->text(0)) {
-				found = true;
-				break;
+			if (itm) {
+				TerminalCollectionFilter* fil = dynamic_cast<TerminalCollectionFilter*>(itm);
+				TerminalCollectionFilter* filC = dynamic_cast<TerminalCollectionFilter*>(_newData->child(i));
+				if (fil) {
+					if (filC) {
+						fil->merge(filC, false);
+					}
+					else {
+						TERMINAL_LOGW("Item to merge is a Terminal Collection Filter, but filter was not expected. Skipping");
+					}
+				}
+				else if (filC) {
+					TERMINAL_LOGW("Item to merge is not a Terminal Collection Filter, but filter was expected. Skipping");
+				}
 			}
-		}
-
-		if (!found) {
-			QJsonObject expObj;
-			TerminalCollectionItem* itm = dynamic_cast<TerminalCollectionItem*>(_newData->child(i));
-			if (itm == nullptr) {
-				TERMINAL_LOGE("Terminal collection item cast failed for pre export");
-				return false;
-			}
-
-			itm->addToJsonObject(expObj);
-
-			TerminalCollectionItem* newChild = TerminalCollectionItem::createFromJsonObject(ownerTerminal(), expObj);
-			if (newChild == nullptr) {
-				TERMINAL_LOGE("Terminal collection item import failed from creation");
-				return false;
-			}
-			addChild(newChild);
-		}
-		else {
-			// Merge childs
-			TerminalCollectionFilter* itm = dynamic_cast<TerminalCollectionFilter*>(this->child(x));
-			TerminalCollectionFilter* itmM = dynamic_cast<TerminalCollectionFilter*>(this->child(i));
-
-			if (itm && itmM) {
-				if (!itm->merge(itmM, false)) {
-					TERMINAL_LOGE("Child merge failed");
+			else {
+				TerminalCollectionItem* filC = dynamic_cast<TerminalCollectionItem*>(_newData->child(i));
+				if (filC == nullptr) {
+					TERMINAL_LOGE("Terminal collection item cast failed");
+					return false;
+				}
+				if (!this->createChildFromMerge(filC)) {
+					TERMINAL_LOGE("Failed to create child from merge");
 					return false;
 				}
 			}
 		}
-	}
 
-	return true;
+		return true;
+	}
+}
+
+bool TerminalCollectionFilter::createChildFromMerge(TerminalCollectionItem* _itemToMerge) {
+	TERMINAL_LOG("0> Adding new child \"" + _itemToMerge->text(0) + "\"");
+
+	// Child is new child
+	QJsonObject expObj;
+	_itemToMerge->addToJsonObject(expObj);
+
+	TerminalCollectionItem* newChild = TerminalCollectionItem::createFromJsonObject(ownerTerminal(), expObj);
+	if (newChild) {
+		this->addChild(newChild);
+
+		// Check if item is filter (if so then merge)
+		TerminalCollectionFilter* fil = dynamic_cast<TerminalCollectionFilter*>(newChild);
+		if (fil) {
+			TerminalCollectionFilter* filC = dynamic_cast<TerminalCollectionFilter*>(_itemToMerge);
+			if (filC) {
+				return fil->merge(filC, false);
+			}
+			else {
+				TERMINAL_LOGE("Expected filter item");
+				return false;
+			}
+		}
+		else {
+			return true;
+		}
+	}
+	else {
+		TERMINAL_LOGE("Failed to create child item");
+		return false;
+	}
 }
 
 // #####################################################################################################################################################################################
@@ -819,10 +838,10 @@ void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter *
 	QAction * actionRemove = nullptr;
 	// Add optional actions
 	if (_filter != m_requestsRootFilter) {
-		QAction* actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
+		actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
 		actionRemove->setToolTip("Remove this filter and all of its childs");
 
-		QAction* actionRename = menu.addAction(QIcon(":/images/Rename.png"), "Rename");
+		actionRename = menu.addAction(QIcon(":/images/Rename.png"), "Rename");
 		actionRename->setToolTip("Enter rename mode");
 	}
 
@@ -934,17 +953,26 @@ void Terminal::removeFilter(TerminalCollectionFilter * _filter) {
 	else {
 		QTreeWidgetItem * par = _filter->parent();
 		if (par) {
+			if (_filter->childCount() > 0) {
+				QMessageBox msg(QMessageBox::Warning, "Confirm delete", "Do you really want to remove the Terminal Collection Filter \"" + _filter->text(0) + "\". "
+					"The filter and all of its childs will be removed. "
+					"This operation can not be undone.", QMessageBox::Yes | QMessageBox::No);
+
+				if (msg.exec() != QMessageBox::Yes) return;
+			}
+
+			TERMINAL_LOG("Removing terminal collection filter \"" + _filter->text(0) + "\"");
 			m_exportLock = true;
 			par->removeChild(_filter);
 			delete _filter;
 			m_exportLock = false;
+
+			slotSaveRequestCollection();
 		}
 		else {
 			TERMINAL_LOGE("Parent item not found to remove from");
 		}
 	}
-
-	slotSaveRequestCollection();
 }
 
 void Terminal::addNewRequestFromCurrent(TerminalCollectionFilter * _parentFilter) {
@@ -1085,6 +1113,7 @@ void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 	if (_filter->merge(impRoot, true)) {
 		TERMINAL_LOG("Terminal collection import successful");
 		s.setValue("Terminal.LastCollection", fn);
+		slotSaveRequestCollection();
 	}
 	else {
 		TERMINAL_LOGE("Terminal collection import failed");
