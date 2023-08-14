@@ -12,6 +12,7 @@
 // Qt header
 #include <QtWidgets/qgraphicslinearlayout.h>
 #include <QtWidgets/qgraphicsgridlayout.h>
+#include <QtWidgets/qgraphicswidget.h>
 
 class QGraphicsWidget;
 
@@ -20,6 +21,29 @@ class QGraphicsWidget;
 #define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem "OT_GILayG"
 
 namespace ot {
+
+	class GraphicsLayoutItem;
+
+	class OT_WIDGETS_API_EXPORT GraphicsLayoutItemWrapper : public QGraphicsWidget {
+	public:
+		GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner);
+		virtual ~GraphicsLayoutItemWrapper();
+
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+
+	private:
+		GraphicsLayoutItem* m_owner;
+
+		GraphicsLayoutItemWrapper() = delete;
+		GraphicsLayoutItemWrapper(const GraphicsLayoutItemWrapper&) = delete;
+		GraphicsLayoutItemWrapper& operator = (const GraphicsLayoutItemWrapper&) = delete;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class OT_WIDGETS_API_EXPORT GraphicsLayoutItem : public ot::GraphicsItem {
 	public:
@@ -34,7 +58,7 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 	private:
-		QGraphicsWidget* m_layoutWrap;
+		GraphicsLayoutItemWrapper* m_layoutWrap;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

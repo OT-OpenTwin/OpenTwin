@@ -46,11 +46,11 @@ namespace ot {
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
 		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) = 0;
 
+		void handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect);
+
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
-
-		void handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect);
 
 	private:
 		std::string m_configuration;
@@ -109,7 +109,6 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
-	protected:
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 	private:
@@ -141,7 +140,6 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
-	protected:
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 	private:

@@ -10,8 +10,21 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
-// Qt header
-#include <QtWidgets/qgraphicswidget.h>
+ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner) : m_owner(_owner) {
+	OTAssertNullptr(m_owner);
+}
+
+ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
+
+void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	m_owner->handleItemClickEvent(_event, boundingRect());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutWrap(nullptr) {}
 
@@ -39,7 +52,7 @@ void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemG
 		}
 		else {
 			// Add wrapped layout item
-			m_layoutWrap = new QGraphicsWidget;
+			m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 			m_layoutWrap->setLayout(lay);
 
 			if (_group) _group->addToGroup(m_layoutWrap);
