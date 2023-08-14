@@ -799,12 +799,10 @@ bool ViewerAPI::setTable(ot::UID _viewerID, ot::UID entityID, ot::UID entityVers
 		DataBase* temp = DataBase::GetDataBase();
 		auto entityBase = temp->GetEntityFromEntityIDandVersion(entityID, entityVersion);
 		std::shared_ptr<EntityParameterizedDataTable> tableTopoEnt((dynamic_cast<EntityParameterizedDataTable*>(entityBase)));
-		tableTopoEnt->getTableData();
 		bool refresh = false;
 
 		if (tableTopoEnt != nullptr)
 		{
-			
 			refresh = v->getTableViewer()->CreateNewTable(tableTopoEnt, tableTopoEnt->getSelectedHeaderOrientation());
 		}
 		else

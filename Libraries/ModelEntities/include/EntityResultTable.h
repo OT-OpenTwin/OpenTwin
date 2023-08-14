@@ -32,13 +32,26 @@ public:
 	std::shared_ptr<EntityResultTableData<T>> getTableData(void);
 	void setTableData(std::shared_ptr<EntityResultTableData<T>> tableData);
 
+	int getMinColumn();
+	int getMinRow();
+	int getMaxColumn();
+	int getMaxRow();
+
+	void setMinColumn(int minCol);
+	void setMinRow(int minRow);
+	void setMaxColumn(int maxCol);
+	void setMaxRow(int maxRow);
+
 protected:
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 private:
+	int _minCol = 0;
+	int _minRow = 0;
+	int _maxCol = 50;
+	int _maxRow = 50;
 	virtual int getSchemaVersion(void) { return 1; };
-
 	void EnsureTableDataLoaded(void);
 	std::string className; 
 	std::shared_ptr<EntityResultTableData<T>> tableData = nullptr;

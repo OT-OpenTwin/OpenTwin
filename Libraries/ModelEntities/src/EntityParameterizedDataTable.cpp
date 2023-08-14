@@ -37,6 +37,8 @@ void EntityParameterizedDataTable::createProperties(HeaderOrientation defaultOri
 	getProperties().createProperty(filePathProperty, "Source file");
 
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { _headerSettingHorizontal,_headerSettingVertical }, GetHeaderOrientation(defaultOrientation) , _defaulCategory, getProperties());
+
+	EntityResultTable<std::string>::createProperties();
 }
 
 std::string EntityParameterizedDataTable::getSelectedHeaderOrientationString()

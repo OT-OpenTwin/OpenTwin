@@ -44,7 +44,11 @@ void EntityResultTable<T>::AddStorageData(bsoncxx::builder::basic::document &sto
 	// Now we store the particular information about the current object
 	storage.append(
 		bsoncxx::builder::basic::kvp("TableDataID", tableDataStorageId),
-		bsoncxx::builder::basic::kvp("TableDataVersion", tableDataStorageVersion)
+		bsoncxx::builder::basic::kvp("TableDataVersion", tableDataStorageVersion),
+		bsoncxx::builder::basic::kvp("MinCol", _minCol),
+		bsoncxx::builder::basic::kvp("MaxCol", _maxCol),
+		bsoncxx::builder::basic::kvp("MinRow", _minRow),
+		bsoncxx::builder::basic::kvp("MaxRow", _maxRow)
 	);
 }
 
@@ -63,6 +67,10 @@ void EntityResultTable<T>::readSpecificDataFromDataBase(bsoncxx::document::view 
 	// Here we can load any special information about the entity
 	tableDataStorageId = doc_view["TableDataID"].get_int64();
 	tableDataStorageVersion = doc_view["TableDataVersion"].get_int64();
+	_minCol =	doc_view["MinCol"].get_int32();
+	_maxCol =	doc_view["MaxCol"].get_int32();
+	_minRow =	doc_view["MinRow"].get_int32();
+	_maxRow =	doc_view["MaxRow"].get_int32();
 
 	resetModified();
 }
@@ -118,7 +126,12 @@ void EntityResultTable<T>::addVisualizationItem(bool isHidden)
 template <class T>
 void EntityResultTable<T>::createProperties()
 {
-	// This item has no properties yet	
+	const std::string visibleTableSize = "Visible Table Dimensions";
+
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Min Row", _minRow, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Max Row", _maxRow, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Min Column", _minCol, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Max Column", _maxCol, "default", getProperties());
 	getProperties().forceResetUpdateForAllProperties();
 }
 
@@ -179,6 +192,75 @@ void EntityResultTable<T>::setTableData(std::shared_ptr<EntityResultTableData<T>
 	tableData = data;
 	tableDataStorageId = tableData->getEntityID();
 	tableDataStorageVersion = tableData->getEntityStorageVersion();
+}
+
+
+template<class T>
+inline int EntityResultTable<T>::getMinColumn()
+{
+	auto propBase = getProperties().getProperty("Min Column");
+	auto intProp =	dynamic_cast<EntityPropertiesInteger*>(propBase);
+	return intProp->getValue();
+}
+
+template<class T>
+inline int EntityResultTable<T>::getMinRow()
+{
+	auto propBase = getProperties().getProperty("Min Row");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	return intProp->getValue();
+}
+
+template<class T>
+inline int EntityResultTable<T>::getMaxColumn()
+{
+	auto propBase = getProperties().getProperty("Max Column");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	return intProp->getValue();
+}
+
+template<class T>
+inline int EntityResultTable<T>::getMaxRow()
+{
+	auto propBase = getProperties().getProperty("Max Row");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	return intProp->getValue();
+}
+
+template<class T>
+inline void EntityResultTable<T>::setMinColumn(int minCol)
+{
+	auto propBase = getProperties().getProperty("Min Column");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	intProp->setValue(minCol);
+	intProp->setNeedsUpdate();
+}
+
+template<class T>
+inline void EntityResultTable<T>::setMinRow(int minRow)
+{
+	auto propBase = getProperties().getProperty("Min Row");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	intProp->setValue(minRow);
+	intProp->setNeedsUpdate();
+}
+
+template<class T>
+inline void EntityResultTable<T>::setMaxColumn(int maxCol)
+{
+	auto propBase = getProperties().getProperty("Max Column");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	intProp->setValue(maxCol);
+	intProp->setNeedsUpdate();
+}
+
+template<class T>
+inline void EntityResultTable<T>::setMaxRow(int maxRow)
+{
+	auto propBase = getProperties().getProperty("Max Row");
+	auto intProp = dynamic_cast<EntityPropertiesInteger*>(propBase);
+	intProp->setValue(maxRow);
+	intProp->setNeedsUpdate();
 }
 
 template <class T>

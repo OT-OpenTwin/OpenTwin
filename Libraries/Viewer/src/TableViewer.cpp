@@ -30,7 +30,7 @@ bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>>
 {
 	if (_tableID != table->getEntityID() || _tableVersion != table->getEntityStorageVersion() || orientation != _tableOrientation)
 	{
-		//TakeTime(t1);
+
 		std::chrono::system_clock::time_point t1 = std::chrono::system_clock::now();
 		auto tableData = table->getTableData();
 		std::chrono::system_clock::time_point t2 = std::chrono::system_clock::now();
@@ -42,25 +42,78 @@ bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>>
 			_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 			unsigned int numberOfColumns = tableData->getNumberOfColumns();
 			unsigned int numberOfRows = tableData->getNumberOfRows();
+			int minCol = table->getMinColumn();
+			int maxCol = table->getMaxColumn();
+			int minRow = table->getMinRow();
+			int maxRow = table->getMaxRow();
+			
+			unsigned int rowStart,columnStart, rowEnd, columnEnd;
+			rowEnd= numberOfRows < maxRow ? numberOfRows: maxRow;
+			columnEnd= numberOfColumns < maxCol ? numberOfColumns : maxCol;
 
-			unsigned int rowStart(0),columnStart(0);
+			if (minRow <= rowEnd)
+			{
+				if (minRow < 0)
+				{
+					rowStart = 0;
+				}
+				else
+				{
+					rowStart = minRow;
+				}
+			}
+			else
+			{
+				if (rowEnd== 0)
+				{
+					rowStart = 0;
+				}
+				else
+				{
+					rowStart = rowEnd- 1;
+				}
+			}
+			
+			if (minCol<= columnEnd)
+			{
+				if (minCol< 0)
+				{
+					columnStart = 0;
+				}
+				else
+				{
+					columnStart = minCol;
+				}
+			}
+			else
+			{
+				if (columnEnd== 0)
+				{
+					columnStart = 0;
+				}
+				else
+				{
+					columnStart = columnEnd - 1;
+				}
+			}
+
+
 			if (orientation == EntityParameterizedDataTable::HeaderOrientation::horizontal)
 			{
-				rowStart = 1;
-				_table->setColumnCount(numberOfColumns);
-				_table->setRowCount(numberOfRows-1);
+				_table->setColumnCount(columnEnd - columnStart);
+				_table->setRowCount(rowEnd - rowStart -1 );
 				for (unsigned int c = 0; c < numberOfColumns; c++)
 				{
 					QString text = QString::fromStdString(tableData->getValue(0, c));
 					QTableWidgetItem *item = new QTableWidgetItem(text);
 					_table->setHorizontalHeaderItem(c, item);
 				}
+				rowStart++;
 			}
 			else
 			{
-				columnStart = 1;
-				_table->setColumnCount(numberOfColumns-1);
-				_table->setRowCount(numberOfRows);
+				_table->setColumnCount(columnEnd - columnStart -1);
+				_table->setRowCount(rowEnd - rowStart);
 
 				for (unsigned int r = 0; r < numberOfRows; r++)
 				{
@@ -68,13 +121,14 @@ bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>>
 					QTableWidgetItem *item = new QTableWidgetItem(text);
 					_table->setVerticalHeaderItem(r, item);
 				}
+				columnStart++;
 			}
 			std::chrono::system_clock::time_point t5 = std::chrono::system_clock::now();
 			unsigned int itemRowIndex(0);
-			for (unsigned int r = rowStart; r < numberOfRows; r++)
+			for (unsigned int r = rowStart; r < rowEnd; r++)
 			{
 				unsigned int itemColumnIndex = 0;
-				for (unsigned int c = columnStart; c < numberOfColumns; c++)
+				for (unsigned int c = columnStart; c < columnEnd; c++)
 				{
 					QString text = QString::fromStdString(tableData->getValue(r, c));
 					QTableWidgetItem *item = new QTableWidgetItem(text);
