@@ -168,21 +168,23 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		OT_rJSON_parseDOC(cfgDoc, cfgRaw.toStdString().c_str());
 		OT_rJSON_val cfgObj = cfgDoc.GetObject();
 		cfg = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(cfgObj);
+		cfg->setFromJsonObject(cfgObj);
 	}
 	catch (const std::exception& e) {
 		OT_LOG_EAS(e.what());
-		delete cfg;
+		if (cfg) delete cfg;
+		cfg = nullptr;
 		return;
 	}
 	catch (...) {
 		OT_LOG_EA("Unknown error");
-		delete cfg;
+		if (cfg) delete cfg;
+		cfg = nullptr;
 		return;
 	}
 
 	if (cfg == nullptr) {
 		OT_LOG_WA("No config created");
-		delete cfg;
 		return;
 	}
 
@@ -198,13 +200,13 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-		delete newItem;
+		if (newItem) delete newItem;
 		delete cfg;
 		return;
 	}
 	catch (...) {
 		OT_LOG_EA("Unknown error occured");
-		delete newItem;
+		if (newItem) delete newItem;
 		delete cfg;
 		return;
 	}
@@ -220,7 +222,6 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	// Check if the events mime data contains the configuration
 	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty()) {
 		_event->acceptProposedAction();
-		OT_LOG_D("Drag move event accepted for: Block");
 	}
 	else {
 		GraphicsView::dragMoveEvent(_event);

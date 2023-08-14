@@ -25,7 +25,7 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
 
-	protected slots:
+	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
 		virtual void enterEvent(QEvent* _event) override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
