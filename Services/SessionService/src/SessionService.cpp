@@ -55,6 +55,7 @@ SessionService::SessionService()
 	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
 	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_BlockEditorService, OT_INFO_SERVICE_TYPE_BlockEditorService));
 	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
+	DefaultSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	m_mandatoryServicesMap.insert_or_assign("Default", DefaultSessionServices);
 }
 

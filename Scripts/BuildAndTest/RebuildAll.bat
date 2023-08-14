@@ -294,6 +294,11 @@ ECHO Build Service: BlockEditorService
 ECHO ===============================================================
 CALL "%OT_BLOCKEDITORSERVICE_ROOT%\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Service: DataProcessingService
+ECHO ===============================================================
+CALL "%OT_DATA_PROCESSING_SERVICE_ROOT%\build.bat" %1 %2
+
 REM ====================================================================
 REM Build the executables
 REM ====================================================================
