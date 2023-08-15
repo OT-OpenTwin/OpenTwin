@@ -73,6 +73,8 @@ public:
 	//! This list is used to identify if all the requested services have been registered
 	void addRequestedService(const std::string& _serviceName, const std::string& _serviceType);
 
+	void removeRequestedService(const std::string& _serviceName, const std::string& _serviceType);
+
 	//! @brief Returns the vector containing all still requested services
 	const std::vector<std::pair<std::string, std::string>>& requestedServices(void) const { return m_requestedServices; };
 
@@ -160,7 +162,6 @@ public:
 	ot::serviceID_t generateNextServiceId(void);
 
 private:
-	void removeRequestedService(const std::string& _serviceName, const std::string& _serviceType);
 
 	std::mutex											m_mutex;
 

@@ -71,8 +71,8 @@ bool ServiceRunStarter::queueEmpty(void) {
 }
 
 void ServiceRunStarter::worker(void) {
-	while (!m_isStopping) {
 
+	while (!m_isStopping) {
 		m_mutex.lock();																			// Lock
 		if (m_queue.empty()) {
 			m_mutex.unlock();																	// Unlock
@@ -84,9 +84,6 @@ void ServiceRunStarter::worker(void) {
 			startupInformation info = m_queue.front();
 			m_queue.pop_front();
 			
-			OT_LOG_D("Sending run command to service (name = \"" + info.serviceName + "\"; type = \"" + info.serviceType +
-				"\"; id = \"" + std::to_string(info.serviceId) + "\")");
-
 			// Create run document
 			OT_rJSON_createDOC(doc);
 			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Run);
@@ -94,6 +91,7 @@ void ServiceRunStarter::worker(void) {
 			ot::rJSON::add(doc, OT_PARAM_AUTH_PASSWORD, info.credentialsUserPassword);
 			ot::rJSON::add(doc, OT_PARAM_SETTINGS_USERCOLLECTION, info.userCollection);
 
+			// Get session
 			Session * session = SessionService::instance()->getSession(info.sessionId, false);
 			if (session == nullptr) {
 				m_mutex.unlock();																// Unlock
@@ -111,6 +109,9 @@ void ServiceRunStarter::worker(void) {
 				m_mutex.unlock();																// Unlock
 			} 
 			
+			OT_LOG_D("Sending run command to service (name = \"" + info.serviceName + "\"; type = \"" + info.serviceType +
+				"\"; id = \"" + std::to_string(info.serviceId) + "\")");
+
 			std::string response;
 			std::string messageOut = ot::rJSON::toJSON(doc);
 			if (!ot::msg::send("", info.serviceUrl, ot::EXECUTE, messageOut, response, 3000)) {

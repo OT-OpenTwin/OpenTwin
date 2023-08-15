@@ -875,6 +875,8 @@ std::string SessionService::handleServiceShow(OT_rJSON_doc& _commandDoc)
 		return OT_ACTION_RETURN_INDICATOR_Error "Invalid service id";
 	}
 
+	theSession->removeRequestedService(theService->name(), theService->type());
+
 	theService->setVisible();
 	OT_rJSON_createDOC(responseDoc);
 	theSession->addServiceListToDocument(responseDoc);

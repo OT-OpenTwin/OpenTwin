@@ -60,6 +60,16 @@ void Session::addRequestedService(const std::string& _serviceName, const std::st
 	OT_LOG_D("Added requested service: " + _serviceName + " (type = " + _serviceType + ") to session (id = " + m_id + ")");
 }
 
+void Session::removeRequestedService(const std::string& _serviceName, const std::string& _serviceType) {
+	for (size_t i = 0; i < m_requestedServices.size(); i++) {
+		if (m_requestedServices[i].first == _serviceName && m_requestedServices[i].second == _serviceType) {
+			OT_LOG_D("Removed requested service: " + _serviceName + " (type = " + _serviceType + ") from session (id = " + m_id + ")");
+			m_requestedServices.erase(m_requestedServices.begin() + i);
+			return;
+		}
+	}
+}
+
 void Session::addDebugPortInUse(ot::port_t _port) {
 	m_debugPorts.push_back(_port);
 }
@@ -76,8 +86,6 @@ Service * Session::registerService(const std::string & _serviceIP, const std::st
 	m_serviceMap.insert_or_assign(_serviceID, newService);
 
 	OT_LOG_D("Service with { \"id\": \"" + std::to_string(_serviceID) + "\"} was registered at session with {\"id\":\"" + m_id + "\"}");
-
-	removeRequestedService(_serviceName, _serviceType);
 
 	return newService;
 }
@@ -96,8 +104,6 @@ Service * Session::registerService(Service * _service) {
 	m_serviceMap.insert_or_assign(_service->id(), _service);
 
 	OT_LOG_D("The service (name = \"" + _service->name() + "\"; type = \"" + _service->type() + "\"; id = \"" + std::to_string(_service->id()) + "\") was registered at the session (id = \"" + m_id + "\")");
-
-	removeRequestedService(_service->name(), _service->type());
 
 	return _service;
 }
@@ -185,6 +191,7 @@ void Session::addServiceListToDocument(OT_rJSON_doc & _doc) {
 		}
 	}
 	ot::rJSON::add(_doc, OT_ACTION_PARAM_SESSION_SERVICES, serviceList);
+	OT_LOG_W(">> " + ot::rJSON::toJSON(_doc));
 }
 
 void Session::broadcastMessage(Service * _sender, const std::string& _message, bool _async) {
@@ -295,14 +302,4 @@ std::list<std::string> Session::toolBarTabOrder(void) {
 
 ot::serviceID_t Session::generateNextServiceId(void) {
 	return m_serviceIdManager.grabNextID();
-}
-
-void Session::removeRequestedService(const std::string& _serviceName, const std::string& _serviceType) {
-	for (size_t i = 0; i < m_requestedServices.size(); i++) {
-		if (m_requestedServices[i].first == _serviceName && m_requestedServices[i].second == _serviceType) {
-			OT_LOG_D("Removed requested service: " + _serviceName + " (type = " + _serviceType + ") from session (id = " + m_id + ")");
-			m_requestedServices.erase(m_requestedServices.begin() + i);
-			return;
-		}
-	}
 }
