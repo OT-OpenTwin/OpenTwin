@@ -55,6 +55,7 @@ namespace ot {
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;
 
 	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 	private:

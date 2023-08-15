@@ -28,6 +28,10 @@ ot::GraphicsItem::~GraphicsItem() {
 
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	m_flags = _flags;
+	if (m_group) {
+		m_group->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+		m_group->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	}
 	this->graphicsItemFlagsChanged(_flags);
 }
 
@@ -111,6 +115,11 @@ void ot::GraphicsRectangularItem::finalizeItem(QGraphicsScene* _scene, QGraphics
 	if (_group) _group->addToGroup(this);
 }
 
+void ot::GraphicsRectangularItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
 void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
 }
@@ -162,6 +171,11 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
 void ot::GraphicsTextItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
 	_scene->addItem(this);
 	if (_group) _group->addToGroup(this);
+}
+
+void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
 }
 
 void ot::GraphicsTextItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

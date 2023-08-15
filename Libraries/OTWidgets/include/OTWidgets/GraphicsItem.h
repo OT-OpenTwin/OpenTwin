@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OpenTwinCore/SimpleFactory.h"
+#include "OpenTwinCore/Flags.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
@@ -111,6 +112,9 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
+	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
 	private:
 		QSizeF m_size;
 
@@ -142,6 +146,9 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
+	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
 	private:
 		QSizeF m_size;
 
@@ -150,3 +157,5 @@ namespace ot {
 	
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemFlag);

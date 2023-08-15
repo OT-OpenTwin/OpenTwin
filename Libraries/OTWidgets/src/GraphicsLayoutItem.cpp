@@ -61,6 +61,13 @@ void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemG
 	}
 }
 
+void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	if (m_layoutWrap) {
+		m_layoutWrap->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+		m_layoutWrap->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	}
+}
+
 void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	if (m_layoutWrap) {
 		m_layoutWrap->paint(_painter, _opt, _widget);
