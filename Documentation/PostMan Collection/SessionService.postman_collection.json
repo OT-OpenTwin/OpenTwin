@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "7f4bbb97-658c-4b0d-838f-cbf59e000cdb",
+		"_postman_id": "ef0dad71-40b2-44a0-8e24-2de080c2ed46",
 		"name": "SessionService",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13477394"
 	},
 	"item": [
 		{
@@ -971,6 +972,68 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"action\":\"Service.DebugDisable\",\r\n    \"Service.Name\":\"PythonExecutionService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8093/execute",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8093",
+							"path": [
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DataProcessingService.Debug.Off Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"action\":\"Service.DebugDisable\",\r\n    \"Service.Name\":\"PythonExecutionService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8093/execute",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8093",
+							"path": [
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DataProcessingService.Debug.On",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"PythonExecutionService\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
