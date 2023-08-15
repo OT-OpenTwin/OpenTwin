@@ -93,6 +93,9 @@
     <ClCompile Include="src\ConnectToLoggerDialog.cpp">
       <Filter>Source Files\Dialog</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextFinder.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -115,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="include\File.h">
       <Filter>Header Files\API</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TextFinder.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@
 class StatusBar;
 class LogVisualization;
 class Terminal;
+class TextFinder;
 
 class QTabWidget;
 class QMenuBar;
@@ -64,6 +65,7 @@ private:
 
 	LogVisualization *	m_logger;
 	Terminal *			m_terminal;
+	TextFinder* m_textFinder;
 
 	QDockWidget *		m_outputDock;
 	QTextEdit *			m_output;

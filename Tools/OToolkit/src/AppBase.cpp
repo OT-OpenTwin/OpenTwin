@@ -2,6 +2,7 @@
 #include "StatusBar.h"
 #include "LogVisualization.h"
 #include "Terminal.h"
+#include "TextFinder.h"
 
 // OT header
 #include "OpenTwinCore/rJSON.h"
@@ -131,9 +132,11 @@ void AppBase::slotInitialize(void) {
 	// Create tools
 	m_logger = new LogVisualization;
 	m_terminal = new Terminal;
+	m_textFinder = new TextFinder;
 
 	m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
 	m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
+	m_tabWidget->addTab(m_textFinder->widget(), "Text Finder");
 
 	// Setup menu
 	m_logger->createMenuBarEntries(m_menuBar);
