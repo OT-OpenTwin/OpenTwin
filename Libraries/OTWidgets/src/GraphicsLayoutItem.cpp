@@ -151,7 +151,45 @@ bool ot::GraphicsHBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) {}
 
 bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	ot::GraphicsGridLayoutItemCfg* cfg = dynamic_cast<ot::GraphicsGridLayoutItemCfg*>(_cfg);
+	if (cfg == nullptr) {
+		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		return false;
+	}
 
+	// Create items
+	int x = 0;
+	for (auto r : cfg->items()) {
+		int y = 0;
+		for (auto c : r) {
+			if (c) {
+				ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(c);
+				if (i == nullptr) {
+					OT_LOG_EA("GraphicsFactory failed");
+					return false;
+				}
+				QGraphicsLayoutItem* ii = dynamic_cast<QGraphicsLayoutItem*>(i);
+				if (ii) {
+					this->addItem(ii, x, y);
+				}
+				else {
+					OT_LOG_EA("GraphicsItem cast to QGraphicsLayoutItem failed");
+				}
+			}
+			y++;
+		}
+		x++;
+	}
+
+	// Setup stretches
+	x = 0;
+	for (auto r : cfg->rowStretch()) {
+		this->setRowStretchFactor(x++, r);
+	}
+	x = 0;
+	for (auto r : cfg->columnStretch()) {
+		this->setColumnStretchFactor(x++, r);
+	}
 
 	return true;
 }

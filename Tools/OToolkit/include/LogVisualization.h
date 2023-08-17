@@ -52,6 +52,8 @@ public:
 
 public slots:
 	void slotConnect(void);
+	void slotImport(void);
+	void slotExport(void);
 
 	void slotClear(void);
 	void slotClearAll(void);
@@ -116,6 +118,8 @@ private:
 
 	// Tool Bar
 	QAction *					m_connectButton;
+	QAction *					m_importButton;
+	QAction *					m_exportButton;
 };
 
 class LogVisualizationItemViewDialog : public QDialog {

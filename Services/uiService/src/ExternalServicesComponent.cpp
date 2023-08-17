@@ -3225,7 +3225,6 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 				startupReady = true;
 			}
 			else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
-				OT_LOG_W("Startup not ready");
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1s);
 			}
@@ -3271,7 +3270,6 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 			auto oldService = m_serviceIdMap.find(senderID);
 			if (oldService == m_serviceIdMap.end()) {
-				OT_LOG_D(">> " + senderName);
 				m_serviceIdMap.insert_or_assign(senderID, new ot::ServiceBase{ senderName, senderType, senderURL, senderID });
 			}
 		}

@@ -28,6 +28,7 @@
 #include <QtWidgets/qplaintextedit.h>
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qapplication.h>
+#include <QtWidgets/qfiledialog.h>
 
 #define TABLE_TXT_DETAILED "Detailed"
 #define TABLE_TXT_INFO "Info"
@@ -286,8 +287,15 @@ QList<QWidget *> LogVisualization::statusBarWidgets(void) const {
 void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 	QMenu * topLvlMenu = _menuBar->addMenu("Log Visualization");
 	m_connectButton = topLvlMenu->addAction(QIcon(":/images/Shutdown.png"), "Connect");
+	topLvlMenu->addSeparator();
+	m_importButton = topLvlMenu->addAction(QIcon(":images/Import.png"), "Import");
+	m_exportButton = topLvlMenu->addAction(QIcon(":images/Export.png"), "Export");
+	m_importButton->setEnabled(false);
+	m_exportButton->setEnabled(false);
 
 	connect(m_connectButton, &QAction::triggered, this, &LogVisualization::slotConnect);
+	connect(m_importButton, &QAction::triggered, this, &LogVisualization::slotImport);
+	connect(m_exportButton, &QAction::triggered, this, &LogVisualization::slotExport);
 }
 
 void LogVisualization::slotConnect(void) {
@@ -300,6 +308,8 @@ void LogVisualization::slotConnect(void) {
 
 	m_centralLayoutW->setEnabled(true);
 	m_connectButton->setEnabled(false);
+	m_importButton->setEnabled(true);
+	m_exportButton->setEnabled(true);
 
 	slotClear();
 
@@ -308,6 +318,88 @@ void LogVisualization::slotConnect(void) {
 	for (auto msg : lst) {
 		appendLogMessage(msg);
 	}
+}
+
+void LogVisualization::slotImport(void) {
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	QString fn = QFileDialog::getOpenFileName(widget(), "Import Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	if (fn.isEmpty()) return;
+
+	QFile f(fn);
+	if (!f.open(QIODevice::ReadOnly)) {
+		LOGVIS_LOGE("Failed to open file for reading. File: \"" + fn + "\"");
+		return;
+	}
+
+	OT_rJSON_parseDOC(doc, f.readAll().toStdString().c_str());
+	f.close();
+
+	if (!doc.IsArray()) {
+		LOGVIS_LOGE("Import failed: Document is not an array");
+	}
+
+	QList<ot::LogMessage> msg;
+
+	for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
+		try {
+			if (!doc[i].IsObject()) {
+				throw std::exception("Array entry is not an object");
+			}
+			OT_rJSON_val obj = doc[i].GetObject();
+			ot::LogMessage m;
+			m.setFromJsonObject(obj);
+			msg.push_back(m);
+		}
+		catch (const std::exception& _e) {
+			LOGVIS_LOGE(_e.what());
+		}
+		catch (...) {
+			LOGVIS_LOGE("[FATAL] Unknown error");
+		}
+	}
+
+	if (msg.empty()) {
+		LOGVIS_LOGW("No data imported");
+		return;
+	}
+
+	this->slotClear();
+	this->appendLogMessages(msg);
+
+	s.setValue("LogVisualization.LastExportedFile", fn);
+	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
+}
+
+void LogVisualization::slotExport(void) {
+	if (m_messages.empty()) {
+		LOGVIS_LOGW("No messages to export");
+		return;
+	}
+
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	QString fn = QFileDialog::getSaveFileName(widget(), "Export Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	if (fn.isEmpty()) return;
+	
+	QFile f(fn);
+	if (!f.open(QIODevice::WriteOnly)) {
+		LOGVIS_LOGE("Failed to open file for writing. File: \"" + fn + "\"");
+		return;
+	}
+
+	OT_rJSON_doc doc;
+	doc.SetArray();
+
+	for (auto m : m_messages) {
+		OT_rJSON_createValueObject(msgObj);
+		m.addToJsonObject(doc, msgObj);
+		doc.PushBack(msgObj, doc.GetAllocator());
+	}
+
+	f.write(QByteArray::fromStdString(ot::rJSON::toJSON(doc)));
+	f.close();
+
+	s.setValue("LogVisualization.LastExportedFile", fn);
+	LOGVIS_LOG("Log Messages successfully exported to file \"" + fn + "\"");
 }
 
 void LogVisualization::slotClear(void) {

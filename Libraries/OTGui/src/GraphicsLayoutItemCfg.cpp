@@ -152,7 +152,14 @@ void ot::GraphicsBoxLayoutItemCfg::clearItems(void) {
 ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(int _rows, int _columns) 
 	: m_rows(_rows), m_columns(_columns)
 {
-
+	m_rowStretch.resize(m_rows);
+	m_columnStretch.resize(m_columns);
+	for (int r = 0; r < m_rows; r++) {
+		m_rowStretch[r] = 0;
+	}
+	for (int c = 0; c < m_columns; c++) {
+		m_columnStretch[c] = 0;
+	}
 }
 
 void ot::GraphicsGridLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
@@ -300,6 +307,14 @@ void ot::GraphicsGridLayoutItemCfg::addChildItem(int _row, int _column, ot::Grap
 	}
 
 	m_items[_row][_column] = _item;
+}
+
+void ot::GraphicsGridLayoutItemCfg::setRowStretch(int _row, int _stretch) {
+	m_rowStretch[_row] = _stretch;
+}
+
+void ot::GraphicsGridLayoutItemCfg::setColumnStretch(int _column, int _stretch) {
+	m_columnStretch[_column] = _stretch;
 }
 
 void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {

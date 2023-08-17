@@ -145,13 +145,11 @@ std::string ot::Dispatcher::dispatch(const std::string& _action, OT_rJSON_doc& _
 		}
 	}
 	catch (const std::exception& _e) {
-		otAssert(0, "Error occured");
-		OT_LOG_E(_e.what());
+		OT_LOG_EAS(_e.what());
 		result = std::string(OT_ACTION_RETURN_INDICATOR_Error) + _e.what();
 	}
 	catch (...) {
-		otAssert(0, "Unknown error occured");
-		OT_LOG_E("[FATAL] Unknown error occured");
+		OT_LOG_EA("[FATAL] Unknown error occured");
 		result = OT_ACTION_RETURN_INDICATOR_Error "Unknown error";
 	}
 

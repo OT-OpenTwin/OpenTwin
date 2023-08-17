@@ -146,8 +146,18 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg); };
 
+		int rowCount(void) const { return m_rows; };
+		int columnCount(void) const { return m_columns; };
+
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) override;
 		void addChildItem(int _row, int _column, ot::GraphicsItemCfg* _item);
+		const std::vector<std::vector<GraphicsItemCfg*>>& items(void) const { return m_items; };
+
+		void setRowStretch(int _row, int _stretch);
+		const std::vector<int>& rowStretch(void) const { return m_rowStretch; };
+
+		void setColumnStretch(int _column, int _stretch);
+		const std::vector<int>& columnStretch(void) const { return m_columnStretch; };
 
 	private:
 		void clearAndResize(void);

@@ -52,7 +52,9 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "Block Editor:Test:Empty") return createEmptyTestEditor();
-	else assert(0); // Unhandled button action
+	else { 
+		OT_LOG_W("Unknown model action");
+		assert(0); }// Unhandled button action
 	return std::string();
 }
 
@@ -90,24 +92,24 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 }
 
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
-	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
+	ot::GraphicsGridLayoutItemCfg* centralLayout = new ot::GraphicsGridLayoutItemCfg(2, 2);
 
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
 	title->setName(_name);
 	title->setText(_name);
 	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
 
-	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
-
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
+	leftRect->setSize(ot::Size2D(20, 20));
 	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
+	rightRect->setSize(ot::Size2D(30, 30));
 
-	midLayout->addChildItem(leftRect);
-	midLayout->addStrech(1);
-	midLayout->addChildItem(rightRect);
+	centralLayout->addChildItem(0, 0, title);
+	centralLayout->addChildItem(0, 1, rightRect);
+	centralLayout->addChildItem(1, 0, leftRect);
 
-	centralLayout->addChildItem(title);
-	centralLayout->addChildItem(midLayout, 1);
+	centralLayout->setColumnStretch(0, 1);
+	centralLayout->setRowStretch(1, 1);
 
 	return centralLayout;
 }
@@ -152,7 +154,9 @@ std::string Application::createEmptyTestEditor(void) {
 			OT_LOG_E("Invalid response from UI");
 			m_uiComponent->displayDebugMessage("Invalid response\n");
 		}
+
 	}
+	
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -182,7 +186,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage("Block Editor");
 	_ui->addMenuGroup("Block Editor", "Test");
 	_ui->addMenuButton("Block Editor", "Test", "Empty", "Create empty", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add");
-
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }

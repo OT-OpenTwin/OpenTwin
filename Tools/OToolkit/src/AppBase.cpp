@@ -141,6 +141,7 @@ void AppBase::slotInitialize(void) {
 	// Setup menu
 	m_logger->createMenuBarEntries(m_menuBar);
 	m_terminal->createMenuBarEntries(m_menuBar);
+	m_textFinder->createMenuBarEntries(m_menuBar);
 
 	// Setup information
 	m_statusBar->setCurrentTool(m_logger);

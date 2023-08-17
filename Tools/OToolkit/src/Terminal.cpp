@@ -56,13 +56,19 @@
 #define TERMINAL_LOGW(___message) OTOOLKIT_LOGW("OTerminal", ___message)
 #define TERMINAL_LOGE(___message) OTOOLKIT_LOGE("OTerminal", ___message)
 
+#define TERMINAL_KEYSEQ_Save "Ctrl+S"
+#define TERMINAL_KEYSEQ_Send "Ctrl+Return"
+#define TERMINAL_KEYSEQ_Rename "Ctrl+R"
+#define TERMINAL_KEYSEQ_Delete "Del"
+#define TERMINAL_KEYSEQ_Clone "Ctrl+D"
+
 #define TERMINAL_JSON_MEM_CHECK_EXISTS(___jsonObject, ___memberName, ___errorReturnCase) if (!___jsonObject.contains(___memberName)) { TERMINAL_LOGE(QString("JSON object member \"") + ___memberName + "\" is missing"); ___errorReturnCase; }
 #define TERMINAL_JSON_MEM_CHECK_TYPE(___jsonObject, ___memberName, ___memberType, ___errorReturnCase)  if (!___jsonObject[___memberName].is##___memberType()) { TERMINAL_LOGE(QString("JSON object member \"") + ___memberName + "\" is not a " + #___memberType); ___errorReturnCase; }
 #define TERMINAL_JSON_MEM_CHECK(___jsonObject, ___memberName, ___memberType, ___errorReturnCase) TERMINAL_JSON_MEM_CHECK_EXISTS(___jsonObject, ___memberName, ___errorReturnCase); TERMINAL_JSON_MEM_CHECK_TYPE(___jsonObject, ___memberName, ___memberType, ___errorReturnCase)
 
 namespace intern {
-	const Qt::ItemFlags FilterFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	const Qt::ItemFlags RequestFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	const Qt::ItemFlags FilterFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	const Qt::ItemFlags RequestFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 }
 
 TerminalCollectionItem::TerminalCollectionItem(Terminal * _owner, const QString& _title) : m_owner(_owner) {
@@ -471,6 +477,13 @@ Terminal::Terminal() : m_exportLock(false) {
 	m_responseLayout->addWidget(m_responseEdit, 1);
 	m_responseLayout->addWidget(m_responseLength, 0);
 
+	// Create shortcuts
+	m_shortcutSave = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Save), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutSend = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Send), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutRename = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Rename), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutDelete = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Delete), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+
 	// Restore settings
 	QSettings s("OpenTwin", applicationName());
 	m_receiverUrl->setText(s.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
@@ -478,7 +491,7 @@ Terminal::Terminal() : m_exportLock(false) {
 
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
-	m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
+	//m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
 	m_navigation->addTopLevelItem(m_requestsRootFilter);
 	
 	slotLoadRequestCollection();
@@ -489,6 +502,12 @@ Terminal::Terminal() : m_exportLock(false) {
 	connect(m_navigation, &QTreeWidget::itemChanged, this, &Terminal::slotNavigationItemChanged);
 	connect(m_btnSend, &QPushButton::clicked, this, &Terminal::slotSendMessage);
 	connect(m_receiverName, &QComboBox::currentTextChanged, this, &Terminal::slotServiceNameChanged);
+
+	connect(m_shortcutSave, &QShortcut::activated, this, &Terminal::slotUpdateCurrent);
+	connect(m_shortcutSend, &QShortcut::activated, this, &Terminal::slotSendMessage);
+	connect(m_shortcutRename, &QShortcut::activated, this, &Terminal::slotRenameCurrent);
+	connect(m_shortcutDelete, &QShortcut::activated, this, &Terminal::slotDeleteCurrent);
+	connect(m_shortcutClone, &QShortcut::activated, this, &Terminal::slotCloneCurrent);
 
 	TERMINAL_LOG("Terminal initialization completed");
 }
@@ -673,17 +692,67 @@ void Terminal::slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _colu
 }
 
 void Terminal::slotNavigationItemChanged(QTreeWidgetItem* _item, int _column) {
+	// Get item
 	TerminalCollectionItem* itm = dynamic_cast<TerminalCollectionItem*>(_item);
-	if (itm) { 
-		if (itm->text(0) != itm->title()) {
-			itm->setTitle(itm->text(0));
-			slotSaveRequestCollection();
-		} 
-	}
-	else {
-		otAssert(0, "Unknown navigation item");
+	if (itm == nullptr) {
 		TERMINAL_LOGE("Unknwon navitaion item");
+		return;
 	}
+
+	// Get parent
+	QTreeWidgetItem* par = itm->parent();
+	if (par == nullptr) {
+		TERMINAL_LOGE("Navigation item has no parent");
+		return;
+	}
+	// Check for duplicates
+	for (int i = 0; i < par->childCount(); i++) {
+		if (par->child(i) != itm) {
+			if (par->child(i)->text(0) == itm->text(0)) {
+				TERMINAL_LOGW("Can not rename item: Duplicate name");
+				itm->setText(0, itm->title());
+				return;
+			}
+		}
+	}
+
+	// Update item if required
+	if (itm->text(0) != itm->title()) {
+		itm->setTitle(itm->text(0));
+		slotSaveRequestCollection();
+	}
+}
+
+void Terminal::slotUpdateCurrent(void) {
+	auto sel = m_navigation->selectedItems();
+	if (sel.isEmpty()) return;
+	if (sel.count() > 1) {
+		TERMINAL_LOGW("Multiselection is not supported");
+	}
+	TerminalRequest* req = dynamic_cast<TerminalRequest*>(sel[0]);
+	if (req) {
+		updateRequestFromCurrent(req);
+	}
+}
+
+void Terminal::slotRenameCurrent(void) {
+	auto sel = m_navigation->selectedItems();
+	if (sel.isEmpty()) return;
+	if (sel.count() > 1) {
+		TERMINAL_LOGW("Multiselection is not supported");
+	}
+	TerminalCollectionItem* req = dynamic_cast<TerminalCollectionItem*>(sel[0]);
+	if (req) {
+		m_navigation->editItem(req);
+	}
+}
+
+void Terminal::slotDeleteCurrent(void) {
+
+}
+
+void Terminal::slotCloneCurrent(void) {
+
 }
 
 void Terminal::slotLoadRequestCollection(void) {
@@ -728,8 +797,6 @@ void Terminal::slotLoadRequestCollection(void) {
 void Terminal::slotSaveRequestCollection(void) {
 	if (m_exportLock) return;
 
-	TERMINAL_LOG("Saving OTerminal request collection...");
-
 	QJsonObject obj;
 	obj[OT_JSON_COLLECTION_Version] = INFO_COLLECTION_VERSION;
 
@@ -741,8 +808,6 @@ void Terminal::slotSaveRequestCollection(void) {
 
 	QSettings s("OpenTwin", applicationName());
 	s.setValue("Terminal.RequestCollection", doc.toJson());
-
-	TERMINAL_LOG("Terminal request collection saved successfully.");
 }
 
 // ################################################################################################################################
@@ -840,9 +905,13 @@ void Terminal::handleContextFilter(const QPoint& _pt, TerminalCollectionFilter *
 	if (_filter != m_requestsRootFilter) {
 		actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
 		actionRemove->setToolTip("Remove this filter and all of its childs");
+		actionRemove->setShortcut(QKeySequence(TERMINAL_KEYSEQ_Delete));
+		actionRemove->setShortcutVisibleInContextMenu(true);
 
 		actionRename = menu.addAction(QIcon(":/images/Rename.png"), "Rename");
 		actionRename->setToolTip("Enter rename mode");
+		actionRename->setShortcut(QKeySequence(TERMINAL_KEYSEQ_Rename));
+		actionRename->setShortcutVisibleInContextMenu(true);
 	}
 
 	menu.addSeparator();
@@ -894,13 +963,19 @@ void Terminal::handleContextRequest(const QPoint& _pt, TerminalRequest * _reques
 	menu.addSeparator();
 	QAction* actionReplace = menu.addAction(QIcon(":/images/DownPage.png"), "Set values from current");
 	actionReplace->setToolTip("Set values from currently active configuration");
+	actionReplace->setShortcut(QKeySequence(TERMINAL_KEYSEQ_Save));
+	actionReplace->setShortcutVisibleInContextMenu(true);
 
 	menu.addSeparator();
 	QAction* actionRemove = menu.addAction(QIcon(":/images/Remove.png"), "Remove");
 	actionRemove->setToolTip("Remove this request");
+	actionRemove->setShortcut(QKeySequence(TERMINAL_KEYSEQ_Delete));
+	actionRemove->setShortcutVisibleInContextMenu(true);
 
 	QAction* actionRename = menu.addAction(QIcon(":/images/Rename.png"), "Rename");
 	actionRename->setToolTip("Enter rename mode");
+	actionRename->setShortcut(QKeySequence(TERMINAL_KEYSEQ_Rename));
+	actionRename->setShortcutVisibleInContextMenu(true);
 	
 	// Show context menu
 	QAction * result = menu.exec(m_navigation->mapToGlobal(_pt));
@@ -1000,6 +1075,8 @@ void Terminal::updateRequestFromCurrent(TerminalRequest* _request) {
 	_request->setUrl(m_receiverUrl->text());
 	_request->setEndpoint(endpointToMessageType());
 	_request->setMessageBody(m_messageEdit->toPlainText());
+
+	TERMINAL_LOG("Request updated");
 
 	slotSaveRequestCollection();
 }

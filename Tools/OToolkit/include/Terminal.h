@@ -150,6 +150,10 @@ private slots:
 	void slotShowNavigationContextMenu(const QPoint& _pt);
 	void slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _column);
 	void slotNavigationItemChanged(QTreeWidgetItem* _item, int _column);
+	void slotUpdateCurrent(void);
+	void slotRenameCurrent(void);
+	void slotDeleteCurrent(void);
+	void slotCloneCurrent(void);
 
 	void slotLoadRequestCollection(void);
 	void slotSaveRequestCollection(void);
@@ -248,5 +252,7 @@ private:
 	QShortcut* m_shortcutSave;
 	QShortcut* m_shortcutSend;
 	QShortcut* m_shortcutRename;
+	QShortcut* m_shortcutDelete;
+	QShortcut* m_shortcutClone;
 
 };
