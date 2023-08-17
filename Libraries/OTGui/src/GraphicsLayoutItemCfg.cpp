@@ -311,18 +311,18 @@ void ot::GraphicsGridLayoutItemCfg::setColumnStretch(int _column, int _stretch) 
 }
 
 void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {
-	for (const auto& r : m_items) {
-		for (auto c : r) {
-			if (c) delete c;
+	for (const auto& c : m_items) {
+		for (auto r : c) {
+			if (r) delete r;
 		}
 	}
 
 	m_items.clear();
-	m_items.resize(m_columns);
-	for (auto& c : m_items) {
-		c.resize(m_rows);
-		for (int r = 0; r < m_rows; r++) {
-			c[r] = nullptr;
+	m_items.resize(m_rows);
+	for (size_t r = 0; r < m_items.size(); r++) {
+		m_items[r].resize(m_columns);
+		for (size_t c = 0; c < m_columns; c++) {
+			m_items[r][c] = nullptr;
 		}
 	}
 
