@@ -152,14 +152,7 @@ void ot::GraphicsBoxLayoutItemCfg::clearItems(void) {
 ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(int _rows, int _columns) 
 	: m_rows(_rows), m_columns(_columns)
 {
-	m_rowStretch.resize(m_rows);
-	m_columnStretch.resize(m_columns);
-	for (int r = 0; r < m_rows; r++) {
-		m_rowStretch[r] = 0;
-	}
-	for (int c = 0; c < m_columns; c++) {
-		m_columnStretch[c] = 0;
-	}
+	clearAndResize();
 }
 
 void ot::GraphicsGridLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
@@ -323,7 +316,24 @@ void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {
 			if (c) delete c;
 		}
 	}
+
 	m_items.clear();
+	m_items.resize(m_columns);
+	for (auto& c : m_items) {
+		c.resize(m_rows);
+		for (int r = 0; r < m_rows; r++) {
+			c[r] = nullptr;
+		}
+	}
+
+	m_rowStretch.resize(m_rows);
+	m_columnStretch.resize(m_columns);
+	for (int r = 0; r < m_rows; r++) {
+		m_rowStretch[r] = 0;
+	}
+	for (int c = 0; c < m_columns; c++) {
+		m_columnStretch[c] = 0;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
