@@ -505,6 +505,7 @@ std::pair<ot::UID, ot::UID> DataCategorizationHandler::CreateNewTable(std::strin
 	{
 		updatedTableEntity->AddRangeToPreviewStatus(std::make_pair<>(range.first, range.second));
 	}
+	updatedTableEntity->createProperties();
 	updatedTableEntity->StoreToDataBase();
 
 	ot::UIDList topoEntID { updatedTableEntity->getEntityID() };
@@ -633,9 +634,11 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getID(),entityInfo.getVersion(), selection->getTableOrientation());
 			uint32_t topRow, bottomRow, leftColun, rightColumn;
 			selection->getSelectedRange(topRow, bottomRow, leftColun, rightColumn);
+			bool selectEntireColumn = selection->getSelectEntireColumn();
+			bool selectEntireRow = selection->getSelectEntireRow();
 			newSelection->AddRange(topRow, bottomRow, leftColun, rightColumn);
 			_modelComponent->getEntityInformation(selection->getScriptName(), entityInfo);
-			newSelection->createProperties(_scriptFolder, _scriptFolderUID, selection->getScriptName(), entityInfo.getID());
+			newSelection->createProperties(_scriptFolder, _scriptFolderUID, selection->getScriptName(), entityInfo.getID(),selectEntireRow,selectEntireColumn);
 			newSelection->setConsiderForBatchprocessing(true);
 			newSelection->StoreToDataBase();
 
@@ -721,6 +724,17 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 			std::string::difference_type n = std::count(name.begin(), name.end(), '/');
 			uint32_t tableEdges[4];
 			rangeEntity->getSelectedRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]);
+			if (rangeEntity->getSelectEntireRow())
+			{
+				tableEdges[2] = 0;
+				tableEdges[3] = INT_MAX;
+			}
+			if (rangeEntity->getSelectEntireColumn())
+			{
+				tableEdges[0] = 0;
+				tableEdges[1] = INT_MAX;
+			}
+
 			if (n == 2) //First topology level: RMD
 			{
 				rmdRanges.push_back(ot::TableRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]));
@@ -779,6 +793,16 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 
 		uint32_t tR, bR, lC, rC;
 		rangeEntity->getSelectedRange(tR, bR, lC, rC);
+		if (rangeEntity->getSelectEntireRow())
+		{
+			lC = 0;
+			rC = INT_MAX;
+		}
+		if (rangeEntity->getSelectEntireColumn())
+		{
+			tR = 0;
+			bR = INT_MAX;
+		}
 		ranges.push_back(ot::TableRange(tR, bR, lC, rC));
 	}
 	RequestRangesSelection(ranges);

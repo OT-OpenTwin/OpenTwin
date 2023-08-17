@@ -48,36 +48,46 @@ std::map<std::string, std::list<std::string>> PreviewAssemblerRMD::CollectUnique
 	std::map<std::string, std::list<std::string>> previewFields;
 	for (size_t i = 0; i < _selectedRangeEntities.size(); i++)
 	{
-		uint32_t selection[4];
-		_selectedRangeEntities[i]->getSelectedRange(selection[0], selection[1], selection[2], selection[3]);
+
 		for (auto sourceTable : _tableSources)
 		{
 			if (sourceTable->getName() == _selectedRangeEntities[i]->getTableName())
 			{
+				uint32_t selection[4];
+				_selectedRangeEntities[i]->getSelectedRange(selection[0], selection[1], selection[2], selection[3], sourceTable);
 				auto sourceTableData = sourceTable->getTableData();
-				int offsetDueToHeader = 1;
-
-				if (_selectedRangeEntities[i]->getTableOrientation() ==	EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
+				if (_selectedRangeEntities[i]->getSelectEntireRow())
 				{
-					for (uint32_t column = selection[2]; column <= selection[3]; column++)
+					selection[3] = static_cast<uint32_t>(sourceTableData->getNumberOfColumns())- 1;
+					if (sourceTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::vertical)
 					{
-						for (uint32_t row = selection[0]; row <= selection[1]; row++)
-						{
-							previewFields[sourceTableData->getValue(0, column)].push_back(sourceTableData->getValue(row + offsetDueToHeader, column));
-						}
-						previewFields[sourceTableData->getValue(0, column)].unique();
+						selection[2] = 1;
+					}
+					else
+					{
+						selection[2] = 0;
 					}
 				}
-				else
+				if (_selectedRangeEntities[i]->getSelectEntireColumn())
+				{
+					selection[1] = static_cast<uint32_t>(sourceTableData->getNumberOfRows()) - 1;
+					if (sourceTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::horizontal)
+					{
+						selection[0] = 1;
+					}
+					else
+					{
+						selection[0] = 0;
+					}
+				}
+
+				for (uint32_t column = selection[2]; column <= selection[3]; column++)
 				{
 					for (uint32_t row = selection[0]; row <= selection[1]; row++)
 					{
-						for (uint32_t column = selection[2]; column <= selection[3]; column++)
-						{
-							previewFields[sourceTableData->getValue(row, 0)].push_back(sourceTableData->getValue(row , column + offsetDueToHeader));
-						}
-						previewFields[sourceTableData->getValue(row, 0)].unique();
+						previewFields[sourceTableData->getValue(0, column)].push_back(sourceTableData->getValue(row, column));
 					}
+					previewFields[sourceTableData->getValue(0, column)].unique();
 				}
 			}
 		}

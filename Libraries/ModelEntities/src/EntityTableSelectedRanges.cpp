@@ -61,7 +61,7 @@ bool EntityTableSelectedRanges::updateFromProperties(void)
 	
 }
 
-void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID)
+void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, bool selectEntireRow , bool selectEntireColumn)
 {
 	std::string sourceFileGroup = "Source file";
 
@@ -93,10 +93,15 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	auto passOnScript = new EntityPropertiesBoolean(_propNamePassOnScript, false);
 	passOnScript->setVisible(false);
 
+
+	EntityPropertiesBoolean::createProperty(rangeGroup, "Select entire row", selectEntireRow, "default", getProperties());
+	EntityPropertiesBoolean::createProperty(rangeGroup, "Select entire column", selectEntireColumn, "default", getProperties());
+
 	getProperties().createProperty(topRow, rangeGroup);
 	getProperties().createProperty(bottomRow, rangeGroup);
 	getProperties().createProperty(leftColumn, rangeGroup);
 	getProperties().createProperty(rightColumn, rangeGroup);
+	
 
 	getProperties().createProperty(considerInAutomaticCreation, updateStrategyGroup);
 	getProperties().createProperty(updateScript, updateStrategyGroup);
@@ -119,6 +124,36 @@ std::string EntityTableSelectedRanges::getSelectedType()
 
 }
 
+void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t& leftColumn, uint32_t& rightColumn, std::shared_ptr<EntityParameterizedDataTable> referencedTable)
+{
+	getSelectedRange(topRow, bottomRow, leftColumn, rightColumn);
+	if (getSelectEntireColumn())
+	{
+		bottomRow = referencedTable->getTableData()->getNumberOfRows() -1;
+		if (referencedTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::horizontal)
+		{
+			topRow = 1;
+		}
+		else
+		{
+			topRow = 0;
+		}
+	}
+	if (getSelectEntireRow())
+	{
+		rightColumn = referencedTable->getTableData()->getNumberOfColumns() - 1;
+		if (referencedTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::vertical)
+		{
+			leftColumn = 1;
+		}
+		else
+		{
+			leftColumn = 0;
+		}
+	}
+
+}
+
 void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t& leftColumn, uint32_t& rightColumn)
 {
 	topRow = _topCells;
@@ -138,6 +173,19 @@ void EntityTableSelectedRanges::setConsiderForBatchprocessing(bool considerForBa
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
 	considerForBatchProcessing->setValue(considerForBatchprocessing);
 }
+
+bool EntityTableSelectedRanges::getSelectEntireRow()
+{
+	auto selectEntireRowEnt = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Select entire row"));
+	return selectEntireRowEnt->getValue();
+}
+
+bool EntityTableSelectedRanges::getSelectEntireColumn()
+{
+	auto selectEntireRowEnt = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Select entire column"));
+	return selectEntireRowEnt->getValue();
+}
+
 
 bool EntityTableSelectedRanges::getPassOnScript()
 {

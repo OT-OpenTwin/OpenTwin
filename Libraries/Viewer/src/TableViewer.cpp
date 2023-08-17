@@ -18,9 +18,11 @@ std::vector<ot::TableRange> TableViewer::GetSelectedRanges()
 	QList<QTableWidgetSelectionRange> ranges = _table->selectedRanges();
 	std::vector<ot::TableRange> rangesInternalType;
 	rangesInternalType.reserve(ranges.size());
+	int colOffset =	_activeTable->getMinColumn();
+	int rowOffset = _activeTable->getMinRow();
 	for (auto range : ranges)
 	{
-		rangesInternalType.push_back(ot::TableRange(range.topRow(), range.bottomRow(), range.leftColumn(), range.rightColumn()));
+		rangesInternalType.push_back(ot::TableRange(range.topRow() + rowOffset, range.bottomRow() + rowOffset, range.leftColumn() + colOffset, range.rightColumn() + colOffset));
 	}
 	return rangesInternalType;
 }
@@ -67,10 +69,63 @@ void TableViewer::ChangeColorOfSelection(ot::Color & background)
 
 void TableViewer::SelectRanges(std::vector<ot::TableRange>& ranges)
 {
-	_table->clearSelection();
-	for (auto range : ranges)
+
+	if(_activeTable != nullptr)
 	{
-		_table->setRangeSelected(QTableWidgetSelectionRange(range.GetTopRow(), range.GetLeftColumn(), range.GetBottomRow(), range.GetRightColumn()),true);
+		_table->clearSelection();
+
+		int minCol = _activeTable->getMinColumn() < 0 ? 0 : _activeTable->getMinColumn();
+		int maxCol = _activeTable->getMaxColumn() < 0 ? 0 : _activeTable->getMaxColumn();
+		int minRow = _activeTable->getMinRow() < 0 ? 0 : _activeTable->getMinRow();
+		int maxRow = _activeTable->getMaxRow() < 0 ? 0 : _activeTable->getMaxRow();
+		auto paramTable = dynamic_cast<EntityParameterizedDataTable*>(_activeTable.get());
+		if (paramTable == nullptr || paramTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::horizontal)
+		{
+			if (minRow == 0) { minRow = 1; }
+		}
+		else
+		{
+			if (minCol == 0) { minCol = 1; }
+		}
+		for (auto range : ranges)
+		{
+			int displayedTableTopRowIndx = range.GetTopRow() - minRow;
+			int displayedTableBottomRowIndx = range.GetBottomRow() - minRow;
+			if (displayedTableBottomRowIndx >= 0 || displayedTableTopRowIndx >= 0) //&& (same for column)
+			{
+				if (displayedTableTopRowIndx < 0)
+				{
+					displayedTableTopRowIndx = 0;
+				}
+				if (range.GetBottomRow() > maxRow)
+				{
+					displayedTableBottomRowIndx = maxRow - minRow;
+				}
+				if (displayedTableBottomRowIndx >= _activeTable->getTableData()->getNumberOfRows())
+				{
+					displayedTableBottomRowIndx = _activeTable->getTableData()->getNumberOfRows() - 1;
+				}
+			}
+
+			int displayedTableLeftColIndx = range.GetLeftColumn() - minCol;
+			int displayedTableRightColIndx = range.GetRightColumn() - minCol;
+			if (displayedTableLeftColIndx >= 0 || displayedTableRightColIndx >= 0)
+			{
+				if (displayedTableLeftColIndx < 0)
+				{
+					displayedTableLeftColIndx = 0;
+				}
+				if(range.GetRightColumn()> maxCol)
+				{
+					displayedTableRightColIndx = maxCol - minCol;
+				}
+				if (displayedTableRightColIndx >= _activeTable->getTableData()->getNumberOfColumns())
+				{
+					displayedTableRightColIndx = _activeTable->getTableData()->getNumberOfColumns() - 1;
+				}
+			}
+			_table->setRangeSelected(QTableWidgetSelectionRange(displayedTableTopRowIndx, displayedTableLeftColIndx, displayedTableBottomRowIndx, displayedTableRightColIndx), true);
+		}
 	}
 }
 
@@ -147,46 +202,30 @@ void TableViewer::SetTableData()
 		std::chrono::system_clock::time_point t4 = std::chrono::system_clock::now();
 		_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
-		uint64_t numberOfColumns = tableData->getNumberOfColumns();
-		uint64_t numberOfRows = tableData->getNumberOfRows();
-
+		//Get iterators for data access
 		unsigned int rowStart(0), columnStart(0), rowEnd(0), columnEnd(0);
 		if (_tableOrientation == EntityParameterizedDataTable::HeaderOrientation::horizontal)
 		{
-			for (unsigned int c = 0; c < numberOfColumns; c++)
-			{
-				QString text = QString::fromStdString(tableData->getValue(0, c));
-				QTableWidgetItem* item = new QTableWidgetItem(text);
-				_table->setHorizontalHeaderItem(c, item);
-			}
-			rowStart++;
+			rowStart = 1;
 		}
 		else
 		{
-			for (unsigned int r = 0; r < numberOfRows; r++)
-			{
-				QString text = QString::fromStdString(tableData->getValue(r, 0));
-				QTableWidgetItem* item = new QTableWidgetItem(text);
-				_table->setVerticalHeaderItem(r, item);
-			}
-			columnStart++;
+			columnStart = 1;
 		}
+		uint64_t numberOfColumns = tableData->getNumberOfColumns();
+		uint64_t numberOfRows = tableData->getNumberOfRows();
+		SetLoopRanges(rowStart, columnStart, rowEnd, columnEnd, numberOfColumns, numberOfRows);
 
-
-
-		SetLoopRanges(rowStart, columnStart, rowEnd, columnEnd,numberOfColumns,numberOfRows);
-		
-		uint32_t numberOfVisibleRows(0), numberOfVisibleColumns(0), distance (0);
-
+		//Set number of rows and columns at visible table
+		uint32_t numberOfVisibleRows(0), numberOfVisibleColumns(0), distance(0);
 		distance = rowEnd - rowStart;
-
 		if (distance <= 0)
 		{
 			numberOfVisibleRows = 1;
 		}
 		else
 		{
-			numberOfVisibleRows = distance + 1;
+			numberOfVisibleRows = distance +1;
 		}
 		distance = columnEnd - columnStart;
 		if (distance <= 0)
@@ -195,13 +234,52 @@ void TableViewer::SetTableData()
 		}
 		else
 		{
-			numberOfVisibleColumns = columnEnd - columnStart + 1;
+			numberOfVisibleColumns = distance + 1;
 		}
-		
-		
-		_table->setColumnCount(numberOfVisibleColumns);
 		_table->setRowCount(numberOfVisibleRows);
+		_table->setColumnCount(numberOfVisibleColumns);
 
+		//Setting both headers
+		if (_tableOrientation == EntityParameterizedDataTable::HeaderOrientation::horizontal)
+		{
+			unsigned int columnPtr = 0;
+			for (unsigned int c = columnStart; c <= columnEnd ; c++)
+			{
+				QString text = QString::fromStdString(tableData->getValue(0, c));
+				QTableWidgetItem* item = new QTableWidgetItem(text);
+				_table->setHorizontalHeaderItem(columnPtr, item);
+				columnPtr++;
+			}
+			int rowPtr = 0;
+			for (unsigned int r = rowStart; r <= rowEnd; r++)
+			{
+				QString text = QString::fromStdString(std::to_string(r));
+				QTableWidgetItem* item = new QTableWidgetItem(text);
+				_table->setVerticalHeaderItem(rowPtr, item);
+				rowPtr++;
+			}
+		}
+		else
+		{
+			int rowPtr = 0;
+			for (unsigned int r = rowStart; r <= rowEnd ; r++)
+			{
+				QString text = QString::fromStdString(tableData->getValue(r, 0));
+				QTableWidgetItem* item = new QTableWidgetItem(text);
+				_table->setVerticalHeaderItem(rowPtr, item);
+			}
+
+			int columnPtr = 0;
+			for (unsigned int c = columnStart; c <= columnEnd; c++)
+			{
+				QString text = QString::fromStdString(std::to_string(c));
+				QTableWidgetItem* item = new QTableWidgetItem(text);
+				_table->setVerticalHeaderItem(columnPtr, item);
+				columnPtr++;
+			}
+		}
+
+		//Filling data in visible table
 		std::chrono::system_clock::time_point t5 = std::chrono::system_clock::now();
 		unsigned int itemRowIndex(0);
 		for (unsigned int r = rowStart; r <= rowEnd; r++)
@@ -244,18 +322,26 @@ void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart,
 	_shownMinRow = _activeTable->getMinRow();
 	_shownMaxRow = _activeTable->getMaxRow();
 
-	if (numberOfRows < _shownMaxRow) //max Row lays within the possible index
+	if (numberOfRows <= _shownMaxRow) //max Row lays within the possible index
 	{
 		outRowEnd = numberOfRows - 1;
+	}
+	else if (_shownMaxRow < outRowStart)
+	{
+		outRowEnd = outRowStart;
 	}
 	else
 	{
 		outRowEnd = _shownMaxRow;
 	}
 
-	if (numberOfColumns < _shownMaxCol) //max Row lays within the possible index
+	if (numberOfColumns <= _shownMaxCol) //max Row lays within the possible index
 	{
 		outColumnEnd = numberOfColumns - 1;
+	}
+	else if (_shownMaxCol < outColumnStart)
+	{
+		outColumnEnd = outColumnStart;
 	}
 	else
 	{
@@ -266,7 +352,7 @@ void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart,
 	if (_shownMinRow > outRowEnd || _shownMinRow < 0 || _shownMinRow < outRowStart)
 	{
 
-		//outRowStart remains the default; 0 respectively 1 if the header is in the first row
+		//outRowStart remains the default; 0 respectively 1 if the header is in the zeroth row
 	}
 	else
 	{
@@ -276,7 +362,7 @@ void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart,
 	if (_shownMinCol > outColumnEnd || _shownMinCol < 0 || _shownMinCol < outRowStart)
 	{
 
-		outColumnStart = 0;//outRowStart remains the default; 0 respectively 1 if the header is in the first row
+		//outRowStart remains the default; 0 respectively 1 if the header is in the zeroth column
 	}
 	else
 	{

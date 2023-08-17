@@ -19,7 +19,6 @@ public:
 	void AddRangeToPreviewStatus(std::pair<ot::UID, ot::UID> range) { _displayedRanges.push_back(range); }
 
 private:
-	void createProperties() override {};
 	std::vector<std::pair<ot::UID, ot::UID>> _displayedRanges;
 
 

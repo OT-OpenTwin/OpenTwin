@@ -1,6 +1,7 @@
 #pragma once
 #include "EntityBase.h"
 #include "EntityParameterizedDataCategorization.h"
+#include "EntityParameterizedDataTable.h"
 #include <vector>
 
 class __declspec(dllexport) EntityTableSelectedRanges : public EntityBase
@@ -12,15 +13,19 @@ public:
 	virtual entityType getEntityType() override { return TOPOLOGY; }
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties(void) override;
-	void createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID);
+	void createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, bool selectEntireRow = false, bool selectEntireColumn = false);
 	void SetTableProperties(std::string tableName, ot::UID tableID, ot::UID tableVersion, std::string tableOrientation);
 
 	std::string getSelectedType();
 	const std::string getTableName() const { return _tableName; }
 	const std::string getTableOrientation() const { return _tableOrientation; }
+	void getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t & leftColumn, uint32_t & rightColumn, std::shared_ptr<EntityParameterizedDataTable> referencedTable);
 	void getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t & leftColumn, uint32_t & rightColumn);
 	bool getConsiderForBatchprocessing();
 	void setConsiderForBatchprocessing(bool considerForBatchprocessing);
+	bool getSelectEntireRow();
+	bool getSelectEntireColumn();
+
 	bool getPassOnScript();
 	std::string getScriptName();
 	void AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell);
