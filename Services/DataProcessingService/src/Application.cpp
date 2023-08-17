@@ -11,6 +11,15 @@
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
 
+#include "OpenTwinCommunication/Msg.h"
+#include "OpenTwinCommunication/ActionTypes.h"
+#include "OpenTwinCore/Owner.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/LinearGradientPainter2D.h"
+#include "OTGui/GraphicsCollectionCfg.h"
+#include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsLayoutItemCfg.h"
+
 // Open twin header
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
@@ -68,9 +77,79 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 
-	_ui->addMenuPage("Data Processing");
-	_ui->addMenuGroup("Data Processing", "Test");
-	_ui->addMenuButton("Block Editor", "Test", "Empty", "Create empty", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add");
+	const std::string pageName = "Data Processing";
+	const std::string groupName = "Pipeline Handling";
+	ot::Flags<ot::ui::lockType> modelWrite;
+	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+
+	_ui->addMenuPage(pageName);
+	_ui->addMenuGroup(pageName, groupName);
+	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
+	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "Kriging");
+
+	ot::GraphicsEditorPackage pckg("TestPackage", "Test title");
+	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
+	ot::GraphicsCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsCollectionCfg("Database", "Database");
+	ot::GraphicsCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsCollectionCfg("Visualization", "Visualization");
+	
+	ot::GraphicsCollectionCfg* mathBlockCollection = new ot::GraphicsCollectionCfg("Mathematical Operations", "Mathematical Operations");
+	ot::GraphicsCollectionCfg* customizedBlockCollection = new ot::GraphicsCollectionCfg("Customized Blocks", "Customized Blocks");
+	
+
+	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
+	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
+
+	auto black = ot::Color(255, 255, 255);
+	auto blockSize = ot::Size2D(100, 60);
+	/*ot::GraphicsGridLayoutItemCfg* layout = new ot::GraphicsGridLayoutItemCfg(2, 2);
+	layout->setBorder(ot::Border(black, 2));
+	layout->setSize();*/
+
+	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg();
+	centralLayout->setSize(blockSize);
+	centralLayout->setBorder(ot::Border(black, 2));
+	ot::GraphicsHBoxLayoutItemCfg* topLine= new ot::GraphicsHBoxLayoutItemCfg();
+	topLine->setBorder(ot::Border(black, 2));
+
+	ot::GraphicsTextItemCfg* label = new ot::GraphicsTextItemCfg("C", black);
+	label->setName("Label");
+	topLine->addChildItem(label);
+	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg("Database Handle", black);
+	title->setName("Title");
+	topLine->addStrech();
+	topLine->addChildItem(title);
+	centralLayout->addChildItem(topLine);
+
+	//ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg("C:\\OpenTwin\\Deployment\\icons\\Default\\database.png");
+	//centralLayout->addChildItem(image);
+
+	controlBlockDatabaseCollection->addItem(centralLayout);
+
+
+	//a2->addItem(createTestBlock2("Alpha 3"));
+	pckg.addCollection(controlBlockCollection);
+	pckg.addCollection(customizedBlockCollection);
+	pckg.addCollection(mathBlockCollection);
+
+	OT_rJSON_createDOC(doc);
+	OT_rJSON_createValueObject(pckgObj);
+	pckg.addToJsonObject(doc, pckgObj);
+
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	ot::GlobalOwner::instance().addToJsonObject(doc, doc);
+
+	std::string response;
+	std::string req = ot::rJSON::toJSON(doc);
+
+	if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
+		assert(0);
+	}
+
+	if (response != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Invalid response from UI");
+		m_uiComponent->displayDebugMessage("Invalid response\n");
+	}
 
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);

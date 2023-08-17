@@ -54,6 +54,9 @@
 #include "EntityResearchMetadata.h"
 #include "EntitySolverGetDP.h"
 #include "EntityMeasurementMetadata.h"
+#include "EntityBlock.h"
+#include "EntityBlockDatabaseAccess.h"
+
 
 EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 {
@@ -292,6 +295,14 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntitySolverGetDP")
 	{
 		return new EntitySolverGetDP(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlock")
+	{
+		return new EntityBlock(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockDatabaseAccess")
+	{
+		return new EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else
 	{

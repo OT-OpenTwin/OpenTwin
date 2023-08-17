@@ -41,10 +41,10 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	tableData->StoreToDataBase();
 
 	auto tp4 = std::chrono::system_clock::now();
-	_uiComponent->displayMessage("Total duration: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4 - tp1).count()) + " mys\n");
-	_uiComponent->displayMessage("Extraction from source entity: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp2- tp1).count()) + " mys\n");
-	_uiComponent->displayMessage("Table data created: " +std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp3-tp2).count()) + " mys\n");
-	_uiComponent->displayMessage("Table data stored: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4- tp3).count()) + " mys\n");
+	//_uiComponent->displayMessage("Total duration: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4 - tp1).count()) + " mys\n");
+	//_uiComponent->displayMessage("Extraction from source entity: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp2- tp1).count()) + " mys\n");
+	//_uiComponent->displayMessage("Table data created: " +std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp3-tp2).count()) + " mys\n");
+	//_uiComponent->displayMessage("Table data stored: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4- tp3).count()) + " mys\n");
 
 
 	topoEnt->setTableData(tableData);

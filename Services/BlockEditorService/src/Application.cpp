@@ -141,7 +141,7 @@ std::string Application::createEmptyTestEditor(void) {
 
 		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-		ot::GlobalOwner::instance().addToJsonObject(doc, doc);
+		ot::GlobalOwner::instance().addToJsonObject(doc, doc); //Eigentlich nur die OT_JSON_MEMBER_GlobalOwnerId gewrapped
 
 		std::string response;
 		std::string req = ot::rJSON::toJSON(doc);

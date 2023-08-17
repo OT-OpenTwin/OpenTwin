@@ -1565,11 +1565,13 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 			{
 				const std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				ot::UIDList identifiers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-				ot::UIDList versions = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+
+				ot::UIDList entityIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				ot::UIDList entityVersions = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+				
 				if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
 				{
-					rapidjson::Document  reply = m_fileHandler.StoreFileInDataBase(identifiers,versions);
+					rapidjson::Document  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
 					std::string response;
 					sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
 					// Check if response is an error or warning

@@ -48,14 +48,15 @@ rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& entityID
 		auto newFile = CreateNewSourceEntity(documentType, *uid, _senderName);
 		topoID.push_back(*uid);
 		uid++;
-
-
 		std::string entityName = CreateNewUniqueTopologyName(documentName);
 		newFile->setName(entityName);
 		newFile->setInitiallyHidden(false);
 		newFile->setFileProperties(directoryPath, documentName, documentType);
-		auto memBlock = ExtractFileContentAsBinary(absoluteFilePath);
+
 		std::unique_ptr <EntityBinaryData> newData(new EntityBinaryData(*uid, newFile.get(), nullptr, nullptr, nullptr, _senderName));
+		dataID.push_back(*uid);
+		uid++;
+		auto memBlock = ExtractFileContentAsBinary(absoluteFilePath);
 
 		EntityFileText* newTextFile = dynamic_cast<EntityFileText*>(newFile.get());
 		if (newTextFile!= nullptr)
@@ -64,8 +65,6 @@ rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& entityID
 			newTextFile->setTextEncoding(encoding(memBlock));
 			newTextFile = nullptr;
 		}
-		dataID.push_back(*uid);
-		uid++;
 		
 		newData->setData(memBlock.data(), memBlock.size());
 		newData->StoreToDataBase(*version);
