@@ -59,11 +59,28 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 }
 
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
-	ot::GraphicsImageItemCfg* cfg = new ot::GraphicsImageItemCfg;
-	cfg->setSize(ot::Size2D(100, 60));
+	ot::GraphicsImageItemCfg* bot = new ot::GraphicsImageItemCfg;
+	bot->setSize(ot::Size2D(100, 60));
+	bot->setName(_name + "i");
+	bot->setTitle(_name + "i");
+	bot->setImagePath("Default/BugGreen");
+
+	ot::GraphicsTextItemCfg* top = new ot::GraphicsTextItemCfg("Senor Buggo");
+	top->setName(_name + "t");
+	top->setTitle(_name + "t");
+
+	ot::GraphicsRectangularItemCfg* backgr = new ot::GraphicsRectangularItemCfg;
+	backgr->setName(_name + "b");
+	backgr->setTitle(_name + "b");
+	backgr->setCornerRadius(5);
+	backgr->setSize(ot::Size2D(100, 50));
+	ot::GraphicsStackItemCfg* cfgTop = new ot::GraphicsStackItemCfg(bot, top);
+	cfgTop->setName(_name + "s");
+	cfgTop->setTitle(_name + "s");
+
+	ot::GraphicsStackItemCfg* cfg = new ot::GraphicsStackItemCfg(backgr, cfgTop);
 	cfg->setName(_name);
 	cfg->setTitle(_name);
-	cfg->setImagePath("Default/BugGreen");
 	return cfg;
 }
 
@@ -150,12 +167,6 @@ std::string Application::createEmptyTestEditor(void) {
 		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
 			return OT_ACTION_RETURN_VALUE_FAILED;
 		}
-
-		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_E("Invalid response from UI");
-			m_uiComponent->displayDebugMessage("Invalid response\n");
-		}
-
 	}
 	
 	return OT_ACTION_RETURN_VALUE_OK;

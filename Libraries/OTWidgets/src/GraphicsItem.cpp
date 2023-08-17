@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/GraphicsFactory.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
@@ -86,6 +87,98 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+ot::GraphicsStackItem::GraphicsStackItem() : ot::GraphicsItem(false), m_top(nullptr), m_bottom(nullptr) {
+
+}
+
+ot::GraphicsStackItem::~GraphicsStackItem() {
+	if (m_top) delete m_top;
+	if (m_bottom) delete m_bottom;
+}
+
+bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
+	ot::GraphicsStackItemCfg* cfg = dynamic_cast<ot::GraphicsStackItemCfg*>(_cfg);
+	if (cfg == nullptr) {
+		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		return false;
+	}
+
+	OTAssertNullptr(cfg->topItem());
+	OTAssertNullptr(cfg->bottomItem());
+
+	if (m_bottom) delete m_bottom;
+	if (m_top) delete m_top;
+	m_bottom = nullptr;
+	m_top = nullptr;
+	m_bottom = ot::GraphicsFactory::itemFromConfig(cfg->bottomItem());
+	m_top = ot::GraphicsFactory::itemFromConfig(cfg->topItem());
+	if (m_top == nullptr || m_bottom == nullptr) {
+		OT_LOG_EA("Failed to create child item(s). Abort");
+		if (m_bottom) delete m_bottom;
+		if (m_top) delete m_top;
+		m_bottom = nullptr;
+		m_top = nullptr;
+		return false;
+	}
+	return true;
+}
+
+QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	QSizeF s(1., 1.);
+	QGraphicsLayoutItem* itm = dynamic_cast<QGraphicsLayoutItem*>(m_bottom);
+	if (itm) s = s.expandedTo(itm->preferredSize());
+	itm = nullptr;
+	itm = dynamic_cast<QGraphicsLayoutItem*>(m_top);
+	if (itm) s = s.expandedTo(itm->preferredSize());
+	return s;
+}
+
+void ot::GraphicsStackItem::setGeometry(const QRectF& _rect) {
+	setPos(_rect.topLeft());
+}
+
+void ot::GraphicsStackItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+	if (m_bottom) {
+		m_bottom->finalizeItem(_scene, _group, _isRoot);
+		QGraphicsItem* itm = dynamic_cast<QGraphicsItem*>(m_bottom);
+		if (itm) { this->addToGroup(itm); }
+		else {
+			OT_LOG_EA("GraohicsItem cast to QGraphicsItem cast failed");
+		}
+	}
+	if (m_top) {
+		m_top->finalizeItem(_scene, _group, _isRoot);
+		QGraphicsItem* itm = dynamic_cast<QGraphicsItem*>(m_top);
+		if (itm) { this->addToGroup(itm); }
+		else {
+			OT_LOG_EA("GraohicsItem cast to QGraphicsItem cast failed");
+		}
+	}
+
+	_scene->addItem(this);
+	if (_group) _group->addToGroup(this);
+}
+
+void ot::GraphicsStackItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+}
+
+void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 ot::GraphicsRectangularItem::GraphicsRectangularItem() : ot::GraphicsItem(false), m_size(200, 100) {
 
 }
@@ -95,6 +188,7 @@ ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
 }
 
 bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
 	ot::GraphicsRectangularItemCfg* cfg = dynamic_cast<ot::GraphicsRectangularItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
@@ -144,6 +238,7 @@ ot::GraphicsTextItem::~GraphicsTextItem() {
 }
 
 bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
 	ot::GraphicsTextItemCfg* cfg = dynamic_cast<ot::GraphicsTextItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
@@ -210,8 +305,17 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
 
-	this->setPixmap(ot::IconManager::instance().getPixmap(QString::fromStdString(cfg->imagePath())));
-
+	try {
+		this->setPixmap(ot::IconManager::instance().getPixmap(QString::fromStdString(cfg->imagePath())));
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+		return false;
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+		return false;
+	}
 	return true;
 }
 
@@ -245,10 +349,12 @@ void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // Register at class factory
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
+static ot::SimpleFactoryRegistrar<ot::GraphicsStackItem> stackItem(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 
 // Register at global key map (config -> item)
 static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
+static ot::GlobalKeyMapRegistrar stackItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::GlobalKeyMapRegistrar imageItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
 static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);

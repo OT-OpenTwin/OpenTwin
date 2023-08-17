@@ -18,10 +18,10 @@
 // std header
 #include <string>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsItemPairCfg "OT_GICPair"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GICText"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg "OT_GICStack"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GICRectangular"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GICRect"
 
 #pragma warning(disable:4251)
 
@@ -73,11 +73,11 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORTONLY GraphicsItemPairCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsStackItemCfg : public ot::GraphicsItemCfg {
 	public:
-		GraphicsItemPairCfg();
-		GraphicsItemPairCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem);
-		virtual ~GraphicsItemPairCfg();
+		GraphicsStackItemCfg();
+		GraphicsStackItemCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem);
+		virtual ~GraphicsStackItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -90,9 +90,18 @@ namespace ot {
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsItemPairCfg); };
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg); };
 
+		//! @brief Set the bottom item
+		//! The stack item takes ownership of the item
+		//! @param _bottom Child item
+		void setBottomItem(ot::GraphicsItemCfg* _bottom);
 		ot::GraphicsItemCfg* bottomItem(void) { return m_bottom; };
+
+		//! @brief Set the top item
+		//! The stack item takes ownership of the item
+		//! @param _top Child item
+		void setTopItem(ot::GraphicsItemCfg* _top);
 		ot::GraphicsItemCfg* topItem(void) { return m_top; };
 
 	private:

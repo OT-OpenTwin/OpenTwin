@@ -14,10 +14,12 @@
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItem "OT_GIImage"
 #define OT_GRAPHICSITEM_MIMETYPE_Configuration "GraphicsItem.Configuration"
+
+#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsStackItem "OT_GIStack"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItem "OT_GIImage"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
 
 namespace ot {
 
@@ -67,25 +69,33 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	//class OT_WIDGETS_API_EXPORT GraphicsItemPair : public ot::GraphicsItem {
-	//public:
-	//	GraphicsItemPair();
-	//	virtual ~GraphicsItemPair();
+	class OT_WIDGETS_API_EXPORT GraphicsStackItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
+	public:
+		GraphicsStackItem();
+		virtual ~GraphicsStackItem();
 
-	//	virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
-	//	//! @brief Returns the key that is used to create an instance of this class in the simple factory
-	//	virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem); };
 
-	//	virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
-	//	virtual void setGeometry(const QRectF& rect) override;
+		virtual void setGeometry(const QRectF& rect) override;
 
-	//	virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
+		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
 
-	//private:
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
-	//};
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	private:
+		ot::GraphicsItem* m_top;
+		ot::GraphicsItem* m_bottom;
+	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

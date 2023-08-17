@@ -71,30 +71,34 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItemPairCfg::GraphicsItemPairCfg() : m_bottom(nullptr), m_top(nullptr) {}
+ot::GraphicsStackItemCfg::GraphicsStackItemCfg() : m_bottom(nullptr), m_top(nullptr) {}
 
-ot::GraphicsItemPairCfg::GraphicsItemPairCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem) : m_bottom(_bottomItem), m_top(_topItem) {}
+ot::GraphicsStackItemCfg::GraphicsStackItemCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem) : m_bottom(_bottomItem), m_top(_topItem) {}
 
-ot::GraphicsItemPairCfg::~GraphicsItemPairCfg() {
+ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 	if (m_top) delete m_top;
 	if (m_bottom) delete m_bottom;
 }
 
-void ot::GraphicsItemPairCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+void ot::GraphicsStackItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	ot::GraphicsItemCfg::addToJsonObject(_document, _object);
+
 	OTAssertNullptr(m_top);
 	OTAssertNullptr(m_bottom);
 
 	OT_rJSON_createValueObject(topObj);
-	m_top->addToJsonObject(_document, topObj);
+	if (m_top) m_top->addToJsonObject(_document, topObj);
 
 	OT_rJSON_createValueObject(bottomObj);
-	m_bottom->addToJsonObject(_document, bottomObj);
+	if (m_bottom) m_bottom->addToJsonObject(_document, bottomObj);
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Top, topObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Bottom, bottomObj);
 }
 
-void ot::GraphicsItemPairCfg::setFromJsonObject(OT_rJSON_val & _object) {
+void ot::GraphicsStackItemCfg::setFromJsonObject(OT_rJSON_val & _object) {
+	ot::GraphicsItemCfg::setFromJsonObject(_object);
+
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Top, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Bottom, Object);
 
@@ -107,7 +111,9 @@ void ot::GraphicsItemPairCfg::setFromJsonObject(OT_rJSON_val & _object) {
 	m_bottom = nullptr;
 
 	m_top = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(topObj);
+	m_top->setFromJsonObject(topObj);
 	m_bottom = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(bottomObj);
+	m_bottom->setFromJsonObject(bottomObj);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -234,7 +240,7 @@ void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter
 }
 
 // Register at class factory
-static ot::SimpleFactoryRegistrar<ot::GraphicsItemPairCfg> itemPairCfg(OT_SimpleFactoryJsonKeyValue_GraphicsItemPairCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItemCfg> textItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg);
+static ot::SimpleFactoryRegistrar<ot::GraphicsStackItemCfg> stackItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg);
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg);
