@@ -24,7 +24,7 @@
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include <OpenTwinCommunication/ActionTypes.h>	
-
+#include "TemplateDefaultManager.h"
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -60,11 +60,35 @@ Application::~Application()
 
 void Application::run(void)
 {
+	if (!EnsureDataBaseConnection())
+	{
+		assert(0);
+	}
 	// Add code that should be executed when the service is started and may start its work
 }
 
+#include "EntityBlockDatabaseAccess.h"
+
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
+
+
+	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+	{
+		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		if (action == _buttonRunPipeline.GetFullDescription())
+		{
+			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			block->setName("Processing Blocks/Database Access");
+			block->createProperties();
+			block->StoreToDataBase();
+
+			ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
+			std::list<bool> forceVis{ false };
+			m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
+		}
+	}
+
 	return ""; // Return empty string if the request does not expect a return
 }
 

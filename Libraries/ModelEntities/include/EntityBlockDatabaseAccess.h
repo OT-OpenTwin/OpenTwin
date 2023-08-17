@@ -5,7 +5,7 @@ class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 {
 public:
 	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactory* factory, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockDataProcessing"; };
+	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	virtual void addVisualizationNodes(void) override;
 	virtual void createProperties(void);

@@ -1,7 +1,7 @@
 #include "EntityBlock.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactory* factory, const std::string& owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner)
+	:EntityBase(ID,parent,obs,ms,factory,owner), _blockName(""), _location(0.,0.)
 {
 }
 
