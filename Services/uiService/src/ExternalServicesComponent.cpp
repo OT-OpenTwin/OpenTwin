@@ -66,7 +66,6 @@
 #include <thread>
 #include <vector>
 
-const QString c_serviceName = "uiService";
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
 static std::thread * g_sessionServiceHealthCheckThread{ nullptr };
@@ -3147,7 +3146,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SESSION_TYPE, "Default");
 
 		// Add service information
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SERVICE_NAME, c_serviceName.toStdString());
+		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SERVICE_NAME, OT_INFO_SERVICE_TYPE_UI);
 		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SERVICE_TYPE, OT_INFO_SERVICE_TYPE_UI);
 		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(m_uiServiceURL)); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
 		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_START_RELAY, m_isRelayServiceRequired);
