@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/IconManager.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
@@ -209,7 +210,7 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
 
-	this->setPixmap(QPixmap(QString::fromStdString(cfg->imagePath())));
+	this->setPixmap(ot::IconManager::instance().getPixmap(QString::fromStdString(cfg->imagePath())));
 
 	return true;
 }

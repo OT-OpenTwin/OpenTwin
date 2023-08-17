@@ -59,10 +59,11 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 }
 
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
-	ot::GraphicsRectangularItemCfg* cfg = new ot::GraphicsRectangularItemCfg;
+	ot::GraphicsImageItemCfg* cfg = new ot::GraphicsImageItemCfg;
 	cfg->setSize(ot::Size2D(100, 60));
 	cfg->setName(_name);
 	cfg->setTitle(_name);
+	cfg->setImagePath("Default/BugGreen");
 	return cfg;
 }
 
