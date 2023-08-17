@@ -16,6 +16,7 @@
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItem "OT_GIImage"
 #define OT_GRAPHICSITEM_MIMETYPE_Configuration "GraphicsItem.Configuration"
 
 namespace ot {
@@ -154,7 +155,39 @@ namespace ot {
 
 	};
 
-	
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_WIDGETS_API_EXPORT GraphicsImageItem : public QGraphicsPixmapItem, public QGraphicsLayoutItem, public GraphicsItem {
+	public:
+		GraphicsImageItem();
+		virtual ~GraphicsImageItem();
+
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem); };
+
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
+
+		virtual void setGeometry(const QRectF& rect) override;
+
+		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) override;
+
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	private:
+		QSizeF m_size;
+	};
 
 }
 

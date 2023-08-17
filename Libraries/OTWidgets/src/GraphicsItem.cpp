@@ -192,10 +192,62 @@ void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+ot::GraphicsImageItem::GraphicsImageItem() : ot::GraphicsItem(false) {
+
+}
+
+ot::GraphicsImageItem::~GraphicsImageItem() {
+
+}
+
+bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	ot::GraphicsImageItemCfg* cfg = dynamic_cast<ot::GraphicsImageItemCfg*>(_cfg);
+	if (cfg == nullptr) {
+		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		return false;
+	}
+	m_size.setWidth(cfg->size().width());
+	m_size.setHeight(cfg->size().height());
+
+	this->setPixmap(QPixmap(QString::fromStdString(cfg->imagePath())));
+
+	return true;
+}
+
+void ot::GraphicsImageItem::setGeometry(const QRectF& rect) {
+	setPos(rect.topLeft());
+}
+
+void ot::GraphicsImageItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+	_scene->addItem(this);
+	if (_group) _group->addToGroup(this);
+}
+
+void ot::GraphicsImageItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+}
+
+void ot::GraphicsImageItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Register at class factory
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
+static ot::SimpleFactoryRegistrar<ot::GraphicsImageItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 
 // Register at global key map (config -> item)
 static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
+static ot::GlobalKeyMapRegistrar imageItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
 static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
