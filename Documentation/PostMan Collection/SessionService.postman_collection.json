@@ -1033,7 +1033,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"PythonExecutionService\"\r\n}",
+							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"DataProcessingService\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
