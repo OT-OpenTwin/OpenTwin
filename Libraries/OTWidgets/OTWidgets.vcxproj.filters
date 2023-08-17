@@ -31,6 +31,9 @@
     <ClCompile Include="src\GraphicsPicker.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\IconManager.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h">
       <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\IconManager.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
