@@ -19,11 +19,18 @@ ot::IconManager& ot::IconManager::instance(void) {
 }
 
 void ot::IconManager::addSearchPath(const QString& _path) {
-	m_searchPaths.append(_path);
+	if (_path.isEmpty()) {
+		OT_LOG_WA("Empty search path provided. Ignoring");
+		return;
+	}
+	QString path = _path;
+	path.replace("\\", "/");
+	if (!path.endsWith("/")) path.append("/");
+	m_searchPaths.append(path);
 }
 
 QIcon& ot::IconManager::getIcon(const QString& _subPath) {
-	return this->get<QIcon>(_subPath, { ".png", ".jpg" }, m_icons);
+	return this->get<QIcon>(_subPath, { ".png", ".jpg", ".ico" }, m_icons);
 }
 
 QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {

@@ -135,9 +135,6 @@
     <ClCompile Include="src\akGui\aDialog.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aIconManager.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aObjectManager.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
@@ -357,9 +354,6 @@
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
     <ClInclude Include="include\akGui\aColorStyleDefaultDark.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akGui\aIconManager.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
     <ClInclude Include="include\akGui\aObjectManager.h">

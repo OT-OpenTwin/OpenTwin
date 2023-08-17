@@ -2723,13 +2723,6 @@ namespace ak {
 			const QString &											_path
 		);
 
-		//! @brief Will remove the provided search path from the icon manager
-		//! @param _path The existing search path to remove
-		//! @throw ak::Exception if the API is not initialized
-		UICORE_API_EXPORT void removeIconSearchPath(
-			const QString &											_path
-		);
-
 		//! @brief Will generate a new UID and return it
 		//! @throw ak::Exception if the API is not initialized
 		UICORE_API_EXPORT UID createUid(void);

@@ -33,7 +33,6 @@
 #include <akGui/aApplication.h>
 #include <akGui/aColorStyle.h>
 #include <akGui/aContextMenuItem.h>
-#include <akGui/aIconManager.h>
 #include <akGui/aPaintable.h>
 #include <akGui/aSpecialTabBar.h>
 #include <akGui/aTtbContainer.h>
@@ -66,6 +65,8 @@
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
 
+#include <OTWidgets/IconManager.h>
+
 // Qt header
 #include <qsurfaceformat.h>					// QSurfaceFormat
 #include <qfiledialog.h>					// Open/Save file dialog
@@ -80,7 +81,6 @@ static ak::uiAPI::apiManager		m_apiManager;					//! The API manager
 static ak::aObjectManager *			m_objManager = nullptr;					//! The object manager used in this API
 static ak::aMessenger *				m_messenger = nullptr;					//! The messenger used in this API
 static ak::aUidManager *			m_uidManager = nullptr;					//! The UID manager used in this API
-static ak::aIconManager *			m_iconManager = nullptr;					//! The icon manager used in this API
 
 template <class T> T * akCastObject(ak::aObject * _obj) {
 	T * ret = nullptr;
@@ -102,12 +102,6 @@ ak::uiAPI::apiManager::apiManager()
 }
 
 ak::uiAPI::apiManager::~apiManager() {
-	// iconManager
-	if (m_iconManager != nullptr) {
-		delete m_iconManager; m_iconManager = nullptr;
-	}
-
-
 	// messenger
 	if (m_messenger != nullptr) {
 		delete m_messenger; m_messenger = nullptr;
@@ -145,9 +139,6 @@ void ak::uiAPI::apiManager::ini(
 	
 	// uid manager
 	m_uidManager = new aUidManager();
-	
-	// icon manager
-	m_iconManager = new aIconManager(QString(""));
 	
 	// object manager
 	m_objManager = new aObjectManager(m_messenger, m_uidManager);
@@ -363,8 +354,7 @@ ak::UID ak::uiAPI::createAction(
 	const QString &										_iconSize
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, *m_iconManager->icon(_iconName, _iconSize));
+	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName));
 }
 
 ak::UID ak::uiAPI::createAction(
@@ -429,10 +419,9 @@ ak::UID ak::uiAPI::createColorStyleSwitch(
 	bool					_isBright
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
-	return createColorStyleSwitch(_creatorUid, _brightModeTitle, _darkModeTitle, 
-		*m_iconManager->icon(_brightModeIconName, _brightModeIconFolder),
-		*m_iconManager->icon(_darkModeIconName, _darkModeIconFolder),
+	return createColorStyleSwitch(_creatorUid, _brightModeTitle, _darkModeTitle,
+		ot::IconManager::instance().getIcon(_brightModeIconFolder + "/" + _brightModeIconName),
+		ot::IconManager::instance().getIcon(_darkModeIconFolder + "/" + _darkModeIconName),
 		_isBright);
 }
 
@@ -484,8 +473,7 @@ ak::UID ak::uiAPI::createDockWatcher(
 	const QString &						_text
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
-	return m_objManager->createDockWatcher(_creatorUid, *m_iconManager->icon(_iconName, _iconFolder), _text);
+	return m_objManager->createDockWatcher(_creatorUid, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _text);
 }
 
 ak::UID ak::uiAPI::createGlobalKeyListener(
@@ -527,8 +515,7 @@ ak::UID ak::uiAPI::createLogInDialog(
 	const QString &										_password
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
-	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, *m_iconManager->pixmap(_imageName), _username, _password);
+	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, ot::IconManager::instance().getPixmap("Images/" + _imageName), _username, _password);
 }
 
 ak::UID ak::uiAPI::createNiceLineEdit(
@@ -652,8 +639,7 @@ ak::UID ak::uiAPI::createToolButton(
 	const QString &										_iconFolder
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, *m_iconManager->icon(_iconName, _iconFolder));
+	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
 }
 
 ak::UID ak::uiAPI::createTree(
@@ -703,8 +689,7 @@ void ak::uiAPI::action::setIcon(
 	const QString &										_iconName,
 	const QString &										_iconFolder
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	object::get<aAction>(_actionUID)->setIcon(*m_iconManager->icon(_iconName, _iconFolder));
+	object::get<aAction>(_actionUID)->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
 }
 
 QString ak::uiAPI::action::getText(
@@ -846,10 +831,9 @@ ak::ID ak::uiAPI::contextMenu::addItem(
 	contextMenuRole		_role
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aObject * obj = m_objManager->object(_widgetUID);
 	assert(obj != nullptr); // Invalid UID
-	aContextMenuItem * newItem = new aContextMenuItem(*m_iconManager->icon(_iconName, _iconSize), _text, _role);
+	aContextMenuItem * newItem = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName), _text, _role);
 
 	switch (obj->type())
 	{
@@ -1405,8 +1389,7 @@ ak::dialogResult ak::uiAPI::promptDialog::show(
 	const QString &				_iconPath,
 	QWidget *					_parentWidget
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return show(_message, _title, _type, *m_iconManager->icon(_iconName, _iconPath), _parentWidget);
+	return show(_message, _title, _type, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName), _parentWidget);
 }
 
 ak::dialogResult ak::uiAPI::promptDialog::show(
@@ -1826,9 +1809,8 @@ void ak::uiAPI::propertyGrid::setGroupStateIcons(
 	const QString &									_groupExpandIconName,
 	const QString &									_groupExpandIconFolder
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	setGroupStateIcons(_propertyGridUID, *m_iconManager->icon(_groupCollapseIconName, _groupCollapseIconFolder),
-		*m_iconManager->icon(_groupExpandIconName, _groupExpandIconFolder));
+	setGroupStateIcons(_propertyGridUID, ot::IconManager::instance().getIcon(_groupCollapseIconFolder + "/" + _groupCollapseIconName),
+		ot::IconManager::instance().getIcon(_groupExpandIconFolder + "/" + _groupExpandIconName));
 }
 
 void ak::uiAPI::propertyGrid::setDeleteIcon(
@@ -1836,8 +1818,7 @@ void ak::uiAPI::propertyGrid::setDeleteIcon(
 	const QString& _deleteIconName,
 	const QString& _deleteIconFolder
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	object::get<aPropertyGridWidget>(_propertyGridUID)->setDeleteIcon(*m_iconManager->icon(_deleteIconName, _deleteIconFolder));
+	object::get<aPropertyGridWidget>(_propertyGridUID)->setDeleteIcon(ot::IconManager::instance().getIcon(_deleteIconFolder + "/" + _deleteIconName));
 }
 
 void ak::uiAPI::propertyGrid::resetItemAsError(
@@ -1884,7 +1865,6 @@ void ak::uiAPI::propertyGrid::setEnabled(
 	bool											_enabled
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aPropertyGridWidget * actualPropertyGrid = nullptr;
 	actualPropertyGrid = dynamic_cast<aPropertyGridWidget *>(m_objManager->object(_propertyGridUID));
 	assert(actualPropertyGrid != nullptr); // Invalid object type
@@ -1895,7 +1875,6 @@ bool ak::uiAPI::propertyGrid::isEnabled(
 	UID											_propertyGridUID
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aPropertyGridWidget * actualPropertyGrid = nullptr;
 	actualPropertyGrid = dynamic_cast<aPropertyGridWidget *>(m_objManager->object(_propertyGridUID));
 	assert(actualPropertyGrid != nullptr); // Invalid object type
@@ -1982,8 +1961,7 @@ ak::ID ak::uiAPI::tabWidget::addTab(
 	const QString &		_iconName,
 	const QString &		_iconFolder
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), *m_iconManager->icon(_iconName, _iconFolder), _title);
+	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _title);
 }
 
 ak::ID ak::uiAPI::tabWidget::addTab(
@@ -2008,8 +1986,7 @@ ak::ID ak::uiAPI::tabWidget::addTab(
 	const QString &		_iconName,
 	const QString &		_iconFolder
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, *m_iconManager->icon(_iconName, _iconFolder), _title);
+	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _title);
 }
 
 ak::ID ak::uiAPI::tabWidget::addTab(
@@ -2335,11 +2312,10 @@ void ak::uiAPI::toolButton::setIcon(
 	const QString &					_iconFolder
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->getAction()->setIcon(*m_iconManager->icon(_iconName, _iconFolder));
+	actualToolButton->getAction()->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
 }
 
 ak::ID ak::uiAPI::toolButton::addMenuItem(
@@ -2374,11 +2350,10 @@ ak::ID ak::uiAPI::toolButton::addMenuItem(
 	const QString &					_iconFolder
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
-	aContextMenuItem * itm = new aContextMenuItem(*m_iconManager->icon(_iconName, _iconFolder), _text, cmrNone);
+	aContextMenuItem * itm = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _text, cmrNone);
 	return actualToolButton->addMenuItem(itm);
 }
 
@@ -2386,7 +2361,6 @@ void ak::uiAPI::toolButton::addMenuSeperator(
 	UID							_toolButtonUID
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
@@ -2397,7 +2371,6 @@ void ak::uiAPI::toolButton::clearMenu(
 	UID							_toolButtonUID
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
@@ -2410,7 +2383,6 @@ void ak::uiAPI::toolButton::setMenuItemChecked(
 	bool							_checked
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
@@ -2422,7 +2394,6 @@ void ak::uiAPI::toolButton::setMenuItemNotCheckable(
 	ID							_itemID
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
@@ -2434,7 +2405,6 @@ QString ak::uiAPI::toolButton::getMenuItemText(
 	ID							_itemID
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	assert(m_iconManager != nullptr); // API not initialized
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
@@ -2464,7 +2434,7 @@ ak::ID ak::uiAPI::tree::addItem(
 	textAlignment				_textAlignment
 ) {
 	auto actualTree = object::get<aTreeWidget>(_treeUID);
-	return actualTree->add(_parentId, _text, _textAlignment, *m_iconManager->icon(_iconName, _iconSize));
+	return actualTree->add(_parentId, _text, _textAlignment, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName));
 }
 
 ak::ID ak::uiAPI::tree::addItem(
@@ -2485,9 +2455,8 @@ ak::ID ak::uiAPI::tree::addItem(
 	const QString &				_iconSize,
 	textAlignment				_textAlignment
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
 	auto actualTree = object::get<aTreeWidget>(_treeUID);
-	return actualTree->add(_cmd, _delimiter, _textAlignment, *m_iconManager->icon(_iconName, _iconSize));
+	return actualTree->add(_cmd, _delimiter, _textAlignment, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName));
 }
 
 void ak::uiAPI::tree::clear(
@@ -2674,9 +2643,8 @@ void ak::uiAPI::tree::setItemIcon(
 	const QString &					_iconName,
 	const QString &					_iconFolder
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
 	auto actualTree = object::get<aTreeWidget>(_treeUID);
-	actualTree->setItemIcon(_itemID, *m_iconManager->icon(_iconName, _iconFolder));
+	actualTree->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
 }
 
 void ak::uiAPI::tree::setItemEnabled(
@@ -2955,8 +2923,7 @@ void ak::uiAPI::window::setWaitingAnimation(
 	UID												_windowUID,
 	const QString &										_animationName
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(m_iconManager->movie(_animationName));
+	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(&ot::IconManager::instance().getMovie("Animations/" + _animationName));
  }
 
 void ak::uiAPI::window::setCentralWidgetMinimumSize(
@@ -3061,19 +3028,9 @@ void ak::uiAPI::setDefaultColorStyle() {
 void ak::uiAPI::addIconSearchPath(
 	const QString &										_path
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
 	assert(m_objManager != nullptr); // API not initialized
-	m_iconManager->addDirectory(_path);
-	m_objManager->setIconSearchDirectories(m_iconManager->searchDirectories());
-}
-
-void ak::uiAPI::removeIconSearchPath(
-	const QString &										_path
-) {
-	assert(m_iconManager != nullptr); // API not initialized
-	assert(m_objManager != nullptr); // API not initialized
-	m_iconManager->removeDirectory(_path);
-	m_objManager->setIconSearchDirectories(m_iconManager->searchDirectories());
+	ot::IconManager::instance().addSearchPath(_path);
+	m_objManager->setIconSearchDirectories(ot::IconManager::instance().searchPaths().toVector().toStdVector());
 }
 
 ak::UID ak::uiAPI::createUid(void) {
@@ -3087,29 +3044,25 @@ const QIcon & ak::uiAPI::getIcon(
 	const QString &											_iconName,
 	const QString &											_iconSubPath
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return *m_iconManager->icon(_iconName, _iconSubPath);
+	return ot::IconManager::instance().getIcon(_iconSubPath + "/" + _iconName);
 }
 
 const QIcon & ak::uiAPI::getApplicationIcon(
 	const QString &											_iconName
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return *m_iconManager->applicationIcon(_iconName);
+	return ot::IconManager::instance().getIcon("Application/" + _iconName);
 }
 
 const QPixmap & ak::uiAPI::getPixmap(
 	const QString &											_name
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return *m_iconManager->pixmap(_name);
+	return ot::IconManager::instance().getPixmap("Images/" + _name);
 }
 
 QMovie * ak::uiAPI::getMovie(
 	const QString&											_name
 ) {
-	assert(m_iconManager != nullptr); // API not initialized
-	return m_iconManager->movie(_name);
+	return &ot::IconManager::instance().getMovie("Animations/" + _name);
 }
 
 // ###############################################################################################################################################

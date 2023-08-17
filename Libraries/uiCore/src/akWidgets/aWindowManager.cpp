@@ -17,7 +17,6 @@
 #include <akCore/rJSON.h>
 
 #include <akGui/aColorStyle.h>
-#include <akGui/aIconManager.h>
 #include <akGui/aObjectManager.h>
 #include <akGui/aTtbContainer.h>
 
