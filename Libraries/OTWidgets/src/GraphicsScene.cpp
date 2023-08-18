@@ -5,13 +5,14 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/GraphicsItem.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::GraphicsScene::GraphicsScene() : m_gridSize(10) {}
+ot::GraphicsScene::GraphicsScene() : m_gridSize(10), m_connectionOrigin(nullptr) {}
 
 ot::GraphicsScene::~GraphicsScene() {}
 
@@ -38,4 +39,8 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	QList<QGraphicsItem*> selectedItems = items(_event->scenePos());
 
 	QGraphicsScene::mouseDoubleClickEvent(_event);
+}
+
+void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
+	
 }

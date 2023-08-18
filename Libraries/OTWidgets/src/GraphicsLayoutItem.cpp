@@ -36,7 +36,7 @@ ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutW
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	
+	if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 

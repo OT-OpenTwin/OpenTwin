@@ -79,6 +79,11 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 			drag->exec();
 		}
 	}
+	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
+		if (m_flags & ot::GraphicsItem::ItemIsConnectable) {
+
+		}
+	}
 }
 
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {

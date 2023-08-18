@@ -55,12 +55,12 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
-		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
-		bool hasHover(void) const { return m_hasHover; };
-
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const = 0;
+
+		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
+		bool hasHover(void) const { return m_hasHover; };
 
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};

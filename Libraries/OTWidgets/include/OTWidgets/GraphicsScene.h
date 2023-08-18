@@ -13,6 +13,8 @@
 
 namespace ot {
 
+	class GraphicsItem;
+
 	class OT_WIDGETS_API_EXPORT GraphicsScene : public QGraphicsScene {
 		Q_OBJECT
 	public:
@@ -29,11 +31,16 @@ namespace ot {
 
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin
+		//! @param _item Origin item
+		void startConnection(ot::GraphicsItem* _item);
+
 	protected:
 		virtual void drawBackground(QPainter* _painter, const QRectF& _rect) override;
 
 	private:
 		int m_gridSize;
+		QGraphicsItem* m_connectionOrigin;
 	};
 
 }
