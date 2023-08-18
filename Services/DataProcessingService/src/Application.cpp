@@ -71,21 +71,19 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
-
-
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			block->setName("Processing Blocks/Database Access");
-			block->createProperties();
-			block->StoreToDataBase();
+			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			//block->setName("Processing Blocks/Database Access");
+			//block->createProperties();
+			//block->StoreToDataBase();
 
-			ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
-			std::list<bool> forceVis{ false };
-			m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
+			//ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
+			//std::list<bool> forceVis{ false };
+			//m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
 		}
 	}
 
