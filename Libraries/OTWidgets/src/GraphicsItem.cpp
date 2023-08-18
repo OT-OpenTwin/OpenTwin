@@ -81,6 +81,11 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 	}
 }
 
+bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) m_flags |= GraphicsItem::ItemIsConnectable;
+	return true;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -121,7 +126,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		m_top = nullptr;
 		return false;
 	}
-	return true;
+	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
@@ -198,7 +203,7 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setHeight(cfg->size().height());
 	setRect(0., 0., m_size.width(), m_size.height());
 
-	return true;
+	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& rect) {
@@ -257,7 +262,7 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	this->setPlainText(QString::fromStdString(cfg->text()));
 
-	return true;
+	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
@@ -316,7 +321,7 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("[FATAL] Unknown error");
 		return false;
 	}
-	return true;
+	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsImageItem::setGeometry(const QRectF& rect) {

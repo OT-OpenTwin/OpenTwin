@@ -30,6 +30,10 @@ ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutW
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 
+bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	return ot::GraphicsItem::setupFromConfig(_cfg);
+}
+
 void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
 	std::list<QGraphicsLayoutItem*> lst;
 	this->getAllItems(lst);
@@ -109,7 +113,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		}
 	}
 
-	return true;
+	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsBoxLayoutItem::getAllItems(std::list<QGraphicsLayoutItem *>& _items) const {
@@ -191,7 +195,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		this->setColumnStretchFactor(x++, r);
 	}
 
-	return true;
+	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsGridLayoutItem::getAllItems(std::list<QGraphicsLayoutItem*>& _items) const {

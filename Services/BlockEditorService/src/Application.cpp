@@ -96,8 +96,11 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
 	leftRect->setSize(ot::Size2D(20, 20));
+	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+
 	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
 	rightRect->setSize(ot::Size2D(30, 30));
+	rightRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 	midLayout->addChildItem(leftRect);
 	midLayout->addStrech(1);

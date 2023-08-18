@@ -50,6 +50,8 @@ namespace ot {
 		GraphicsLayoutItem();
 		virtual ~GraphicsLayoutItem();
 		
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
 		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup * _group, bool _isRoot) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;

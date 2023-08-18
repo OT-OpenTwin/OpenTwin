@@ -31,6 +31,11 @@ namespace ot {
 
 	class OT_GUI_API_EXPORTONLY GraphicsItemCfg : public ot::Serializable, public ot::SimpleFactoryObject {
 	public:
+		enum GraphicsItemFlag {
+			NoFlags           = 0x00, //! @brief No item flags
+			ItemIsConnectable = 0x01  //! @brief Item can be used as source or destination of a conncetion
+		};
+
 		GraphicsItemCfg();
 		virtual ~GraphicsItemCfg();
 
@@ -59,12 +64,16 @@ namespace ot {
 		void setMargin(const Margins& _margin) { m_margins = _margin; };
 		const Margins& margin(void) const { return m_margins; };
 
+		void setGraphicsItemFlags(GraphicsItemFlag _flags) { m_flags = _flags; };
+		GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+
 	private:
 		std::string m_name;
 		std::string m_tile;
 		Size2D m_size;
 		Border m_border;
 		Margins m_margins;
+		GraphicsItemFlag m_flags;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -224,3 +233,5 @@ namespace ot {
 		GraphicsRectangularItemCfg& operator = (GraphicsRectangularItemCfg&) = delete;
 	};
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItemCfg::GraphicsItemFlag);

@@ -12,6 +12,7 @@
 
 #define OT_JSON_MEMBER_Top "Top"
 #define OT_JSON_MEMBER_Bottom "Bottom"
+#define OT_JSON_MEMBER_Flags "Flags"
 #define OT_JSON_MEMBER_Name "Name" // <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Text "Text" //  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                           ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Size "Size" //   <^^\\ '## < ##' \\ ^^^^^^O^                                                                                         ^O^^^^^^// '## w ##' //^^3
@@ -24,7 +25,7 @@
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                          ^O^^^^^^   //.:## > ##:.//^^  3
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                      ^O^^^^^^   //.:## > ##:.//^^   3
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10) {}
+ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags) {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
@@ -41,6 +42,10 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 	m_margins.addToJsonObject(_document, marginObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Margin, marginObj);
 
+	OT_rJSON_createValueArray(flagArr);
+	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value("Connectable", _document.GetAllocator()), _document.GetAllocator());
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Flags, flagArr);
+
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Title, m_tile);
 	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
@@ -52,6 +57,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Size, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Border, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
 
 	m_name = _object[OT_JSON_MEMBER_Name].GetString();
 	m_tile = _object[OT_JSON_MEMBER_Title].GetString();
@@ -63,6 +69,13 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	m_size.setFromJsonObject(sizeObj);
 	m_border.setFromJsonObject(borderObj);
 	m_margins.setFromJsonObject(marginObj);
+
+	m_flags = NoFlags;
+	OT_rJSON_val flagArr = _object[OT_JSON_MEMBER_Flags].GetArray();
+	for (rapidjson::SizeType i = 0; i < flagArr.Size(); i++) {
+		OT_rJSON_checkArrayEntryType(flagArr, i, String);
+		if (flagArr[i].GetString() == "Connectable") m_flags |= ItemIsConnectable;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

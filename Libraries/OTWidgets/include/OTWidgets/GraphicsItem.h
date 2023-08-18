@@ -28,16 +28,17 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
 		enum GraphicsItemFlag {
-			NoFlags        = 0x00, //! @brief No graphics item flags
-			ItemIsMoveable = 0x01, //! @brief The item can be moved by a user
+			NoFlags            = 0x00, //! @brief No graphics item flags
+			ItemIsConnectable  = 0x01, //! @brief Item can be used as source or destination of a conncetion
+			ItemIsMoveable     = 0x02, //! @brief The item can be moved by a user
 			ItemPreviewContext = 0x10, //! @brief Item is placed in a preview (preview box)
-			ItemNetworkContext = 0x20 //! @brief Item is placed in a network (editor)
+			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
 		};
 
 		GraphicsItem(bool _isLayout = false);
 		virtual ~GraphicsItem();
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) = 0;
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
 
 		void setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags);
 		ot::GraphicsItem::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
