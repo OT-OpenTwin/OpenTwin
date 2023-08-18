@@ -20,6 +20,11 @@ void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _e
 	m_owner->handleItemClickEvent(_event, boundingRect());
 }
 
+void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	m_owner->paintGeneralGraphics(_painter, _opt, _widget);
+	QGraphicsWidget::paint(_painter, _opt, _widget);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -31,6 +36,7 @@ ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutW
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
@@ -76,6 +82,17 @@ void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGra
 	if (m_layoutWrap) {
 		m_layoutWrap->paint(_painter, _opt, _widget);
 	}
+	std::list<QGraphicsLayoutItem*> l;
+	getAllItems(l);
+	for (auto i : l) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem *>(i);
+		if (itm) {
+			itm->callPaint(_painter, _opt, _widget);
+		}
+		else {
+			OT_LOG_EA("Item cast failed");
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -114,6 +131,10 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	}
 
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
+}
+
+QRectF ot::GraphicsBoxLayoutItem::getGraphicsItemBoundingRect(void) const {
+	return this->contentsRect();
 }
 
 void ot::GraphicsBoxLayoutItem::getAllItems(std::list<QGraphicsLayoutItem *>& _items) const {
@@ -196,6 +217,10 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	}
 
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
+}
+
+QRectF ot::GraphicsGridLayoutItem::getGraphicsItemBoundingRect(void) const {
+	return this->contentsRect();
 }
 
 void ot::GraphicsGridLayoutItem::getAllItems(std::list<QGraphicsLayoutItem*>& _items) const {

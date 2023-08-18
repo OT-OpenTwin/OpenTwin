@@ -196,7 +196,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	try {
 		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
 		newItem->finalizeAsRootItem(scene());
-		newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
+		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());

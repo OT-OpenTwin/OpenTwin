@@ -31,6 +31,8 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
 	private:
 		GraphicsLayoutItem* m_owner;
 
@@ -56,10 +58,11 @@ namespace ot {
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;
 
-	protected:
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
+	protected:
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+		
 	private:
 		GraphicsLayoutItemWrapper* m_layoutWrap;
 	};
@@ -78,6 +81,8 @@ namespace ot {
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	private:
 		GraphicsBoxLayoutItem() = delete;
@@ -148,6 +153,8 @@ namespace ot {
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	private:
 		QSizeF m_size;

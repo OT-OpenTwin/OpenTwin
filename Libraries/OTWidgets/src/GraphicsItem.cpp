@@ -20,7 +20,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItem::GraphicsItem(bool _isLayout) : m_flags(GraphicsItem::NoFlags), m_group(nullptr), m_isLayout(_isLayout) {
+ot::GraphicsItem::GraphicsItem(bool _isLayout) : m_flags(GraphicsItem::NoFlags), m_group(nullptr), m_isLayout(_isLayout), m_hasHover(false) {
 	
 }
 
@@ -84,6 +84,10 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) m_flags |= GraphicsItem::ItemIsConnectable;
 	return true;
+}
+
+void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) _painter->fillRect(this->getGraphicsItemBoundingRect(), Qt::GlobalColor::green);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -163,6 +167,15 @@ void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 	this->paint(_painter, _opt, _widget);
 }
 
+void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paintGeneralGraphics(_painter, _opt, _widget);
+	QGraphicsItemGroup::paint(_painter, _opt, _widget);
+}
+
+QRectF ot::GraphicsStackItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
+}
+
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
@@ -212,6 +225,15 @@ void ot::GraphicsRectangularItem::graphicsItemFlagsChanged(ot::GraphicsItem::Gra
 
 void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paintGeneralGraphics(_painter, _opt, _widget);
+	QGraphicsRectItem::paint(_painter, _opt, _widget);
+}
+
+QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
 }
 
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
@@ -273,8 +295,17 @@ void ot::GraphicsTextItem::callPaint(QPainter* _painter, const QStyleOptionGraph
 	this->paint(_painter, _opt, _widget);
 }
 
+void ot::GraphicsTextItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paintGeneralGraphics(_painter, _opt, _widget);
+	QGraphicsTextItem::paint(_painter, _opt, _widget);
+}
+
 void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+}
+
+QRectF ot::GraphicsTextItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -329,6 +360,15 @@ void ot::GraphicsImageItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 void ot::GraphicsImageItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsImageItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paintGeneralGraphics(_painter, _opt, _widget);
+	QGraphicsPixmapItem::paint(_painter, _opt, _widget);
+}
+
+QRectF ot::GraphicsImageItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
 }
 
 void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {

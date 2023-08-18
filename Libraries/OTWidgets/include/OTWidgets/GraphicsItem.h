@@ -53,15 +53,24 @@ namespace ot {
 
 		void handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect);
 
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
+
+		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
+		bool hasHover(void) const { return m_hasHover; };
+
+		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const = 0;
+
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
-		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
 	private:
 		std::string m_configuration;
 		GraphicsItemFlag m_flags;
 		QGraphicsItemGroup* m_group;
 		bool m_isLayout;
+		bool m_hasHover;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -89,6 +98,10 @@ namespace ot {
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
@@ -122,7 +135,11 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
@@ -156,7 +173,11 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
@@ -191,7 +212,11 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
