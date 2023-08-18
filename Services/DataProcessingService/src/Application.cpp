@@ -95,7 +95,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 	return ""; // Return empty string if the request does not expect a return
 }
 
-#include "BlockDatabaseAccess.h"
+#include "BlockPickerManager.h"
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
@@ -110,32 +110,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
 	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "Kriging");
 
-	ot::GraphicsEditorPackage pckg("TestPackage", "Test title");
-	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
-	ot::GraphicsCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsCollectionCfg("Database", "Database");
-	ot::GraphicsCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsCollectionCfg("Visualization", "Visualization");
-	
-	ot::GraphicsCollectionCfg* mathBlockCollection = new ot::GraphicsCollectionCfg("Mathematical Operations", "Mathematical Operations");
-	ot::GraphicsCollectionCfg* customizedBlockCollection = new ot::GraphicsCollectionCfg("Customized Blocks", "Customized Blocks");
-	
-
-	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
-	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
-
-
-	BlockDatabaseAccess dbA ("Hans");
-
-	controlBlockDatabaseCollection->addItem(dbA.GetBlock());
-
-
-	//a2->addItem(createTestBlock2("Alpha 3"));
-	pckg.addCollection(controlBlockCollection);
-	pckg.addCollection(customizedBlockCollection);
-	pckg.addCollection(mathBlockCollection);
+	BlockPickerManager blockPickerManger;
+	std::unique_ptr<ot::GraphicsEditorPackage> graphicsEditorPackage(blockPickerManger.BuildUpBlockPicker());
 
 	OT_rJSON_createDOC(doc);
 	OT_rJSON_createValueObject(pckgObj);
-	pckg.addToJsonObject(doc, pckgObj);
+	graphicsEditorPackage->addToJsonObject(doc, pckgObj);
 
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);

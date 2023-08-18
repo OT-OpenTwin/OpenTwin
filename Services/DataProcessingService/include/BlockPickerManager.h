@@ -4,7 +4,7 @@
 class BlockPickerManager
 {
 public:
+	ot::GraphicsEditorPackage* BuildUpBlockPicker();
 
 private:
-	//ot::GraphicsEditorPackage BuildUpBlockPicker();
 };
