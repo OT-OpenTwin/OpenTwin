@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\BlockTypes">
+      <UniqueIdentifier>{bf16a846-2f75-44b8-9ca9-c6a41bf17c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BlockTypes">
+      <UniqueIdentifier>{4d4603af-9084-4179-9e95-e6f9d4f566c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -27,8 +33,14 @@
     <ClCompile Include="src\ModelNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataProcessingBlock.cpp">
+    <ClCompile Include="src\BlockDataProcessing.cpp">
+      <Filter>Source Files\BlockTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockPickerManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockDatabaseAccess.cpp">
+      <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,8 +53,14 @@
     <ClInclude Include="include\ModelNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DataProcessingBlock.h">
+    <ClInclude Include="include\BlockDataProcessing.h">
+      <Filter>Header Files\BlockTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockPickerManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockDatabaseAccess.h">
+      <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

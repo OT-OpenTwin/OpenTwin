@@ -95,6 +95,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 	return ""; // Return empty string if the request does not expect a return
 }
 
+#include "BlockDatabaseAccess.h"
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
@@ -121,31 +122,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
 
-	auto black = ot::Color(255, 255, 255);
-	auto blockSize = ot::Size2D(100, 60);
-	/*ot::GraphicsGridLayoutItemCfg* layout = new ot::GraphicsGridLayoutItemCfg(2, 2);
-	layout->setBorder(ot::Border(black, 2));
-	layout->setSize();*/
 
-	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg();
-	centralLayout->setSize(blockSize);
-	centralLayout->setBorder(ot::Border(black, 2));
-	ot::GraphicsHBoxLayoutItemCfg* topLine= new ot::GraphicsHBoxLayoutItemCfg();
-	topLine->setBorder(ot::Border(black, 2));
+	BlockDatabaseAccess dbA ("Hans");
 
-	ot::GraphicsTextItemCfg* label = new ot::GraphicsTextItemCfg("C", black);
-	label->setName("Label");
-	topLine->addChildItem(label);
-	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg("Database Handle", black);
-	title->setName("Title");
-	topLine->addStrech();
-	topLine->addChildItem(title);
-	centralLayout->addChildItem(topLine);
-
-	//ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg("C:\\OpenTwin\\Deployment\\icons\\Default\\database.png");
-	//centralLayout->addChildItem(image);
-
-	controlBlockDatabaseCollection->addItem(centralLayout);
+	controlBlockDatabaseCollection->addItem(dbA.GetBlock());
 
 
 	//a2->addItem(createTestBlock2("Alpha 3"));
