@@ -65,9 +65,19 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	bot->setTitle(_name + "i");
 	bot->setImagePath("Default/BugGreen");
 
-	ot::GraphicsTextItemCfg* top = new ot::GraphicsTextItemCfg("Senor Buggo");
+	ot::GraphicsTextItemCfg* topA = new ot::GraphicsTextItemCfg("Senor");
+	topA->setName(_name + "tA");
+	topA->setTitle(_name + "tA");
+
+	ot::GraphicsTextItemCfg* topB = new ot::GraphicsTextItemCfg("Buggo");
+	topB->setName(_name + "tB");
+	topB->setTitle(_name + "tB");
+
+	ot::GraphicsVBoxLayoutItemCfg* top = new ot::GraphicsVBoxLayoutItemCfg;
 	top->setName(_name + "t");
 	top->setTitle(_name + "t");
+	top->addChildItem(topA);
+	top->addChildItem(topB);
 
 	ot::GraphicsRectangularItemCfg* backgr = new ot::GraphicsRectangularItemCfg;
 	backgr->setName(_name + "b");

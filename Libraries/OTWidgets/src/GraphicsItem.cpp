@@ -145,20 +145,10 @@ void ot::GraphicsStackItem::setGeometry(const QRectF& _rect) {
 
 void ot::GraphicsStackItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
 	if (m_bottom) {
-		m_bottom->finalizeItem(_scene, _group, _isRoot);
-		QGraphicsItem* itm = dynamic_cast<QGraphicsItem*>(m_bottom);
-		if (itm) { this->addToGroup(itm); }
-		else {
-			OT_LOG_EA("GraohicsItem cast to QGraphicsItem cast failed");
-		}
+		m_bottom->finalizeItem(_scene, this, _isRoot);
 	}
 	if (m_top) {
-		m_top->finalizeItem(_scene, _group, _isRoot);
-		QGraphicsItem* itm = dynamic_cast<QGraphicsItem*>(m_top);
-		if (itm) { this->addToGroup(itm); }
-		else {
-			OT_LOG_EA("GraohicsItem cast to QGraphicsItem cast failed");
-		}
+		m_top->finalizeItem(_scene, this, _isRoot);
 	}
 
 	_scene->addItem(this);
