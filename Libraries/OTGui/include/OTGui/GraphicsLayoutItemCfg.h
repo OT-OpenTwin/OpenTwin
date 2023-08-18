@@ -131,7 +131,7 @@ namespace ot {
 	class OT_GUI_API_EXPORTONLY GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
-		virtual ~GraphicsGridLayoutItemCfg() {};
+		virtual ~GraphicsGridLayoutItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

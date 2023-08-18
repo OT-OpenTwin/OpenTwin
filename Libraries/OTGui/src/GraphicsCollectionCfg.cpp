@@ -97,10 +97,12 @@ void ot::GraphicsCollectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 }
 
 void ot::GraphicsCollectionCfg::addChildCollection(GraphicsCollectionCfg* _child) {
+	OTAssertNullptr(_child);
 	m_collections.push_back(_child);
 }
 
 void ot::GraphicsCollectionCfg::addItem(GraphicsItemCfg* _item) {
+	OTAssertNullptr(_item);
 	m_items.push_back(_item);
 }
 

@@ -155,6 +155,15 @@ ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(int _rows, int _columns
 	clearAndResize();
 }
 
+ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
+	for (auto r : m_items) {
+		for (auto c : r) {
+			if (c) delete c;
+		}
+	}
+	m_items.clear();
+}
+
 void ot::GraphicsGridLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	ot::GraphicsLayoutItemCfg::addToJsonObject(_document, _object);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Rows, m_rows);
