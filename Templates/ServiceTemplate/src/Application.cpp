@@ -50,7 +50,10 @@ Application::~Application()
 
 void Application::run(void)
 {
-	// Add code that should be executed when the service is started and may start its work
+	if (!EnsureDataBaseConnection())
+	{
+		assert(0);
+	}
 }
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
