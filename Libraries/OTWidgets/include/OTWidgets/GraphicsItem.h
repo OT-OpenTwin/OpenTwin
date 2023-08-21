@@ -85,8 +85,15 @@ namespace ot {
 		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
 		bool hasHover(void) const { return m_hasHover; };		
 
+		void setUid(ot::UID _uid) { m_uid = _uid; };
+		ot::UID uid(void) const { return m_uid; };
+
+		void setGraphicsItemName(const std::string& _name) { m_name = _name; };
+		const std::string& graphicsItemName(void) const { return m_name; };
+
 		void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
+		GraphicsItem* getRootItem(void);
 
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
@@ -96,12 +103,14 @@ namespace ot {
 
 	private:
 		std::string m_configuration;
+		std::string m_name;
 		GraphicsItemFlag m_flags;
 		GraphicsItem* m_parent;
 		GraphicsGroupItem* m_group;
 		bool m_isContainerItem;
 		bool m_hasHover;
 		GraphicsScene* m_scene;
+		ot::UID m_uid;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

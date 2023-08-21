@@ -35,7 +35,7 @@
 //! @param ___h Height variable
 #define OT_AdjustMinimumGraphicsViewSize(___w, ___h)
 #endif
-ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false) {
+ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_currentUid(0) {
 	m_scene = new GraphicsScene(this);
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
@@ -72,6 +72,17 @@ void ot::GraphicsView::viewAll(void) {
 	if (viewPortRect.width() > boundingRect.width() && viewPortRect.height() > boundingRect.height())
 	{
 		resetView();
+	}
+}
+
+ot::GraphicsItem* ot::GraphicsView::getItem(ot::UID _itemUid) {
+	auto it = m_items.find(_itemUid);
+	if (it == m_items.end()) {
+		OT_LOG_WAS("Item with the UID \"" + std::to_string(_itemUid) + "\" does not exist");
+		return nullptr;
+	}
+	else {
+		return it->second;
 	}
 }
 
@@ -200,6 +211,10 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
 		newItem->finalizeItem(m_scene, nullptr);
 		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
+		newItem->setUid(++m_currentUid);
+		
+		m_items.insert_or_assign(m_currentUid, newItem);
+		emit itemAdded(m_currentUid);
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());

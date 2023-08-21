@@ -21,7 +21,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_parent(nullptr), m_group(nullptr), m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr) {}
+ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_parent(nullptr), m_group(nullptr), m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_uid(0) {}
 
 ot::GraphicsItem::~GraphicsItem() {
 	
@@ -35,6 +35,11 @@ void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _
 	else {
 		this->graphicsItemFlagsChanged(m_flags);
 	}
+}
+
+ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
+	if (m_parent) return m_parent->getRootItem();
+	return this;
 }
 
 void ot::GraphicsItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -96,6 +101,7 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) m_flags |= GraphicsItem::ItemIsConnectable;
+	m_name = _cfg->name();
 	return true;
 }
 
