@@ -11,19 +11,12 @@
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
 
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/Owner.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/LinearGradientPainter2D.h"
-#include "OTGui/GraphicsCollectionCfg.h"
-#include "OTGui/GraphicsEditorPackage.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
 
 // Open twin header
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include <OpenTwinCommunication/ActionTypes.h>	
+#include "OpenTwinCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
 Application * g_instance{ nullptr };
 
@@ -125,29 +118,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "Kriging");
 
 	BlockPickerManager blockPickerManger;
-	std::unique_ptr<ot::GraphicsEditorPackage> graphicsEditorPackage(blockPickerManger.BuildUpBlockPicker());
-
-	OT_rJSON_createDOC(doc);
-	OT_rJSON_createValueObject(pckgObj);
-	graphicsEditorPackage->addToJsonObject(doc, pckgObj);
-
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-	ot::GlobalOwner::instance().addToJsonObject(doc, doc);
-
-	std::string response;
-	std::string req = ot::rJSON::toJSON(doc);
-
-	if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
-		assert(0);
-	}
-
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invalid response from UI");
-		m_uiComponent->displayDebugMessage("Invalid response\n");
-	}
-
-
+	blockPickerManger.OrderUIToCreateBlockPicker();
+	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 

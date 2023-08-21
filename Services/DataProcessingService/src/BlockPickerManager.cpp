@@ -6,6 +6,37 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
 #include "BlockDatabaseAccess.h"
+#include "OpenTwinCommunication/ActionTypes.h"
+#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCommunication/Msg.h"
+#include "Application.h"
+#include "OpenTwinFoundation/UiComponent.h"
+
+void BlockPickerManager::OrderUIToCreateBlockPicker()
+{
+
+	auto graphicsEditorPackage = BuildUpBlockPicker();
+	OT_rJSON_createDOC(doc);
+	OT_rJSON_createValueObject(pckgObj);
+	graphicsEditorPackage->addToJsonObject(doc, pckgObj);
+
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	ot::GlobalOwner::instance().addToJsonObject(doc, doc);
+
+	std::string response;
+	std::string req = ot::rJSON::toJSON(doc);
+	
+	auto uiComponent = Application::instance()->uiComponent();
+	if (!ot::msg::send("", uiComponent->serviceURL(), ot::QUEUE, req, response)) {
+		assert(0);
+	}
+
+	if (response != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Invalid response from UI");
+		uiComponent->displayDebugMessage("Invalid response\n");
+	}
+}
 
 ot::GraphicsEditorPackage* BlockPickerManager::BuildUpBlockPicker()
 {
