@@ -153,7 +153,7 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 		_event->acceptProposedAction();
 	}
 	else {
-		GraphicsView::dragEnterEvent(_event);
+		QGraphicsView::dragEnterEvent(_event);
 	}
 }
 
@@ -227,6 +227,6 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 		_event->acceptProposedAction();
 	}
 	else {
-		GraphicsView::dragMoveEvent(_event);
+		QGraphicsView::dragMoveEvent(_event);
 	}
 }
