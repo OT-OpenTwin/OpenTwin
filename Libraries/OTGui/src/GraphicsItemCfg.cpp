@@ -25,6 +25,8 @@
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                          ^O^^^^^^   //.:## > ##:.//^^  3
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                      ^O^^^^^^   //.:## > ##:.//^^   3
 
+#define OT_JSON_VALUE_Connectable "Connectable"
+
 ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags) {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
@@ -43,7 +45,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Margin, marginObj);
 
 	OT_rJSON_createValueArray(flagArr);
-	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value("Connectable", _document.GetAllocator()), _document.GetAllocator());
+	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _document.GetAllocator()), _document.GetAllocator());
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Flags, flagArr);
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
@@ -74,7 +76,8 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_val flagArr = _object[OT_JSON_MEMBER_Flags].GetArray();
 	for (rapidjson::SizeType i = 0; i < flagArr.Size(); i++) {
 		OT_rJSON_checkArrayEntryType(flagArr, i, String);
-		if (flagArr[i].GetString() == "Connectable") m_flags |= ItemIsConnectable;
+		std::string f = flagArr[i].GetString();
+		if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
 	}
 }
 
@@ -124,9 +127,9 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(OT_rJSON_val & _object) {
 	m_bottom = nullptr;
 
 	m_top = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(topObj);
-	m_top->setFromJsonObject(topObj);
+	if (m_top) m_top->setFromJsonObject(topObj);
 	m_bottom = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(bottomObj);
-	m_bottom->setFromJsonObject(bottomObj);
+	if (m_bottom) m_bottom->setFromJsonObject(bottomObj);
 }
 
 void ot::GraphicsStackItemCfg::setBottomItem(ot::GraphicsItemCfg* _bottom) {

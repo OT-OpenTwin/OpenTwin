@@ -100,7 +100,7 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 }
 
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) m_flags |= GraphicsItem::ItemIsConnectable;
+	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) { m_flags |= GraphicsItem::ItemIsConnectable; }
 	m_name = _cfg->name();
 	return true;
 }
@@ -115,7 +115,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsGroupItem::GraphicsGroupItem() : ot::GraphicsItem(false) {
+ot::GraphicsGroupItem::GraphicsGroupItem(bool _containerItem) : ot::GraphicsItem(_containerItem) {
 
 }
 
@@ -172,7 +172,7 @@ void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsStackItem::GraphicsStackItem() : m_top(nullptr), m_bottom(nullptr) {
+ot::GraphicsStackItem::GraphicsStackItem() : GraphicsGroupItem(true), m_top(nullptr), m_bottom(nullptr) {
 
 }
 

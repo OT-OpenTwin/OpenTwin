@@ -169,7 +169,10 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 }
 
 void ot::GraphicsView::dropEvent(QDropEvent* _event) {
-	if (!m_dropEnabled) return;
+	if (!m_dropEnabled) {
+		_event->acceptProposedAction();
+		return;
+	}
 	QByteArray cfgRaw = _event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration);
 	if (cfgRaw.isEmpty()) {
 		OT_LOG_W("Drop event reqected: MimeData not matching");

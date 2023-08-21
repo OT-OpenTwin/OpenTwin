@@ -65,7 +65,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 
 	m_uiComponent->displayMessage("New item dropped { name: \"" + name + "\", UID: \"" + std::to_string(uid) + "\" } at editor { name: \"" + editorName + "\" }\n");
 
-	return std::string();
+	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
 
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
