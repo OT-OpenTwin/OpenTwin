@@ -211,7 +211,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
 		newItem->finalizeItem(m_scene, nullptr);
 		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
-		newItem->setUid(++m_currentUid);
+		newItem->setGraphicsItemUid(++m_currentUid);
 		
 		m_items.insert_or_assign(m_currentUid, newItem);
 		emit itemAdded(m_currentUid);

@@ -56,6 +56,8 @@
 #include "OpenTwinFoundation/SettingsData.h"
 #include "OpenTwinFoundation/OTObject.h"
 #include "OTWidgets/GraphicsPicker.h"
+#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsItem.h"
 #include "DataBase.h"
 
 // C++ header
@@ -2055,6 +2057,15 @@ ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
 	return m_graphicsPickerDock->pickerWidget();
 }
 
+void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::ServiceOwner_t _owner) {
+	ot::GraphicsView* newEditor = new ot::GraphicsView;
+	newEditor->setGraphicsViewName(_name);
+	newEditor->setDropsEnabled(true);
+	AppBase::instance()->addTabToCentralView(_title, newEditor);
+	m_graphicsViews.store(_owner, newEditor);
+	connect(newEditor, &ot::GraphicsView::itemAdded, this, &AppBase::slotGraphicsItemDroppend);
+}
+
 // ######################################################################################################################
 
 // Slots
@@ -2124,6 +2135,44 @@ AppBase * AppBase::instance(void) {
 		g_app = new AppBase;
 	}
 	return g_app;
+}
+
+void AppBase::slotGraphicsItemDroppend(ot::UID _itemUid) {
+	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+	}
+	else {
+		ot::GraphicsItem* itm = view->getItem(_itemUid);
+		if (itm == nullptr) {
+			OT_LOG_E("Failed to get item from view");
+		}
+		else {
+			otAssert(itm->graphicsItemUid() == _itemUid, "UID mismatch");
+			OT_rJSON_createDOC(doc);
+			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped);
+			ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, itm->graphicsItemName());
+			ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, itm->graphicsItemUid());
+			try {
+				auto owner = m_graphicsViews.findOwner(view);
+				ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+				std::string response;
+				if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+					OT_LOG_E("Failed to send http request");
+					return;
+				}
+				if (response != OT_ACTION_RETURN_VALUE_OK) {
+					OT_LOG_E("Invalid response: " + response);
+				}
+			}
+			catch (const std::exception& _e) {
+				OT_LOG_E(_e.what());
+			}
+			catch (...) {
+				OT_LOG_E("[FATAL] Unknown error");
+			}
+		}
+	}
 }
 
 // #######################################################################################################################

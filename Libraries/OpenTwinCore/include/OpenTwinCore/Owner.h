@@ -9,6 +9,7 @@
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/CoreAPIExport.h"
 #include "OpenTwinCore/rJSON.h"
+#include "OpenTwinCore/Logger.h"
 
 // std header
 #include <string>
@@ -95,6 +96,8 @@ namespace ot {
 	//! @brief Manage objects that have an owner
 	template<class K, class V> class OwnerManagerTemplate {
 	public:
+		OwnerManagerTemplate() {};
+		virtual ~OwnerManagerTemplate() {};
 
 		//! @brief Store the provided object for the given owner
 		//! The manager takes ownership of the object
@@ -138,6 +141,16 @@ namespace ot {
 
 		//! @brief Return the owner data
 		std::list<V*>* const operator[](const ot::Owner<K>& _owner) { return objectList(_owner); };
+
+		ot::Owner<K> findOwner(V* _obj) {
+			for (auto it : m_data) {
+				for (auto e : *it.second) {
+					if (e == _obj) return it.first;
+				}
+			}
+			OT_LOG_WA("Owner not found");
+			throw std::exception("Owner not found");
+		}
 
 	private:
 

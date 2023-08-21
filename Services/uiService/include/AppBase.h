@@ -22,6 +22,7 @@
 #include <akWidgets/aWindow.h>
 
 #include "OpenTwinCore/ServiceBase.h"
+#include "OpenTwinCore/Owner.h"
 #include "OpenTwinFoundation/UserCredentials.h"
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
@@ -56,6 +57,7 @@ class ToolBar;
 namespace ak { class aNotifier; class aColorStyle; class aWindow; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
+namespace ot { class GraphicsView; }
 namespace ot { class GraphicsPickerDockWidget; }
 struct structModelViewInfo
 {
@@ -446,6 +448,8 @@ public:
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
+	void createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::ServiceOwner_t _owner);
+
 	// ######################################################################################################################
 
 	// Prompt
@@ -479,6 +483,9 @@ public:
 	std::string getCredentialUserName(void) { return m_userName; }
 	std::string getCredentialUserPassword(void) { return m_userEncryptedPassword; }
 	std::string getCredentialUserPasswordClear(void) { return m_userPassword; }
+
+public slots:
+	void slotGraphicsItemDroppend(ot::UID _itemUid);
 
 private slots:
 	void reapplyColorStyle(void);
@@ -596,6 +603,8 @@ private:
 
 	std::string					m_currentStateWindow;
 	std::string					m_currentStateColorStyle;
+
+	ot::ServiceOwnerManagerTemplate<ot::GraphicsView> m_graphicsViews;
 
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;

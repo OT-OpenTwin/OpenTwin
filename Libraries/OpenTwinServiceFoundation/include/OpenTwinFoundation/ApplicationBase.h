@@ -125,39 +125,6 @@ namespace ot {
 
 		// ####################################################################################################################################################################################################################################################################################
 
-		//! @brief Will be called when the user dropped a block onto the block editor, but before it is actually added to the block network
-		//! If this block should not be added to the block network, a string with a reason must be returned
-		//! @param _blockEditorName The name of the block editor where this event originated at
-		//! @param _blockName The name of the Block (Block Type)
-		//! @param _newBlockId The ID of the block if this block may be added to the network
-		//! @return An empty string if everything is ok, otherwise the reason why the block may not be added
-		virtual std::string blockEditorBlockDropped(const std::string& _blockEditorName, const std::string& _blockName, const std::string& _newBlockId) { return std::string(); };
-
-		//! @brief Will be called when the user removed a block from the block network
-		//! @param _blockEditorName The name of the block editor where this event originated at
-		//! @param _blockId The ID of the block that was removed
-		virtual void blockEditorBlockRemoved(const std::string& _blockEditorName, const std::string& _blockId) {};
-
-		//! @brief Will be called when the user dropped (dragged) a connection between two connectors
-		//! If this connection should not be allowed, a string with a reson must be returned
-		//! @param _blockEditorName The name of the block editor where this event originated at
-		//! @param _blockFromId The ID of the block where the connection was created from
-		//! @param _connectorFromName The name of the connector where the connection was created from
-		//! @param _blockToId The ID of the block where the connection was created to
-		//! @param _connectorToName The name of the connector where the connection was created to
-		//! @return An empty string if everything is ok, otherwise the reasyn why the connection may not be added
-		virtual std::string blockEditorConnectionDropped(const std::string& _blockEditorName, const std::string& _blockFromId, const std::string& _connectorFromName, const std::string& _blockToId, const std::string& _connectorToName) { return std::string(); };
-
-		//! @brief Will be called when the user removed a block connection in the block network
-		//! @param _blockEditorName The name of the block editor where this event originated at
-		//! @param _blockFromId The ID of the block where the connection was created from
-		//! @param _connectorFromName The name of the connector where the connection was created from
-		//! @param _blockToId The ID of the block where the connection was created to
-		//! @param _connectorToName The name of the connector where the connection was created to
-		virtual void blockEditorConnectionRemoved(const std::string& _blockEditorName, const std::string& _blockFromId, const std::string& _connectorFromName, const std::string& _blockToId, const std::string& _connectorToName) {};
-
-		// ####################################################################################################################################################################################################################################################################################
-
 		// Setter
 
 		//! @brief Will set the database URL of the database this application is using
@@ -353,11 +320,7 @@ namespace ot {
 		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleContextMenuItemClicked, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemClicked, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleContextMenuItemCheckedChanged, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleGraphicsEditorItemDropped, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleGraphicsEditorItemRemoved, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemRemoved, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleGraphicsEditorConnectionDropped, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleGraphicsEditorConnectionRemoved, ApplicationBase, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionRemoved, ot::SECURE_MESSAGE_TYPES);
-
+		
 		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
 		std::string __processMessage(const std::string & _message, OT_rJSON_doc &doc, serviceID_t _senderID);
 		void __shuttingDown(bool _requestedAsCommand);

@@ -40,6 +40,9 @@ namespace ot {
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
+		void setGraphicsViewName(const std::string& _name) { m_viewName = _name; };
+		const std::string& graphcisViewName(void) const { return m_viewName; };
+
 	signals:
 		void itemAdded(ot::UID _uid);
 
@@ -61,6 +64,7 @@ namespace ot {
 		virtual void mousePressedMoveEvent(QMouseEvent* _event) {};
 
 	private:
+		std::string m_viewName;
 		GraphicsScene* m_scene;
 		bool m_isPressed;
 		bool m_wheelEnabled;

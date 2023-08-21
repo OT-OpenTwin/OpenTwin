@@ -2777,16 +2777,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
-
+				
 				//ot::BlockEditorConfigurationPackage pckg;
 				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
 
 				ot::GraphicsEditorPackage pckg("", "");
 				pckg.setFromJsonObject(configurationObj);
 
-				ot::GraphicsView* newEditor = new ot::GraphicsView;
-				newEditor->setDropsEnabled(true);
-				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.title()), newEditor);
+				AppBase::instance()->createEmptyGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), owner);
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
@@ -2896,6 +2894,15 @@ size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
 		assert(0); // Error handling
 	}
 	return 0;
+}
+
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::ServiceOwner_t _service, rapidjson::Document& doc, std::string& response) {
+	auto it = m_serviceIdMap.find(_service.id());
+	if (it == m_serviceIdMap.end()) {
+		OT_LOG_E("Failed to find service with id \"" + std::to_string(_service.id()) + "\"");
+		return false;
+	}
+	return sendHttpRequest(operation, it->second->serviceURL(), doc, response);
 }
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, rapidjson::Document &doc, std::string &response)

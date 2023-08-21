@@ -58,6 +58,16 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 	return std::string();
 }
 
+std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
+	std::string name = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+	ot::UID uid = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+
+	m_uiComponent->displayMessage("New item dropped { name: \"" + name + "\", UID: \"" + std::to_string(uid) + "\" } at editor { name: \"" + editorName + "\" }\n");
+
+	return std::string();
+}
+
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	ot::GraphicsImageItemCfg* bot = new ot::GraphicsImageItemCfg;
 	bot->setSize(ot::Size2D(100, 60));
