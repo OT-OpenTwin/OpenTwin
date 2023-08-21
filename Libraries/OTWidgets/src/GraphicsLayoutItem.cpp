@@ -92,7 +92,7 @@ void ot::GraphicsLayoutItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupIt
 
 void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	if (m_layoutWrap) {
-		m_layoutWrap->graphicsItemFlagsChanged(_flags);
+		m_layoutWrap->setGraphicsItemFlags(_flags);
 	}
 }
 

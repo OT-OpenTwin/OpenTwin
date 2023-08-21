@@ -39,7 +39,8 @@ namespace ot {
 			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
 		};
 
-		GraphicsItem(bool _isLayout = false);
+		//! @param _containerItem If true the item will work as a container and create a group for grouping child items
+		GraphicsItem(bool _containerItem = false);
 		virtual ~GraphicsItem();
 
 		// ###############################################################################################################################################
@@ -90,12 +91,14 @@ namespace ot {
 		void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
 
+		bool isContainerItem(void) const { return m_isContainerItem; };
+
 	private:
 		std::string m_configuration;
 		GraphicsItemFlag m_flags;
 		GraphicsItem* m_parent;
 		GraphicsGroupItem* m_group;
-		bool m_isLayout;
+		bool m_isContainerItem;
 		bool m_hasHover;
 		GraphicsScene* m_scene;
 	};

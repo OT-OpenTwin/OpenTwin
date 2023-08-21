@@ -21,7 +21,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItem::GraphicsItem(bool _isLayout) : m_flags(GraphicsItem::NoFlags), m_parent(nullptr), m_group(nullptr), m_isLayout(_isLayout), m_hasHover(false), m_scene(nullptr) {}
+ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_parent(nullptr), m_group(nullptr), m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr) {}
 
 ot::GraphicsItem::~GraphicsItem() {
 	
@@ -30,19 +30,24 @@ ot::GraphicsItem::~GraphicsItem() {
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	m_flags = _flags;
 	if (m_group) {
-		m_group->graphicsItemFlagsChanged(_flags);
+		m_group->setGraphicsItemFlags(m_flags);
 	}
-	this->graphicsItemFlagsChanged(_flags);
+	else {
+		this->graphicsItemFlagsChanged(m_flags);
+	}
 }
 
 void ot::GraphicsItem::finalizeAsRootItem(GraphicsScene* _scene) {
 	otAssert(m_group == nullptr, "Group item already created");
-	if (m_isLayout) {
+
+	this->setGraphicsScene(_scene);
+
+	if (m_isContainerItem) {
 		m_group = new GraphicsGroupItem;
 		m_group->setParentGraphicsItem(this);
+		
 		this->finalizeItem(_scene, m_group, true);
-		_scene->addItem(m_group);
-		this->setGraphicsScene(_scene);
+		m_group->finalizeItem(_scene, nullptr, false);
 	}
 	else {
 		this->finalizeItem(_scene, m_group, true);
@@ -104,7 +109,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsGroupItem::GraphicsGroupItem() : ot::GraphicsItem(false) {
+ot::GraphicsGroupItem::GraphicsGroupItem() : ot::GraphicsItem(true) {
 
 }
 
@@ -217,6 +222,8 @@ void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	ot::GraphicsGroupItem::graphicsItemFlagsChanged(_flags);
+	if (m_bottom) m_bottom->setGraphicsItemFlags(_flags);
+	if (m_top) m_top->setGraphicsItemFlags(_flags);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
