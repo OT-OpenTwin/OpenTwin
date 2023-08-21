@@ -84,8 +84,8 @@ void ot::GraphicsLayoutItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupIt
 			// Add wrapped layout item
 			m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 			m_layoutWrap->setParentGraphicsItem(this);
-			m_layoutWrap->setLayout(lay);
 			m_layoutWrap->finalizeItem(_scene, _group, false);
+			m_layoutWrap->setLayout(lay);
 		}
 	}
 }
@@ -101,7 +101,7 @@ void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGra
 		m_layoutWrap->callPaint(_painter, _opt, _widget);
 	}
 	std::list<QGraphicsLayoutItem*> l;
-	getAllItems(l);
+	this->getAllItems(l);
 	for (auto i : l) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem *>(i);
 		if (itm) {
