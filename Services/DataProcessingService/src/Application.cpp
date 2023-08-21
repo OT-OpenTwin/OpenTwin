@@ -68,7 +68,7 @@ void Application::run(void)
 }
 
 #include "EntityBlockDatabaseAccess.h"
-
+#include "ClassFactory.h"
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
@@ -76,14 +76,28 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			//block->setName("Processing Blocks/Database Access");
-			//block->createProperties();
-			//block->StoreToDataBase();
+			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			block->setName("Processing Blocks/Database Access");
+			ot::Connector co0(ot::ConnectorType::Source, "C0");
+			ot::Connector co1(ot::ConnectorType::Filter, "C1");
+			block->AddConnector(co0);
+			block->AddConnector(co1);
 
-			//ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
-			//std::list<bool> forceVis{ false };
-			//m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
+			ot::BlockConnection bo0("Hans.C0", "Peter.C0");
+			ot::BlockConnection bo1("Hans.C0", "GustavC0");
+			block->AddOutgoingConnection(bo0);
+			block->AddOutgoingConnection(bo1);
+
+			block->createProperties();
+			block->StoreToDataBase();
+
+			ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
+			std::list<bool> forceVis{ false };
+			m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
+
+			ClassFactory classFactory;
+			auto tempBase = m_modelComponent->readEntityFromEntityIDandVersion(block->getEntityID(), block->getEntityStorageVersion(), classFactory);
+			auto temp = dynamic_cast<EntityBlockDatabaseAccess*>(tempBase);
 		}
 	}
 

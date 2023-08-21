@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\BlockConnection.h" />
     <ClInclude Include="include\BoundingBox.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.hpp" />
+    <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityBlock.h" />
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityMeasurementMetadata.h" />
@@ -105,13 +107,16 @@
     <ClInclude Include="include\PropertyBundleScaling.h" />
     <ClInclude Include="include\PropertyBundleVis2D3D.h" />
     <ClInclude Include="include\ScalingProperties.h" />
+    <ClInclude Include="include\SerializeWithBSON.h" />
     <ClInclude Include="include\TemplateDefaultManager.h" />
     <ClInclude Include="include\Types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
+    <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\ClassFactory.cpp" />
+    <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\DataBase.cpp" />
     <ClCompile Include="src\EntityAnnotation.cpp" />
     <ClCompile Include="src\EntityAnnotationData.cpp" />

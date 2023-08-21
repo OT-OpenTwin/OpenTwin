@@ -20,16 +20,14 @@ ot::GraphicsEditorPackage* BlockPickerManager::BuildUpBlockPicker()
 	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
 
-	BlockDatabaseAccess dbA("Hans");
+	BlockDatabaseAccess dbA("BlockDatabaseAccess");
 
 	controlBlockDatabaseCollection->addItem(dbA.GetBlock());
-
 
 	//a2->addItem(createTestBlock2("Alpha 3"));
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);
 	pckg->addCollection(mathBlockCollection);
-
 
 	return pckg;
 }

@@ -13,6 +13,22 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 		bsoncxx::builder::basic::kvp("LocationX", _location.x()),
 		bsoncxx::builder::basic::kvp("LocationY", _location.y())
 	);
+	
+	auto connectorsArray = bsoncxx::builder::basic::array();
+	for (const ot::Connector& connector : _connectors)
+	{
+		auto subDocument = connector.SerializeBSON();
+		connectorsArray.append(subDocument);
+	}
+	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
+
+	auto outgoingConnectionArray = bsoncxx::builder::basic::array();
+	for (ot::BlockConnection& connection : _outgoingConnections)
+	{
+		auto subDocument = connection.SerializeBSON();
+		outgoingConnectionArray.append(subDocument);
+	}
+	storage.append(bsoncxx::builder::basic::kvp("Connections", outgoingConnectionArray));
 }
 
 void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
@@ -24,4 +40,21 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	_location.setX(locationX);
 	_location.setY(locationY);
 
+	auto allOutgoingConnections	= doc_view["Connections"].get_array();
+	for (auto& element : allOutgoingConnections.value)
+	{
+		auto subDocument = element.get_value().get_document();
+		ot::BlockConnection connection;
+		connection.DeserializeBSON(subDocument);
+		_outgoingConnections.push_back(connection);
+	}
+
+	auto allConnectors = doc_view["Connectors"].get_array();
+	for (auto& element: allConnectors.value)
+	{
+		auto subDocument = element.get_value().get_document();
+		ot::Connector connector;
+		connector.DeserializeBSON(subDocument);
+		_connectors.push_back(connector);
+	}
 }
