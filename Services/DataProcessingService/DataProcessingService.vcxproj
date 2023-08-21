@@ -181,6 +181,8 @@
     <ClCompile Include="src\BlockDataProcessing.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\Pipeline.cpp" />
+    <ClCompile Include="src\PipelineManager.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +191,8 @@
     <ClInclude Include="include\BlockPickerManager.h" />
     <ClInclude Include="include\BlockDataProcessing.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\Pipeline.h" />
+    <ClInclude Include="include\PipelineManager.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

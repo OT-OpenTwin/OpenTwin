@@ -66,6 +66,9 @@
     <ClCompile Include="src\PythonServiceInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\BusinessLogicHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinFoundation\AbstractModelNotifier.h">
@@ -144,6 +147,9 @@
       <Filter>Third Party Libraries</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenTwinFoundation\PythonServiceInterface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinFoundation\BusinessLogicHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

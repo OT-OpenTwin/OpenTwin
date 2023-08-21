@@ -18,6 +18,10 @@
 #include <OpenTwinCommunication/ActionTypes.h>	
 #include "OpenTwinCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
+
+
+#include "BlockPickerManager.h"
+
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -102,7 +106,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 	return ""; // Return empty string if the request does not expect a return
 }
 
-#include "BlockPickerManager.h"
+
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);

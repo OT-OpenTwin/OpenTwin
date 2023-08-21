@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\ApplicationBase.cpp" />
+    <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="include\OpenTwinFoundation\AbstractModelNotifier.h" />
     <ClInclude Include="include\OpenTwinFoundation\AbstractUiNotifier.h" />
     <ClInclude Include="include\OpenTwinFoundation\ApplicationBase.h" />
+    <ClInclude Include="include\OpenTwinFoundation\BusinessLogicHandler.h" />
     <ClInclude Include="include\OpenTwinFoundation\ContextMenu.h" />
     <ClInclude Include="include\OpenTwinFoundation\PythonServiceInterface.h" />
     <ClInclude Include="include\OpenTwinFoundation\UserCredentials.h" />

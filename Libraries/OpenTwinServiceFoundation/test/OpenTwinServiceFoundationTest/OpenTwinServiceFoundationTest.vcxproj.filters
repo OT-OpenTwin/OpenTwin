@@ -18,6 +18,9 @@
     <ClInclude Include="include\FixtureMatrix.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\FixtureBusinessLogicHandler.h">
+      <Filter>src\Fixture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FixtureMatrix.cpp">
@@ -27,6 +30,9 @@
       <Filter>src\Test</Filter>
     </ClCompile>
     <ClCompile Include="src\TypeNameTemplateTest.cpp">
+      <Filter>src\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestBusinessLagicHandler.cpp">
       <Filter>src\Test</Filter>
     </ClCompile>
   </ItemGroup>

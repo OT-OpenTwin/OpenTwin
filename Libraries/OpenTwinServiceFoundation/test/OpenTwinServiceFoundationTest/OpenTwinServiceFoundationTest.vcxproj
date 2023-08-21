@@ -41,9 +41,11 @@
   <ItemGroup>
     <ClCompile Include="src\FixtureMatrix.cpp" />
     <ClCompile Include="src\MatrixTest.cpp" />
+    <ClCompile Include="src\TestBusinessLagicHandler.cpp" />
     <ClCompile Include="src\TypeNameTemplateTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\FixtureBusinessLogicHandler.h" />
     <ClInclude Include="include\FixtureMatrix.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
@@ -69,19 +71,19 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>X64;_DEBUG;OPENTWINFOUNDATION_EXPORTS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>
       </MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(MONGO_CXX_INCD);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinServiceFoundation.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenTwinServiceFoundation.lib;$(OT_DEFAULT_SERVICE_LIBD);$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
