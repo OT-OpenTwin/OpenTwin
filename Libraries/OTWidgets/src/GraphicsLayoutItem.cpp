@@ -17,12 +17,30 @@ ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _ow
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
 
 void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	m_owner->handleItemClickEvent(_event, boundingRect());
+	this->handleItemClickEvent(_event, boundingRect());
+	QGraphicsWidget::mousePressEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	m_owner->paintGeneralGraphics(_painter, _opt, _widget);
 	QGraphicsWidget::paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsLayoutItemWrapper::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	if (_group) _group->addToGroup(this);
+	_scene->addItem(this);
+}
+
+void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+QRectF ot::GraphicsLayoutItemWrapper::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -40,7 +58,9 @@ bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+void ot::GraphicsLayoutItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	this->setGraphicsScene(_scene);
+
 	std::list<QGraphicsLayoutItem*> lst;
 	this->getAllItems(lst);
 
@@ -63,24 +83,22 @@ void ot::GraphicsLayoutItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemG
 		else {
 			// Add wrapped layout item
 			m_layoutWrap = new GraphicsLayoutItemWrapper(this);
+			m_layoutWrap->setParentGraphicsItem(this);
 			m_layoutWrap->setLayout(lay);
-
-			if (_group) _group->addToGroup(m_layoutWrap);
-			_scene->addItem(m_layoutWrap);
+			m_layoutWrap->finalizeItem(_scene, _group, false);
 		}
 	}
 }
 
 void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	if (m_layoutWrap) {
-		m_layoutWrap->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-		m_layoutWrap->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+		m_layoutWrap->graphicsItemFlagsChanged(_flags);
 	}
 }
 
 void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	if (m_layoutWrap) {
-		m_layoutWrap->paint(_painter, _opt, _widget);
+		m_layoutWrap->callPaint(_painter, _opt, _widget);
 	}
 	std::list<QGraphicsLayoutItem*> l;
 	getAllItems(l);
@@ -119,10 +137,12 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			}
 			QGraphicsLayoutItem* ii = dynamic_cast<QGraphicsLayoutItem*>(i);
 			if (ii) {
+				i->setParentGraphicsItem(this);
 				this->addItem(ii);
 			}
 			else {
 				OT_LOG_EA("GraphicsItem cast to QGraphicsLayoutItem failed");
+				delete i;
 			}
 		}
 		else {
@@ -195,6 +215,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				}
 				QGraphicsLayoutItem* ii = dynamic_cast<QGraphicsLayoutItem*>(i);
 				if (ii) {
+					i->setParentGraphicsItem(this);
 					this->addItem(ii, x, y);
 				}
 				else {

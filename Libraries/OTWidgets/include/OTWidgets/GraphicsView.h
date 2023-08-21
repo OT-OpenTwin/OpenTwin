@@ -13,6 +13,10 @@
 
 namespace ot {
 
+	class GraphicsScene;
+
+	//! @brief View widget used to display GraphicsItems
+	//! Note that the View creates its own scene.
 	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView {
 		Q_OBJECT
 	public:
@@ -24,6 +28,10 @@ namespace ot {
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
+
+		GraphicsScene* getGraphicsScene(void) { return m_scene; };
+
+		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
@@ -43,8 +51,10 @@ namespace ot {
 		virtual void mousePressedMoveEvent(QMouseEvent* _event) {};
 
 	private:
+		GraphicsScene* m_scene;
 		bool m_isPressed;
 		bool m_wheelEnabled;
+		bool m_dropEnabled;
 
 	};
 

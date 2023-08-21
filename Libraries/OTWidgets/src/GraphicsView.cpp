@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsFactory.h"
 
@@ -34,8 +35,10 @@
 //! @param ___h Height variable
 #define OT_AdjustMinimumGraphicsViewSize(___w, ___h)
 #endif
-ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true) {
-	setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false) {
+	m_scene = new GraphicsScene(this);
+	this->setScene(m_scene);
+	this->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 }
 
 ot::GraphicsView::~GraphicsView() {
@@ -107,7 +110,6 @@ void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 {
 	QGraphicsView::mousePressEvent(_event);
 	viewport()->setCursor(Qt::CrossCursor);
-
 	if (_event->button() == Qt::LeftButton) {
 		m_isPressed = true;
 	}
@@ -147,7 +149,7 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 
 void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty()) {
+	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty() && m_dropEnabled) {
 		_event->acceptProposedAction();
 	}
 	else {
@@ -156,6 +158,7 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 }
 
 void ot::GraphicsView::dropEvent(QDropEvent* _event) {
+	if (!m_dropEnabled) return;
 	QByteArray cfgRaw = _event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration);
 	if (cfgRaw.isEmpty()) {
 		OT_LOG_W("Drop event reqected: MimeData not matching");
@@ -195,7 +198,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	ot::GraphicsItem* newItem = nullptr;
 	try {
 		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
-		newItem->finalizeAsRootItem(scene());
+		newItem->finalizeAsRootItem(m_scene);
 		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
 	}
 	catch (const std::exception& _e) {

@@ -13,12 +13,14 @@
 
 namespace ot {
 
+	class GraphicsView;
 	class GraphicsItem;
+	class GraphicsPathItem;
 
 	class OT_WIDGETS_API_EXPORT GraphicsScene : public QGraphicsScene {
 		Q_OBJECT
 	public:
-		GraphicsScene();
+		GraphicsScene(GraphicsView * _view);
 		virtual ~GraphicsScene();
 
 		//! @brief Set the grid size
@@ -31,16 +33,23 @@ namespace ot {
 
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
+
 		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin
 		//! @param _item Origin item
 		void startConnection(ot::GraphicsItem* _item);
+
+		GraphicsView* getGraphicsView(void) { return m_view; };
 
 	protected:
 		virtual void drawBackground(QPainter* _painter, const QRectF& _rect) override;
 
 	private:
 		int m_gridSize;
-		QGraphicsItem* m_connectionOrigin;
+		GraphicsView* m_view;
+		GraphicsItem* m_connectionOrigin;
+		GraphicsPathItem* m_pathItem;
+		GraphicsScene();
 	};
 
 }

@@ -64,6 +64,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	bot->setName(_name + "i");
 	bot->setTitle(_name + "i");
 	bot->setImagePath("Default/BugGreen");
+	bot->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 	ot::GraphicsTextItemCfg* topA = new ot::GraphicsTextItemCfg("Senor");
 	topA->setName(_name + "tA");
@@ -78,6 +79,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	top->setTitle(_name + "t");
 	top->addChildItem(topA);
 	top->addChildItem(topB);
+	top->setSize(ot::Size2D(100, 50));
 
 	ot::GraphicsRectangularItemCfg* backgr = new ot::GraphicsRectangularItemCfg;
 	backgr->setName(_name + "b");
@@ -91,6 +93,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	ot::GraphicsStackItemCfg* cfg = new ot::GraphicsStackItemCfg(backgr, cfgTop);
 	cfg->setName(_name);
 	cfg->setTitle(_name);
+	cfg->setSize(ot::Size2D(100, 50));
 	return cfg;
 }
 
@@ -132,8 +135,10 @@ ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
 	leftRect->setSize(ot::Size2D(20, 20));
+	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
 	rightRect->setSize(ot::Size2D(30, 30));
+	rightRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 	centralLayout->addChildItem(0, 0, title);
 	centralLayout->addChildItem(0, 1, rightRect);

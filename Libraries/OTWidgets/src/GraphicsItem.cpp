@@ -3,15 +3,16 @@
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-
 // OpenTwin header
 #include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/IconManager.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
 #include <QtCore/qmimedata.h>
+#include <QtCore/qmath.h>
 #include <QtGui/qdrag.h>
 #include <QtGui/qfont.h>
 #include <QtGui/qpainter.h>
@@ -20,9 +21,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItem::GraphicsItem(bool _isLayout) : m_flags(GraphicsItem::NoFlags), m_group(nullptr), m_isLayout(_isLayout), m_hasHover(false) {
-	
-}
+ot::GraphicsItem::GraphicsItem(bool _isLayout) : m_flags(GraphicsItem::NoFlags), m_parent(nullptr), m_group(nullptr), m_isLayout(_isLayout), m_hasHover(false), m_scene(nullptr) {}
 
 ot::GraphicsItem::~GraphicsItem() {
 	
@@ -31,27 +30,30 @@ ot::GraphicsItem::~GraphicsItem() {
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	m_flags = _flags;
 	if (m_group) {
-		m_group->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-		m_group->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+		m_group->graphicsItemFlagsChanged(_flags);
 	}
 	this->graphicsItemFlagsChanged(_flags);
 }
 
-void ot::GraphicsItem::finalizeAsRootItem(QGraphicsScene* _scene) {
+void ot::GraphicsItem::finalizeAsRootItem(GraphicsScene* _scene) {
 	otAssert(m_group == nullptr, "Group item already created");
 	if (m_isLayout) {
-		m_group = new QGraphicsItemGroup;
+		m_group = new GraphicsGroupItem;
+		m_group->setParentGraphicsItem(this);
 		this->finalizeItem(_scene, m_group, true);
 		_scene->addItem(m_group);
+		this->setGraphicsScene(_scene);
 	}
 	else {
 		this->finalizeItem(_scene, m_group, true);
-	}
-	
+	}	
 }
 
 void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect) {
-	if (m_flags & ot::GraphicsItem::ItemPreviewContext) {
+	if (m_parent) {
+		m_parent->handleItemClickEvent(_event, _rect);
+	}
+	else if (m_flags & ot::GraphicsItem::ItemPreviewContext) {
 		// Start drag since its a preview item
 		otAssert(!m_configuration.empty(), "No configuration set");
 
@@ -81,7 +83,8 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 	}
 	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
 		if (m_flags & ot::GraphicsItem::ItemIsConnectable) {
-
+			OTAssertNullptr(m_scene); // Ensure the finalizeItem() method calls setGraphicsScene()
+			m_scene->startConnection(this);
 		}
 	}
 }
@@ -101,7 +104,64 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsStackItem::GraphicsStackItem() : ot::GraphicsItem(false), m_top(nullptr), m_bottom(nullptr) {
+ot::GraphicsGroupItem::GraphicsGroupItem() : ot::GraphicsItem(false) {
+
+}
+
+ot::GraphicsGroupItem::~GraphicsGroupItem() {
+
+}
+
+bool ot::GraphicsGroupItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
+	return ot::GraphicsItem::setupFromConfig(_cfg);
+}
+
+QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->contentsRect().size();
+}
+
+void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
+	setPos(_rect.topLeft());
+}
+
+void ot::GraphicsGroupItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	this->setGraphicsScene(_scene);
+	_scene->addItem(this);
+	if (_group) _group->addToGroup(this);
+}
+
+void ot::GraphicsGroupItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	QGraphicsItemGroup::mousePressEvent(_event);
+}
+
+void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paintGeneralGraphics(_painter, _opt, _widget);
+	QGraphicsItemGroup::paint(_painter, _opt, _widget);
+}
+
+QRectF ot::GraphicsGroupItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
+}
+
+void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsStackItem::GraphicsStackItem() : m_top(nullptr), m_bottom(nullptr) {
 
 }
 
@@ -117,7 +177,6 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
-
 	OTAssertNullptr(cfg->topItem());
 	OTAssertNullptr(cfg->bottomItem());
 
@@ -135,55 +194,29 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		m_top = nullptr;
 		return false;
 	}
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	m_bottom->setParentGraphicsItem(this);
+	m_top->setParentGraphicsItem(this);
+	return ot::GraphicsGroupItem::setupFromConfig(_cfg);
 }
 
-QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	QSizeF s(1., 1.);
-	QGraphicsLayoutItem* itm = dynamic_cast<QGraphicsLayoutItem*>(m_bottom);
-	if (itm) s = s.expandedTo(itm->preferredSize());
-	itm = nullptr;
-	itm = dynamic_cast<QGraphicsLayoutItem*>(m_top);
-	if (itm) s = s.expandedTo(itm->preferredSize());
-	return s;
-}
-
-void ot::GraphicsStackItem::setGeometry(const QRectF& _rect) {
-	setPos(_rect.topLeft());
-}
-
-void ot::GraphicsStackItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+void ot::GraphicsStackItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	ot::GraphicsGroupItem::finalizeItem(_scene, _group, _isRoot);
 	if (m_bottom) {
-		m_bottom->finalizeItem(_scene, this, _isRoot);
+		m_bottom->finalizeItem(_scene, _group, false);
 	}
 	if (m_top) {
-		m_top->finalizeItem(_scene, this, _isRoot);
+		m_top->finalizeItem(_scene, _group, false);
 	}
-
-	_scene->addItem(this);
-	if (_group) _group->addToGroup(this);
-}
-
-void ot::GraphicsStackItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleItemClickEvent(_event, boundingRect());
 }
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paintGeneralGraphics(_painter, _opt, _widget);
-	QGraphicsItemGroup::paint(_painter, _opt, _widget);
-}
-
-QRectF ot::GraphicsStackItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
+	ot::GraphicsGroupItem::callPaint(_painter, _opt, _widget);
+	if (m_bottom) m_bottom->callPaint(_painter, _opt, _widget);
+	if (m_top) m_top->callPaint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	ot::GraphicsGroupItem::graphicsItemFlagsChanged(_flags);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -218,7 +251,9 @@ void ot::GraphicsRectangularItem::setGeometry(const QRectF& rect) {
 	setPos(rect.topLeft());
 }
 
-void ot::GraphicsRectangularItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+void ot::GraphicsRectangularItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	this->setGraphicsScene(_scene);
+
 	_scene->addItem(this);
 	if (_group) _group->addToGroup(this);
 }
@@ -286,7 +321,9 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
 	setPos(rect.topLeft());
 }
 
-void ot::GraphicsTextItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+void ot::GraphicsTextItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	this->setGraphicsScene(_scene);
+
 	_scene->addItem(this);
 	if (_group) _group->addToGroup(this);
 }
@@ -354,7 +391,9 @@ void ot::GraphicsImageItem::setGeometry(const QRectF& rect) {
 	setPos(rect.topLeft());
 }
 
-void ot::GraphicsImageItem::finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup* _group, bool _isRoot) {
+void ot::GraphicsImageItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	this->setGraphicsScene(_scene);
+
 	_scene->addItem(this);
 	if (_group) _group->addToGroup(this);
 }
@@ -379,6 +418,53 @@ QRectF ot::GraphicsImageItem::getGraphicsItemBoundingRect(void) const {
 void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsPathItem::GraphicsPathItem() {
+
+}
+
+ot::GraphicsPathItem::~GraphicsPathItem() {
+
+}
+
+void ot::GraphicsPathItem::setPathPoints(const QPointF& _origin, const QPointF& _dest) {
+	m_origin = _origin;
+	m_dest = _dest;
+
+	QPainterPath pth(m_origin);
+	pth.lineTo(m_dest);
+
+	this->setPath(pth);
+	this->update();
+}
+
+bool ot::GraphicsPathItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	// Ignore, return false in case the setup is called to ensure this item wont be setup
+	return false;
+}
+
+void ot::GraphicsPathItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+	if (_group) _group->addToGroup(this);
+	_scene->addItem(this);
+}
+
+void ot::GraphicsPathItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+QRectF ot::GraphicsPathItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
+}
+
+void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	// Ignore
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

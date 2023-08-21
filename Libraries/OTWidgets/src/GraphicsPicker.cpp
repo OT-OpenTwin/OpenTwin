@@ -87,8 +87,8 @@ void ot::GraphicsPicker::clear(void) {
 	}
 	m_previewData.clear();
 	for (auto v : m_views) {
-		m_viewLayout->removeWidget(v.view);
-		delete v.view;
+		m_viewLayout->removeWidget(v);
+		delete v;
 	}
 	m_views.clear();
 }
@@ -99,12 +99,12 @@ void ot::GraphicsPicker::clear(void) {
 
 void ot::GraphicsPicker::slotSelectionChanged(void) {
 	for (auto v : m_views) {
-		m_viewLayout->removeWidget(v.view);
-		delete v.view;
+		m_viewLayout->removeWidget(v);
+		delete v;
 	}
 	m_views.clear();
 
-	std::list<PreviewBox> previews;
+	std::list<GraphicsView *> previews;
 
 	for (auto itm : m_navigation->treeWidget()->selectedItems()) {
 		auto it = m_previewData.find(itm);
@@ -119,25 +119,19 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 					bCfg->addToJsonObject(configDoc, configDoc);
 					newItem->setConfiguration(ot::rJSON::toJSON(configDoc));
 
-					PreviewBox box;
+					GraphicsView* newView = new GraphicsView;
+					newView->setMaximumSize(m_previewSize);
+					newView->setMinimumSize(m_previewSize);
+					newView->setDragMode(QGraphicsView::NoDrag);
 
-					box.scene = new GraphicsScene;
-					box.scene->setGridSize(0);
-
-					box.view = new GraphicsView;
-					box.view->setScene(box.scene);
-					box.view->setMaximumSize(m_previewSize);
-					box.view->setMinimumSize(m_previewSize);
-					box.view->setDragMode(QGraphicsView::NoDrag);
-
-					newItem->finalizeAsRootItem(box.scene);
+					newItem->finalizeAsRootItem(newView->getGraphicsScene());
 					newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemPreviewContext);
 
-					box.view->viewAll();
+					newView->viewAll();
 
-					m_viewLayout->addWidget(box.view);
-					//m_viewLayout->addWidget(box.view, 0, 0);
-					m_views.push_back(box);
+					m_viewLayout->addWidget(newView);
+					//m_viewLayout->addWidget(newView, 0, 0);
+					m_views.push_back(newView);
 				}
 				else {
 					OT_LOG_E("Failed to create preview item from factory");

@@ -19,12 +19,13 @@ class QGraphicsWidget;
 #define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem "OT_GILayV"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem "OT_GILayH"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem "OT_GILayG"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem "OT_GILayWrap"
 
 namespace ot {
 
 	class GraphicsLayoutItem;
 
-	class OT_WIDGETS_API_EXPORT GraphicsLayoutItemWrapper : public QGraphicsWidget {
+	class OT_WIDGETS_API_EXPORT GraphicsLayoutItemWrapper : public QGraphicsWidget, public ot::GraphicsItem {
 	public:
 		GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner);
 		virtual ~GraphicsLayoutItemWrapper();
@@ -32,6 +33,17 @@ namespace ot {
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
+
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem); };
 
 	private:
 		GraphicsLayoutItem* m_owner;
@@ -54,13 +66,12 @@ namespace ot {
 		
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
-		virtual void finalizeItem(QGraphicsScene* _scene, QGraphicsItemGroup * _group, bool _isRoot) override;
+		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
-	protected:
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 		
 	private:

@@ -26,7 +26,6 @@ namespace ot {
 	class GraphicsCollectionCfg;
 	class GraphicsItemCfg;
 	class GraphicsView;
-	class GraphicsScene;
 	class TreeWidgetFilter;
 
 	class OT_WIDGETS_API_EXPORT GraphicsPicker : public QObject {
@@ -61,18 +60,13 @@ namespace ot {
 
 		void storePreviewData(QTreeWidgetItem* _item, GraphicsItemCfg* _config);
 
-		struct PreviewBox {
-			GraphicsView* view;
-			GraphicsScene* scene;
-		};
-
 		bool                  m_repaintPreviewRequired;
 
 		QSize                 m_previewSize;
 		QSplitter* m_splitter;
 		TreeWidgetFilter* m_navigation;
 
-		std::list<PreviewBox> m_views;
+		std::list<GraphicsView *> m_views;
 		QWidget* m_viewLayoutW;
 		QGridLayout* m_viewLayout;
 

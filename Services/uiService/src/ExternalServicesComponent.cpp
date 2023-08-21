@@ -2785,9 +2785,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				pckg.setFromJsonObject(configurationObj);
 
 				ot::GraphicsView* newEditor = new ot::GraphicsView;
-				ot::GraphicsScene* newScene = new ot::GraphicsScene;
-				newEditor->setScene(newScene);
-				
+				newEditor->setDropsEnabled(true);
 				AppBase::instance()->addTabToCentralView(QString::fromStdString(pckg.title()), newEditor);
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
