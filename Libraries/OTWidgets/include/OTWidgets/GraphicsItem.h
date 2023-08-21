@@ -49,14 +49,11 @@ namespace ot {
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
 
-		virtual void finalizeAsRootItem(GraphicsScene* _scene);
+		void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group);
 
 		// ###############################################################################################################################################
 
 		// Pure virtual functions
-
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) = 0;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
@@ -93,6 +90,10 @@ namespace ot {
 
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) = 0;
+
 	private:
 		std::string m_configuration;
 		GraphicsItemFlag m_flags;
@@ -123,8 +124,6 @@ namespace ot {
 
 		virtual void setGeometry(const QRectF& rect) override;
 
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
-
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -134,6 +133,10 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -152,11 +155,13 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem); };
 
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
-
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		ot::GraphicsItem* m_top;
@@ -183,8 +188,6 @@ namespace ot {
 
 		virtual void setGeometry(const QRectF& rect) override;
 
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
-
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -194,6 +197,10 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		QSizeF m_size;
@@ -220,8 +227,6 @@ namespace ot {
 
 		virtual void setGeometry(const QRectF& rect) override;
 
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
-
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -231,6 +236,10 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		QSizeF m_size;
@@ -258,8 +267,6 @@ namespace ot {
 
 		virtual void setGeometry(const QRectF& rect) override;
 
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
-
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -269,6 +276,10 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		QSizeF m_size;
@@ -292,13 +303,15 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPathItem); };
 
-		virtual void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) override;
-
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	protected:
+		//! @brief Finish setting up the item and add it to the scene (and all childs)
+		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		QPointF m_origin;

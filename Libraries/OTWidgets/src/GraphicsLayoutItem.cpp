@@ -25,7 +25,7 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsLayoutItemWrapper::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsLayoutItemWrapper::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	if (_group) _group->addToGroup(this);
 	_scene->addItem(this);
 }
@@ -58,7 +58,7 @@ bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsLayoutItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsLayoutItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	this->setGraphicsScene(_scene);
 
 	std::list<QGraphicsLayoutItem*> lst;
@@ -67,26 +67,24 @@ void ot::GraphicsLayoutItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupIt
 	for (auto itm : lst) {
 		// Finalize child
 		ot::GraphicsItem* gi = dynamic_cast<ot::GraphicsItem*>(itm);
-		if (gi) gi->finalizeItem(_scene, _group, false);
+		if (gi) gi->finalizeItem(_scene, _group);
 		else {
 			OT_LOG_EA("Failed to cast GrahicsLayoutItem child to GraphicsItem");
 		}
 	}
 
-	if (_isRoot) {
-		otAssert(m_layoutWrap == nullptr, "Should not be happening");
+	otAssert(m_layoutWrap == nullptr, "Layout wrap already created");
 
-		QGraphicsLayout* lay = dynamic_cast<QGraphicsLayout *>(this);
-		if (lay == nullptr) {
-			OT_LOG_EA("OT::GraphicsLayoutItem cast to QGraphicsLayout failed");
-		}
-		else {
-			// Add wrapped layout item
-			m_layoutWrap = new GraphicsLayoutItemWrapper(this);
-			m_layoutWrap->setParentGraphicsItem(this);
-			m_layoutWrap->finalizeItem(_scene, _group, false);
-			m_layoutWrap->setLayout(lay);
-		}
+	QGraphicsLayout* lay = dynamic_cast<QGraphicsLayout*>(this);
+	if (lay == nullptr) {
+		OT_LOG_EA("OT::GraphicsLayoutItem cast to QGraphicsLayout failed");
+	}
+	else {
+		// Add wrapped layout item
+		m_layoutWrap = new GraphicsLayoutItemWrapper(this);
+		m_layoutWrap->setParentGraphicsItem(this);
+		m_layoutWrap->finalizeItem(_scene, _group);
+		m_layoutWrap->setLayout(lay);
 	}
 }
 

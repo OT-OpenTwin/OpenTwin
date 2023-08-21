@@ -37,7 +37,7 @@ void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _
 	}
 }
 
-void ot::GraphicsItem::finalizeAsRootItem(GraphicsScene* _scene) {
+void ot::GraphicsItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	otAssert(m_group == nullptr, "Group item already created");
 
 	this->setGraphicsScene(_scene);
@@ -46,11 +46,11 @@ void ot::GraphicsItem::finalizeAsRootItem(GraphicsScene* _scene) {
 		m_group = new GraphicsGroupItem;
 		m_group->setParentGraphicsItem(this);
 		
-		this->finalizeItem(_scene, m_group, true);
-		m_group->finalizeItem(_scene, nullptr, false);
+		this->finalizeItemContents(_scene, m_group);
+		m_group->finalizeItem(_scene, _group);
 	}
 	else {
-		this->finalizeItem(_scene, m_group, true);
+		this->finalizeItemContents(_scene, _group);
 	}	
 }
 
@@ -109,7 +109,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsGroupItem::GraphicsGroupItem() : ot::GraphicsItem(true) {
+ot::GraphicsGroupItem::GraphicsGroupItem() : ot::GraphicsItem(false) {
 
 }
 
@@ -130,7 +130,7 @@ void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
 	setPos(_rect.topLeft());
 }
 
-void ot::GraphicsGroupItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsGroupItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	this->setGraphicsScene(_scene);
 	_scene->addItem(this);
 	if (_group) _group->addToGroup(this);
@@ -204,13 +204,12 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsGroupItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsStackItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
-	ot::GraphicsGroupItem::finalizeItem(_scene, _group, _isRoot);
+void ot::GraphicsStackItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	if (m_bottom) {
-		m_bottom->finalizeItem(_scene, _group, false);
+		m_bottom->finalizeItem(_scene, _group);
 	}
 	if (m_top) {
-		m_top->finalizeItem(_scene, _group, false);
+		m_top->finalizeItem(_scene, _group);
 	}
 }
 
@@ -258,7 +257,7 @@ void ot::GraphicsRectangularItem::setGeometry(const QRectF& rect) {
 	setPos(rect.topLeft());
 }
 
-void ot::GraphicsRectangularItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsRectangularItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	this->setGraphicsScene(_scene);
 
 	_scene->addItem(this);
@@ -328,7 +327,7 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
 	setPos(rect.topLeft());
 }
 
-void ot::GraphicsTextItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsTextItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	this->setGraphicsScene(_scene);
 
 	_scene->addItem(this);
@@ -398,7 +397,7 @@ void ot::GraphicsImageItem::setGeometry(const QRectF& rect) {
 	setPos(rect.topLeft());
 }
 
-void ot::GraphicsImageItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsImageItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	this->setGraphicsScene(_scene);
 
 	_scene->addItem(this);
@@ -457,7 +456,7 @@ bool ot::GraphicsPathItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return false;
 }
 
-void ot::GraphicsPathItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group, bool _isRoot) {
+void ot::GraphicsPathItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
 	if (_group) _group->addToGroup(this);
 	_scene->addItem(this);
 }

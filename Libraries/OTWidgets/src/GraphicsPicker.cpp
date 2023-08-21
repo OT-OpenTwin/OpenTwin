@@ -124,7 +124,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 					newView->setMinimumSize(m_previewSize);
 					newView->setDragMode(QGraphicsView::NoDrag);
 
-					newItem->finalizeAsRootItem(newView->getGraphicsScene());
+					newItem->finalizeItem(newView->getGraphicsScene(), nullptr);
 					newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemPreviewContext);
 
 					newView->viewAll();
