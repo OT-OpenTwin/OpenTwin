@@ -13,8 +13,6 @@
 ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration) {
 	OTAssertNullptr(_configuration);
 
-	OT_LOG_D("Constructing for key: " + _configuration->simpleFactoryObjectKey());
-
 	if (!ot::GlobalKeyMap::instance().contains(_configuration->simpleFactoryObjectKey())) {
 		OT_LOG_EA("No key found");
 		return nullptr;
