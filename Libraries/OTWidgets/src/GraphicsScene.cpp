@@ -79,7 +79,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		p.setColor(QColor(64, 255, 64));
 		p.setWidth(1);
 		m_pathItem->setPen(p);
-		m_pathItem->setPathPoints(m_connectionOrigin->getGraphicsItemBoundingRect().center(), m_connectionOrigin->getGraphicsItemBoundingRect().center());
+		m_pathItem->setPathPoints(m_connectionOrigin->getGraphicsItemCenter(), m_connectionOrigin->getGraphicsItemCenter());
 
 		this->addItem(m_pathItem);
 		return;

@@ -21,10 +21,54 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_parent(nullptr), m_group(nullptr), m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_uid(0) {}
+ot::GraphicsItemDrag::GraphicsItemDrag(QWidget* _widget, GraphicsItem* _owner, const QRectF& _rect) : QDrag(_widget), m_widget(_widget), m_owner(_owner), m_rect(_rect), m_queueCount(0) {
+
+}
+
+ot::GraphicsItemDrag::~GraphicsItemDrag() {
+
+}
+
+void ot::GraphicsItemDrag::queue(void) {
+	m_queueCount++;
+	QMetaObject::invokeMethod(this, &GraphicsItemDrag::slotQueue, Qt::QueuedConnection);
+}
+
+void ot::GraphicsItemDrag::slotQueue(void) {
+	if (--m_queueCount == 0) {
+		// Add configuration to mime data
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText("OT_BLOCK");
+		mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_Configuration, QByteArray::fromStdString(m_owner->configuration()));
+
+		// Create drag
+		this->setMimeData(mimeData);
+
+		// Create preview
+		QPixmap prev(m_rect.size().toSize());
+		QPainter p(&prev);
+		QStyleOptionGraphicsItem opt;
+		p.fillRect(QRect(QPoint(0, 0), m_rect.size().toSize()), Qt::gray);
+
+		// Paint
+		m_owner->callPaint(&p, &opt, m_widget);
+
+		// Run drag
+		this->setPixmap(prev);
+		this->exec();
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_group(nullptr), m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_uid(0) {}
 
 ot::GraphicsItem::~GraphicsItem() {
-	
+	if (m_drag) delete m_drag;
 }
 
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -68,27 +112,10 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 		otAssert(!m_configuration.empty(), "No configuration set");
 
 		if (_event->button() == Qt::LeftButton) {
-			// Add configuration to mime data
-			QMimeData* mimeData = new QMimeData;
-			mimeData->setText("OT_BLOCK");
-			mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_Configuration, QByteArray::fromStdString(m_configuration));
-			
-			// Create drag
-			QDrag* drag = new QDrag(_event->widget());
-			drag->setMimeData(mimeData);
-
-			// Create preview
-			QPixmap prev(_rect.size().toSize());
-			QPainter p(&prev);
-			QStyleOptionGraphicsItem opt;
-			p.fillRect(QRect(QPoint(0, 0), _rect.size().toSize()), Qt::gray);
-
-			// Paint
-			this->callPaint(&p, &opt, _event->widget());
-
-			// Run drag
-			drag->setPixmap(prev);
-			drag->exec();
+			if (m_drag == nullptr) {
+				m_drag = new GraphicsItemDrag(_event->widget(), this, _rect);
+			}
+			m_drag->queue();
 		}
 	}
 	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
@@ -159,6 +186,10 @@ void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphics
 
 QRectF ot::GraphicsGroupItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
+}
+
+QPointF ot::GraphicsGroupItem::getGraphicsItemCenter(void) const {
+	return this->scenePos();
 }
 
 void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -288,6 +319,10 @@ QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
+QPointF ot::GraphicsRectangularItem::getGraphicsItemCenter(void) const {
+	return this->scenePos();
+}
+
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
 }
@@ -362,6 +397,10 @@ QRectF ot::GraphicsTextItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
+QPointF ot::GraphicsTextItem::getGraphicsItemCenter(void) const {
+	return this->scenePos();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -427,6 +466,10 @@ QRectF ot::GraphicsImageItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
+QPointF ot::GraphicsImageItem::getGraphicsItemCenter(void) const {
+	return this->scenePos();
+}
+
 void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
@@ -473,6 +516,10 @@ void ot::GraphicsPathItem::callPaint(QPainter* _painter, const QStyleOptionGraph
 
 QRectF ot::GraphicsPathItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
+}
+
+QPointF ot::GraphicsPathItem::getGraphicsItemCenter(void) const {
+	return this->scenePos();
 }
 
 void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {

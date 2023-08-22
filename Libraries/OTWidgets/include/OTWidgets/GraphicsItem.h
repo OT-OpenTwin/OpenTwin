@@ -12,6 +12,7 @@
 
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
+#include <QtGui/qdrag.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
 
 #define OT_GRAPHICSITEM_MIMETYPE_Configuration "GraphicsItem.Configuration"
@@ -25,9 +26,34 @@
 
 namespace ot {
 
+	class GraphicsItem;
 	class GraphicsItemCfg;
 	class GraphicsScene;
 	class GraphicsGroupItem;
+
+	class OT_WIDGETS_API_EXPORT GraphicsItemDrag : public QDrag {
+		Q_OBJECT
+	public:
+		GraphicsItemDrag(QWidget * _widget, GraphicsItem* _owner, const QRectF& _rect);
+		virtual ~GraphicsItemDrag();
+
+		void queue(void);
+
+	private slots:
+		void slotQueue(void);
+
+	private:
+		QWidget* m_widget;
+		QRectF m_rect;
+		GraphicsItem* m_owner;
+		int m_queueCount;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
@@ -58,6 +84,8 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const = 0;
+
+		virtual QPointF getGraphicsItemCenter(void) const = 0;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
 
@@ -97,6 +125,8 @@ namespace ot {
 
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
+		GraphicsGroupItem* getItemGroup(void) const { return m_group; };
+
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
 		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) = 0;
@@ -109,6 +139,7 @@ namespace ot {
 		GraphicsGroupItem* m_group;
 		bool m_isContainerItem;
 		bool m_hasHover;
+		GraphicsItemDrag* m_drag;
 		GraphicsScene* m_scene;
 		ot::UID m_uid;
 	};
@@ -140,6 +171,8 @@ namespace ot {
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+
+		virtual QPointF getGraphicsItemCenter(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -205,6 +238,8 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
+		virtual QPointF getGraphicsItemCenter(void) const override;
+
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
@@ -243,6 +278,8 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+
+		virtual QPointF getGraphicsItemCenter(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -284,6 +321,8 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
+		virtual QPointF getGraphicsItemCenter(void) const override;
+
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
@@ -315,6 +354,8 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+
+		virtual QPointF getGraphicsItemCenter(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 

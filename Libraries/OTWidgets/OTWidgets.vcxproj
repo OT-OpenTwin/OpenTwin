@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
-    <ClInclude Include="include\OTWidgets\GraphicsItem.h" />
+    <QtMoc Include="include\OTWidgets\GraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsLayoutItem.h" />
     <QtMoc Include="include\OTWidgets\GraphicsPicker.h" />
     <ClInclude Include="include\OTWidgets\IconManager.h" />
