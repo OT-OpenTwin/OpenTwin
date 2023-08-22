@@ -18,6 +18,7 @@
 namespace ot {
 
 	class GraphicsItem;
+	class GraphicsConnectionItem;
 	class GraphicsScene;
 
 	//! @brief View widget used to display GraphicsItems
@@ -37,14 +38,18 @@ namespace ot {
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
 		GraphicsItem* getItem(ot::UID _itemUid);
+		GraphicsConnectionItem* getConnection(ot::UID _connectionUid);
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
 		void setGraphicsViewName(const std::string& _name) { m_viewName = _name; };
 		const std::string& graphcisViewName(void) const { return m_viewName; };
 
+		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);
+
 	signals:
 		void itemAdded(ot::UID _uid);
+		void connectionAdded(ot::UID _uid);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
@@ -72,6 +77,7 @@ namespace ot {
 		ot::UID m_currentUid;
 
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
+		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
 	};
 
 }

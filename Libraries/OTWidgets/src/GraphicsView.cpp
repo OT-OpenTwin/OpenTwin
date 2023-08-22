@@ -86,6 +86,30 @@ ot::GraphicsItem* ot::GraphicsView::getItem(ot::UID _itemUid) {
 	}
 }
 
+ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(ot::UID _connectionUid) {
+	auto it = m_connections.find(_connectionUid);
+	if (it == m_connections.end()) {
+		OT_LOG_WA("Connection with the UID \"" + std::to_string(_connectionUid) + "\" does not exist");
+		return nullptr;
+	}
+	else {
+		return it->second;
+	}
+}
+
+void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest) {
+	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
+	newConnection->setGraphicsItemUid(++m_currentUid);
+	QPen p;
+	p.setColor(QColor(255, 0, 0));
+	p.setWidth(1);
+	newConnection->connect(_origin, _dest);
+	m_scene->addItem(newConnection);
+
+	m_connections.insert_or_assign(newConnection->graphicsItemUid(), newConnection);
+	emit connectionAdded(m_currentUid);
+}
+
 // ########################################################################################################
 
 // Protected: Slots
@@ -242,7 +266,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 
 void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty()) {
+	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty() && m_dropEnabled) {
 		_event->acceptProposedAction();
 	}
 	else {

@@ -68,6 +68,22 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
 
+std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document) {
+	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+
+	ot::UID originUid = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId);
+	std::string originConnectable = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName);
+
+	ot::UID destUid = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId);
+	std::string destConnectable = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName);
+
+	m_uiComponent->displayMessage("New connection dropped { o.i: \"" + std::to_string(originUid) + "\", o.c: \"" + originConnectable + 
+		"\", d.i: \"" + std::to_string(destUid) + "\", d.c: \"" + destConnectable + 
+		"\" } at editor { name: \"" + editorName + "\" }\n");
+
+	return std::string(OT_ACTION_RETURN_VALUE_OK);
+}
+
 ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	ot::GraphicsImageItemCfg* bot = new ot::GraphicsImageItemCfg;
 	bot->setSize(ot::Size2D(100, 60));

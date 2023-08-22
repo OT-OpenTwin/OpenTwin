@@ -2064,6 +2064,7 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 	AppBase::instance()->addTabToCentralView(_title, newEditor);
 	m_graphicsViews.store(_owner, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemAdded, this, &AppBase::slotGraphicsItemDroppend);
+	connect(newEditor, &ot::GraphicsView::connectionAdded, this, &AppBase::slotGraphicsConnectionDroppend);
 }
 
 // ######################################################################################################################
@@ -2141,37 +2142,79 @@ void AppBase::slotGraphicsItemDroppend(ot::UID _itemUid) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
+		return;
 	}
-	else {
-		ot::GraphicsItem* itm = view->getItem(_itemUid);
-		if (itm == nullptr) {
-			OT_LOG_E("Failed to get item from view");
+	
+	ot::GraphicsItem* itm = view->getItem(_itemUid);
+	if (itm == nullptr) {
+		OT_LOG_E("Failed to get item from view");
+		return;
+	}
+
+	otAssert(itm->graphicsItemUid() == _itemUid, "UID mismatch");
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, itm->graphicsItemName());
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, itm->graphicsItemUid());
+	
+	try {
+		auto owner = m_graphicsViews.findOwner(view);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
 		}
-		else {
-			otAssert(itm->graphicsItemUid() == _itemUid, "UID mismatch");
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped);
-			ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, itm->graphicsItemName());
-			ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, itm->graphicsItemUid());
-			try {
-				auto owner = m_graphicsViews.findOwner(view);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
-				std::string response;
-				if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
-					OT_LOG_E("Failed to send http request");
-					return;
-				}
-				if (response != OT_ACTION_RETURN_VALUE_OK) {
-					OT_LOG_E("Invalid response: " + response);
-				}
-			}
-			catch (const std::exception& _e) {
-				OT_LOG_E(_e.what());
-			}
-			catch (...) {
-				OT_LOG_E("[FATAL] Unknown error");
-			}
+		if (response != OT_ACTION_RETURN_VALUE_OK) {
+			OT_LOG_E("Invalid response: " + response);
 		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsConnectionDroppend(ot::UID _connectionUid) {
+	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsConnectionItem* itm = view->getConnection(_connectionUid);
+	if (itm == nullptr) {
+		OT_LOG_E("Failed to get connection from view");
+		return;
+	}
+
+	otAssert(itm->graphicsItemUid() == _itemUid, "UID mismatch");
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId, itm->originItem()->getRootItem()->graphicsItemUid());
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId, itm->destItem()->getRootItem()->graphicsItemUid());
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName, itm->originItem()->graphicsItemName());
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName, itm->destItem()->graphicsItemName());
+
+	try {
+		auto owner = m_graphicsViews.findOwner(view);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+		if (response != OT_ACTION_RETURN_VALUE_OK) {
+			OT_LOG_E("Invalid response: " + response);
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
 	}
 }
 

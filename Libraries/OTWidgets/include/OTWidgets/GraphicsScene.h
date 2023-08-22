@@ -38,6 +38,7 @@ namespace ot {
 		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin
 		//! @param _item Origin item
 		void startConnection(ot::GraphicsItem* _item);
+		void stopConnection(void);
 
 		GraphicsView* getGraphicsView(void) { return m_view; };
 

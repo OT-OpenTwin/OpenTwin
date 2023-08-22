@@ -47,6 +47,7 @@ public:
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleNewGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped, ot::SECURE_MESSAGE_TYPES);
 	
 	std::string createEmptyTestEditor(void);
 

@@ -21,7 +21,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItemDrag::GraphicsItemDrag(QWidget* _widget, GraphicsItem* _owner, const QRectF& _rect) : QDrag(_widget), m_widget(_widget), m_owner(_owner), m_rect(_rect), m_queueCount(0) {
+ot::GraphicsItemDrag::GraphicsItemDrag(GraphicsItem* _owner) : m_widget(nullptr), m_owner(_owner), m_queueCount(0) {
 
 }
 
@@ -29,20 +29,23 @@ ot::GraphicsItemDrag::~GraphicsItemDrag() {
 
 }
 
-void ot::GraphicsItemDrag::queue(void) {
+void ot::GraphicsItemDrag::queue(QWidget* _widget, const QRectF& _rect) {
 	m_queueCount++;
+	m_widget = _widget;
+	m_rect = _rect;
 	QMetaObject::invokeMethod(this, &GraphicsItemDrag::slotQueue, Qt::QueuedConnection);
 }
 
 void ot::GraphicsItemDrag::slotQueue(void) {
 	if (--m_queueCount == 0) {
 		// Add configuration to mime data
+		QDrag drag(m_widget);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText("OT_BLOCK");
 		mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_Configuration, QByteArray::fromStdString(m_owner->configuration()));
 
 		// Create drag
-		this->setMimeData(mimeData);
+		drag.setMimeData(mimeData);
 
 		// Create preview
 		QPixmap prev(m_rect.size().toSize());
@@ -54,8 +57,8 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 		m_owner->callPaint(&p, &opt, m_widget);
 
 		// Run drag
-		this->setPixmap(prev);
-		this->exec();
+		drag.setPixmap(prev);
+		drag.exec();
 	}
 }
 
@@ -113,9 +116,9 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 
 		if (_event->button() == Qt::LeftButton) {
 			if (m_drag == nullptr) {
-				m_drag = new GraphicsItemDrag(_event->widget(), this, _rect);
+				m_drag = new GraphicsItemDrag(this);
 			}
-			m_drag->queue();
+			m_drag->queue(_event->widget(), _rect);
 		}
 	}
 	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
@@ -134,6 +137,25 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) _painter->fillRect(this->getGraphicsItemBoundingRect(), Qt::GlobalColor::green);
+}
+
+void ot::GraphicsItem::setGraphicsItemPosition(const QPointF& _pos) {
+	m_pos = _pos;
+	for (auto c : m_connections) {
+		c->updateConnection();
+	}
+}
+
+void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
+	m_connections.push_back(_connection);
+}
+
+void ot::GraphicsItem::forgetConnection(GraphicsConnectionItem* _connection) {
+	auto it = std::find(m_connections.begin(), m_connections.end(), _connection);
+	while (it != m_connections.end()) {
+		m_connections.erase(it);
+		it = std::find(m_connections.begin(), m_connections.end(), _connection);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -160,7 +182,8 @@ QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 }
 
 void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
-	setPos(_rect.topLeft());
+	this->setGraphicsItemPosition(_rect.topLeft());
+	this->setPos(this->graphicsItemPosition());
 }
 
 void ot::GraphicsGroupItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -290,8 +313,9 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsRectangularItem::setGeometry(const QRectF& rect) {
-	setPos(rect.topLeft());
+void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
+	this->setGraphicsItemPosition(_rect.topLeft());
+	this->setPos(this->graphicsItemPosition());
 }
 
 void ot::GraphicsRectangularItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -364,8 +388,9 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsTextItem::setGeometry(const QRectF& rect) {
-	setPos(rect.topLeft());
+void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
+	this->setGraphicsItemPosition(_rect.topLeft());
+	this->setPos(this->graphicsItemPosition());
 }
 
 void ot::GraphicsTextItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -438,8 +463,9 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsImageItem::setGeometry(const QRectF& rect) {
-	setPos(rect.topLeft());
+void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
+	this->setGraphicsItemPosition(_rect.topLeft());
+	this->setPos(this->graphicsItemPosition());
 }
 
 void ot::GraphicsImageItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -524,6 +550,38 @@ QPointF ot::GraphicsPathItem::getGraphicsItemCenter(void) const {
 
 void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	// Ignore
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsConnectionItem::GraphicsConnectionItem() : m_origin(nullptr), m_dest(nullptr) {
+
+}
+
+ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
+
+}
+
+void ot::GraphicsConnectionItem::connect(GraphicsItem* _origin, GraphicsItem* _dest) {
+	OTAssertNullptr(_origin);
+	OTAssertNullptr(_dest);
+	m_origin = _origin;
+	m_dest = _dest;
+	m_origin->storeConnection(this);
+	m_dest->storeConnection(this);
+	this->updateConnection();
+}
+
+void ot::GraphicsConnectionItem::updateConnection(void) {
+	if (m_origin == nullptr || m_dest == nullptr) {
+		OT_LOG_EA("Can not draw connection since to item were set");
+		return;
+	}
+	this->setPathPoints(m_origin->graphicsItemPosition(), m_dest->graphicsItemPosition());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

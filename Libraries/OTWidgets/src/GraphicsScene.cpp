@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
 
 // Qt header
@@ -41,21 +42,13 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
 		OTAssertNullptr(actualItm);
 		if (actualItm->graphicsItemFlags() & ot::GraphicsItem::ItemIsConnectable) {
-			OT_LOG_W("Conn start");
 			this->startConnection(actualItm);
 			QGraphicsScene::mouseDoubleClickEvent(_event);
 			return;
 		}
 	}
 
-	// Stop connection
-	if (m_pathItem) {
-		OT_LOG_W("Conn stop");
-		removeItem(m_pathItem);
-		delete m_pathItem;
-		m_pathItem = nullptr;
-		m_connectionOrigin = nullptr;
-	}
+	this->stopConnection();
 
 	QGraphicsScene::mouseDoubleClickEvent(_event);
 }
@@ -63,7 +56,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_pathItem) {
 		OTAssertNullptr(m_connectionOrigin);
-		m_pathItem->setPathPoints(m_connectionOrigin->getGraphicsItemBoundingRect().center(), _event->scenePos());
+		m_pathItem->setPathPoints(m_connectionOrigin->graphicsItemPosition(), _event->scenePos());
 	}
 	QGraphicsScene::mouseMoveEvent(_event);
 }
@@ -79,13 +72,28 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		p.setColor(QColor(64, 255, 64));
 		p.setWidth(1);
 		m_pathItem->setPen(p);
-		m_pathItem->setPathPoints(m_connectionOrigin->getGraphicsItemCenter(), m_connectionOrigin->getGraphicsItemCenter());
+		m_pathItem->setPathPoints(m_connectionOrigin->graphicsItemPosition(), m_connectionOrigin->graphicsItemPosition());
 
 		this->addItem(m_pathItem);
 		return;
 	}
 	else {
-		if (m_connectionOrigin == _item) return;
+		if (m_connectionOrigin == _item) {
+			stopConnection();
+			return;
+		}
 		OT_LOG_D("New conncetion");
+		m_view->addConnection(m_connectionOrigin, _item);
+		this->stopConnection();
+	}
+}
+
+void ot::GraphicsScene::stopConnection(void) {
+	// Stop connection
+	if (m_pathItem) {
+		removeItem(m_pathItem);
+		delete m_pathItem;
+		m_pathItem = nullptr;
+		m_connectionOrigin = nullptr;
 	}
 }

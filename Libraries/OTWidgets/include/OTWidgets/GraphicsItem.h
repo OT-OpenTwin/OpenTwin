@@ -12,8 +12,10 @@
 
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
-#include <QtGui/qdrag.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
+
+// std header
+#include <list>
 
 #define OT_GRAPHICSITEM_MIMETYPE_Configuration "GraphicsItem.Configuration"
 
@@ -22,22 +24,24 @@
 #define OT_SimpleFactoryJsonKeyValue_GraphicsGroupItem "OT_GIGroup"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsStackItem "OT_GIStack"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItem "OT_GIImage"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsConnectionItem "OT_GIConnection"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
 
 namespace ot {
 
 	class GraphicsItem;
+	class GraphicsConnectionItem;
 	class GraphicsItemCfg;
 	class GraphicsScene;
 	class GraphicsGroupItem;
 
-	class OT_WIDGETS_API_EXPORT GraphicsItemDrag : public QDrag {
+	class OT_WIDGETS_API_EXPORT GraphicsItemDrag : public QObject {
 		Q_OBJECT
 	public:
-		GraphicsItemDrag(QWidget * _widget, GraphicsItem* _owner, const QRectF& _rect);
+		GraphicsItemDrag(GraphicsItem* _owner);
 		virtual ~GraphicsItemDrag();
 
-		void queue(void);
+		void queue(QWidget* _widget, const QRectF& _rect);
 
 	private slots:
 		void slotQueue(void);
@@ -123,9 +127,15 @@ namespace ot {
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
 		GraphicsItem* getRootItem(void);
 
+		void setGraphicsItemPosition(const QPointF& _pos);
+		const QPointF& graphicsItemPosition(void) const { return m_pos; };
+
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
 		GraphicsGroupItem* getItemGroup(void) const { return m_group; };
+
+		void storeConnection(GraphicsConnectionItem* _connection);
+		void forgetConnection(GraphicsConnectionItem* _connection);
 
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
@@ -142,6 +152,8 @@ namespace ot {
 		GraphicsItemDrag* m_drag;
 		GraphicsScene* m_scene;
 		ot::UID m_uid;
+		QPointF m_pos;
+		std::list<GraphicsConnectionItem*> m_connections;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -367,6 +379,33 @@ namespace ot {
 		QPointF m_origin;
 		QPointF m_dest;
 	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public GraphicsPathItem {
+	public:
+		GraphicsConnectionItem();
+		virtual ~GraphicsConnectionItem();
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsConnectionItem); };
+
+		void connect(GraphicsItem* _origin, GraphicsItem* _dest);
+
+		void updateConnection(void);
+
+		GraphicsItem* originItem(void) { return m_origin; };
+		GraphicsItem* destItem(void) { return m_dest; };
+
+	private:
+		GraphicsItem* m_origin;
+		GraphicsItem* m_dest;
+	};
+	
 
 }
 
