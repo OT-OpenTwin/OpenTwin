@@ -54,18 +54,20 @@ Application::~Application()
 // ##################################################################################################################################################################################################################
 
 // Required functions
-
+#include "TemplateDefaultManager.h"
 void Application::run(void)
 {
 	if (!EnsureDataBaseConnection())
 	{
-		assert(0);
+		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
 	// Add code that should be executed when the service is started and may start its work
 }
 
 #include "EntityBlockDatabaseAccess.h"
 #include "ClassFactory.h"
+#include "BlockHandlerDatabaseAccess.h"
+
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
@@ -85,7 +87,12 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			block->AddOutgoingConnection(bo0);
 			block->AddOutgoingConnection(bo1);
 
-			block->createProperties();
+			std::list<std::string>projects{"Test"};
+			block->createProperties(projects, *projects.begin());
+			
+			BlockHandlerDatabaseAccess handlerDatabaseAccess(block.get());
+			BlockHandler::genericDataBlock parameter;
+			auto result = handlerDatabaseAccess.Execute(parameter);
 			block->StoreToDataBase();
 
 			ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;

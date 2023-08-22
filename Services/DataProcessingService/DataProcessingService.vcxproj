@@ -98,6 +98,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC); $(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -118,6 +120,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC); $(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,6 +142,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC); $(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,6 +168,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC); $(MONGO_BOOST_ROOT)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -177,22 +183,34 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BlockDatabaseAccess.cpp" />
+    <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp" />
     <ClCompile Include="src\BlockPickerManager.cpp" />
     <ClCompile Include="src\BlockDataProcessing.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\Pipeline.cpp" />
+    <ClCompile Include="src\PipelineFilter.cpp" />
     <ClCompile Include="src\PipelineManager.cpp" />
+    <ClCompile Include="src\PipelineSink.cpp" />
+    <ClCompile Include="src\PipelineSource.cpp" />
+    <ClCompile Include="src\ResultCollectionHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\BlockDatabaseAccess.h" />
+    <ClInclude Include="include\BlockHandler.h" />
+    <ClInclude Include="include\BlockHandlerDatabaseAccess.h" />
     <ClInclude Include="include\BlockPickerManager.h" />
     <ClInclude Include="include\BlockDataProcessing.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\Pipeline.h" />
+    <ClInclude Include="include\PipelineFilter.h" />
+    <ClInclude Include="include\PipelineItem.h" />
     <ClInclude Include="include\PipelineManager.h" />
+    <ClInclude Include="include\PipelineSink.h" />
+    <ClInclude Include="include\PipelineSource.h" />
+    <ClInclude Include="include\ResultCollectionHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

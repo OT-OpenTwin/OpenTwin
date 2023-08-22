@@ -264,10 +264,10 @@ namespace ot {
 		void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation> &entityInfo);
 		UID getPrefetchedEntityVersion(UID entityID);
 
-		// ##########################################################################################################################################
-	protected:
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response);
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response);
+		// ##########################################################################################################################################
+	protected:
 
 		bool EnsureDataBaseConnection(void);
 

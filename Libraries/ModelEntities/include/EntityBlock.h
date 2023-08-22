@@ -12,11 +12,14 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntityBlock"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
-	void SetBlockName(const std::string& blockID) { _blockName = blockID; }
-	void SetBlockPosition(ot::Point2DD& position) { _location = position; }
+	void setBlockName(const std::string& blockID) { _blockName = blockID; }
+	void setBlockPosition(ot::Point2DD& position) { _location = position; }
+	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
+	std::list<ot::BlockConnection> getAllOutgoingConnections() const {	return _outgoingConnections;	}
+	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
+	
 	void AddConnector(const ot::Connector& connector) { _connectors.push_back(connector); }
 	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
-	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 
 protected:
 	std::string _blockName;
