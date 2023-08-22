@@ -40,8 +40,6 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
-		virtual QPointF getGraphicsItemCenter(void) const override;
-
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem); };
 
@@ -100,8 +98,6 @@ namespace ot {
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
-
-		virtual QPointF getGraphicsItemCenter(void) const override;
 
 	private:
 		GraphicsBoxLayoutItem() = delete;
@@ -174,8 +170,6 @@ namespace ot {
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
-
-		virtual QPointF getGraphicsItemCenter(void) const override;
 
 	private:
 		QSizeF m_size;

@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/IconManager.h"
 #include "OTGui/GraphicsItemCfg.h"
@@ -211,10 +212,6 @@ QRectF ot::GraphicsGroupItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
-QPointF ot::GraphicsGroupItem::getGraphicsItemCenter(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
@@ -291,8 +288,8 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsRectangularItem::GraphicsRectangularItem() : ot::GraphicsItem(false), m_size(200, 100) {
-
+ot::GraphicsRectangularItem::GraphicsRectangularItem() : ot::GraphicsItem(false), m_size(10, 10), m_cornerRadius(0) {
+	this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
 ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
@@ -308,14 +305,17 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	}
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
-	setRect(0., 0., m_size.width(), m_size.height());
-
+	m_cornerRadius = cfg->cornerRadius();
+	
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
+	return QRectF(this->graphicsItemPosition(), m_size);
+}
+
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
-	this->setGraphicsItemPosition(_rect.topLeft());
-	this->setPos(this->graphicsItemPosition());
+	this->setPos(_rect.topLeft());
 }
 
 void ot::GraphicsRectangularItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -336,19 +336,103 @@ void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOpti
 
 void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
-	QGraphicsRectItem::paint(_painter, _opt, _widget);
+	_painter->drawRoundedRect(QRectF(this->graphicsItemPosition(), m_size), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
-QPointF ot::GraphicsRectangularItem::getGraphicsItemCenter(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+}
+
+QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	switch (_change)
+	{
+	case QGraphicsItem::ItemPositionChange:
+		otAssert(_value.type() == QVariant::PointF, "Invalid type");
+		this->setGraphicsItemPosition(_value.toPointF());
+		OT_LOG_W("X");
+		break;
+	case QGraphicsItem::ItemMatrixChange:
+		break;
+	case QGraphicsItem::ItemVisibleChange:
+		break;
+	case QGraphicsItem::ItemEnabledChange:
+		break;
+	case QGraphicsItem::ItemSelectedChange:
+		break;
+	case QGraphicsItem::ItemParentChange:
+		break;
+	case QGraphicsItem::ItemChildAddedChange:
+		break;
+	case QGraphicsItem::ItemChildRemovedChange:
+		break;
+	case QGraphicsItem::ItemTransformChange:
+		break;
+	case QGraphicsItem::ItemPositionHasChanged:
+		otAssert(_value.type() == QVariant::PointF, "Invalid type");
+		this->setGraphicsItemPosition(_value.toPointF());
+		OT_LOG_W("Y");
+		break;
+	case QGraphicsItem::ItemTransformHasChanged:
+		break;
+	case QGraphicsItem::ItemSceneChange:
+		break;
+	case QGraphicsItem::ItemVisibleHasChanged:
+		break;
+	case QGraphicsItem::ItemEnabledHasChanged:
+		break;
+	case QGraphicsItem::ItemSelectedHasChanged:
+		break;
+	case QGraphicsItem::ItemParentHasChanged:
+		break;
+	case QGraphicsItem::ItemSceneHasChanged:
+		break;
+	case QGraphicsItem::ItemCursorChange:
+		break;
+	case QGraphicsItem::ItemCursorHasChanged:
+		break;
+	case QGraphicsItem::ItemToolTipChange:
+		break;
+	case QGraphicsItem::ItemToolTipHasChanged:
+		break;
+	case QGraphicsItem::ItemFlagsChange:
+		break;
+	case QGraphicsItem::ItemFlagsHaveChanged:
+		break;
+	case QGraphicsItem::ItemZValueChange:
+		break;
+	case QGraphicsItem::ItemZValueHasChanged:
+		break;
+	case QGraphicsItem::ItemOpacityChange:
+		break;
+	case QGraphicsItem::ItemOpacityHasChanged:
+		break;
+	case QGraphicsItem::ItemScenePositionHasChanged:
+		otAssert(_value.type() == QVariant::PointF, "Invalid type");
+		this->setGraphicsItemPosition(_value.toPointF());
+		OT_LOG_W("Z");
+		break;
+	case QGraphicsItem::ItemRotationChange:
+		break;
+	case QGraphicsItem::ItemRotationHasChanged:
+		break;
+	case QGraphicsItem::ItemScaleChange:
+		break;
+	case QGraphicsItem::ItemScaleHasChanged:
+		break;
+	case QGraphicsItem::ItemTransformOriginPointChange:
+		break;
+	case QGraphicsItem::ItemTransformOriginPointHasChanged:
+		break;
+	default:
+		otAssert(0, "Unknown type");
+		break;
+	}
+
+	return QGraphicsItem::itemChange(_change, _value);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -389,8 +473,7 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
-	this->setGraphicsItemPosition(_rect.topLeft());
-	this->setPos(this->graphicsItemPosition());
+	this->setPos(_rect.topLeft());
 }
 
 void ot::GraphicsTextItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -420,10 +503,6 @@ void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 QRectF ot::GraphicsTextItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
-}
-
-QPointF ot::GraphicsTextItem::getGraphicsItemCenter(void) const {
-	return this->scenePos();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -492,10 +571,6 @@ QRectF ot::GraphicsImageItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
-QPointF ot::GraphicsImageItem::getGraphicsItemCenter(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
@@ -507,7 +582,7 @@ void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsPathItem::GraphicsPathItem() {
+ot::GraphicsPathItem::GraphicsPathItem() : ot::GraphicsItem(false) {
 
 }
 
@@ -519,11 +594,12 @@ void ot::GraphicsPathItem::setPathPoints(const QPointF& _origin, const QPointF& 
 	m_origin = _origin;
 	m_dest = _dest;
 
+	OT_LOG_W("Path: (" + std::to_string(_origin.x()) + "; " + std::to_string(_origin.y()) + ") (" + std::to_string(_dest.x()) + "; " + std::to_string(_dest.y()) + ")");
+
 	QPainterPath pth(m_origin);
 	pth.lineTo(m_dest);
 
 	this->setPath(pth);
-	this->update();
 }
 
 bool ot::GraphicsPathItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -532,6 +608,7 @@ bool ot::GraphicsPathItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 void ot::GraphicsPathItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
+	this->setGraphicsScene(_scene);
 	if (_group) _group->addToGroup(this);
 	_scene->addItem(this);
 }
@@ -542,10 +619,6 @@ void ot::GraphicsPathItem::callPaint(QPainter* _painter, const QStyleOptionGraph
 
 QRectF ot::GraphicsPathItem::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
-}
-
-QPointF ot::GraphicsPathItem::getGraphicsItemCenter(void) const {
-	return this->scenePos();
 }
 
 void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -566,7 +639,7 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 
 }
 
-void ot::GraphicsConnectionItem::connect(GraphicsItem* _origin, GraphicsItem* _dest) {
+void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
 	OTAssertNullptr(_origin);
 	OTAssertNullptr(_dest);
 	m_origin = _origin;
@@ -579,6 +652,10 @@ void ot::GraphicsConnectionItem::connect(GraphicsItem* _origin, GraphicsItem* _d
 void ot::GraphicsConnectionItem::updateConnection(void) {
 	if (m_origin == nullptr || m_dest == nullptr) {
 		OT_LOG_EA("Can not draw connection since to item were set");
+		return;
+	}
+	if (graphicsScene() == nullptr) {
+		OT_LOG_EA("No graphics scene set");
 		return;
 	}
 	this->setPathPoints(m_origin->graphicsItemPosition(), m_dest->graphicsItemPosition());

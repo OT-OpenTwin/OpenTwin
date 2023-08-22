@@ -56,6 +56,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_pathItem) {
 		OTAssertNullptr(m_connectionOrigin);
+		OT_LOG_W("Pos: " + std::to_string(m_connectionOrigin->graphicsItemPosition().x()) + "; " + std::to_string(m_connectionOrigin->graphicsItemPosition().y()));
 		m_pathItem->setPathPoints(m_connectionOrigin->graphicsItemPosition(), _event->scenePos());
 	}
 	QGraphicsScene::mouseMoveEvent(_event);
@@ -74,7 +75,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		m_pathItem->setPen(p);
 		m_pathItem->setPathPoints(m_connectionOrigin->graphicsItemPosition(), m_connectionOrigin->graphicsItemPosition());
 
-		this->addItem(m_pathItem);
+		m_pathItem->finalizeItem(this, nullptr);
 		return;
 	}
 	else {

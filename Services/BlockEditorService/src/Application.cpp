@@ -125,20 +125,25 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 
 ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
+	centralLayout->setName(_name);
+	centralLayout->setTitle(_name);
 
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
-	title->setName(_name);
-	title->setText(_name);
+	title->setName("Title");
+	title->setText("Title");
 	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
 
 	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
 
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
+	leftRect->setName("Left");
 	leftRect->setSize(ot::Size2D(20, 20));
 	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
+	rightRect->setName("Right");
 	rightRect->setSize(ot::Size2D(30, 30));
+	rightRect->setCornerRadius(2);
 	rightRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 	midLayout->addChildItem(leftRect);
@@ -153,16 +158,21 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	ot::GraphicsGridLayoutItemCfg* centralLayout = new ot::GraphicsGridLayoutItemCfg(2, 2);
+	centralLayout->setName(_name);
+	centralLayout->setTitle(_name);
 
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
-	title->setName(_name);
-	title->setText(_name);
+	title->setName("Title");
+	title->setText("Title");
 	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
 
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
+	leftRect->setName("Left");
 	leftRect->setSize(ot::Size2D(20, 20));
 	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+
 	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
+	rightRect->setName("Right");
 	rightRect->setSize(ot::Size2D(30, 30));
 	rightRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 

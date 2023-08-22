@@ -52,6 +52,7 @@ public:
 
 public slots:
 	void slotConnect(void);
+	void slotAutoConnect(void);
 	void slotImport(void);
 	void slotExport(void);
 
@@ -62,12 +63,14 @@ public slots:
 	void slotDeselectAllServices(void);
 	void slotAutoScrollToBottomChanged(void);
 	void slotUpdateCheckboxColors(void);
+	void slotToggleAutoConnect(void);
 	void slotViewCellContent(QTableWidgetItem* _itm);
 
 private:
 	void iniTableItem(int _row, int _column, QTableWidgetItem * _itm);
 	void checkEntryFilter(int _row);
 	void updateCountLabels(void);
+	void connectToLogger(bool _isAutoConnect);
 
 	// Data
 
@@ -118,6 +121,7 @@ private:
 
 	// Tool Bar
 	QAction *					m_connectButton;
+	QAction* m_autoConnect;
 	QAction *					m_importButton;
 	QAction *					m_exportButton;
 };

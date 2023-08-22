@@ -2190,7 +2190,7 @@ void AppBase::slotGraphicsConnectionDroppend(ot::UID _connectionUid) {
 		return;
 	}
 
-	otAssert(itm->graphicsItemUid() == _itemUid, "UID mismatch");
+	otAssert(itm->graphicsItemUid() == _connectionUid, "UID mismatch");
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId, itm->originItem()->getRootItem()->graphicsItemUid());

@@ -16,7 +16,7 @@ class QPushButton;
 class ConnectToLoggerDialog : public QDialog {
 	Q_OBJECT
 public:
-	ConnectToLoggerDialog();
+	ConnectToLoggerDialog(bool _isAutoConnect);
 	virtual ~ConnectToLoggerDialog();
 
 	const std::list<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
@@ -44,4 +44,6 @@ private:
 
 	std::list<ot::LogMessage>	m_messageBuffer;
 	bool						m_success;
+
+	ConnectToLoggerDialog() = delete;
 };

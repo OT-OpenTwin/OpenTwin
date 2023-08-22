@@ -18,7 +18,7 @@
 #define DIA_LOGW(___message) OTOOLKIT_LOGW("Logger Service Connector", ___message)
 #define DIA_LOGE(___message) OTOOLKIT_LOGE("Logger Service Connector", ___message)
 
-ConnectToLoggerDialog::ConnectToLoggerDialog() : m_success(false) {
+ConnectToLoggerDialog::ConnectToLoggerDialog(bool _isAutoConnect) : m_success(false) {
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 
 	// Create layouts
@@ -53,6 +53,10 @@ ConnectToLoggerDialog::ConnectToLoggerDialog() : m_success(false) {
 	// Connect signals
 	connect(m_btnConnect, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotConnect);
 	connect(m_btnCancel, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotCancel);
+
+	if (_isAutoConnect) {
+		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotConnect, Qt::QueuedConnection);
+	}
 }
 
 ConnectToLoggerDialog::~ConnectToLoggerDialog() {

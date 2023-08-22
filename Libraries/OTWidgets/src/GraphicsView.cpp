@@ -39,6 +39,7 @@ ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_d
 	m_scene = new GraphicsScene(this);
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+	this->setAlignment(Qt::AlignAbsolute);
 }
 
 ot::GraphicsView::~GraphicsView() {
@@ -89,7 +90,7 @@ ot::GraphicsItem* ot::GraphicsView::getItem(ot::UID _itemUid) {
 ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(ot::UID _connectionUid) {
 	auto it = m_connections.find(_connectionUid);
 	if (it == m_connections.end()) {
-		OT_LOG_WA("Connection with the UID \"" + std::to_string(_connectionUid) + "\" does not exist");
+		OT_LOG_WAS("Connection with the UID \"" + std::to_string(_connectionUid) + "\" does not exist");
 		return nullptr;
 	}
 	else {
@@ -103,10 +104,13 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	QPen p;
 	p.setColor(QColor(255, 0, 0));
 	p.setWidth(1);
-	newConnection->connect(_origin, _dest);
-	m_scene->addItem(newConnection);
+	
+	newConnection->finalizeItem(m_scene, nullptr);
 
 	m_connections.insert_or_assign(newConnection->graphicsItemUid(), newConnection);
+
+	newConnection->connectItems(_origin, _dest);
+
 	emit connectionAdded(m_currentUid);
 }
 

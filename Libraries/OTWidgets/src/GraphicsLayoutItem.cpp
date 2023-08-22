@@ -43,10 +43,6 @@ QRectF ot::GraphicsLayoutItemWrapper::getGraphicsItemBoundingRect(void) const {
 	return this->boundingRect();
 }
 
-QPointF ot::GraphicsLayoutItemWrapper::getGraphicsItemCenter(void) const {
-	return this->scenePos();
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -159,10 +155,6 @@ QRectF ot::GraphicsBoxLayoutItem::getGraphicsItemBoundingRect(void) const {
 	return this->contentsRect();
 }
 
-QPointF ot::GraphicsBoxLayoutItem::getGraphicsItemCenter(void) const {
-	return this->contentsRect().center();
-}
-
 void ot::GraphicsBoxLayoutItem::getAllItems(std::list<QGraphicsLayoutItem *>& _items) const {
 	for (int i = 0; i < this->count(); i++) {
 		if (this->itemAt(i)) _items.push_back(this->itemAt(i));
@@ -248,10 +240,6 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 QRectF ot::GraphicsGridLayoutItem::getGraphicsItemBoundingRect(void) const {
 	return this->contentsRect();
-}
-
-QPointF ot::GraphicsGridLayoutItem::getGraphicsItemCenter(void) const {
-	return this->contentsRect().center();
 }
 
 void ot::GraphicsGridLayoutItem::getAllItems(std::list<QGraphicsLayoutItem*>& _items) const {

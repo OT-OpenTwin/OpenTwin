@@ -89,8 +89,6 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const = 0;
 
-		virtual QPointF getGraphicsItemCenter(void) const = 0;
-
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
 
 		// ###############################################################################################################################################
@@ -184,8 +182,6 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
-		virtual QPointF getGraphicsItemCenter(void) const override;
-
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
@@ -228,7 +224,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public QGraphicsRectItem, public QGraphicsLayoutItem, public GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public QGraphicsItem, public QGraphicsLayoutItem, public GraphicsItem {
 	public:
 		GraphicsRectangularItem();
 		virtual ~GraphicsRectangularItem();
@@ -240,6 +236,8 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
 
+		virtual QRectF boundingRect(void) const override;
+
 		virtual void setGeometry(const QRectF& rect) override;
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
@@ -250,9 +248,9 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
-		virtual QPointF getGraphicsItemCenter(void) const override;
-
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value) override;
 
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
@@ -260,7 +258,7 @@ namespace ot {
 
 	private:
 		QSizeF m_size;
-
+		int m_cornerRadius;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -290,8 +288,6 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
-
-		virtual QPointF getGraphicsItemCenter(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -333,8 +329,6 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
-		virtual QPointF getGraphicsItemCenter(void) const override;
-
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
@@ -367,8 +361,6 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
-		virtual QPointF getGraphicsItemCenter(void) const override;
-
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
@@ -394,7 +386,7 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsConnectionItem); };
 
-		void connect(GraphicsItem* _origin, GraphicsItem* _dest);
+		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
 
 		void updateConnection(void);
 

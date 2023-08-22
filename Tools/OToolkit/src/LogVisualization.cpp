@@ -285,8 +285,14 @@ QList<QWidget *> LogVisualization::statusBarWidgets(void) const {
 }
 
 void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
+	QSettings s("OpenTwin", applicationName());
+
 	QMenu * topLvlMenu = _menuBar->addMenu("Log Visualization");
 	m_connectButton = topLvlMenu->addAction(QIcon(":/images/Shutdown.png"), "Connect");
+	m_autoConnect = topLvlMenu->addAction("Auto-Connect");
+	m_autoConnect->setCheckable(true);
+	m_autoConnect->setChecked(s.value("LogVisualization.AutoConnect", false).toBool());
+
 	topLvlMenu->addSeparator();
 	m_importButton = topLvlMenu->addAction(QIcon(":images/Import.png"), "Import");
 	m_exportButton = topLvlMenu->addAction(QIcon(":images/Export.png"), "Export");
@@ -294,30 +300,22 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 	m_exportButton->setEnabled(false);
 
 	connect(m_connectButton, &QAction::triggered, this, &LogVisualization::slotConnect);
+	connect(m_autoConnect, &QAction::triggered, this, &LogVisualization::slotToggleAutoConnect);
 	connect(m_importButton, &QAction::triggered, this, &LogVisualization::slotImport);
 	connect(m_exportButton, &QAction::triggered, this, &LogVisualization::slotExport);
+
+	if (m_autoConnect->isChecked()) {
+		LOGVIS_LOG("Auto connect requested, request queued");
+		QMetaObject::invokeMethod(this, &LogVisualization::slotAutoConnect, Qt::QueuedConnection);
+	}
 }
 
 void LogVisualization::slotConnect(void) {
-	ConnectToLoggerDialog dia;
-	dia.exec();
+	this->connectToLogger(false);
+}
 
-	if (!dia.success()) {
-		return;
-	}
-
-	m_centralLayoutW->setEnabled(true);
-	m_connectButton->setEnabled(false);
-	m_importButton->setEnabled(true);
-	m_exportButton->setEnabled(true);
-
-	slotClear();
-
-	const std::list<ot::LogMessage>& lst = dia.messageBuffer();
-	
-	for (auto msg : lst) {
-		appendLogMessage(msg);
-	}
+void LogVisualization::slotAutoConnect(void) {
+	this->connectToLogger(true);
 }
 
 void LogVisualization::slotImport(void) {
@@ -455,6 +453,13 @@ void LogVisualization::slotUpdateCheckboxColors(void) {
 
 	m_ignoreNewMessages->setStyleSheet(m_ignoreNewMessages->isChecked() ? red : def);
 	m_autoScrollToBottom->setStyleSheet(m_autoScrollToBottom->isChecked() ? red : def);
+}
+
+void LogVisualization::slotToggleAutoConnect(void) {
+	m_autoConnect->setChecked(!m_autoConnect->isChecked());
+
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	s.setValue("LogVisualization.AutoConnect", m_autoConnect->isChecked());
 }
 
 void LogVisualization::slotViewCellContent(QTableWidgetItem* _itm) {
@@ -626,6 +631,28 @@ void LogVisualization::updateCountLabels(void) {
 	m_messageCountLabel->setText("Log count: " + QString::number(m_messages.size()));
 	m_warningCountLabel->setText("Warnings: " + QString::number(m_warningCount));
 	m_errorCountLabel->setText("Errors: " + QString::number(m_errorCount));
+}
+
+void LogVisualization::connectToLogger(bool _isAutoConnect) {
+	ConnectToLoggerDialog dia(_isAutoConnect);
+	dia.exec();
+
+	if (!dia.success()) {
+		return;
+	}
+
+	m_centralLayoutW->setEnabled(true);
+	m_connectButton->setEnabled(false);
+	m_importButton->setEnabled(true);
+	m_exportButton->setEnabled(true);
+
+	slotClear();
+
+	const std::list<ot::LogMessage>& lst = dia.messageBuffer();
+
+	for (auto msg : lst) {
+		appendLogMessage(msg);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
