@@ -48,7 +48,6 @@ namespace ot {
 
 	private:
 		QWidget* m_widget;
-		QRectF m_rect;
 		GraphicsItem* m_owner;
 		int m_queueCount;
 	};
@@ -87,7 +86,14 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
+		//! @brief Return thre graphics item bounding rect
+		//! Return QRectF(QGraphicsItem::pos(), QSizeF)
+		//! Or return the boundingRect() function of the derived Qt Graphics Item
 		virtual QRectF getGraphicsItemBoundingRect(void) const = 0;
+
+		//! @brief Return the graphics item position in scene coordinates
+		//! Return QGraphicsItem::scenePos()
+		virtual QPointF getGraphicsItemScenePos(void) const = 0;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
 
@@ -98,6 +104,8 @@ namespace ot {
 		void handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect);
 
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
+
+		void handleItemMoved(void);
 
 		// ###############################################################################################################################################
 
@@ -125,9 +133,6 @@ namespace ot {
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
 		GraphicsItem* getRootItem(void);
 
-		void setLastGraphicsItemPosition(const QPointF& _pos);
-		const QPointF& lastGraphicsItemPosition(void) const { return m_lastPos; };
-
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
 		GraphicsGroupItem* getItemGroup(void) const { return m_group; };
@@ -150,7 +155,6 @@ namespace ot {
 		GraphicsItemDrag* m_drag;
 		GraphicsScene* m_scene;
 		ot::UID m_uid;
-		QPointF m_lastPos;
 		std::list<GraphicsConnectionItem*> m_connections;
 	};
 
@@ -174,6 +178,8 @@ namespace ot {
 
 		virtual void setGeometry(const QRectF& rect) override;
 
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -181,6 +187,7 @@ namespace ot {
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -235,22 +242,17 @@ namespace ot {
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
-
 		virtual QRectF boundingRect(void) const override;
-
 		virtual void setGeometry(const QRectF& rect) override;
-
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
-
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
-
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value) override;
 
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
@@ -283,11 +285,14 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -321,6 +326,8 @@ namespace ot {
 
 		virtual void setGeometry(const QRectF& rect) override;
 
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -328,6 +335,7 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -354,12 +362,15 @@ namespace ot {
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPathItem); };
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 

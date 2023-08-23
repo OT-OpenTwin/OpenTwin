@@ -234,7 +234,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	}
 
 	// Store current event position to position the new item at this pos
-	QPointF position = this->mapToScene(mapToGlobal(_event->pos()));
+	QPointF position = this->mapToScene(_event->pos());
 
 	// Create graphics item from configuration
 	ot::GraphicsItem* newItem = nullptr;
@@ -246,6 +246,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		newItem->setGraphicsItemUid(++m_currentUid);
 		
 		m_items.insert_or_assign(m_currentUid, newItem);
+
 		emit itemAdded(m_currentUid);
 	}
 	catch (const std::exception& _e) {

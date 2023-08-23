@@ -34,11 +34,14 @@ namespace ot {
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem); };
@@ -74,6 +77,9 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
+
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
 		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
@@ -96,8 +102,6 @@ namespace ot {
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
-
-		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	private:
 		GraphicsBoxLayoutItem() = delete;
@@ -168,8 +172,6 @@ namespace ot {
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
-
-		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 
 	private:
 		QSizeF m_size;

@@ -56,8 +56,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_pathItem) {
 		OTAssertNullptr(m_connectionOrigin);
-		OT_LOG_W("Pos: " + std::to_string(m_connectionOrigin->lastGraphicsItemPosition().x()) + "; " + std::to_string(m_connectionOrigin->lastGraphicsItemPosition().y()));
-		m_pathItem->setPathPoints(m_connectionOrigin->lastGraphicsItemPosition(), _event->scenePos());
+		m_pathItem->setPathPoints(m_connectionOrigin->getGraphicsItemScenePos() + m_connectionOrigin->getGraphicsItemBoundingRect().center(), _event->scenePos());
 	}
 	QGraphicsScene::mouseMoveEvent(_event);
 }
@@ -73,7 +72,10 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		p.setColor(QColor(64, 255, 64));
 		p.setWidth(1);
 		m_pathItem->setPen(p);
-		m_pathItem->setPathPoints(m_connectionOrigin->lastGraphicsItemPosition(), m_connectionOrigin->lastGraphicsItemPosition());
+		m_pathItem->setPathPoints(
+			m_connectionOrigin->getGraphicsItemScenePos() + m_connectionOrigin->getGraphicsItemBoundingRect().center(), 
+			m_connectionOrigin->getGraphicsItemScenePos() + m_connectionOrigin->getGraphicsItemBoundingRect().center()
+		);
 
 		m_pathItem->finalizeItem(this, nullptr);
 		return;
