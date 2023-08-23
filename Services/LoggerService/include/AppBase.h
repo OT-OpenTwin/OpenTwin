@@ -18,6 +18,7 @@ private:
 	std::string handleClear(void);
 	std::string handleLog(OT_rJSON_doc& _jsonDocument);
 	std::string handleRegister(OT_rJSON_doc& _jsonDocument);
+	std::string handleDeregister(OT_rJSON_doc& _jsonDocument);
 	void notifyListeners(const ot::LogMessage& _message);
 
 	void workerNotify(std::list<std::string> _receiver, std::string _message);

@@ -43,6 +43,8 @@ public:
 
 	virtual void createMenuBarEntries(QMenuBar * _menuBar) override;
 
+	virtual bool toolPrepareShutdown(QString& _errorString) override;
+
 	void appendLogMessage(const ot::LogMessage& _msg);
 	void appendLogMessages(const QList<ot::LogMessage>& _messages);
 
@@ -71,6 +73,7 @@ private:
 	void checkEntryFilter(int _row);
 	void updateCountLabels(void);
 	void connectToLogger(bool _isAutoConnect);
+	bool disconnectFromLogger(void);
 
 	// Data
 
@@ -79,6 +82,8 @@ private:
 	int							m_warningCount;
 
 	bool						m_filterLock;
+	std::string                 m_loggerUrl;
+	//bool                        m_isConnected;
 
 	QTimer *					m_filterTimer;
 

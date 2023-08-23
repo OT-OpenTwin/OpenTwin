@@ -12,11 +12,13 @@
 // Qt header
 #include <QtCore/qdatetime.h>
 #include <QtCore/qsettings.h>
+#include <QtGui/qevent.h>
 #include <QtWidgets/qtabwidget.h>
 #include <QtWidgets/qmenubar.h>
 #include <QtWidgets/qdockwidget.h>
 #include <QtWidgets/qtextedit.h>
 #include <QtWidgets/qshortcut.h>
+#include <QtWidgets/qmessagebox.h>
 
 enum InternLogType {
 	InternInfo,
@@ -32,6 +34,11 @@ AppBase * AppBase::instance(void) {
 }
 
 void AppBase::closeEvent(QCloseEvent * _event) {
+	QString err;
+	if (!this->preShutdownTool(m_logger)) { _event->accept(); return; }
+	if (!this->preShutdownTool(m_terminal)) { _event->accept(); return; }
+	if (!this->preShutdownTool(m_textFinder)) { _event->accept(); return; }
+
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 	s.setValue("IsMaximized", isMaximized());
 	s.setValue("SizeX", size().width());
@@ -43,6 +50,10 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	if (m_logger) {
 		delete m_logger;
 		m_logger = nullptr;
+	}
+	if (m_textFinder) {
+		delete m_textFinder;
+		m_textFinder = nullptr;
 	}
 	if (m_terminal) {
 		delete m_terminal;
@@ -78,6 +89,11 @@ void AppBase::logError(const QString& _sender, const QString& _message) {
 	else {
 		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternError));
 	}
+}
+
+void AppBase::showErrorPromt(const QString& _text) {
+	QMessageBox msg(QMessageBox::Critical, "Error", _text, QMessageBox::Ok, this);
+	msg.exec();
 }
 
 void AppBase::slotProcessMessage(const QString& _message) {
@@ -273,4 +289,23 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	log("OToolkit", "Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
+}
+
+bool AppBase::preShutdownTool(OToolkitAPI::AbstractTool* _tool) {
+	if (_tool) {
+		QString err;
+		if (!_tool->toolPrepareShutdown(err)) {
+			QMessageBox msg(
+				QMessageBox::Critical,
+				"Error",
+				"Failed to prepare tool \"" + _tool->toolName() + "\" for shutdown.\nError:\n" + err + "\n\nDo you want to continue? All unsaved changes will be lost.",
+				QMessageBox::Yes | QMessageBox::No,
+				this
+			);
+			if (msg.exec() != QMessageBox::Yes) {
+				return false;
+			}
+		}
+	}
+	return true;
 }

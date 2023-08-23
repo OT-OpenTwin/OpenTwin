@@ -231,5 +231,7 @@
         <file>qss_icons/dark/rc/window_undock_pressed@2x.png</file>
         <file>images/False.png</file>
         <file>images/True.png</file>
+        <file>images/Connected.png</file>
+        <file>images/Disconnected.png</file>
     </qresource>
 </RCC>

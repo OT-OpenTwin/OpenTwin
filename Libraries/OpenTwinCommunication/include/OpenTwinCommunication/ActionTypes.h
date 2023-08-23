@@ -23,6 +23,7 @@
 #define OT_ACTION_CMD_Compound "Compound"
 #define OT_ACTION_CMD_ServiceClosing "Service.Closing"
 #define OT_ACTION_CMD_RegisterNewService "Service.New"
+#define OT_ACTION_CMD_RemoveService "Service.Remove"
 #define OT_ACTION_CMD_StartNewService "Service.Start.Single"
 #define OT_ACTION_CMD_StartNewServices "Service.Start.Multiple"
 #define OT_ACTION_CMD_StartNewRelayService "Service.Start.Relay"

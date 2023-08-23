@@ -10,9 +10,9 @@
 
 // OpenTwin header
 #include "OpenTwinCore/CoreAPIExport.h"
-#include <exception>
 
 // std header
+#include <exception>
 #include <string>
 #include <list>
 #include <vector>

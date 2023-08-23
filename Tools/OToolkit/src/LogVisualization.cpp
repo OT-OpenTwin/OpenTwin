@@ -145,11 +145,6 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	m_table->setHorizontalHeaderItem(tFunction, new QTableWidgetItem("Function"));
 	m_table->setHorizontalHeaderItem(tMessage, new QTableWidgetItem("Message"));
 
-	//m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	//m_table->horizontalHeader()->setSectionResizeMode(tMessage, QHeaderView::Stretch);
-
-	//m_table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
 	m_table->setAlternatingRowColors(true);
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -203,7 +198,6 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	}
 
 	// Initialize colors and text
-	m_centralLayoutW->setEnabled(false);
 	slotUpdateCheckboxColors();
 	updateCountLabels();
 	
@@ -288,7 +282,7 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 	QSettings s("OpenTwin", applicationName());
 
 	QMenu * topLvlMenu = _menuBar->addMenu("Log Visualization");
-	m_connectButton = topLvlMenu->addAction(QIcon(":/images/Shutdown.png"), "Connect");
+	m_connectButton = topLvlMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
 	m_autoConnect = topLvlMenu->addAction("Auto-Connect");
 	bool needAutoConnect = s.value("LogVisualization.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
@@ -296,8 +290,6 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 	topLvlMenu->addSeparator();
 	m_importButton = topLvlMenu->addAction(QIcon(":images/Import.png"), "Import");
 	m_exportButton = topLvlMenu->addAction(QIcon(":images/Export.png"), "Export");
-	m_importButton->setEnabled(false);
-	m_exportButton->setEnabled(false);
 
 	connect(m_connectButton, &QAction::triggered, this, &LogVisualization::slotConnect);
 	connect(m_autoConnect, &QAction::triggered, this, &LogVisualization::slotToggleAutoConnect);
@@ -308,6 +300,13 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 		LOGVIS_LOG("Auto connect requested, request queued");
 		QMetaObject::invokeMethod(this, &LogVisualization::slotAutoConnect, Qt::QueuedConnection);
 	}
+}
+
+bool LogVisualization::toolPrepareShutdown(QString& _errorString) {
+	if (this->disconnectFromLogger()) return true;
+	
+	_errorString = "Failed to send deregistration request to LoggerService \"" + QString::fromStdString(m_loggerUrl) + "\"";
+	return false;
 }
 
 void LogVisualization::slotConnect(void) {
@@ -634,6 +633,11 @@ void LogVisualization::updateCountLabels(void) {
 }
 
 void LogVisualization::connectToLogger(bool _isAutoConnect) {
+	if (!m_loggerUrl.empty()) {
+		this->disconnectFromLogger();
+		return;
+	}
+
 	ConnectToLoggerDialog dia(_isAutoConnect);
 	dia.exec();
 
@@ -641,17 +645,38 @@ void LogVisualization::connectToLogger(bool _isAutoConnect) {
 		return;
 	}
 	
+	m_loggerUrl = dia.loggerServiceUrl().toStdString();
+
 	LOGVIS_LOG("Successfully connected to LoggerService. Refreshing log messages...");
 
-	m_centralLayoutW->setEnabled(true);
-	m_connectButton->setEnabled(false);
-	m_importButton->setEnabled(true);
-	m_exportButton->setEnabled(true);
-
+	m_connectButton->setText("Disconnect");
+	m_connectButton->setIcon(QIcon(":/images/Connected.png"));
 	this->slotClear();
 	this->appendLogMessages(dia.messageBuffer());
-
+	
 	LOGVIS_LOG("Done.");
+}
+
+bool LogVisualization::disconnectFromLogger(void) {
+	if (m_loggerUrl.empty()) return true;
+
+	std::string response;
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_RemoveService);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, AppBase::instance()->url().toStdString());
+
+	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+		LOGVIS_LOGE("Failed to send remove service request to logger service.");
+		return false;
+	}
+
+	LOGVIS_LOG("Successfully deregistered at LoggerService \"" + QString::fromStdString(m_loggerUrl) + "\"");
+	m_loggerUrl.clear();
+
+	m_connectButton->setText("Connect");
+	m_connectButton->setIcon(QIcon(":/images/Disconnected.png"));
+	
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

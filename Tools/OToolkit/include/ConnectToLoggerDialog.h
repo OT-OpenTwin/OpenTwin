@@ -23,6 +23,8 @@ public:
 	const QList<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
 	bool success(void) const { return m_success; };
 
+	QString loggerServiceUrl(void) const;
+
 private slots:
 	void slotCancel(void);
 	void slotConnect(void);

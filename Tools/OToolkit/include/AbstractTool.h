@@ -44,6 +44,13 @@ namespace OToolkitAPI {
 		//! @brief Is called after the user switched to a different tool
 		virtual void toolWasHidden(void) {};
 
+		//! @brief Is called before the tool will be destroyed
+		//! If any error occurs that might lead to a potential loss of data the function should return false.
+		//! On error the user will get notified and may decide if he wants to ignore the error or not
+		//! @param _errorString Error text should be written here
+		//! @return False if the tool failed to shut down
+		virtual bool toolPrepareShutdown(QString& _errorString) { return true; };
+
 		// ##########################################################################################################################
 
 		// Helper functions

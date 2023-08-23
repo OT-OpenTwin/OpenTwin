@@ -23,6 +23,8 @@ class QShortcut;
 #define OTOOLKIT_LOGW(___sender, ___message) AppBase::instance()->logWarning(___sender, ___message)
 #define OTOOLKIT_LOGE(___sender, ___message) AppBase::instance()->logError(___sender, ___message)
 
+namespace OToolkitAPI { class AbstractTool; }
+
 class AppBase : public QMainWindow {
 	Q_OBJECT
 public:
@@ -42,6 +44,8 @@ public:
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
 	QApplication* applicationInstance(void) { return m_app; };
 
+	void showErrorPromt(const QString& _text);
+
 public slots:
 	void slotProcessMessage(const QString& _message);
 	void slotDockWidgetVisibilityChanged(bool _visible);
@@ -56,6 +60,7 @@ private slots:
 
 private:
 	AppBase();
+	bool preShutdownTool(OToolkitAPI::AbstractTool* _tool);
 	
 	Qt::HANDLE			m_mainThread;
 

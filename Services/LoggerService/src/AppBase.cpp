@@ -21,6 +21,7 @@ std::string AppBase::dispatchAction(const std::string& _action, OT_rJSON_doc& _j
 	if (_action == OT_ACTION_CMD_Log) return handleLog(_jsonDocument);
 	else if (_action == OT_ACTION_CMD_Ping) return OT_ACTION_CMD_Ping;
 	else if (_action == OT_ACTION_CMD_RegisterNewService) return handleRegister(_jsonDocument);
+	else if (_action == OT_ACTION_CMD_RemoveService) return handleDeregister(_jsonDocument);
 	else if (_action == OT_ACTION_CMD_Reset) return handleClear();
 	else if (_action == OT_ACTION_CMD_GetDebugInformation) return handleGetDebugInfo();
 	else if (_action == OT_ACTION_CMD_ServiceShutdown) exit(0);
@@ -93,6 +94,22 @@ std::string AppBase::handleRegister(OT_rJSON_doc& _jsonDocument) {
 		doc.PushBack(msgObj, doc.GetAllocator());
 	}
 	return ot::rJSON::toJSON(doc);
+}
+
+std::string AppBase::handleDeregister(OT_rJSON_doc& _jsonDocument) {
+	std::string receiverUrl = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
+	std::string ret = OT_ACTION_RETURN_VALUE_FAILED;
+	m_receiverMutex.lock();
+	auto it = std::find(m_receiver.begin(), m_receiver.end(), receiverUrl);
+	if (it != m_receiver.end()) {
+		m_receiver.erase(it);
+		ret = OT_ACTION_RETURN_VALUE_OK;
+#ifdef _DEBUG
+		std::cout << "Removed Receiver: " << receiverUrl << std::endl;
+#endif // _DEBUG
+	}
+	m_receiverMutex.unlock();
+	return ret;
 }
 
 void AppBase::notifyListeners(const ot::LogMessage& _message) {

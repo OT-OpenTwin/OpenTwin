@@ -63,6 +63,10 @@ ConnectToLoggerDialog::~ConnectToLoggerDialog() {
 
 }
 
+QString ConnectToLoggerDialog::loggerServiceUrl(void) const {
+	return m_url->text();
+}
+
 void ConnectToLoggerDialog::slotCancel(void) {
 	close();
 }
