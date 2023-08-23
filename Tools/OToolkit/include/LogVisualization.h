@@ -121,7 +121,7 @@ private:
 
 	// Tool Bar
 	QAction *					m_connectButton;
-	QAction* m_autoConnect;
+	QAction*					m_autoConnect;
 	QAction *					m_importButton;
 	QAction *					m_exportButton;
 };

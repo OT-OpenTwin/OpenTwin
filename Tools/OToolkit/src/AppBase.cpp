@@ -16,6 +16,7 @@
 #include <QtWidgets/qmenubar.h>
 #include <QtWidgets/qdockwidget.h>
 #include <QtWidgets/qtextedit.h>
+#include <QtWidgets/qshortcut.h>
 
 enum InternLogType {
 	InternInfo,
@@ -192,6 +193,11 @@ void AppBase::slotLog(const QString& _sender, const QString& _message, int _type
 	m_output->append("");
 }
 
+void AppBase::slotRecenter(void) {
+	this->move(0, 0);
+	this->resize(800, 600);
+}
+
 AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	setObjectName("OToolkit_MainWindow");
 
@@ -236,6 +242,9 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	m_outputAction->setCheckable(true);
 	m_outputAction->setChecked(true);
 
+	// Setup global shortcuts
+	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);
+
 	// Restore settings
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 	bool isMax = s.value("IsMaximized", false).toBool();
@@ -259,6 +268,7 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	connect(m_outputAction, &QAction::triggered, this, &AppBase::slotToggleOutput);
 	connect(m_settingsAction, &QAction::triggered, this, &AppBase::slotSettings);
 	connect(m_exitAction, &QAction::triggered, this, &AppBase::slotClose);
+	connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 
 	log("OToolkit", "Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
 

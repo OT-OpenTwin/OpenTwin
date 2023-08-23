@@ -17,6 +17,7 @@ class QDockWidget;
 class QTextEdit;
 class QAction;
 class QApplication;
+class QShortcut;
 
 #define OTOOLKIT_LOG(___sender, ___message) AppBase::instance()->log(___sender, ___message)
 #define OTOOLKIT_LOGW(___sender, ___message) AppBase::instance()->logWarning(___sender, ___message)
@@ -51,6 +52,7 @@ public slots:
 private slots:
 	void slotInitialize(void);
 	void slotLog(const QString& _sender, const QString& _message, int _type);
+	void slotRecenter(void);
 
 private:
 	AppBase();
@@ -74,4 +76,6 @@ private:
 	QAction *			m_settingsAction;
 	QAction *			m_exitAction;
 	QApplication* m_app;
+
+	QShortcut* m_recenterShortcut;
 };

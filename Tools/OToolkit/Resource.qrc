@@ -229,5 +229,7 @@
         <file>qss_icons/dark/rc/window_undock_focus@2x.png</file>
         <file>qss_icons/dark/rc/window_undock_pressed.png</file>
         <file>qss_icons/dark/rc/window_undock_pressed@2x.png</file>
+        <file>images/False.png</file>
+        <file>images/True.png</file>
     </qresource>
 </RCC>

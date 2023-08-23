@@ -290,8 +290,8 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 	QMenu * topLvlMenu = _menuBar->addMenu("Log Visualization");
 	m_connectButton = topLvlMenu->addAction(QIcon(":/images/Shutdown.png"), "Connect");
 	m_autoConnect = topLvlMenu->addAction("Auto-Connect");
-	m_autoConnect->setCheckable(true);
-	m_autoConnect->setChecked(s.value("LogVisualization.AutoConnect", false).toBool());
+	bool needAutoConnect = s.value("LogVisualization.AutoConnect", false).toBool();
+	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
 
 	topLvlMenu->addSeparator();
 	m_importButton = topLvlMenu->addAction(QIcon(":images/Import.png"), "Import");
@@ -304,7 +304,7 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 	connect(m_importButton, &QAction::triggered, this, &LogVisualization::slotImport);
 	connect(m_exportButton, &QAction::triggered, this, &LogVisualization::slotExport);
 
-	if (m_autoConnect->isChecked()) {
+	if (needAutoConnect) {
 		LOGVIS_LOG("Auto connect requested, request queued");
 		QMetaObject::invokeMethod(this, &LogVisualization::slotAutoConnect, Qt::QueuedConnection);
 	}
@@ -456,10 +456,10 @@ void LogVisualization::slotUpdateCheckboxColors(void) {
 }
 
 void LogVisualization::slotToggleAutoConnect(void) {
-	m_autoConnect->setChecked(!m_autoConnect->isChecked());
-
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	s.setValue("LogVisualization.AutoConnect", m_autoConnect->isChecked());
+	bool is = !s.value("LogVisualization.AutoConnect", false).toBool();
+	m_autoConnect->setIcon(is ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
+	s.setValue("LogVisualization.AutoConnect", is);
 }
 
 void LogVisualization::slotViewCellContent(QTableWidgetItem* _itm) {
