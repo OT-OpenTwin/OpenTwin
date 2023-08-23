@@ -125,8 +125,8 @@ namespace ot {
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
 		GraphicsItem* getRootItem(void);
 
-		void setGraphicsItemPosition(const QPointF& _pos);
-		const QPointF& graphicsItemPosition(void) const { return m_pos; };
+		void setLastGraphicsItemPosition(const QPointF& _pos);
+		const QPointF& lastGraphicsItemPosition(void) const { return m_lastPos; };
 
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
@@ -150,7 +150,7 @@ namespace ot {
 		GraphicsItemDrag* m_drag;
 		GraphicsScene* m_scene;
 		ot::UID m_uid;
-		QPointF m_pos;
+		QPointF m_lastPos;
 		std::list<GraphicsConnectionItem*> m_connections;
 	};
 

@@ -22,13 +22,9 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
 
-ot::GraphicsItemDrag::GraphicsItemDrag(GraphicsItem* _owner) : m_widget(nullptr), m_owner(_owner), m_queueCount(0) {
+ot::GraphicsItemDrag::GraphicsItemDrag(GraphicsItem* _owner) : m_widget(nullptr), m_owner(_owner), m_queueCount(0) {}
 
-}
-
-ot::GraphicsItemDrag::~GraphicsItemDrag() {
-
-}
+ot::GraphicsItemDrag::~GraphicsItemDrag() {}
 
 void ot::GraphicsItemDrag::queue(QWidget* _widget, const QRectF& _rect) {
 	m_queueCount++;
@@ -140,9 +136,9 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) _painter->fillRect(this->getGraphicsItemBoundingRect(), Qt::GlobalColor::green);
 }
 
-void ot::GraphicsItem::setGraphicsItemPosition(const QPointF& _pos) {
-	m_pos = _pos;
-	for (auto c : m_connections) {
+void ot::GraphicsItem::setLastGraphicsItemPosition(const QPointF& _pos) {
+	m_lastPos = _pos;
+	for (auto c : m_connections) { 
 		c->updateConnection();
 	}
 }
@@ -183,8 +179,7 @@ QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 }
 
 void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
-	this->setGraphicsItemPosition(_rect.topLeft());
-	this->setPos(this->graphicsItemPosition());
+	this->setPos(_rect.topLeft());
 }
 
 void ot::GraphicsGroupItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -289,7 +284,7 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsRectangularItem::GraphicsRectangularItem() : ot::GraphicsItem(false), m_size(10, 10), m_cornerRadius(0) {
-	this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
 ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
@@ -311,7 +306,7 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	return QRectF(this->graphicsItemPosition(), m_size);
+	return QRectF(this->pos(), m_size);
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
@@ -336,7 +331,7 @@ void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOpti
 
 void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
-	_painter->drawRoundedRect(QRectF(this->graphicsItemPosition(), m_size), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(QRectF(this->pos(), m_size), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
@@ -351,9 +346,6 @@ QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChan
 	switch (_change)
 	{
 	case QGraphicsItem::ItemPositionChange:
-		otAssert(_value.type() == QVariant::PointF, "Invalid type");
-		this->setGraphicsItemPosition(_value.toPointF());
-		OT_LOG_W("X");
 		break;
 	case QGraphicsItem::ItemMatrixChange:
 		break;
@@ -372,9 +364,6 @@ QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChan
 	case QGraphicsItem::ItemTransformChange:
 		break;
 	case QGraphicsItem::ItemPositionHasChanged:
-		otAssert(_value.type() == QVariant::PointF, "Invalid type");
-		this->setGraphicsItemPosition(_value.toPointF());
-		OT_LOG_W("Y");
 		break;
 	case QGraphicsItem::ItemTransformHasChanged:
 		break;
@@ -411,9 +400,7 @@ QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChan
 	case QGraphicsItem::ItemOpacityHasChanged:
 		break;
 	case QGraphicsItem::ItemScenePositionHasChanged:
-		otAssert(_value.type() == QVariant::PointF, "Invalid type");
-		this->setGraphicsItemPosition(_value.toPointF());
-		OT_LOG_W("Z");
+		this->setLastGraphicsItemPosition(_value.toPointF());
 		break;
 	case QGraphicsItem::ItemRotationChange:
 		break;
@@ -428,7 +415,7 @@ QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChan
 	case QGraphicsItem::ItemTransformOriginPointHasChanged:
 		break;
 	default:
-		otAssert(0, "Unknown type");
+		OT_LOG_EA("Unknown graphics item change value");
 		break;
 	}
 
@@ -543,8 +530,7 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
-	this->setGraphicsItemPosition(_rect.topLeft());
-	this->setPos(this->graphicsItemPosition());
+	this->setPos(_rect.topLeft());
 }
 
 void ot::GraphicsImageItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
@@ -593,8 +579,6 @@ ot::GraphicsPathItem::~GraphicsPathItem() {
 void ot::GraphicsPathItem::setPathPoints(const QPointF& _origin, const QPointF& _dest) {
 	m_origin = _origin;
 	m_dest = _dest;
-
-	OT_LOG_W("Path: (" + std::to_string(_origin.x()) + "; " + std::to_string(_origin.y()) + ") (" + std::to_string(_dest.x()) + "; " + std::to_string(_dest.y()) + ")");
 
 	QPainterPath pth(m_origin);
 	pth.lineTo(m_dest);
@@ -658,7 +642,7 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 		OT_LOG_EA("No graphics scene set");
 		return;
 	}
-	this->setPathPoints(m_origin->graphicsItemPosition(), m_dest->graphicsItemPosition());
+	this->setPathPoints(m_origin->lastGraphicsItemPosition(), m_dest->lastGraphicsItemPosition());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
