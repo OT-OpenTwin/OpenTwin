@@ -105,7 +105,7 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	p.setColor(QColor(255, 0, 0));
 	p.setWidth(1);
 	
-	newConnection->finalizeItem(m_scene, nullptr);
+	m_scene->addItem(newConnection->getQGraphicsItem());
 
 	m_connections.insert_or_assign(newConnection->graphicsItemUid(), newConnection);
 
@@ -241,8 +241,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	try {
 		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
 		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
-		newItem->finalizeItem(m_scene, nullptr);
-		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
+		m_scene->addItem(newItem->getQGraphicsItem());
 		newItem->setGraphicsItemUid(++m_currentUid);
 		
 		m_items.insert_or_assign(m_currentUid, newItem);

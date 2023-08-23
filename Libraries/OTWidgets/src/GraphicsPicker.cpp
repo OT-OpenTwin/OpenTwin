@@ -117,14 +117,14 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 					// Store configuration to create item when dragging (and dropping (: )
 					OT_rJSON_createDOC(configDoc);
 					bCfg->addToJsonObject(configDoc, configDoc);
-					newItem->setConfiguration(ot::rJSON::toJSON(configDoc));
+					newItem->getRootItem()->setConfiguration(ot::rJSON::toJSON(configDoc));
 
 					GraphicsView* newView = new GraphicsView;
 					newView->setMaximumSize(m_previewSize);
 					newView->setMinimumSize(m_previewSize);
 					newView->setDragMode(QGraphicsView::NoDrag);
 
-					newItem->finalizeItem(newView->getGraphicsScene(), nullptr);
+					newView->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
 					newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemPreviewContext);
 
 					newView->viewAll();

@@ -275,7 +275,7 @@ ot::GraphicsFlowItemCfg::~GraphicsFlowItemCfg() {}
 void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	// --- Create items ------------------------------------------------
 	
-	// Create root item
+	// Root
 	ot::GraphicsStackItemCfg* root = new ot::GraphicsStackItemCfg;
 	root->setGraphicsItemFlags(this->graphicsItemFlags());
 	root->setName(this->name());
@@ -285,24 +285,34 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg;
 	bor->setCornerRadius(5);
 	bor->setName(this->name() + "_bor");
-	bor->setSize(ot::Size2D(100, 200));
+	bor->setSize(ot::Size2D(200, 200));
 
-	// Main layout
+	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(this->name() + "_mLay");
 
-	// Title layout
+	// Title: Stack
+	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
+	tStack->setName(this->name() + "_tStack");
+
+	// Title: Border
+	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg;
+	tBor->setName(this->name() + "_tBor");
+	tBor->setCornerRadius(5);
+	tBor->setSize(ot::Size2D(200, 30));
+
+	// Title: Layout
 	ot::GraphicsHBoxLayoutItemCfg* tLay = new ot::GraphicsHBoxLayoutItemCfg;
 	tLay->setName(this->name() + "_tLay");
 
-	// Title
+	// Title: Title
 	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
 	tit->setName(this->name() + "_tit");
 	tit->setText(this->title());
 
 	// Central stack
-	ot::GraphicsStackItemCfg* cStack = new ot::GraphicsStackItemCfg;
-	cStack->setName(this->name() + "_cStack");
+	//ot::GraphicsStackItemCfg* cStack = new ot::GraphicsStackItemCfg;
+	//cStack->setName(this->name() + "_cStack");
 
 	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_inputs.size(), m_outputs.size()), 3);
 	cLay->setName(this->name() + "_cLay");
@@ -317,12 +327,15 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 		cLay->addChildItem(ix++, 2, this->createConnector(c, false));
 	}
 
-	// --- Setup item relationshipts ------------------------------------
+	// --- Setup item relationships -------------------------------------
 
 	root->setBottomItem(bor);
 	root->setTopItem(mLay);
 
-	mLay->addChildItem(tLay);
+	tStack->setBottomItem(tBor);
+	tStack->setTopItem(tLay);
+
+	mLay->addChildItem(tStack);
 	mLay->addChildItem(cLay); // Switch to stack (cStack) once image implemented
 	mLay->addStrech(1);
 
@@ -392,7 +405,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createConnector(const FlowConnecto
 	case Square: return createSquareConnector(_entry, _isInput);
 	default:
 		OT_LOG_EA("Unknown flow connector type");
-		break;
+		throw std::exception("Unknown flow connector type");
 	}
 }
 

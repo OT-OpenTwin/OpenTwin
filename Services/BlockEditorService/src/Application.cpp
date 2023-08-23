@@ -124,7 +124,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 }
 
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
-	ot::GraphicsGridLayoutItemCfg* centralLayout = new ot::GraphicsGridLayoutItemCfg(2, 2);
+	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
 	centralLayout->setName(_name);
 	centralLayout->setTitle(_name);
 
@@ -137,17 +137,8 @@ ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	leftRect->setSize(ot::Size2D(20, 20));
 	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
-	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
-	rightRect->setName("Right");
-	rightRect->setSize(ot::Size2D(30, 30));
-	rightRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-	centralLayout->addChildItem(0, 0, title);
-	centralLayout->addChildItem(0, 1, rightRect);
-	centralLayout->addChildItem(1, 0, leftRect);
-
-	centralLayout->setColumnStretch(0, 1);
-	centralLayout->setRowStretch(1, 1);
+	centralLayout->addChildItem(title);
+	centralLayout->addChildItem(leftRect);
 
 	return centralLayout;
 }

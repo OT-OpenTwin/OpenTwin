@@ -12,6 +12,8 @@
 
 ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner) : m_owner(_owner) {
 	OTAssertNullptr(m_owner);
+	m_group = new ot::GraphicsGroupItem;
+	m_group->addToGroup(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
@@ -33,18 +35,15 @@ QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemCh
 	return QGraphicsWidget::itemChange(_change, _value);
 }
 
-void ot::GraphicsLayoutItemWrapper::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
-	if (_group) _group->addToGroup(this);
-	_scene->addItem(this);
-}
-
 void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	OTAssertNullptr(m_group);
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	m_group->setGraphicsItemFlags(_flags);
 }
 
 QRectF ot::GraphicsLayoutItemWrapper::getGraphicsItemBoundingRect(void) const {
@@ -53,6 +52,12 @@ QRectF ot::GraphicsLayoutItemWrapper::getGraphicsItemBoundingRect(void) const {
 
 QPointF ot::GraphicsLayoutItemWrapper::getGraphicsItemScenePos(void) const {
 	return this->scenePos();
+}
+
+void ot::GraphicsLayoutItemWrapper::setParentGraphicsItem(GraphicsItem* _itm) {
+	OTAssertNullptr(m_group);
+	m_group->setParentGraphicsItem(_itm);
+	ot::GraphicsItem::setParentGraphicsItem(m_group);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -66,34 +71,19 @@ ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutW
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
+	//if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsLayoutItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
+void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
 	OTAssertNullptr(m_layoutWrap);
-
-	this->setGraphicsScene(_scene);
-
-	m_layoutWrap->finalizeItem(_scene, _group);
-
-	std::list<QGraphicsLayoutItem*> lst;
-	this->getAllItems(lst);
-
-	for (auto itm : lst) {
-		// Finalize child
-		ot::GraphicsItem* gi = dynamic_cast<ot::GraphicsItem*>(itm);
-		if (gi) gi->finalizeItem(_scene, _group);
-		else {
-			OT_LOG_EA("Failed to cast GrahicsLayoutItem child to GraphicsItem");
-		}
-	}
+	m_layoutWrap->setParentGraphicsItem(_itm);
+	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
 void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	if (m_layoutWrap) {
-		m_layoutWrap->setGraphicsItemFlags(_flags);
-	}
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setGraphicsItemFlags(_flags);
 }
 
 void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -123,11 +113,18 @@ QPointF ot::GraphicsLayoutItem::getGraphicsItemScenePos(void) const {
 	return m_layoutWrap->scenePos();
 }
 
-void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
+void ot::GraphicsLayoutItem::createLayoutWrapperAndGroup(QGraphicsLayout* _layout) {
 	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 	m_layoutWrap->setParentGraphicsItem(this);
 	m_layoutWrap->setLayout(_layout);
+	// Refresh the parent item
+	this->setParentGraphicsItem(nullptr);
+}
+
+void ot::GraphicsLayoutItem::addChildToGroup(ot::GraphicsItem* _item) {
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->getGroupItem()->addToGroup(_item->getQGraphicsItem());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -138,7 +135,7 @@ void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 
 ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) 
 {
-	this->createLayoutWrapper(this);
+	this->createLayoutWrapperAndGroup(this);
 }
 
 bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -147,6 +144,8 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
+
+	this->setContentsMargins(_cfg->margins().left(), _cfg->margins().top(), _cfg->margins().right(), _cfg->margins().bottom());
 
 	for (auto itm : cfg->items()) {
 		if (itm.first) {
@@ -158,6 +157,8 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			i->setParentGraphicsItem(this);
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
+			this->addChildToGroup(i);
+			this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
 		}
 		else {
 			this->addStretch(itm.second);
@@ -205,7 +206,7 @@ bool ot::GraphicsHBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) 
 {
-	this->createLayoutWrapper(this);
+	this->createLayoutWrapperAndGroup(this);
 }
 
 bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -214,6 +215,8 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
+
+	this->setContentsMargins(_cfg->margins().left(), _cfg->margins().top(), _cfg->margins().right(), _cfg->margins().bottom());
 
 	// Create items
 	int x = 0;
@@ -229,6 +232,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				i->setParentGraphicsItem(this);
 				OTAssertNullptr(i->getQGraphicsLayoutItem());
 				this->addItem(i->getQGraphicsLayoutItem(), x, y);
+				this->addChildToGroup(i);
 			}
 			y++;
 		}

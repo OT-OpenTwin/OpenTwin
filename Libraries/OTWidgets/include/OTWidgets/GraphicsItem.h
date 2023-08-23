@@ -78,8 +78,6 @@ namespace ot {
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
 
-		void finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _group);
-
 		// ###############################################################################################################################################
 
 		// Pure virtual functions
@@ -99,7 +97,7 @@ namespace ot {
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
 
-		//virtual QGraphicsItem* getQGraphicsItem(void) = 0;
+		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
 
 		// ###############################################################################################################################################
 
@@ -133,27 +131,20 @@ namespace ot {
 		void setGraphicsItemName(const std::string& _name) { m_name = _name; };
 		const std::string& graphicsItemName(void) const { return m_name; };
 
-		void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
+		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
 		GraphicsItem* getRootItem(void);
 
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
-		GraphicsGroupItem* getItemGroup(void) const { return m_group; };
-
 		void storeConnection(GraphicsConnectionItem* _connection);
 		void forgetConnection(GraphicsConnectionItem* _connection);
-
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) = 0;
 
 	private:
 		std::string m_configuration;
 		std::string m_name;
 		GraphicsItemFlag m_flags;
 		GraphicsItem* m_parent;
-		GraphicsGroupItem* m_group;
 		bool m_isContainerItem;
 		bool m_hasHover;
 		GraphicsItemDrag* m_drag;
@@ -193,12 +184,9 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
 		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -220,10 +208,6 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		ot::GraphicsItem* m_top;
@@ -257,12 +241,9 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
 		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		QSizeF m_size;
@@ -300,12 +281,10 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
 		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 	};
 
 
@@ -340,12 +319,10 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
 		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -373,12 +350,9 @@ namespace ot {
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
 		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return nullptr; };
+		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-	protected:
-		//! @brief Finish setting up the item and add it to the scene (and all childs)
-		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
 
 	private:
 		QPointF m_origin;

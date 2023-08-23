@@ -76,8 +76,8 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 			m_connectionOrigin->getGraphicsItemScenePos() + m_connectionOrigin->getGraphicsItemBoundingRect().center(), 
 			m_connectionOrigin->getGraphicsItemScenePos() + m_connectionOrigin->getGraphicsItemBoundingRect().center()
 		);
-
-		m_pathItem->finalizeItem(this, nullptr);
+		this->addItem(m_pathItem->getQGraphicsItem());
+		
 		return;
 	}
 	else {
