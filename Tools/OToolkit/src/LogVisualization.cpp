@@ -640,19 +640,18 @@ void LogVisualization::connectToLogger(bool _isAutoConnect) {
 	if (!dia.success()) {
 		return;
 	}
+	
+	LOGVIS_LOG("Successfully connected to LoggerService. Refreshing log messages...");
 
 	m_centralLayoutW->setEnabled(true);
 	m_connectButton->setEnabled(false);
 	m_importButton->setEnabled(true);
 	m_exportButton->setEnabled(true);
 
-	slotClear();
+	this->slotClear();
+	this->appendLogMessages(dia.messageBuffer());
 
-	const std::list<ot::LogMessage>& lst = dia.messageBuffer();
-
-	for (auto msg : lst) {
-		appendLogMessage(msg);
-	}
+	LOGVIS_LOG("Done.");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

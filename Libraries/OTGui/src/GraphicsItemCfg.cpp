@@ -355,6 +355,8 @@ void ot::GraphicsFlowItemCfg::addOutput(const std::string& _name, const std::str
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createConnectorEntry(const FlowConnectorEntry& _entry, ot::GraphicsItemCfg* _connectorItem, bool _isInput) const {
+	_connectorItem->setGraphicsItemFlags(_connectorItem->graphicsItemFlags() | ot::GraphicsItemCfg::ItemIsConnectable);
+
 	ot::GraphicsHBoxLayoutItemCfg* itmLay = new ot::GraphicsHBoxLayoutItemCfg;
 	itmLay->setName(_entry.name + "_lay");
 

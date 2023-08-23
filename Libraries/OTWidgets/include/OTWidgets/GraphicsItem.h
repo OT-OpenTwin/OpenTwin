@@ -97,6 +97,10 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
 
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
+
+		//virtual QGraphicsItem* getQGraphicsItem(void) = 0;
+
 		// ###############################################################################################################################################
 
 		// Generalized functionallity
@@ -188,6 +192,7 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -251,6 +256,7 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -279,7 +285,7 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem); };
 
-		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual void setGeometry(const QRectF& rect) override;
 
@@ -293,16 +299,13 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
 		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
-
-	private:
-		QSizeF m_size;
-
 	};
 
 
@@ -322,7 +325,7 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem); };
 
-		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual void setGeometry(const QRectF& rect) override;
 
@@ -336,15 +339,13 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
 		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
-
-	private:
-		QSizeF m_size;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -371,6 +372,7 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return nullptr; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 

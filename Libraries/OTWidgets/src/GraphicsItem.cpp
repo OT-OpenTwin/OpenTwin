@@ -90,7 +90,7 @@ void ot::GraphicsItem::finalizeItem(GraphicsScene* _scene, GraphicsGroupItem* _g
 
 	this->setGraphicsScene(_scene);
 
-	if (m_isContainerItem) {
+	if (m_isContainerItem && false) {
 		m_group = new GraphicsGroupItem;
 		m_group->setParentGraphicsItem(this);
 		
@@ -175,6 +175,8 @@ QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 }
 
 void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
 }
 
@@ -317,6 +319,8 @@ QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
 }
 
@@ -381,8 +385,6 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
-	m_size.setWidth(cfg->size().width());
-	m_size.setHeight(cfg->size().height());
 	
 	QFont f = this->font();
 	f.setPixelSize(cfg->textFont().size());
@@ -397,7 +399,13 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->boundingRect().size();
+}
+
 void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
 }
 
@@ -461,9 +469,7 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
-	m_size.setWidth(cfg->size().width());
-	m_size.setHeight(cfg->size().height());
-
+	
 	try {
 		this->setPixmap(ot::IconManager::instance().getPixmap(QString::fromStdString(cfg->imagePath())));
 	}
@@ -478,7 +484,14 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+QSizeF ot::GraphicsImageItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	
+	return this->boundingRect().size();
+}
+
 void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
 }
 

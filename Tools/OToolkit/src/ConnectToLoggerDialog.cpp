@@ -159,7 +159,7 @@ void ConnectToLoggerDialog::worker(QString _url) {
 		}
 	}
 
-	DIA_LOG("Connection worker success. Returning to main event loop...");
+	DIA_LOG("Connection worker success");
 
 	QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotDone, Qt::QueuedConnection);
 }

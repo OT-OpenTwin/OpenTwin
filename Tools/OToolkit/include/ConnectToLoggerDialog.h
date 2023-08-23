@@ -2,6 +2,7 @@
 
 #include "OpenTwinCore/Logger.h"
 
+#include <QtCore/qlist.h>
 #include <QtWidgets/qdialog.h>
 
 #include <list>
@@ -19,7 +20,7 @@ public:
 	ConnectToLoggerDialog(bool _isAutoConnect);
 	virtual ~ConnectToLoggerDialog();
 
-	const std::list<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
+	const QList<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
 	bool success(void) const { return m_success; };
 
 private slots:
@@ -42,7 +43,7 @@ private:
 	QPushButton *				m_btnCancel;
 	QPushButton *				m_btnConnect;
 
-	std::list<ot::LogMessage>	m_messageBuffer;
+	QList<ot::LogMessage>	m_messageBuffer;
 	bool						m_success;
 
 	ConnectToLoggerDialog() = delete;

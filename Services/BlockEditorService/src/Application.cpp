@@ -123,38 +123,6 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	return cfg;
 }
 
-ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
-	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
-	centralLayout->setName(_name);
-	centralLayout->setTitle(_name);
-
-	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
-	title->setName("Title");
-	title->setText("Title");
-	
-	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
-
-	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
-	leftRect->setName("Left");
-	leftRect->setSize(ot::Size2D(20, 20));
-	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-	ot::GraphicsRectangularItemCfg* rightRect = new ot::GraphicsRectangularItemCfg;
-	rightRect->setName("Right");
-	rightRect->setSize(ot::Size2D(30, 30));
-	rightRect->setCornerRadius(2);
-	rightRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-	midLayout->addChildItem(leftRect);
-	midLayout->addStrech(1);
-	midLayout->addChildItem(rightRect);
-
-	centralLayout->addChildItem(title);
-	centralLayout->addChildItem(midLayout, 1);
-
-	return centralLayout;
-}
-
 ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	ot::GraphicsGridLayoutItemCfg* centralLayout = new ot::GraphicsGridLayoutItemCfg(2, 2);
 	centralLayout->setName(_name);
@@ -163,7 +131,7 @@ ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
 	title->setName("Title");
 	title->setText("Title");
-	
+
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
 	leftRect->setName("Left");
 	leftRect->setSize(ot::Size2D(20, 20));
@@ -180,6 +148,53 @@ ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 
 	centralLayout->setColumnStretch(0, 1);
 	centralLayout->setRowStretch(1, 1);
+
+	return centralLayout;
+}
+
+ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
+	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
+	centralLayout->setName(_name);
+	
+	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
+	tit->setText(_name);
+	
+	ot::GraphicsGridLayoutItemCfg* grid = new ot::GraphicsGridLayoutItemCfg(2, 3);
+	grid->setColumnStretch(1, 1);
+
+	ot::GraphicsHBoxLayoutItemCfg* b1 = new ot::GraphicsHBoxLayoutItemCfg;
+	ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
+	r1->setSize(ot::Size2D(10, 10));
+	ot::GraphicsTextItemCfg* t1 = new ot::GraphicsTextItemCfg;
+	t1->setText("Test 1");
+	b1->addChildItem(r1);
+	b1->addChildItem(t1);
+	b1->addStrech(1);
+
+	ot::GraphicsHBoxLayoutItemCfg* b2 = new ot::GraphicsHBoxLayoutItemCfg;
+	ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
+	r2->setSize(ot::Size2D(10, 10));
+	ot::GraphicsTextItemCfg* t2 = new ot::GraphicsTextItemCfg;
+	t2->setText("Test 2");
+	b2->addChildItem(r2);
+	b2->addChildItem(t2);
+	b2->addStrech(1);
+
+	ot::GraphicsHBoxLayoutItemCfg* b3 = new ot::GraphicsHBoxLayoutItemCfg;
+	ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
+	r3->setSize(ot::Size2D(10, 10));
+	ot::GraphicsTextItemCfg* t3 = new ot::GraphicsTextItemCfg;
+	t3->setText("Test 3");
+	b3->addChildItem(r3);
+	b3->addChildItem(t3);
+	b3->addStrech(1);
+
+	centralLayout->addChildItem(tit);
+	centralLayout->addChildItem(grid, 1);
+
+	grid->addChildItem(0, 0, b1);
+	grid->addChildItem(0, 2, b2);
+	grid->addChildItem(1, 2, b3);
 
 	return centralLayout;
 }

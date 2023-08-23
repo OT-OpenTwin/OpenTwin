@@ -42,6 +42,7 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem); };
@@ -79,10 +80,14 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
+		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return m_layoutWrap; };
 
 	protected:
 		//! @brief Finish setting up the item and add it to the scene (and all childs)
 		virtual void finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) override;
+
+		//! @brief Call this function from the item constructor to create the layout wrapper instance
+		void createLayoutWrapper(QGraphicsLayout* _layout);
 
 	private:
 		GraphicsLayoutItemWrapper* m_layoutWrap;

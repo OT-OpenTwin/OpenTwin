@@ -71,7 +71,11 @@ bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 void ot::GraphicsLayoutItem::finalizeItemContents(GraphicsScene* _scene, GraphicsGroupItem* _group) {
+	OTAssertNullptr(m_layoutWrap);
+
 	this->setGraphicsScene(_scene);
+
+	m_layoutWrap->finalizeItem(_scene, _group);
 
 	std::list<QGraphicsLayoutItem*> lst;
 	this->getAllItems(lst);
@@ -83,20 +87,6 @@ void ot::GraphicsLayoutItem::finalizeItemContents(GraphicsScene* _scene, Graphic
 		else {
 			OT_LOG_EA("Failed to cast GrahicsLayoutItem child to GraphicsItem");
 		}
-	}
-
-	otAssert(m_layoutWrap == nullptr, "Layout wrap already created");
-
-	QGraphicsLayout* lay = dynamic_cast<QGraphicsLayout*>(this);
-	if (lay == nullptr) {
-		OT_LOG_EA("OT::GraphicsLayoutItem cast to QGraphicsLayout failed");
-	}
-	else {
-		// Add wrapped layout item
-		m_layoutWrap = new GraphicsLayoutItemWrapper(this);
-		m_layoutWrap->setParentGraphicsItem(this);
-		m_layoutWrap->finalizeItem(_scene, _group);
-		m_layoutWrap->setLayout(lay);
 	}
 }
 
@@ -133,13 +123,23 @@ QPointF ot::GraphicsLayoutItem::getGraphicsItemScenePos(void) const {
 	return m_layoutWrap->scenePos();
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
+void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
+	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
+	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
+	m_layoutWrap->setParentGraphicsItem(this);
+	m_layoutWrap->setLayout(_layout);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) {}
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) 
+{
+	this->createLayoutWrapper(this);
+}
 
 bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	ot::GraphicsBoxLayoutItemCfg* cfg = dynamic_cast<ot::GraphicsBoxLayoutItemCfg*>(_cfg);
@@ -155,15 +155,9 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				OT_LOG_EA("GraphicsFactory failed");
 				return false;
 			}
-			QGraphicsLayoutItem* ii = dynamic_cast<QGraphicsLayoutItem*>(i);
-			if (ii) {
-				i->setParentGraphicsItem(this);
-				this->addItem(ii);
-			}
-			else {
-				OT_LOG_EA("GraphicsItem cast to QGraphicsLayoutItem failed");
-				delete i;
-			}
+			i->setParentGraphicsItem(this);
+			OTAssertNullptr(i->getQGraphicsLayoutItem());
+			this->addItem(i->getQGraphicsLayoutItem());
 		}
 		else {
 			this->addStretch(itm.second);
@@ -209,7 +203,10 @@ bool ot::GraphicsHBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) {}
+ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) 
+{
+	this->createLayoutWrapper(this);
+}
 
 bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	ot::GraphicsGridLayoutItemCfg* cfg = dynamic_cast<ot::GraphicsGridLayoutItemCfg*>(_cfg);
@@ -229,14 +226,9 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 					OT_LOG_EA("GraphicsFactory failed");
 					return false;
 				}
-				QGraphicsLayoutItem* ii = dynamic_cast<QGraphicsLayoutItem*>(i);
-				if (ii) {
-					i->setParentGraphicsItem(this);
-					this->addItem(ii, x, y);
-				}
-				else {
-					OT_LOG_EA("GraphicsItem cast to QGraphicsLayoutItem failed");
-				}
+				i->setParentGraphicsItem(this);
+				OTAssertNullptr(i->getQGraphicsLayoutItem());
+				this->addItem(i->getQGraphicsLayoutItem(), x, y);
 			}
 			y++;
 		}
