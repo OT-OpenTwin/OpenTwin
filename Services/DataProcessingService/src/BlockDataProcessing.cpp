@@ -27,7 +27,6 @@ ot::GraphicsItemCfg* BlockDataProcessing::CreateBaseLayer()
 {
 	ot::GraphicsRectangularItemCfg* groundRect = new ot::GraphicsRectangularItemCfg();
 	groundRect->setSize(_blockSize);
-	groundRect->setBorder(ot::Border(_colourBorder, 2));
 	return groundRect;
 }
 
@@ -38,11 +37,9 @@ ot::GraphicsItemCfg* BlockDataProcessing::CreateMainLayer()
 	ot::GraphicsHBoxLayoutItemCfg* topLine = new ot::GraphicsHBoxLayoutItemCfg();
 
 	ot::GraphicsTextItemCfg* label = new ot::GraphicsTextItemCfg(_blockLabel, _colourBorder);
-	label->setBorder(ot::Border(_colourBorder, 2));
 	topLine->addChildItem(label);
 
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg(_blockTitle, _colourBorder);
-	title->setBorder(ot::Border(_colourBorder, 2));
 	topLine->addChildItem(title, 1);
 
 	centralLayout->addChildItem(topLine);
@@ -64,7 +61,6 @@ ot::GraphicsItemCfg* BlockDataProcessing::CreateConnectors()
 	connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	connector->setName("C0");
 	connector->setSize(_connectorSize);
-	connector->setBorder(ot::Border(_colourConnector, 2));
 	connectorPositioning->addChildItem(1, 1, connector);
 
 	return connectorPositioning;

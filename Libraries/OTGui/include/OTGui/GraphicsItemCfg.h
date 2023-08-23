@@ -19,6 +19,7 @@
 #include <string>
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GICText"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsFlowItemCfg "OT_GICFlow"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg "OT_GICStack"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GICRect"
@@ -58,11 +59,8 @@ namespace ot {
 		void setSize(const ot::Size2D& _size) { m_size = _size; };
 		const ot::Size2D& size(void) const { return m_size; };
 
-		void setBorder(const Border& _border) { m_border = _border; };
-		const Border& border(void) const { return m_border; };
-
-		void setMargin(const Margins& _margin) { m_margins = _margin; };
-		const Margins& margin(void) const { return m_margins; };
+		void setMargins(const Margins& _margin) { m_margins = _margin; };
+		const Margins& margins(void) const { return m_margins; };
 
 		void setGraphicsItemFlags(GraphicsItemFlag _flags) { m_flags = _flags; };
 		GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
@@ -71,7 +69,6 @@ namespace ot {
 		std::string m_name;
 		std::string m_tile;
 		Size2D m_size;
-		Border m_border;
 		Margins m_margins;
 		GraphicsItemFlag m_flags;
 	};
@@ -232,6 +229,56 @@ namespace ot {
 		GraphicsRectangularItemCfg(GraphicsRectangularItemCfg&) = delete;
 		GraphicsRectangularItemCfg& operator = (GraphicsRectangularItemCfg&) = delete;
 	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_GUI_API_EXPORTONLY GraphicsFlowItemCfg : public ot::GraphicsItemCfg {
+	public:
+		enum FlowConnectorType {
+			Square
+		};
+
+		GraphicsFlowItemCfg();
+		virtual ~GraphicsFlowItemCfg();
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsFlowItemCfg); };
+
+		void addInput(const std::string& _name, const std::string& _title, FlowConnectorType _type);
+		void addOutput(const std::string& _name, const std::string& _title, FlowConnectorType _type);
+
+	private:
+		struct FlowConnectorEntry {
+			std::string name;
+			std::string title;
+			FlowConnectorType type;
+		};
+
+		ot::GraphicsItemCfg* createConnectorEntry(const FlowConnectorEntry& _entry, ot::GraphicsItemCfg* _connectorItem, bool _isInput) const;
+		ot::GraphicsItemCfg* createSquareConnector(const FlowConnectorEntry& _entry, bool _isInput) const;
+		ot::GraphicsItemCfg* createConnector(const FlowConnectorEntry& _entry, bool _isInput) const;
+
+		std::list<FlowConnectorEntry> m_inputs;
+		std::list<FlowConnectorEntry> m_outputs;
+
+		GraphicsFlowItemCfg(GraphicsFlowItemCfg&) = delete;
+		GraphicsFlowItemCfg& operator = (GraphicsFlowItemCfg&) = delete;
+	};
+
 }
 
 OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItemCfg::GraphicsItemFlag);

@@ -131,8 +131,7 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
 	title->setName("Title");
 	title->setText("Title");
-	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
-
+	
 	ot::GraphicsHBoxLayoutItemCfg* midLayout = new ot::GraphicsHBoxLayoutItemCfg;
 
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
@@ -164,8 +163,7 @@ ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
 	title->setName("Title");
 	title->setText("Title");
-	title->setBorder(ot::Border(ot::Color(rand() % 255, rand() % 255, rand() % 255), 2));
-
+	
 	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
 	leftRect->setName("Left");
 	leftRect->setSize(ot::Size2D(20, 20));
@@ -186,6 +184,18 @@ ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 	return centralLayout;
 }
 
+ot::GraphicsItemCfg* createTestBlock4(const std::string& _name) {
+	ot::GraphicsFlowItemCfg* flow = new ot::GraphicsFlowItemCfg;
+	flow->setName(_name);
+	flow->setTitle(_name);
+
+	flow->addInput("SomeIn", "input", ot::GraphicsFlowItemCfg::Square);
+	flow->addOutput("SomeOut1", "output 1", ot::GraphicsFlowItemCfg::Square);
+	flow->addOutput("SomeOut2", "output 2", ot::GraphicsFlowItemCfg::Square);
+
+	return flow;
+}
+
 std::string Application::createEmptyTestEditor(void) {
 	if (m_uiComponent) {
 		/*ot::BlockEditorConfigurationPackage pckg("AlwaysNumberOne", "Block Editor");
@@ -202,9 +212,10 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
 		a->addChildCollection(a1);
 		a1->addItem(createTestBlock("Alpha 1"));
-		a1->addItem(createTestBlock3("Alpha 2"));
+		a1->addItem(createTestBlock2("Alpha 2"));
 		a->addChildCollection(a2);
-		a2->addItem(createTestBlock2("Alpha 3"));
+		a2->addItem(createTestBlock3("Alpha 3"));
+		a2->addItem(createTestBlock4("Alpha 4"));
 		pckg.addCollection(a);
 
 		OT_rJSON_createDOC(doc);
