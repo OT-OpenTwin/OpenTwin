@@ -11,6 +11,8 @@
 #include "OpenTwinCore/Flags.h"
 
 // Qt header
+#include <QtGui/qpen.h>
+#include <QtGui/qbrush.h>
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
 
@@ -247,6 +249,8 @@ namespace ot {
 
 	private:
 		QSizeF m_size;
+		QBrush m_brush;
+		QPen m_pen;
 		int m_cornerRadius;
 	};
 

@@ -34,6 +34,12 @@
     <ClCompile Include="src\IconManager.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\Painter2DFactory.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OTQtConverter.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -78,6 +84,12 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\IconManager.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DFactory.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\OTQtConverter.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>

@@ -219,11 +219,15 @@ namespace ot {
 		void setCornerRadius(int _px) { m_cornerRadius = _px; };
 		int cornerRadius(void) const { return m_cornerRadius; };
 		
+		void setBorder(const ot::Border& _border) { m_border = _border; };
+		const ot::Border& border(void) const { return m_border; };
+
 		void setBackgroundPainer(ot::Painter2D* _painter);
 		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
 
 	private:
 		int m_cornerRadius;
+		ot::Border m_border;
 		ot::Painter2D* m_backgroundPainter;
 
 		GraphicsRectangularItemCfg(GraphicsRectangularItemCfg&) = delete;

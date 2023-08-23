@@ -7,7 +7,6 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/Painter2D.h"
-#include "OTGui/Painter2DFactory.h"
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
@@ -17,11 +16,12 @@
 #define OT_JSON_MEMBER_Size "Size" //   <^^\\ '## w ##' \\ ^^^^^^O^                 .                '                          .                        ^O^^^^^^// '## W ##' //^^3
 #define OT_JSON_MEMBER_Title "Title" //    <^^\\ '## w ##' \\ ^^^^^^O^                            .              .                  .                     ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Flags "Flags" //     <^^\\  ## o ##' \\ ^^^^^^O^                                   '                                                  ^O^^^^^^// '## m ##' //^^3
-#define OT_JSON_MEMBER_Margin "Margin" //      <^^\\  ## x ##  \\ ^^^^^^O^                                                       '                    '        ^O^^^^^^ // '## m ##' //^^3
-#define OT_JSON_MEMBER_Bottom "Bottom" //        <^^\\  ## < ##  \\ ^^^^^^O^           .                       '                          .                          ^O^^^^^^  // '## > ##. //^^3
-#define OT_JSON_MEMBER_TextFont "TextFont" //         < ^^\\ '## < ##' \\  ^^^^^^O^                                                                                                   ^O^^^^^^  // .## > ##..//^^ 3
-#define OT_JSON_MEMBER_TextColor "TextColor" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                          ^O^^^^^^   //.:## > ##:.//^^  3
-#define OT_JSON_MEMBER_ImagePath "ImagePath" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                      ^O^^^^^^   //.:## > ##:.//^^   3
+#define OT_JSON_MEMBER_Border "Border" //      <^^\\  ## x ##  \\ ^^^^^^O^                                                       '                    '        ^O^^^^^^ // '## m ##' //^^3
+#define OT_JSON_MEMBER_Margin "Margin" //        <^^\\  ## < ##  \\ ^^^^^^O^           .                       '                          .                          ^O^^^^^^  // '## > ##. //^^3
+#define OT_JSON_MEMBER_Bottom "Bottom" //         < ^^\\ '## < ##' \\  ^^^^^^O^                                                                                              ^O^^^^^^  // .## > ##..//^^ 3
+#define OT_JSON_MEMBER_TextFont "TextFont" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                      ^O^^^^^^   //.:## > ##:.//^^  3
+#define OT_JSON_MEMBER_TextColor "TextColor" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                           ^O^^^^^^   //.:## > ##:.//^^   3
+#define OT_JSON_MEMBER_ImagePath "ImagePath"
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
@@ -210,7 +210,10 @@ void ot::GraphicsImageItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter, int _cornerRadius)
 	: m_backgroundPainter(_backgroundPainter), m_cornerRadius(_cornerRadius)
 {
-
+	if (m_backgroundPainter == nullptr) {
+		// If no background painter was provided, we set a transparent background as default
+		m_backgroundPainter = new ot::FillPainter2D(ot::Color(0, 0, 0, 0));
+	}
 }
 
 ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
@@ -218,40 +221,37 @@ ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
 }
 
 void ot::GraphicsRectangularItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	OTAssertNullptr(m_backgroundPainter);
+
 	GraphicsItemCfg::addToJsonObject(_document, _object);
 	
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CornerRadius, m_cornerRadius);
 
-	if (m_backgroundPainter) {
-		OT_rJSON_createValueObject(backgroundPainterObj);
-		m_backgroundPainter->addToJsonObject(_document, backgroundPainterObj);
-		ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
-	}
-	else {
-		OT_rJSON_createValueNull(backgroundPainterObj);
-		ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
-	}
+	OT_rJSON_createValueObject(backgroundPainterObj);
+	m_backgroundPainter->addToJsonObject(_document, backgroundPainterObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
+
+	OT_rJSON_createValueObject(borderObj);
+	m_border.addToJsonObject(_document, borderObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Border, borderObj);
 }
 
 void ot::GraphicsRectangularItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_CornerRadius, Int);
-	OT_rJSON_checkMemberExists(_object, OT_JSON_MEMBER_BackgroundPainter);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Border, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_BackgroundPainter, Object);
 
 	m_cornerRadius = _object[OT_JSON_MEMBER_CornerRadius].GetInt();
 
-	if (_object[OT_JSON_MEMBER_BackgroundPainter].IsObject()) {
-		OT_rJSON_val backgroundPainterObj = _object[OT_JSON_MEMBER_BackgroundPainter].GetObject();
-		setBackgroundPainer(ot::Painter2DFactory::painter2DFromJson(backgroundPainterObj));
-	}
-	else if (_object[OT_JSON_MEMBER_BackgroundPainter].IsNull()) {
-		setBackgroundPainer(nullptr);
-	}
-	else {
-		OT_LOG_E("Background painter member is not an object (or null)");
-		throw std::exception("JSON object member invalid type");
-	}
+	OT_rJSON_val backgroundPainterObj = _object[OT_JSON_MEMBER_BackgroundPainter].GetObject();
+	ot::Painter2D* p = ot::SimpleFactory::instance().createType<ot::Painter2D>(backgroundPainterObj);
+	p->setFromJsonObject(backgroundPainterObj);
+	this->setBackgroundPainer(p);
+
+	OT_rJSON_val borderObj = _object[OT_JSON_MEMBER_Border].GetObject();
+	m_border.setFromJsonObject(borderObj);
 }
 
 void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter) {
@@ -282,7 +282,8 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	root->setTitle(this->title());
 
 	// Border
-	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg;
+	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(ot::Color(50, 50, 50, 255)));
+	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	bor->setCornerRadius(5);
 	bor->setName(this->name() + "_bor");
 	bor->setSize(ot::Size2D(200, 200));
@@ -296,7 +297,8 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	tStack->setName(this->name() + "_tStack");
 
 	// Title: Border
-	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg;
+	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(ot::Color(70, 70, 70)));
+	tBor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	tBor->setName(this->name() + "_tBor");
 	tBor->setCornerRadius(5);
 	tBor->setSize(ot::Size2D(200, 30));

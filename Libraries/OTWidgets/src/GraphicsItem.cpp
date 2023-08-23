@@ -9,6 +9,8 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/Painter2DFactory.h"
+#include "OTWidgets/OTQtConverter.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
@@ -279,7 +281,14 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
 	m_cornerRadius = cfg->cornerRadius();
+	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
+	m_pen.setWidth(cfg->border().top()); // ToDo: Add seperate borders on all 4 sides
+	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
+	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 	
+	//OT_LOG_W("Orig: " + std::to_string(cfg->border().color().r()) + "; " + std::to_string(cfg->border().color().g()) + "; " + std::to_string(cfg->border().color().b()) + "; " + std::to_string(cfg->border().color().a()));
+	//OT_LOG_W(": " + std::to_string(m_pen.color().red()) + "; " + std::to_string(m_pen.color().green()) + "; " + std::to_string(m_pen.color().blue()) + "; " + std::to_string(m_pen.color().alpha()));
+
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
@@ -311,7 +320,9 @@ void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOpti
 
 void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
-	_painter->drawRoundedRect(QRectF(this->pos(), m_size), m_cornerRadius, m_cornerRadius);
+	_painter->setBrush(m_brush);
+	_painter->setPen(m_pen);
+	_painter->drawRoundedRect(this->boundingRect(), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {

@@ -16,8 +16,6 @@
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinCommunication/Msg.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -221,11 +219,9 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1", "1");
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
 		a->addChildCollection(a1);
-		a1->addItem(createTestBlock("Alpha 1"));
-		a1->addItem(createTestBlock2("Alpha 2"));
+		a1->addItem(createTestBlock4("Alpha 1"));
 		a->addChildCollection(a2);
-		a2->addItem(createTestBlock3("Alpha 3"));
-		a2->addItem(createTestBlock4("Alpha 4"));
+		a2->addItem(createTestBlock4("Alpha 2"));
 		pckg.addCollection(a);
 
 		OT_rJSON_createDOC(doc);
