@@ -59,7 +59,7 @@
 //! @brief Log a information message according to the service logger configuration and assert.
 //! Information messages should contain general information.
 //! @param ___text The log message.
-#define OT_LOG_IAS(___text) assert(0); OT_LOG(___text, ot::DEFAULT_LOG)
+#define OT_LOG_IAS(___text) otAssert(0, ""); OT_LOG(___text, ot::DEFAULT_LOG)
 
 //! @brief Log a detailed information message according to the service logger configuration.
 //! Detailed information messages may contain more information than regular information messages.
@@ -75,7 +75,7 @@
 //! @brief Log a detailed information message according to the service logger configuration and assert.
 //! Detailed information messages may contain more information than regular information messages.
 //! @param ___text The log message.
-#define OT_LOG_DAS(___text) assert(0); OT_LOG(___text, ot::DETAILED_LOG)
+#define OT_LOG_DAS(___text) otAssert(0, ""); OT_LOG(___text, ot::DETAILED_LOG)
 
 //! @brief Log a warning message according to the service logger configuration.
 //! @param ___text The log message.
@@ -88,7 +88,7 @@
 
 //! @brief Log a warning message according to the service logger configuration and assert.
 //! @param ___text The log message.
-#define OT_LOG_WAS(___text) assert(0); OT_LOG(___text, ot::WARNING_LOG)
+#define OT_LOG_WAS(___text) otAssert(0, ""); OT_LOG(___text, ot::WARNING_LOG)
 
 //! @brief Log a error message according to the service logger configuration.
 //! @param ___text The log message.
@@ -101,7 +101,7 @@
 
 //! @brief Log a error message according to the service logger configuration and assert.
 //! @param ___text The log message.
-#define OT_LOG_EAS(___text) assert(0); OT_LOG(___text, ot::ERROR_LOG)
+#define OT_LOG_EAS(___text) otAssert(0, ""); OT_LOG(___text, ot::ERROR_LOG)
 
 #pragma warning (disable: 4251)
 
