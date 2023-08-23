@@ -105,7 +105,7 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	p.setColor(QColor(255, 0, 0));
 	p.setWidth(1);
 	
-	m_scene->addItem(newConnection->getQGraphicsItem());
+	m_scene->addItem(newConnection);
 
 	m_connections.insert_or_assign(newConnection->graphicsItemUid(), newConnection);
 

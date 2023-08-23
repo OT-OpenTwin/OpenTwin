@@ -183,8 +183,8 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
-		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
-		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 	};
@@ -240,8 +240,8 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
-		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
-		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -280,8 +280,8 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
-		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
-		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -318,8 +318,8 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
-		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return this; };
-		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
@@ -349,8 +349,8 @@ namespace ot {
 
 		virtual QRectF getGraphicsItemBoundingRect(void) const override;
 		virtual QPointF getGraphicsItemScenePos(void) const override;
-		QGraphicsLayoutItem* getQGraphicsLayoutItem(void) { return nullptr; };
-		virtual QGraphicsItem* getQGraphicsItem(void) { return this; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return nullptr; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 

@@ -112,6 +112,7 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	backgr->setTitle(_name + "b");
 	backgr->setCornerRadius(5);
 	backgr->setSize(ot::Size2D(100, 50));
+
 	ot::GraphicsStackItemCfg* cfgTop = new ot::GraphicsStackItemCfg(bot, top);
 	cfgTop->setName(_name + "s");
 	cfgTop->setTitle(_name + "s");
@@ -156,6 +157,7 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 	ot::GraphicsHBoxLayoutItemCfg* b1 = new ot::GraphicsHBoxLayoutItemCfg;
 	ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
 	r1->setSize(ot::Size2D(10, 10));
+	r1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	ot::GraphicsTextItemCfg* t1 = new ot::GraphicsTextItemCfg;
 	t1->setText("Test 1");
 	b1->addChildItem(r1);
@@ -165,6 +167,7 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 	ot::GraphicsHBoxLayoutItemCfg* b2 = new ot::GraphicsHBoxLayoutItemCfg;
 	ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
 	r2->setSize(ot::Size2D(10, 10));
+	r2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	ot::GraphicsTextItemCfg* t2 = new ot::GraphicsTextItemCfg;
 	t2->setText("Test 2");
 	b2->addChildItem(r2);
@@ -174,6 +177,7 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 	ot::GraphicsHBoxLayoutItemCfg* b3 = new ot::GraphicsHBoxLayoutItemCfg;
 	ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
 	r3->setSize(ot::Size2D(10, 10));
+	r3->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	ot::GraphicsTextItemCfg* t3 = new ot::GraphicsTextItemCfg;
 	t3->setText("Test 3");
 	b3->addChildItem(r3);

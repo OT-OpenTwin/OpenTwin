@@ -554,6 +554,8 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
 	OTAssertNullptr(_origin);
 	OTAssertNullptr(_dest);
+	otAssert(m_origin == nullptr, "Origin already set");
+	otAssert(m_dest == nullptr, "Origin already set");
 	m_origin = _origin;
 	m_dest = _dest;
 	m_origin->storeConnection(this);
@@ -566,10 +568,7 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 		OT_LOG_EA("Can not draw connection since to item were set");
 		return;
 	}
-	if (graphicsScene() == nullptr) {
-		OT_LOG_EA("No graphics scene set");
-		return;
-	}
+	
 	this->setPathPoints(
 		m_origin->getGraphicsItemScenePos() + m_origin->getGraphicsItemBoundingRect().center(),
 		m_dest->getGraphicsItemScenePos() + m_dest->getGraphicsItemBoundingRect().center()
