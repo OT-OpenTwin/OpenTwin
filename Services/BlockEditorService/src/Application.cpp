@@ -197,6 +197,8 @@ ot::GraphicsItemCfg* createTestBlock4(const std::string& _name) {
 	flow->setName(_name);
 	flow->setTitle(_name);
 	flow->setTitleBackgroundColor(255, 0, 0);
+	//flow->setBackgroundImagePath("Default/python");
+
 	//flow->addInput("SomeIn", "input", ot::GraphicsFlowItemCfg::Square);
 	flow->addOutput("SomeOut1", "output 1", ot::GraphicsFlowItemCfg::Square);
 	flow->addOutput("SomeOut2", "output 2", ot::GraphicsFlowItemCfg::Square);

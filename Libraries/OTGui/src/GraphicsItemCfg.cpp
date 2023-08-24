@@ -323,14 +323,17 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	bor->setCornerRadius(5);
 	bor->setName(this->name() + "_bor");
 	bor->setSize(ot::Size2D(200, 200));
+	root->setBottomItem(bor);
 
 	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(this->name() + "_mLay");
+	root->setTopItem(mLay);
 
 	// Title: Stack
 	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
 	tStack->setName(this->name() + "_tStack");
+	mLay->addChildItem(tStack);
 
 	// Title: Border
 	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
@@ -338,20 +341,22 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	tBor->setName(this->name() + "_tBor");
 	tBor->setCornerRadius(5);
 	tBor->setSize(ot::Size2D(200, 30));
+	tStack->setBottomItem(tBor);
 
 	// Title: Layout
 	ot::GraphicsHBoxLayoutItemCfg* tLay = new ot::GraphicsHBoxLayoutItemCfg;
 	tLay->setName(this->name() + "_tLay");
+	tStack->setTopItem(tLay);
 
 	// Title: Title
 	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
 	tit->setName(this->name() + "_tit");
 	tit->setText(this->title());
+	tLay->addStrech(1);
+	tLay->addChildItem(tit);
+	tLay->addStrech(1);
 
-	// Central stack
-	//ot::GraphicsStackItemCfg* cStack = new ot::GraphicsStackItemCfg;
-	//cStack->setName(this->name() + "_cStack");
-
+	// Central grid
 	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_inputs.size(), m_outputs.size()), 3);
 	cLay->setName(this->name() + "_cLay");
 	cLay->setColumnStretch(1, 1);
@@ -365,21 +370,24 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 		cLay->addChildItem(ix++, 2, this->createConnector(c, false));
 	}
 
-	// --- Setup item relationships -------------------------------------
+	// Central stack
+	if (m_backgroundImagePath.empty()) {
+		mLay->addChildItem(cLay);
+	}
+	else {
+		ot::GraphicsStackItemCfg* cStack = new ot::GraphicsStackItemCfg;
+		cStack->setName(this->name() + "_cStack");
 
-	root->setBottomItem(bor);
-	root->setTopItem(mLay);
+		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
+		cImg->setImagePath(m_backgroundImagePath);
+		cImg->setName(this->name() + "_cImg");
+		
+		cStack->setBottomItem(cImg);
+		cStack->setTopItem(cLay);
 
-	tStack->setBottomItem(tBor);
-	tStack->setTopItem(tLay);
-
-	mLay->addChildItem(tStack);
-	mLay->addChildItem(cLay); // Switch to stack (cStack) once image implemented
+		mLay->addChildItem(cStack);
+	}
 	mLay->addStrech(1);
-
-	tLay->addStrech(1);
-	tLay->addChildItem(tit);
-	tLay->addStrech(1);
 
 	// Finally add the root to the document (Flow block exports only)
 	root->addToJsonObject(_document, _object);

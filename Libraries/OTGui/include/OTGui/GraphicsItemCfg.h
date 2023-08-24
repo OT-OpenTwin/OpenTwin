@@ -303,6 +303,8 @@ namespace ot {
 
 		void setConnectorTextFont(const ot::Font& _font) { m_connectorTextFont = _font; };
 
+		void setBackgroundImagePath(const std::string& _path) { m_backgroundImagePath = _path; };
+
 	private:
 		struct FlowConnectorEntry {
 			std::string name;
@@ -319,6 +321,8 @@ namespace ot {
 
 		ot::Color m_connectorTextColor;
 		ot::Font m_connectorTextFont;
+
+		std::string m_backgroundImagePath;
 
 		std::list<FlowConnectorEntry> m_inputs;
 		std::list<FlowConnectorEntry> m_outputs;
