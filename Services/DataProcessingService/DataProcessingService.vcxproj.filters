@@ -45,10 +45,10 @@
     <ClCompile Include="src\ModelNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockDataProcessing.cpp">
+    <ClCompile Include="src\BlockItemDataProcessing.cpp">
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockDatabaseAccess.cpp">
+    <ClCompile Include="src\BlockItemDatabaseAccess.cpp">
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
     <ClCompile Include="src\Pipeline.cpp">
@@ -79,7 +79,7 @@
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockEntityHandler.cpp">
-      <Filter>Source Files\BlockTypes</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,7 +92,7 @@
     <ClInclude Include="include\ModelNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockDatabaseAccess.h">
+    <ClInclude Include="include\BlockItemDatabaseAccess.h">
       <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
     <ClInclude Include="include\PipelineManager.h">
@@ -101,7 +101,7 @@
     <ClInclude Include="include\Pipeline.h">
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockDataProcessing.h">
+    <ClInclude Include="include\BlockItemDataProcessing.h">
       <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
     <ClInclude Include="include\PipelineFilter.h">
@@ -132,7 +132,7 @@
       <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockEntityHandler.h">
-      <Filter>Header Files\BlockTypes</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

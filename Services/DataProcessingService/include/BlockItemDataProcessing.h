@@ -2,11 +2,13 @@
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
+#include "OTGui/GraphicsItemCfg.h"
+#include <memory>
 
-class BlockDataProcessing
+class BlockItemDataProcessing
 {
 public:
-	BlockDataProcessing(const std::string& blockName, const std::string& blockTitle, const std::string& blockLabel, const std::string& imageName = "");
+	BlockItemDataProcessing(const std::string& blockName, const std::string& blockTitle, const std::string& blockLabel, const std::string& imageName = "");
 	ot::GraphicsItemCfg* GetBlock();
 	const std::string& getBlockName()const { return _blockName; }
 
@@ -14,11 +16,13 @@ protected:
 	ot::Size2D _blockSize;
 	ot::Size2D _connectorSize;
 	ot::Color _colourBorder;
+	ot::Color _colourTitle;
+	ot::Color _colourBackground;
+
 	ot::Color _colourConnector;		
 
-	virtual ot::GraphicsItemCfg* CreateBaseLayer();
-	virtual ot::GraphicsItemCfg* CreateMainLayer();
-	virtual ot::GraphicsItemCfg* CreateConnectors();
+	virtual void AddConnectors(ot::GraphicsFlowItemCfg* block) {};
+	virtual void AddBackgroundImage(ot::GraphicsFlowItemCfg* block) {};
 
 private:
 	const std::string _blockTitle;

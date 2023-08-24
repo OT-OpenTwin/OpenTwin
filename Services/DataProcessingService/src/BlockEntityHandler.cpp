@@ -1,14 +1,14 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
-#include "BlockDatabaseAccess.h"
+#include "BlockItemDatabaseAccess.h"
 
 std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& editorName, const std::string& blockName, ot::UID itemID)
 {
 	std::shared_ptr<EntityBlock> blockEntity = nullptr;
 	if (blockName == "Database access")
 	{
-		blockEntity = BlockDatabaseAccess::CreateBlockEntity();
+		blockEntity = BlockItemDatabaseAccess::CreateBlockEntity();
 	}
 	else
 	{
