@@ -266,13 +266,49 @@ void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() {
-
+ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() : m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_connectorTextColor(200, 200, 200) {
+	this->setBackgroundColor(ot::Color(50, 50, 50));
+	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 }
 	
 ot::GraphicsFlowItemCfg::~GraphicsFlowItemCfg() {}
 
 void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	OTAssertNullptr(m_backgroundPainter);
+	OTAssertNullptr(m_titleBackgroundPainter);
+
+	// --- Create a copy of local data ------------------------------------------------
+
+	// Create a copy of the painter
+	ot::Painter2D* painterBack = nullptr;
+	ot::Painter2D* painterTitleBack = nullptr;
+
+	try {
+		OT_rJSON_createDOC(backDoc);
+		m_backgroundPainter->addToJsonObject(backDoc, backDoc);
+		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(backDoc);
+		painterBack->setFromJsonObject(backDoc);
+
+		OT_rJSON_createDOC(titleBackDoc);
+		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc);
+		painterTitleBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc);
+		painterTitleBack->setFromJsonObject(titleBackDoc);
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+		if (painterBack) delete painterBack;
+		if (painterTitleBack) delete painterTitleBack;
+		return;
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+		if (painterBack) delete painterBack;
+		if (painterTitleBack) delete painterTitleBack;
+		return;
+	}
+	OTAssertNullptr(painterBack);
+	OTAssertNullptr(painterTitleBack);
+	
 	// --- Create items ------------------------------------------------
 	
 	// Root
@@ -282,7 +318,7 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	root->setTitle(this->title());
 
 	// Border
-	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(ot::Color(50, 50, 50, 255)));
+	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);
 	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	bor->setCornerRadius(5);
 	bor->setName(this->name() + "_bor");
@@ -297,7 +333,7 @@ void ot::GraphicsFlowItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_
 	tStack->setName(this->name() + "_tStack");
 
 	// Title: Border
-	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(ot::Color(70, 70, 70)));
+	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
 	tBor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	tBor->setName(this->name() + "_tBor");
 	tBor->setCornerRadius(5);
@@ -369,6 +405,26 @@ void ot::GraphicsFlowItemCfg::addOutput(const std::string& _name, const std::str
 	m_outputs.push_back(entry);
 }
 
+void ot::GraphicsFlowItemCfg::setBackgroundPainter(ot::Painter2D* _painter) {
+	if (m_backgroundPainter == _painter) return;
+	if (m_backgroundPainter) delete m_backgroundPainter;
+	m_backgroundPainter = _painter;
+}
+
+void ot::GraphicsFlowItemCfg::setBackgroundColor(const ot::Color& _color) {
+	this->setBackgroundPainter(new ot::FillPainter2D(_color));
+}
+
+void ot::GraphicsFlowItemCfg::setTitleBackgroundPainter(ot::Painter2D* _painter) {
+	if (m_titleBackgroundPainter == _painter) return;
+	if (m_titleBackgroundPainter) delete m_titleBackgroundPainter;
+	m_titleBackgroundPainter = _painter;
+}
+
+void ot::GraphicsFlowItemCfg::setTitleBackgroundColor(const ot::Color& _color) {
+	this->setTitleBackgroundPainter(new ot::FillPainter2D(_color));
+}
+
 ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createConnectorEntry(const FlowConnectorEntry& _entry, ot::GraphicsItemCfg* _connectorItem, bool _isInput) const {
 	_connectorItem->setGraphicsItemFlags(_connectorItem->graphicsItemFlags() | ot::GraphicsItemCfg::ItemIsConnectable);
 
@@ -378,6 +434,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createConnectorEntry(const FlowCon
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
 	itmTxt->setName(_entry.name + "_tit");
 	itmTxt->setText(_entry.title);
+	itmTxt->setTextColor(m_connectorTextColor);
+	itmTxt->setTextFont(m_connectorTextFont);
 
 	if (_isInput) {
 		itmLay->addChildItem(_connectorItem);

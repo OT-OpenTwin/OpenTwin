@@ -262,8 +262,46 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsFlowItemCfg); };
 
+		//! @brief Add a connector on the left side of the FlowItem
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _type Connector type
 		void addInput(const std::string& _name, const std::string& _title, FlowConnectorType _type);
+
+		//! @brief Add a connector on the right side of the FlowItem
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _type Connector type
 		void addOutput(const std::string& _name, const std::string& _title, FlowConnectorType _type);
+
+		//! @brief Replace the current background painter
+		//! The item takes ownership
+		void setBackgroundPainter(ot::Painter2D* _painter);
+
+		//! @brief Sets the background color
+		//! Will create a FillPainter2D and replace the current background painter
+		void setBackgroundColor(const ot::Color& _color);
+
+		//! @brief Sets the background color
+		//! Will create a FillPainter2D and replace the current background painter
+		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(ot::Color(_r, _g, _b, _a)); };
+
+		//! @brief Replace the current background painter
+		//! The item takes ownership
+		void setTitleBackgroundPainter(ot::Painter2D* _painter);
+
+		//! @brief Sets the title background color
+		//! Will create a FillPainter2D and replace the current title background painter
+		void setTitleBackgroundColor(const ot::Color& _color);
+
+		//! @brief Sets the title background color
+		//! Will create a FillPainter2D and replace the current title background painter
+		inline void setTitleBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setTitleBackgroundColor(ot::Color(_r, _g, _b, _a)); };
+
+		void setConnectorTextColor(const ot::Color& _color) { m_connectorTextColor = _color; };
+		inline void setConnectorTextColor(int _r, int _g, int _b, int _a = 255) { m_connectorTextColor = ot::Color(_r, _g, _b, _a); };
+
+		void setConnectorTextFont(const ot::Font& _font) { m_connectorTextFont = _font; };
 
 	private:
 		struct FlowConnectorEntry {
@@ -275,6 +313,12 @@ namespace ot {
 		ot::GraphicsItemCfg* createConnectorEntry(const FlowConnectorEntry& _entry, ot::GraphicsItemCfg* _connectorItem, bool _isInput) const;
 		ot::GraphicsItemCfg* createSquareConnector(const FlowConnectorEntry& _entry, bool _isInput) const;
 		ot::GraphicsItemCfg* createConnector(const FlowConnectorEntry& _entry, bool _isInput) const;
+
+		ot::Painter2D* m_backgroundPainter;
+		ot::Painter2D* m_titleBackgroundPainter;
+
+		ot::Color m_connectorTextColor;
+		ot::Font m_connectorTextFont;
 
 		std::list<FlowConnectorEntry> m_inputs;
 		std::list<FlowConnectorEntry> m_outputs;

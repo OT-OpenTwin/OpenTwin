@@ -196,8 +196,8 @@ ot::GraphicsItemCfg* createTestBlock4(const std::string& _name) {
 	ot::GraphicsFlowItemCfg* flow = new ot::GraphicsFlowItemCfg;
 	flow->setName(_name);
 	flow->setTitle(_name);
-
-	flow->addInput("SomeIn", "input", ot::GraphicsFlowItemCfg::Square);
+	flow->setTitleBackgroundColor(255, 0, 0);
+	//flow->addInput("SomeIn", "input", ot::GraphicsFlowItemCfg::Square);
 	flow->addOutput("SomeOut1", "output 1", ot::GraphicsFlowItemCfg::Square);
 	flow->addOutput("SomeOut2", "output 2", ot::GraphicsFlowItemCfg::Square);
 
