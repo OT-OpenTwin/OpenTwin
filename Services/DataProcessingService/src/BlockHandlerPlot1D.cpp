@@ -1,6 +1,7 @@
 #pragma once
 #include "BlockHandlerPlot1D.h"
 #include "EntityPlot1D.h"
+#include "EntityResult1D.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(ot::components::ModelComponent* modelComponent)
@@ -10,10 +11,12 @@ BlockHandlerPlot1D::BlockHandlerPlot1D(ot::components::ModelComponent* modelComp
 
 BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::genericDataBlock& inputData)
 {
+	std::vector<double> xValues;
+	xValues.reserve(inputData.size());
 
 	std::vector<double> resultCurve;
 	resultCurve.reserve(inputData.size());
-
+	double count(0.);
 	for (auto& data : inputData)
 	{
 		if (std::holds_alternative<int32_t>(data))
@@ -36,22 +39,28 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 		{
 			throw std::exception("Block of type Plot1D can only handle input data of type float, double, int32 or int64");
 		}
+
+		xValues.push_back(count);
+		count = +1;
 	}
-	/*std::string plotName = "Plots/firstplot";
-	{
-		EntityResult1D* curve = _modelComponent->addResult1DEntity(plotName, resultCurve, {}, {, xlabel, xunit, ylabel, yunit, colorID, visualize);
-	}
+	
+	std::string xlabel("X-Label"), xunit("X-Unit"), ylabel("Y-Label"), yunit("Y-Unit");
+	int colorID(0);
+	std::string plotName = "Plots/firstPlot";
+	
+	EntityResult1D* curve = _modelComponent->addResult1DEntity(plotName, xValues, resultCurve, {}, xlabel, xunit, ylabel, yunit, colorID, true);
+	curve->StoreToDataBase();
 
-	topologyEntityIDList.push_back(curve->getEntityID());
-	topologyEntityVersionList.push_back(curve->getEntityStorageVersion());
-	topologyEntityForceVisibleList.push_back(false);
+	std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),curve->getName())};
+	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity("Plots/firstPlot1", "SomeEntries", curves);
+	plotID->StoreToDataBase();
 
-	dataEntityIDList.push_back(curve->getCurveDataStorageId());
-	dataEntityVersionList.push_back(curve->getCurveDataStorageVersion());
-	dataEntityParentList.push_back(curve->getEntityID());
 
-    _modelComponent->addPlot1DEntity()
-    std::unique_ptr<EntityPlot1D> resultPlot(new EntityPlot1D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-    resultPlot->*/
+	ot::UIDList topoEnt, topoVers, dataEnt;
+	std::list<bool> forceVis{ false,false };
+
+	_modelComponent->addEntitiesToModel(topoEnt,topoVers,forceVis,dataEnt,dataEnt,dataEnt,"Created plot");
+
+
     return genericDataBlock();
 }

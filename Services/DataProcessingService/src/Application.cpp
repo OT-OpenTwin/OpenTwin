@@ -65,6 +65,8 @@ void Application::run(void)
 }
 
 #include "BlockEntityHandler.h"
+#include "BlockHandlerDatabaseAccess.h"
+#include "BlockHandlerPlot1D.h"
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
@@ -73,33 +75,17 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			//block->setName("Processing Blocks/Database Access");
-			//ot::Connector co0(ot::ConnectorType::Source, "C0");
-			//ot::Connector co1(ot::ConnectorType::Filter, "C1");
-			//block->AddConnector(co0);
-			//block->AddConnector(co1);
 
-			//ot::BlockConnection bo0("Hans.C0", "Peter.C0");
-			//ot::BlockConnection bo1("Hans.C0", "GustavC0");
-			//block->AddOutgoingConnection(bo0);
-			//block->AddOutgoingConnection(bo1);
+			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			std::list<std::string>projects{"Test"};
+			block->createProperties(projects, *projects.begin());
+			
+			BlockHandlerDatabaseAccess dbAccess(block.get());
+			BlockHandler::genericDataBlock parameter, result;
+			result = dbAccess.Execute(parameter);
 
-			//std::list<std::string>projects{"Test"};
-			//block->createProperties(projects, *projects.begin());
-			//
-			//BlockHandlerDatabaseAccess handlerDatabaseAccess(block.get());
-			//BlockHandler::genericDataBlock parameter;
-			//auto result = handlerDatabaseAccess.Execute(parameter);
-			//block->StoreToDataBase();
-
-			//ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
-			//std::list<bool> forceVis{ false };
-			//m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
-
-			//ClassFactory classFactory;
-			//auto tempBase = m_modelComponent->readEntityFromEntityIDandVersion(block->getEntityID(), block->getEntityStorageVersion(), classFactory);
-			//auto temp = dynamic_cast<EntityBlockDatabaseAccess*>(tempBase);
+			BlockHandlerPlot1D plot(m_modelComponent);
+			plot.Execute(result);
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)
