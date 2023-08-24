@@ -5,7 +5,6 @@ BlockItemDatabaseAccess::BlockItemDatabaseAccess()
 	:BlockItemDataProcessing("Database access", "Database Access", "C", /*"BlockItemDatabaseAccess"*/"")
 {
 	_colourTitle.set(ot::Color::Lime);
-	_colourBackground.set(ot::Color::White);
 }
 
 std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()

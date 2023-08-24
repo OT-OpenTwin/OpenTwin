@@ -5,6 +5,8 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
 #include "BlockItemDatabaseAccess.h"
+#include "BlockItemPlot1D.h"
+
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCore/Owner.h"
 #include "OpenTwinCommunication/Msg.h"
@@ -67,10 +69,10 @@ ot::GraphicsEditorPackage* BlockItemManager::BuildUpBlockPicker()
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
 
 	BlockItemDatabaseAccess dbA;
-
-	EntityBlockDatabaseAccess dbAEnt(0, nullptr, nullptr, nullptr, nullptr, "");
+	BlockItemPlot1D plot;
 
 	controlBlockDatabaseCollection->addItem(dbA.GetBlock());
+	controlBlockVisualizationCollection->addItem(plot.GetBlock());
 
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);

@@ -8,6 +8,7 @@ BlockItemDataProcessing::BlockItemDataProcessing(const std::string& blockName, c
 	_connectorSize = ot::Size2D(12, 12);
 	_colourBorder = ot::Color(255, 255, 255);
 	_colourConnector = ot::Color(ot::Color::Blue);
+	_colourBackground.set(ot::Color::White);
 }
 
 ot::GraphicsItemCfg* BlockItemDataProcessing::GetBlock()

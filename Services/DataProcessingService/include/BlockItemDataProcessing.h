@@ -18,11 +18,9 @@ protected:
 	ot::Color _colourBorder;
 	ot::Color _colourTitle;
 	ot::Color _colourBackground;
-
 	ot::Color _colourConnector;		
 
 	virtual void AddConnectors(ot::GraphicsFlowItemCfg* block) {};
-	virtual void AddBackgroundImage(ot::GraphicsFlowItemCfg* block) {};
 
 private:
 	const std::string _blockTitle;

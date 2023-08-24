@@ -188,6 +188,7 @@
     <ClCompile Include="src\BlockHandlerPlot1D.cpp" />
     <ClCompile Include="src\BlockItemManager.cpp" />
     <ClCompile Include="src\BlockItemDataProcessing.cpp" />
+    <ClCompile Include="src\BlockItemPlot1D.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\Pipeline.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BlockItemManager.h" />
     <ClInclude Include="include\BlockItemDataProcessing.h" />
+    <ClInclude Include="include\BlockItemPlot1D.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\Pipeline.h" />
     <ClInclude Include="include\PipelineFilter.h" />

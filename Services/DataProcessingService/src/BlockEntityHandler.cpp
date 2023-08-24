@@ -2,6 +2,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "BlockItemDatabaseAccess.h"
+#include "BlockItemPlot1D.h"
 
 std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& editorName, const std::string& blockName, ot::UID itemID)
 {
@@ -9,6 +10,10 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& 
 	if (blockName == "Database access")
 	{
 		blockEntity = BlockItemDatabaseAccess::CreateBlockEntity();
+	}
+	else if(blockName == "Plot 1D")
+	{
+		blockEntity = BlockItemPlot1D::CreateBlockEntity();
 	}
 	else
 	{
