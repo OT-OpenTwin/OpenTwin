@@ -31,8 +31,10 @@ void BlockPickerManager::OrderUIToCreateBlockPicker()
 	}
 
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invalid response from UI");
-		uiComponent->displayDebugMessage("Invalid response\n");
+		// Message is queued, no response here
+
+		//OT_LOG_E("Invalid response from UI");
+		//uiComponent->displayDebugMessage("Invalid response\n");
 	}
 }
 

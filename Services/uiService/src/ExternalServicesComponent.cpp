@@ -2871,7 +2871,7 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 	AppBase * app{ AppBase::instance() };
 
 	std::string response;
-	sendHttpRequest(EXECUTE, m_sessionServiceURL, ot::rJSON::toJSON(doc), response);
+	sendHttpRequest(EXECUTE, m_globalSessionServiceURL, ot::rJSON::toJSON(doc), response);
 
 	// todo: add json return value containing true/false and username instead of empty string for more clarity
 	if (response.empty()) return false;
