@@ -1,4 +1,5 @@
-#include "BlockPickerManager.h"
+#include "BlockItemManager.h"
+
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -10,7 +11,9 @@
 #include "Application.h"
 #include "OpenTwinFoundation/UiComponent.h"
 
-void BlockPickerManager::OrderUIToCreateBlockPicker()
+#include "EntityBlockDatabaseAccess.h"
+
+void BlockItemManager::OrderUIToCreateBlockPicker()
 {
 
 	auto graphicsEditorPackage = BuildUpBlockPicker();
@@ -38,7 +41,19 @@ void BlockPickerManager::OrderUIToCreateBlockPicker()
 	}
 }
 
-ot::GraphicsEditorPackage* BlockPickerManager::BuildUpBlockPicker()
+std::string BlockItemManager::getEntityBlockName(const std::string& blockName)
+{
+	if (_blockNameToEntityBlockName.find(blockName) != _blockNameToEntityBlockName.end())
+	{
+		return _blockNameToEntityBlockName[blockName];
+	}
+	else
+	{
+		assert(0);
+	}
+}
+
+ot::GraphicsEditorPackage* BlockItemManager::BuildUpBlockPicker()
 {
 	ot::GraphicsEditorPackage* pckg = new ot::GraphicsEditorPackage("Data Processing", "Data Processing");
 	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
@@ -51,14 +66,17 @@ ot::GraphicsEditorPackage* BlockPickerManager::BuildUpBlockPicker()
 	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
 
-	BlockDatabaseAccess dbA("BlockDatabaseAccess");
+	BlockDatabaseAccess dbA;
+
+	EntityBlockDatabaseAccess dbAEnt(0, nullptr, nullptr, nullptr, nullptr, "");
 
 	controlBlockDatabaseCollection->addItem(dbA.GetBlock());
 
-	//a2->addItem(createTestBlock2("Alpha 3"));
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);
 	pckg->addCollection(mathBlockCollection);
 
 	return pckg;
 }
+
+std::map<std::string, std::string> BlockItemManager::_blockNameToEntityBlockName;

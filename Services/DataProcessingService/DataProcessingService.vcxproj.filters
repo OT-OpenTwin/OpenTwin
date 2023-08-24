@@ -48,9 +48,6 @@
     <ClCompile Include="src\BlockDataProcessing.cpp">
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockPickerManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockDatabaseAccess.cpp">
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
@@ -75,6 +72,15 @@
     <ClCompile Include="src\ResultCollectionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockHandlerPlot1D.cpp">
+      <Filter>Source Files\BlockHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockItemManager.cpp">
+      <Filter>Source Files\BlockTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockEntityHandler.cpp">
+      <Filter>Source Files\BlockTypes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -98,9 +104,6 @@
     <ClInclude Include="include\BlockDataProcessing.h">
       <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockPickerManager.h">
-      <Filter>Header Files\BlockHandling</Filter>
-    </ClInclude>
     <ClInclude Include="include\PipelineFilter.h">
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
@@ -121,6 +124,15 @@
     </ClInclude>
     <ClInclude Include="include\ResultCollectionHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandlerPlot1D.h">
+      <Filter>Header Files\BlockHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockItemManager.h">
+      <Filter>Header Files\BlockTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockEntityHandler.h">
+      <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

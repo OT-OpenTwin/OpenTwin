@@ -1,10 +1,10 @@
 #pragma once
 #include "BlockDataProcessing.h"
+#include "EntityBlock.h"
 
 class BlockDatabaseAccess : public BlockDataProcessing
 {
 public:
-	BlockDatabaseAccess(const std::string& blockName);
-private:
-
+	BlockDatabaseAccess();
+	static std::shared_ptr<EntityBlock> CreateBlockEntity();
 };

@@ -13,10 +13,10 @@ BlockDataProcessing::BlockDataProcessing(const std::string& blockName, const std
 ot::GraphicsItemCfg* BlockDataProcessing::GetBlock()
 {
 	ot::GraphicsStackItemCfg* block = new ot::GraphicsStackItemCfg();
+	block->setName(_blockName);
 	block->setBottomItem(CreateBaseLayer());
 	
 	ot::GraphicsStackItemCfg* mainLayerWithConnectors = new ot::GraphicsStackItemCfg();
-	mainLayerWithConnectors->setName(_blockName);
 	mainLayerWithConnectors->setBottomItem(CreateMainLayer());
 	mainLayerWithConnectors->setTopItem(CreateConnectors());
 	block->setTopItem(mainLayerWithConnectors);

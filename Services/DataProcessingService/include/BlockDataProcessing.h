@@ -3,12 +3,12 @@
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
-
 class BlockDataProcessing
 {
 public:
 	BlockDataProcessing(const std::string& blockName, const std::string& blockTitle, const std::string& blockLabel, const std::string& imageName = "");
 	ot::GraphicsItemCfg* GetBlock();
+	const std::string& getBlockName()const { return _blockName; }
 
 protected:
 	ot::Size2D _blockSize;

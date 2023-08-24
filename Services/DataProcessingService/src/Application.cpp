@@ -20,7 +20,7 @@
 #include "TemplateDefaultManager.h"
 
 
-#include "BlockPickerManager.h"
+#include "BlockItemManager.h"
 
 Application * g_instance{ nullptr };
 
@@ -64,9 +64,7 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 }
 
-#include "EntityBlockDatabaseAccess.h"
-#include "ClassFactory.h"
-#include "BlockHandlerDatabaseAccess.h"
+#include "BlockEntityHandler.h"
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
@@ -75,34 +73,52 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			block->setName("Processing Blocks/Database Access");
-			ot::Connector co0(ot::ConnectorType::Source, "C0");
-			ot::Connector co1(ot::ConnectorType::Filter, "C1");
-			block->AddConnector(co0);
-			block->AddConnector(co1);
+			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			//block->setName("Processing Blocks/Database Access");
+			//ot::Connector co0(ot::ConnectorType::Source, "C0");
+			//ot::Connector co1(ot::ConnectorType::Filter, "C1");
+			//block->AddConnector(co0);
+			//block->AddConnector(co1);
 
-			ot::BlockConnection bo0("Hans.C0", "Peter.C0");
-			ot::BlockConnection bo1("Hans.C0", "GustavC0");
-			block->AddOutgoingConnection(bo0);
-			block->AddOutgoingConnection(bo1);
+			//ot::BlockConnection bo0("Hans.C0", "Peter.C0");
+			//ot::BlockConnection bo1("Hans.C0", "GustavC0");
+			//block->AddOutgoingConnection(bo0);
+			//block->AddOutgoingConnection(bo1);
 
-			std::list<std::string>projects{"Test"};
-			block->createProperties(projects, *projects.begin());
-			
-			BlockHandlerDatabaseAccess handlerDatabaseAccess(block.get());
-			BlockHandler::genericDataBlock parameter;
-			auto result = handlerDatabaseAccess.Execute(parameter);
-			block->StoreToDataBase();
+			//std::list<std::string>projects{"Test"};
+			//block->createProperties(projects, *projects.begin());
+			//
+			//BlockHandlerDatabaseAccess handlerDatabaseAccess(block.get());
+			//BlockHandler::genericDataBlock parameter;
+			//auto result = handlerDatabaseAccess.Execute(parameter);
+			//block->StoreToDataBase();
 
-			ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
-			std::list<bool> forceVis{ false };
-			m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
+			//ot::UIDList entID{ block->getEntityID() }, entVers{block->getEntityStorageVersion()}, dataEnt;
+			//std::list<bool> forceVis{ false };
+			//m_modelComponent->addEntitiesToModel(entID, entVers, forceVis, dataEnt, dataEnt, dataEnt, "Added a block entity");
 
-			ClassFactory classFactory;
-			auto tempBase = m_modelComponent->readEntityFromEntityIDandVersion(block->getEntityID(), block->getEntityStorageVersion(), classFactory);
-			auto temp = dynamic_cast<EntityBlockDatabaseAccess*>(tempBase);
+			//ClassFactory classFactory;
+			//auto tempBase = m_modelComponent->readEntityFromEntityIDandVersion(block->getEntityID(), block->getEntityStorageVersion(), classFactory);
+			//auto temp = dynamic_cast<EntityBlockDatabaseAccess*>(tempBase);
 		}
+	}
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)
+	{
+		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+		ot::UID itemID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
+		
+		BlockEntityHandler handler;
+		handler.setModelComponent(m_modelComponent);
+		auto blockEntity = handler.CreateBlock(editorName, itemName, itemID);
+		
+		ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
+		std::list<bool> forceVis;
+		m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
+
+	}
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped)
+	{
 	}
 
 	return ""; // Return empty string if the request does not expect a return
@@ -128,8 +144,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
 	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "Kriging");
 
-	BlockPickerManager blockPickerManger;
-	blockPickerManger.OrderUIToCreateBlockPicker();
+	BlockItemManager blockItemManger;
+	blockItemManger.OrderUIToCreateBlockPicker();
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }

@@ -1,7 +1,15 @@
 #include "BlockDatabaseAccess.h"
+#include "EntityBlockDatabaseAccess.h"
 
-BlockDatabaseAccess::BlockDatabaseAccess(const std::string& blockName)
-	:BlockDataProcessing(blockName, "Database Access", "C", "BlockDataBaseAccess")
+BlockDatabaseAccess::BlockDatabaseAccess()
+	:BlockDataProcessing("Database access", "Database Access", "C", "BlockDataBaseAccess")
+{}
+
+std::shared_ptr<EntityBlock> BlockDatabaseAccess::CreateBlockEntity()
 {
+	std::shared_ptr<EntityBlockDatabaseAccess> dbAccessBlockEntity(new EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, nullptr, ""));
 
+	std::list<std::string> listOfProjects{ "Test" };
+	dbAccessBlockEntity->createProperties(listOfProjects, *listOfProjects.begin());
+	return dbAccessBlockEntity;
 }
