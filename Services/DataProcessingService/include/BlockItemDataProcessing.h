@@ -2,7 +2,7 @@
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsFlowItemCfg.h"
 #include <memory>
 
 class BlockItemDataProcessing

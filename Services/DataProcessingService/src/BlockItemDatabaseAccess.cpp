@@ -20,6 +20,6 @@ std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()
 
 void BlockItemDatabaseAccess::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
-	block->addOutput("C0", "Data output", ot::GraphicsFlowItemCfg::Square);
+	block->addOutput("C0", "Data output", ot::GraphicsFlowConnectorCfg::Square);
 
 }

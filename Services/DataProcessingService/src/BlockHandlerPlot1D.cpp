@@ -56,10 +56,13 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 	plotID->StoreToDataBase();
 
 
-	ot::UIDList topoEnt, topoVers, dataEnt;
+	ot::UIDList topoEnt{curve->getEntityID(), plotID->getEntityID()}, 
+		topoVers{curve->getEntityStorageVersion(), plotID->getEntityStorageVersion()},
+		dataEntID{ (ot::UID)curve->getCurveDataStorageId() }, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion()},
+		dataEntParent{curve->getEntityID()};
 	std::list<bool> forceVis{ false,false };
 
-	_modelComponent->addEntitiesToModel(topoEnt,topoVers,forceVis,dataEnt,dataEnt,dataEnt,"Created plot");
+	_modelComponent->addEntitiesToModel(topoEnt,topoVers,forceVis,dataEntID,dataEntVers,dataEntParent,"Created plot");
 
 
     return genericDataBlock();

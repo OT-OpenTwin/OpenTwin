@@ -15,9 +15,6 @@ ot::GraphicsItemCfg* BlockItemDataProcessing::GetBlock()
 {
 	ot::GraphicsFlowItemCfg* block = new ot::GraphicsFlowItemCfg;
 	
-	block->setName(_blockName);
-	block->setTitle(_blockName);
-	
 	block->setTitleBackgroundColor(_colourTitle.rInt(), _colourTitle.gInt(), _colourTitle.bInt());
 	block->setBackgroundColor(_colourBackground.rInt(), _colourBackground.gInt(), _colourBackground.gInt());
 
@@ -27,5 +24,5 @@ ot::GraphicsItemCfg* BlockItemDataProcessing::GetBlock()
 		block->setBackgroundImagePath("default/" + _imageName);
 	}
 	
-	return block;
+	return block->createGraphicsItem(_blockName,_blockTitle);
 }

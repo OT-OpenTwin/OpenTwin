@@ -9,7 +9,7 @@ BlockItemPlot1D::BlockItemPlot1D()
 
 void BlockItemPlot1D::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
-	block->addInput("C0", "Y-Axis", ot::GraphicsFlowItemCfg::Square);
+	block->addInput("C0", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
 }
 
 std::shared_ptr<EntityBlock> BlockItemPlot1D::CreateBlockEntity()
