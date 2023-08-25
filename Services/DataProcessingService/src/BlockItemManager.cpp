@@ -43,18 +43,6 @@ void BlockItemManager::OrderUIToCreateBlockPicker()
 	}
 }
 
-std::string BlockItemManager::getEntityBlockName(const std::string& blockName)
-{
-	if (_blockNameToEntityBlockName.find(blockName) != _blockNameToEntityBlockName.end())
-	{
-		return _blockNameToEntityBlockName[blockName];
-	}
-	else
-	{
-		assert(0);
-	}
-}
-
 ot::GraphicsEditorPackage* BlockItemManager::BuildUpBlockPicker()
 {
 	ot::GraphicsEditorPackage* pckg = new ot::GraphicsEditorPackage("Data Processing", "Data Processing");
@@ -80,5 +68,3 @@ ot::GraphicsEditorPackage* BlockItemManager::BuildUpBlockPicker()
 
 	return pckg;
 }
-
-std::map<std::string, std::string> BlockItemManager::_blockNameToEntityBlockName;

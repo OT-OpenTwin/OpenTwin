@@ -76,16 +76,17 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 
-			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			std::list<std::string>projects{"KWT_Demo"};
-			block->createProperties(projects, *projects.begin());
-			
-			BlockHandlerDatabaseAccess dbAccess(block.get());
-			BlockHandler::genericDataBlock parameter, result;
-			result = dbAccess.Execute(parameter);
+			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			//std::list<std::string>projects{"KWT_Demo"};
+			//block->createProperties(projects, *projects.begin());
+			//
+			//BlockHandlerDatabaseAccess dbAccess(block.get());
+			//BlockHandler::genericDataBlock parameter, result;
+			//result = dbAccess.Execute(parameter);
 
-			BlockHandlerPlot1D plot(m_modelComponent);
-			plot.Execute(result);
+			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+			//BlockHandlerPlot1D plot;
+			//plot.Execute(result);
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)
@@ -105,6 +106,12 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped)
 	{
+		ot::UID uidOrigin = ot::rJSON::getULongLong(_doc,OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId);
+		ot::UID uidDestination = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId);
+		std::string connectorNameOrigin = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName);
+		std::string connectorNameDestination = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName);
+
+		//m_modelComponent->getListOfFolderItems()
 	}
 
 	return ""; // Return empty string if the request does not expect a return

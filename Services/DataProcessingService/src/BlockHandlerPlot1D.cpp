@@ -4,19 +4,26 @@
 #include "EntityResult1D.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
-BlockHandlerPlot1D::BlockHandlerPlot1D(ot::components::ModelComponent* modelComponent)
-    : _modelComponent(modelComponent)
+BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity)
 {
+	_xlabel = blockEntity->getXLabel();
+	_ylabel = blockEntity->getYLabel();
+	
+	_xunit = blockEntity->getXUnit();
+	_yunit = blockEntity->getYUnit();
+
 }
 
 BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::genericDataBlock& inputData)
 {
-	std::vector<double> xValues;
-	xValues.reserve(inputData.size());
 
 	std::vector<double> resultCurve;
 	resultCurve.reserve(inputData.size());
+	
+	std::vector<double> xValues;
+	xValues.reserve(inputData.size());
 	double count(0.);
+	
 	for (auto& data : inputData)
 	{
 		if (std::holds_alternative<int32_t>(data))
@@ -43,15 +50,13 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 		xValues.push_back(count);
 		count += 1;
 	}
+	 
 	
-	std::string name = "firstPlot";
-	std::string xlabel("X-Label"), xunit("X-Unit"), ylabel("Y-Label"), yunit("Y-Unit");
 	int colorID(0);
 	
-	EntityResult1D* curve = _modelComponent->addResult1DEntity(_resultFolder + name, xValues, resultCurve, {}, xlabel, xunit, ylabel, yunit, colorID, true);
-
-	std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),name)};
-	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(_resultFolder + "Plot", "SomeEntries", curves);
+	EntityResult1D* curve = _modelComponent->addResult1DEntity(_resultFolder + _curveName, xValues, resultCurve, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
+	std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName)};
+	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(_resultFolder + _plotName, "SomeEntries", curves);
 
 
 	ot::UIDList topoEnt{curve->getEntityID(), plotID->getEntityID()}, 
@@ -59,7 +64,6 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 		dataEntID{ (ot::UID)curve->getCurveDataStorageId() }, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion()},
 		dataEntParent{curve->getEntityID()};
 	std::list<bool> forceVis{ false,false };
-
 	_modelComponent->addEntitiesToModel(topoEnt,topoVers,forceVis,dataEntID,dataEntVers,dataEntParent,"Created plot");
 
 

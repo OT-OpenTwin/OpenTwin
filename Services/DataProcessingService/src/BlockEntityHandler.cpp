@@ -22,7 +22,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& 
 
 	assert(blockEntity != nullptr);
 	
-	std::string entName = CreateNewUniqueTopologyName(editorName, blockName);
+	std::string entName = CreateNewUniqueTopologyName(_blockFolder+"/"+ editorName, blockName);
 	blockEntity->setName(entName);
 	
 	blockEntity->setEntityID(_modelComponent->createEntityUID());

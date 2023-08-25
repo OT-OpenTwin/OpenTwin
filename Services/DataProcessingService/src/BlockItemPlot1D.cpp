@@ -16,5 +16,6 @@ std::shared_ptr<EntityBlock> BlockItemPlot1D::CreateBlockEntity()
 {
 	auto plotBlock = new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, nullptr, "");
 	plotBlock->createProperties();
+	plotBlock->AddConnector(ot::Connector(ot::ConnectorType::Sink, "C0"));
 	return std::shared_ptr<EntityBlock>(plotBlock);
 }
