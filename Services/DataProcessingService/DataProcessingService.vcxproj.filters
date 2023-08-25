@@ -84,6 +84,9 @@
     <ClCompile Include="src\BlockItemPlot1D.cpp">
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockItemPython.cpp">
+      <Filter>Source Files\BlockTypes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockItemPlot1D.h">
+      <Filter>Header Files\BlockTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockItemPython.h">
       <Filter>Header Files\BlockTypes</Filter>
     </ClInclude>
   </ItemGroup>

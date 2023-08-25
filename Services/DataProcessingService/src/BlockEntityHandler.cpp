@@ -19,7 +19,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& 
 	}
 	else
 	{
-		assert(0);
+		return std::shared_ptr<EntityBlock>(nullptr);
 	}
 
 	assert(blockEntity != nullptr);

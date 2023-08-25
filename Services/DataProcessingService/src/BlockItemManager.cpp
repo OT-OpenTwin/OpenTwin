@@ -6,6 +6,7 @@
 
 #include "BlockItemDatabaseAccess.h"
 #include "BlockItemPlot1D.h"
+#include "BlockItemPython.h"
 
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCore/Owner.h"
@@ -58,7 +59,9 @@ ot::GraphicsEditorPackage* BlockItemManager::BuildUpBlockPicker()
 
 	BlockItemDatabaseAccess dbA;
 	BlockItemPlot1D plot;
+	BlockItemPython python;
 
+	customizedBlockCollection->addItem(python.GetBlock());
 	controlBlockDatabaseCollection->addItem(dbA.GetBlock());
 	controlBlockVisualizationCollection->addItem(plot.GetBlock());
 

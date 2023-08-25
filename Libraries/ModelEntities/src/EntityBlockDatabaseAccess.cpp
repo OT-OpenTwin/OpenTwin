@@ -31,8 +31,8 @@ void EntityBlockDatabaseAccess::addVisualizationNodes(void)
 void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& dataProjectNames, const std::string& defaultProjectName)
 {
 	EntityPropertiesSelection::createProperty("Database Properties", "Projectname", dataProjectNames, defaultProjectName, "default", getProperties());
-	EntityPropertiesString::createProperty("Database Access", "Query", "", "default", getProperties());
-	EntityPropertiesString::createProperty("Database Access", "Projection", "", "default", getProperties());
+	EntityPropertiesString::createProperty("Database Access", "Query", "{}", "default", getProperties());
+	EntityPropertiesString::createProperty("Database Access", "Projection", "{value: 1, _id: 0}", "default", getProperties());
 }
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()

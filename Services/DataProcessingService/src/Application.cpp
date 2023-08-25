@@ -97,10 +97,12 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
 		
 		auto blockEntity = _blockEntHandler.CreateBlock(editorName, itemName, itemID);
-		
-		ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
-		std::list<bool> forceVis;
-		m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
+		if (blockEntity != nullptr)
+		{
+			ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
+			std::list<bool> forceVis;
+			m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
+		}
 
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped)
