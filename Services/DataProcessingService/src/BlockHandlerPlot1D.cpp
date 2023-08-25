@@ -41,18 +41,17 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 		}
 
 		xValues.push_back(count);
-		count = +1;
+		count += 1;
 	}
 	
 	std::string name = "firstPlot";
 	std::string xlabel("X-Label"), xunit("X-Unit"), ylabel("Y-Label"), yunit("Y-Unit");
 	int colorID(0);
-	std::string plotFolder = "Scripts/";
 	
-	EntityResult1D* curve = _modelComponent->addResult1DEntity("Scripts/" + name, xValues, resultCurve, {}, xlabel, xunit, ylabel, yunit, colorID, true);
+	EntityResult1D* curve = _modelComponent->addResult1DEntity(_resultFolder + name, xValues, resultCurve, {}, xlabel, xunit, ylabel, yunit, colorID, true);
 
 	std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),name)};
-	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(plotFolder + "Plot", "SomeEntries", curves);
+	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(_resultFolder + "Plot", "SomeEntries", curves);
 
 
 	ot::UIDList topoEnt{curve->getEntityID(), plotID->getEntityID()}, 

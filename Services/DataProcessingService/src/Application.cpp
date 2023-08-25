@@ -77,7 +77,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		{
 
 			std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			std::list<std::string>projects{"Test"};
+			std::list<std::string>projects{"KWT_Demo"};
 			block->createProperties(projects, *projects.begin());
 			
 			BlockHandlerDatabaseAccess dbAccess(block.get());

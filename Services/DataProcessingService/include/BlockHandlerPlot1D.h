@@ -10,4 +10,5 @@ public:
 
 private:
 	ot::components::ModelComponent* _modelComponent;
+	std::string _resultFolder = "Results/";
 };

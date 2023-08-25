@@ -26,11 +26,11 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)
 {
 	OT_rJSON_createDOC(query);
-	ot::rJSON::add(query, "P_2", 1);
+	//ot::rJSON::add(query, "P_1", 1);
 	OT_rJSON_createDOC(projection);
 	ot::rJSON::add(projection, "Value", 1);
 	ot::rJSON::add(projection, "_id", 0);
-	auto dbResponse = _dataStorageAccess->GetAllDocuments(ot::rJSON::toJSON(query), ot::rJSON::toJSON(projection),0);
+	auto dbResponse = _dataStorageAccess->GetAllDocuments(/*ot::rJSON::toJSON(query)*/ "{}", ot::rJSON::toJSON(projection), 0);
 	bool success = dbResponse.getSuccess();
 
 	auto resultDoc = ot::rJSON::fromJSON(dbResponse.getResult());
