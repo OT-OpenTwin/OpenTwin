@@ -65,9 +65,6 @@ namespace ot {
 		virtual void dropEvent(QDropEvent* _event) override;
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
-	protected:
-		virtual void mousePressedMoveEvent(QMouseEvent* _event) {};
-
 	private:
 		std::string m_viewName;
 		GraphicsScene* m_scene;
@@ -75,6 +72,7 @@ namespace ot {
 		bool m_wheelEnabled;
 		bool m_dropEnabled;
 		ot::UID m_currentUid;
+		QPoint m_lastPanPos;
 
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
 		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;

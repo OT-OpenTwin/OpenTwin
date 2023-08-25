@@ -57,6 +57,7 @@
 #include "OpenTwinFoundation/OTObject.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "DataBase.h"
 
@@ -2061,10 +2062,12 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 	ot::GraphicsView* newEditor = new ot::GraphicsView;
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setDropsEnabled(true);
+
 	AppBase::instance()->addTabToCentralView(_title, newEditor);
 	m_graphicsViews.store(_owner, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemAdded, this, &AppBase::slotGraphicsItemDroppend);
 	connect(newEditor, &ot::GraphicsView::connectionAdded, this, &AppBase::slotGraphicsConnectionDroppend);
+	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 }
 
 // ######################################################################################################################
@@ -2215,6 +2218,45 @@ void AppBase::slotGraphicsConnectionDroppend(ot::UID _connectionUid) {
 	}
 	catch (...) {
 		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsSelectionChanged(void) {
+	ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
+	if (scene == nullptr) {
+		OT_LOG_E("GraphicsScene cast failed");
+		return;
+	}
+
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged);
+
+	ot::UIDList sel;
+	for (auto s : scene->selectedItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
+		OTAssertNullptr(itm);
+		sel.push_back(itm->graphicsItemUid());
+	}
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, sel);
+
+	try {
+		ot::GraphicsView* view = scene->getGraphicsView();
+		auto owner = m_graphicsViews.findOwner(view);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+			OT_LOG_EA("Failed to send http request");
+			return;
+		}
+		if (response != OT_ACTION_RETURN_VALUE_OK) {
+			OT_LOG_EAS("Invalid response: " + response);
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 

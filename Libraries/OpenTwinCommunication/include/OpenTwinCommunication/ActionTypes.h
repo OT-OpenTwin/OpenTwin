@@ -222,6 +222,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemRemoved "UI.GraphicsEditor.Item.Removed"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped "UI.GraphicsEditor.Connection.Dropped"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionRemoved "UI.GraphicsEditor.Connection.Removed"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged "UI.GraphicsEditor.SelectionChanged"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
@@ -490,6 +491,7 @@
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_EditorTitle "GraphicsEditor.Title"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName "GraphicsEditor.Item.Name"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId "GraphicsEditor.Item.ID"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds "GraphicsEditor.Item.IDs"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId "GraphicsEditor.Origin.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestId "GraphicsEditor.Dest.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName "GraphicsEditor.Origin.ConName"

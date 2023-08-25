@@ -19,6 +19,7 @@
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsEditorPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
+#include "OTGui/GraphicsFlowItemCfg.h"
 
 Application * g_instance{ nullptr };
 
@@ -78,6 +79,24 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	m_uiComponent->displayMessage("New connection dropped { o.i: \"" + std::to_string(originUid) + "\", o.c: \"" + originConnectable + 
 		"\", d.i: \"" + std::to_string(destUid) + "\", d.c: \"" + destConnectable + 
 		"\" } at editor { name: \"" + editorName + "\" }\n");
+
+	return std::string(OT_ACTION_RETURN_VALUE_OK);
+}
+
+std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document) {
+	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	auto sel = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+
+	std::string msg = "Selection changed: [";
+	bool f = true;
+	for (auto s : sel) {
+		if (!f) msg.append("; ");
+		f = false;
+		msg.append(std::to_string(s));
+	}
+	msg.append("]\n");
+
+	m_uiComponent->displayMessage(msg);
 
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
@@ -193,17 +212,15 @@ ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 }
 
 ot::GraphicsItemCfg* createTestBlock4(const std::string& _name) {
-	ot::GraphicsFlowItemCfg* flow = new ot::GraphicsFlowItemCfg;
-	flow->setName(_name);
-	flow->setTitle(_name);
-	flow->setTitleBackgroundColor(255, 0, 0);
+	ot::GraphicsFlowItemCfg flow;
+	flow.setTitleBackgroundColor(255, 0, 0);
 	//flow->setBackgroundImagePath("Default/python");
 
-	//flow->addInput("SomeIn", "input", ot::GraphicsFlowItemCfg::Square);
-	flow->addOutput("SomeOut1", "output 1", ot::GraphicsFlowItemCfg::Square);
-	flow->addOutput("SomeOut2", "output 2", ot::GraphicsFlowItemCfg::Square);
+	flow.addInput("SomeIn", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+	flow.addOutput("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+	flow.addOutput("SomeOut2", "Error", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Red);
 
-	return flow;
+	return flow.createGraphicsItem(_name, _name);
 }
 
 std::string Application::createEmptyTestEditor(void) {

@@ -487,6 +487,7 @@ public:
 public slots:
 	void slotGraphicsItemDroppend(ot::UID _itemUid);
 	void slotGraphicsConnectionDroppend(ot::UID _connectionUid);
+	void slotGraphicsSelectionChanged(void);
 
 private slots:
 	void reapplyColorStyle(void);

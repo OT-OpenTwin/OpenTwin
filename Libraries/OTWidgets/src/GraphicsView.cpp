@@ -13,32 +13,13 @@
 // Qt header
 #include <QtGui/qevent.h>
 #include <QtCore/qmimedata.h>
+#include <QtWidgets/qscrollbar.h>
 //#include <QtWidgets/qgraphicsscene.h>
 
-//! If this is true, the graphics view will force a minimum size
-#define OT_CFG_ForceMinimumGraphicsViewSize true
-
-#if (OT_CFG_ForceMinimumGraphicsViewSize == true)
-// Only to use in this context
-#define OT_INTERN_MinimumGraphicsViewSizeWidth 500
-// Only to use in this context
-#define OT_INTERN_MinimumGraphicsViewSizeHeight 500
-
-//! @brief Adjust the provided variables according to the GraphicsViews default forced minimum size (if enabled)
-//! @param ___w Width variable
-//! @param ___h Height variable
-#define OT_AdjustMinimumGraphicsViewSize(___w, ___h) if (___w < OT_INTERN_MinimumGraphicsViewSizeWidth) { ___w = OT_INTERN_MinimumGraphicsViewSizeWidth; }; if (___h < OT_INTERN_MinimumGraphicsViewSizeHeight) { ___h = OT_INTERN_MinimumGraphicsViewSizeHeight; }
-
-#else
-//! @brief Adjust the provided variables according to the GraphicsViews default forced minimum size (if enabled)
-//! @param ___w Width variable
-//! @param ___h Height variable
-#define OT_AdjustMinimumGraphicsViewSize(___w, ___h)
-#endif
 ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_currentUid(0) {
 	m_scene = new GraphicsScene(this);
 	this->setScene(m_scene);
-	this->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 	this->setAlignment(Qt::AlignAbsolute);
 }
 
@@ -55,7 +36,6 @@ void ot::GraphicsView::resetView(void) {
 	setSceneRect(QRectF());
 	int w = boundingRect.width();
 	int h = boundingRect.height();
-	OT_AdjustMinimumGraphicsViewSize(w, h);
 	QRectF viewRect = boundingRect.marginsAdded(QMarginsF(w, h, w, h));
 	fitInView(viewRect, Qt::AspectRatioMode::KeepAspectRatio);
 	centerOn(viewRect.center());
@@ -67,7 +47,6 @@ void ot::GraphicsView::viewAll(void) {
 	QRectF boundingRect = mapFromScene(s->itemsBoundingRect()).boundingRect();
 	int w = boundingRect.width();
 	int h = boundingRect.height();
-	OT_AdjustMinimumGraphicsViewSize(w, h);
 	QRect viewPortRect = viewport()->rect().marginsRemoved(QMargins(w, h, w, h));
 
 	if (viewPortRect.width() > boundingRect.width() && viewPortRect.height() > boundingRect.height())
@@ -148,8 +127,9 @@ void ot::GraphicsView::enterEvent(QEvent* _event)
 void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 {
 	QGraphicsView::mousePressEvent(_event);
-	viewport()->setCursor(Qt::CrossCursor);
-	if (_event->button() == Qt::LeftButton) {
+	if (_event->button() == Qt::MiddleButton) {
+		viewport()->setCursor(Qt::ClosedHandCursor);
+		m_lastPanPos = _event->pos();
 		m_isPressed = true;
 	}
 }
@@ -157,15 +137,24 @@ void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
 {
 	QGraphicsView::mouseReleaseEvent(_event);
-	viewport()->setCursor(Qt::CrossCursor);
 
-	m_isPressed = false;
+	if (_event->button() == Qt::MiddleButton) {
+		m_isPressed = false;
+		viewport()->setCursor(Qt::CrossCursor);
+	}
 }
 
 void ot::GraphicsView::mouseMoveEvent(QMouseEvent* _event)
 {
-	QGraphicsView::mouseMoveEvent(_event);
-	if (m_isPressed) { mousePressedMoveEvent(_event); }
+	if (m_isPressed) {
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->x() - m_lastPanPos.x()));
+		verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->y() - m_lastPanPos.y()));
+		m_lastPanPos = _event->pos();
+		_event->accept();
+	}
+	else {
+		QGraphicsView::mouseMoveEvent(_event);
+	}
 }
 
 void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)

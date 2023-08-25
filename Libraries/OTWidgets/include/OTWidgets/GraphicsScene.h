@@ -17,6 +17,8 @@ namespace ot {
 	class GraphicsItem;
 	class GraphicsPathItem;
 
+	//! @brief Graphics Scene for ot::GraphicsItem
+	//! Adding QGraphicsItems to the scene that do not inherit ot::GraphicsItem might lead to undefined behavior
 	class OT_WIDGETS_API_EXPORT GraphicsScene : public QGraphicsScene {
 		Q_OBJECT
 	public:
@@ -32,7 +34,6 @@ namespace ot {
 		int gridSize(void) const { return m_gridSize; };
 
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) override;
-
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin

@@ -13,7 +13,9 @@
 #include <QtGui/qevent.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::GraphicsScene::GraphicsScene(GraphicsView* _view) : m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_pathItem(nullptr) {}
+ot::GraphicsScene::GraphicsScene(GraphicsView* _view) : m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_pathItem(nullptr) {
+
+}
 
 ot::GraphicsScene::~GraphicsScene() {}
 

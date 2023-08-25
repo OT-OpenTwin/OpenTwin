@@ -54,6 +54,9 @@
     <ClInclude Include="include\OTGui\Painter2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsFlowItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -88,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="src\Painter2D.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsFlowItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

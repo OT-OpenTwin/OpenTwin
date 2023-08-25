@@ -23,6 +23,7 @@
     <ClInclude Include="include\OTGui\Font.h" />
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsEditorPackage.h" />
+    <ClInclude Include="include\OTGui\GraphicsFlowItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
@@ -37,6 +38,7 @@
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\GraphicsCollectionCfg.cpp" />
     <ClCompile Include="src\GraphicsEditorPackage.cpp" />
+    <ClCompile Include="src\GraphicsFlowItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfg.cpp" />
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />

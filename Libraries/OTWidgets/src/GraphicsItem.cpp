@@ -365,6 +365,8 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	f.setItalic(cfg->textFont().isItalic());
 	f.setBold(cfg->textFont().isBold());
 	this->setFont(f);
+
+	this->setDefaultTextColor(ot::OTQtConverter::toQt(cfg->textColor()));
 	
 	//this->setDefaultTextColor(QColor(cfg->textColor().r(), cfg->textColor().g(), cfg->textColor().b(), cfg->textColor().a()));
 
