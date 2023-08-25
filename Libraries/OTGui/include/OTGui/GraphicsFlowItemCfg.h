@@ -17,10 +17,10 @@ namespace ot {
 	class OT_GUI_API_EXPORTONLY GraphicsFlowConnectorCfg {
 	public:
 		enum ConnectorFigure {
-			Square
+			Square,
 			//TriangleRight,
 			//TriangleLeft,
-			//Circle
+			Circle
 		};
 
 		GraphicsFlowConnectorCfg();
@@ -55,6 +55,7 @@ namespace ot {
 	private:
 		ot::GraphicsItemCfg* createConnectorItem(void);
 		ot::GraphicsItemCfg* createSquareItem(void);
+		ot::GraphicsItemCfg* createCircleItem(void);
 
 		std::string m_name;
 		std::string m_text;

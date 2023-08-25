@@ -218,10 +218,10 @@ ot::GraphicsItemCfg* createTestBlock4(const std::string& _name) {
 
 	flow.addInput("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 	flow.addInput("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-	flow.addInput("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Square, ot::Color::IndianRed);
+	flow.addInput("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
 	flow.addOutput("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-	flow.addOutput("SomeOut2", "Error", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Red);
-	flow.addOutput("SomeOut3", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+	flow.addOutput("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+	flow.addOutput("SomeOut3", "Error", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Red);
 
 	return flow.createGraphicsItem(_name, _name);
 }

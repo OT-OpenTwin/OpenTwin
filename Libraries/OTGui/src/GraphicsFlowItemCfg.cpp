@@ -51,6 +51,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 	switch (m_figure)
 	{
 	case ot::GraphicsFlowConnectorCfg::Square: return this->createSquareItem();
+	case ot::GraphicsFlowConnectorCfg::Circle: return this->createCircleItem();
 	default:
 		OT_LOG_EA("Unknown connector type");
 		throw std::exception("Unknown connector type");
@@ -60,6 +61,13 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
 	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(m_primaryColor));
 	itm->setSize(ot::Size2D(10, 10));
+	itm->setBorder(ot::Border(m_secondaryColor, 1));
+
+	return itm;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createCircleItem(void) {
+	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, new ot::FillPainter2D(m_primaryColor));
 	itm->setBorder(ot::Border(m_secondaryColor, 1));
 
 	return itm;
@@ -180,6 +188,10 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
+
+		// Fix until auto scaling is implemented
+#pragma message("[OPEN TWIN] [WARNING] <<<- FIX IMPLEMENTED ->>>")
+		cImg->setSize(ot::Size2D(30, 30));
 
 		cStack->setBottomItem(cImg);
 		cStack->setTopItem(cLay);

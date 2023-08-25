@@ -678,7 +678,7 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsStackItem> stackItem(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
-static ot::SimpleFactoryRegistrar<ot::GraphicsImageItem> elliItem(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
+static ot::SimpleFactoryRegistrar<ot::GraphicsEllipseItem> elliItem(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 
 // Register at global key map (config -> item)
