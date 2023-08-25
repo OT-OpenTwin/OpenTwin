@@ -6,12 +6,17 @@
 
 class Pipeline
 {
+
 public:
-	Pipeline(PipelineSource sourceBlock);
+	Pipeline();
+
 	void RunPipeline();
+	void SetSource(PipelineSource* sourceBlock) { _sourceBlock = sourceBlock; };
+	void AddFilter(PipelineFilter&& newFilter) { _filter.push_back(newFilter); };
+	void AddSink(PipelineSink&& newSink) { _sinks.push_back(newSink); };
 
 private:
-	//const PipelineSource _sourceBlock;
+	PipelineSource* _sourceBlock;
 	std::list<PipelineFilter> _filter;
 	std::list<PipelineSink> _sinks;
 };

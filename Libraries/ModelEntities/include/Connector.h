@@ -12,6 +12,8 @@ namespace ot
 		Connector(ConnectorType type, const std::string& connectorName);
 		Connector();
 		ConnectorType getConnectorType() const { return _connectorType; }
+		const std::string& getConnectorName() const { return _connectorName; }
+
 		virtual bsoncxx::builder::basic::document SerializeBSON() const  override;
 		virtual void DeserializeBSON(bsoncxx::v_noabi::types::b_document& storage) override;
 

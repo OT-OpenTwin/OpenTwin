@@ -3,6 +3,7 @@
 #include "EntityPlot1D.h"
 #include "EntityResult1D.h"
 #include "OpenTwinCommunication/ActionTypes.h"
+#include "Application.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity)
 {
@@ -11,7 +12,7 @@ BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity)
 	
 	_xunit = blockEntity->getXUnit();
 	_yunit = blockEntity->getYUnit();
-
+	_modelComponent = Application::instance()->modelComponent();
 }
 
 BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::genericDataBlock& inputData)

@@ -1,6 +1,7 @@
 #pragma once
 #include "PipelineItem.h"
 #include "OpenTwinCore/Variable.h"
+#include "BlockHandler.h"
 
 class PipelineSource : public PipelineItem
 {
@@ -9,5 +10,5 @@ public:
 	genericDataBlock CreateData(genericDataBlock& parameter) const;
 
 private:
-	//SourceBlockHandler _handler;
+	BlockHandler* _handler;
 };

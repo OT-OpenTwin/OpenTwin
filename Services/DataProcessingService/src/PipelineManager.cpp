@@ -2,19 +2,23 @@
 #include "OpenTwinFoundation/BusinessLogicHandler.h"
 #include "Application.h"
 #include "ClassFactory.h"
-#include "Pipeline.h"
+
 
 void PipelineManager::RunAll() 
 {
-	BusinessLogicHandler handler;
 	auto blockEntities = GetAllBlockEntities();
 	CreatePipelines(blockEntities);
 	blockEntities.clear();
+
+	for (Pipeline& pipeline : pipelines)
+	{
+		pipeline.RunPipeline();
+	}
 }
 
 std::list<std::shared_ptr<EntityBlock>> PipelineManager::GetAllBlockEntities()
 {
-	std::string entityDict = "Processing Blocks";
+	std::string entityDict = "Blocks/Data Processing";
 	std::list<std::string> namesOfEntities = _modelComponent->getListOfFolderItems(entityDict);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(namesOfEntities, entityInfos);
@@ -46,7 +50,10 @@ void PipelineManager::CreatePipelines(std::list<std::shared_ptr<EntityBlock>>& a
 				bool hasOutgoingConnection = CheckIfSourceHasOutgoingConnection(connector, allConnections);
 				if (hasOutgoingConnection)
 				{
-					//Pipeline newPipeline(blockEntity);
+					Pipeline newPipeline;
+					newPipeline.SetSource(new PipelineSource(blockEntity));
+					AddFiltersAndSinks(newPipeline, allConnections, allBlockEntities);
+					pipelines.push_back(newPipeline);
 				}
 			}
 		}
@@ -54,7 +61,50 @@ void PipelineManager::CreatePipelines(std::list<std::shared_ptr<EntityBlock>>& a
 
 }
 
+void PipelineManager::AddFiltersAndSinks(Pipeline& newPipeline, std::list<ot::BlockConnection>& allBlockConnections, std::list<std::shared_ptr<EntityBlock>>& allBlockEntities)
+{
+	for (auto& connection : allBlockConnections)
+	{
+		for (auto& blockEntity : allBlockEntities)
+		{
+			if (connection.getIDDestination() == blockEntity->getBlockID())
+			{
+				for (auto& connector : blockEntity->getAllConnectors())
+				{
+					if (connector.getConnectorType() == ot::ConnectorType::Filter)
+					{
+						newPipeline.AddFilter(PipelineFilter(blockEntity));
+					}
+					else if (connector.getConnectorType() == ot::ConnectorType::Sink)
+					{
+						newPipeline.AddSink(PipelineSink(blockEntity));
+					}
+					else
+					{
+						assert(0);
+					}
+				}
+				break;
+			}
+		}
+	}
+}
+
 bool PipelineManager::CheckIfSourceHasOutgoingConnection(ot::Connector& connector, std::list<ot::BlockConnection>& allBlockConnections)
 {
+	if (allBlockConnections.size() == 0)
+	{
+		return false;
+	}
+	else
+	{
+		for (auto& connection : allBlockConnections)
+		{
+			if (connection.getConnectorOrigin() == connector.getConnectorName())
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }

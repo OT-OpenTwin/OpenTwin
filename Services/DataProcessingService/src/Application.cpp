@@ -76,6 +76,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 
+			_pipelineManager.RunAll();
 			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 			//std::list<std::string>projects{"KWT_Demo"};
 			//block->createProperties(projects, *projects.begin());
@@ -95,9 +96,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		ot::UID itemID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
 		
-		BlockEntityHandler handler;
-		handler.setModelComponent(m_modelComponent);
-		auto blockEntity = handler.CreateBlock(editorName, itemName, itemID);
+		auto blockEntity = _blockEntHandler.CreateBlock(editorName, itemName, itemID);
 		
 		ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
 		std::list<bool> forceVis;
@@ -111,7 +110,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string connectorNameOrigin = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName);
 		std::string connectorNameDestination = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName);
 
-		//m_modelComponent->getListOfFolderItems()
+		_blockEntHandler.AddBlockConnection(uidOrigin, uidDestination, connectorNameOrigin, connectorNameDestination);
 	}
 
 	return ""; // Return empty string if the request does not expect a return
@@ -154,7 +153,8 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-
+	_blockEntHandler.setModelComponent(_model);
+	_pipelineManager.setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

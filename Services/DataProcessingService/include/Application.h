@@ -15,6 +15,9 @@
 // C++ header
 #include <string>
 
+#include "BlockEntityHandler.h"
+#include "PipelineManager.h"
+
 // Forward declaration
 namespace ot {
 	namespace components {
@@ -116,4 +119,7 @@ private:
 	virtual ~Application();
 
 	ot::MenuButtonDescription _buttonRunPipeline;
+
+	BlockEntityHandler _blockEntHandler;
+	PipelineManager _pipelineManager;
 };
