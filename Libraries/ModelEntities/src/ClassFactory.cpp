@@ -56,7 +56,7 @@
 #include "EntityMeasurementMetadata.h"
 #include "EntityBlock.h"
 #include "EntityBlockDatabaseAccess.h"
-
+#include "EntityBlockPlot1D.h"
 
 EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 {
@@ -303,6 +303,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityBlockDatabaseAccess")
 	{
 		return new EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockPlot1D")
+	{
+		return new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else
 	{

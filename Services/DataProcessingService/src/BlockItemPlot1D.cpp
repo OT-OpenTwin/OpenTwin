@@ -1,5 +1,5 @@
 #include "BlockItemPlot1D.h"
-
+#include "EntityBlockPlot1D.h"
 
 BlockItemPlot1D::BlockItemPlot1D()
 	:BlockItemDataProcessing("Plot 1D", "Plot 1D","V", /*"Plot1DVisible"*/"")
@@ -14,5 +14,7 @@ void BlockItemPlot1D::AddConnectors(ot::GraphicsFlowItemCfg* block)
 
 std::shared_ptr<EntityBlock> BlockItemPlot1D::CreateBlockEntity()
 {
-	return std::shared_ptr<EntityBlock>(new EntityBlock(0,nullptr,nullptr,nullptr,nullptr,""));
+	auto plotBlock = new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, nullptr, "");
+	plotBlock->createProperties();
+	return std::shared_ptr<EntityBlock>(plotBlock);
 }
