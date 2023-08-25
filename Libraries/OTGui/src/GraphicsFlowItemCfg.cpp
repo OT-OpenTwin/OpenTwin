@@ -30,15 +30,11 @@ ot::GraphicsFlowConnectorCfg& ot::GraphicsFlowConnectorCfg::operator = (const Gr
 	return *this;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::toGraphicsItem(bool _isInput) {
+void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, int _connectorColumn, int _titleColumn, GraphicsGridLayoutItemCfg* _gridLayout) {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	itm->setName(m_name);
-
-	// Layout
-	ot::GraphicsHBoxLayoutItemCfg* itmLay = new ot::GraphicsHBoxLayoutItemCfg;
-	itmLay->setName(m_name + "_lay");
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
@@ -47,20 +43,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::toGraphicsItem(bool _isInput)
 	itmTxt->setTextColor(m_textColor);
 	itmTxt->setTextFont(m_font);
 
-	// Place items in layout (input:  [] text     output:  text [])
-	if (_isInput) {
-		itmLay->addChildItem(itm, 0);
-		itmLay->addChildItem(itmTxt, 0);
-		itmLay->addStrech(1);
-	}
-	else {
-		itmLay->addStrech(1);
-		itmLay->addChildItem(itmTxt, 0);
-		itmLay->addChildItem(itm, 0);
-	}
-
-	// Return the layout holding the text and item
-	return itmLay;
+	_gridLayout->addChildItem(_row, _connectorColumn, itm);
+	_gridLayout->addChildItem(_row, _titleColumn, itmTxt);
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
@@ -75,6 +59,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
 	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(m_primaryColor));
+	itm->setSize(ot::Size2D(10, 10));
 	itm->setBorder(ot::Border(m_secondaryColor, 1));
 
 	return itm;
@@ -170,18 +155,19 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	tLay->addStrech(1);
 
 	// Central grid
-	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_inputs.size(), m_outputs.size()), 3);
+	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_inputs.size(), m_outputs.size()), 5);
 	cLay->setName(_name + "_cLay");
-	cLay->setColumnStretch(1, 1);
 
 	int ix = 0;
 	for (auto c : m_inputs) {
-		cLay->addChildItem(ix++, 0, c.toGraphicsItem(true));
+		c.addToGrid(ix++, 0, 1, cLay);
 	}
 	ix = 0;
 	for (auto c : m_outputs) {
-		cLay->addChildItem(ix++, 2, c.toGraphicsItem(false));
+		c.addToGrid(ix++, 4, 3, cLay);
 	}
+
+	cLay->setColumnStretch(2, 1);
 
 	// Central stack
 	if (m_backgroundImagePath.empty()) {

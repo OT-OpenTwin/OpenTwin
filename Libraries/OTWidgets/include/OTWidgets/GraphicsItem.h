@@ -26,6 +26,7 @@
 #define OT_SimpleFactoryJsonKeyValue_GraphicsGroupItem "OT_GIGroup"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsStackItem "OT_GIStack"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItem "OT_GIImage"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem "OT_GIElli"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsConnectionItem "OT_GIConnection"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
 
@@ -252,6 +253,44 @@ namespace ot {
 		QBrush m_brush;
 		QPen m_pen;
 		int m_cornerRadius;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_WIDGETS_API_EXPORT GraphicsEllipseItem : public QGraphicsItem, public QGraphicsLayoutItem, public GraphicsItem {
+	public:
+		GraphicsEllipseItem();
+		virtual ~GraphicsEllipseItem();
+
+		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem); };
+
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return QSizeF(m_radiusX, m_radiusY); };
+		virtual QRectF boundingRect(void) const override;
+		virtual void setGeometry(const QRectF& rect) override;
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+		virtual QRectF getGraphicsItemBoundingRect(void) const override;
+		virtual QPointF getGraphicsItemScenePos(void) const override;
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
+
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+	private:
+		QBrush m_brush;
+		QPen m_pen;
+		int m_radiusX;
+		int m_radiusY;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

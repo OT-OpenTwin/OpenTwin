@@ -12,6 +12,8 @@
 
 namespace ot {
 
+	class GraphicsGridLayoutItemCfg;
+
 	class OT_GUI_API_EXPORTONLY GraphicsFlowConnectorCfg {
 	public:
 		enum ConnectorFigure {
@@ -48,7 +50,7 @@ namespace ot {
 		GraphicsFlowConnectorCfg::ConnectorFigure figure(void) const { return m_figure; };
 
 		//! @brief Creates a graphics item corresponding to the 
-		ot::GraphicsItemCfg* toGraphicsItem(bool _isInput);
+		void addToGrid(int _row, int _connectorColumn, int _titleColumn, GraphicsGridLayoutItemCfg* _gridLayout);
 
 	private:
 		ot::GraphicsItemCfg* createConnectorItem(void);

@@ -15,6 +15,7 @@ ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _ow
 	m_group = new ot::GraphicsGroupItem;
 	m_group->addToGroup(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+	this->setParentGraphicsItem(m_group);
 }
 
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
@@ -158,7 +159,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
 			this->addChildToGroup(i);
-			this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
+			if (itm.second > 0) this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
 		}
 		else {
 			this->addStretch(itm.second);
@@ -240,15 +241,13 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	}
 
 	// Setup stretches
-	x = 0;
-	for (auto r : cfg->rowStretch()) {
-		this->setRowStretchFactor(x++, r);
+	for (size_t r = 0; r < cfg->rowStretch().size(); r++) {
+		this->setRowStretchFactor(r, cfg->rowStretch()[r]);
 	}
-	x = 0;
-	for (auto r : cfg->columnStretch()) {
-		this->setColumnStretchFactor(x++, r);
+	for (size_t c = 0; c < cfg->columnStretch().size(); c++) {
+		this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
 	}
-
+	
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 

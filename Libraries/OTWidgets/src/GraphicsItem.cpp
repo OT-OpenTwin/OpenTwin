@@ -343,6 +343,86 @@ void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _eve
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+ot::GraphicsEllipseItem::GraphicsEllipseItem() : ot::GraphicsItem(false), m_radiusX(5), m_radiusY(5) {
+	this->setGraphicsItem(this);
+	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+}
+
+ot::GraphicsEllipseItem::~GraphicsEllipseItem() {
+
+}
+
+bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
+	ot::GraphicsEllipseItemCfg* cfg = dynamic_cast<ot::GraphicsEllipseItemCfg*>(_cfg);
+	if (cfg == nullptr) {
+		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		return false;
+	}
+	m_radiusX = cfg->radiusX();
+	m_radiusY = cfg->radiusY();
+	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
+	m_pen.setWidth(cfg->border().top()); // ToDo: Add seperate borders on all 4 sides
+	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
+	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
+
+	//OT_LOG_W("Orig: " + std::to_string(cfg->border().color().r()) + "; " + std::to_string(cfg->border().color().g()) + "; " + std::to_string(cfg->border().color().b()) + "; " + std::to_string(cfg->border().color().a()));
+	//OT_LOG_W(": " + std::to_string(m_pen.color().red()) + "; " + std::to_string(m_pen.color().green()) + "; " + std::to_string(m_pen.color().blue()) + "; " + std::to_string(m_pen.color().alpha()));
+
+	return ot::GraphicsItem::setupFromConfig(_cfg);
+}
+
+QRectF ot::GraphicsEllipseItem::boundingRect(void) const {
+	return QRectF(this->pos(), QSizeF(m_radiusX * 2, m_radiusY * 2));
+}
+
+void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
+	this->setPos(_rect.topLeft());
+}
+
+QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
+		this->handleItemMoved();
+	}
+	return _value;
+}
+
+void ot::GraphicsEllipseItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+void ot::GraphicsEllipseItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paintGeneralGraphics(_painter, _opt, _widget);
+	_painter->setBrush(m_brush);
+	_painter->setPen(m_pen);
+	_painter->drawEllipse(this->boundingRect().center(), m_radiusX, m_radiusY);
+}
+
+QRectF ot::GraphicsEllipseItem::getGraphicsItemBoundingRect(void) const {
+	return this->boundingRect();
+}
+
+QPointF ot::GraphicsEllipseItem::getGraphicsItemScenePos(void) const {
+	return this->scenePos();
+}
+
+void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 ot::GraphicsTextItem::GraphicsTextItem() : ot::GraphicsItem(false) {
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
@@ -598,10 +678,12 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsStackItem> stackItem(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
+static ot::SimpleFactoryRegistrar<ot::GraphicsImageItem> elliItem(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 
 // Register at global key map (config -> item)
 static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
 static ot::GlobalKeyMapRegistrar stackItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::GlobalKeyMapRegistrar imageItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsImageItem);
+static ot::GlobalKeyMapRegistrar elliItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
 static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
