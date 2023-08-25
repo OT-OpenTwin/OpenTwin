@@ -44,16 +44,15 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 		count = +1;
 	}
 	
+	std::string name = "firstPlot";
 	std::string xlabel("X-Label"), xunit("X-Unit"), ylabel("Y-Label"), yunit("Y-Unit");
 	int colorID(0);
-	std::string plotName = "Plots/firstPlot";
+	std::string plotFolder = "Scripts/";
 	
-	EntityResult1D* curve = _modelComponent->addResult1DEntity(plotName, xValues, resultCurve, {}, xlabel, xunit, ylabel, yunit, colorID, true);
-	curve->StoreToDataBase();
+	EntityResult1D* curve = _modelComponent->addResult1DEntity("Scripts/" + name, xValues, resultCurve, {}, xlabel, xunit, ylabel, yunit, colorID, true);
 
-	std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),curve->getName())};
-	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity("Plots/firstPlot1", "SomeEntries", curves);
-	plotID->StoreToDataBase();
+	std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),name)};
+	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(plotFolder + "Plot", "SomeEntries", curves);
 
 
 	ot::UIDList topoEnt{curve->getEntityID(), plotID->getEntityID()}, 
