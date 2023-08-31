@@ -32,6 +32,7 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
 		m_owner->handleItemMoved();
+		m_owner->raiseEvent(ot::GraphicsItem::Resized);
 	}
 	return QGraphicsWidget::itemChange(_change, _value);
 }
@@ -181,7 +182,11 @@ void ot::GraphicsBoxLayoutItem::getAllItems(std::list<QGraphicsLayoutItem *>& _i
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsVBoxLayoutItem::GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem) : GraphicsBoxLayoutItem(Qt::Vertical, _parentItem) {}
+ot::GraphicsVBoxLayoutItem::GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem) 
+	: GraphicsBoxLayoutItem(Qt::Vertical, _parentItem) 
+{
+
+}
 
 bool ot::GraphicsVBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsBoxLayoutItem::setupFromConfig(_cfg);

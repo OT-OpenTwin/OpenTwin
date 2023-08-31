@@ -122,6 +122,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
+	raiseEvent(ot::GraphicsItem::Resized);
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
@@ -346,6 +347,16 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 	ot::GraphicsGroupItem::graphicsItemFlagsChanged(_flags);
 }
 
+void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
+	if (_event == ot::GraphicsItem::Resized) {
+		for (auto itm : m_items) {
+			if (itm.item != _sender && !itm.isMaster) {
+				//itm.item->getQGraphicsLayoutItem()->setGeometry(_sender->getGraphicsItemBoundingRect());
+			}
+		}
+	}
+}
+
 void ot::GraphicsStackItem::memClear(void) {
 	for (auto itm : m_items) delete itm.item;
 	m_items.clear();
@@ -418,7 +429,7 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(this->calculateDrawRect(QRectF(this->pos(), m_size)), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(QRectF(this->pos(), m_size), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {

@@ -162,11 +162,12 @@ namespace ot {
 		void addGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 		void removeGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 
+		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 	protected:
 		QRectF calculateDrawRect(const QRectF& _rect) const;
-		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
 	private:
 		bool m_isContainerItem;
@@ -247,6 +248,9 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+		//! @brief Will be called when this item was registered as an event handler and the child raised an event
+		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) override;
 
 	private:
 		void memClear(void);

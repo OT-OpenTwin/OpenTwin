@@ -177,14 +177,14 @@ void ot::GraphicsStackItemCfg::addItemTop(ot::GraphicsItemCfg* _item, bool _isMa
 	GraphicsStackItemCfgEntry e;
 	e.isMaster = _isMaster;
 	e.item = _item;
-	m_items.push_front(e);
+	m_items.push_back(e);
 }
 
 void ot::GraphicsStackItemCfg::addItemBottom(ot::GraphicsItemCfg* _item, bool _isMaster) {
 	GraphicsStackItemCfgEntry e;
 	e.isMaster = _isMaster;
 	e.item = _item;
-	m_items.push_back(e);
+	m_items.push_front(e);
 }
 
 void ot::GraphicsStackItemCfg::memClear(void) {
