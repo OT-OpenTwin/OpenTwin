@@ -42,7 +42,7 @@ namespace ot {
 		Verdana
 	};
 
-	OT_GUI_API_EXPORT std::string toString(Alignment _Alignation);
+	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
 	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
 
 	OT_GUI_API_EXPORT std::string toString(Orientation _orientation);

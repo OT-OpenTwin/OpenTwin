@@ -25,12 +25,13 @@
 #define OT_JSON_MEMBER_TextFont "TextFont"
 #define OT_JSON_MEMBER_TextColor "TextColor"
 #define OT_JSON_MEMBER_ImagePath "ImagePath"
+#define OT_JSON_MEMBER_Alignment "Alignment"
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
 #define OT_JSON_VALUE_Connectable "Connectable"
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags) {}
+ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter) {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
@@ -49,6 +50,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Title, m_tile);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Alignment, ot::toString(m_alignment));
 	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
 }
 
@@ -58,9 +60,11 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Size, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Alignment, String);
 
 	m_name = _object[OT_JSON_MEMBER_Name].GetString();
 	m_tile = _object[OT_JSON_MEMBER_Title].GetString();
+	m_alignment = ot::stringToAlignment(_object[OT_JSON_MEMBER_Alignment].GetString());
 
 	OT_rJSON_val sizeObj = _object[OT_JSON_MEMBER_Size].GetObject();
 	OT_rJSON_val marginObj = _object[OT_JSON_MEMBER_Margin].GetObject();

@@ -2,8 +2,8 @@
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/Logger.h"
 
-std::string ot::toString(ot::Alignment _Alignment) {
-	switch (_Alignment)
+std::string ot::toString(ot::Alignment _alignment) {
+	switch (_alignment)
 	{
 	case ot::Alignment::AlignCenter: return "AlignCenter";
 	case ot::Alignment::AlignTop: return "AlignTop";
@@ -15,7 +15,7 @@ std::string ot::toString(ot::Alignment _Alignment) {
 	case ot::Alignment::AlignLeft: return "AlignLeft";
 	case ot::Alignment::AlignTopLeft: return "AlignTopLeft";
 	default:
-		OT_LOG_EA("Unknown Alignment provided");
+		OT_LOG_EAS("Unknown Alignment provided: \"" + std::to_string((int)_alignment) + "\"");
 		throw std::exception("Unknown Alignment provided");
 	}
 }
@@ -31,7 +31,7 @@ ot::Alignment ot::stringToAlignment(const std::string& _string) {
 	else if (_string == toString(ot::Alignment::AlignLeft)) return ot::Alignment::AlignLeft;
 	else if (_string == toString(ot::Alignment::AlignTopLeft)) return ot::Alignment::AlignTopLeft;
 	else {
-		OT_LOG_EA("Unknown Alignment provided");
+		OT_LOG_EAS("Unknown Alignment provided: \"" + _string + "\"");
 		throw std::exception("Unknown Alignment provided");
 	}
 }
@@ -42,7 +42,7 @@ std::string ot::toString(Orientation _orientation) {
 	case ot::Horizontal: return "Horizontal";
 	case ot::Vertical: return "Vertical";
 	default:
-		OT_LOG_EA("Unknown Orientation provided");
+		OT_LOG_EAS("Unknown Orientation provided: \"" + std::to_string((int)_orientation) + "\"");
 		throw std::exception("Unknown Orientation provided");
 	}
 }
@@ -51,7 +51,7 @@ ot::Orientation ot::stringToOrientation(const std::string& _string) {
 	if (_string == toString(ot::Orientation::Horizontal)) return ot::Orientation::Horizontal;
 	else if (_string == toString(ot::Orientation::Vertical)) return ot::Orientation::Vertical;
 	else {
-		OT_LOG_EA("Unknown Orientation provided");
+		OT_LOG_EAS("Unknown Orientation provided: \"" + _string + "\"");
 		throw std::exception("Unknown Orientation provided");
 	}
 }
@@ -71,6 +71,7 @@ std::string ot::toString(ot::FontFamily _fontFamily) {
 	case ot::TrebuchetMS: return "TrebuchetMS";
 	case ot::Verdana: return "Verdana";
 	default:
+		OT_LOG_EAS("Unknown font family provided: \"" + std::to_string((int)_fontFamily) + "\"");
 		OT_LOG_EA("Unknown font family provided");
 		throw std::exception("Unknown font family provided");
 	}
@@ -89,7 +90,7 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 	else if (_string == toString(TrebuchetMS)) { return TrebuchetMS; }
 	else if (_string == toString(Verdana)) { return Verdana; }
 	else {
-		OT_LOG_EA("Unknown font family provided");
+		OT_LOG_EAS("Unknown font family provided: \"" + _string + "\"");
 		throw std::exception("Unknown font family provided");
 	}
 }

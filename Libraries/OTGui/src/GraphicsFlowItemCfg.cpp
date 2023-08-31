@@ -189,10 +189,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
 
-		// Fix until auto scaling is implemented
-#pragma message("[OPEN TWIN] [WARNING] <<<- FIX IMPLEMENTED ->>>")
-		cImg->setSize(ot::Size2D(30, 30));
-
 		cStack->setBottomItem(cImg);
 		cStack->setTopItem(cLay);
 

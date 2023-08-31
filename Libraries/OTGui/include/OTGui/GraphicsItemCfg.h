@@ -65,12 +65,16 @@ namespace ot {
 		void setGraphicsItemFlags(GraphicsItemFlag _flags) { m_flags = _flags; };
 		GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
 
+		void setAlignment(ot::Alignment _align) { m_alignment = _align; };
+		ot::Alignment alignment(void) const { return m_alignment; };
+
 	private:
 		std::string m_name;
 		std::string m_tile;
 		Size2D m_size;
 		Margins m_margins;
 		GraphicsItemFlag m_flags;
+		ot::Alignment m_alignment;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
