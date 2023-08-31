@@ -129,12 +129,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	bor->setCornerRadius(5);
 	bor->setName(_name + "_bor");
 	bor->setSize(ot::Size2D(200, 200));
-	root->setBottomItem(bor);
+	root->addItemTop(bor, false);
 
 	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(_name + "_mLay");
-	root->setTopItem(mLay);
+	root->addItemTop(mLay, true);
 
 	// Title: Stack
 	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
@@ -147,12 +147,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	tBor->setName(_name + "_tBor");
 	tBor->setCornerRadius(5);
 	tBor->setSize(ot::Size2D(200, 30));
-	tStack->setBottomItem(tBor);
+	tStack->addItemTop(tBor, false);
 
 	// Title: Layout
 	ot::GraphicsHBoxLayoutItemCfg* tLay = new ot::GraphicsHBoxLayoutItemCfg;
 	tLay->setName(_name + "_tLay");
-	tStack->setTopItem(tLay);
+	tStack->addItemTop(tLay, true);
 
 	// Title: Title
 	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
@@ -189,8 +189,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
 
-		cStack->setBottomItem(cImg);
-		cStack->setTopItem(cLay);
+		cStack->addItemTop(cImg, false);
+		cStack->addItemTop(cLay, true);
 
 		mLay->addChildItem(cStack);
 	}

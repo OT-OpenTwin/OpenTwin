@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTGui/GuiTypes.h"
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Flags.h"
 
@@ -63,6 +64,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
+		enum GraphicsItemEvent {
+			Resized
+		};
+
 		enum GraphicsItemFlag {
 			NoFlags            = 0x00, //! @brief No graphics item flags
 			ItemIsConnectable  = 0x01, //! @brief Item can be used as source or destination of a conncetion
@@ -80,6 +85,9 @@ namespace ot {
 		// Virtual functions
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
+
+		//! @brief Will be called when this item was registered as an event handler and the child raised an event
+		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
 		// ###############################################################################################################################################
 
@@ -141,18 +149,41 @@ namespace ot {
 		bool isContainerItem(void) const { return m_isContainerItem; };
 
 		void storeConnection(GraphicsConnectionItem* _connection);
+
+		//! @brief Removes the collection from the list (item will not be destroyed)
 		void forgetConnection(GraphicsConnectionItem* _connection);
 
+		void setGraphicsItemRequestedSize(const QSizeF& _size) { m_requestedSize = _size; };
+		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
+
+		void setGraphicsItemAlignment(ot::Alignment _align) { m_alignment = _align; };
+		ot::Alignment graphicsItemAlignment(void) const { return m_alignment; };
+
+		void addGraphicsItemEventHandler(ot::GraphicsItem* _handler);
+		void removeGraphicsItemEventHandler(ot::GraphicsItem* _handler);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+	protected:
+		QRectF calculateDrawRect(const QRectF& _rect) const;
+		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
+
 	private:
-		std::string m_configuration;
-		std::string m_name;
-		GraphicsItemFlag m_flags;
-		GraphicsItem* m_parent;
 		bool m_isContainerItem;
 		bool m_hasHover;
+		ot::UID m_uid;
+		std::string m_configuration;
+		std::string m_name;
+		ot::Alignment m_alignment;
+		GraphicsItemFlag m_flags;
+
+		GraphicsItem* m_parent;
 		GraphicsItemDrag* m_drag;
 		GraphicsScene* m_scene;
-		ot::UID m_uid;
+
+		QSizeF m_requestedSize;
+
+		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
 	};
 
@@ -200,6 +231,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsStackItem : public ot::GraphicsGroupItem {
 	public:
+		struct GraphicsStackItemEntry {
+			ot::GraphicsItem* item;
+			bool isMaster;
+		};
+
 		GraphicsStackItem();
 		virtual ~GraphicsStackItem();
 
@@ -213,8 +249,9 @@ namespace ot {
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 	private:
-		ot::GraphicsItem* m_top;
-		ot::GraphicsItem* m_bottom;
+		void memClear(void);
+
+		std::list<GraphicsStackItemEntry> m_items;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

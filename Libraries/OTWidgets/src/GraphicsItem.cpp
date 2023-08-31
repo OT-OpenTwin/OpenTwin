@@ -66,7 +66,11 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_uid(0) {}
+ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
+	m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_uid(0), m_alignment(ot::AlignCenter), m_requestedSize(10., 10.)
+{
+
+}
 
 ot::GraphicsItem::~GraphicsItem() {
 	if (m_drag) delete m_drag;
@@ -108,6 +112,7 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) { m_flags |= GraphicsItem::ItemIsConnectable; }
 	m_name = _cfg->name();
+	m_alignment = _cfg->alignment();
 	return true;
 }
 
@@ -128,6 +133,80 @@ void ot::GraphicsItem::forgetConnection(GraphicsConnectionItem* _connection) {
 	while (it != m_connections.end()) {
 		m_connections.erase(it);
 		it = std::find(m_connections.begin(), m_connections.end(), _connection);
+	}
+}
+
+void ot::GraphicsItem::addGraphicsItemEventHandler(ot::GraphicsItem* _handler) {
+	m_eventHandler.push_back(_handler);
+}
+
+void ot::GraphicsItem::removeGraphicsItemEventHandler(ot::GraphicsItem* _handler) {
+	auto it = std::find(m_eventHandler.begin(), m_eventHandler.end(), _handler);
+	while (it != m_eventHandler.end()) {
+		m_eventHandler.erase(it);
+		it = std::find(m_eventHandler.begin(), m_eventHandler.end(), _handler);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected: Helper
+
+QRectF ot::GraphicsItem::calculateDrawRect(const QRectF& _rect) const {
+	// Size
+	QSizeF s(_rect.size());
+	if (s.width() > m_requestedSize.width()) { s.setWidth(m_requestedSize.width()); }
+	if (s.height() > m_requestedSize.height()) { s.setHeight(m_requestedSize.height()); }
+
+	// Position
+	QPointF p; // Top left coord
+	switch (m_alignment)
+	{
+	case ot::AlignCenter:
+		p.setX(_rect.x() + ((_rect.width() / 2.) - (s.width() / 2.)));
+		p.setY(_rect.y() + ((_rect.height() / 2.) - (s.height() / 2.)));
+		break;
+	case ot::AlignTop:
+		p.setX(_rect.x() + ((_rect.width() / 2.) - (s.width() / 2.)));
+		p.setY(_rect.y());
+		break;
+	case ot::AlignTopRight:
+		p.setX(_rect.x() + (_rect.width() - s.width()));
+		p.setY(_rect.y());
+		break;
+	case ot::AlignRight:
+		p.setX(_rect.x() + (_rect.width() - s.width()));
+		p.setY(_rect.y() + ((_rect.height() / 2.) - (s.height() / 2.)));
+		break;
+	case ot::AlignBottomRight:
+		p.setX(_rect.x() + (_rect.width() - s.width()));
+		p.setY(_rect.y() + (_rect.height() - s.height()));
+		break;
+	case ot::AlignBottom:
+		p.setX(_rect.x() + ((_rect.width() / 2.) - (s.width() / 2.)));
+		p.setY(_rect.y() + (_rect.height() - s.height()));
+		break;
+	case ot::AlignBottomLeft:
+		p.setX(_rect.x());
+		p.setY(_rect.y() + (_rect.height() - s.height()));
+		break;
+	case ot::AlignLeft:
+		p.setX(_rect.x());
+		p.setY(_rect.y() + ((_rect.height() / 2.) - (s.height() / 2.)));
+	case ot::AlignTopLeft:
+		p = _rect.topLeft();
+		break;
+	default:
+		OT_LOG_EA("Unknown alignment provided");
+		break;
+	}
+
+	return QRectF(p, s);
+}
+
+void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
+	for (auto itm : m_eventHandler) {
+		itm->graphicsItemEventHandler(this, _event);
 	}
 }
 
@@ -202,13 +281,12 @@ void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsStackItem::GraphicsStackItem() : GraphicsGroupItem(true), m_top(nullptr), m_bottom(nullptr) {
+ot::GraphicsStackItem::GraphicsStackItem() : GraphicsGroupItem(true) {
 
 }
 
 ot::GraphicsStackItem::~GraphicsStackItem() {
-	if (m_top) delete m_top;
-	if (m_bottom) delete m_bottom;
+	this->memClear();
 }
 
 bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -218,42 +296,59 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
-	OTAssertNullptr(cfg->topItem());
-	OTAssertNullptr(cfg->bottomItem());
 
-	if (m_bottom) delete m_bottom;
-	if (m_top) delete m_top;
-	m_bottom = nullptr;
-	m_top = nullptr;
-	m_bottom = ot::GraphicsFactory::itemFromConfig(cfg->bottomItem());
-	m_top = ot::GraphicsFactory::itemFromConfig(cfg->topItem());
-	if (m_top == nullptr || m_bottom == nullptr) {
-		OT_LOG_EA("Failed to create child item(s). Abort");
-		if (m_bottom) delete m_bottom;
-		if (m_top) delete m_top;
-		m_bottom = nullptr;
-		m_top = nullptr;
-		return false;
+	this->memClear();
+
+	for (auto itm : cfg->items()) {
+		OTAssertNullptr(itm.item);
+
+		ot::GraphicsItem* i = nullptr;
+		try {
+			i = ot::GraphicsFactory::itemFromConfig(itm.item);
+			if (i) {
+				GraphicsStackItemEntry e;
+				e.isMaster = itm.isMaster;
+				e.item = i;
+				i->setParentGraphicsItem(this);
+				if (e.isMaster) {
+					// If the item is a master item, install an event filter for resizing the child items
+					i->addGraphicsItemEventHandler(this);
+				}
+				m_items.push_back(e);
+
+				this->addToGroup(e.item->getQGraphicsItem());
+			}
+			else {
+				OT_LOG_EA("Failed to created graphics item from factory");
+			}
+		}
+		catch (const std::exception& _e) {
+			OT_LOG_EAS("Failed to create child item: " + std::string(_e.what()));
+			if (i) delete i;
+			throw _e;
+		}
+		catch (...) {
+			OT_LOG_EA("[FATAL] Unknown error");
+			if (i) delete i;
+			throw std::exception("[FATAL] Unknown error");
+		}
 	}
-	m_bottom->setParentGraphicsItem(this);
-	m_top->setParentGraphicsItem(this);
-
-	this->addToGroup(m_bottom->getQGraphicsItem());
-	this->addToGroup(m_top->getQGraphicsItem());
 
 	return ot::GraphicsGroupItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	ot::GraphicsGroupItem::callPaint(_painter, _opt, _widget);
-	if (m_bottom) m_bottom->callPaint(_painter, _opt, _widget);
-	if (m_top) m_top->callPaint(_painter, _opt, _widget);
+	for (auto itm : m_items) itm.item->callPaint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	ot::GraphicsGroupItem::graphicsItemFlagsChanged(_flags);
-	if (m_bottom) m_bottom->setGraphicsItemFlags(_flags);
-	if (m_top) m_top->setGraphicsItemFlags(_flags);
+}
+
+void ot::GraphicsStackItem::memClear(void) {
+	for (auto itm : m_items) delete itm.item;
+	m_items.clear();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -293,13 +388,14 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	return QRectF(this->pos(), m_size);
+	return QRectF(this->pos(), this->graphicsItemRequestedSize());
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -322,7 +418,7 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(this->boundingRect(), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(this->calculateDrawRect(QRectF(this->pos(), m_size)), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
@@ -373,13 +469,14 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QRectF ot::GraphicsEllipseItem::boundingRect(void) const {
-	return QRectF(this->pos(), QSizeF(m_radiusX * 2, m_radiusY * 2));
+	return QRectF(this->pos(), this->graphicsItemRequestedSize());
 }
 
 void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -402,7 +499,7 @@ void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphi
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawEllipse(this->boundingRect().center(), m_radiusX, m_radiusY);
+	_painter->drawEllipse(this->calculateDrawRect(QRectF(this->pos(), QSizeF(m_radiusX * 2., m_radiusY * 2.))).center(), m_radiusX, m_radiusY);
 }
 
 QRectF ot::GraphicsEllipseItem::getGraphicsItemBoundingRect(void) const {
@@ -463,6 +560,7 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -543,6 +641,7 @@ void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsImageItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

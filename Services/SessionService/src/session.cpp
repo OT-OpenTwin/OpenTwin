@@ -191,7 +191,6 @@ void Session::addServiceListToDocument(OT_rJSON_doc & _doc) {
 		}
 	}
 	ot::rJSON::add(_doc, OT_ACTION_PARAM_SESSION_SERVICES, serviceList);
-	OT_LOG_W(">> " + ot::rJSON::toJSON(_doc));
 }
 
 void Session::broadcastMessage(Service * _sender, const std::string& _message, bool _async) {

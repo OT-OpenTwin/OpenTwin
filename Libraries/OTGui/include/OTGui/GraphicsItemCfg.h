@@ -85,6 +85,11 @@ namespace ot {
 
 	class OT_GUI_API_EXPORTONLY GraphicsStackItemCfg : public ot::GraphicsItemCfg {
 	public:
+		struct GraphicsStackItemCfgEntry {
+			ot::GraphicsItemCfg* item;
+			bool isMaster;
+		};
+
 		GraphicsStackItemCfg();
 		GraphicsStackItemCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem);
 		virtual ~GraphicsStackItemCfg();
@@ -102,21 +107,17 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg); };
 
-		//! @brief Set the bottom item
-		//! The stack item takes ownership of the item
-		//! @param _bottom Child item
-		void setBottomItem(ot::GraphicsItemCfg* _bottom);
-		ot::GraphicsItemCfg* bottomItem(void) { return m_bottom; };
+		void addItemTop(ot::GraphicsItemCfg* _item, bool _isMaster);
+		void addItemBottom(ot::GraphicsItemCfg* _item, bool _isMaster);
 
-		//! @brief Set the top item
-		//! The stack item takes ownership of the item
-		//! @param _top Child item
-		void setTopItem(ot::GraphicsItemCfg* _top);
-		ot::GraphicsItemCfg* topItem(void) { return m_top; };
+		//! @brief Returns a list with all items in the stack
+		//! 0: bottom, n: top
+		const std::list<GraphicsStackItemCfgEntry>& items(void) const { return m_items; };
 
 	private:
-		ot::GraphicsItemCfg* m_bottom;
-		ot::GraphicsItemCfg* m_top;
+		void memClear(void);
+
+		std::list<GraphicsStackItemCfgEntry> m_items;
 
 	};
 
