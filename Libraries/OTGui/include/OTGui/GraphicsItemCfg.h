@@ -91,7 +91,6 @@ namespace ot {
 		};
 
 		GraphicsStackItemCfg();
-		GraphicsStackItemCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem);
 		virtual ~GraphicsStackItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object

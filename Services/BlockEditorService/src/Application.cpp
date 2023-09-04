@@ -130,14 +130,19 @@ ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
 	backgr->setCornerRadius(5);
 	backgr->setSize(ot::Size2D(100, 50));
 
-	ot::GraphicsStackItemCfg* cfgTop = new ot::GraphicsStackItemCfg(bot, top);
+	ot::GraphicsStackItemCfg* cfgTop = new ot::GraphicsStackItemCfg;
 	cfgTop->setName(_name + "s");
 	cfgTop->setTitle(_name + "s");
+	cfgTop->addItemTop(bot, false);
+	cfgTop->addItemTop(top, true);
 
-	ot::GraphicsStackItemCfg* cfg = new ot::GraphicsStackItemCfg(backgr, cfgTop);
+	ot::GraphicsStackItemCfg* cfg = new ot::GraphicsStackItemCfg;
 	cfg->setName(_name);
 	cfg->setTitle(_name);
 	cfg->setSize(ot::Size2D(100, 50));
+	cfg->addItemTop(backgr, false);
+	cfg->addItemTop(cfgTop, true);
+
 	return cfg;
 }
 

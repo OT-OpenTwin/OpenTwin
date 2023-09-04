@@ -88,12 +88,10 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsStackItemCfg::GraphicsStackItemCfg() 
+ot::GraphicsStackItemCfg::GraphicsStackItemCfg()
 {
 
 }
-
-ot::GraphicsStackItemCfg::GraphicsStackItemCfg(ot::GraphicsItemCfg* _bottomItem, ot::GraphicsItemCfg* _topItem) {}
 
 ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 	this->memClear();

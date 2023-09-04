@@ -153,7 +153,7 @@ namespace ot {
 		//! @brief Removes the collection from the list (item will not be destroyed)
 		void forgetConnection(GraphicsConnectionItem* _connection);
 
-		void setGraphicsItemRequestedSize(const QSizeF& _size) { m_requestedSize = _size; };
+		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) { m_requestedSize = _size; };
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
 
 		void setGraphicsItemAlignment(ot::Alignment _align) { m_alignment = _align; };
@@ -288,6 +288,8 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
 	private:
 		QSizeF m_size;

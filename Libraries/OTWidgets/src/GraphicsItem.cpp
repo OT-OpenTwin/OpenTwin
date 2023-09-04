@@ -122,7 +122,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
-	raiseEvent(ot::GraphicsItem::Resized);
+	this->raiseEvent(ot::GraphicsItem::Resized); //ToDo: Seperate function
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
@@ -348,10 +348,25 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 }
 
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
+	OTAssertNullptr(_sender);
+	
 	if (_event == ot::GraphicsItem::Resized) {
+		ot::GraphicsItem* mas = nullptr;
+		for (auto itm : m_items) {
+			if (itm.isMaster) {
+				if (mas != nullptr) {
+					OT_LOG_EA("Multiple master items not supported yet");
+				}
+				mas = itm.item;
+			}
+		}
+		if (mas == nullptr) {
+			OT_LOG_EA("No master item found");
+		}
+
 		for (auto itm : m_items) {
 			if (itm.item != _sender && !itm.isMaster) {
-				//itm.item->getQGraphicsLayoutItem()->setGeometry(_sender->getGraphicsItemBoundingRect());
+				itm.item->setGraphicsItemRequestedSize(mas->getQGraphicsItem()->boundingRect().size());
 			}
 		}
 	}
@@ -399,14 +414,14 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	return QRectF(this->pos(), this->graphicsItemRequestedSize());
+	return QRectF(this->pos(), m_size);
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	this->setGraphicsItemRequestedSize(_rect.size());
+	ot::GraphicsItem::setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -429,7 +444,10 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(QRectF(this->pos(), m_size), m_cornerRadius, m_cornerRadius);
+	//OT_LOG_W("Ox: " + std::to_string(m_size.width()) + "; Oy: " + std::to_string(m_size.height()));
+	//OT_LOG_W("Cx: " + std::to_string(this->calculateDrawRect(QRectF(this->pos(), m_size)).width()) + "; Cy: " + std::to_string(this->calculateDrawRect(QRectF(this->pos(), m_size)).height()));
+	//OT_LOG_W("---------------------------");
+	_painter->drawRoundedRect(this->calculateDrawRect(QRectF(this->pos(), m_size)), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
@@ -442,6 +460,14 @@ QPointF ot::GraphicsRectangularItem::getGraphicsItemScenePos(void) const {
 
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	QGraphicsItem::mousePressEvent(_event);
+}
+
+void ot::GraphicsRectangularItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
+	if (_size == m_size) return;
+	//this->prepareGeometryChange();
+	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
+	//m_size = _size;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -487,7 +513,6 @@ void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -523,6 +548,7 @@ QPointF ot::GraphicsEllipseItem::getGraphicsItemScenePos(void) const {
 
 void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	QGraphicsItem::mousePressEvent(_event);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -571,7 +597,6 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -590,6 +615,7 @@ void ot::GraphicsTextItem::paint(QPainter* _painter, const QStyleOptionGraphicsI
 
 void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	QGraphicsItem::mousePressEvent(_event);
 }
 
 QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -652,7 +678,6 @@ void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	this->setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsImageItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -664,6 +689,7 @@ QVariant ot::GraphicsImageItem::itemChange(QGraphicsItem::GraphicsItemChange _ch
 
 void ot::GraphicsImageItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	QGraphicsItem::mousePressEvent(_event);
 }
 
 void ot::GraphicsImageItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
