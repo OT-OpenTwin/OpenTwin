@@ -5,69 +5,6 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 {
 }
 
-ot::Point2DD EntityBlock::getCoordinates() 
-{
-	if (_coordinate2DEntityID != 0)
-	{
-		if (_coordinate2DEntity == nullptr)
-		{
-			ot::UID currentVersion = getCurrentEntityVersion(_coordinate2DEntityID);
-			if (currentVersion != _coordinate2DEntity->getEntityStorageVersion())
-			{
-				std::map<ot::UID, EntityBase*> entitymap;
-				auto entBase = readEntityFromEntityID(this, _coordinate2DEntityID, entitymap);
-				_coordinate2DEntity = dynamic_cast<EntityCoordinates2D*>(entBase);
-				assert(_coordinate2DEntity != nullptr);
-			}
-		}
-		return _coordinate2DEntity->getCoordinates();
-	}
-	else
-	{
-		throw std::exception("Coordinates of Entityblock were not set.");
-	}
-}
-
-void EntityBlock::setCoordinates(ot::Point2DD& coordinates)
-{
-	if (_coordinate2DEntity != nullptr)
-	{
-		delete _coordinate2DEntity;
-		_coordinate2DEntity = nullptr;
-		_coordinate2DEntityID = 0;
-	}
-	
-	_coordinate2DEntity = new EntityCoordinates2D(createEntityUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
-	_coordinate2DEntity->setCoordinates(coordinates);
-	_coordinate2DEntity->StoreToDataBase();
-
-	_coordinate2DEntityID = _coordinate2DEntity->getEntityID();
-}
-
-ot::UID EntityBlock::getCoordinateEntityID() const
-{
-	if (_coordinate2DEntity != nullptr)
-	{
-		return _coordinate2DEntity->getEntityID();
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-ot::UID EntityBlock::getCoordinateEntityVersion() const
-{
-	if (_coordinate2DEntity != nullptr)
-	{
-		return _coordinate2DEntity->getEntityStorageVersion();
-	}
-	else
-	{
-		return 0;
-	}
-}
-
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);
