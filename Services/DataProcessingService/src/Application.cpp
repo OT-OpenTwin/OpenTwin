@@ -55,12 +55,15 @@ Application::~Application()
 
 // Required functions
 #include "TemplateDefaultManager.h"
+#include "ResultCollectionHandler.h"
+
 void Application::run(void)
 {
 	if (!EnsureDataBaseConnection())
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
+
 	// Add code that should be executed when the service is started and may start its work
 }
 
@@ -100,7 +103,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (blockEntity != nullptr)
 		{
 			ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
-			std::list<bool> forceVis;
+			std::list<bool> forceVis{false,false};
 			m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
 		}
 
