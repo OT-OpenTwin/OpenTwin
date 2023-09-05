@@ -57,6 +57,7 @@
 #include "EntityBlock.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPlot1D.h"
+#include "EntityCoordinates2D.h"
 
 EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 {
@@ -307,6 +308,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityBlockPlot1D")
 	{
 		return new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityCoordinates2D")
+	{
+		return new EntityCoordinates2D(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
 	else
 	{

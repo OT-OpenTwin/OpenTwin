@@ -27,6 +27,7 @@
     <ClInclude Include="include\EntityBlock.h" />
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityBlockPlot1D.h" />
+    <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityMeasurementMetadata.h" />
     <ClInclude Include="include\EntityResearchMetadata.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="src\EntityCartesianVector.cpp" />
     <ClCompile Include="src\EntityContainer.cpp" />
     <ClCompile Include="src\EntityCompressedVector.cpp" />
+    <ClCompile Include="src\EntityCoordinates2D.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />

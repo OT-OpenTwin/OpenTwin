@@ -55,7 +55,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT Point2D : public Point2DTemplate<int> {
 	public:
 		Point2D() : Point2DTemplate(0, 0) {};
-		Point2D(int _w, int _h) : Point2DTemplate(_w, _h) {};
+		Point2D(int _x, int _y) : Point2DTemplate(_x, _y) {};
 		Point2D(const Point2D& _other) : Point2DTemplate(_other) {};
 		virtual ~Point2D() {};
 
@@ -76,7 +76,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT Point2DF : public Point2DTemplate<float> {
 	public:
 		Point2DF() : Point2DTemplate(0, 0) {};
-		Point2DF(float _w, float _h) : Point2DTemplate(_w, _h) {};
+		Point2DF(float _x, float _y) : Point2DTemplate(_x, _y) {};
 		Point2DF(const Point2DF& _other) : Point2DTemplate(_other) {};
 		virtual ~Point2DF() {};
 
@@ -97,7 +97,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT Point2DD : public Point2DTemplate<double> {
 	public:
 		Point2DD() : Point2DTemplate(0, 0) {};
-		Point2DD(double _w, double _h) : Point2DTemplate(_w, _h) {};
+		Point2DD(double _x, double _y) : Point2DTemplate(_x, _y) {};
 		Point2DD(const Point2DD& _other) : Point2DTemplate(_other) {};
 		virtual ~Point2DD() {};
 

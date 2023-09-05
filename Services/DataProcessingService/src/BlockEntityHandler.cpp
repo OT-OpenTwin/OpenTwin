@@ -30,7 +30,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& 
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setBlockID(itemID);
-	blockEntity->StoreToDataBase();
+	blockEntity->StoreToDataBase(); //Needs to be moved to the place in code where the location is being set
 
 	return blockEntity;
 }

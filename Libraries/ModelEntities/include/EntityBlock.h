@@ -2,6 +2,8 @@
 #include "EntityBase.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/Point2D.h"
+#include "EntityCoordinates2D.h"
+
 #include "Connector.h"
 #include "BlockConnection.h"
 
@@ -13,7 +15,7 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlock"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	void setBlockID(ot::UID blockID) { _blockID = blockID; }
-	void setBlockPosition(ot::Point2DD& position) { _location = position; }
+	
 	ot::UID getBlockID() const { return _blockID; }
 	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
 	std::list<ot::BlockConnection> getAllOutgoingConnections() const {	return _outgoingConnections;	}
@@ -22,9 +24,16 @@ public:
 	void AddConnector(const ot::Connector& connector) { _connectors.push_back(connector); }
 	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
 
+	ot::Point2DD getCoordinates();
+	void setCoordinates(ot::Point2DD& coordinates);
+
+	ot::UID getCoordinateEntityID() const;
+	ot::UID getCoordinateEntityVersion() const;
+
 protected:
-	ot::UID _blockID;
-	ot::Point2DD _location;
+	ot::UID _blockID = 0;
+	ot::UID _coordinate2DEntityID = 0;
+	EntityCoordinates2D* _coordinate2DEntity = nullptr;
 	std::list<ot::Connector> _connectors;
 	std::list<ot::BlockConnection> _outgoingConnections;
 
