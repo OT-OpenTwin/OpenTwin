@@ -60,10 +60,10 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 	EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(_resultFolder + _plotName, "SomeEntries", curves);
 
 
-	ot::UIDList topoEnt{curve->getEntityID(), plotID->getEntityID()}, 
-		topoVers{curve->getEntityStorageVersion(), plotID->getEntityStorageVersion()},
-		dataEntID{ (ot::UID)curve->getCurveDataStorageId() }, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion()},
-		dataEntParent{curve->getEntityID()};
+	ot::UIDList topoEnt{plotID->getEntityID()}, 
+		topoVers{plotID->getEntityStorageVersion()},
+		dataEntID{ (ot::UID)curve->getCurveDataStorageId(),curve->getEntityID() }, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion(),curve->getEntityStorageVersion() },
+		dataEntParent{ plotID->getEntityID() ,plotID->getEntityID() };
 	std::list<bool> forceVis{ false,false };
 	_modelComponent->addEntitiesToModel(topoEnt,topoVers,forceVis,dataEntID,dataEntVers,dataEntParent,"Created plot");
 

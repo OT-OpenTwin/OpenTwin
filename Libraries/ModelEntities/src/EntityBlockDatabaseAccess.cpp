@@ -39,7 +39,7 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& dataPro
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 {
 	auto propertyBase =	getProperties().getProperty("Projectname");
-	auto selectedProjectName = dynamic_cast<EntityPropertiesSelection*>(propertyBase); 
+	auto selectedProjectName = dynamic_cast<EntityPropertiesProjectList*>(propertyBase); 
 	assert(selectedProjectName != nullptr);
 	
 	return  selectedProjectName->getValue();

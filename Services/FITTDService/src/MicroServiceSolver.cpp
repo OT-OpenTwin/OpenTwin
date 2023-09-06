@@ -324,13 +324,13 @@ std::pair<ot::UID, std::string> MicroServiceSolver::addResultCurve(const std::st
 
 	EntityResult1D *curve = modelComponent->addResult1DEntity(resultDataFolder + name, xdata, ydataRe, ydataIm, xlabel, xunit, ylabel, yunit, colorID, visualize);
 
-	topologyEntityIDList.push_back(curve->getEntityID());
-	topologyEntityVersionList.push_back(curve->getEntityStorageVersion());
-	topologyEntityForceVisibleList.push_back(false);
 
 	dataEntityIDList.push_back(curve->getCurveDataStorageId());
+	dataEntityIDList.push_back(curve->getEntityID());
+
 	dataEntityVersionList.push_back(curve->getCurveDataStorageVersion());
-	dataEntityParentList.push_back(curve->getEntityID());
+	dataEntityVersionList.push_back(curve->getEntityStorageVersion());
+	
 
 	return std::pair<ot::UID, std::string>(curve->getEntityID(), name);
 }
@@ -342,6 +342,9 @@ void MicroServiceSolver::addPlot1D(std::string name, std::string title, const st
 	topologyEntityIDList.push_back(plotID->getEntityID());
 	topologyEntityVersionList.push_back(plotID->getEntityStorageVersion());
 	topologyEntityForceVisibleList.push_back(false);
+
+	dataEntityParentList.push_back(plotID->getEntityID());
+	dataEntityParentList.push_back(plotID->getEntityID());
 }
 
 void MicroServiceSolver::addResultFD(std::string name, std::string title, double * xComponent, double * yComponent, double * zComponent, size_t size)
