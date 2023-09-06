@@ -200,8 +200,6 @@ namespace ViewerAPI
 
 	__declspec(dllexport) QWidget * getPlotWidget(ot::UID _viewerID);
 
-	__declspec(dllexport) QWidget* getBlockDiagramEditorWidget(ot::UID _viewerID);
-
 	/***************************************** Table API *****************************************/
 	__declspec(dllexport) QWidget* getTable (ot::UID _viewerID);
 	__declspec(dllexport) bool setTable (ot::UID _viewerID, ot::UID tableEntityID, ot::UID tableEntityVersion);

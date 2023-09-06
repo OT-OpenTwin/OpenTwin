@@ -917,10 +917,6 @@ QWidget * ViewerComponent::getVersionGraphWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getVersionGraphWidget(_viewerID);
 }
 
-QWidget * ViewerComponent::getBlockDiagramEditorWidget(ViewerUIDtype _viewerID)
-{
-	return ViewerAPI::getBlockDiagramEditorWidget(_viewerID);
-}
 
 QWidget * ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
 {

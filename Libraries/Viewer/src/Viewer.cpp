@@ -220,7 +220,6 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 
 	// Create new view handler
 	m_versionGraph = new VersionGraph(this);
-	m_drawingView = new DrawingView(this);
 	m_tableViewer = new TableViewer(this);
 
 	// Create settings
@@ -260,9 +259,6 @@ Viewer::~Viewer()
 
 	if (m_versionGraph != nullptr) delete m_versionGraph;
 	m_versionGraph = nullptr;
-
-	if (m_drawingView != nullptr) delete m_drawingView;
-	m_drawingView = nullptr;
 
 	if (m_tableViewer != nullptr) delete m_tableViewer;
 	m_tableViewer = nullptr;

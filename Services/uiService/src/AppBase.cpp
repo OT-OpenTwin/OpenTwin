@@ -1614,10 +1614,7 @@ ViewerUIDtype AppBase::createView(
 	
 	QWidget* temp = m_viewerComponent->getVersionGraphWidget(viewID);
 	uiAPI::tabWidget::addTab(m_tabViewWidget, temp, textVersion);
-	
-	temp = m_viewerComponent->getBlockDiagramEditorWidget(viewID);
-	uiAPI::tabWidget::addTab(m_tabViewWidget, temp, textBlock);
-	
+		
 	temp = m_viewerComponent->getTableWidget(viewID);
 	uiAPI::tabWidget::addTab(m_tabViewWidget, temp, "Table");
 

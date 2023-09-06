@@ -136,9 +136,6 @@
     <ClCompile Include="src\VersionGraph.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockDiagramEditor.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Table.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -282,9 +279,6 @@
     <ClInclude Include="include\ClipPlaneManipulator.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockDiagramEditor.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\TableViewer.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -294,9 +288,6 @@
       <Filter>include</Filter>
     </QtMoc>
     <QtMoc Include="include\VersionGraph.h">
-      <Filter>include</Filter>
-    </QtMoc>
-    <QtMoc Include="include\DrawingView.h">
       <Filter>include</Filter>
     </QtMoc>
     <QtMoc Include="include\Table.h">

@@ -769,16 +769,6 @@ QWidget * ViewerAPI::getPlotWidget(ot::UID _viewerID) {
 	}
 }
 
-QWidget * ViewerAPI::getBlockDiagramEditorWidget(ot::UID _viewerID)
-{
-	Viewer * v = viewerManager[_viewerID];
-	if (v != nullptr) {
-		return v->getDrawingView();
-	}
-	else {
-		return nullptr;
-	}
-}
 
 QWidget * ViewerAPI::getTable(ot::UID _viewerID)
 {

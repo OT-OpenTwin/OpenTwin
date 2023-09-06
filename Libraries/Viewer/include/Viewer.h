@@ -4,7 +4,7 @@
 
 #include <QMainWindow>
 #include <QOpenGLWidget>
-#include "DrawingView.h"
+
 #include "Table.h"
 #include "TableViewer.h"
 
@@ -61,7 +61,6 @@ public:
 
 	Plot * get1DPlot(void) const { return m_plot; }
 	VersionGraph * getVersionGraph(void) const { return m_versionGraph; }
-	DrawingView * getDrawingView(void) const { return m_drawingView; }
 	TableViewer* getTableViewer() const { return m_tableViewer; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
@@ -191,7 +190,6 @@ private:
 	std::string							m_plotTabName;
 
 	VersionGraph *						m_versionGraph;
-	DrawingView*						m_drawingView;
 	TableViewer*						m_tableViewer;
 
 	std::string							m_versionGraphTabName;

@@ -26,7 +26,6 @@
     <ClCompile Include="src\AbstractPlot.cpp" />
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />
-    <ClCompile Include="src\BlockDiagramEditor.cpp" />
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
     <ClCompile Include="src\HandleArrow.cpp" />
     <ClCompile Include="src\HandlerBase.cpp" />
@@ -91,10 +90,8 @@
     <ClInclude Include="include\AbstractPlot.h" />
     <ClInclude Include="include\AxisCenterCross.h" />
     <ClInclude Include="include\AxisCross.h" />
-    <ClInclude Include="include\BlockDiagramEditor.h" />
     <ClInclude Include="include\CappingEffect.h" />
     <ClInclude Include="include\ClipPlaneManipulator.h" />
-    <QtMoc Include="include\DrawingView.h" />
     <ClInclude Include="include\HandleArrow.h" />
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />
