@@ -28,3 +28,20 @@ std::string ResultCollectionHandler::getProjectCollection(const std::string& pro
 	
 	return collectionName;
 }
+
+bool ResultCollectionHandler::CollectionExists(const std::string& collectionName)
+{
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE);
+	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, DataBase::GetDataBase()->getUserName());
+	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, DataBase::GetDataBase()->getUserPassword());
+	ot::rJSON::add(doc, OT_PARAM_AUTH_COLLECTION_NAME, collectionName);
+
+	std::string response;
+	Application::instance()->sendHttpRequest(ot::EXECUTE, _authorizationServiceURL, doc, response);
+
+	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	const bool collectionExists = responseDoc[OT_PARAM_AUTH_COLLECTION_EXISTS].GetBool();
+
+	return collectionExists;
+}

@@ -91,6 +91,7 @@ private:
 	std::string handleAddGroupToProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
 	std::string handleRemoveGroupFromProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
 	std::string handleRemoveProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
+	std::string handleCheckIfCollectionExists(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
 
 
 	std::string serviceURL;

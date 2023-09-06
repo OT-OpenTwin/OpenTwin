@@ -8,7 +8,11 @@ PipelineSource::PipelineSource(std::shared_ptr<EntityBlock> blockEntity)
     EntityBlockDatabaseAccess* dbA = dynamic_cast<EntityBlockDatabaseAccess*>(_blockEntity.get());
     if (dbA != nullptr)
     {
-        _handler = new BlockHandlerDatabaseAccess(dbA);
+        auto dbAccessHandler = new BlockHandlerDatabaseAccess(dbA);
+        if (dbAccessHandler->ResultCollectionExists())
+        {
+            _handler = dbAccessHandler;
+        }
     }
 }
 

@@ -327,6 +327,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, OT_rJSON_doc
 	else if (_action == OT_ACTION_ADD_GROUP_TO_PROJECT) { return handleAddGroupToProject(_actionDocument, loggedInUser); }
 	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument, loggedInUser); }
 	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument, loggedInUser); }
+	else if (_action == OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE) { return handleCheckIfCollectionExists(_actionDocument, loggedInUser); }
 	else
 	{
 		// This action is unknown
@@ -807,5 +808,15 @@ std::string ServiceBase::handleRemoveProject(OT_rJSON_doc& _actionDocument, User
 
 	OT_rJSON_createDOC(json);
 	ot::rJSON::add(json, "successful", successful);
+	return ot::rJSON::toJSON(json);
+}
+
+std::string ServiceBase::handleCheckIfCollectionExists(OT_rJSON_doc& _actionDocument, User& _loggedInUser)
+{
+	std::string collectionName = ot::rJSON::getString(_actionDocument, OT_PARAM_AUTH_COLLECTION_NAME);
+	bool exist = MongoProjectFunctions::checkForCollectionExistence(collectionName, adminClient);
+	
+	OT_rJSON_createDOC(json);
+	ot::rJSON::add(json, OT_PARAM_AUTH_COLLECTION_EXISTS, exist);
 	return ot::rJSON::toJSON(json);
 }

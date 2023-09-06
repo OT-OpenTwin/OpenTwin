@@ -64,6 +64,8 @@ namespace MongoProjectFunctions
 
 	bool changeProjectCreator(bsoncxx::oid& projectId, User& oldOwner, User& newOwner, mongocxx::client& adminClient);
 
+	bool checkForCollectionExistence(const std::string& collectionName, mongocxx::client& loggedInUser);
+
 	std::string projectToJson(Project& project);
 
 	std::string projectsToJson(std::vector<Project>& projects);

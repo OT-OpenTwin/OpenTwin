@@ -663,6 +663,11 @@ namespace MongoProjectFunctions
 		return false;
 	}
 
+	bool checkForCollectionExistence(const std::string& collectionName, mongocxx::client& userClient)
+	{
+		mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
+		return secondaryDb.has_collection(collectionName);
+	}
 
 	std::string projectToJson(Project& project)
 	{

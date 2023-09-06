@@ -640,7 +640,7 @@
 #define OT_ACTION_ADD_GROUP_TO_PROJECT "AddGroupToProject"
 #define OT_ACTION_REMOVE_GROUP_FROM_PROJECT "RemoveGroupFromProject"
 #define OT_ACTION_REMOVE_PROJECT "RemoveProject"
-
+#define OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE "Collection.Exists"
 
 #define OT_PARAM_AUTH_PROJECT_NAME "ProjectName"
 #define OT_PARAM_AUTH_PROJECT_NAMES "ProjectNames"
@@ -655,6 +655,8 @@
 #define OT_PARAM_AUTH_GROUP "groupName"
 #define OT_PARAM_AUTH_GROUPOWNER "ownerUsername"
 #define OT_PARAM_AUTH_USER_NAME "username"
+#define OT_PARAM_AUTH_COLLECTION_NAME "CollectionName"
+#define OT_PARAM_AUTH_COLLECTION_EXISTS "Collection.Exists"
 
 
 

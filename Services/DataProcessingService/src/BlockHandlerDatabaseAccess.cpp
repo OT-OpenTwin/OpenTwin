@@ -8,11 +8,15 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 
 	ResultCollectionHandler resultCollectionHandler;
 	std::string resultCollectionName = resultCollectionHandler.getProjectCollection(projectName) + ".results";
-	_queryString = blockEntity->getQuery();
-	_projectionString = blockEntity->getProjection();
-	const std::string dbURL = "Projects";
+	_resultCollectionExists = resultCollectionHandler.CollectionExists(resultCollectionName);
+	if (_resultCollectionExists)
+	{
+		_queryString = blockEntity->getQuery();
+		_projectionString = blockEntity->getProjection();
+		const std::string dbURL = "Projects";
 	
-	_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
+		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
+	}
 }
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
