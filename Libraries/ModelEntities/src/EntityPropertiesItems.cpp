@@ -768,3 +768,30 @@ void EntityPropertiesEntityList::createProperty(const std::string &group, const 
 	// Finally create the new property
 	properties.createProperty(new EntityPropertiesEntityList(name, contName, contID, value, valID), group);
 }
+
+
+void EntityPropertiesProjectList::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(other);
+	_value = selection->getValue();
+	setNeedsUpdate();
+}
+
+void EntityPropertiesProjectList::addToJsonDocument(rapidjson::Document& jsonDoc, EntityBase* root)
+{
+	rapidjson::Value container(rapidjson::kObjectType);
+	EntityPropertiesBase::addToJsonDocument(container, jsonDoc.GetAllocator(), "projectlist");
+
+	rapidjson::Value jsonValue(rapidjson::kStringType);
+	jsonValue.SetString(_value.c_str(), jsonDoc.GetAllocator());
+	container.AddMember("Value", jsonValue, jsonDoc.GetAllocator());
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+	jsonDoc.AddMember(jsonName, container, jsonDoc.GetAllocator());
+
+}
+
+void EntityPropertiesProjectList::readFromJsonObject(const rapidjson::Value& object)
+{
+	_value = ot::rJSON::getString(const_cast<rapidjson::Value&>(object), "Value");
+}

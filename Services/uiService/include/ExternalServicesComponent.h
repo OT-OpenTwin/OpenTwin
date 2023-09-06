@@ -325,6 +325,8 @@ private:
 
 	// Private functions
 
+	std::list<std::string> GetAllUserProjects();
+
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 	
 	void removeServiceFromList(std::vector<ot::ServiceBase *> &list, ot::ServiceBase *service);

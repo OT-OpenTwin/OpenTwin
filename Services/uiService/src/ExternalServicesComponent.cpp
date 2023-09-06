@@ -532,6 +532,20 @@ void ExternalServicesComponent::fillPropertyGrid(const std::string &settings)
 				QString value = item["ValueName"].GetString();
 				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
 			}
+			else if (type == "projectlist")
+			{
+				std::vector<QString> selection;
+
+				std::list<std::string> userProjects = GetAllUserProjects();
+
+				for (auto& project : userProjects)
+				{
+					selection.push_back(QString(project.c_str()));
+				}
+
+				QString value = item["Value"].GetString();
+				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
+			}
 			else
 			{
 				assert(0); // Unsupported type
@@ -884,6 +898,33 @@ void ExternalServicesComponent::isModified(ModelUIDtype visualizationModelID, bo
 	catch (...) {
 		assert(0); // Error handling
 	}
+}
+
+std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
+{
+	std::string authorizationURL = AppBase::instance()->getAuthorizationServiceURL();
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_ALL_USER_PROJECTS);
+	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, AppBase::instance()->getCredentialUserName());
+	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, AppBase::instance()->getCredentialUserPasswordClear());
+	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_FILTER, "");
+	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_LIMIT, 0);
+	std::string response;
+	if (!ot::msg::send("", authorizationURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response))
+	{
+		throw std::exception("Could not get the projectlist of the authorization service.");
+	}
+	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	const rapidjson::Value& projectArray = responseDoc["projects"];
+	assert(projectArray.IsArray());
+	std::list<std::string> projectList;
+	for (auto& element : projectArray.GetArray())
+	{
+		std::string projectDescription = element.GetString();
+		OT_rJSON_parseDOC(projectDescriptionDoc, projectDescription.c_str());
+		projectList.push_back(projectDescriptionDoc[OT_PARAM_AUTH_NAME].GetString());
+	}
+	return projectList;
 }
 
 void ExternalServicesComponent::prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs)

@@ -30,7 +30,7 @@ public:
 	void setGroup(const std::string &g) { group = g; };
 	const std::string &getGroup(void) { return group; };
 
-	enum eType { DOUBLE, INTEGER, BOOLEAN, STRING, SELECTION, COLOR, ENTITYLIST };
+	enum eType { DOUBLE, INTEGER, BOOLEAN, STRING, SELECTION, COLOR, ENTITYLIST, PROJECTLIST };
 	virtual eType getType(void) = 0;
 
 	void resetNeedsUpdate(void) { needsUpdateFlag = false; };
@@ -333,4 +333,24 @@ private:
 
 	std::string valueName;
 	ot::UID valueID;
+};
+
+
+class __declspec(dllexport) EntityPropertiesProjectList : public EntityPropertiesBase
+{
+public:
+	EntityPropertiesProjectList() {};
+	EntityPropertiesProjectList(const std::string& name) { setName(name); }
+	virtual EntityPropertiesBase* createCopy(void) override { return new EntityPropertiesProjectList(*this); };
+	virtual eType getType(void) override { return PROJECTLIST; };
+	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
+
+	virtual bool hasSameValue(EntityPropertiesBase* other) override { return true; };
+	virtual void addToJsonDocument(rapidjson::Document& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const rapidjson::Value& object) override;
+
+	void setValue(std::string& value) { _value = value; }
+	std::string getValue() const {return _value;}
+private:
+	std::string _value;
 };

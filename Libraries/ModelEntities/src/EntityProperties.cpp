@@ -203,13 +203,14 @@ void EntityProperties::buildFromJSON(const std::string &prop)
 
 			EntityPropertiesBase *newSetting(nullptr);
 
-			if      (type == "double"    ) newSetting = new EntityPropertiesDouble;
-			else if (type == "integer"   ) newSetting = new EntityPropertiesInteger;
-			else if (type == "boolean"   ) newSetting = new EntityPropertiesBoolean;
-			else if (type == "string"    ) newSetting = new EntityPropertiesString;
-			else if (type == "selection" ) newSetting = new EntityPropertiesSelection;
-			else if (type == "color"     ) newSetting = new EntityPropertiesColor;
+			if (type == "double") newSetting = new EntityPropertiesDouble;
+			else if (type == "integer") newSetting = new EntityPropertiesInteger;
+			else if (type == "boolean") newSetting = new EntityPropertiesBoolean;
+			else if (type == "string") newSetting = new EntityPropertiesString;
+			else if (type == "selection") newSetting = new EntityPropertiesSelection;
+			else if (type == "color") newSetting = new EntityPropertiesColor;
 			else if (type == "entitylist") newSetting = new EntityPropertiesEntityList;
+			else if (type == "projectlist") newSetting = new EntityPropertiesProjectList;
 			else
 			{
 				assert(0); // Unknown type
@@ -305,8 +306,11 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 		if (current != nullptr)
 		{
 			// Check for compatible types
-			assert(   modified->getType() == EntityPropertiesBase::SELECTION && current->getType() == EntityPropertiesBase::ENTITYLIST
-				   || modified->getType() == current->getType());
+			bool isCompatible =
+				modified->getType() == EntityPropertiesBase::SELECTION &&
+				(current->getType() == EntityPropertiesBase::ENTITYLIST || current->getType() == EntityPropertiesBase::PROJECTLIST)
+				|| modified->getType() == current->getType();
+			assert(isCompatible);
 
 			if (current->getReadOnly())
 			{
@@ -317,8 +321,7 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 			{
 				if (!modified->hasMultipleValues())
 				{				
-					if (   modified->getType() == EntityPropertiesBase::SELECTION && current->getType() == EntityPropertiesBase::ENTITYLIST
-						|| modified->getType() == current->getType())
+					if (isCompatible)
 					{
 						current->copySettings(modified, root);
 					}
