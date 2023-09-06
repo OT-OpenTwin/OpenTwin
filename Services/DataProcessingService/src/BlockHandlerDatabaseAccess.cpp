@@ -5,6 +5,7 @@
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity)
 {
 	const std::string projectName =	blockEntity->getSelectedProjectName();
+
 	ResultCollectionHandler resultCollectionHandler;
 	std::string resultCollectionName = resultCollectionHandler.getProjectCollection(projectName) + ".results";
 	_queryString = blockEntity->getQuery();

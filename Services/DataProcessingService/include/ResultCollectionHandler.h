@@ -5,7 +5,8 @@
 class ResultCollectionHandler
 {
 public:
-	std::list<std::string> getListOfProjects();
+	ResultCollectionHandler();
 	std::string getProjectCollection(const std::string& projectName);
-
+private:
+	std::string _authorizationServiceURL;
 };
