@@ -433,7 +433,10 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 		return;
 	}
 
+	deleteSingleSolverResults(solverEntity);
+
 	GetDPLauncher getDPSolver(this);
+	modelComponent()->clearNewEntityList();
 
 	std::string logFileText;
 	std::string output = getDPSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->serviceURL(),
@@ -442,24 +445,20 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	// Store the output in a result item
 
-	std::list<ot::UID> topologyEntityIDList;
-	std::list<ot::UID> topologyEntityVersionList;
-	std::list<bool> topologyEntityForceVisible;
-	std::list<ot::UID> dataEntityIDList;
-	std::list<ot::UID> dataEntityVersionList;
-	std::list<ot::UID> dataEntityParentList;
-
 	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getName() + "/Output", logFileText + output);
 
-	topologyEntityIDList.push_back(text->getEntityID());
-	topologyEntityVersionList.push_back(text->getEntityStorageVersion());
-	topologyEntityForceVisible.push_back(false);
-
-	dataEntityIDList.push_back(text->getTextDataStorageId());
-	dataEntityVersionList.push_back(text->getTextDataStorageVersion());
-	dataEntityParentList.push_back(text->getEntityID());
+	modelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
+	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
 
 	// Store the newly created items in the data base
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-										 dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added solver results");
+	m_modelComponent->storeNewEntities("added solver results");
+}
+
+void Application::deleteSingleSolverResults(EntityBase* solverEntity)
+{
+	std::list<std::string> entityNameList;
+	entityNameList.push_back(solverEntity->getName() + "/Results");
+	entityNameList.push_back(solverEntity->getName() + "/Output");
+
+	modelComponent()->deleteEntitiesFromModel(entityNameList, false);
 }

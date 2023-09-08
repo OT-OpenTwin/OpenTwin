@@ -1,7 +1,5 @@
 #pragma once
 #include "EntityVis2D3D.h"
-#include "PropertyBundlePlane.h"
-#include "PropertyBundleScaling.h"
 
 class __declspec(dllexport) EntityResult3D : public EntityVis2D3D
 {
@@ -13,7 +11,4 @@ public:
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 
-private:
-	PropertyBundlePlane propertyBundlePlane;
-	PropertyBundleScaling propertyBundleScaling;
 };

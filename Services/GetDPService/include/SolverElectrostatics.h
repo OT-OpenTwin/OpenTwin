@@ -2,6 +2,8 @@
 
 #include "SolverBase.h"
 
+class Application;
+
 class SolverElectrostatics : public SolverBase {
 public:
 	SolverElectrostatics() {}
@@ -9,7 +11,7 @@ public:
 
 	virtual void writeInputFile(std::ofstream& controlFile) override;
 	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) override;
-	virtual void convertResults(const std::string& tempDirPath) override;
+	virtual void convertResults(const std::string& tempDirPath, Application* app, const std::string& solverName) override;
 
 private:
 	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap);
@@ -31,10 +33,10 @@ private:
 	void writeResolution(std::ofstream& controlFile);
 	void writePostProcessing(std::ofstream& controlFile);
 	void writePostOperation(std::ofstream& controlFile);
-	void convertPotential(const std::string& tempDirPath);
-	void convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap);
-	void convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap);
-	void convertEfield(const std::string& tempDirPath);
+	void convertPotential(const std::string& tempDirPath, Application* app, const std::string& solverName);
+	void convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, const std::string& solverName);
+	void convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, const std::string& solverName);
+	void convertEfield(const std::string& tempDirPath, Application* app, const std::string& solverName);
 	size_t getOrAddNode(const std::string& node, const std::string& potential, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, std::list<std::string>& potentialList, size_t& nodeIndex, std::map<std::string, std::string>& nodeToPotentialMap);
 	size_t getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex);
 };

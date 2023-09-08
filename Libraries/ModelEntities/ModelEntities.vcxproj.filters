@@ -324,6 +324,12 @@
     </ClInclude>
     <ClInclude Include="include\EntityCoordinates2D.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>    
+    <ClInclude Include="include\EntityResultUnstructuredMesh.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityResultUnstructuredMeshData.h">
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -559,6 +565,12 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityCoordinates2D.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityResultUnstructuredMesh.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

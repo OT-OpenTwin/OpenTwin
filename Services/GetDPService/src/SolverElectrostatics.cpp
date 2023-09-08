@@ -1,4 +1,8 @@
 #include "SolverElectrostatics.h"
+#include "Application.h"
+#include "EntityVis2D3D.h"
+
+#include "OpenTwinFoundation/ModelComponent.h"
 
 #include <cassert>
 
@@ -58,13 +62,13 @@ std::string SolverElectrostatics::runSolver(const std::string& tempDirPath, ot::
     return solverOutput.str();
 }
 
-void SolverElectrostatics::convertResults(const std::string& tempDirPath)
+void SolverElectrostatics::convertResults(const std::string& tempDirPath, Application* app, const std::string& solverName)
 {
     // We first need to convert the potential result file to a vtk file
-    convertPotential(tempDirPath);
+    convertPotential(tempDirPath, app, solverName);
 
     // Now we convert the electric field results to a vtk file
-    convertEfield(tempDirPath);
+    convertEfield(tempDirPath, app, solverName);
 }
 
 void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap)
@@ -425,15 +429,15 @@ void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
         "} \n\n";
 }
 
-void SolverElectrostatics::convertPotential(const std::string& tempDirPath)
+void SolverElectrostatics::convertPotential(const std::string& tempDirPath, Application* app, const std::string& solverName)
 {
     std::map<std::string, std::string> nodeToPotentialMap;
 
-    convertGlobalPotential(tempDirPath, nodeToPotentialMap);
-    convertSurfacePotentials(tempDirPath, nodeToPotentialMap);
+    convertGlobalPotential(tempDirPath, nodeToPotentialMap, app, solverName);
+    convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverName);
 }
 
-void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap)
+void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, const std::string &solverName)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\potential.pos";
@@ -485,6 +489,25 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
 
     potentialFile.close();
 
+    // Create the potential volume item
+    EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+
+    if (visualizationEntity == nullptr) return;
+
+    visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
+    visualizationEntity->setName(solverName + "/Results/Potential/Volume");
+    visualizationEntity->setEditable(true);
+    visualizationEntity->setInitiallyHidden(true);
+
+    visualizationEntity->createProperties();
+
+    //visualizationEntity->setSource(matrix->getEntityID(), matrix->getEntityStorageVersion());
+    //visualizationEntity->setMesh(mesh->getEntityID(), mesh->getEntityStorageVersion());
+
+    visualizationEntity->StoreToDataBase();
+
+    app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+
     // Now write the vtk file information based on the intermediate data structures
     std::string vtkFileName = tempDirPath + "\\potential.vtu";
     std::ofstream vtkFile(vtkFileName);
@@ -524,7 +547,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     vtkFile.close();
 }
 
-void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap)
+void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, const std::string& solverName)
 {
     for (auto item : groupNameToIdMap)
     {
@@ -577,6 +600,26 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
 
             potentialFile.close();
 
+            // Create the potential volume item
+            EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+
+            if (visualizationEntity == nullptr) return;
+
+            visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
+            visualizationEntity->setName(solverName + "/Results/Potential/Surface/" + item.first.substr(1));
+            visualizationEntity->setEditable(true);
+            visualizationEntity->setInitiallyHidden(true);
+
+            visualizationEntity->createProperties();
+
+            //visualizationEntity->setSource(matrix->getEntityID(), matrix->getEntityStorageVersion());
+            //visualizationEntity->setMesh(mesh->getEntityID(), mesh->getEntityStorageVersion());
+
+            visualizationEntity->StoreToDataBase();
+
+            app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+
+            // Write the vtk file
             std::string vtkFileName = tempDirPath + "\\potential#" + std::to_string(item.second) + ".vtu";
             std::ofstream vtkFile(vtkFileName);
 
@@ -644,7 +687,7 @@ size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::st
     return index;
 }
 
-void SolverElectrostatics::convertEfield(const std::string& tempDirPath)
+void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Application* app, const std::string& solverName)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\efield.pos";
@@ -722,6 +765,25 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath)
     }
 
     potentialFile.close();
+
+    // Create the potential volume item
+    EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+
+    if (visualizationEntity == nullptr) return;
+
+    visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
+    visualizationEntity->setName(solverName + "/Results/E-Field");
+    visualizationEntity->setEditable(true);
+    visualizationEntity->setInitiallyHidden(true);
+
+    visualizationEntity->createProperties();
+
+    //visualizationEntity->setSource(matrix->getEntityID(), matrix->getEntityStorageVersion());
+    //visualizationEntity->setMesh(mesh->getEntityID(), mesh->getEntityStorageVersion());
+
+    visualizationEntity->StoreToDataBase();
+
+    app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
 
     // Now write the vtk file information based on the intermediate data structures
     std::string vtkFileName = tempDirPath + "\\efield.vtu";

@@ -30,6 +30,8 @@
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityMeasurementMetadata.h" />
     <ClInclude Include="include\EntityResearchMetadata.h" />
+    <ClInclude Include="include\EntityResultUnstructuredMesh.h" />
+    <ClInclude Include="include\EntityResultUnstructuredMeshData.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
     <ClInclude Include="include\EntityFileText.h" />
     <ClInclude Include="include\GenericBsonDocument.h" />
@@ -154,6 +156,8 @@
     <ClCompile Include="src\EntityParameter.cpp" />
     <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
     <ClCompile Include="src\EntityResearchMetadata.cpp" />
+    <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
+    <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
     <ClCompile Include="src\EntityWithDynamicFields.cpp" />
     <ClCompile Include="src\EntityParameterizedDataPreviewTable.cpp" />
     <ClCompile Include="src\EntityFile.cpp" />
