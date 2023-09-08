@@ -1,6 +1,9 @@
 #include "SolverElectrostatics.h"
 #include "Application.h"
 #include "EntityVis2D3D.h"
+#include "EntityBinaryData.h"
+#include "EntityResultUnstructuredMesh.h"
+#include "EntityResultUnstructuredMeshData.h"
 
 #include "OpenTwinFoundation/ModelComponent.h"
 
@@ -62,13 +65,16 @@ std::string SolverElectrostatics::runSolver(const std::string& tempDirPath, ot::
     return solverOutput.str();
 }
 
-void SolverElectrostatics::convertResults(const std::string& tempDirPath, Application* app, const std::string& solverName)
+void SolverElectrostatics::convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity)
 {
+    long long globalVisualizationMeshID = -1;
+    long long globalVisualizationMeshVersion = -1;
+
     // We first need to convert the potential result file to a vtk file
-    convertPotential(tempDirPath, app, solverName);
+    convertPotential(tempDirPath, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
 
     // Now we convert the electric field results to a vtk file
-    convertEfield(tempDirPath, app, solverName);
+    convertEfield(tempDirPath, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
 }
 
 void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap)
@@ -429,15 +435,16 @@ void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
         "} \n\n";
 }
 
-void SolverElectrostatics::convertPotential(const std::string& tempDirPath, Application* app, const std::string& solverName)
+void SolverElectrostatics::convertPotential(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
 {
     std::map<std::string, std::string> nodeToPotentialMap;
 
-    convertGlobalPotential(tempDirPath, nodeToPotentialMap, app, solverName);
-    convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverName);
+    convertGlobalPotential(tempDirPath, nodeToPotentialMap, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
+    convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverEntity);
 }
 
-void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, const std::string &solverName)
+void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string>& nodeToPotentialMap, Application* app, EntityBase*solverEntity,
+                                                  long long &globalVisualizationMeshID, long long &globalVisualizationMeshVersion)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\potential.pos";
@@ -447,6 +454,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     std::list<std::string> nodeList;
     std::list<std::string> potentialList;
     std::list<std::vector<size_t>> cellList;
+    size_t cellListSize = 0;
 
     size_t nodeIndex = 0;
 
@@ -472,9 +480,9 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
         if (!fileEndReached)
         {
             // Now we process the line
-            std::string n1 = elements[ 2] + " " + elements[ 3] + " " + elements[ 4];
-            std::string n2 = elements[ 5] + " " + elements[ 6] + " " + elements[ 7];
-            std::string n3 = elements[ 8] + " " + elements[ 9] + " " + elements[10];
+            std::string n1 = elements[2] + " " + elements[3] + " " + elements[4];
+            std::string n2 = elements[5] + " " + elements[6] + " " + elements[7];
+            std::string n3 = elements[8] + " " + elements[9] + " " + elements[10];
             std::string n4 = elements[11] + " " + elements[12] + " " + elements[13];
 
             size_t indexN1 = getOrAddNode(n1, elements[17], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
@@ -484,29 +492,43 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
 
             std::vector<size_t> cell{ indexN1, indexN2, indexN3, indexN4 };
             cellList.push_back(cell);
+
+            cellListSize += 6;
         }
     }
 
     potentialFile.close();
 
+    // Create the global mesh item if needed
+    if (globalVisualizationMeshID == -1 || globalVisualizationMeshVersion == -1)
+    {
+        storeMesh(4, 10, nodeList, cellList, cellListSize, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
+    }
+
+    // Create the potential data item 
+    long long scalarDataID = -1;
+    long long scalarDataVersion = -1;
+    storeMeshScalarData(nodeList.size(), cellList.size(), potentialList, app, solverEntity, scalarDataID, scalarDataVersion);
+
     // Create the potential volume item
     EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
-    if (visualizationEntity == nullptr) return;
-
     visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
-    visualizationEntity->setName(solverName + "/Results/Potential/Volume");
+    visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Volume");
     visualizationEntity->setEditable(true);
     visualizationEntity->setInitiallyHidden(true);
 
     visualizationEntity->createProperties();
 
-    //visualizationEntity->setSource(matrix->getEntityID(), matrix->getEntityStorageVersion());
-    //visualizationEntity->setMesh(mesh->getEntityID(), mesh->getEntityStorageVersion());
+    visualizationEntity->setSource(scalarDataID, scalarDataVersion);
+    visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
 
     visualizationEntity->StoreToDataBase();
 
     app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+
+    delete visualizationEntity;
+    visualizationEntity = nullptr;
 
     // Now write the vtk file information based on the intermediate data structures
     std::string vtkFileName = tempDirPath + "\\potential.vtu";
@@ -547,7 +569,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     vtkFile.close();
 }
 
-void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, const std::string& solverName)
+void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, EntityBase* solverEntity)
 {
     for (auto item : groupNameToIdMap)
     {
@@ -561,6 +583,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
             std::list<std::string> nodeList;
             std::list<std::string> potentialList;
             std::list<std::vector<size_t>> cellList;
+            size_t cellListSize = 0;
 
             const int elementsPerRow = 17;
 
@@ -595,29 +618,42 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
 
                     std::vector<size_t> cell{ indexN1, indexN2, indexN3 };
                     cellList.push_back(cell);
+
+                    cellListSize += 5;
                 }
             }
 
             potentialFile.close();
 
+            // Create the surface mesh item if needed
+            long long visualizationMeshID = -1;
+            long long visualizationMeshVersion = -1;
+            storeMesh(3, 5, nodeList, cellList, cellListSize, app, solverEntity, visualizationMeshID, visualizationMeshVersion);
+
+            // Create the surface potential data item 
+            long long scalarDataID = -1;
+            long long scalarDataVersion = -1;
+            storeMeshScalarData(nodeList.size(), cellList.size(), potentialList, app, solverEntity, scalarDataID, scalarDataVersion);
+
             // Create the potential volume item
             EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
-            if (visualizationEntity == nullptr) return;
-
             visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
-            visualizationEntity->setName(solverName + "/Results/Potential/Surface/" + item.first.substr(1));
+            visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Surface/" + item.first.substr(1));
             visualizationEntity->setEditable(true);
             visualizationEntity->setInitiallyHidden(true);
 
             visualizationEntity->createProperties();
 
-            //visualizationEntity->setSource(matrix->getEntityID(), matrix->getEntityStorageVersion());
-            //visualizationEntity->setMesh(mesh->getEntityID(), mesh->getEntityStorageVersion());
+            visualizationEntity->setSource(scalarDataID, scalarDataVersion);
+            visualizationEntity->setMesh(visualizationMeshID, visualizationMeshVersion);
 
             visualizationEntity->StoreToDataBase();
 
             app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+
+            delete visualizationEntity;
+            visualizationEntity = nullptr;
 
             // Write the vtk file
             std::string vtkFileName = tempDirPath + "\\potential#" + std::to_string(item.second) + ".vtu";
@@ -687,7 +723,7 @@ size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::st
     return index;
 }
 
-void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Application* app, const std::string& solverName)
+void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\efield.pos";
@@ -698,6 +734,7 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
     std::list<std::vector<size_t>> cellList;
     std::list<std::string> vectorList;
     std::list<double> magnitudeList;
+    size_t cellListSize = 0;
 
     size_t nodeIndex = 0;
 
@@ -761,29 +798,43 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
             cellList.push_back(cell);
             vectorList.push_back(averageVector);
             magnitudeList.push_back(magnitude);
+
+            cellListSize += 6;
         }
     }
 
     potentialFile.close();
 
-    // Create the potential volume item
+    // Create the global mesh item if needed
+    if (globalVisualizationMeshID == -1 || globalVisualizationMeshVersion == -1)
+    {
+        storeMesh(4, 10, nodeList, cellList, cellListSize, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
+    }
+
+    // Create the efield data item 
+    long long vectorDataID = -1;
+    long long vectorDataVersion = -1;
+    storeMeshVectorData(nodeList.size(), cellList.size(), magnitudeList, vectorList, app, solverEntity, vectorDataID, vectorDataVersion);
+
+    // Create the efield item
     EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
-    if (visualizationEntity == nullptr) return;
-
     visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
-    visualizationEntity->setName(solverName + "/Results/E-Field");
+    visualizationEntity->setName(solverEntity->getName() + "/Results/E-Field");
     visualizationEntity->setEditable(true);
     visualizationEntity->setInitiallyHidden(true);
 
     visualizationEntity->createProperties();
 
-    //visualizationEntity->setSource(matrix->getEntityID(), matrix->getEntityStorageVersion());
-    //visualizationEntity->setMesh(mesh->getEntityID(), mesh->getEntityStorageVersion());
+    visualizationEntity->setSource(vectorDataID, vectorDataVersion);
+    visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
 
     visualizationEntity->StoreToDataBase();
 
     app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+
+    delete visualizationEntity;
+    visualizationEntity = nullptr;
 
     // Now write the vtk file information based on the intermediate data structures
     std::string vtkFileName = tempDirPath + "\\efield.vtu";
@@ -850,4 +901,204 @@ size_t SolverElectrostatics::getOrAddCellNode(const std::string& node, std::map<
     }
 
     return index;
+}
+
+void SolverElectrostatics::storeMesh(int numberNodes, int cellType, std::list<std::string>& nodeList, std::list<std::vector<size_t>>& cellList, size_t& cellListSize, Application* app, EntityBase* solverEntity, long long& visualizationMeshID, long long& visualizationMeshVersion)
+{
+    // Create the global mesh item if needed
+    EntityBinaryData* xcoord = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* ycoord = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* zcoord = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* cells = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+
+    double* xc = new double[nodeList.size()];
+    double* yc = new double[nodeList.size()];
+    double* zc = new double[nodeList.size()];
+
+    size_t index = 0;
+    for (auto node : nodeList)
+    {
+        std::stringstream ss(node);
+
+        ss >> xc[index];
+        ss >> yc[index];
+        ss >> zc[index];
+
+        index++;
+        assert(index <= nodeList.size());
+    }
+
+    xcoord->setData((char*)xc, sizeof(double) * nodeList.size());
+    ycoord->setData((char*)yc, sizeof(double) * nodeList.size());
+    zcoord->setData((char*)zc, sizeof(double) * nodeList.size());
+
+    xcoord->StoreToDataBase();
+    ycoord->StoreToDataBase();
+    zcoord->StoreToDataBase();
+
+    delete[] xc; xc = nullptr;
+    delete[] yc; yc = nullptr;
+    delete[] zc; zc = nullptr;
+
+    int* c = new int[cellListSize];
+
+    index = 0;
+    for (auto cell : cellList)
+    {
+        c[index++] = numberNodes;
+
+        for (size_t nodeIndex = 0; nodeIndex < numberNodes; nodeIndex++)
+        {
+            c[index++] = (int)cell[nodeIndex];
+        }
+
+        c[index++] = cellType;
+
+        assert(index <= cellListSize);
+    }
+
+    cells->setData((char*)c, sizeof(int) * cellListSize);
+    cells->StoreToDataBase();
+
+    delete[] c; c = nullptr;
+
+    long long xcEntityID        = xcoord->getEntityID();
+    long long xcEntityVersion   = xcoord->getEntityStorageVersion();
+    long long ycEntityID        = ycoord->getEntityID();
+    long long ycEntityVersion   = ycoord->getEntityStorageVersion();
+    long long zcEntityID        = zcoord->getEntityID();
+    long long zcEntityVersion   = zcoord->getEntityStorageVersion();
+    long long cellEntityID      = cells->getEntityID();
+    long long cellEntityVersion = cells->getEntityStorageVersion();
+
+    EntityResultUnstructuredMesh* visualizationMesh = new EntityResultUnstructuredMesh(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+
+    visualizationMesh->setMeshData(nodeList.size(), cellList.size(), cellListSize, xcoord, ycoord, zcoord, cells);
+
+    visualizationMesh->StoreToDataBase();
+
+    app->modelComponent()->addNewDataEntity(xcEntityID, xcEntityVersion, visualizationMesh->getEntityID());
+    app->modelComponent()->addNewDataEntity(ycEntityID, ycEntityVersion, visualizationMesh->getEntityID());
+    app->modelComponent()->addNewDataEntity(zcEntityID, zcEntityVersion, visualizationMesh->getEntityID());
+    app->modelComponent()->addNewDataEntity(cellEntityID, cellEntityVersion, visualizationMesh->getEntityID());
+
+    app->modelComponent()->addNewDataEntity(visualizationMesh->getEntityID(), visualizationMesh->getEntityStorageVersion(), solverEntity->getEntityID());
+
+    visualizationMeshID      = visualizationMesh->getEntityID();
+    visualizationMeshVersion = visualizationMesh->getEntityStorageVersion();
+
+    delete visualizationMesh;
+    visualizationMesh = nullptr;
+}
+
+void SolverElectrostatics::storeMeshScalarData(size_t numberPoints, size_t numberCells, std::list<std::string>& potentialList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
+{
+    // Create the potential data item 
+    EntityBinaryData* pointScalar = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* pointVector = nullptr;
+    EntityBinaryData* cellScalar = nullptr;
+    EntityBinaryData* cellVector = nullptr;
+
+    float* p = new float[potentialList.size()];
+
+    size_t index = 0;
+    for (auto potential : potentialList)
+    {
+        p[index] = (float)atof(potential.c_str());
+
+        index++;
+        assert(index <= potentialList.size());
+    }
+
+    pointScalar->setData((char*)p, sizeof(float) * potentialList.size());
+    pointScalar->StoreToDataBase();
+
+    delete[] p; p = nullptr;
+
+    long long pointScalarID      = pointScalar->getEntityID();
+    long long pointScalarVersion = pointScalar->getEntityStorageVersion();
+
+    EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+
+    visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
+    visualizationMeshData->StoreToDataBase();
+
+    app->modelComponent()->addNewDataEntity(pointScalarID, pointScalarVersion, visualizationMeshData->getEntityID());
+    app->modelComponent()->addNewDataEntity(visualizationMeshData->getEntityID(), visualizationMeshData->getEntityStorageVersion(), solverEntity->getEntityID());
+
+    visualizationMeshDataID      = visualizationMeshData->getEntityID();
+    visualizationMeshDataVersion = visualizationMeshData->getEntityStorageVersion();
+
+    delete visualizationMeshData;
+    visualizationMeshData = nullptr;
+}
+
+void SolverElectrostatics::storeMeshVectorData(size_t numberPoints, size_t numberCells, std::list<double> &magnitudeList, std::list<std::string> &vectorList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
+{
+    // Create the potential data item 
+    EntityBinaryData* pointScalar = nullptr;
+    EntityBinaryData* pointVector = nullptr;
+    EntityBinaryData* cellScalar = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* cellVector = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+
+    float* m = new float[magnitudeList.size()];
+
+    size_t index = 0;
+    for (auto mag : magnitudeList)
+    {
+        m[index] = (float)mag;
+
+        index++;
+        assert(index <= magnitudeList.size());
+    }
+
+    cellScalar->setData((char*)m, sizeof(float) * magnitudeList.size());
+    cellScalar->StoreToDataBase();
+
+    delete[] m; m = nullptr;
+
+    float* v = new float[3 * vectorList.size()];
+
+    index = 0;
+    for (auto vec : vectorList)
+    {
+        std::stringstream ss(vec);
+
+        double vx = 0.0, vy = 0.0, vz = 0.0;
+
+        ss >> vx;
+        ss >> vy;
+        ss >> vz;
+
+        v[index++] = (float)vx;
+        v[index++] = (float)vy;
+        v[index++] = (float)vz;
+
+        assert(index <= 3 * vectorList.size());
+    }
+
+    cellVector->setData((char*)v, sizeof(float) * 3 * vectorList.size());
+    cellVector->StoreToDataBase();
+
+    delete[] v; v = nullptr;
+
+    long long cellScalarID      = cellScalar->getEntityID();
+    long long cellScalarVersion = cellScalar->getEntityStorageVersion();
+    long long cellVectorID      = cellVector->getEntityID();
+    long long cellVectorVersion = cellVector->getEntityStorageVersion();
+
+    EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+
+    visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
+    visualizationMeshData->StoreToDataBase();
+
+    app->modelComponent()->addNewDataEntity(cellScalarID, cellScalarVersion, visualizationMeshData->getEntityID());
+    app->modelComponent()->addNewDataEntity(cellVectorID, cellVectorVersion, visualizationMeshData->getEntityID());
+    app->modelComponent()->addNewDataEntity(visualizationMeshData->getEntityID(), visualizationMeshData->getEntityStorageVersion(), solverEntity->getEntityID());
+
+    visualizationMeshDataID = visualizationMeshData->getEntityID();
+    visualizationMeshDataVersion = visualizationMeshData->getEntityStorageVersion();
+
+    delete visualizationMeshData;
+    visualizationMeshData = nullptr;
 }

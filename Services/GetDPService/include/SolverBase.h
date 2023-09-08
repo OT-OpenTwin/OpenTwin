@@ -32,7 +32,7 @@ public:
 
 	virtual void writeInputFile(std::ofstream& controlFile) = 0;
 	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) = 0;
-	virtual void convertResults(const std::string& tempDirPath, Application* app, const std::string& solverName) = 0;
+	virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase *solverEntity) = 0;
 
 	void runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent);
 

@@ -102,7 +102,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 		logFileText = solver->runSolver(tempDirPath, application->uiComponent());
 
 		// Convert the results
-		solver->convertResults(tempDirPath, application, solverEntity->getName());
+		solver->convertResults(tempDirPath, application, solverEntity);
 	}
 	catch (std::string& error)
 	{
