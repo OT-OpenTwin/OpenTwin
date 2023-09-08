@@ -9,7 +9,8 @@ BlockItemPlot1D::BlockItemPlot1D()
 
 void BlockItemPlot1D::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
-	block->addInput("C0", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
+	block->addInput("C0", "X-Axis", ot::GraphicsFlowConnectorCfg::Square);
+	block->addInput("C1", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
 }
 
 std::shared_ptr<EntityBlock> BlockItemPlot1D::CreateBlockEntity()
@@ -17,5 +18,6 @@ std::shared_ptr<EntityBlock> BlockItemPlot1D::CreateBlockEntity()
 	auto plotBlock = new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, nullptr, "");
 	plotBlock->createProperties();
 	plotBlock->AddConnector(ot::Connector(ot::ConnectorType::Sink, "C0"));
+	plotBlock->AddConnector(ot::Connector(ot::ConnectorType::Sink, "C1"));
 	return std::shared_ptr<EntityBlock>(plotBlock);
 }
