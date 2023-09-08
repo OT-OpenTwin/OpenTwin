@@ -109,6 +109,7 @@
 #define OT_ACTION_CMD_MODEL_ActivateVersion "Model.ActivateVersion"
 #define OT_ACTION_CMD_MODEL_AddPropertiesToEntities "Model.Entities.AddProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
+#define OT_ACTION_CMD_MODEL_TEMP "Model.Temp"
 
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
@@ -563,7 +564,6 @@
 #define OT_INFO_SERVICE_TYPE_GETDP "GetDPService"
 #define OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "PythonExecutionService"
 #define OT_INFO_SERVICE_TYPE_BlockEditorService "BlockEditorService"
-
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 

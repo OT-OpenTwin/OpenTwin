@@ -11,8 +11,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	_resultCollectionExists = resultCollectionHandler.CollectionExists(resultCollectionName);
 	if (_resultCollectionExists)
 	{
-		_queryString = blockEntity->getQuery();
-		_projectionString = blockEntity->getProjection();
+
 		const std::string dbURL = "Projects";
 	
 		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);

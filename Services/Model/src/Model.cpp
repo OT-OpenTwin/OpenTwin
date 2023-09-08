@@ -4837,6 +4837,40 @@ ModelState * Model::getStateManager(void)
 	return stateManager;
 }
 
+void Model::setStateMangager(ModelState* state)
+{
+	entityMap.clear();
+
+	stateManager = state;
+	stateManager->openProject();
+
+	auto doc = bsoncxx::builder::basic::document{};
+
+	if (!GetDocumentFromEntityID(0, doc))
+	{
+		displayMessage("ERROR: Unable to read most recent model from storage: " + projectName + "\n");
+		return;
+	}
+
+	auto doc_view = doc.view()["Found"].get_document().view();
+
+	ot::UID schemaVersion = (ot::UID)DataBase::GetIntFromView(doc_view, "SchemaVersion_Model");
+	assert(schemaVersion == 2);
+
+	long long entityRootId = doc_view["entityRoot"].get_int64();
+	setModelStorageVersion((ot::UID)DataBase::GetIntFromView(doc_view, "Version"));
+	
+	std::list<ot::UID> prefetchIds;
+	getStateManager()->getListOfTopologyEntites(prefetchIds);
+	prefetchDocumentsFromStorage(prefetchIds);
+
+	// Now read the root entity (this will implicitly also recursively load all other subentities as well
+	if (entityRootId != -1)
+	{
+		entityRoot = dynamic_cast<EntityContainer*>(readEntityFromEntityID(nullptr, entityRootId, entityMap));
+	}
+}
+
 void Model::determineIDandVersionForEntityWithChildren(EntityBase *entity, std::list<ot::UID> &entityInfoIDList, std::list<ot::UID> &entityInfoVersionList)
 {	
 	entityInfoIDList.push_back(entity->getEntityID());

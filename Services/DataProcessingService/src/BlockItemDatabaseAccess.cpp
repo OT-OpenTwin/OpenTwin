@@ -11,8 +11,10 @@ std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()
 {
 	std::shared_ptr<EntityBlockDatabaseAccess> dbAccessBlockEntity(new EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, nullptr, ""));
 
-	std::list<std::string> listOfProjects{ "KWT_Demo" };
-	dbAccessBlockEntity->createProperties(listOfProjects, *listOfProjects.begin());
+
+	dbAccessBlockEntity->createProperties();
+
+
 	dbAccessBlockEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C0"));
 	return dbAccessBlockEntity;
 }

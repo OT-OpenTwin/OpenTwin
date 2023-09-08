@@ -8,10 +8,9 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	virtual void addVisualizationNodes(void) override;
-	void createProperties(std::list<std::string>& dataProjectNames, const std::string& defaultProjectName);
+	void createProperties();
 	std::string getSelectedProjectName();
-	std::string getQuery();
-	std::string getProjection();
+	std::string getQueryDimension();
 
 protected:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

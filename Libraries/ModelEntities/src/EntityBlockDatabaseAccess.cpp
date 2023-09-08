@@ -28,12 +28,12 @@ void EntityBlockDatabaseAccess::addVisualizationNodes(void)
 	}
 }
 
-void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& dataProjectNames, const std::string& defaultProjectName)
+void EntityBlockDatabaseAccess::createProperties()
 {
 	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList("Projectname");
 	getProperties().createProperty(projectList, "Database Access");
-	EntityPropertiesString::createProperty("Database Access", "Query", "{}", "default", getProperties());
-	EntityPropertiesString::createProperty("Database Access", "Projection", "{value: 1, _id: 0}", "default", getProperties());
+	
+	EntityPropertiesSelection::createProperty("Access Type", "Outcome dimension", { "1D", "2D", "3D", "Custom" }, "1D", "default", getProperties());
 }
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
@@ -45,22 +45,13 @@ std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 	return  selectedProjectName->getValue();
 }
 
-std::string EntityBlockDatabaseAccess::getQuery()
+std::string EntityBlockDatabaseAccess::getQueryDimension()
 {
-	auto propertyBase = getProperties().getProperty("Query");
-	auto dbQuery = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	assert(dbQuery != nullptr);
+	auto propertyBase = getProperties().getProperty("Outcome dimension");
+	auto outcome= dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	assert(outcome != nullptr);
 
-	return dbQuery->getValue();
-}
-
-std::string EntityBlockDatabaseAccess::getProjection()
-{
-	auto propertyBase = getProperties().getProperty("Projection");
-	auto dbProjection = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	assert(dbProjection != nullptr);
-
-	return dbProjection->getValue();
+	return outcome->getValue();
 }
 
 void EntityBlockDatabaseAccess::AddStorageData(bsoncxx::builder::basic::document& storage)

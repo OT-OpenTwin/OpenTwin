@@ -196,6 +196,7 @@ public:
 	int getSessionCount(void);
 
 	ModelState* getStateManager(void);
+	void setStateMangager(ModelState* state);
 
 	void promptResponse(const std::string &type, const std::string &answer, const std::string &parameter1);
 

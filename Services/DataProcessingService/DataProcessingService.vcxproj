@@ -191,6 +191,7 @@
     <ClCompile Include="src\BlockItemPlot1D.cpp" />
     <ClCompile Include="src\BlockItemPython.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\Pipeline.cpp" />
     <ClCompile Include="src\PipelineFilter.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="include\BlockItemDataProcessing.h" />
     <ClInclude Include="include\BlockItemPlot1D.h" />
     <ClInclude Include="include\BlockItemPython.h" />
+    <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\Pipeline.h" />
     <ClInclude Include="include\PipelineFilter.h" />

@@ -1081,6 +1081,25 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			//Currently only the ui service uses this function but the ui url is currently not available when this method is being invoked.
 			sendHttpRequest(QUEUE, globalUIserviceURL, replyDoc, response);
 		}
+		else if (action == OT_ACTION_CMD_MODEL_TEMP)
+		{
+			std::string projectName = ot::rJSON::getString(doc, OT_ACTION_PARAM_PROJECT_NAME);
+			std::string	collectionName = ot::rJSON::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
+			std::string folder = ot::rJSON::getString(doc, OT_ACTION_PARAM_Folder);
+			std::string className = ot::rJSON::getString(doc, OT_ACTION_PARAM_Type);
+			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
+			
+			const ModelState* currentProjectState = globalModel->getStateManager();
+
+			DataBase::GetDataBase()->setProjectName(projectName);
+			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+			ModelState* secondaryState = new ModelState(globalModel->getSessionCount(), globalModel->getServiceIDAsInt());
+			globalModel->setStateMangager(secondaryState);
+			globalModel->projectOpen();
+
+			return getReturnJSONFromUIDList(globalModel->getIDsOfFolderItemsOfType(folder, className, recursive));
+		}
+
 		else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
 #ifdef _DEBUG
 		OutputDebugStringA("[OPEN TWIN] [DEBUG] Emergency shutdown received. exit(-100)");

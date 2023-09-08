@@ -87,6 +87,9 @@
     <ClCompile Include="src\BlockItemPython.cpp">
       <Filter>Source Files\BlockTypes</Filter>
     </ClCompile>
+    <ClCompile Include="src\MeasurementCampaignHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="include\BlockItemPython.h">
       <Filter>Header Files\BlockTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MeasurementCampaignHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

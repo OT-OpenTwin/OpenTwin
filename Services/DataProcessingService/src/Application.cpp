@@ -21,6 +21,7 @@
 
 
 #include "BlockItemManager.h"
+#include "ClassFactory.h"
 
 Application * g_instance{ nullptr };
 
@@ -70,6 +71,7 @@ void Application::run(void)
 #include "BlockEntityHandler.h"
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPlot1D.h"
+#include "MeasurementCampaignHandler.h"
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
@@ -91,6 +93,25 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 			//BlockHandlerPlot1D plot;
 			//plot.Execute(result);
+		}
+	}
+	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
+	{
+		assert(m_selectedEntities.size() == 1);
+		std::list<ot::EntityInformation> entityInfos;
+		m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
+		ClassFactory classFactory;
+		auto entBase =	m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), classFactory);
+		auto dbAccess =	dynamic_cast<EntityBlockDatabaseAccess*>(entBase);
+		if (dbAccess != nullptr)
+		{
+			const std::string queryDimension = dbAccess->getQueryDimension();
+			const std::string projectName = dbAccess->getSelectedProjectName();
+			ResultCollectionHandler resultCollection;
+			const std::string collectionName = resultCollection.getProjectCollection(projectName);
+
+			MeasurementCampaignHandler mcHandler;
+			mcHandler.ConnectToCollection(collectionName, projectName);
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)
