@@ -74,6 +74,8 @@ void Application::run(void)
 #include "BlockHandlerPlot1D.h"
 #include "MeasurementCampaignHandler.h"
 
+#include "DataBase.h"
+
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
@@ -81,12 +83,39 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
+			const std::string projectName = "With Resultcolelction";
+			ResultCollectionHandler resultCollection;
+			const std::string collectionName = resultCollection.getProjectCollection(projectName);
 
-			_pipelineManager.RunAll();
+			OT_rJSON_createDOC(tempDoc);
+			ot::rJSON::add(tempDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION);
+			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_PROJECT_NAME, projectName);
+			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_COLLECTION_NAME, collectionName);
+			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_Folder, "Dataset");
+			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_Type, "EntityMeasurementMetadata");
+			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_Recursive, true);
+
+			std::string response = sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, tempDoc);
+
+
+			OT_rJSON_parseDOC(responseDoc, response.c_str());
+			ot::UIDList entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			ot::UIDList entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+			DataBase::GetDataBase()->setProjectName(collectionName);
+
+			auto version =	entityVersions.begin();
+			ClassFactory classFactory;
+			for (ot::UID id : entityIDs)
+			{
+				auto entBase =	m_modelComponent->readEntityFromEntityIDandVersion(id,*version,classFactory);
+				version++;
+			}
+
+			//_pipelineManager.RunAll();
 			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 			//std::list<std::string>projects{"KWT_Demo"};
 			//block->createProperties(projects, *projects.begin());
-			//
+			
 			//BlockHandlerDatabaseAccess dbAccess(block.get());
 			//BlockHandler::genericDataBlock parameter, result;
 			//result = dbAccess.Execute(parameter);

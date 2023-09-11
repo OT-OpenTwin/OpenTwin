@@ -1081,7 +1081,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			//Currently only the ui service uses this function but the ui url is currently not available when this method is being invoked.
 			sendHttpRequest(QUEUE, globalUIserviceURL, replyDoc, response);
 		}
-		else if (action == OT_ACTION_CMD_MODEL_TEMP)
+		else if (action == OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION)
 		{
 			std::string projectName = ot::rJSON::getString(doc, OT_ACTION_PARAM_PROJECT_NAME);
 			std::string	collectionName = ot::rJSON::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
@@ -1089,15 +1089,25 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			std::string className = ot::rJSON::getString(doc, OT_ACTION_PARAM_Type);
 			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
 			
-			//const ModelState* currentProjectState = globalModel->getStateManager();
+			std::string actualOpenedProject= DataBase::GetDataBase()->getProjectName();
+			DataBase::GetDataBase()->setProjectName(collectionName);
+			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+			Model secondary(projectName, collectionName);
+			secondary.projectOpen();
+			ot::UIDList entityIDList = secondary.getIDsOfFolderItemsOfType(folder, className, recursive);
+			ot::UIDList entityVersions;
+			secondary.getEntityVersions(entityIDList, entityVersions);
 
-			//DataBase::GetDataBase()->setProjectName(projectName);
-			//DataBase::GetDataBase()->RemovePrefetchedDocument(0);
-			//ModelState* secondaryState = new ModelState(globalModel->getSessionCount(), globalModel->getServiceIDAsInt());
-			//globalModel->setStateMangager(secondaryState);
-			//globalModel->projectOpen();
+			DataBase::GetDataBase()->setProjectName(actualOpenedProject);
+			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+			globalModel->projectOpen();
 
-			return getReturnJSONFromUIDList(globalModel->getIDsOfFolderItemsOfType(folder, className, recursive));
+
+			OT_rJSON_createDOC(newDoc);
+			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
+			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersions);
+
+			return ot::rJSON::toJSON(newDoc);
 		}
 
 		else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {

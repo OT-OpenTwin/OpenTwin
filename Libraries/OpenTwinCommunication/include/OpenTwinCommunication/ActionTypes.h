@@ -109,7 +109,7 @@
 #define OT_ACTION_CMD_MODEL_ActivateVersion "Model.ActivateVersion"
 #define OT_ACTION_CMD_MODEL_AddPropertiesToEntities "Model.Entities.AddProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
-#define OT_ACTION_CMD_MODEL_TEMP "Model.Temp"
+#define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
 
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
