@@ -180,6 +180,12 @@ ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: Result Collection Access
+ECHO ===============================================================
+CALL "%OT_RESULT_COLLECTION_ACCESS_ROOT%\build.bat" %1 %2
+
+
+ECHO ===============================================================
 ECHO Build Microservice Launcher: OpenTwin
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\build.bat" %1 %2 > RUSTbuildLog.txt
