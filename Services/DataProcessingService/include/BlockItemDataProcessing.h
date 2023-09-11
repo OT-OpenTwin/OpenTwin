@@ -8,7 +8,7 @@
 class BlockItemDataProcessing
 {
 public:
-	BlockItemDataProcessing(const std::string& blockName, const std::string& blockTitle, const std::string& blockLabel, const std::string& imageName = "");
+	BlockItemDataProcessing();
 	ot::GraphicsItemCfg* GetBlock();
 	const std::string& getBlockName()const { return _blockName; }
 
@@ -20,11 +20,9 @@ protected:
 	ot::Color _colourBackground;
 	ot::Color _colourConnector;		
 
-	virtual void AddConnectors(ot::GraphicsFlowItemCfg* block) {};
+	std::string _blockTitle = "";
+	std::string _blockName = "";
+	std::string _imageName = "";
 
-private:
-	const std::string _blockTitle;
-	const std::string _blockLabel;
-	const std::string _blockName;
-	const std::string _imageName;
+	virtual void AddConnectors(ot::GraphicsFlowItemCfg* block) {};
 };

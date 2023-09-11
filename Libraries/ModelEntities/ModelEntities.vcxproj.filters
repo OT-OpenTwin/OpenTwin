@@ -331,6 +331,9 @@
     <ClInclude Include="include\EntityResultUnstructuredMeshData.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityBlockPython.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -572,6 +575,8 @@
     </ClCompile>
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp">
       <Filter>Source Files\Entities</Filter>
+    <ClCompile Include="src\EntityBlockPython.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

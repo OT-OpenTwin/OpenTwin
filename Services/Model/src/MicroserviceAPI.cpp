@@ -1089,13 +1089,13 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			std::string className = ot::rJSON::getString(doc, OT_ACTION_PARAM_Type);
 			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
 			
-			const ModelState* currentProjectState = globalModel->getStateManager();
+			//const ModelState* currentProjectState = globalModel->getStateManager();
 
-			DataBase::GetDataBase()->setProjectName(projectName);
-			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
-			ModelState* secondaryState = new ModelState(globalModel->getSessionCount(), globalModel->getServiceIDAsInt());
-			globalModel->setStateMangager(secondaryState);
-			globalModel->projectOpen();
+			//DataBase::GetDataBase()->setProjectName(projectName);
+			//DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+			//ModelState* secondaryState = new ModelState(globalModel->getSessionCount(), globalModel->getServiceIDAsInt());
+			//globalModel->setStateMangager(secondaryState);
+			//globalModel->projectOpen();
 
 			return getReturnJSONFromUIDList(globalModel->getIDsOfFolderItemsOfType(folder, className, recursive));
 		}

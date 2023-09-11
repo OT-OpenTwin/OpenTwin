@@ -13,23 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\BlockTypes">
-      <UniqueIdentifier>{bf16a846-2f75-44b8-9ca9-c6a41bf17c4f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\BlockTypes">
-      <UniqueIdentifier>{4d4603af-9084-4179-9e95-e6f9d4f566c2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Pipeline">
       <UniqueIdentifier>{856d0176-b6a9-4c39-a83b-ac2af41600e3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Pipeline">
       <UniqueIdentifier>{6372d915-8143-4176-a56f-9e8f972a3d73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\BlockHandling">
-      <UniqueIdentifier>{89e29ce9-6af8-450f-8a78-e27680275438}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\BlockHandling">
       <UniqueIdentifier>{031a1c64-1cf3-426f-b9f8-0022d3323f52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BlockFunctionality">
+      <UniqueIdentifier>{89e29ce9-6af8-450f-8a78-e27680275438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Blocks">
+      <UniqueIdentifier>{bf16a846-2f75-44b8-9ca9-c6a41bf17c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blocks">
+      <UniqueIdentifier>{4d4603af-9084-4179-9e95-e6f9d4f566c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,10 +46,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockItemDataProcessing.cpp">
-      <Filter>Source Files\BlockTypes</Filter>
+      <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockItemDatabaseAccess.cpp">
-      <Filter>Source Files\BlockTypes</Filter>
+      <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="src\Pipeline.cpp">
       <Filter>Source Files\Pipeline</Filter>
@@ -76,18 +76,21 @@
       <Filter>Source Files\BlockHandling</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockItemManager.cpp">
-      <Filter>Source Files\BlockTypes</Filter>
+      <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockEntityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockItemPlot1D.cpp">
-      <Filter>Source Files\BlockTypes</Filter>
+      <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockItemPython.cpp">
-      <Filter>Source Files\BlockTypes</Filter>
+      <Filter>Source Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="src\MeasurementCampaignHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExternalDependencies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,7 +105,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockItemDatabaseAccess.h">
-      <Filter>Header Files\BlockTypes</Filter>
+      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="include\PipelineManager.h">
       <Filter>Header Files\Pipeline</Filter>
@@ -111,7 +114,7 @@
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockItemDataProcessing.h">
-      <Filter>Header Files\BlockTypes</Filter>
+      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="include\PipelineFilter.h">
       <Filter>Header Files\Pipeline</Filter>
@@ -126,31 +129,37 @@
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandler.h">
-      <Filter>Header Files\BlockHandling</Filter>
+      <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandlerDatabaseAccess.h">
-      <Filter>Header Files\BlockHandling</Filter>
+      <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\ResultCollectionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandlerPlot1D.h">
-      <Filter>Header Files\BlockHandling</Filter>
+      <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockItemManager.h">
-      <Filter>Header Files\BlockTypes</Filter>
+      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockEntityHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockItemPlot1D.h">
-      <Filter>Header Files\BlockTypes</Filter>
+      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockItemPython.h">
-      <Filter>Header Files\BlockTypes</Filter>
+      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="include\MeasurementCampaignHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExternalDependencies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockEntityFactoryRegistrar.h">
+      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

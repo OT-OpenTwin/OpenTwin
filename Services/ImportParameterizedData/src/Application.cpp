@@ -242,6 +242,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
+			_parametrizedDataHandler->CheckEssentials();
 			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == _buttonImportCSV.GetFullDescription())
 			{

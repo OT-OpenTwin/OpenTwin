@@ -120,6 +120,5 @@ private:
 
 	ot::MenuButtonDescription _buttonRunPipeline;
 
-	BlockEntityHandler _blockEntHandler;
 	PipelineManager _pipelineManager;
 };

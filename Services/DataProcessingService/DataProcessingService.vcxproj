@@ -191,6 +191,7 @@
     <ClCompile Include="src\BlockItemPlot1D.cpp" />
     <ClCompile Include="src\BlockItemPython.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\ExternalDependencies.cpp" />
     <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\Pipeline.cpp" />
@@ -203,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\BlockEntityFactoryRegistrar.h" />
     <ClInclude Include="include\BlockItemDatabaseAccess.h" />
     <ClInclude Include="include\BlockEntityHandler.h" />
     <ClInclude Include="include\BlockHandler.h" />
@@ -212,6 +214,7 @@
     <ClInclude Include="include\BlockItemDataProcessing.h" />
     <ClInclude Include="include\BlockItemPlot1D.h" />
     <ClInclude Include="include\BlockItemPython.h" />
+    <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\Pipeline.h" />

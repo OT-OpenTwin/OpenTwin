@@ -1,8 +1,6 @@
 #include "BlockItemDataProcessing.h"
 
-BlockItemDataProcessing::BlockItemDataProcessing(const std::string& blockName, const std::string& blockTitle, const std::string& blockLabel, const std::string& imageName)
-	:
-	_blockName(blockName), _blockTitle(blockTitle), _blockLabel(blockLabel), _imageName(imageName)
+BlockItemDataProcessing::BlockItemDataProcessing()
 {
 	_blockSize = ot::Size2D(140, 70);
 	_connectorSize = ot::Size2D(12, 12);

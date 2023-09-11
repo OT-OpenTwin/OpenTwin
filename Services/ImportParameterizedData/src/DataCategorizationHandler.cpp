@@ -41,16 +41,18 @@ void DataCategorizationHandler::AddSelectionsAsQuantity(std::list<ot::UID> selec
 
 void DataCategorizationHandler::ModelComponentWasSet()
 {
-	ot::EntityInformation entityInfo;
-	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
-	_scriptFolderUID = entityInfo.getID();
-	std::list<std::string> allItems =	_modelComponent->getListOfFolderItems(_baseFolder);
-	_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
-	_rmdPath = entityInfo.getName();
+	//ot::EntityInformation entityInfo;
+	//_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
+	//_scriptFolderUID = entityInfo.getID();
+	//std::list<std::string> allItems =	_modelComponent->getListOfFolderItems(_baseFolder);
+	//_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
+	//_rmdPath = entityInfo.getName();
 }
 
 void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
 {
+
+
 	 CheckEssentials();
 	_activeCollectionEntities.clear();
 	_markedForStorringEntities.clear();
@@ -808,6 +810,23 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 	RequestRangesSelection(ranges);
 	/*std::string category = rangeEntity->getCategorization();
 	RequestColouringRanges(category);*/
+}
+
+inline void DataCategorizationHandler::CheckEssentials()
+{
+	if (_rmdPath == "")
+	{
+		ot::EntityInformation entityInfo;
+		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(_baseFolder);
+		_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
+		_rmdPath = entityInfo.getName();
+	}
+	if (_scriptFolderUID == 0)
+	{
+		ot::EntityInformation entityInfo;
+		_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
+		_scriptFolderUID = entityInfo.getID();
+	}
 }
 
 void DataCategorizationHandler::RequestRangesSelection(std::vector<ot::TableRange>& ranges)

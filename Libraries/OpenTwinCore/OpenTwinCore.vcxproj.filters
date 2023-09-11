@@ -147,6 +147,9 @@
     <ClInclude Include="include\OpenTwinCore\EncodingConverter_UTF16ToUTF8.h">
       <Filter>include\TextEncoding</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\FolderNames.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

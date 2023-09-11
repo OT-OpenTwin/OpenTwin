@@ -1,11 +1,15 @@
 #include "BlockItemPlot1D.h"
 #include "EntityBlockPlot1D.h"
+#include "BlockEntityFactoryRegistrar.h"
 
 BlockItemPlot1D::BlockItemPlot1D()
-	:BlockItemDataProcessing("Plot 1D", "Plot 1D","V", /*"Plot1DVisible"*/"")
+	:BlockItemDataProcessing()
 {
 	_colourTitle.set(ot::Color::Yellow);
+	_blockName = "Plot 1D";
+	_blockTitle = "Plot 1D";
 }
+static BlockEntityFactoryRegistrar factoryEntry("Plot 1D", BlockItemPlot1D::CreateBlockEntity);
 
 void BlockItemPlot1D::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {

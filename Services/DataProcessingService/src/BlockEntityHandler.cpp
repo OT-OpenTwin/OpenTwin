@@ -1,25 +1,27 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
-#include "BlockItemDatabaseAccess.h"
-#include "BlockItemPlot1D.h"
+
 #include "Application.h"
 #include "ClassFactory.h"
+
+BlockEntityHandler& BlockEntityHandler::GetInstance()
+{
+	static BlockEntityHandler instance;
+	return instance;
+}
 
 std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& editorName, const std::string& blockName, ot::UID itemID)
 {
 	std::shared_ptr<EntityBlock> blockEntity = nullptr;
-	if (blockName == "Database access")
+
+	if (_blockEntityFactories.find(blockName) == _blockEntityFactories.end())
 	{
-		blockEntity = BlockItemDatabaseAccess::CreateBlockEntity();
-	}
-	else if(blockName == "Plot 1D")
-	{
-		blockEntity = BlockItemPlot1D::CreateBlockEntity();
+		assert(0);
 	}
 	else
 	{
-		return std::shared_ptr<EntityBlock>(nullptr);
+		blockEntity= _blockEntityFactories[blockName]();
 	}
 
 	assert(blockEntity != nullptr);
@@ -57,5 +59,17 @@ void BlockEntityHandler::AddBlockConnection(ot::UID idOrigin, ot::UID idDestinat
 			_modelComponent->addEntitiesToModel(topoEntID, topoEntVer, forceVis, dataEnt, dataEnt, dataEnt, "Added connection to EntityBlock");
 			break;
 		}
+	}
+}
+
+void BlockEntityHandler::RegisterBlockEntity(const std::string& key, std::function<std::shared_ptr<EntityBlock> ()> factoryMethod)
+{
+	if (_blockEntityFactories.find(key) == _blockEntityFactories.end())
+	{
+		_blockEntityFactories[key] = factoryMethod;
+	}
+	else
+	{
+		assert(0); //Double entry should not happen
 	}
 }

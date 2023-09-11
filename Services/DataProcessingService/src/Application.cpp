@@ -22,6 +22,7 @@
 
 #include "BlockItemManager.h"
 #include "ClassFactory.h"
+#include "ExternalDependencies.h"
 
 Application * g_instance{ nullptr };
 
@@ -120,7 +121,16 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		ot::UID itemID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
 		
-		auto blockEntity = _blockEntHandler.CreateBlock(editorName, itemName, itemID);
+		ExternalDependencies dependencies;
+		if (dependencies.getPythonScriptFolderID() == 0)
+		{
+			ot::EntityInformation entityInfo;
+			m_modelComponent->getEntityInformation("Scripts", entityInfo);
+			ExternalDependencies dependencies;
+			dependencies.setPythonScriptFolderID(entityInfo.getID());
+		}
+
+		auto blockEntity = BlockEntityHandler::GetInstance().CreateBlock(editorName, itemName, itemID);
 		if (blockEntity != nullptr)
 		{
 			ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
@@ -136,7 +146,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string connectorNameOrigin = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName);
 		std::string connectorNameDestination = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName);
 
-		_blockEntHandler.AddBlockConnection(uidOrigin, uidDestination, connectorNameOrigin, connectorNameDestination);
+		BlockEntityHandler::GetInstance().AddBlockConnection(uidOrigin, uidDestination, connectorNameOrigin, connectorNameDestination);
 	}
 
 	return ""; // Return empty string if the request does not expect a return
@@ -146,7 +156,6 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 {
 	return ""; // Return empty string if the request does not expect a return
 }
-
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
@@ -179,7 +188,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-	_blockEntHandler.setModelComponent(_model);
+	 BlockEntityHandler::GetInstance().setModelComponent(_model);
 	_pipelineManager.setModelComponent(_model);
 }
 

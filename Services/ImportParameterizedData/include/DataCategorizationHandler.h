@@ -48,6 +48,8 @@ public:
 
 	void SelectRange(ot::UIDList iDs, ot::UIDList versions);
 
+	inline void CheckEssentials();
+
 	ot::Color GetSerializedColour() const
 	{ 
 		return _backgroundColour;
