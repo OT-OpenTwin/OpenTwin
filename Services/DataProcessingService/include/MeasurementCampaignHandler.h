@@ -4,6 +4,7 @@
 
 #include "OpenTwinFoundation/BusinessLogicHandler.h"
 #include "EntityMeasurementMetadata.h"
+#include "OpenTwinCore/Variable.h"
 
 class MeasurementCampaignHandler : public BusinessLogicHandler
 {
@@ -13,5 +14,7 @@ public:
 	std::vector<std::string> GetQuantityList();
 
 private:
-	std::vector<std::shared_ptr<EntityMeasurementMetadata>> _measurementMetadata;
+
+	std::list<ot::EntityInformation> getMSMDEntityInformation(const std::string& collectionName, const std::string& projectName);
+	void CollectMetaInformation(std::vector<std::shared_ptr<EntityMeasurementMetadata>>& measurementMetadata);
 };

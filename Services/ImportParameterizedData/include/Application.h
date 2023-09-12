@@ -20,6 +20,8 @@
 #include "DataCategorizationHandler.h"
 #include "DataCollectionCreationHandler.h"
 
+#include "OpenTwinCore/FolderNames.h"
+
 // Forward declaration
 namespace ot {
 	namespace components {
@@ -145,13 +147,13 @@ private:
 	ot::MenuButtonDescription _buttonCreateDataCollection;
 
 	const std::string _dataSourcesFolder = "Files";
-	const std::string _scriptsFolder = "Scripts";
+	const std::string _scriptsFolder = ot::FolderNames::PythonScriptFolder;
 	const std::string _tableFolder = "Tables";
 	const std::string _dataCategorizationFolder = "Data Categorization";
 	const std::string _parameterFolder = "Parameterset";
 	const std::string _quantityFolder = "Quantityset";
 	const std::string _previewTableNAme = "Preview";
-	const std::string _datasetFolder = "Dataset";
+	const std::string _datasetFolder = ot::FolderNames::DatasetFolder;
 
 	ot::UID _visualizationModel = -1;
 	   

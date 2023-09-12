@@ -105,9 +105,13 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 			auto version =	entityVersions.begin();
 			ClassFactory classFactory;
+
+			std::list<ot::EntityInformation> entityInfos;
 			for (ot::UID id : entityIDs)
 			{
-				auto entBase =	m_modelComponent->readEntityFromEntityIDandVersion(id,*version,classFactory);
+				ot::EntityInformation entityInfo;
+				entityInfo.setID(id);
+				entityInfo.setVersion(*version);
 				version++;
 			}
 
