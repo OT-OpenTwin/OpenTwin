@@ -20,12 +20,12 @@ PythonAPI::PythonAPI()
 	_wrapper.InitializePythonInterpreter();
 }
 
-std::list<ot::variable_t> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<ot::variable_t>>>& parameterSet)
+std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<ot::Variable>>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
 	EntityBuffer::INSTANCE().setModelComponent(Application::instance()->modelComponent());
 	auto currentParameterSet = parameterSet.begin();
-	std::list<ot::variable_t> returnValues;
+	std::list<ot::Variable> returnValues;
 	PythonObjectBuilder pyObBuilder;
 	for (std::string& scriptName : scripts)
 	{
@@ -33,7 +33,7 @@ std::list<ot::variable_t> PythonAPI::Execute(std::list<std::string>& scripts, st
 		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
-		std::optional <std::list<ot::variable_t>>& parameterSetForScript = *currentParameterSet;
+		std::optional <std::list<ot::Variable>>& parameterSetForScript = *currentParameterSet;
 		CPythonObjectNew pythonParameterSet(nullptr);
 		if (parameterSetForScript.has_value())
 		{
@@ -100,41 +100,41 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 	}
 }
 
-CPythonObjectNew PythonAPI::CreateParameterSet(std::list<ot::variable_t>& parameterSet)
+CPythonObjectNew PythonAPI::CreateParameterSet(std::list<ot::Variable>& parameterSet)
 {
 	PythonObjectBuilder pObjectBuilder;
 	pObjectBuilder.StartTupleAssemply(static_cast<int>(parameterSet.size()));
 
-	for (ot::variable_t& parameter : parameterSet)
+	for (ot::Variable& parameter : parameterSet)
 	{
-		if (std::holds_alternative<int32_t>(parameter))
+		if (parameter.isInt32())
 		{
-			auto value = pObjectBuilder.setInt32(std::get<int32_t>(parameter));
+			auto value = pObjectBuilder.setInt32(parameter.getInt32());
 			pObjectBuilder << &value;
 		}
-		else if (std::holds_alternative<int64_t>(parameter))
+		else if (parameter.isInt64())
 		{
-			auto value = pObjectBuilder.setInt32(static_cast<int32_t>(std::get<int64_t>(parameter)));
+			auto value = pObjectBuilder.setInt32(static_cast<int32_t>(parameter.getInt64()));
 			pObjectBuilder << &value;
 		}
-		else if (std::holds_alternative<double>(parameter))
+		else if (parameter.isDouble())
 		{
-			auto value = pObjectBuilder.setDouble(std::get<double>(parameter));
+			auto value = pObjectBuilder.setDouble(parameter.getDouble());
 			pObjectBuilder << &value;
 		}
-		else if (std::holds_alternative<float>(parameter))
+		else if (parameter.isFloat())
 		{
-			auto value = pObjectBuilder.setDouble(static_cast<double>(std::get<float>(parameter)));
+			auto value = pObjectBuilder.setDouble(static_cast<double>(parameter.getFloat()));
 			pObjectBuilder << &value;
 		}
-		else if (std::holds_alternative<const char*>(parameter))
+		else if (parameter.isConstCharPtr())
 		{
-			auto value = pObjectBuilder.setString(std::string(std::get<const char*>(parameter)));
+			auto value = pObjectBuilder.setString(std::string(parameter.getConstCharPtr()));
 			pObjectBuilder << &value;
 		}
-		else if (std::holds_alternative<bool>(parameter))
+		else if (parameter.isBool())
 		{
-			auto value = pObjectBuilder.setBool(std::get<bool>(parameter));
+			auto value = pObjectBuilder.setBool(parameter.getBool());
 			pObjectBuilder << &value;
 		}
 		else

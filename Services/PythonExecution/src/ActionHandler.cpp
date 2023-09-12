@@ -2,6 +2,8 @@
 #include "ActionHandler.h"
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinCore/Variable.h"
+#include "OpenTwinCore/VariableToJSONConverter.h"
+#include "OpenTwinCore/JSONToVariableConverter.h"
 
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
@@ -80,7 +82,7 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 
 		//Extract parameter array from json doc
 		auto parameterArrayArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
-		std::list<std::optional<std::list<ot::variable_t>>> allParameter;
+		std::list<std::optional<std::list<ot::Variable>>> allParameter;
 
 		ot::JSONToVariableConverter converterJ2V;
 		for (uint32_t i = 0; i < parameterArrayArray.Size(); i++)
@@ -93,7 +95,7 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 			{
 				auto parameterArray = parameterArrayArray[i].GetArray();
 				//Todo: support of lists/maps as parameter
-				std::list<ot::variable_t> scriptParameter;
+				std::list<ot::Variable> scriptParameter;
 				for (uint32_t i = 0; i < parameterArray.Size(); i++)
 				{
 					auto paramerter = converterJ2V(parameterArray[i]);
@@ -104,14 +106,14 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 		}
 
 		//Execute
-		std::list<ot::variable_t> result = _pythonAPI.Execute(scripts, allParameter);
+		std::list<ot::Variable> result = _pythonAPI.Execute(scripts, allParameter);
 
 		//Wrapp result in json string
 		OT_rJSON_createDOC(returnValues);
 		OT_rJSON_createValueArray(rJsonResult);
 		ot::VariableToJSONConverter converterV2J;
 
-		for (ot::variable_t& var : result)
+		for (ot::Variable& var : result)
 		{
 			rJsonResult.PushBack(converterV2J(var,returnValues), returnValues.GetAllocator());
 		}

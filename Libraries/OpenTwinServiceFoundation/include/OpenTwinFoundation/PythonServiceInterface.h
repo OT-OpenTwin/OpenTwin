@@ -20,7 +20,7 @@ namespace ot
 	class OT_SERVICEFOUNDATION_API_EXPORT PythonServiceInterface
 	{
 	public:
-		using scriptParameter = std::optional<std::list<ot::variable_t>>;
+		using scriptParameter = std::optional<std::list<ot::Variable>>;
 		PythonServiceInterface(const std::string& pythonExecutionServiceURL);
 		void AddScriptWithParameter(const std::string& scriptName, const scriptParameter& scriptParameter);
 		ot::ReturnMessage SendExecutionOrder();

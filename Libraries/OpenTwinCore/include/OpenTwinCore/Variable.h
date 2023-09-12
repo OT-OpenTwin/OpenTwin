@@ -8,24 +8,37 @@
 #pragma once
 #include <variant>
 #include <stdint.h>
-#include "OpenTwinCore/rJSONHelper.h"
-#include "openTwinCore/CoreAPIExport.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OpenTwinCore/CoreAPIExport.h"
 
+#pragma warning(disable:4251)
 namespace ot
 {
-	using variable_t = std::variant<int32_t, int64_t, bool, float, double, const char*>;
-
-	class VariableToJSONConverter
+	class OT_CORE_API_EXPORT Variable
 	{
 	public:
-		__declspec(dllexport) rapidjson::Value operator() (variable_t& value, OT_rJSON_doc& emebeddingDocument);
-	};
+		Variable(float value);
+		Variable(double value);
+		Variable(int32_t value);
+		Variable(int64_t value);
+		Variable(bool value);
+		Variable(const char* value);
 
-	class JSONToVariableConverter
-	{
-	public:
-		__declspec(dllexport) variable_t operator() (rapidjson::Value& value);
-	};
+		bool isFloat() const;
+		bool isDouble() const;
+		bool isInt32() const;
+		bool isInt64() const;
+		bool isBool() const;
+		bool isConstCharPtr() const;
 
+		float getFloat() const;
+		double getDouble() const;
+		int32_t getInt32() const;
+		int64_t getInt64() const;
+		bool getBool() const;
+		const char* getConstCharPtr() const;
+
+	private:
+		std::variant<int32_t, int64_t, bool, float, double, const char*> _value;
+	};
+	
 }

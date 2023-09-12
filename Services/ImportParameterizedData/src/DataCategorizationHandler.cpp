@@ -692,8 +692,8 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	auto pythonScriptName = pythonScriptNames.begin();
 	for (auto newSelectionEntityName = newSelectionEntityNames.begin(); newSelectionEntityName != newSelectionEntityNames.end(); newSelectionEntityName++)
 	{
-		ot::variable_t parameterEntityName = (*newSelectionEntityName).c_str();
-		std::list<ot::variable_t> parameterList{parameterEntityName};
+		ot::Variable parameterEntityName = (*newSelectionEntityName).c_str();
+		std::list<ot::Variable> parameterList{parameterEntityName};
 		_pythonInterface->AddScriptWithParameter(*pythonScriptName, parameterList);
 		pythonScriptName++;
 	}

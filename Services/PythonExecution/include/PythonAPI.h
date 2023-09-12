@@ -12,12 +12,12 @@ class PythonAPI
 public:
 	PythonAPI();
 
-	std::list<ot::variable_t> Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<ot::variable_t>>>& parameterSet) noexcept(false);
+	std::list<ot::Variable> Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<ot::Variable>>>& parameterSet) noexcept(false);
 
 private:
 	std::map<std::string , std::string> _moduleEntrypointByScriptName;
 	PythonWrapper _wrapper;
 	void EnsureScriptsAreLoaded(std::list<std::string> scripts);
-	CPythonObjectNew CreateParameterSet(std::list<ot::variable_t>& parameterSet);
+	CPythonObjectNew CreateParameterSet(std::list<ot::Variable>& parameterSet);
 
 };

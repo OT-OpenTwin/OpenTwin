@@ -8,7 +8,7 @@ class BlockHandler : public BusinessLogicHandler
 {
 public:
 
-	using genericDataBlock = std::list<ot::variable_t>;
+	using genericDataBlock = std::list<ot::Variable>;
 
 	virtual genericDataBlock Execute(genericDataBlock& inputData) = 0;
 

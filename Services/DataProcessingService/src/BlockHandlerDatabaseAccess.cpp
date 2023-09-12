@@ -1,6 +1,7 @@
 #pragma once
 #include "BlockHandlerDatabaseAccess.h"
 #include "ResultCollectionHandler.h"
+#include "OpenTwinCore/JSONToVariableConverter.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity)
 {

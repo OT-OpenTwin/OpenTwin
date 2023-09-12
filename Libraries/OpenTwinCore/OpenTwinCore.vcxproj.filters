@@ -37,9 +37,6 @@
     <ClCompile Include="src\StringHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Variable.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextEncoding.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -51,6 +48,15 @@
     </ClCompile>
     <ClCompile Include="src\EncodingGuesser.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Variable.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONToVariableConverter.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VariableToJSONConverter.cpp">
+      <Filter>src\Variable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,9 +135,6 @@
     <ClInclude Include="include\OpenTwinCore\TypeNames.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OpenTwinCore\Variable.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OpenTwinCore\CoreAPIExport.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -150,6 +153,15 @@
     <ClInclude Include="include\OpenTwinCore\FolderNames.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\Variable.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\VariableToJSONConverter.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\JSONToVariableConverter.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -160,6 +172,12 @@
     </Filter>
     <Filter Include="include\TextEncoding">
       <UniqueIdentifier>{73977dab-7521-4c1c-a2a9-e677cd97e934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\VariableType">
+      <UniqueIdentifier>{425822ce-f53b-454a-9990-b097ca2f1f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Variable">
+      <UniqueIdentifier>{cf7eae33-666c-468a-823f-a33dc893eda9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

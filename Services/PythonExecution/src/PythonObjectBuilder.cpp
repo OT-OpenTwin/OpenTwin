@@ -207,27 +207,27 @@ std::list<bool> PythonObjectBuilder::getBoolList(const CPythonObject& pValue, co
 	return values;
 }
 
-std::optional<ot::variable_t> PythonObjectBuilder::getVariable(CPythonObject& pValue)
+std::optional<ot::Variable> PythonObjectBuilder::getVariable(CPythonObject& pValue)
 {
 	if (PyFloat_Check(pValue))
 	{
-		return ot::variable_t(static_cast<double>(PyFloat_AsDouble(pValue)));
+		return ot::Variable(static_cast<double>(PyFloat_AsDouble(pValue)));
 	}
 	else if (PyBool_Check(pValue))
 	{
-		return ot::variable_t(static_cast<bool>(PyLong_AsLong(pValue)));
+		return ot::Variable(static_cast<bool>(PyLong_AsLong(pValue)));
 	}
 	else if (PyLong_Check(pValue))
 	{
-		return ot::variable_t(static_cast<int64_t>(PyLong_AsLongLong(pValue)));
+		return ot::Variable(static_cast<int64_t>(PyLong_AsLongLong(pValue)));
 	}
 	else if (PyUnicode_Check(pValue))
 	{
-		return ot::variable_t(PyUnicode_AsUTF8(pValue));
+		return ot::Variable(PyUnicode_AsUTF8(pValue));
 	}
 	else if (Py_None == pValue)
 	{
-		return ot::variable_t({});
+		return {};
 	}
 	else
 	{

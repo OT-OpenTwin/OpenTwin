@@ -27,21 +27,21 @@ BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::generic
 	
 	for (auto& data : inputData)
 	{
-		if (std::holds_alternative<int32_t>(data))
+		if (data.isInt32())
 		{
-			resultCurve.push_back(static_cast<double>(std::get<int32_t>(data)));
+			resultCurve.push_back(static_cast<double>(data.getInt32()));
 		}
-		else if (std::holds_alternative<int64_t>(data))
+		else if (data.isInt64())
 		{
-			resultCurve.push_back(static_cast<double>(std::get<int64_t>(data)));
+			resultCurve.push_back(static_cast<double>(data.getInt64()));
 		}
-		else if (std::holds_alternative<float>(data))
+		else if (data.isFloat())
 		{
-			resultCurve.push_back(static_cast<double>(std::get<float>(data)));
+			resultCurve.push_back(static_cast<double>(data.getFloat()));
 		}
-		else if (std::holds_alternative<double>(data))
+		else if (data.isDouble())
 		{
-			resultCurve.push_back(std::get<double>(data));
+			resultCurve.push_back(data.getDouble());
 		}
 		else
 		{

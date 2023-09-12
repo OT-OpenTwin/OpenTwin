@@ -2,6 +2,9 @@
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/Msg.h"
 #include "OpenTwinCommunication/CommunicationTypes.h"
+#include "OpenTwinCore/JSONToVariableConverter.h"
+#include "OpenTwinCore/VariableToJSONConverter.h"
+
 
 ot::PythonServiceInterface::PythonServiceInterface(const std::string& pythonExecutionServiceURL)
 	: _pythonExecutionServiceURL(pythonExecutionServiceURL)

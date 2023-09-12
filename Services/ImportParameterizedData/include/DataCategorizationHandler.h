@@ -76,7 +76,7 @@ private:
 	ot::Color _backgroundColour;
 
 	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
-	std::map<std::string, std::list<std::optional<std::list<ot::variable_t>>>> _allVariablesByMSMD;
+	std::map<std::string, std::list<std::optional<std::list<ot::Variable>>>> _allVariablesByMSMD;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _activeCollectionEntities;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> _markedForStorringEntities;
 
