@@ -11,12 +11,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Header.h">
+    <ClInclude Include="include\QuantityContainer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MeasurementCampaign.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataParameter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataQuantity.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Header.cpp">
+    <ClCompile Include="src\QuantityContainer.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
