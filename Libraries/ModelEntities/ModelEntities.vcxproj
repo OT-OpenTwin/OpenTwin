@@ -101,8 +101,6 @@
     <ClInclude Include="include\Geometry.h" />
     <ClInclude Include="include\ModelState.h" />
     <ClInclude Include="include\PlaneProperties.h" />
-    <ClInclude Include="include\PropertiesComponentSelection.h" />
-    <ClInclude Include="include\PropertiesPointSelection.h" />
     <ClInclude Include="include\PropertiesVis2D3D.h" />
     <ClInclude Include="include\PropertyBundle.h" />
     <ClInclude Include="include\PropertyBundleDataHandlePlane.h" />
