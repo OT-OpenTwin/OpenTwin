@@ -5,9 +5,9 @@
 
 namespace ot
 {
-	class VariableToJSONConverter
+	class __declspec(dllexport) VariableToJSONConverter
 	{
 	public:
-		__declspec(dllexport) rapidjson::Value operator() (Variable& value, OT_rJSON_doc& emebeddingDocument);
+		rapidjson::Value operator() (Variable& value, OT_rJSON_doc& emebeddingDocument);
 	};
 }

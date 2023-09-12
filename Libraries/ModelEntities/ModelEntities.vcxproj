@@ -23,6 +23,7 @@
     <ClInclude Include="include\BoundingBox.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.hpp" />
+    <ClInclude Include="include\BSONToVariableConverter.h" />
     <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityBlock.h" />
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
@@ -113,11 +114,13 @@
     <ClInclude Include="include\SerializeWithBSON.h" />
     <ClInclude Include="include\TemplateDefaultManager.h" />
     <ClInclude Include="include\Types.h" />
+    <ClInclude Include="include\VariableToBSONConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
     <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\BSONToVariableConverter.cpp" />
     <ClCompile Include="src\ClassFactory.cpp" />
     <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\DataBase.cpp" />
@@ -196,6 +199,7 @@
     <ClCompile Include="src\PropertyBundleVis2D3D.cpp" />
     <ClCompile Include="src\TemplateDefaultManager.cpp" />
     <ClCompile Include="src\Types.cpp" />
+    <ClCompile Include="src\VariableToBSONConverter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>
@@ -298,6 +302,8 @@
       <SDLCheck>
       </SDLCheck>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>$(Qt_DEFINES_);%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -322,6 +328,7 @@
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -344,6 +351,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -366,6 +374,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

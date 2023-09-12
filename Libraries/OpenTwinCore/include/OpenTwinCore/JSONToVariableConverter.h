@@ -5,9 +5,9 @@
 
 namespace ot
 {
-	class JSONToVariableConverter
+	class __declspec(dllexport)  JSONToVariableConverter
 	{
 	public:
-		__declspec(dllexport) Variable operator() (rapidjson::Value& value);
+		Variable operator() (rapidjson::Value& value);
 	};
 }

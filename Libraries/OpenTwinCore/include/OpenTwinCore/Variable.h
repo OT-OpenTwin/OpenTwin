@@ -9,6 +9,7 @@
 #include <variant>
 #include <stdint.h>
 #include "OpenTwinCore/CoreAPIExport.h"
+#include "openTwinCore/TypeNames.h"
 
 #pragma warning(disable:4251)
 namespace ot
@@ -36,6 +37,12 @@ namespace ot
 		int64_t getInt64() const;
 		bool getBool() const;
 		const char* getConstCharPtr() const;
+
+		bool operator==(const Variable& other)const;
+		bool operator>(const Variable& other)const;
+		bool operator<(const Variable& other)const;
+
+		std::string getTypeName()const;
 
 	private:
 		std::variant<int32_t, int64_t, bool, float, double, const char*> _value;

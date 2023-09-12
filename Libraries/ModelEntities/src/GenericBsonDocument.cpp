@@ -1,11 +1,27 @@
 #include "GenericBsonDocument.h"
-
-void GenericBsonDocument::AddAllDocumentFieldsToDocument(bsoncxx::builder::basic::document& storage) const
+#include "VariableToBSONConverter.h"
+void GenericBsonDocument::AddAllFieldsToDocument(bsoncxx::builder::basic::document& storage) const
 {
-	AddMapToDocument<>(_stringFieldsByName, storage);
-	AddMapToDocument<>(_doubleFieldsByName, storage);
-	AddMapToDocument<>(_int32FieldsByName, storage);
-	AddMapToDocument<>(_int64FieldsByName, storage);
+	VariableToBSONConverter converter;
+	for (auto mapEntry : _fields)
+	{
+		std::list<ot::Variable>& fieldValues = mapEntry.second;
+		const std::string fieldName = mapEntry.first;
+		if (fieldValues.size() == 1)
+		{
+			const auto& value = *fieldValues.begin();
+			converter(storage,value,fieldName);
+		}
+		else
+		{
+			auto valueArray = bsoncxx::builder::basic::array();
+			for (auto& fieldValue : fieldValues)
+			{
+				converter(valueArray, fieldValue);
+			}
+			storage.append(bsoncxx::builder::basic::kvp(fieldName, valueArray));
+		}
+	}
 }
 
 //void GenericBsonDocument::CheckForIlligalName(std::string fieldName)

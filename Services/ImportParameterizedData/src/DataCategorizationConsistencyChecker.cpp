@@ -75,17 +75,11 @@ bool DataCategorizationConsistencyChecker::isValidQuantityAndParameterNumberMatc
 {
 
 	std::map<uint64_t,std::list<std::string>> numberOfParameter;
-	AddFieldNameByFieldvalueSize(parameterData.GetDoubleFields(),numberOfParameter);
-	AddFieldNameByFieldvalueSize(parameterData.GetInt32Fields(),numberOfParameter);
-	AddFieldNameByFieldvalueSize(parameterData.GetInt64Fields(),numberOfParameter);
-	AddFieldNameByFieldvalueSize(parameterData.GetStringFields(),numberOfParameter);
-	
+	AddFieldNameByFieldvalueSize(parameterData.getFields(),numberOfParameter);
+		
 	std::map<uint64_t, std::list<std::string>> numberOfQuantities;
-	AddFieldNameByFieldvalueSize(quantityData.GetDoubleFields(),numberOfQuantities);
-	AddFieldNameByFieldvalueSize(quantityData.GetInt32Fields(), numberOfQuantities);
-	AddFieldNameByFieldvalueSize(quantityData.GetInt64Fields(), numberOfQuantities);
-	AddFieldNameByFieldvalueSize(quantityData.GetStringFields(),numberOfQuantities);
-	
+	AddFieldNameByFieldvalueSize(quantityData.getFields(),numberOfQuantities);
+		
 	if (numberOfQuantities.size() == 1 && numberOfParameter.size() == 1 && numberOfParameter.begin()->first == numberOfQuantities.begin()->first)
 	{
 		return true;

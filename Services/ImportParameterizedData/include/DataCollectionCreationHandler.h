@@ -53,26 +53,5 @@ private:
 	void UpdateRMDEntity(const MetadataAssemblyRangeData& rmdData);
 	std::list<int32_t> GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex);
 
-	template <class T>
-	bool FieldsAreAllSame(const std::map<std::string,std::list<T>>& isStatus, const std::map<std::string, std::list<T>>& mustStatus);
+	bool FieldsAreAllSame(const std::map<std::string,std::list<ot::Variable>>& isStatus, const std::map<std::string, std::list<ot::Variable>>& mustStatus);
 };
-
-template<class T>
-inline bool DataCollectionCreationHandler::FieldsAreAllSame(const std::map<std::string, std::list<T>>& isStatus, const std::map<std::string, std::list<T>>& mustStatus)
-{
-	if (isStatus.size() != mustStatus.size())
-	{
-		return false;
-	}
-	
-	for (const auto& isField : isStatus)
-	{
-		std::string isFieldName = isField.first;
-		if (mustStatus.find(isFieldName) == mustStatus.end() || mustStatus.find(isFieldName)->second != isField.second)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}

@@ -244,6 +244,12 @@
     <ClCompile Include="include\PropertyBundleDataHandle.h">
       <Filter>include\PropertyBundle\Handle</Filter>
     </ClCompile>
+    <ClCompile Include="src\VariableToBSONConverter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BSONToVariableConverter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BlockConnection.h">
@@ -527,6 +533,12 @@
     </ClInclude>
     <ClInclude Include="include\ScalingProperties.h">
       <Filter>include\PropertyBundle\Description</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VariableToBSONConverter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BSONToVariableConverter.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

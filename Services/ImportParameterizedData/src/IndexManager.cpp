@@ -60,46 +60,18 @@ void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurement
 			_takenParameterIndices.insert(std::stoi(parameterIndex));
 
 			auto document = existingMetadata->getDocument(parameterName);
-			auto allStringFieldsByName = document->getStringFields();
-			if (allStringFieldsByName->find(_nameField) == allStringFieldsByName->end())
+			auto allFieldsByName = document->getFields();
+			if (allFieldsByName->find(_nameField) == allFieldsByName->end())
 			{
 				assert(0);
 			}
-			std::string parameterName = *allStringFieldsByName->find(_nameField)->second.begin();
-			auto allInt32FieldsByName = document->getInt32Fields();
-			auto allInt64FieldsByName = document->getInt64Fields();
-			auto allDoubleFieldsByName = document->getDoubleFields();
-
-			Documentation::INSTANCE()->AddToDocumentation(parameterAbbreviation + ": " + parameterName + " ");
-			if (allStringFieldsByName->find(_valueField) != allStringFieldsByName->end())
-			{
-				_stringParameterByName[parameterName].uniqueValues = allStringFieldsByName->find(_valueField)->second;
-				_stringParameterByName[parameterName].parameterName = parameterName;
-				_stringParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " +	std::to_string(_stringParameterByName[parameterName].uniqueValues.size()) + " string values.\n");
-			}
-			else if (allInt32FieldsByName->find(_valueField) != allInt32FieldsByName->end())
-			{
-				_int32ParameterByName[parameterName].uniqueValues = allInt32FieldsByName->find(_valueField)->second;
-				_int32ParameterByName[parameterName].parameterName = parameterName;
-				_int32ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int32ParameterByName[parameterName].uniqueValues.size()) + " int32 values.\n");
-			}
-			else if (allInt64FieldsByName->find(_valueField) != allInt64FieldsByName->end())
-			{
-				_int64ParameterByName[parameterName].uniqueValues = allInt64FieldsByName->find(_valueField)->second;
-				_int64ParameterByName[parameterName].parameterName = parameterName;
-				_int64ParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_int64ParameterByName[parameterName].uniqueValues.size()) + " int64 values.\n");
-			}
-			else if (allDoubleFieldsByName->find(_valueField) != allDoubleFieldsByName->end())
-			{
-				_doubleParameterByName[parameterName].uniqueValues = allDoubleFieldsByName->find(_valueField)->second;
-				_doubleParameterByName[parameterName].parameterName = parameterName;
-				_doubleParameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
-				Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_doubleParameterByName[parameterName].uniqueValues.size()) + " double values.\n");
-			}
+			std::string parameterName = allFieldsByName->find(_nameField)->second.begin()->getConstCharPtr();
 			
+			Documentation::INSTANCE()->AddToDocumentation(parameterAbbreviation + ": " + parameterName + " ");
+			_parameterByName[parameterName].uniqueValues = allFieldsByName->find(_valueField)->second;
+			_parameterByName[parameterName].parameterName = parameterName;
+			_parameterByName[parameterName].parameterAbbreviation = parameterAbbreviation;
+			Documentation::INSTANCE()->AddToDocumentation("with " + std::to_string(_parameterByName[parameterName].uniqueValues.size()) + " string values.\n");
 		}
 	}
 }
@@ -122,11 +94,11 @@ void IndexManager::StoreAllQuantities(std::list<std::shared_ptr<EntityMeasuremen
 			}
 
 			auto document = existingMetadata->getDocument(quantityName);
-			auto allStringFieldsByName = document->getStringFields();
-			std::string quantityName = *allStringFieldsByName->find(_nameField)->second.begin();
+			auto allFieldsByName = document->getFields();
+			std::string quantityName = allFieldsByName->find(_nameField)->second.begin()->getConstCharPtr();
 
 			_takenQuantitiesByName[quantityName].quantityName = quantityName;
-			_takenQuantitiesByName[quantityName].typeName = *allStringFieldsByName->find(_typeField)->second.begin();
+			_takenQuantitiesByName[quantityName].typeName = allFieldsByName->find(_typeField)->second.begin()->getConstCharPtr();
 
 			std::string quantityAbbreviation = subDocumentName.substr(subDocumentName.find(_quantityAbbreviationBase), subDocumentName.size());
 			std::string quantityIndex = quantityAbbreviation.substr(quantityAbbreviation.find(_quantityAbbreviationBase) + _quantityAbbreviationBase.size(), quantityAbbreviation.size());
@@ -152,11 +124,8 @@ MetadataParameterBundle IndexManager::CreateMetadataParameter(MetadataAssemblyRa
 	}
 
 	MetadataParameterBundle parameterBundle;
-	AddMetadataParameterToBundle(*allParameter.GetStringFields(), _stringParameterByName, parameterBundle);
-	AddMetadataParameterToBundle(*allParameter.GetInt32Fields(), _int32ParameterByName, parameterBundle);
-	AddMetadataParameterToBundle(*allParameter.GetInt64Fields(), _int64ParameterByName, parameterBundle);
-	AddMetadataParameterToBundle(*allParameter.GetDoubleFields(), _doubleParameterByName, parameterBundle);
-
+	AddMetadataParameterToBundle(*allParameter.getFields(), _parameterByName, parameterBundle);
+	
 	CreateParameterValueIndices();
 	return parameterBundle;
 }
@@ -170,79 +139,17 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 		return "Parameter: " + parameterName + " already exists as: " + type + "\n";
 	};
 
-	for (auto& field : *allParameter.GetStringFields())
+	for (auto& field : *allParameter.getFields())
 	{
-		if (_int32ParameterByName.find(field.first) != _int32ParameterByName.end())
+		auto existingParameterEntry = _parameterByName.find(field.first);
+		if (existingParameterEntry != _parameterByName.end())
 		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "int32");
-		}
-		if (_int64ParameterByName.find(field.first) != _int64ParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "int64");
-		}
-		if (_doubleParameterByName.find(field.first) != _doubleParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "double");
-		}
-	}
-
-	for (auto& field : *allParameter.GetDoubleFields())
-	{
-		if (_stringParameterByName.find(field.first) != _stringParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first,"string");
-		}
-		if (_int32ParameterByName.find(field.first) != _int32ParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "int32");
-		}
-		if(_int64ParameterByName.find(field.first) != _int64ParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "int64");
-		}
-	}
-
-	for (auto& field : *allParameter.GetInt32Fields())
-	{
-		if (_stringParameterByName.find(field.first) != _stringParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "string");
-		}
-		if (_int64ParameterByName.find(field.first) != _int64ParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "int64");
-		}
-		if (_doubleParameterByName.find(field.first) != _doubleParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "double");
-		}
-	}
-
-	for (auto& field : *allParameter.GetInt64Fields())
-	{
-		if (_stringParameterByName.find(field.first) != _stringParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "string");
-		}
-		if (_int32ParameterByName.find(field.first) != _int32ParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "int32");
-		}
-		if (_doubleParameterByName.find(field.first) != _doubleParameterByName.end())
-		{
-			isConsistent = false;
-			errorMessage += CreateErrorText(field.first, "double");
+			auto& uniqueValues = existingParameterEntry->second.uniqueValues;
+			if(uniqueValues.begin()->getTypeName() != field.second.begin()->getTypeName())
+			{
+				isConsistent = false;
+				errorMessage += CreateErrorText(field.first, uniqueValues.begin()->getTypeName());
+			}
 		}
 	}
 
@@ -252,19 +159,7 @@ bool IndexManager::CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeD
 bool IndexManager::CheckIfAllParameterHaveSameSize(MetadataAssemblyRangeData& allParameter, std::string& errorMessage)
 {
 	std::map<std::string, uint64_t> parameterNameBySize;
-	for (const auto& field : *allParameter.GetStringFields())
-	{
-		parameterNameBySize[field.first] = field.second.size();
-	}
-	for (const auto& field : *allParameter.GetDoubleFields())
-	{
-		parameterNameBySize[field.first] = field.second.size();
-	}
-	for (const auto& field : *allParameter.GetInt32Fields())
-	{
-		parameterNameBySize[field.first] = field.second.size();
-	}
-	for (const auto& field : *allParameter.GetInt64Fields())
+	for (const auto& field : *allParameter.getFields())
 	{
 		parameterNameBySize[field.first] = field.second.size();
 	}
@@ -283,33 +178,9 @@ bool IndexManager::CheckIfAllParameterHaveSameSize(MetadataAssemblyRangeData& al
 	return sizeIsConsistent;
 }
 
-int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const std::string& value)
+int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const ot::Variable& value)
 {
-	const auto parameterValueIndicesByName = _stringParameterValueIndicesByName.find(parameterName);
-	const auto& parameterValueIndices = parameterValueIndicesByName->second;
-	int32_t index = parameterValueIndices.find(value)->second;
-	return index;
-}
-
-int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const double& value)
-{
-	const auto parameterValueIndicesByName = _doubleParameterValueIndicesByName.find(parameterName);
-	const auto& parameterValueIndices = parameterValueIndicesByName->second;
-	int32_t index = parameterValueIndices.find(value)->second;
-	return index;
-}
-
-int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const int32_t& value)
-{
-	const auto parameterValueIndicesByName = _int32ParameterValueIndicesByName.find(parameterName);
-	const auto& parameterValueIndices = parameterValueIndicesByName->second;
-	int32_t index = parameterValueIndices.find(value)->second;
-	return index;
-}
-
-int32_t IndexManager::GetParameterIndex(const std::string& parameterName, const int64_t& value)
-{
-	const auto parameterValueIndicesByName = _int64ParameterValueIndicesByName.find(parameterName);
+	const auto parameterValueIndicesByName = _parameterValueIndicesByName.find(parameterName);
 	const auto& parameterValueIndices = parameterValueIndicesByName->second;
 	int32_t index = parameterValueIndices.find(value)->second;
 	return index;
@@ -324,12 +195,68 @@ std::map<std::string, MetadataQuantity*> IndexManager::GetNonExistingQuantityAbb
 {
 	std::map<std::string, MetadataQuantity*> newQuantities;
 
-	AddNewQuantities(*allParameter.GetDoubleFields(), ot::TypeNames::getDoubleTypeName(), newQuantities);
-	AddNewQuantities(*allParameter.GetInt32Fields(), ot::TypeNames::getInt32TypeName(), newQuantities);
-	AddNewQuantities(*allParameter.GetInt64Fields(), ot::TypeNames::getInt64TypeName(), newQuantities);
-	AddNewQuantities(*allParameter.GetStringFields(), ot::TypeNames::getStringTypeName(), newQuantities);
-
+	AddNewQuantities(*allParameter.getFields(), newQuantities);
+	
 	return newQuantities;
+}
+
+void IndexManager::AddMetadataParameterToBundle(const std::map<std::string, std::list<ot::Variable>>& allFields, std::map<std::string, MetadataParameter>& existingMetadata, MetadataParameterBundle& bundle)
+{
+	for (auto& field : allFields)
+	{
+
+		//Get pointer to already existing parameterset (name and abbr.) or create new one if not existing (setting name and abbr.)
+		if (existingMetadata.find(field.first) == existingMetadata.end())
+		{
+			for (auto newValue : field.second)
+			{
+				existingMetadata[field.first].uniqueValues.push_back(newValue);
+				existingMetadata[field.first].selectedValues.push_back(newValue);
+			}
+			existingMetadata[field.first].uniqueValues.unique();
+
+			existingMetadata[field.first].parameterName = field.first;
+			int32_t nextParameterIndex = 1;
+			while (_takenParameterIndices.find(nextParameterIndex) != _takenParameterIndices.end())
+			{
+				nextParameterIndex++;
+			}
+			_takenParameterIndices.insert(nextParameterIndex);
+			existingMetadata[field.first].parameterAbbreviation = _parameterAbbreviationBase + std::to_string(nextParameterIndex);
+			bundle.AddMetadataParameter(existingMetadata[field.first]);
+		}
+		else
+		{
+			MetadataParameter newParameter;
+			MetadataParameter* compareParameter = &existingMetadata[field.first];
+
+			for (auto newValue : field.second)
+			{
+				newParameter.selectedValues.push_back(newValue);
+
+				bool newValueAlreadyKnown = false;
+				for (auto value : compareParameter->uniqueValues)
+				{
+					if (newValue == value)
+					{
+						newValueAlreadyKnown = true;
+						break;
+					}
+				}
+				if (!newValueAlreadyKnown)
+				{
+					newParameter.uniqueValues.push_back(newValue);
+					compareParameter->uniqueValues.push_back(newValue);
+				}
+			}
+			if (newParameter.uniqueValues.size() != 0)
+			{
+				newParameter.parameterName = compareParameter->parameterName;
+				newParameter.parameterAbbreviation = compareParameter->parameterAbbreviation;
+				bundle.AddMetadataParameter(newParameter);
+			}
+		}
+	}
 }
 
 int32_t IndexManager::GetNextQuantityIndex()
@@ -358,9 +285,46 @@ int32_t IndexManager::GetNextQuantityIndex()
 
 void IndexManager::CreateParameterValueIndices()
 {
-	CreateParameterValueIndices(_stringParameterByName, _stringParameterValueIndicesByName);
-	CreateParameterValueIndices(_doubleParameterByName, _doubleParameterValueIndicesByName);
-	CreateParameterValueIndices(_int32ParameterByName, _int32ParameterValueIndicesByName);
-	CreateParameterValueIndices(_int64ParameterByName, _int64ParameterValueIndicesByName);
+	CreateParameterValueIndices(_parameterByName, _parameterValueIndicesByName);
+}
+
+void IndexManager::CreateParameterValueIndices(std::map<std::string, MetadataParameter>& parameterByName, std::map<std::string, std::map<ot::Variable, int32_t>>& parameterValueIndices)
+{
+	for (const auto& parameter : parameterByName)
+	{
+		auto valuePointer = parameter.second.uniqueValues.begin();
+		for (int i = 1; i <= parameter.second.uniqueValues.size(); i++)
+		{
+			parameterValueIndices[parameter.second.parameterAbbreviation][*valuePointer] = i;
+			valuePointer++;
+		}
+	}
+}
+
+void IndexManager::AddNewQuantities(const std::map<std::string, std::list<ot::Variable>>& fields, std::map<std::string, MetadataQuantity*>& newQuantities)
+{
+	for (auto& field : fields)
+	{
+		if (_takenQuantitiesByName.find(field.first) != _takenQuantitiesByName.end())
+		{
+			if (_takenQuantitiesByName[field.first].typeName != field.second.begin()->getTypeName())
+			{
+				Documentation::INSTANCE()->AddToDocumentation("Quantity " + field.first + " is already used with a different datatype in a previous MSMD\n");
+			}
+			else
+			{
+				Documentation::INSTANCE()->AddToDocumentation("Quantity " + field.first + " already exists\n");
+			}
+		}
+		else
+		{
+			_takenQuantitiesByName[field.first].quantityName = field.first;
+			_takenQuantitiesByName[field.first].typeName = field.second.begin()->getTypeName();
+			_takenQuantitiesByName[field.first].quantityIndex = GetNextQuantityIndex();
+			_takenQuantitiesByName[field.first].quantityAbbreviation = _quantityAbbreviationBase + std::to_string(_takenQuantitiesByName[field.first].quantityIndex);
+			newQuantities[_takenQuantitiesByName[field.first].quantityName] = &_takenQuantitiesByName[field.first];
+			Documentation::INSTANCE()->AddToDocumentation("Added new Quantity " + field.first + " as " + _takenQuantitiesByName[field.first].quantityAbbreviation + "\n");
+		}
+	}
 }
 

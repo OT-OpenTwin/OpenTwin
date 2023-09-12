@@ -2,11 +2,29 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <algorithm>
+#include "BSONToVariableConverter.h"
 
 EntityWithDynamicFields::EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactory* factory, const std::string& owner)
 	: EntityContainer(ID, parent, mdl, ms, factory, owner)
 {
 	_bsonDocumentsByName["/"];
+}
+
+void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+{
+	if (_bsonDocumentsByName.find(documentName) == _bsonDocumentsByName.end())
+	{
+		if (documentName[0] != '/')
+		{
+			documentName = "/" + documentName;
+		}
+		GenericBsonDocument newDocument;
+		newDocument.setDocumentName(documentName);
+		_bsonDocumentsByName.insert({ documentName, newDocument });
+	}
+	_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+
+	setModified();
 }
 
 std::vector<std::string> EntityWithDynamicFields::getDocumentsNames(std::string parentDocument) const
@@ -118,7 +136,7 @@ void EntityWithDynamicFields::OrderGenericDocumentsHierarchical()
 
 void EntityWithDynamicFields::AddGenericDocumentToBsonDocument(const GenericBsonDocument* genericDocument, bsoncxx::builder::basic::document& bsonDocument)
 {
-	genericDocument->AddAllDocumentFieldsToDocument(bsonDocument);
+	genericDocument->AddAllFieldsToDocument(bsonDocument);
 
 	for (auto genericSubDocument : genericDocument->getSubDocuments())
 	{
@@ -132,64 +150,10 @@ void EntityWithDynamicFields::AddGenericDocumentToBsonDocument(const GenericBson
 
 void EntityWithDynamicFields::ExtractElementValues(const bsoncxx::document::element& element, std::string documentName)
 {
-	std::string fieldName = element.key().to_string();
 	auto type = element.type();
+	std::string fieldName = element.key().to_string();
 
-	if (type == bsoncxx::type::k_array)
-	{
-		auto arrayElements = element.get_array().value;
-		auto firstElement = arrayElements.begin();
-		auto arrayElementType = firstElement->type();
-
-		switch (arrayElementType)
-		{
-		case bsoncxx::type::k_double:
-		{
-			std::list<double> doubleFields;
-			for (const auto& arrayElement : arrayElements)
-			{
-				doubleFields.push_back(arrayElement.get_double());
-			}
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, doubleFields);
-			break;
-		}
-		case bsoncxx::type::k_utf8:
-		{
-			std::list<std::string> stringList;
-			for (const auto& arrayElement : arrayElements)
-			{
-				stringList.push_back(arrayElement.get_utf8().value.data());
-			}
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, stringList);
-			break;
-		}
-		case bsoncxx::type::k_int32:
-		{
-			std::list<int32_t> fields;
-			for (const auto& arrayElement : arrayElements)
-			{
-				fields.push_back(arrayElement.get_int32());
-			}
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, fields);
-			break;
-		}
-		case bsoncxx::type::k_int64:
-		{
-			std::list<int64_t> fields;
-			for (const auto& arrayElement : arrayElements)
-			{
-				fields.push_back(arrayElement.get_int64());
-			}
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, fields);
-			break;
-		}
-		default:
-		{
-			assert(0);
-		}
-		}
-	}
-	else if (type == bsoncxx::type::k_document)
+	if (type == bsoncxx::type::k_document)
 	{
 		for (const auto& subElement : element.get_document().view())
 		{
@@ -205,36 +169,26 @@ void EntityWithDynamicFields::ExtractElementValues(const bsoncxx::document::elem
 	}
 	else
 	{
-		switch (type)
+		BSONToVariableConverter converter;
+		std::list<ot::Variable> values;
+		if (type == bsoncxx::type::k_array)
 		{
-		case bsoncxx::type::k_double:
+			auto arrayElements = element.get_array().value;
+		
+			auto firstElement = arrayElements.begin();
+			auto arrayElementType = firstElement->type();
+
+			for (const auto& arrayElement : arrayElements)
+			{
+				values.push_back(converter(arrayElement));
+			}
+			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+		}
+		else
 		{
-			std::list<double> field = { element.get_double() };
+			std::list<ot::Variable> field{ converter(element) };
 			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, field);
-			break;
-		}
-		case bsoncxx::type::k_utf8:
-		{
-			std::list<std::string> field = { element.get_utf8().value.data() };
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, field);
-			break;
-		}
-		case bsoncxx::type::k_int32:
-		{
-			std::list<int32_t> field = { element.get_int32() };
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, field);
-			break;
-		}
-		case bsoncxx::type::k_int64:
-		{
-			std::list<int64_t> field = { element.get_int64() };
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, field);
-			break;
-		}
-		default:
-		{
-			assert(0);
-		}
 		}
 	}
+
 }

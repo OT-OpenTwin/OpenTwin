@@ -15,6 +15,7 @@
 #include <list>
 #include <memory>
 #include <stdint.h>
+#include "OpenTwinCore/Variable.h"
 
 class MetadataAssemblyRangeData
 {
@@ -27,10 +28,8 @@ public:
 
 	void LoadAllRangeSelectionInformation(const std::list< std::shared_ptr<EntityTableSelectedRanges>>& allRanges, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& allTables);
 
-	const std::map<std::string, std::list<std::string>>*	GetStringFields() const { return &_stringFields; };
-	const std::map<std::string, std::list<double>>*			GetDoubleFields() const { return &_doubleFields; };
-	const std::map<std::string, std::list<int32_t>>*		GetInt32Fields() const { return &_int32Fields; };
-	const std::map<std::string, std::list<int64_t>>*		GetInt64Fields() const { return &_int64Fields; };
+
+	const std::map<std::string, std::list<ot::Variable>>* getFields() const { return &_fields; };
 
 	uint64_t getNumberOfFields() const;
 
@@ -53,11 +52,8 @@ private:
 	/// <param name="rangeTypesByRangeNames"></param>
 	void TransformSelectedDataIntoSelectedDataType(std::map<std::string, std::list<std::string>>& allFields, std::map<std::string, std::string>& rangeTypesByRangeNames);
 	
-	std::map<std::string,std::list<std::string>> _stringFields;
-	std::map<std::string,std::list<double>> _doubleFields;
-	std::map<std::string,std::list<int32_t>> _int32Fields;
-	std::map<std::string,std::list<int64_t>> _int64Fields;
-
+	std::map<std::string,std::list<ot::Variable>> _fields;
+	
 };
 
 

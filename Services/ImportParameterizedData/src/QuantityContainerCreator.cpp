@@ -6,38 +6,50 @@ QuantityContainerCreator::QuantityContainerCreator(int32_t& msmdIndex, std::set<
 	
 }
 
-void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, std::string& value)
+void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, ot::Variable value)
 {
-	AddToQuantityContainer(_stringQuantContainers, quantityIndex, parameterValueIndices, value);
-}
+	bool doesAlreadyExist = false;
+	//for (auto& quantityContainer : quantityContainerOfType)
+	//{
+	//	if (quantityContainer.ParameterValueIndicesAndQuantityIndexAreMatching(parameterValueIndices, quantityIndex))
+	//	{
+	//		doesAlreadyExist = true;
+	//	}
+	//}
+	if (!doesAlreadyExist)
+	{
+		//if (quantityContainerOfType.back().GetValueArraySize() >= _containerSize)
+		//{
+		//	assert(0);// Container size should match with the number of parameter apperiences.
+		//}
+		_quantContainers.push_back(QuantityContainer(_msmdIndex, _parameterAbbreviations, parameterValueIndices, quantityIndex, _isFlatCollection));
+		_quantContainers.back().AddValue(value);
+	}
 
-void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, double& value)
-{
-	AddToQuantityContainer(_doubleQuantContainers, quantityIndex, parameterValueIndices, value);
-}
-
-void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, int32_t& value)
-{
-	AddToQuantityContainer(_int32QuantContainers, quantityIndex, parameterValueIndices, value);
-}
-
-void QuantityContainerCreator::AddToQuantityContainer(int32_t& quantityIndex, std::list<int32_t>& parameterValueIndices, int64_t& value)
-{
-	AddToQuantityContainer(_int64QuantContainers, quantityIndex, parameterValueIndices, value);
 }
 
 void QuantityContainerCreator::Flush(DataStorageAPI::ResultDataStorageAPI& storageAPI)
 {
-	uint64_t totalSize = _stringQuantContainers.size() + _doubleQuantContainers.size() + _int32QuantContainers.size() + _int64QuantContainers.size();
+	uint64_t totalSize = _quantContainers.size();
 	if (totalSize > 0)
 	{
 		_updater->SetTotalNumberOfUpdates(5, totalSize);
 		_triggerCounter = 0;
 
-		FlushTypedList<>(_stringQuantContainers, storageAPI);
-		FlushTypedList<>(_doubleQuantContainers, storageAPI);
-		FlushTypedList<>(_int32QuantContainers , storageAPI);
-		FlushTypedList<>(_int64QuantContainers , storageAPI);
+		for (auto& qc : _quantContainers)
+		{
+			DataStorageAPI::DataStorageResponse response = storageAPI.InsertDocumentToResultStorage(qc._mongoDocument, _checkForDocumentExistenceBeforeInsert, _quequeDocumentsWhenInserting);
+			if (!response.getSuccess())
+			{
+				throw std::exception("Insertion of quantity container failed.");
+			}
+			if (_updater != nullptr)
+			{
+				_triggerCounter++;
+				_updater->TriggerUpdate(_triggerCounter);
+			}
+		}
+		_quantContainers.clear();
 	}
 }
 

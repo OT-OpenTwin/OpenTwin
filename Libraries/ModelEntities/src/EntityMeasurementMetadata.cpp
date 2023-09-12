@@ -53,3 +53,24 @@ std::vector<std::string> EntityMeasurementMetadata::getAllQuantityDocumentNames(
 {
 	return getDocumentsNames(_quantityDocument);
 }
+
+void EntityMeasurementMetadata::InsertToParameterField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+{
+	std::string fullDocumentPath = _parameterDocument;
+	if (documentName != "")
+	{
+		fullDocumentPath += "/" + documentName;
+	}
+	InsertInField(fieldName, values, fullDocumentPath);
+}
+
+void EntityMeasurementMetadata::InsertToQuantityField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+{
+	std::string fullDocumentPath = _quantityDocument;
+	if (documentName != "")
+	{
+		fullDocumentPath += "/" + documentName;
+	}
+	InsertInField(fieldName, values, fullDocumentPath);
+}
+

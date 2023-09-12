@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FixtureTextEncoding.cpp" />
+    <ClCompile Include="src\FixtureVariable.cpp" />
     <ClCompile Include="src\TestPerformanceTest.cpp" />
     <ClCompile Include="src\TestrJSON.cpp" />
     <ClCompile Include="src\TestSimpleFactory.cpp" />
@@ -52,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureTextEncoding.h" />
+    <ClInclude Include="include\FixtureVariable.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

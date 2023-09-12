@@ -1,4 +1,5 @@
 #include "openTwinCore/Variable.h"
+#include <cassert>
 
 ot::Variable::Variable(float value)
 	:_value(value)
@@ -82,4 +83,74 @@ bool ot::Variable::getBool() const
 const char* ot::Variable::getConstCharPtr() const
 {
 	return std::get<const char*>(_value);
+}
+
+bool ot::Variable::operator==(const Variable& other) const
+{
+	const bool equal =
+		other.isBool() && this->isBool() && (other.getBool() == this->getBool()) ||
+		other.isConstCharPtr() && this->isConstCharPtr() && (*other.getConstCharPtr() == *this->getConstCharPtr()) ||
+		other.isDouble() && this->isDouble() && (other.getDouble() == this->getDouble()) ||
+		other.isFloat() && this->isFloat() && (other.getFloat() == this->getFloat()) ||
+		other.isInt32() && this->isInt32() && (other.getInt32() == this->getInt32()) ||
+		other.isInt64() && this->isInt64() && (other.getInt64() == this->getInt64());
+	return equal;
+	
+}
+
+bool ot::Variable::operator>(const Variable& other) const
+{
+	const bool larger =
+		other.isBool() && this->isBool() && (this->getBool()> other.getBool()) ||
+		other.isConstCharPtr() && this->isConstCharPtr() && (*this->getConstCharPtr()> *other.getConstCharPtr()) ||
+		other.isDouble() && this->isDouble() && (this->getDouble()> other.getDouble()) ||
+		other.isFloat() && this->isFloat() && (this->getFloat()> other.getFloat()) ||
+		other.isInt32() && this->isInt32() && (this->getInt32() > other.getInt32()) ||
+		other.isInt64() && this->isInt64() && (this->getInt64() > other.getInt64() );
+	return larger;
+}
+
+bool ot::Variable::operator<(const Variable& other) const 
+{
+	const bool smaller =
+		other.isBool() && this->isBool() && (this->getBool() < other.getBool()) ||
+		other.isConstCharPtr() && this->isConstCharPtr() && (*this->getConstCharPtr() < *other.getConstCharPtr()) ||
+		other.isDouble() && this->isDouble() && (this->getDouble() < other.getDouble()) ||
+		other.isFloat() && this->isFloat() && (this->getFloat() < other.getFloat()) ||
+		other.isInt32() && this->isInt32() && (this->getInt32() < other.getInt32()) ||
+		other.isInt64() && this->isInt64() && (this->getInt64() < other.getInt64());
+	return smaller;
+}
+
+std::string ot::Variable::getTypeName() const
+{
+	size_t index = _value.index();
+	if (index == 0)
+	{
+		return ot::TypeNames::getInt32TypeName();
+	}
+	else if (index == 1)
+	{
+		return ot::TypeNames::getInt64TypeName();
+	}
+	else if (index == 2)
+	{
+		return ot::TypeNames::getBoolTypeName();
+	}
+	else if (index == 3)
+	{
+		return ot::TypeNames::getFloatTypeName();
+	}
+	else if (index == 4)
+	{
+		return ot::TypeNames::getDoubleTypeName();
+	}
+	else if (index == 5)
+	{
+		return ot::TypeNames::getStringTypeName();
+	}
+	else
+	{
+		assert(0);
+	}
 }

@@ -14,6 +14,7 @@
 #include "MetadataAssemblyRangeData.h"
 #include "MetadataQuantity.h"
 #include "Documentation.h"
+#include "openTwinCore/Variable.h"
 
 #include <set>
 #include <map>
@@ -32,11 +33,8 @@ public:
 	
 	bool DoesMSMDAlreadyExist(const std::string& msmdIndex) { return _takenMetadataNames.find(msmdIndex) != _takenMetadataNames.end(); }
 
-	int32_t GetParameterIndex(const std::string& parameterName, const std::string& value);
-	int32_t GetParameterIndex(const std::string& parameterName, const double& value);
-	int32_t GetParameterIndex(const std::string& parameterName, const int32_t& value);
-	int32_t GetParameterIndex(const std::string& parameterName, const int64_t& value);
-
+	int32_t GetParameterIndex(const std::string& parameterName, const ot::Variable& value);
+	
 	int32_t GetQuantityIndex(const std::string& quantityName);
 
 private:
@@ -47,15 +45,9 @@ private:
 	const std::string _typeField;
 	const std::string _msmdNameBase = "Measurementserieses Metadata_";
 
-	std::map<std::string, MetadataParameter<std::string>> _stringParameterByName; 
-	std::map<std::string, MetadataParameter<double>> _doubleParameterByName;
-	std::map<std::string, MetadataParameter<int32_t>> _int32ParameterByName;
-	std::map<std::string, MetadataParameter<int64_t>> _int64ParameterByName;
-
-	std::map<std::string, std::map<std::string,int32_t>> _stringParameterValueIndicesByName;
-	std::map<std::string, std::map<double,int32_t>>_doubleParameterValueIndicesByName;
-	std::map<std::string, std::map<int32_t,int32_t>>_int32ParameterValueIndicesByName;
-	std::map<std::string, std::map<int64_t,int32_t>> _int64ParameterValueIndicesByName;
+	std::map<std::string, MetadataParameter> _parameterByName; 
+	std::map<std::string, std::map<ot::Variable,int32_t>> _parameterValueIndicesByName;
+	
 
 
 	std::set<int> _takenParameterIndices; 
@@ -70,116 +62,12 @@ private:
 	void StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities);
 	bool CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeData& allParameter, std::string& errorMessage);
 	bool CheckIfAllParameterHaveSameSize(MetadataAssemblyRangeData& allParameter, std::string& errorMessage);
-	template <class T>
-	void AddMetadataParameterToBundle(const std::map<std::string, std::list<T>>& allFieldsOfTypeT, std::map<std::string, MetadataParameter<T>>& existingMetadata, MetadataParameterBundle& bundle);
+	
+	void AddMetadataParameterToBundle(const std::map<std::string, std::list<ot::Variable>>& allFields, std::map<std::string, MetadataParameter>& existingMetadata, MetadataParameterBundle& bundle);
 	int32_t GetNextQuantityIndex();
 	void CreateParameterValueIndices();
-	template <class T>
-	void CreateParameterValueIndices(std::map<std::string, MetadataParameter<T>>& parameterByName, std::map<std::string, std::map<T, int32_t>>& parameterValueIndices);
-	template <class T>
-	void AddNewQuantities(const std::map<std::string, std::list<T>>& felder, std::string expectedType, std::map<std::string, MetadataQuantity*>& newQuantities);
+	
+	void CreateParameterValueIndices(std::map<std::string, MetadataParameter>& parameterByName, std::map<std::string, std::map<ot::Variable, int32_t>>& parameterValueIndices);
+	void AddNewQuantities(const std::map<std::string, std::list<ot::Variable>>& felder, std::map<std::string, MetadataQuantity*>& newQuantities);
 
 };
-
-template<class T>
-inline void IndexManager::AddMetadataParameterToBundle(const std::map<std::string, std::list<T>>& allFieldsOfTypeT, std::map<std::string, MetadataParameter<T>>& existingMetadata, MetadataParameterBundle& bundle)
-{
-	for (auto& field : allFieldsOfTypeT)
-	{
-
-		//Get pointer to already existing parameterset (name and abbr.) or create new one if not existing (setting name and abbr.)
-		if (existingMetadata.find(field.first) == existingMetadata.end())
-		{
-			for (auto newValue : field.second)
-			{
-				existingMetadata[field.first].uniqueValues.push_back(newValue);
-				existingMetadata[field.first].selectedValues.push_back(newValue);
-			}
-			existingMetadata[field.first].uniqueValues.unique();
-
-			existingMetadata[field.first].parameterName = field.first;
-			int32_t nextParameterIndex = 1;
-			while (_takenParameterIndices.find(nextParameterIndex) != _takenParameterIndices.end())
-			{
-				nextParameterIndex++;
-			}
-			_takenParameterIndices.insert(nextParameterIndex);
-			existingMetadata[field.first].parameterAbbreviation = _parameterAbbreviationBase + std::to_string(nextParameterIndex);
-			bundle.AddMetadataParameter(existingMetadata[field.first]);
-		}
-		else
-		{
-			MetadataParameter<T> newParameter;
-			MetadataParameter<T>* compareParameter = &existingMetadata[field.first];
-			
-			for (auto newValue : field.second)
-			{
-				newParameter.selectedValues.push_back(newValue);
-
-				bool newValueAlreadyKnown = false;
-				for (auto value : compareParameter->uniqueValues)
-				{
-					if (newValue == value)
-					{
-						newValueAlreadyKnown = true;
-						break;
-					}
-				}
-				if (!newValueAlreadyKnown)
-				{
-					newParameter.uniqueValues.push_back(newValue);
-					compareParameter->uniqueValues.push_back(newValue);
-				}
-			}
-			if (newParameter.uniqueValues.size() != 0)
-			{
-				newParameter.parameterName = compareParameter->parameterName;
-				newParameter.parameterAbbreviation = compareParameter->parameterAbbreviation;
-				bundle.AddMetadataParameter(newParameter);
-			}
-		}
-	}
-}
-
-template<class T>
-inline void IndexManager::CreateParameterValueIndices(std::map<std::string, MetadataParameter<T>>& parameterByName, std::map<std::string, std::map<T, int32_t>>& parameterValueIndices)
-{
-	for (const auto& parameter : parameterByName)
-	{
-		auto valuePointer = parameter.second.uniqueValues.begin();
-		for (int i = 1; i <= parameter.second.uniqueValues.size(); i++)
-		{
-			parameterValueIndices[parameter.second.parameterAbbreviation][*valuePointer] = i;
-			valuePointer++;
-
-		}
-	}
-}
-
-template<class T>
-inline void IndexManager::AddNewQuantities(const std::map<std::string, std::list<T>>& fields, std::string expectedType, std::map<std::string, MetadataQuantity*>& newQuantities)
-{
-	for (auto& field : fields)
-	{
-		if (_takenQuantitiesByName.find(field.first) != _takenQuantitiesByName.end())
-		{
-			if (_takenQuantitiesByName[field.first].typeName != ot::TypeNames::getDoubleTypeName())
-			{
-				Documentation::INSTANCE()->AddToDocumentation("Quantity " + field.first + " is already used with a different datatype in a previous MSMD\n");
-			}
-			else
-			{
-				Documentation::INSTANCE()->AddToDocumentation("Quantity " + field.first + " already exists\n");
-			}
-		}
-		else
-		{
-			_takenQuantitiesByName[field.first].quantityName = field.first;
-			_takenQuantitiesByName[field.first].typeName = ot::TypeNames::getDoubleTypeName();
-			_takenQuantitiesByName[field.first].quantityIndex = GetNextQuantityIndex();
-			_takenQuantitiesByName[field.first].quantityAbbreviation = _quantityAbbreviationBase + std::to_string(_takenQuantitiesByName[field.first].quantityIndex);
-			newQuantities[_takenQuantitiesByName[field.first].quantityName] = &_takenQuantitiesByName[field.first];
-			Documentation::INSTANCE()->AddToDocumentation("Added new Quantity " + field.first + " as " + _takenQuantitiesByName[field.first].quantityAbbreviation + "\n");
-		}
-	}
-}

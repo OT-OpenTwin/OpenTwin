@@ -32,7 +32,7 @@ void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list
 
 uint64_t MetadataAssemblyRangeData::getNumberOfFields() const
 {
-	return _stringFields.size() + _doubleFields.size() + _int32Fields.size() + _int64Fields.size();
+	return _fields.size();
 }
 
 std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields)
@@ -79,39 +79,27 @@ void MetadataAssemblyRangeData::TransformSelectedDataIntoSelectedDataType(std::m
 	{
 		const std::string& fieldName = currentField->first;
 		const std::list<std::string>& fieldValuesRaw = currentField->second;
-		if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
+		std::list<ot::Variable> values;
+		for (const std::string& fieldValueString : fieldValuesRaw)
 		{
-			std::list<double> fieldValues;
-			for (const std::string& fieldValueString : fieldValuesRaw)
+			if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
 			{
-				fieldValues.push_back(std::stod(fieldValueString));
+				values.push_back(ot::Variable(std::stod(fieldValueString)));
 			}
-			_doubleFields.insert({ fieldName, fieldValues });
-			currentField = allFields.erase(currentField);
-		}
-		else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
-		{
-			std::list<int32_t> fieldValues;
-			for (std::string fieldValueString : fieldValuesRaw)
+			else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
 			{
-				fieldValues.push_back(std::stoi(fieldValueString));
+				values.push_back(ot::Variable(std::stoi(fieldValueString)));
 			}
-			_int32Fields.insert({fieldName, fieldValues });
-			currentField = allFields.erase(currentField);
-		}
-		else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
-		{
-			std::list<int64_t> fieldValues;
-			for (std::string fieldValueString : fieldValuesRaw)
+			else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
 			{
-				fieldValues.push_back(std::stoll(fieldValueString));
+				values.push_back(ot::Variable(std::stoll(fieldValueString)));
 			}
-			_int64Fields.insert({ fieldName, fieldValues });
-			currentField = allFields.erase(currentField);
-		}
-		else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getStringTypeName())
-		{
-			_stringFields.insert({ fieldName, fieldValuesRaw});
+			else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getStringTypeName())
+			{
+				values.push_back(ot::Variable(fieldValueString.c_str()));
+			}
+
+			_fields.insert({ fieldName,values });
 			currentField = allFields.erase(currentField);
 		}
 	}
