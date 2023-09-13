@@ -274,7 +274,7 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
 
-		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override { return m_size; };
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual QRectF boundingRect(void) const override;
 		virtual void setGeometry(const QRectF& rect) override;
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
@@ -290,6 +290,9 @@ namespace ot {
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
+
+		void setRectangleSize(const QSizeF& _size);
+		const QSizeF& rectangleSize(void) const { return m_size; };
 
 	private:
 		QSizeF m_size;
@@ -328,6 +331,10 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+		void setRadius(int _x, int _y);
+		int radiusX(void) const { return m_radiusX; };
+		int radiusY(void) const { return m_radiusY; };
 
 	private:
 		QBrush m_brush;

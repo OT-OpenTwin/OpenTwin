@@ -14,6 +14,7 @@
 #include <QtGui/qevent.h>
 #include <QtCore/qmimedata.h>
 #include <QtWidgets/qscrollbar.h>
+#include <QtWidgets/qgraphicsproxywidget.h>
 //#include <QtWidgets/qgraphicsscene.h>
 
 ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_currentUid(0) {
@@ -21,6 +22,9 @@ ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_d
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 	this->setAlignment(Qt::AlignAbsolute);
+
+	// ToDo: This is required while working with proxy widgets, but we should not use em
+	this->setMouseTracking(true);
 }
 
 ot::GraphicsView::~GraphicsView() {
@@ -132,6 +136,18 @@ void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 		m_lastPanPos = _event->pos();
 		m_isPressed = true;
 	}
+	else if (_event->button() == Qt::LeftButton) {
+		
+		QGraphicsItem* itm = m_scene->itemAt(mapToScene(_event->pos()), QTransform());
+		if (itm)
+		{
+			QGraphicsProxyWidget* proxy = dynamic_cast<QGraphicsProxyWidget*>(itm);
+			if (proxy) {
+				//proxy->setFlag(QGraphicsItem::ItemIsMovable);
+				//proxy->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+			}
+		}
+	}
 }
 
 void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
@@ -141,6 +157,17 @@ void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
 	if (_event->button() == Qt::MiddleButton) {
 		m_isPressed = false;
 		viewport()->setCursor(Qt::CrossCursor);
+	}
+	else if (_event->button() == Qt::LeftButton) {
+		QGraphicsItem* itm = m_scene->itemAt(mapToScene(_event->pos()), QTransform());
+		if (itm)
+		{
+			QGraphicsProxyWidget* proxy = dynamic_cast<QGraphicsProxyWidget*>(itm);
+			if (proxy) {
+				//proxy->setFlag(QGraphicsItem::ItemIsMovable, false);
+				//proxy->setFlag(QGraphicsItem::ItemSendsGeometryChanges, false);
+			}
+		}
 	}
 }
 

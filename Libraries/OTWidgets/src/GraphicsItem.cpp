@@ -399,6 +399,9 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
+
+	this->prepareGeometryChange();
+
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
 	m_cornerRadius = cfg->cornerRadius();
@@ -407,20 +410,22 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
 	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 	
-	//OT_LOG_W("Orig: " + std::to_string(cfg->border().color().r()) + "; " + std::to_string(cfg->border().color().g()) + "; " + std::to_string(cfg->border().color().b()) + "; " + std::to_string(cfg->border().color().a()));
-	//OT_LOG_W(": " + std::to_string(m_pen.color().red()) + "; " + std::to_string(m_pen.color().green()) + "; " + std::to_string(m_pen.color().blue()) + "; " + std::to_string(m_pen.color().alpha()));
-
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+QSizeF ot::GraphicsRectangularItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return m_size; 
+};
+
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	return QRectF(this->pos(), m_size);
+	return this->geometry();
+	//return QRectF(QPointF(0., 0.), this->geometry().size());//,  m_size);
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_rect.size());
 }
 
@@ -444,10 +449,7 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	//OT_LOG_W("Ox: " + std::to_string(m_size.width()) + "; Oy: " + std::to_string(m_size.height()));
-	//OT_LOG_W("Cx: " + std::to_string(this->calculateDrawRect(QRectF(this->pos(), m_size)).width()) + "; Cy: " + std::to_string(this->calculateDrawRect(QRectF(this->pos(), m_size)).height()));
-	//OT_LOG_W("---------------------------");
-	_painter->drawRoundedRect(this->calculateDrawRect(QRectF(this->pos(), m_size)), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(QRectF(this->pos(), m_size), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
@@ -465,10 +467,14 @@ void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _eve
 
 void ot::GraphicsRectangularItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	if (_size == m_size) return;
-	//this->prepareGeometryChange();
+	this->prepareGeometryChange();
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
-	//m_size = _size;
 }
+
+void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
+	this->prepareGeometryChange();
+	m_size = _size; 
+};
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -492,6 +498,9 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
+
+	this->prepareGeometryChange();
+
 	m_radiusX = cfg->radiusX();
 	m_radiusY = cfg->radiusY();
 	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
@@ -499,20 +508,17 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
 	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 
-	//OT_LOG_W("Orig: " + std::to_string(cfg->border().color().r()) + "; " + std::to_string(cfg->border().color().g()) + "; " + std::to_string(cfg->border().color().b()) + "; " + std::to_string(cfg->border().color().a()));
-	//OT_LOG_W(": " + std::to_string(m_pen.color().red()) + "; " + std::to_string(m_pen.color().green()) + "; " + std::to_string(m_pen.color().blue()) + "; " + std::to_string(m_pen.color().alpha()));
-
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 QRectF ot::GraphicsEllipseItem::boundingRect(void) const {
-	return QRectF(this->pos(), this->graphicsItemRequestedSize());
+	return QRectF(QPointF(0., 0.), this->geometry().size());// QSizeF(m_radiusX * 2., m_radiusY * 2.));
 }
 
 void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 }
 
 QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -551,6 +557,12 @@ void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) 
 	QGraphicsItem::mousePressEvent(_event);
 }
 
+void ot::GraphicsEllipseItem::setRadius(int _x, int _y) {
+	this->prepareGeometryChange();
+	m_radiusX = _x;
+	m_radiusY = _y;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -574,29 +586,29 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		return false;
 	}
 	
+	this->prepareGeometryChange();
+
 	QFont f = this->font();
 	f.setPixelSize(cfg->textFont().size());
 	f.setItalic(cfg->textFont().isItalic());
 	f.setBold(cfg->textFont().isBold());
+
 	this->setFont(f);
-
 	this->setDefaultTextColor(ot::OTQtConverter::toQt(cfg->textColor()));
-	
-	//this->setDefaultTextColor(QColor(cfg->textColor().r(), cfg->textColor().g(), cfg->textColor().b(), cfg->textColor().a()));
-
 	this->setPlainText(QString::fromStdString(cfg->text()));
 
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->boundingRect().size();
+	QFontMetrics m(this->font());
+	return QSizeF(m.width(this->toPlainText()), m.height());
 }
 
 void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 }
 
 void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -655,7 +667,10 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		return false;
 	}
 	
+	this->prepareGeometryChange();
+
 	try {
+
 		this->setPixmap(ot::IconManager::instance().getPixmap(QString::fromStdString(cfg->imagePath())));
 	}
 	catch (const std::exception& _e) {
