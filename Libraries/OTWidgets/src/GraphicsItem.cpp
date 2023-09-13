@@ -414,19 +414,26 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QSizeF ot::GraphicsRectangularItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return m_size; 
+	switch (_hint) {
+	case Qt::MinimumSize:
+	case Qt::PreferredSize:
+	case Qt::MaximumSize:
+		return m_size;
+	default:
+		OT_LOG_EA("Unknown Qt::SizeHint");
+		break;
+	}
+	return _constrains;
 };
 
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	return this->geometry();
-	//return QRectF(QPointF(0., 0.), this->geometry().size());//,  m_size);
+	return QRectF(QPointF(0., 0.), this->geometry().size());
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	QGraphicsLayoutItem::setGeometry(this->boundingRect());
-	ot::GraphicsItem::setGraphicsItemRequestedSize(_rect.size());
 }
 
 QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -511,14 +518,28 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+QSizeF ot::GraphicsEllipseItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	switch (_hint) {
+	case Qt::MinimumSize:
+	case Qt::PreferredSize:
+	case Qt::MaximumSize:
+		return QSizeF(m_radiusX * 2., m_radiusY * 2.);
+		return QSizeF(m_radiusX * 2., m_radiusY * 2.);
+	default:
+		OT_LOG_EA("Unknown Qt::SizeHint");
+		break;
+	}
+	return _constrains;
+};
+
 QRectF ot::GraphicsEllipseItem::boundingRect(void) const {
-	return QRectF(QPointF(0., 0.), this->geometry().size());// QSizeF(m_radiusX * 2., m_radiusY * 2.));
+	return QRectF(QPointF(0., 0.), this->geometry().size());
 }
 
 void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 }
 
 QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -601,14 +622,25 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	QFontMetrics m(this->font());
-	return QSizeF(m.width(this->toPlainText()), m.height());
-}
+	switch (_hint) {
+	case Qt::MinimumSize:
+	case Qt::PreferredSize:
+	case Qt::MaximumSize:
+	{
+		QFontMetrics m(this->font());
+		return QSizeF(m.width(this->toPlainText()), m.height());
+	}
+	default:
+		OT_LOG_EA("Unknown Qt::SizeHint");
+		break;
+	}
+	return _constrains;
+};
 
 void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 }
 
 void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -685,9 +717,17 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 QSizeF ot::GraphicsImageItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	
-	return this->boundingRect().size();
-}
+	switch (_hint) {
+	case Qt::MinimumSize:
+	case Qt::PreferredSize:
+	case Qt::MaximumSize:
+		return QSizeF(this->pixmap().size());
+	default:
+		OT_LOG_EA("Unknown Qt::SizeHint");
+		break;
+	}
+	return _constrains;
+};
 
 void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
