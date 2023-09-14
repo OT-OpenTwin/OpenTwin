@@ -25,6 +25,7 @@ public:
 
 	std::vector<std::string> getDocumentsNames(std::string parentDocument = "/") const;
 	const GenericDocument* getDocument(std::string documentName);
+	const GenericDocument* getDocumentTopLevel();
 	void ClearAllDocuments();
 
 protected:

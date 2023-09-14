@@ -50,6 +50,11 @@ const GenericDocument* EntityWithDynamicFields::getDocument(std::string document
 	return &_bsonDocumentsByName[documentName];
 }
 
+const GenericDocument* EntityWithDynamicFields::getDocumentTopLevel()
+{
+	return getDocument("/");
+}
+
 void EntityWithDynamicFields::ClearAllDocuments()
 {
 	_bsonDocumentsByName.clear();

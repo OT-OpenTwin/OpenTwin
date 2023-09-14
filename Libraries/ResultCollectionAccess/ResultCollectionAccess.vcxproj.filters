@@ -38,6 +38,21 @@
     <ClInclude Include="include\CrossCollectionAccess.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\MetadataEntry.h">
+      <Filter>include\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntryObject.h">
+      <Filter>include\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntrySingle.h">
+      <Filter>include\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntryArray.h">
+      <Filter>include\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SeriesMetadata.h">
+      <Filter>include\Metadata</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">

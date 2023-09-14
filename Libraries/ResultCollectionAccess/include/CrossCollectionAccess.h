@@ -1,6 +1,15 @@
+/*****************************************************************//**
+ * \file   CrossCollectionAccess.h
+ * \brief  Interface to access a different project and get its metadata regarding the result collection.
+ * 
+ * \author Wagner
+ * \date   September 2023
+ *********************************************************************/
+
 #pragma once
 #include <memory>
 #include <list>
+
 #include "OpenTwinCore/CoreTypes.h"
 #include "EntityMeasurementMetadata.h"
 #include "EntityResearchMetadata.h"

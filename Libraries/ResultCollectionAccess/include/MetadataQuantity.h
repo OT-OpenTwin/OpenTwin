@@ -5,6 +5,7 @@
 #include <list>
 
 #include "OpenTwinCore/Variable.h"
+#include "MetadataEntry.h"
 
 struct MetadataQuantity
 {
@@ -12,5 +13,5 @@ struct MetadataQuantity
 	std::string quantityAbbreviation;
 	std::string typeName;
 	int32_t quantityIndex;
-	std::map < std::string, std::list<ot::Variable>> metaData;
+	std::map < std::string, std::shared_ptr<MetadataEntry>> metaData;
 };
