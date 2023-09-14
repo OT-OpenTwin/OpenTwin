@@ -1,6 +1,9 @@
 #include "SolverElectrostatics.h"
 #include "Application.h"
 #include "EntityVis2D3D.h"
+#include "EntityVisUnstructuredScalarSurface.h"
+#include "EntityVisUnstructuredScalarVolume.h"
+#include "EntityVisUnstructuredVectorVolume.h"
 #include "EntityBinaryData.h"
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
@@ -511,7 +514,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     storeMeshScalarData(nodeList.size(), cellList.size(), potentialList, app, solverEntity, scalarDataID, scalarDataVersion);
 
     // Create the potential volume item
-    EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+    EntityVis2D3D* visualizationEntity = new EntityVisUnstructuredScalarVolume(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
     visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Volume");
@@ -636,7 +639,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
             storeMeshScalarData(nodeList.size(), cellList.size(), potentialList, app, solverEntity, scalarDataID, scalarDataVersion);
 
             // Create the potential volume item
-            EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+            EntityVis2D3D* visualizationEntity = new EntityVisUnstructuredScalarSurface(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
             visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
             visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Surface/" + item.first.substr(1));
@@ -817,7 +820,7 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
     storeMeshVectorData(nodeList.size(), cellList.size(), magnitudeList, vectorList, app, solverEntity, vectorDataID, vectorDataVersion);
 
     // Create the efield item
-    EntityVis2D3D* visualizationEntity = new EntityVis2D3D(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+    EntityVis2D3D* visualizationEntity = new EntityVisUnstructuredVectorVolume(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
     visualizationEntity->setName(solverEntity->getName() + "/Results/E-Field");

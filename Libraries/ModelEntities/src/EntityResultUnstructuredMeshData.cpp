@@ -60,7 +60,7 @@ void EntityResultUnstructuredMeshData::setData(long long numberPoints, long long
 	pointScalar = pointVector = cellScalar = cellVector = nullptr;
 }
 
-void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector)
+void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector, ClassFactory* factory)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 
@@ -92,28 +92,28 @@ void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& p
 	if (_pointScalar == nullptr && _pointScalarID != -1 && _pointScalarVersion != -1)
 	{
 		std::map<ot::UID, EntityBase *> entityMap;
-		_pointScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointScalarID, _pointScalarVersion, entityMap));
+		_pointScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointScalarID, _pointScalarVersion, entityMap, factory));
 		assert(_pointScalar != nullptr);
 	}
 
 	if (_pointVector == nullptr && _pointVectorID != -1 && _pointVectorVersion != -1)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_pointVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointVectorID, _pointVectorVersion, entityMap));
+		_pointVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointVectorID, _pointVectorVersion, entityMap, factory));
 		assert(_pointVector != nullptr);
 	}
 
 	if (_cellScalar == nullptr && _cellScalarID != -1 && _cellScalarVersion != -1)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_cellScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellScalarID, _cellScalarVersion, entityMap));
+		_cellScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellScalarID, _cellScalarVersion, entityMap, factory));
 		assert(_cellScalar != nullptr);
 	}
 
 	if (_cellVector == nullptr && _cellVectorID != -1 && _cellVectorVersion != -1)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_cellVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellVectorID, _cellVectorVersion, entityMap));
+		_cellVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellVectorID, _cellVectorVersion, entityMap, factory));
 		assert(_cellVector != nullptr);
 	}
 
@@ -142,7 +142,7 @@ void EntityResultUnstructuredMeshData::readData(EntityBinaryData* data, size_t& 
 
 		for (size_t index = 0; index < lenValues; index++)
 		{
-			values[index] = ((int*)bytes.data())[index];
+			values[index] = ((float*)bytes.data())[index];
 		}
 	}
 }

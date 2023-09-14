@@ -183,6 +183,7 @@
     <ClCompile Include="src\DataSourceManager.cpp" />
     <ClCompile Include="src\DataSourceManagerItem.cpp" />
     <ClCompile Include="src\DataSourceResult3D.cpp" />
+    <ClCompile Include="src\DataSourceUnstructuredMesh.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -192,6 +193,9 @@
     <ClCompile Include="src\VtkDriverCartesianVectorfield.cpp" />
     <ClCompile Include="src\VtkDriverFactory.cpp" />
     <ClCompile Include="src\VtkDriverGeneric.cpp" />
+    <ClCompile Include="src\VtkDriverUnstructuredScalarSurface.cpp" />
+    <ClCompile Include="src\VtkDriverUnstructuredScalarVolume.cpp" />
+    <ClCompile Include="src\VtkDriverUnstructuredVectorVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -200,6 +204,7 @@
     <ClInclude Include="include\DataSourceManager.h" />
     <ClInclude Include="include\DataSourceManagerItem.h" />
     <ClInclude Include="include\DataSourceResult3D.h" />
+    <ClInclude Include="include\DataSourceUnstructuredMesh.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\vtk2osg.h" />
@@ -208,6 +213,9 @@
     <ClInclude Include="include\VtkDriverCartesianVectorfield.h" />
     <ClInclude Include="include\VtkDriverFactory.h" />
     <ClInclude Include="include\VtkDriverGeneric.h" />
+    <ClInclude Include="include\VtkDriverUnstructuredScalarSurface.h" />
+    <ClInclude Include="include\VtkDriverUnstructuredScalarVolume.h" />
+    <ClInclude Include="include\VtkDriverUnstructuredVectorVolume.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

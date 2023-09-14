@@ -119,7 +119,7 @@ protected:
 
 	ot::UID createEntityUID(void);
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
-	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap);
+	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactory* factory = nullptr);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
 	void entityIsStored(void);
 

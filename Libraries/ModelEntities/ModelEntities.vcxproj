@@ -36,6 +36,9 @@
     <ClInclude Include="include\EntityResultUnstructuredMeshData.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
     <ClInclude Include="include\EntityFileText.h" />
+    <ClInclude Include="include\EntityVisUnstructuredScalarSurface.h" />
+    <ClInclude Include="include\EntityVisUnstructuredScalarVolume.h" />
+    <ClInclude Include="include\EntityVisUnstructuredVectorVolume.h" />
     <ClInclude Include="include\GenericBsonDocument.h" />
     <ClInclude Include="include\ClassFactory.h" />
     <ClInclude Include="include\DataBase.h" />
@@ -161,6 +164,9 @@
     <ClCompile Include="src\EntityResearchMetadata.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
+    <ClCompile Include="src\EntityVisUnstructuredScalarSurface.cpp" />
+    <ClCompile Include="src\EntityVisUnstructuredScalarVolume.cpp" />
+    <ClCompile Include="src\EntityVisUnstructuredVectorVolume.cpp" />
     <ClCompile Include="src\EntityWithDynamicFields.cpp" />
     <ClCompile Include="src\EntityParameterizedDataPreviewTable.cpp" />
     <ClCompile Include="src\EntityFile.cpp" />

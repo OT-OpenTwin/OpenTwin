@@ -6,6 +6,9 @@
 #include "VtkDriverGeneric.h"
 #include "VtkDriverCartesianFaceScalar.h"
 #include "VtkDriverCartesianVectorfield.h"
+#include "VtkDriverUnstructuredScalarSurface.h"
+#include "VtkDriverUnstructuredScalarVolume.h"
+#include "VtkDriverUnstructuredVectorVolume.h"
 
 VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 {
@@ -13,8 +16,21 @@ VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 	{
 		return new VtkDriverCartesianFaceScalar;
 	}
-	else if (visEntity->getClassName() == "EntityResult3D") {
+	else if (visEntity->getClassName() == "EntityResult3D") 
+	{
 		return new VtkDriverCartesianVectorfield;
+	}
+	else if (visEntity->getClassName() == "EntityVisUnstructuredScalarSurface") 
+	{
+		return new VtkDriverUnstructuredScalarSurface;
+	}
+	else if (visEntity->getClassName() == "EntityVisUnstructuredScalarVolume") 
+	{
+		return new VtkDriverUnstructuredScalarVolume;
+	}
+	else if (visEntity->getClassName() == "EntityVisUnstructuredVectorVolume") 
+	{
+		return new VtkDriverUnstructuredVectorVolume;
 	}
 	else
 	{

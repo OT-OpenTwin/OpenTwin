@@ -5,6 +5,7 @@
 
 #include "DataSourceCartesianVector.h"
 #include "DataSourceResult3D.h"
+#include "DataSourceUnstructuredMesh.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
 {
@@ -15,6 +16,10 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	else if (resultEntity->getClassName() == "EntityResult3DData")
 	{
 		return new DataSourceResult3D;
+	}
+	else if (resultEntity->getClassName() == "EntityResultUnstructuredMeshData")
+	{
+		return new DataSourceUnstructuredMesh;
 	}
 	else
 	{

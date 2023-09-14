@@ -59,6 +59,12 @@
 #include "EntityBlockPlot1D.h"
 #include "EntityCoordinates2D.h"
 #include "EntityBlockPython.h"
+#include "EntityResultUnstructuredMesh.h"
+#include "EntityResultUnstructuredMeshData.h"
+
+#include "EntityVisUnstructuredScalarSurface.h"
+#include "EntityVisUnstructuredScalarVolume.h"
+#include "EntityVisUnstructuredVectorVolume.h"
 
 EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 {
@@ -317,6 +323,26 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityBlockPython")
 	{
 		return new EntityBlockPython(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityVisUnstructuredScalarSurface")
+	{
+		return new EntityVisUnstructuredScalarSurface(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityVisUnstructuredScalarVolume")
+	{
+		return new EntityVisUnstructuredScalarVolume(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityVisUnstructuredVectorVolume")
+	{
+		return new EntityVisUnstructuredVectorVolume(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityResultUnstructuredMesh")
+	{
+		return new EntityResultUnstructuredMesh(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityResultUnstructuredMeshData")
+	{
+		return new EntityResultUnstructuredMeshData(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
 	else
 	{

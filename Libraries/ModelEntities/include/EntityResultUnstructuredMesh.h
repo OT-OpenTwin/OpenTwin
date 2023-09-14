@@ -19,8 +19,8 @@ public:
 	
 	virtual entityType getEntityType(void) override { return DATA;};
 
-	void GetPointCoordData(size_t& numberPoints, double *&x, double*& y, double*& z);
-	void GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells);
+	void GetPointCoordData(size_t& numberPoints, double *&x, double*& y, double*& z, ClassFactory* factory);
+	void GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells, ClassFactory* factory);
 
 	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
 	void setMeshData(size_t numberPoints, size_t numberCells, size_t sizeCellData, EntityBinaryData*& xcoord, EntityBinaryData*& ycoord, EntityBinaryData*& zcoord, EntityBinaryData*& cellData);

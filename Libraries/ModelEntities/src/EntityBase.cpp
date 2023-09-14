@@ -232,7 +232,7 @@ ot::UID EntityBase::createEntityUID(void)
 	return getUidGenerator()->getUID();
 }
 
-EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap)
+EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactory* factory)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 
@@ -245,8 +245,8 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	assert(classFactory != nullptr);
-	EntityBase *entity = classFactory->CreateEntity(entityType);
+	assert(classFactory != nullptr || factory != nullptr);
+	EntityBase *entity = (classFactory != nullptr ? classFactory : factory)->CreateEntity(entityType);
 
 	if (entity == nullptr)
 	{

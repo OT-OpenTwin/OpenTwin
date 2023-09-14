@@ -23,7 +23,7 @@ public:
 	long long getNumberOfPoints(void) { return _numberPoints; };
 	long long getNumberOfCells(void) { return _numberCells; };
 
-	void getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector);
+	void getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector, ClassFactory* factory);
 
 	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
 	void setData(long long numberPoints, long long numberCells, EntityBinaryData*& pointScalar, EntityBinaryData*& pointVector, EntityBinaryData*& cellScalar, EntityBinaryData*& cellVector);

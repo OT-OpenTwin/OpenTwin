@@ -55,7 +55,7 @@ protected:
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
-private:
+protected:
 	ot::UID visualizationDataID;
 	ot::UID visualizationDataVersion;
 	ot::UID sourceID;

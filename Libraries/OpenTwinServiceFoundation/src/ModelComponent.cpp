@@ -182,8 +182,11 @@ EntityBase * ot::components::ModelComponent::readEntityFromEntityIDandVersion(UI
 
 	EntityBase *entity = classFactory.CreateEntity(entityType);
 
-	std::map<UID, EntityBase *> entityMap;
-	entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);
+	if (entity != nullptr)
+	{
+		std::map<UID, EntityBase*> entityMap;
+		entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);
+	}
 
 	return entity;
 }
