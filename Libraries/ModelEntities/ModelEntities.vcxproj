@@ -106,12 +106,15 @@
     <ClInclude Include="include\ModelState.h" />
     <ClInclude Include="include\PlaneProperties.h" />
     <ClInclude Include="include\PropertiesVis2D3D.h" />
+    <ClInclude Include="include\PropertiesVisUnstructuredVector.h" />
     <ClInclude Include="include\PropertyBundle.h" />
     <ClInclude Include="include\PropertyBundleDataHandlePlane.h" />
     <ClInclude Include="include\PropertyBundleDataHandleScaling.h" />
+    <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVector.h" />
     <ClInclude Include="include\PropertyBundleDataHandleVis2D3D.h" />
     <ClInclude Include="include\PropertyBundlePlane.h" />
     <ClInclude Include="include\PropertyBundleScaling.h" />
+    <ClInclude Include="include\PropertyBundleVisUnstructuredVector.h" />
     <ClInclude Include="include\PropertyBundleVis2D3D.h" />
     <ClInclude Include="include\ScalingProperties.h" />
     <ClInclude Include="include\SerializeWithBSON.h" />
@@ -200,9 +203,11 @@
     <ClCompile Include="src\PropertyBundleDataHandlePlane.cpp" />
     <ClCompile Include="src\PropertyBundleDataHandleScaling.cpp" />
     <ClCompile Include="src\PropertyBundleDataHandleVis2D3D.cpp" />
+    <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredVector.cpp" />
     <ClCompile Include="src\PropertyBundlePlane.cpp" />
     <ClCompile Include="src\PropertyBundleScaling.cpp" />
     <ClCompile Include="src\PropertyBundleVis2D3D.cpp" />
+    <ClCompile Include="src\PropertyBundleVisUnstructuredVector.cpp" />
     <ClCompile Include="src\TemplateDefaultManager.cpp" />
     <ClCompile Include="src\Types.cpp" />
     <ClCompile Include="src\VariableToBSONConverter.cpp" />

@@ -6,7 +6,7 @@
 #include "Types.h"
 #include "PropertyBundlePlane.h"
 #include "PropertyBundleScaling.h"
-#include "PropertyBundleVis2D3D.h"
+#include "PropertyBundleVisUnstructuredVector.h"
 
 #include <list>
 
@@ -29,7 +29,9 @@ protected:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-
+	PropertyBundlePlane propertyBundlePlane;
+	PropertyBundleScaling propertyBundleScaling;
+	PropertyBundleVisUnstructuredVector propertyBundleVisUnstructuredVector;
 	// Temporary
 	//EntityResultBase *source;
 };

@@ -122,28 +122,13 @@ void EntityVis2D3D::addVisualizationNodes(void)
 
 void EntityVis2D3D::createProperties(void)
 {
-	assert(resultType != EntityResultBase::UNKNOWN);
-	
-	propertyBundlePlane.SetProperties(this);
-	propertyBundleScaling.SetProperties(this);
-	propertyBundleVis2D3D.SetProperties(this);
 
-	updatePropertyVisibilities();
-
-	getProperties().forceResetUpdateForAllProperties();
 }
 
 bool EntityVis2D3D::updatePropertyVisibilities(void)
 {
-	bool updatePropertiesGrid = false;
-
-	updatePropertiesGrid = propertyBundlePlane.UpdatePropertyVisibility(this);
-	updatePropertiesGrid |= propertyBundleScaling.UpdatePropertyVisibility(this);
-	updatePropertiesGrid |= propertyBundleVis2D3D.UpdatePropertyVisibility(this);
-
-	return updatePropertiesGrid;
+	return false;
 }
-
 
 bool EntityVis2D3D::updateFromProperties(void)
 {

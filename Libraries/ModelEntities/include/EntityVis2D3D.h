@@ -4,9 +4,6 @@
 #include "EntityContainer.h"
 #include "EntityResultBase.h"
 #include "Types.h"
-#include "PropertyBundlePlane.h"
-#include "PropertyBundleScaling.h"
-#include "PropertyBundleVis2D3D.h"
 
 #include <list>
 
@@ -63,10 +60,6 @@ protected:
 	ot::UID meshID;
 	ot::UID meshVersion;
 	EntityResultBase::tResultType resultType;
-
-	PropertyBundlePlane propertyBundlePlane;
-	PropertyBundleScaling propertyBundleScaling;
-	PropertyBundleVis2D3D propertyBundleVis2D3D;
 
 	// Temporary
 	//EntityResultBase *source;

@@ -340,6 +340,15 @@
     <ClInclude Include="include\EntityVisUnstructuredVectorVolume.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\PropertiesVisUnstructuredVector.h">
+      <Filter>Header Files\PropertyBundleDescription</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyBundleVisUnstructuredVector.h">
+      <Filter>Header Files\PropertyBundle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVector.h">
+      <Filter>Header Files\PropertyBundleDataHandle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -590,6 +599,12 @@
     </ClCompile>
     <ClCompile Include="src\EntityVisUnstructuredVectorVolume.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredVector.cpp">
+      <Filter>Source Files\PropertyBundleDataHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleVisUnstructuredVector.cpp">
+      <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

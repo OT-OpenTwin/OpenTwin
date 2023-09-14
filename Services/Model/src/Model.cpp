@@ -4089,7 +4089,10 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	visEntity->setDataID(binaryDataItemID);
 	visEntity->setDataVersion(binaryDataItemVersion);
 
-	getStateManager()->addNewEntity(binaryDataItemID, visEntity->getEntityID(), binaryDataItemVersion, ModelStateEntity::tEntityType::DATA);
+	if (binaryDataItemID > 0)
+	{
+		getStateManager()->addNewEntity(binaryDataItemID, visEntity->getEntityID(), binaryDataItemVersion, ModelStateEntity::tEntityType::DATA);
+	}
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(visEntity->getEntityID(), visEntityVersion));

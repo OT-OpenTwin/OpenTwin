@@ -7,6 +7,8 @@ class __declspec(dllexport) PropertyBundlePlane : public PropertyBundle
 public:
 	virtual void SetProperties(EntityBase * thisObject) override;
 	virtual bool UpdatePropertyVisibility(EntityBase * thisObject) override;
+	
+	bool HidePlane(EntityBase* thisObject);
 
 private:
 	PlaneProperties properties;

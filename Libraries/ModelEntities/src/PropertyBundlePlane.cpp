@@ -19,7 +19,12 @@ void PropertyBundlePlane::SetProperties(EntityBase * thisObject)
 
 bool PropertyBundlePlane::UpdatePropertyVisibility(EntityBase * thisObject)
 {
+	bool updatePropertiesGrid = false;
+
 	EntityPropertiesSelection *normalDirection = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormal()));
+
+	if (!normalDirection->getVisible()) updatePropertiesGrid = true;
+	normalDirection->setVisible(true);
 
 	EntityPropertiesDouble *normalX = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormalCooX()));
 	EntityPropertiesDouble *normalY = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormalCooY()));
@@ -28,8 +33,6 @@ bool PropertyBundlePlane::UpdatePropertyVisibility(EntityBase * thisObject)
 	EntityPropertiesDouble *centerX = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterX()));
 	EntityPropertiesDouble *centerY = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterY()));
 	EntityPropertiesDouble *centerZ = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterZ()));
-
-	bool updatePropertiesGrid = false;
 
 	PlaneProperties::NormalDescription normal = properties.GetNormalDescription(normalDirection->getValue());
 	assert(normal != PlaneProperties::NormalDescription::UNKNOWN);
@@ -66,6 +69,43 @@ bool PropertyBundlePlane::UpdatePropertyVisibility(EntityBase * thisObject)
 	centerX->setVisible(centerVisibleX);
 	centerY->setVisible(centerVisibleY);
 	centerZ->setVisible(centerVisibleZ);
+
+	return updatePropertiesGrid;
+}
+
+bool PropertyBundlePlane::HidePlane(EntityBase* thisObject)
+{
+	bool updatePropertiesGrid = false;
+
+	EntityPropertiesSelection* normalDirection = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormal()));
+
+	EntityPropertiesDouble* normalX = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormalCooX()));
+	EntityPropertiesDouble* normalY = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormalCooY()));
+	EntityPropertiesDouble* normalZ = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameNormalCooZ()));
+
+	EntityPropertiesDouble* centerX = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterX()));
+	EntityPropertiesDouble* centerY = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterY()));
+	EntityPropertiesDouble* centerZ = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterZ()));
+
+	if (normalDirection->getVisible()) updatePropertiesGrid = true;
+
+	if (normalX->getVisible()) updatePropertiesGrid = true;
+	if (normalY->getVisible()) updatePropertiesGrid = true;
+	if (normalZ->getVisible()) updatePropertiesGrid = true;
+	
+	if (centerX->getVisible()) updatePropertiesGrid = true;
+	if (centerY->getVisible()) updatePropertiesGrid = true;
+	if (centerZ->getVisible()) updatePropertiesGrid = true;
+
+	normalDirection->setVisible(false);
+
+	normalX->setVisible(false);
+	normalY->setVisible(false);
+	normalZ->setVisible(false);
+
+	centerX->setVisible(false);
+	centerY->setVisible(false);
+	centerZ->setVisible(false);
 
 	return updatePropertiesGrid;
 }

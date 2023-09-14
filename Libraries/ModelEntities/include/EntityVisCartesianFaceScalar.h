@@ -2,6 +2,9 @@
 #pragma warning(disable : 4251)
 
 #include "EntityVis2D3D.h"
+#include "PropertyBundlePlane.h"
+#include "PropertyBundleScaling.h"
+#include "PropertyBundleVis2D3D.h"
 
 class __declspec(dllexport) EntityVisCartesianFaceScalar : public EntityVis2D3D
 {
@@ -20,7 +23,9 @@ protected:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 private:
-
+	PropertyBundlePlane propertyBundlePlane;
+	PropertyBundleScaling propertyBundleScaling;
+	PropertyBundleVis2D3D propertyBundleVis2D3D;
 };
 
 
