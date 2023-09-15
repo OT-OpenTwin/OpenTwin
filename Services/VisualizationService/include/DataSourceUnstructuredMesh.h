@@ -20,25 +20,19 @@ public:
 
 	vtkUnstructuredGrid* GetVtkGrid() { return vtkGrid.GetPointer(); };
 
-	double GetXMinCoordinate() { return _xMinCoordinate; }
-	double GetYMinCoordinate() { return _yMinCoordinate; }
-	double GetZMinCoordinate() { return _zMinCoordinate; }
-	double GetXMaxCoordinate() { return _xMaxCoordinate; }
-	double GetYMaxCoordinate() { return _yMaxCoordinate; }
-	double GetZMaxCoordinate() { return _zMaxCoordinate; }
+	double GetXMinCoordinate();
+	double GetYMinCoordinate();
+	double GetZMinCoordinate();
+	double GetXMaxCoordinate();
+	double GetYMaxCoordinate();
+	double GetZMaxCoordinate();
 
 private:
 	bool loadMeshData(EntityBase* meshEntity);
 	bool loadResultData(EntityBase* resultEntity);
 	void FreeMemory();
+	void buildScalarArray(size_t length, float* data, vtkNew<vtkDoubleArray>& dataArray);
 	void buildVectorArray(size_t length, float* data, vtkNew<vtkDoubleArray>& dataArray);
 
 	vtkNew<vtkUnstructuredGrid> vtkGrid;
-
-	double _xMinCoordinate;
-	double _yMinCoordinate;
-	double _zMinCoordinate;
-	double _xMaxCoordinate;
-	double _yMaxCoordinate;
-	double _zMaxCoordinate;
 };

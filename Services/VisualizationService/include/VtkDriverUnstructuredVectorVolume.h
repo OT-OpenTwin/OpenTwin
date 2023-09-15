@@ -12,7 +12,7 @@
 #include "EntityResultBase.h"
 #include "PropertyBundleDataHandlePlane.h"
 #include "PropertyBundleDataHandleScaling.h"
-#include "PropertyBundleDataHandleVis2D3D.h"
+#include "PropertyBundleDataHandleVisUnstructuredVector.h"
 #include "DataSourceUnstructuredMesh.h"
 
 namespace osg {
@@ -30,12 +30,14 @@ public:
 private:
 	PropertyBundleDataHandlePlane * planeData = nullptr;
 	PropertyBundleDataHandleScaling * scalingData = nullptr;
-	PropertyBundleDataHandleVis2D3D * vis2D3DData = nullptr;
+	PropertyBundleDataHandleVisUnstructuredVector * visData = nullptr;
 	double * scalarRange = nullptr;
 
 	vtkAlgorithmOutput* ApplyCutplane(DataSourceUnstructuredMesh *source, osg::Node *parent);
-	void AssembleNode (vtkAlgorithmOutput * input, osg::Node *parent);
-	vtkAlgorithmOutput* AddNodeVectors(vtkAlgorithmOutput* input);
+	void Assemble2DNode(vtkAlgorithmOutput * input, osg::Node *parent);
+	void Assemble3DNode(DataSourceUnstructuredMesh* dataSource, osg::Node* parent);
+
+	vtkAlgorithmOutput* AddNodeVectors2D(vtkAlgorithmOutput* input);
 	vtkAlgorithmOutput* SetScalarValues(vtkAlgorithmOutput* input);
 	void SetColouring(vtkPolyDataMapper* mapper);
 

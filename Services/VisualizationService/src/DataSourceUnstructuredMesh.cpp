@@ -117,21 +117,23 @@ bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
 	cellScalarData->SetName("CellScalar");
 	cellVectorData->SetName("CellVector");
 
+	buildScalarArray(lenPointScalar, pointScalar, pointScalarData);
+	buildScalarArray(lenCellScalar, cellScalar, cellScalarData);
+
 	buildVectorArray(lenPointVector, pointVector, pointVectorData);
 	buildVectorArray(lenCellVector, cellVector, cellVectorData);
 
-	//vtkNew<vtkDoubleArray> vectorData;
-	//vectorData->SetName("xxx");
-	//vectorData->SetNumberOfComponents(3);
-	//vectorData->SetNumberOfTuples(resultData->getNumberOfCells());
-	//for (int i = 0; i < resultData->getNumberOfCells(); i++)
-	//{
-	//	vectorData->SetTuple3(i, 1.0, 1.0, 1.0);
-	//}
+	if (pointScalar != nullptr)
+	{
+		vtkGrid->GetPointData()->SetScalars(pointScalarData);
+		vtkGrid->GetPointData()->Update();
+	}
 
-	//int index = vtkGrid->GetCellData()->AddArray(vectorData);
-	//int index2 = vtkGrid->GetCellData()->SetActiveVectors("xxx");
-	//vtkGrid->GetCellData()->Update();
+	if (cellScalar != nullptr)
+	{
+		vtkGrid->GetCellData()->SetScalars(cellScalarData);
+		vtkGrid->GetCellData()->Update();
+	}
 
 	if (pointVector != nullptr)
 	{
@@ -150,18 +152,34 @@ bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
 	return true;
 }
 
-void DataSourceUnstructuredMesh::buildVectorArray(size_t length, float *data, vtkNew<vtkDoubleArray> &dataArray)
+void DataSourceUnstructuredMesh::buildScalarArray(size_t length, float *data, vtkNew<vtkDoubleArray> &dataArray)
+{
+	if (length == 0) return;
+	assert(data != nullptr);
+
+	dataArray->SetNumberOfComponents(1);
+	dataArray->SetNumberOfTuples(length);
+
+	size_t index = 0;
+	for (int i = 0; i < length; i++)
+	{
+		dataArray->SetTuple1(i, data[index]);
+		index++;
+	}
+}
+
+void DataSourceUnstructuredMesh::buildVectorArray(size_t length, float* data, vtkNew<vtkDoubleArray>& dataArray)
 {
 	if (length == 0) return;
 	assert(data != nullptr);
 
 	dataArray->SetNumberOfComponents(3);
-	dataArray->SetNumberOfTuples(length/3);
+	dataArray->SetNumberOfTuples(length / 3);
 
 	size_t index = 0;
-	for (int i = 0; i < length/3; i++)
+	for (int i = 0; i < length / 3; i++)
 	{
-		dataArray->SetTuple3(i, data[index], data[index+1], data[index+2]);
+		dataArray->SetTuple3(i, data[index], data[index + 1], data[index + 2]);
 		index += 3;
 	}
 }
@@ -208,4 +226,34 @@ void DataSourceUnstructuredMesh::FreeMemory(void)
 	//	vtkGrid->Delete();
 	//	vtkGrid = nullptr;
 	//}
+}
+
+double DataSourceUnstructuredMesh::GetXMinCoordinate()
+{
+	return vtkGrid->GetBounds()[0];
+}
+
+double DataSourceUnstructuredMesh::GetYMinCoordinate()
+{
+	return vtkGrid->GetBounds()[2];
+}
+
+double DataSourceUnstructuredMesh::GetZMinCoordinate()
+{
+	return vtkGrid->GetBounds()[4];
+}
+
+double DataSourceUnstructuredMesh::GetXMaxCoordinate()
+{
+	return vtkGrid->GetBounds()[1];
+}
+
+double DataSourceUnstructuredMesh::GetYMaxCoordinate()
+{
+	return vtkGrid->GetBounds()[3];
+}
+
+double DataSourceUnstructuredMesh::GetZMaxCoordinate()
+{
+	return vtkGrid->GetBounds()[5];
 }
