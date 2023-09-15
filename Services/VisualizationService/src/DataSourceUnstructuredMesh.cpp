@@ -127,12 +127,14 @@ bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
 	{
 		vtkGrid->GetPointData()->SetScalars(pointScalarData);
 		vtkGrid->GetPointData()->Update();
+		hasPointScalar = true;
 	}
 
 	if (cellScalar != nullptr)
 	{
 		vtkGrid->GetCellData()->SetScalars(cellScalarData);
 		vtkGrid->GetCellData()->Update();
+		hasCellScalar = true;
 	}
 
 	if (pointVector != nullptr)
@@ -140,6 +142,7 @@ bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
 		vtkGrid->GetPointData()->AddArray(pointVectorData);
 	 	vtkGrid->GetPointData()->SetActiveVectors("PointVector");
 		vtkGrid->GetPointData()->Update();
+		hasPointVector = true;
 	}
 
 	if (cellVector != nullptr)
@@ -147,6 +150,7 @@ bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
 		vtkGrid->GetCellData()->AddArray(cellVectorData);
 	 	vtkGrid->GetCellData()->SetActiveVectors("CellVector");
 		vtkGrid->GetCellData()->Update();
+		hasCellVector = true;
 	}
 
 	return true;
@@ -221,11 +225,12 @@ bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *
 
 void DataSourceUnstructuredMesh::FreeMemory(void)
 {
-	//if (vtkGrid != nullptr)
-	//{
-	//	vtkGrid->Delete();
-	//	vtkGrid = nullptr;
-	//}
+	vtkGrid->Reset();
+
+	hasPointScalar = false;
+	hasCellScalar  = false;
+	hasPointVector = false;
+	hasCellVector  = false;
 }
 
 double DataSourceUnstructuredMesh::GetXMinCoordinate()

@@ -27,6 +27,11 @@ public:
 	double GetYMaxCoordinate();
 	double GetZMaxCoordinate();
 
+	bool GetHasPointScalar() { return hasPointScalar; }
+	bool GetHasPointVector() { return hasPointVector; }
+	bool GetHasCellScalar() { return hasCellScalar; }
+	bool GetHasCellVector() { return hasCellVector; }
+
 private:
 	bool loadMeshData(EntityBase* meshEntity);
 	bool loadResultData(EntityBase* resultEntity);
@@ -35,4 +40,8 @@ private:
 	void buildVectorArray(size_t length, float* data, vtkNew<vtkDoubleArray>& dataArray);
 
 	vtkNew<vtkUnstructuredGrid> vtkGrid;
+	bool hasPointScalar;
+	bool hasCellScalar;
+	bool hasPointVector;
+	bool hasCellVector;
 };

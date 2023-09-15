@@ -33,15 +33,18 @@ private:
 	PropertyBundleDataHandleVisUnstructuredVector * visData = nullptr;
 	double * scalarRange = nullptr;
 
-	vtkAlgorithmOutput* ApplyCutplane(DataSourceUnstructuredMesh *source, osg::Node *parent);
-	void Assemble2DNode(vtkAlgorithmOutput * input, osg::Node *parent);
-	void Assemble3DNode(DataSourceUnstructuredMesh* dataSource, osg::Node* parent);
+	vtkAlgorithmOutput* ApplyCutplane(osg::Node *parent);
+	void Assemble2DNode(osg::Node *parent);
+	void Assemble3DNode(osg::Node* parent);
 
 	void AddNodeVectors(vtkAlgorithmOutput* input, osg::Node* parent);
-	vtkAlgorithmOutput* SetScalarValues(vtkAlgorithmOutput* input);
+	vtkAlgorithmOutput* SetScalarValues(void);
 	void SetColouring(vtkPolyDataMapper* mapper);
 	vtkAlgorithmOutput* GetArrowSource(void);
 
 	void CheckForModelUpdates();
 	void DeletePropertyData(void);
+
+	DataSourceUnstructuredMesh* dataSource;
+	vtkAlgorithmOutput* dataConnection;
 };

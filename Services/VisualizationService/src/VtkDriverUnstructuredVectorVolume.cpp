@@ -111,21 +111,31 @@ std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerI
 
 	osg::Node *node = new osg::Switch;
 	
-	auto * dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
+	dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
 	assert(dataSource != nullptr);
 
 	if (dataSource == nullptr) return "";
 
+	vtkNew<vtkCellDataToPointData> cellToPoint;
+
+	dataConnection = nullptr;
+
+	if (dataSource->GetHasCellScalar() || dataSource->GetHasCellVector())
+	{
+		cellToPoint->SetInputData(dataSource->GetVtkGrid());
+		cellToPoint->ProcessAllArraysOn();
+		cellToPoint->Update();
+
+		dataConnection = cellToPoint->GetOutputPort();
+	}
+
 	if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Arrows3D)
 	{
-		Assemble3DNode(dataSource, node);
+		Assemble3DNode(node);
 	}
 	else
 	{
-		auto output = ApplyCutplane(dataSource, node);
-
-		Assemble2DNode(output, node);
-
+		Assemble2DNode(node);
 	}
 
 	CheckForModelUpdates();
@@ -145,7 +155,7 @@ std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerI
 	return dataOut.str();
 }
 
-vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::ApplyCutplane(DataSourceUnstructuredMesh *dataSource, osg::Node * parent)
+vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::ApplyCutplane(osg::Node * parent)
 {	
 	assert(planeData != nullptr);
 	assert(planeData->GetNormalDescription() != PlaneProperties::UNKNOWN);
@@ -199,13 +209,11 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::ApplyCutplane(DataSource
 
 	plane->SetOrigin(x,y,z);
 
-	vtkNew<vtkCellDataToPointData> cellToPoint;
-	cellToPoint->SetInputData(dataSource->GetVtkGrid());
-	cellToPoint->ProcessAllArraysOn();
-	cellToPoint->Update();
-
 	vtkCutter* planeCut = vtkCutter::New();
-	planeCut->SetInputConnection(cellToPoint->GetOutputPort());
+
+	if (dataConnection != nullptr) planeCut->SetInputConnection(dataConnection);
+	else planeCut->SetInputData(dataSource->GetVtkGrid());
+
 	planeCut->SetCutFunction(plane);
 	planeCut->Update();
 
@@ -270,31 +278,26 @@ vtkAlgorithmOutput* VtkDriverUnstructuredVectorVolume::GetArrowSource(void)
 	return nullptr;
 }
 
-void VtkDriverUnstructuredVectorVolume::Assemble3DNode(DataSourceUnstructuredMesh* dataSource, osg::Node* parent)
+void VtkDriverUnstructuredVectorVolume::Assemble3DNode(osg::Node* parent)
 {
-	vtkNew<vtkCellDataToPointData> cellToPoint;
-	cellToPoint->SetInputData(dataSource->GetVtkGrid());
-	cellToPoint->ProcessAllArraysOn();
-	cellToPoint->Update();
-
-	vtkAlgorithmOutput* data = SetScalarValues(cellToPoint->GetOutputPort());
+	vtkAlgorithmOutput* data = SetScalarValues();
 
 	AddNodeVectors(data, parent);
 }
 
-void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * input, osg::Node *parent)
+void VtkDriverUnstructuredVectorVolume::Assemble2DNode(osg::Node *parent)
 {
-	vtkAlgorithmOutput* visualization = nullptr;
+	dataConnection = ApplyCutplane(parent);
 
 	if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Arrows2D)
 	{
-		vtkAlgorithmOutput* data = SetScalarValues(input);
+		vtkAlgorithmOutput* data = SetScalarValues();
 
 		AddNodeVectors(data, parent);
 	}
 	else if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Contour2D)
 	{
-		vtkAlgorithmOutput* scalar = SetScalarValues(input);
+		vtkAlgorithmOutput* scalar = SetScalarValues();
 
 		auto bf = vtkBandedPolyDataContourFilter::New();
 		bf->SetInputConnection(scalar);
@@ -317,10 +320,8 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 			dynamic_cast<osg::Switch*>(parent)->addChild(edgeNode);
 		}
 
-		visualization = bf->GetOutputPort();
-
 		vtkNew<vtkPolyDataMapper> vectorFieldMapper;
-		vectorFieldMapper->SetInputConnection(visualization);
+		vectorFieldMapper->SetInputConnection(bf->GetOutputPort());
 		SetColouring(vectorFieldMapper);
 		vectorFieldMapper->UseLookupTableScalarRangeOn();
 		vectorFieldMapper->SetScalarModeToUseCellData();
@@ -330,8 +331,6 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 
 		osg::Node* cutNode = VTKActorToOSG(vectorFieldActor);
 		dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
-		input->Delete();
-		visualization->Delete();
 	}
 	else if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::UNKNOWN)
 	{
@@ -339,13 +338,16 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 	}
 }
 
-vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues(vtkAlgorithmOutput * input)
+vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues()
 {
 	if (   visData->GetSelectedVisType() != PropertiesVisUnstructuredVector::VisualizationType::Contour2D
 		|| visData->GetSelectedVisComp() == PropertiesVisUnstructuredVector::VisualizationComponent::Abs)
 	{
 		vtkVectorNorm * vectorNorm = vtkVectorNorm::New();
-		vectorNorm->SetInputConnection(input);
+		
+		if (dataConnection != nullptr) vectorNorm->SetInputConnection(dataConnection);
+		else vectorNorm->SetInputData(dataSource->GetVtkGrid());
+
 		vectorNorm->SetNormalize(false);
 		vectorNorm->Update();
 		scalarRange = vectorNorm->GetOutput()->GetScalarRange();
@@ -358,7 +360,10 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues(vtkAlgor
 	else
 	{
 		vtkExtractVectorComponents* vectorComponent = vtkExtractVectorComponents::New();
-		vectorComponent->SetInputConnection(input);
+
+		if (dataConnection != nullptr) vectorComponent->SetInputConnection(dataConnection);
+		else vectorComponent->SetInputData(dataSource->GetVtkGrid());
+
 		vectorComponent->Update();
 		vectorComponent->SetExtractToFieldData(false);
 		if (visData->GetSelectedVisComp() == PropertiesVisUnstructuredVector::VisualizationComponent::X)
@@ -380,7 +385,7 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues(vtkAlgor
 	return nullptr;
 }
 
-void VtkDriverUnstructuredVectorVolume::AddNodeVectors(vtkAlgorithmOutput * input, osg::Node* parent)
+void VtkDriverUnstructuredVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input, osg::Node* parent)
 {
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
