@@ -103,9 +103,13 @@ void VtkDriverUnstructuredVectorVolume::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerItem *dataItem) {
+std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerItem *dataItem) 
+{
+	objectsToDelete.clear();
+
 	updateTopoEntityID.clear();
 	updateTopoEntityVersion.clear();
+
 	std::time_t timer = time(nullptr);
 	reportTime("VTK image creation started", timer);
 
@@ -139,6 +143,12 @@ std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerI
 	}
 
 	CheckForModelUpdates();
+
+	for (auto item : objectsToDelete)
+	{
+		item->Delete();
+	}
+	objectsToDelete.clear();
 
 	// Now we serialize the node information and return it as a string
 	std::stringstream dataOut;
@@ -210,6 +220,7 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::ApplyCutplane(osg::Node 
 	plane->SetOrigin(x,y,z);
 
 	vtkCutter* planeCut = vtkCutter::New();
+	objectsToDelete.push_back(planeCut);
 
 	if (dataConnection != nullptr) planeCut->SetInputConnection(dataConnection);
 	else planeCut->SetInputData(dataSource->GetVtkGrid());
@@ -245,6 +256,8 @@ vtkAlgorithmOutput* VtkDriverUnstructuredVectorVolume::GetArrowSource(void)
 	if (visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::ARROW_FLAT)
 	{
 		vtkArrowSource *arrow = vtkArrowSource::New();
+		objectsToDelete.push_back(arrow);
+
 		arrow->SetTipResolution(6);
 		arrow->SetTipRadius(0.1);
 		arrow->SetTipLength(0.35);
@@ -256,6 +269,7 @@ vtkAlgorithmOutput* VtkDriverUnstructuredVectorVolume::GetArrowSource(void)
 	else if (visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::ARROW_SHADED)
 	{
 		vtkNew<vtkArrowSource> arrow;
+
 		arrow->SetTipResolution(6);
 		arrow->SetTipRadius(0.1);
 		arrow->SetTipLength(0.35);
@@ -263,6 +277,8 @@ vtkAlgorithmOutput* VtkDriverUnstructuredVectorVolume::GetArrowSource(void)
 		arrow->SetShaftRadius(0.03);
 
 		vtkPolyDataNormals *shadedArrow = vtkPolyDataNormals::New();
+		objectsToDelete.push_back(shadedArrow);
+
 		shadedArrow->SetInputConnection(arrow->GetOutputPort());
 		shadedArrow->SetFeatureAngle(80.0);
 		shadedArrow->FlipNormalsOff();
@@ -299,7 +315,7 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(osg::Node *parent)
 	{
 		vtkAlgorithmOutput* scalar = SetScalarValues();
 
-		auto bf = vtkBandedPolyDataContourFilter::New();
+		vtkNew<vtkBandedPolyDataContourFilter> bf;
 		bf->SetInputConnection(scalar);
 		bf->SetGenerateContourEdges(true);
 		bf->SetScalarModeToValue();
@@ -344,6 +360,7 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues()
 		|| visData->GetSelectedVisComp() == PropertiesVisUnstructuredVector::VisualizationComponent::Abs)
 	{
 		vtkVectorNorm * vectorNorm = vtkVectorNorm::New();
+		objectsToDelete.push_back(vectorNorm);
 		
 		if (dataConnection != nullptr) vectorNorm->SetInputConnection(dataConnection);
 		else vectorNorm->SetInputData(dataSource->GetVtkGrid());
@@ -360,6 +377,7 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues()
 	else
 	{
 		vtkExtractVectorComponents* vectorComponent = vtkExtractVectorComponents::New();
+		objectsToDelete.push_back(vectorComponent);
 
 		if (dataConnection != nullptr) vectorComponent->SetInputConnection(dataConnection);
 		else vectorComponent->SetInputData(dataSource->GetVtkGrid());

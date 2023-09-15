@@ -47,4 +47,6 @@ private:
 
 	DataSourceUnstructuredMesh* dataSource;
 	vtkAlgorithmOutput* dataConnection;
+
+	std::list<vtkObject*> objectsToDelete;
 };
