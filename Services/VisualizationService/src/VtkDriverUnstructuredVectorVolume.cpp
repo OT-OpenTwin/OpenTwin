@@ -58,6 +58,8 @@
 #include <vtkBandedPolyDataContourFilter.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkPlaneCutter.h>
+#include <vtkHedgeHog.h>
 
 VtkDriverUnstructuredVectorVolume::VtkDriverUnstructuredVectorVolume() {}
 
@@ -69,6 +71,7 @@ VtkDriverUnstructuredVectorVolume::~VtkDriverUnstructuredVectorVolume()
 void VtkDriverUnstructuredVectorVolume::CheckForModelUpdates()
 {
 	bool requiresModelUpdate = scalingData->UpdateMinMaxProperties(scalarRange[0], scalarRange[1]);
+
 	if (requiresModelUpdate)
 	{
 		long long entityID, entityVersion;
@@ -86,14 +89,19 @@ void VtkDriverUnstructuredVectorVolume::DeletePropertyData(void)
 		delete planeData;
 		planeData = nullptr;
 	}
+
 	if (scalingData != nullptr)
 	{
 		delete scalingData;
 		scalingData = nullptr;
 	}
-}
-#include <vtkPlaneCutter.h>
 
+	if (visData != nullptr)
+	{
+		delete visData;
+		visData = nullptr;
+	}
+}
 
 std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerItem *dataItem) {
 	updateTopoEntityID.clear();
@@ -118,8 +126,9 @@ std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerI
 
 		Assemble2DNode(output, node);
 
-		CheckForModelUpdates();
 	}
+
+	CheckForModelUpdates();
 
 	// Now we serialize the node information and return it as a string
 	std::stringstream dataOut;
@@ -174,11 +183,9 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::ApplyCutplane(DataSource
 		}
 	}
 
-
 	vtkNew<vtkPlane> plane;
 	plane->SetNormal(normalX, normalY,normalZ);
 	double x(0), y(0), z(0);
-
 
 	planeData->GetCenterValueX() < dataSource->GetXMinCoordinate() ? x = dataSource->GetXMinCoordinate() :
 		planeData->GetCenterValueX() > dataSource->GetXMaxCoordinate() ? x = dataSource->GetXMaxCoordinate() :
@@ -202,34 +209,65 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::ApplyCutplane(DataSource
 	planeCut->SetCutFunction(plane);
 	planeCut->Update();
 
-	auto temp = planeCut->GetOutput()->GetCellData()->GetVectors();
+	// Create the mesh visualization
+	if (visData->GetShow2dMesh())
+	{
+		vtkNew<vtkFeatureEdges> edges;
+		edges->SetInputConnection(planeCut->GetOutputPort());
+		edges->BoundaryEdgesOn();
+		edges->ColoringOff();
 
-	vtkVectorNorm * vectorNorm = vtkVectorNorm::New();
-	vectorNorm->SetInputConnection(planeCut->GetOutputPort());
-	//vectorNorm->SetAttributeModeToUseCellData();
-	vectorNorm->SetNormalize(false);
-	vectorNorm->Update();
-	scalarRange = vectorNorm->GetOutput()->GetScalarRange();
+		vtkNew<vtkPolyDataMapper> planeMapper;
+		planeMapper->SetInputConnection(edges->GetOutputPort());
+		planeMapper->SetScalarModeToUseCellData();
 
+		vtkNew<vtkActor> planeActor;
+		planeActor->SetMapper(planeMapper);
+		planeActor->GetProperty()->SetColor(visData->GetColor2dMeshR(), visData->GetColor2dMeshG(), visData->GetColor2dMeshB());
 
-	vtkNew<vtkFeatureEdges> edges;
-	edges->SetInputConnection(planeCut->GetOutputPort());
-	edges->BoundaryEdgesOn();
-	edges->SetColoring(false);
-
-	vtkNew<vtkPolyDataMapper> planeMapper;
-	planeMapper->SetInputConnection(edges->GetOutputPort());
-	//planeMapper->SetScalarModeToUseCellFieldData();
-	//planeMapper->SetScalarModeToUseCellData();
-
-	vtkNew<vtkActor> planeActor;
-	planeActor->SetMapper(planeMapper);
-	planeActor->GetProperty()->SetColor(1,1,1);
-
-	osg::Node *planeNode = VTKActorToOSG(planeActor);
-	dynamic_cast<osg::Switch *>(parent)->addChild(planeNode);
+		osg::Node* planeNode = VTKActorToOSG(planeActor);
+		dynamic_cast<osg::Switch*>(parent)->addChild(planeNode);
+	}
 
 	return planeCut->GetOutputPort();
+}
+
+vtkAlgorithmOutput* VtkDriverUnstructuredVectorVolume::GetArrowSource(void)
+{
+	if (visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::ARROW_FLAT)
+	{
+		vtkArrowSource *arrow = vtkArrowSource::New();
+		arrow->SetTipResolution(6);
+		arrow->SetTipRadius(0.1);
+		arrow->SetTipLength(0.35);
+		arrow->SetShaftResolution(6);
+		arrow->SetShaftRadius(0.03);
+
+		return arrow->GetOutputPort();
+	}
+	else if (visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::ARROW_SHADED)
+	{
+		vtkNew<vtkArrowSource> arrow;
+		arrow->SetTipResolution(6);
+		arrow->SetTipRadius(0.1);
+		arrow->SetTipLength(0.35);
+		arrow->SetShaftResolution(6);
+		arrow->SetShaftRadius(0.03);
+
+		vtkPolyDataNormals *shadedArrow = vtkPolyDataNormals::New();
+		shadedArrow->SetInputConnection(arrow->GetOutputPort());
+		shadedArrow->SetFeatureAngle(80.0);
+		shadedArrow->FlipNormalsOff();
+		shadedArrow->Update();
+
+		return shadedArrow->GetOutputPort();
+	}
+	else
+	{
+		assert(0); // Unknown arrow type
+	}
+
+	return nullptr;
 }
 
 void VtkDriverUnstructuredVectorVolume::Assemble3DNode(DataSourceUnstructuredMesh* dataSource, osg::Node* parent)
@@ -239,60 +277,9 @@ void VtkDriverUnstructuredVectorVolume::Assemble3DNode(DataSourceUnstructuredMes
 	cellToPoint->ProcessAllArraysOn();
 	cellToPoint->Update();
 
-	vtkAlgorithmOutput* visualization = SetScalarValues(cellToPoint->GetOutputPort());
+	vtkAlgorithmOutput* data = SetScalarValues(cellToPoint->GetOutputPort());
 
-	vtkNew<vtkMaskPoints> downSampling;
-	downSampling->SetInputConnection(visualization);
-	downSampling->SetOnRatio(visData->GetDownsamplingRate());
-	downSampling->SetRandomModeType(5);
-	downSampling->Update();
-
-	// Add glyphs for vector visualization
-	vtkNew<vtkArrowSource> arrow;
-	arrow->SetTipResolution(6);
-	arrow->SetTipRadius(0.1);
-	arrow->SetTipLength(0.35);
-	arrow->SetShaftResolution(6);
-	arrow->SetShaftRadius(0.03);
-	
-	vtkNew<vtkPolyDataNormals> shadedArrow;
-	shadedArrow->SetInputConnection(arrow->GetOutputPort());
-	shadedArrow->SetFeatureAngle(80.0);
-	shadedArrow->FlipNormalsOff();
-	shadedArrow->Update();
-
-	vtkGlyph3D* glyph = vtkGlyph3D::New();
-	glyph->SetSourceConnection(shadedArrow->GetOutputPort());
-	glyph->SetInputConnection(downSampling->GetOutputPort());
-	glyph->ScalingOn();
-	glyph->SetColorModeToColorByScalar();
-	glyph->SetScaleModeToScaleByScalar();
-	glyph->SetVectorModeToUseVector();
-	double normalization = std::abs(scalarRange[1]);
-	if (normalization != 0)
-	{
-		glyph->SetScaleFactor(1 / normalization);
-	}
-	else
-	{
-		glyph->SetScaleFactor(1);
-	}
-	glyph->OrientOn();
-	glyph->Update();
-
-	vtkNew<vtkPolyDataMapper> vectorFieldMapper;
-	vectorFieldMapper->SetInputConnection(glyph->GetOutputPort());
-	SetColouring(vectorFieldMapper);
-	vectorFieldMapper->UseLookupTableScalarRangeOn();
-	vectorFieldMapper->SetScalarModeToUsePointData();
-	vectorFieldMapper->SetColorModeToMapScalars();
-	//vectorFieldMapper->SetScalarVisibility(false);
-
-	vtkNew<vtkActor> vectorFieldActor;
-	vectorFieldActor->SetMapper(vectorFieldMapper);
-
-	osg::Node* planeNode = VTKActorToOSG(vectorFieldActor);
-	dynamic_cast<osg::Switch*>(parent)->addChild(planeNode);
+	AddNodeVectors(data, parent);
 }
 
 void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * input, osg::Node *parent)
@@ -301,24 +288,9 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 
 	if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Arrows2D)
 	{
-		vtkAlgorithmOutput* scalar = SetScalarValues(input);
+		vtkAlgorithmOutput* data = SetScalarValues(input);
 
-		visualization = AddNodeVectors2D(scalar);
-
-		vtkNew<vtkPolyDataMapper> vectorFieldMapper;
-		vectorFieldMapper->SetInputConnection(visualization);
-		SetColouring(vectorFieldMapper);
-		vectorFieldMapper->UseLookupTableScalarRangeOn();
-		vectorFieldMapper->SetScalarModeToUsePointData();
-		vectorFieldMapper->SetColorModeToMapScalars();
-
-		vtkNew<vtkActor> vectorFieldActor;
-		vectorFieldActor->SetMapper(vectorFieldMapper);
-
-		osg::Node* cutNode = VTKActorToOSG(vectorFieldActor);
-		dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
-		input->Delete();
-		visualization->Delete();
+		AddNodeVectors(data, parent);
 	}
 	else if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Contour2D)
 	{
@@ -331,40 +303,19 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 		bf->GenerateValues(scalingData->GetColourResolution(), scalarRange);
 		bf->Update();
 
-		//vtkNew<vtkLookupTable> lut;
-		//lut->SetNumberOfTableValues(scalingData->GetColourResolution());
-		//lut->SetTableRange(scalarRange);
-		//lut->SetHueRange(.667, 0.0);
-		//lut->SetAlphaRange(1., 1.);
-		//lut->IndexedLookupOff();
-		//lut->Build();
+		if (visData->GetShow2dIsolines())
+		{
+			vtkNew<vtkPolyDataMapper> edgeMapper;
+			edgeMapper->SetInputData(bf->GetContourEdgesOutput());
+			edgeMapper->SetResolveCoincidentTopologyToPolygonOffset();
 
-		vtkNew<vtkPolyDataMapper> edgeMapper;
-		edgeMapper->SetInputData(bf->GetContourEdgesOutput());
-		edgeMapper->SetResolveCoincidentTopologyToPolygonOffset();
-		
-		vtkNew<vtkActor> edgeActor;
-		edgeActor->SetMapper(edgeMapper);
-		edgeActor->GetProperty()->SetColor(0, 0, 0);
-		osg::Node * edgeNode = VTKActorToOSG(edgeActor);
-		dynamic_cast<osg::Switch *>(parent)->addChild(edgeNode);
+			vtkNew<vtkActor> edgeActor;
+			edgeActor->SetMapper(edgeMapper);
+			edgeActor->GetProperty()->SetColor(visData->GetColor2dIsolinesR(), visData->GetColor2dIsolinesG(), visData->GetColor2dIsolinesB());
 
-		//vtkNew<vtkPolyDataMapper> testAusgabe;
-		//testAusgabe->SetInputConnection(bf->GetOutputPort());
-		//testAusgabe->SetLookupTable(lut);
-		//testAusgabe->SetScalarRange(scalarRange);
-		//testAusgabe->SetScalarModeToUsePointData();
-		//testAusgabe->SetColorModeToMapScalars();
-		
-		//testAusgabe->Update();
-
-		//vtkNew<vtkActor> testAktor;
-		//testAktor->SetMapper(testAusgabe);
-
-		//osg::Node *cutNode = VTKActorToOSG(testAktor);
-		//dynamic_cast<osg::Switch *>(parent)->addChild(cutNode);
-		//input->Delete();
-
+			osg::Node* edgeNode = VTKActorToOSG(edgeActor);
+			dynamic_cast<osg::Switch*>(parent)->addChild(edgeNode);
+		}
 
 		visualization = bf->GetOutputPort();
 
@@ -373,8 +324,6 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 		SetColouring(vectorFieldMapper);
 		vectorFieldMapper->UseLookupTableScalarRangeOn();
 		vectorFieldMapper->SetScalarModeToUseCellData();
-		//vectorFieldMapper->SetColorModeToMapScalars();
-		//vectorFieldMapper->SetScalarVisibility(false);
 
 		vtkNew<vtkActor> vectorFieldActor;
 		vectorFieldActor->SetMapper(vectorFieldMapper);
@@ -388,13 +337,6 @@ void VtkDriverUnstructuredVectorVolume::Assemble2DNode(vtkAlgorithmOutput * inpu
 	{
 		throw std::invalid_argument("Unsuported vector visualization type");
 	}
-	//Banded filter für Contour! 
-	if (visualization == nullptr)
-	{
-		throw std::logic_error("Failed to create a visualization output.");
-	}
-
-
 }
 
 vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues(vtkAlgorithmOutput * input)
@@ -438,7 +380,7 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::SetScalarValues(vtkAlgor
 	return nullptr;
 }
 
-vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::AddNodeVectors2D(vtkAlgorithmOutput * input)
+void VtkDriverUnstructuredVectorVolume::AddNodeVectors(vtkAlgorithmOutput * input, osg::Node* parent)
 {
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
@@ -446,39 +388,65 @@ vtkAlgorithmOutput * VtkDriverUnstructuredVectorVolume::AddNodeVectors2D(vtkAlgo
 	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 
-	// Add glyphs for vector visualization
-	vtkNew<vtkArrowSource> arrow;
-	arrow->SetTipResolution(6);
-	arrow->SetTipRadius(0.1);
-	arrow->SetTipLength(0.35);
-	arrow->SetShaftResolution(6);
-	arrow->SetShaftRadius(0.03);
+	vtkNew<vtkPolyDataMapper> vectorFieldMapper;
+	vtkNew<vtkGlyph3D> glyph;
+	vtkNew<vtkHedgeHog> hedgehog;
 
-	vtkNew<vtkPolyDataNormals> shadedArrow;
-	shadedArrow->SetInputConnection(arrow->GetOutputPort());
-	shadedArrow->SetFeatureAngle(80.0);
-	shadedArrow->FlipNormalsOff();
-	shadedArrow->Update();
-
-	vtkGlyph3D* glyph = vtkGlyph3D::New();
-	glyph->SetSourceConnection(shadedArrow->GetOutputPort());
-	glyph->SetInputConnection(downSampling->GetOutputPort());
-	glyph->SetColorModeToColorByScalar();
-	glyph->SetScaleModeToScaleByScalar();
-	glyph->SetVectorModeToUseVector();
-	glyph->ScalingOn();
-	double normalization = std::abs(scalarRange[1]);
-	if (normalization != 0)
+	if (   visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::ARROW_FLAT
+		|| visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::ARROW_SHADED)
 	{
-		glyph->SetScaleFactor(1 / normalization);
+		glyph->SetSourceConnection(GetArrowSource());
+		glyph->SetInputConnection(downSampling->GetOutputPort());
+		glyph->ScalingOn();
+		glyph->SetColorModeToColorByScalar();
+		glyph->SetScaleModeToScaleByScalar();
+		glyph->SetVectorModeToUseVector();
+		double normalization = std::abs(scalarRange[1]);
+		if (normalization != 0)
+		{
+			glyph->SetScaleFactor(visData->GetArrowScale() / normalization);
+		}
+		else
+		{
+			glyph->SetScaleFactor(visData->GetArrowScale());
+		}
+		glyph->OrientOn();
+		glyph->Update();
+
+		vectorFieldMapper->SetInputConnection(glyph->GetOutputPort());
+	}
+	else if (visData->GetSelectedArrowType() == PropertiesVisUnstructuredVector::VisualizationArrowType::HEDGHEHOG)
+	{
+		hedgehog->SetInputConnection(downSampling->GetOutputPort());
+		hedgehog->SetVectorModeToUseVector();
+		double normalization = std::abs(scalarRange[1]);
+		if (normalization != 0)
+		{
+			hedgehog->SetScaleFactor(visData->GetArrowScale() / normalization);
+		}
+		else
+		{
+			hedgehog->SetScaleFactor(visData->GetArrowScale());
+		}
+		hedgehog->Update();
+
+		vectorFieldMapper->SetInputConnection(hedgehog->GetOutputPort());
 	}
 	else
 	{
-		glyph->SetScaleFactor(1);
+		assert(0); // Unknown arrow type
 	}
-	glyph->OrientOn();
-	glyph->Update();
-	return glyph->GetOutputPort();
+
+	SetColouring(vectorFieldMapper);
+	vectorFieldMapper->UseLookupTableScalarRangeOn();
+	vectorFieldMapper->SetScalarModeToUsePointData();
+	vectorFieldMapper->SetColorModeToMapScalars();
+
+	vtkNew<vtkActor> vectorFieldActor;
+	vectorFieldActor->SetMapper(vectorFieldMapper);
+
+	osg::Node* cutNode = VTKActorToOSG(vectorFieldActor);
+	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
 void VtkDriverUnstructuredVectorVolume::SetColouring(vtkPolyDataMapper * mapper)

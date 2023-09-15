@@ -37,9 +37,10 @@ private:
 	void Assemble2DNode(vtkAlgorithmOutput * input, osg::Node *parent);
 	void Assemble3DNode(DataSourceUnstructuredMesh* dataSource, osg::Node* parent);
 
-	vtkAlgorithmOutput* AddNodeVectors2D(vtkAlgorithmOutput* input);
+	void AddNodeVectors(vtkAlgorithmOutput* input, osg::Node* parent);
 	vtkAlgorithmOutput* SetScalarValues(vtkAlgorithmOutput* input);
 	void SetColouring(vtkPolyDataMapper* mapper);
+	vtkAlgorithmOutput* GetArrowSource(void);
 
 	void CheckForModelUpdates();
 	void DeletePropertyData(void);

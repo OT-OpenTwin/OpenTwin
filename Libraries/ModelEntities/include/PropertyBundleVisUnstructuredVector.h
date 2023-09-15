@@ -14,5 +14,7 @@ public:
 private:
 	PropertiesVisUnstructuredVector properties;
 	const std::string defaultCategory = "3D Visualization";
-	const std::string groupName = "General";
+	const std::string groupNameGeneral = "General";
+	const std::string groupNameArrows = "Arrows";
+	const std::string groupNameContour = "Contour";
 };
