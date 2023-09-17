@@ -41,7 +41,7 @@ std::list<std::shared_ptr<EntityMeasurementMetadata>> CrossCollectionAccess::get
 
 std::shared_ptr<EntityResearchMetadata>  CrossCollectionAccess::getMeasurementCampaignMetadata(ot::components::ModelComponent* modelComponent)
 {
-	EntityMeasurementMetadata temp(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityResearchMetadata temp(0, nullptr, nullptr, nullptr, nullptr, "");
 	std::pair<ot::UIDList, ot::UIDList> entityIdentifier = InquireMetadataEntityIdentifier(temp.getClassName());
 	if (entityIdentifier.first.size() == 1)
 	{

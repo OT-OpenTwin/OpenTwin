@@ -43,6 +43,10 @@ std::vector<std::string> EntityWithDynamicFields::getDocumentsNames(std::string 
 
 const GenericDocument* EntityWithDynamicFields::getDocument(std::string documentName)
 {
+	if (documentName[0] != '/')
+	{
+		documentName = "/" + documentName;
+	}
 	if (_bsonDocumentsByName.find(documentName) == _bsonDocumentsByName.end())
 	{
 		throw std::exception(("Could not find document with the name " + documentName).c_str());

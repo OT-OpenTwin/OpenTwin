@@ -15,7 +15,7 @@
 #include "EntityResearchMetadata.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 
-class CrossCollectionAccess
+class __declspec(dllexport) CrossCollectionAccess
 {
 public:
 	CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL);

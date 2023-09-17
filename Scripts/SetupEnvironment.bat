@@ -89,6 +89,7 @@ SET OT_UIPLUGINAPI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\UIPluginAPI
 SET OT_VIEWER_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\Viewer
 
 SET OT_RESULT_COLLECTION_ACCESS_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\ResultCollectionAccess
+
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin tools root paths
 SET OT_OTOOLKIT_ROOT=%OPENTWIN_DEV_ROOT%\Tools\OToolkit

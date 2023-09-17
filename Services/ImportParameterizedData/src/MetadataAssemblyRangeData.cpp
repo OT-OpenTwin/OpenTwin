@@ -82,26 +82,38 @@ void MetadataAssemblyRangeData::TransformSelectedDataIntoSelectedDataType(std::m
 		std::list<ot::Variable> values;
 		for (const std::string& fieldValueString : fieldValuesRaw)
 		{
-			if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
+			if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getStringTypeName())
 			{
-				values.push_back(ot::Variable(std::stod(fieldValueString)));
+				values.push_back(ot::Variable(fieldValueString));
 			}
-			else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
+			else
 			{
-				values.push_back(ot::Variable(std::stoi(fieldValueString)));
-			}
-			else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
-			{
-				values.push_back(ot::Variable(std::stoll(fieldValueString)));
-			}
-			else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getStringTypeName())
-			{
-				values.push_back(ot::Variable(fieldValueString.c_str()));
-			}
+				std::string fieldValueStringFixed;
+				if (fieldValueString == "")
+				{
+					fieldValueStringFixed = "0";
+				}
+				else
+				{
+					fieldValueStringFixed = fieldValueString;
+				}
 
-			_fields.insert({ fieldName,values });
-			currentField = allFields.erase(currentField);
+				if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
+				{
+					values.push_back(ot::Variable(std::stod(fieldValueStringFixed)));
+				}
+				else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
+				{
+					values.push_back(ot::Variable(std::stoi(fieldValueStringFixed)));
+				}
+				else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
+				{
+					values.push_back(ot::Variable(std::stoll(fieldValueStringFixed)));
+				}
+			}
 		}
+		_fields.insert({ fieldName,values });
+		currentField = allFields.erase(currentField);
 	}
 	assert(allFields.size() == 0);
 }

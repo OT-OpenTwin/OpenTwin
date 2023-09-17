@@ -42,7 +42,6 @@ TEST_P(FixtureVariable, Equal)
 {
 	ot::Variable isValue = GetParam();
 	auto expectedValues= GetExpectedEqualEntries();
-	
 	bool equal = false;
 	int count = 0;
 	for (ot::Variable& var : expectedValues)

@@ -143,8 +143,6 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MeasurementCampaign& meas
 	}
 }
 
-
-
 void MeasurementCampaignFactory::BuildUpOverviewLists(MeasurementCampaign& measurementCampaign)
 {
 	const std::list<SeriesMetadata> allSeriesMetadata = measurementCampaign.getSeriesMetadata();
@@ -179,5 +177,3 @@ void MeasurementCampaignFactory::BuildUpOverviewLists(MeasurementCampaign& measu
 	measurementCampaign.setParameterOverview(std::move(parameterOverview));
 	measurementCampaign.setQuantityOverview(std::move(quantityOverview));
 }
-
-

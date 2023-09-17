@@ -15,6 +15,9 @@
     <Filter Include="include\MetadataFactories">
       <UniqueIdentifier>{7865cabd-cd12-42f8-9eaa-902da4f15303}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\MetadataEntries">
+      <UniqueIdentifier>{1f56f169-44ce-43dd-9369-becc5fb42833}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\QuantityContainer.h">
@@ -38,20 +41,20 @@
     <ClInclude Include="include\CrossCollectionAccess.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\MetadataEntry.h">
-      <Filter>include\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataEntryObject.h">
-      <Filter>include\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataEntrySingle.h">
-      <Filter>include\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataEntryArray.h">
-      <Filter>include\Metadata</Filter>
-    </ClInclude>
     <ClInclude Include="include\SeriesMetadata.h">
       <Filter>include\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntry.h">
+      <Filter>include\MetadataEntries</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntryArray.h">
+      <Filter>include\MetadataEntries</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntryObject.h">
+      <Filter>include\MetadataEntries</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntrySingle.h">
+      <Filter>include\MetadataEntries</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,19 +4,19 @@ ot::Variable ot::JSONToVariableConverter::operator()(rapidjson::Value& value)
 {
 	if (value.IsString())
 	{
-		return value.GetString();
+		return ot::Variable(value.GetString());
 	}
 	else if (value.IsInt())
 	{
-		return value.GetInt();
+		return ot::Variable(value.GetInt());
 	}
 	else if (value.IsDouble())
 	{
-		return value.GetDouble();
+		return ot::Variable(value.GetDouble());
 	}
 	else if (value.IsBool())
 	{
-		return value.GetBool();
+		return ot::Variable(value.GetBool());
 	}
 	else
 	{

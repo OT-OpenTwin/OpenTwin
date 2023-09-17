@@ -7,7 +7,7 @@
 #include "OpenTwinCore/Variable.h"
 #include "MetadataEntry.h"
 
-struct MetadataQuantity
+struct __declspec(dllexport) MetadataQuantity
 {
 	std::string quantityName;
 	std::string quantityAbbreviation;

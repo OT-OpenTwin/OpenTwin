@@ -22,8 +22,34 @@ ot::Variable::Variable(bool value)
 {}
 
 ot::Variable::Variable(const char* value)
-	:_value(value)
-{}
+	:_value(StringWrapper(value))
+{
+
+}
+
+ot::Variable::Variable(const std::string& value)
+	:_value(StringWrapper(value))
+{
+}
+
+
+ot::Variable::Variable(std::string&& value)
+{
+	_value = StringWrapper(value);
+}
+
+ot::Variable& ot::Variable::operator=(const Variable& other)
+{
+	
+	return *this;
+}
+
+ot::Variable& ot::Variable::operator=(Variable&& other)
+{
+	_value = std::move(other._value);
+	return *this;
+}
+
 
 bool ot::Variable::isFloat() const
 {
@@ -52,7 +78,7 @@ bool ot::Variable::isBool() const
 
 bool ot::Variable::isConstCharPtr() const
 {
-	return std::holds_alternative<const char*>(_value);
+	return std::holds_alternative<StringWrapper>(_value);
 }
 
 float ot::Variable::getFloat() const
@@ -82,7 +108,7 @@ bool ot::Variable::getBool() const
 
 const char* ot::Variable::getConstCharPtr() const
 {
-	return std::get<const char*>(_value);
+	return static_cast<const char*>(std::get<StringWrapper>(_value));
 }
 
 bool ot::Variable::operator==(const Variable& other) const
@@ -152,5 +178,6 @@ std::string ot::Variable::getTypeName() const
 	else
 	{
 		assert(0);
+		return "";
 	}
 }

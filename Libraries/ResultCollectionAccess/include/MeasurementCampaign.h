@@ -10,7 +10,7 @@
 #include "SeriesMetadata.h"
 
 
-class MeasurementCampaign
+class __declspec(dllexport) MeasurementCampaign
 {
 public:
 	void AddSeriesMetadata(SeriesMetadata&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }

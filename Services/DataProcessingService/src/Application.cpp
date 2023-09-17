@@ -75,6 +75,8 @@ void Application::run(void)
 #include "MeasurementCampaignHandler.h"
 
 #include "DataBase.h"
+#include "CrossCollectionAccess.h"
+#include "MeasurementCampaignFactory.h"
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
@@ -84,7 +86,16 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 			const std::string projectName = "With Resultcolelction";
-			ResultCollectionHandler resultCollection;
+			auto modelService =	instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+			
+			CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
+			auto rmd =	access.getMeasurementCampaignMetadata(m_modelComponent);
+			auto msmds = access.getMeasurementMetadata(m_modelComponent);
+
+			MeasurementCampaignFactory factory;
+			MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
+
+			/*ResultCollectionHandler resultCollection;
 			const std::string collectionName = resultCollection.getProjectCollection(projectName);
 
 			OT_rJSON_createDOC(tempDoc);
@@ -113,7 +124,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 				entityInfo.setID(id);
 				entityInfo.setVersion(*version);
 				version++;
-			}
+			}*/
 
 			//_pipelineManager.RunAll();
 			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));

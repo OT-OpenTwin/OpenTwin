@@ -203,6 +203,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			}
 			fieldCounter++;
 		}
+		allMetadata.push_back(metadataBuffer);
 	}
 	//Adding all new MSMD handle
 	std::list<ot::UID> entityIDs, entityVersions, dataEntities{};

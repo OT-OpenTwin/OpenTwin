@@ -5,7 +5,7 @@
 #include <MetadataParameter.h>
 #include <MetadataQuantity.h>
 
-class SeriesMetadata
+class __declspec(dllexport) SeriesMetadata
 {
 
 public:

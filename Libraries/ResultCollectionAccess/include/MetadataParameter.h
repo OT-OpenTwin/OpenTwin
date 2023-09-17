@@ -7,7 +7,7 @@
 #include <map>
 #include <stdint.h>
 
-struct MetadataParameter
+struct __declspec(dllexport) MetadataParameter
 {
 	std::string parameterName;
 	std::string parameterAbbreviation;
