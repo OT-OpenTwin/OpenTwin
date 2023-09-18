@@ -10,6 +10,7 @@
 #include "OpenTwinCore/Logger.h"
 //#include "OpenTwinCore/TypeConversion.h"
 #include "OpenTwinCore/otAssert.h"
+#include "OpenTwinCore/ReturnMessage.h"
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 
@@ -653,9 +654,15 @@ std::string ServiceBase::handleCreateProject(OT_rJSON_doc& _actionDocument, User
 std::string ServiceBase::handleGetProjectData(OT_rJSON_doc& _actionDocument) {
 	std::string projectName = ot::rJSON::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 
-	Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
-
-	return MongoProjectFunctions::projectToJson(proj);
+	try
+	{
+		Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
+		return ot::ReturnMessage(ot::ReturnStatus::Ok(), MongoProjectFunctions::projectToJson(proj));
+	}
+	catch (std::runtime_error& error)
+	{
+		return ot::ReturnMessage(ot::ReturnStatus::Failed(), error.what());
+	}
 }
 
 std::string ServiceBase::handleGetAllProjectOwners(OT_rJSON_doc& _actionDocument, User& _loggedInUser) {

@@ -22,11 +22,11 @@ public:
 	std::list<std::shared_ptr<EntityMeasurementMetadata>> getMeasurementMetadata(ot::components::ModelComponent* modelComponent);
 	std::shared_ptr<EntityResearchMetadata> getMeasurementCampaignMetadata(ot::components::ModelComponent* modelComponent);
 
+	bool ConnectedWithCollection() { return _collectionName != ""; }
 private:
 	std::string _projectName = "";
 	std::string _collectionName = "";
 	std::string _modelServiceURL = "";
-	
 	std::string InquireAuthorisationURL(const std::string& sessionServiceURL);
 	void InquireProjectCollection(const std::string& authorisationURL);
 	std::pair<ot::UIDList,ot::UIDList> InquireMetadataEntityIdentifier(const std::string& className);

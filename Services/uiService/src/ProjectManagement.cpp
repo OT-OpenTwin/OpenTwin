@@ -29,6 +29,7 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/Msg.h"
+#include "OpenTwinCore/ReturnMessage.h"
 
 ProjectManagement::ProjectManagement() :
 	isConnected(false),
@@ -136,7 +137,7 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 	AppBase * app{ AppBase::instance() };
 
 	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_PROJECT_DATA);
+ 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_PROJECT_DATA);
 	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
 	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
 	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, projectName);
@@ -146,14 +147,14 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 	{
 		return false;
 	}
-
-	if (hasError(response))
+		
+	ot::ReturnMessage responseMessage(response);
+	if(responseMessage.getStatus()==ot::ReturnStatus::Failed())
 	{
-		// The project does not exist
 		return false;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
 
 	canBeDeleted = false;
 	try
@@ -220,7 +221,13 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 		return "";
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::ReturnMessage responseMessage(response);
+	if (responseMessage.getStatus() == ot::ReturnStatus::Failed())
+	{
+		return "";
+	}
+
+	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
 
 	std::string collectionName;
 

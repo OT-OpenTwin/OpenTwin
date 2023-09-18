@@ -14,6 +14,7 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/Msg.h"
+#include "OpenTwinCore/ReturnMessage.h"
 
 #include <qlayout.h>
 #include <qtablewidget.h>
@@ -392,8 +393,12 @@ void ManageAccess::fillGroupsList(void)
 		assert(0);
 		return;
 	}
-
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::ReturnMessage responseMessage(response);
+	if (responseMessage.getStatus() == ot::ReturnStatus::Failed())
+	{
+		return;
+	}
+	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
 
 	// Reset in group flag for all members
 	for (auto user : m_groupList)

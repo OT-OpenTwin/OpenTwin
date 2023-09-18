@@ -5,6 +5,7 @@
 #include "DataBase.h"
 #include "OpenTwinCore/FolderNames.h"
 #include "ClassFactory.h"
+#include "OpenTwinCore/ReturnMessage.h"
 
 
 CrossCollectionAccess::CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
@@ -87,8 +88,16 @@ void CrossCollectionAccess::InquireProjectCollection(const std::string& authoris
 		throw std::exception("Timeout for requesting the authorisation service.");
 	}
 	
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	_collectionName = responseDoc[OT_PARAM_AUTH_PROJECT_COLLECTION].GetString();
+	ot::ReturnMessage responseMessage(response);
+	if (responseMessage.getStatus() == ot::ReturnStatus::Failed())
+	{
+		_collectionName = "";
+	}
+	else
+	{
+		OT_rJSON_parseDOC(responseDoc, response.c_str());
+		_collectionName = responseDoc[OT_PARAM_AUTH_PROJECT_COLLECTION].GetString();
+	}
 }
 
 std::pair<ot::UIDList, ot::UIDList> CrossCollectionAccess::InquireMetadataEntityIdentifier(const std::string& className)

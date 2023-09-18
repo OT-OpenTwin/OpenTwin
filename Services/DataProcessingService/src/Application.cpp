@@ -85,15 +85,20 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			const std::string projectName = "With Resultcolelction";
+			const std::string projectName = "With esultcollection";
 			auto modelService =	instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
 			
 			CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
-			auto rmd =	access.getMeasurementCampaignMetadata(m_modelComponent);
-			auto msmds = access.getMeasurementMetadata(m_modelComponent);
+			if(access.ConnectedWithCollection())
+			{
+				auto rmd =	access.getMeasurementCampaignMetadata(m_modelComponent);
+				auto msmds = access.getMeasurementMetadata(m_modelComponent);
 
-			MeasurementCampaignFactory factory;
-			MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
+				MeasurementCampaignFactory factory;
+				MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
+			
+			}
+
 
 			/*ResultCollectionHandler resultCollection;
 			const std::string collectionName = resultCollection.getProjectCollection(projectName);
@@ -151,7 +156,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (dbAccess != nullptr)
 		{
 			const std::string queryDimension = dbAccess->getQueryDimension();
-			const std::string projectName = dbAccess->getSelectedProjectName();
+			const std::string projectName = "With Resultcollection";/*dbAccess->getSelectedProjectName();*/
 			ResultCollectionHandler resultCollection;
 			const std::string collectionName = resultCollection.getProjectCollection(projectName);
 

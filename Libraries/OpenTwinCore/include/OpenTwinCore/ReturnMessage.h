@@ -9,7 +9,13 @@ namespace ot
 	{
 	public:
 		ReturnMessage(const std::string& status, const std::string& what)
-			:_status(status), _what(what), _returnMessage("{\"Status\":\"" + status + "\",\"What\":\"" + what + "\"}") {}
+			:_status(status), _what(what)
+		{
+			OT_rJSON_createDOC(doc);
+			ot::rJSON::add(doc,"Status", status);
+			ot::rJSON::add(doc,"What", what);
+			_returnMessage = ot::rJSON::toJSON(doc);
+		}
 		ReturnMessage(OT_rJSON_doc& doc)
 		: _status(ot::rJSON::getString(doc,"Status")), _what(ot::rJSON::getString(doc,"What")), _returnMessage(ot::rJSON::toJSON(doc)) {}
 		ReturnMessage(const std::string& jsonStr)
