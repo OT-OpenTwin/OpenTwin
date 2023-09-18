@@ -67,7 +67,7 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
-	m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_uid(0), m_alignment(ot::AlignCenter), m_requestedSize(10., 10.)
+	m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_requestedSize(10., 10.)
 {
 
 }
@@ -313,7 +313,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				i->setParentGraphicsItem(this);
 				if (e.isMaster) {
 					// If the item is a master item, install an event filter for resizing the child items
-					//i->addGraphicsItemEventHandler(this);
+					i->addGraphicsItemEventHandler(this);
 				}
 				m_items.push_back(e);
 
@@ -340,7 +340,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	ot::GraphicsGroupItem::callPaint(_painter, _opt, _widget);
-	//for (auto itm : m_items) itm.item->callPaint(_painter, _opt, _widget);
+	for (auto itm : m_items) itm.item->callPaint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {

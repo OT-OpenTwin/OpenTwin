@@ -2258,8 +2258,10 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 			OT_LOG_EA("Failed to send http request");
 			return;
 		}
-		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_EAS("Invalid response: " + response);
+		
+		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+		if (rMsg == ot::ReturnMessage::Failed) {
+			OT_LOG_E(rMsg.getWhat());
 		}
 	}
 	catch (const std::exception& _e) {

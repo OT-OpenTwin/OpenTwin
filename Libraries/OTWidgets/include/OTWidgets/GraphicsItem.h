@@ -482,7 +482,6 @@ namespace ot {
 		GraphicsItem* m_dest;
 	};
 	
-	Q_DECLARE_METATYPE(GraphicsItem*);
 }
 
 OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemFlag);
