@@ -87,50 +87,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 			const std::string projectName = "temp";
-			auto modelService =	instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-			
-			CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
-			if(access.ConnectedWithCollection())
-			{
-				auto rmd =	access.getMeasurementCampaignMetadata(m_modelComponent);
-				auto msmds = access.getMeasurementMetadata(m_modelComponent);
 
-				MeasurementCampaignFactory factory;
-				MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
-			
-			}
-
-
-			/*ResultCollectionHandler resultCollection;
-			const std::string collectionName = resultCollection.getProjectCollection(projectName);
-
-			OT_rJSON_createDOC(tempDoc);
-			ot::rJSON::add(tempDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION);
-			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_PROJECT_NAME, projectName);
-			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_COLLECTION_NAME, collectionName);
-			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_Folder, "Dataset");
-			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_Type, "EntityMeasurementMetadata");
-			ot::rJSON::add(tempDoc, OT_ACTION_PARAM_Recursive, true);
-
-			std::string response = sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, tempDoc);
-
-
-			OT_rJSON_parseDOC(responseDoc, response.c_str());
-			ot::UIDList entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-			ot::UIDList entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-			DataBase::GetDataBase()->setProjectName(collectionName);
-
-			auto version =	entityVersions.begin();
-			ClassFactory classFactory;
-
-			std::list<ot::EntityInformation> entityInfos;
-			for (ot::UID id : entityIDs)
-			{
-				ot::EntityInformation entityInfo;
-				entityInfo.setID(id);
-				entityInfo.setVersion(*version);
-				version++;
-			}*/
 
 			//_pipelineManager.RunAll();
 			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
@@ -158,11 +115,49 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		{
 			const std::string queryDimension = dbAccess->getQueryDimension();
 			const std::string projectName = "With Resultcollection";/*dbAccess->getSelectedProjectName();*/
-			ResultCollectionHandler resultCollection;
-			const std::string collectionName = resultCollection.getProjectCollection(projectName);
+			
+			std::list<std::string> quantityNames{ "Quantity 1", "Quantity 2" };
+			std::list<std::string> msmdNames{ "MSMD 0", "MSMD 1" , "MSMD 2" };
+			
+			dbAccess->UpdateBasicProperties(msmdNames, quantityNames);
+			dbAccess->StoreToDataBase();
+			m_modelComponent->addEntitiesToModel({ dbAccess->getEntityID() }, { dbAccess->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added properties");
+			//m_modelComponent->updatePropertyGrid();
+			/*auto propBase = dbAccess->getProperties().getProperty("Measurement Series");
+			if (propBase != nullptr)
+			{
+			}
+			else
+			{
+				EntityProperties properties;
+				EntityPropertiesSelection::createProperty("Query Specification", "Measurement Series", msmdNames, "", "default", properties);
+				EntityPropertiesSelection::createProperty("Query Specification", "Quantity", quantityNames, "", "default", properties);
+				ot::UIDList changedEntities{ dbAccess->getEntityID() };
+				m_modelComponent->addPropertiesToEntities(changedEntities, properties.getJSON(nullptr,false));
+				m_modelComponent->modelChangeOperationCompleted("Added result collection properties");
+			}*/
+			//auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+			//CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
+			//if (access.ConnectedWithCollection())
+			//{
+			//	auto rmd = access.getMeasurementCampaignMetadata(m_modelComponent);
+			//	auto msmds = access.getMeasurementMetadata(m_modelComponent);
 
-			MeasurementCampaignHandler mcHandler;
-			mcHandler.ConnectToCollection(collectionName, projectName);
+			//	MeasurementCampaignFactory factory;
+			//	MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
+			//	std::map <std::string, MetadataQuantity> quantities = measurementCampaign.getMetadataQuantities();
+			//	std::list<std::string> quantityNames;
+			//	for (auto& quantity : quantities)
+			//	{
+			//		quantityNames.push_back(quantity.first);
+			//	}
+			//	std::list<std::string> msmdNames;
+			//	for (auto& msmd : msmds)
+			//	{
+			//		msmdNames.push_back(msmd->getName());
+			//	}
+			//	//dbAccess->UpdateBasicProperties(msmdNames, quantityNames);
+			//}
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)

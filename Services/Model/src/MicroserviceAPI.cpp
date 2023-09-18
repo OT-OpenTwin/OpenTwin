@@ -1092,20 +1092,42 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			std::string actualOpenedProject= DataBase::GetDataBase()->getProjectName();
 			DataBase::GetDataBase()->setProjectName(collectionName);
 			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
-			Model secondary(projectName, collectionName);
-			secondary.projectOpen();
-			ot::UIDList entityIDList = secondary.getIDsOfFolderItemsOfType(folder, className, recursive);
-			ot::UIDList entityVersions;
-			secondary.getEntityVersions(entityIDList, entityVersions);
+			ModelState secondary(globalModel->getSessionCount(), globalModel->getServiceIDAsInt());
+			secondary.openProject();
+
+			std::list<ot::UID> prefetchIds;
+			secondary.getListOfTopologyEntites(prefetchIds);
+			std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
+			for (auto id : prefetchIds)
+			{
+				ot::UID entityID = id;
+				ot::UID entityVersion = secondary.getCurrentEntityVersion(entityID);
+				prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
+			}
+			DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+			ot::UIDList entityIDList, entityVersionList;
+			for (auto& identifier : prefetchIdandVersion)
+			{
+				auto doc = bsoncxx::builder::basic::document{};
+				if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(identifier.first, identifier.second, doc))
+				{
+					return nullptr;
+				}
+				auto doc_view = doc.view()["Found"].get_document().view();
+				std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
+				if (entityType == className)
+				{
+					entityIDList.push_back(identifier.first);
+					entityVersionList.push_back(identifier.second);
+				}
+			}
 
 			DataBase::GetDataBase()->setProjectName(actualOpenedProject);
 			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
-			globalModel->projectOpen();
-
 
 			OT_rJSON_createDOC(newDoc);
 			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersions);
+			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersionList);
 
 			return ot::rJSON::toJSON(newDoc);
 		}

@@ -54,6 +54,26 @@ std::string EntityBlockDatabaseAccess::getQueryDimension()
 	return outcome->getValue();
 }
 
+void EntityBlockDatabaseAccess::UpdateBasicProperties(std::list<std::string>& measurementSeries, std::list<std::string>& quantities)
+{
+	auto baseMSMD =	getProperties().getProperty("Measurement Series");
+	if (baseMSMD == nullptr)
+	{
+		EntityPropertiesSelection::createProperty("Query Specification", "Measurement Series", measurementSeries, "", "default", getProperties());
+		EntityPropertiesSelection::createProperty("Query Specification", "Quantity", quantities, "", "default", getProperties());
+	}
+	else
+	{
+		auto msmdSelection = dynamic_cast<EntityPropertiesSelection*>(baseMSMD);
+		msmdSelection->resetOptions(measurementSeries);
+		
+		auto baseQuantity = getProperties().getProperty("Quantity");
+		auto quantitySelection = dynamic_cast<EntityPropertiesSelection*>(baseQuantity);
+		quantitySelection->resetOptions(quantities);
+	}
+	this->setModified();
+}
+
 void EntityBlockDatabaseAccess::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::AddStorageData(storage);

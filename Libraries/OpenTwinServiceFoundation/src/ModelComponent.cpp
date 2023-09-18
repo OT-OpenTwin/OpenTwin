@@ -275,6 +275,34 @@ void ot::components::ModelComponent::addEntitiesToModel(std::list<UID> & _topolo
 	}
 }
 
+void ot::components::ModelComponent::addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment)
+{
+	OT_rJSON_createDOC(requestDoc);
+	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_AddEntities);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, _topologyEntityIDList);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, _topologyEntityVersionList);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList, _topologyEntityForceVisible);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityIDList, _dataEntityIDList);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityVersionList, _dataEntityVersionList);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityParentList, _dataEntityParentList);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Description, _changeComment);
+
+	// Send the command
+	std::string response;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+		std::cout << "ERROR: Failed to add entities to model: Failed to send HTTP request" << std::endl;
+		return;
+	}
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		std::cout << "ERROR: Failed to add entities to model: " << response << std::endl;
+		return;
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		std::cout << "ERROR: Failed to add entities to model: " << response << std::endl;
+		return;
+	}
+}
+
 void ot::components::ModelComponent::addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName,
 														  std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList, std::list<std::string> & _childrenList, 
 														  const std::string & _changeComment)

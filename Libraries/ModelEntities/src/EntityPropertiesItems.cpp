@@ -281,7 +281,7 @@ void EntityPropertiesString::copySettings(EntityPropertiesBase *other, EntityBas
 	}
 }
 
-void EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, std::list<std::string> options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+void EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -293,7 +293,26 @@ void EntityPropertiesSelection::createProperty(const std::string &group, const s
 	EntityPropertiesSelection *prop = new EntityPropertiesSelection;
 	prop->setName(name);
 
-	for (auto item : options) prop->addOption(item);
+	for (auto& item : options) prop->addOption(item);
+
+	prop->setValue(value);
+
+	properties.createProperty(prop, group);
+}
+
+void EntityPropertiesSelection::createProperty(const std::string& group, const std::string& name, std::list<std::string>&& options, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesSelection* prop = new EntityPropertiesSelection;
+	prop->setName(name);
+
+	for (auto& item : options) prop->addOption(item);
 
 	prop->setValue(value);
 
@@ -474,6 +493,16 @@ bool EntityPropertiesString::hasSameValue(EntityPropertiesBase *other)
 	if (entity == nullptr) return false;
 
 	return (getValue() == entity->getValue());
+}
+
+void EntityPropertiesSelection::resetOptions(std::list<std::string>& _options)
+{
+	options.clear();
+	options.reserve(_options.size());
+	for (auto& item : _options) 
+	{
+		addOption(item);
+	}
 }
 
 bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase *other)

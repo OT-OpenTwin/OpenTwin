@@ -7,7 +7,6 @@
 
 class __declspec(dllexport) SeriesMetadata
 {
-
 public:
 	SeriesMetadata(const std::string& name):_name(name) {};
 	void AddParameter(MetadataParameter&& parameter) { _parameter.push_back(parameter); }
@@ -15,7 +14,6 @@ public:
 	void AddMetadata(std::shared_ptr<MetadataEntry> metadata) { _metaData[metadata->getEntryName()] = metadata; }
 	const std::list<MetadataParameter>& getParameter() const { return _parameter; }
 	const std::list<MetadataQuantity>& getQuantities() const { return _quantity; }
-
 private:
 	const std::string _name;
 	

@@ -65,6 +65,7 @@ namespace ot {
 			// Entity management
 
 			void addEntitiesToModel(std::list<UID> & _topologyEntityIDList, std::list<UID> & _topologyEntityVersionList, std::list<bool> & _topologyEntityForceVisible, std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList, const std::string & _changeComment);
+			void addEntitiesToModel(std::list<UID> && _topologyEntityIDList, std::list<UID> && _topologyEntityVersionList, std::list<bool> && _topologyEntityForceVisible, std::list<UID> && _dataEntityIDList, std::list<UID> && _dataEntityVersionList, std::list<UID> && _dataEntityParentList, const std::string & _changeComment);
 			void addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName, std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList, std::list<std::string> & _childrenList, const std::string & _changeComment);
 			void deleteEntitiesFromModel(std::list<std::string> & _entityNameList, bool _saveModel = true);
 			void getEntityInformation(const std::list<UID> & _entities, std::list<EntityInformation> & _entityInfo);

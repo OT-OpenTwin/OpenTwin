@@ -228,6 +228,7 @@ public:
 
 	void clearOptions() { options.clear(); };
 	void addOption(const std::string &option) { assert(std::find(options.begin(), options.end(), option) == options.end());  options.push_back(option); }
+	void resetOptions(std::list<std::string>& _options);
 	const std::vector<std::string> &getOptions(void) { return options; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
@@ -237,7 +238,8 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string &group, const std::string &name, std::list<std::string> options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static void createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static void createProperty(const std::string &group, const std::string &name, std::list<std::string>&& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
 	bool checkCompatibilityOfSettings(const EntityPropertiesSelection &other);
