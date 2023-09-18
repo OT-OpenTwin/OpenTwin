@@ -1,41 +1,54 @@
 #pragma once
+
+// OpenTwin header
 #include "OpenTwinCore/CoreAPIExport.h"
-#include "rJSON.h"
+#include "OpenTwinCore/Serializable.h"
+#include "OpenTwinCore/rJSON.h"
+
+// std header
 #include <string>
 
 namespace ot
 {
-	class ReturnMessage
+	class OT_CORE_API_EXPORT ReturnMessage : public ot::Serializable
 	{
 	public:
-		ReturnMessage(const std::string& status, const std::string& what)
-			:_status(status), _what(what)
-		{
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc,"Status", status);
-			ot::rJSON::add(doc,"What", what);
-			_returnMessage = ot::rJSON::toJSON(doc);
-		}
-		ReturnMessage(OT_rJSON_doc& doc)
-		: _status(ot::rJSON::getString(doc,"Status")), _what(ot::rJSON::getString(doc,"What")), _returnMessage(ot::rJSON::toJSON(doc)) {}
-		ReturnMessage(const std::string& jsonStr)
-			:_returnMessage(jsonStr)
-		{
-			auto doc = ot::rJSON::fromJSON(_returnMessage);
-			_status = ot::rJSON::getString(doc, "Status");
-			_what = ot::rJSON::getString(doc, "What");
-		}
+		enum ReturnMessageStatus {
+			Ok,
+			Failed
+		};
 
-		operator std::string () const { return _returnMessage; }
-		std::string getWhat() const { return _what; }
-		std::string getStatus() const { return _status; }
+		static std::string statusToString(ReturnMessageStatus _status);
+		static ReturnMessageStatus stringToStatus(const std::string& _status);
+
+		ReturnMessage(ReturnMessageStatus _status = ReturnMessageStatus::Ok, const std::string& _what = std::string());
+		ReturnMessage(const ReturnMessage& _other);
+		~ReturnMessage() {};
+		ReturnMessage& operator = (const ReturnMessage& _other);
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		std::string getWhat() const { return m_what; }
+		ReturnMessageStatus getStatus() const { return m_status; }
+
+		//! @brief Returns a JSON String
+		//! Will create a JSON document, call addToJSONObject and return the json created by the document
+		std::string toJson(void) const;
 
 	private:
-		std::string _status;
-		std::string _what;
-		std::string _returnMessage;
+		ReturnMessageStatus m_status;
+		std::string m_what;
 	};
 
+	/*
 	struct ReturnStatus
 	{
 		static const std::string Ok() { return "OK"; };
@@ -43,4 +56,5 @@ namespace ot
 		static const std::string True() { return "TRUE"; };
 		static const std::string False() { return "FALSE"; };
 	};
+	*/
 }

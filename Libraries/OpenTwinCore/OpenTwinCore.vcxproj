@@ -29,6 +29,7 @@
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Queue.cpp" />
+    <ClCompile Include="src\ReturnMessage.cpp" />
     <ClCompile Include="src\rJSON.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
     <ClCompile Include="src\Logger.cpp" />

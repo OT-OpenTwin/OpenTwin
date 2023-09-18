@@ -26,7 +26,8 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		
 		if (senderURL != _urlMasterService)
 		{
-			returnMessage = ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, "Access denied.");
+			ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Access denied.");
+			returnMessage = rMsg.toJson();
 		}
 		else
 		{
@@ -35,26 +36,28 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 			{
 				auto& checkParameter = _checkParameterFunctions[action];
 				auto checkResult = checkParameter(doc);
-				if (checkResult.getStatus() == OT_ACTION_RETURN_VALUE_OK)
+				if (checkResult.getStatus() == ot::ReturnMessage::Ok)
 				{
 					auto& handlingFunction = _handlingFunctions[action];
-					returnMessage = handlingFunction(doc);
+					returnMessage = handlingFunction(doc).toJson();
 				}
 				else
 				{
-					returnMessage = checkResult;
+					returnMessage = checkResult.toJson();
 				}
 			}
 			else
 			{
 				assert(0); // Action not supported
-				returnMessage = ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, "Action " + action + " not supported.");
+				ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Action \"" + action + "\" not supported.");
+				returnMessage = rMsg.toJson();
 			}
 		}
 	}
 	else
 	{
-		returnMessage = ot::ReturnMessage(ot::ReturnStatus::Failed(), "Message requires a senderURL which is missing.");
+		ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Message requires a senderURL which is missing.");
+		returnMessage = rMsg.toJson();
 	}
 	char* returnValue = new char[returnMessage.size() + 1];
 	std::strcpy(returnValue, returnMessage.c_str());
@@ -118,11 +121,11 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 			rJsonResult.PushBack(converterV2J(var,returnValues), returnValues.GetAllocator());
 		}
 
-		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_OK, ot::rJSON::toJSON(returnValues));
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, ot::rJSON::toJSON(returnValues));
 	}
 	catch (std::exception& e)
 	{
-		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, e.what());
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
 	}
 
 }
@@ -131,7 +134,7 @@ ot::ReturnMessage ActionHandler::CheckParameterExecute(OT_rJSON_doc& doc)
 {
 	if (!ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Scripts) || !ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Parameter))
 	{
-		return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_FAILED, "Either the scripts or parameter are not contained in the message");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Either the scripts or parameter are not contained in the message");
 	}
 	else
 	{

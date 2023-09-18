@@ -96,7 +96,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 					}
 					else
 					{
-						return ot::ReturnMessage(ot::ReturnStatus::Failed(),"Scripts and parameter are not of expected type.");
+						ot::ReturnMessage msg(ot::ReturnMessage::Failed, "Scripts and parameter are not of expected type.");
+						return msg.toJson();
 					}
 				}
 										

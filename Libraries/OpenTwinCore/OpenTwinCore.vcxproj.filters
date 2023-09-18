@@ -58,6 +58,9 @@
     <ClCompile Include="src\VariableToJSONConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
+    <ClCompile Include="src\ReturnMessage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h">

@@ -15,12 +15,12 @@ public:
 
 private:
 
-	using handlerMethod = std::function<ot::ReturnMessage(OT_rJSON_doc& _doc)>;
+	using handlerMethod = std::function<ot::ReturnMessage(OT_rJSON_doc&)>;
 	std::mutex _mutex;
 	const std::string _urlMasterService;
 	std::map<std::string, handlerMethod> _handlingFunctions;
 	std::map<std::string, handlerMethod> _checkParameterFunctions;
-	handlerMethod _noParameterCheck = [](OT_rJSON_doc& doc) {return ot::ReturnMessage(OT_ACTION_RETURN_VALUE_OK, "No check performed."); };
+	handlerMethod _noParameterCheck = [](OT_rJSON_doc& doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
 	PythonAPI _pythonAPI;
 
 	ot::ReturnMessage ShutdownProcess(OT_rJSON_doc& doc);

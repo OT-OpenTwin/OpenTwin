@@ -64,8 +64,8 @@ std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParame
 	{
 		Close();
 		RunWithNextFreeURL(_urlThisProcess);
-		ot::ReturnMessage message(OT_ACTION_RETURN_VALUE_FAILED, "Process not reachable.");
-		return message;
+		ot::ReturnMessage message(ot::ReturnMessage::Failed, "Process not reachable.");
+		return message.toJson();
 	}
 }
 
