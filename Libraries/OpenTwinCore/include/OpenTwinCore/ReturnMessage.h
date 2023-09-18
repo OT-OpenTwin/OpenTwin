@@ -14,15 +14,25 @@ namespace ot
 	{
 	public:
 		enum ReturnMessageStatus {
-			Ok,
-			Failed
+			Ok, //! @brief Ok
+			Failed //! @brief Error
 		};
 
 		static std::string statusToString(ReturnMessageStatus _status);
 		static ReturnMessageStatus stringToStatus(const std::string& _status);
 
+		//! @brief Create a ReturnMessage from the provided json string
+		//! @param _json The json string
 		static ReturnMessage fromJson(const std::string& _json);
 
+		//! @brief Create a json string that can be used to create a ReturnMessage instance
+		//! @param _status The status
+		//! @param _what The message contents
+		static std::string toJson(ReturnMessageStatus _status, const std::string& _what = std::string());
+
+		//! @brief Constructor
+		//! @param _status The status
+		//! @param _what The message contents
 		ReturnMessage(ReturnMessageStatus _status = ReturnMessageStatus::Ok, const std::string& _what = std::string());
 		ReturnMessage(const ReturnMessage& _other);
 		~ReturnMessage() {};
@@ -47,8 +57,14 @@ namespace ot
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		std::string getWhat() const { return m_what; }
-		ReturnMessageStatus getStatus() const { return m_status; }
+		//! @brief Get the return message content
+		std::string getWhat(void) const { return m_what; }
+
+		//! @brief Get the return message status
+		ReturnMessageStatus getStatus(void) const { return m_status; }
+
+		//! @brief Returns a string representation of the status
+		std::string getStatusString(void) const;
 
 		//! @brief Returns a JSON String
 		//! Will create a JSON document, call addToJSONObject and return the JSON string created by the document

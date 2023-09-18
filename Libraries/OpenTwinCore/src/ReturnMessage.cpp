@@ -29,6 +29,11 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 	return msg;
 }
 
+std::string ot::ReturnMessage::toJson(ot::ReturnMessage::ReturnMessageStatus _status, const std::string& _what) {
+	ReturnMessage msg(_status, _what);
+	return msg.toJson();
+}
+
 ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const std::string& _what) : m_status(_status), m_what(_what) {}
 
 ot::ReturnMessage::ReturnMessage(const ReturnMessage& _other) : m_status(_other.m_status), m_what(_other.m_what) {}
@@ -80,6 +85,10 @@ void ot::ReturnMessage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _
 void ot::ReturnMessage::setFromJsonObject(OT_rJSON_val& _object) {
 	m_what = ot::rJSON::getString(_object, "What");
 	m_status = stringToStatus(ot::rJSON::getString(_object, "Status"));
+}
+
+std::string ot::ReturnMessage::getStatusString(void) const {
+	return ReturnMessage::statusToString(m_status);
 }
 
 std::string ot::ReturnMessage::toJson(void) const {
