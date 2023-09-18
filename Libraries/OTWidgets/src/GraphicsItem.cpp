@@ -456,7 +456,7 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(QRectF(this->pos(), m_size), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(this->boundingRect(), m_cornerRadius, m_cornerRadius);
 }
 
 QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
@@ -562,7 +562,7 @@ void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphi
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawEllipse(this->calculateDrawRect(QRectF(this->pos(), QSizeF(m_radiusX * 2., m_radiusY * 2.))).center(), m_radiusX, m_radiusY);
+	_painter->drawEllipse(this->boundingRect().center(), m_radiusX, m_radiusY);
 }
 
 QRectF ot::GraphicsEllipseItem::getGraphicsItemBoundingRect(void) const {
