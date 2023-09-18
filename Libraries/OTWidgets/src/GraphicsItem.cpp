@@ -313,7 +313,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				i->setParentGraphicsItem(this);
 				if (e.isMaster) {
 					// If the item is a master item, install an event filter for resizing the child items
-					i->addGraphicsItemEventHandler(this);
+					//i->addGraphicsItemEventHandler(this);
 				}
 				m_items.push_back(e);
 
@@ -340,7 +340,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	ot::GraphicsGroupItem::callPaint(_painter, _opt, _widget);
-	for (auto itm : m_items) itm.item->callPaint(_painter, _opt, _widget);
+	//for (auto itm : m_items) itm.item->callPaint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -349,7 +349,7 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
 	OTAssertNullptr(_sender);
-	
+	return;
 	if (_event == ot::GraphicsItem::Resized) {
 		ot::GraphicsItem* mas = nullptr;
 		for (auto itm : m_items) {
@@ -410,6 +410,9 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
 	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 	
+	// We call set rectangle size which will call set geometry to finalize the item
+	this->setRectangleSize(m_size);
+
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
@@ -479,8 +482,8 @@ void ot::GraphicsRectangularItem::setGraphicsItemRequestedSize(const QSizeF& _si
 }
 
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
-	this->prepareGeometryChange();
-	m_size = _size; 
+	m_size = _size;
+	this->setGeometry(QRectF(this->pos(), m_size));
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

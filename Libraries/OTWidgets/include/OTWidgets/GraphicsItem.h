@@ -294,6 +294,10 @@ namespace ot {
 		void setRectangleSize(const QSizeF& _size);
 		const QSizeF& rectangleSize(void) const { return m_size; };
 
+		void setRectangleBrush(const QBrush& _brush) { m_brush = _brush; };
+		void setRectanglePen(const QPen& _pen) { m_pen = _pen; };
+		void setCornerRadius(int _r) { m_cornerRadius = _r; };
+
 	private:
 		QSizeF m_size;
 		QBrush m_brush;
