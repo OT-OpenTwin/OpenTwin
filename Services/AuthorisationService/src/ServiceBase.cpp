@@ -657,11 +657,13 @@ std::string ServiceBase::handleGetProjectData(OT_rJSON_doc& _actionDocument) {
 	try
 	{
 		Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
-		return ot::ReturnMessage(ot::ReturnStatus::Ok(), MongoProjectFunctions::projectToJson(proj));
+		ot::ReturnMessage rMsg(ot::ReturnMessage::Ok, MongoProjectFunctions::projectToJson(proj));
+		return rMsg.toJson();
 	}
 	catch (std::runtime_error& error)
 	{
-		return ot::ReturnMessage(ot::ReturnStatus::Failed(), error.what());
+		ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, error.what());
+		return rMsg.toJson();
 	}
 }
 

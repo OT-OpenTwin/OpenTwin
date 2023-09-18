@@ -148,8 +148,8 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 		return false;
 	}
 		
-	ot::ReturnMessage responseMessage(response);
-	if(responseMessage.getStatus()==ot::ReturnStatus::Failed())
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+	if(responseMessage == ot::ReturnMessage::Failed)
 	{
 		return false;
 	}
@@ -221,8 +221,8 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 		return "";
 	}
 
-	ot::ReturnMessage responseMessage(response);
-	if (responseMessage.getStatus() == ot::ReturnStatus::Failed())
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+	if (responseMessage == ot::ReturnMessage::Failed)
 	{
 		return "";
 	}

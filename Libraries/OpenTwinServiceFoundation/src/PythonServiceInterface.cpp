@@ -19,7 +19,7 @@ ot::ReturnMessage ot::PythonServiceInterface::SendExecutionOrder()
 {
 	if (_scriptNamesWithParameter.size() == 0)
 	{
-		return ot::ReturnMessage(ot::ReturnStatus::Failed(), "PythonServiceInterface got nothing to execute.");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "PythonServiceInterface got nothing to execute.");
 	}
 
 	OT_rJSON_doc jsonMessage = AssembleMessage();
@@ -27,7 +27,9 @@ ot::ReturnMessage ot::PythonServiceInterface::SendExecutionOrder()
 	std::string response;
 	std::string message = ot::rJSON::toJSON(jsonMessage);
 	ot::msg::send("", _pythonExecutionServiceURL, ot::MessageType::EXECUTE, message, response);
-	return ot::ReturnMessage(response);
+	assert(0); // Which one to use below?:
+	return ot::ReturnMessage::fromJson(response); // Response is return message object
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, response); // Response is what
 }
 
 OT_rJSON_doc ot::PythonServiceInterface::AssembleMessage()

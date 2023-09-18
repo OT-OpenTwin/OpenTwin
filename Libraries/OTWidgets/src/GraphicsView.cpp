@@ -17,7 +17,7 @@
 #include <QtWidgets/qgraphicsproxywidget.h>
 //#include <QtWidgets/qgraphicsscene.h>
 
-ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_currentUid(0) {
+ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false) {
 	m_scene = new GraphicsScene(this);
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
@@ -59,10 +59,10 @@ void ot::GraphicsView::viewAll(void) {
 	}
 }
 
-ot::GraphicsItem* ot::GraphicsView::getItem(ot::UID _itemUid) {
+ot::GraphicsItem* ot::GraphicsView::getItem(const std::string&  _itemUid) {
 	auto it = m_items.find(_itemUid);
 	if (it == m_items.end()) {
-		OT_LOG_WAS("Item with the UID \"" + std::to_string(_itemUid) + "\" does not exist");
+		OT_LOG_WAS("Item with the UID \"" + _itemUid + "\" does not exist");
 		return nullptr;
 	}
 	else {
@@ -70,10 +70,10 @@ ot::GraphicsItem* ot::GraphicsView::getItem(ot::UID _itemUid) {
 	}
 }
 
-ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(ot::UID _connectionUid) {
+ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _connectionUid) {
 	auto it = m_connections.find(_connectionUid);
 	if (it == m_connections.end()) {
-		OT_LOG_WAS("Connection with the UID \"" + std::to_string(_connectionUid) + "\" does not exist");
+		OT_LOG_WAS("Connection with the UID \"" + _connectionUid + "\" does not exist");
 		return nullptr;
 	}
 	else {
@@ -83,7 +83,6 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(ot::UID _connectionU
 
 void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest) {
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
-	newConnection->setGraphicsItemUid(++m_currentUid);
 	QPen p;
 	p.setColor(QColor(255, 0, 0));
 	p.setWidth(1);
@@ -94,7 +93,19 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 
 	newConnection->connectItems(_origin, _dest);
 
-	emit connectionAdded(m_currentUid);
+	emit connectionCreated(newConnection);
+}
+
+void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
+	auto it = m_items.find(_item->graphicsItemUid());
+	if (it != m_items.end()) {
+		OT_LOG_EAS("An item with the ID \"" + _item->graphicsItemUid() + "\" already exists in this view");
+		delete _item;
+		return;
+	}
+
+	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
+	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
 }
 
 // ########################################################################################################
@@ -257,12 +268,11 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	try {
 		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
 		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
-		m_scene->addItem(newItem->getQGraphicsItem());
-		newItem->setGraphicsItemUid(++m_currentUid);
 		
-		m_items.insert_or_assign(m_currentUid, newItem);
+		// Move to new location
+		newItem->getRootItem()->getQGraphicsItem()->setPos(position);
 
-		emit itemAdded(m_currentUid);
+		emit itemCreated(newItem);
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());

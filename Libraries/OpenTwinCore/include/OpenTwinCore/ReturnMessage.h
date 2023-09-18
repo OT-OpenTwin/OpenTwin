@@ -21,10 +21,21 @@ namespace ot
 		static std::string statusToString(ReturnMessageStatus _status);
 		static ReturnMessageStatus stringToStatus(const std::string& _status);
 
+		static ReturnMessage fromJson(const std::string& _json);
+
 		ReturnMessage(ReturnMessageStatus _status = ReturnMessageStatus::Ok, const std::string& _what = std::string());
 		ReturnMessage(const ReturnMessage& _other);
 		~ReturnMessage() {};
 		ReturnMessage& operator = (const ReturnMessage& _other);
+		ReturnMessage& operator = (const char * _what);
+		ReturnMessage& operator = (const std::string& _what);
+		ReturnMessage& operator = (ReturnMessageStatus _status);
+
+		bool operator == (const ReturnMessageStatus _status) const;
+		bool operator == (const ReturnMessage& _other) const;
+
+		bool operator != (const ReturnMessageStatus _status) const;
+		bool operator != (const ReturnMessage& _other) const;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -40,7 +51,7 @@ namespace ot
 		ReturnMessageStatus getStatus() const { return m_status; }
 
 		//! @brief Returns a JSON String
-		//! Will create a JSON document, call addToJSONObject and return the json created by the document
+		//! Will create a JSON document, call addToJSONObject and return the JSON string created by the document
 		std::string toJson(void) const;
 
 	private:

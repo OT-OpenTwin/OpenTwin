@@ -22,15 +22,54 @@ ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const s
 	}
 }
 
+ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
+	OT_rJSON_parseDOC(doc, _json.c_str());
+	ReturnMessage msg;
+	msg.setFromJsonObject(doc);
+	return msg;
+}
+
 ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const std::string& _what) : m_status(_status), m_what(_what) {}
 
 ot::ReturnMessage::ReturnMessage(const ReturnMessage& _other) : m_status(_other.m_status), m_what(_other.m_what) {}
 
 ot::ReturnMessage& ot::ReturnMessage::operator = (const ReturnMessage& _other) {
-	m_status = _other.m_status;
-	m_what = _other.m_what;
-
+	if (this != &_other) {
+		m_status = _other.m_status;
+		m_what = _other.m_what;
+	}
 	return *this;
+}
+
+ot::ReturnMessage& ot::ReturnMessage::operator = (const char* _what) {
+	this->m_what = _what;
+	return *this;
+}
+
+ot::ReturnMessage& ot::ReturnMessage::operator = (const std::string& _what) {
+	this->m_what = _what;
+	return *this;
+}
+
+ot::ReturnMessage& ot::ReturnMessage::operator = (ReturnMessageStatus _status) {
+	this->m_status = _status;
+	return *this;
+}
+
+bool ot::ReturnMessage::operator == (const ReturnMessageStatus _status) const {
+	return this->m_status == _status;
+}
+
+bool ot::ReturnMessage::operator == (const ReturnMessage& _other) const {
+	return this->m_status == _other.m_status && this->m_what == _other.m_what;
+}
+
+bool ot::ReturnMessage::operator != (const ReturnMessageStatus _status) const {
+	return this->m_status != _status;
+}
+
+bool ot::ReturnMessage::operator != (const ReturnMessage& _other) const {
+	return this->m_status != _other.m_status || this->m_what != _other.m_what;
 }
 
 void ot::ReturnMessage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {

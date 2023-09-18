@@ -136,8 +136,8 @@ namespace ot {
 		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
 		bool hasHover(void) const { return m_hasHover; };		
 
-		void setGraphicsItemUid(ot::UID _uid) { m_uid = _uid; };
-		ot::UID graphicsItemUid(void) const { return m_uid; };
+		void setGraphicsItemUid(const std::string& _uid) { m_uid = _uid; };
+		const std::string& graphicsItemUid(void) const { return m_uid; };
 
 		void setGraphicsItemName(const std::string& _name) { m_name = _name; };
 		const std::string& graphicsItemName(void) const { return m_name; };
@@ -172,7 +172,7 @@ namespace ot {
 	private:
 		bool m_isContainerItem;
 		bool m_hasHover;
-		ot::UID m_uid;
+		std::string m_uid;
 		std::string m_configuration;
 		std::string m_name;
 		ot::Alignment m_alignment;
@@ -482,7 +482,7 @@ namespace ot {
 		GraphicsItem* m_dest;
 	};
 	
-
+	Q_DECLARE_METATYPE(GraphicsItem*);
 }
 
 OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemFlag);

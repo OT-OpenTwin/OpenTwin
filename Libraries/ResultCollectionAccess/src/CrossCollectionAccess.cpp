@@ -88,8 +88,8 @@ void CrossCollectionAccess::InquireProjectCollection(const std::string& authoris
 		throw std::exception("Timeout for requesting the authorisation service.");
 	}
 	
-	ot::ReturnMessage responseMessage(response);
-	if (responseMessage.getStatus() == ot::ReturnStatus::Failed())
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+	if (responseMessage == ot::ReturnMessage::Failed)
 	{
 		_collectionName = "";
 	}

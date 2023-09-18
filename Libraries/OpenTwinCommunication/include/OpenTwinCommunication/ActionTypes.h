@@ -497,6 +497,7 @@
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestId "GraphicsEditor.Dest.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName "GraphicsEditor.Origin.ConName"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName "GraphicsEditor.Dest.ConName"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition "GraphicsEditor.Item.Pos"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

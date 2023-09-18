@@ -13,9 +13,10 @@
 
 
 // Open twin header
+#include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
-#include <OpenTwinCommunication/ActionTypes.h>	
+#include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
 
@@ -166,9 +167,13 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)
 	{
+		// Get item information
 		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-		ot::UID itemID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
+		
+		// Generate UID
+		
+		std::string itemUid = "Some fancy new UID"; // <----- Add code here to generate the new UID
 		
 		ExternalDependencies dependencies;
 		if (dependencies.getPythonScriptFolderID() == 0)
@@ -179,13 +184,20 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			dependencies.setPythonScriptFolderID(entityInfo.getID());
 		}
 
-		auto blockEntity = BlockEntityHandler::GetInstance().CreateBlock(editorName, itemName, itemID);
+		//                                                                                     \/     This value was the UID send from the UI before. Instead of 0 the new UID should be passed
+		auto blockEntity = BlockEntityHandler::GetInstance().CreateBlock(editorName, itemName, 0);
 		if (blockEntity != nullptr)
 		{
 			ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
 			std::list<bool> forceVis{false,false};
 			m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
 		}
+
+		OT_rJSON_createDOC(argDoc);
+		ot::rJSON::add(argDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, itemUid);
+		
+		ot::ReturnMessage response(ot::ReturnMessage::Ok, ot::rJSON::toJSON(argDoc));
+		return response.toJson();
 
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped)

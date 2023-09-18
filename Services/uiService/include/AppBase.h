@@ -58,6 +58,7 @@ namespace ak { class aNotifier; class aColorStyle; class aWindow; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsView; }
+namespace ot { class GraphicsItem; }
 namespace ot { class GraphicsPickerDockWidget; }
 struct structModelViewInfo
 {
@@ -485,8 +486,8 @@ public:
 	std::string getCredentialUserPasswordClear(void) { return m_userPassword; }
 
 public slots:
-	void slotGraphicsItemDroppend(ot::UID _itemUid);
-	void slotGraphicsConnectionDroppend(ot::UID _connectionUid);
+	void slotGraphicsItemDroppend(ot::GraphicsItem * _item);
+	void slotGraphicsConnectionDroppend(ot::GraphicsItem * _connectionItem);
 	void slotGraphicsSelectionChanged(void);
 
 private slots:

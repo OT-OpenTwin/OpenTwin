@@ -698,7 +698,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 		pythonScriptName++;
 	}
 	ot::ReturnMessage returnValue = _pythonInterface->SendExecutionOrder();
-	_uiComponent->displayMessage(returnValue);
+	_uiComponent->displayMessage(returnValue.toJson());
 }
 
 void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)

@@ -37,19 +37,22 @@ namespace ot {
 
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
-		GraphicsItem* getItem(ot::UID _itemUid);
-		GraphicsConnectionItem* getConnection(ot::UID _connectionUid);
+		GraphicsItem* getItem(const std::string& _itemUid);
+		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
 		void setGraphicsViewName(const std::string& _name) { m_viewName = _name; };
 		const std::string& graphcisViewName(void) const { return m_viewName; };
 
+		void addItem(ot::GraphicsItem* _item);
 		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);
 
 	signals:
-		void itemAdded(ot::UID _uid);
-		void connectionAdded(ot::UID _uid);
+		//! @brief Will be emitted when an item was created by the user
+		//! The provided item is the item that was created
+		void itemCreated(ot::GraphicsItem * _item);
+		void connectionCreated(ot::GraphicsItem* _item);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
@@ -71,11 +74,10 @@ namespace ot {
 		bool m_isPressed;
 		bool m_wheelEnabled;
 		bool m_dropEnabled;
-		ot::UID m_currentUid;
 		QPoint m_lastPanPos;
 
-		std::map<ot::UID, ot::GraphicsItem*> m_items;
-		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
+		std::map<std::string, ot::GraphicsItem*> m_items;
+		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
 	};
 
 }

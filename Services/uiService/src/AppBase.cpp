@@ -51,6 +51,8 @@
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Flags.h"
 #include "OpenTwinCore/otAssert.h"
+#include "OpenTwinCore/Point2D.h"
+#include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/UiTypes.h"
 #include "OpenTwinFoundation/SettingsData.h"
@@ -2062,8 +2064,8 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 
 	AppBase::instance()->addTabToCentralView(_title, newEditor);
 	m_graphicsViews.store(_owner, newEditor);
-	connect(newEditor, &ot::GraphicsView::itemAdded, this, &AppBase::slotGraphicsItemDroppend);
-	connect(newEditor, &ot::GraphicsView::connectionAdded, this, &AppBase::slotGraphicsConnectionDroppend);
+	connect(newEditor, &ot::GraphicsView::itemCreated, this, &AppBase::slotGraphicsItemDroppend);
+	connect(newEditor, &ot::GraphicsView::connectionCreated, this, &AppBase::slotGraphicsConnectionDroppend);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 }
 
@@ -2138,36 +2140,45 @@ AppBase * AppBase::instance(void) {
 	return g_app;
 }
 
-void AppBase::slotGraphicsItemDroppend(ot::UID _itemUid) {
+void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
 	}
 	
-	ot::GraphicsItem* itm = view->getItem(_itemUid);
-	if (itm == nullptr) {
-		OT_LOG_E("Failed to get item from view");
-		return;
-	}
-
-	otAssert(itm->graphicsItemUid() == _itemUid, "UID mismatch");
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, itm->graphicsItemName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, itm->graphicsItemUid());
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _item->graphicsItemName());
 	
+	ot::Point2DD itmPos(_item->getQGraphicsItem()->pos().x(), _item->getQGraphicsItem()->pos().y());
+	OT_rJSON_createValueObject(itemPosObj);
+	itmPos.addToJsonObject(doc, itemPosObj);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
+
 	try {
 		auto owner = m_graphicsViews.findOwner(view);
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_E("Failed to send http request");
+			delete _item; // We need to delete the item, since the item was only created but not stored anywhere
 			return;
 		}
-		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_E("Invalid response: " + response);
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Drop failed: " + responseObj.getWhat());
+			delete _item;
+			return;
 		}
+		else {
+			OT_rJSON_parseDOC(paramDoc, responseObj.getWhat().c_str());
+			_item->setGraphicsItemUid(ot::rJSON::getString(paramDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId));
+			view->addItem(_item);
+		}
+
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());
@@ -2177,7 +2188,8 @@ void AppBase::slotGraphicsItemDroppend(ot::UID _itemUid) {
 	}
 }
 
-void AppBase::slotGraphicsConnectionDroppend(ot::UID _connectionUid) {
+void AppBase::slotGraphicsConnectionDroppend(ot::GraphicsItem * _connectionItem) {
+	/*
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2216,6 +2228,7 @@ void AppBase::slotGraphicsConnectionDroppend(ot::UID _connectionUid) {
 	catch (...) {
 		OT_LOG_E("[FATAL] Unknown error");
 	}
+	*/
 }
 
 void AppBase::slotGraphicsSelectionChanged(void) {
@@ -2228,7 +2241,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged);
 
-	ot::UIDList sel;
+	std::list<std::string> sel;
 	for (auto s : scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
 		OTAssertNullptr(itm);
