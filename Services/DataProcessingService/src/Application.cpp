@@ -85,7 +85,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			const std::string projectName = "With esultcollection";
+			const std::string projectName = "temp";
 			auto modelService =	instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
 			
 			CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());

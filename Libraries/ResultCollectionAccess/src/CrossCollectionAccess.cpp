@@ -95,7 +95,7 @@ void CrossCollectionAccess::InquireProjectCollection(const std::string& authoris
 	}
 	else
 	{
-		OT_rJSON_parseDOC(responseDoc, response.c_str());
+		OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
 		_collectionName = responseDoc[OT_PARAM_AUTH_PROJECT_COLLECTION].GetString();
 	}
 }
