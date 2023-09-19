@@ -22,6 +22,8 @@ namespace ot
 		static ReturnMessageStatus stringToStatus(const std::string& _status);
 
 		//! @brief Create a ReturnMessage from the provided json string
+		//! This function will create a new instance and and call set from json.
+		//! If the provided json string is invalid the resulting return message will have the result failed and the what() will return the error string
 		//! @param _json The json string
 		static ReturnMessage fromJson(const std::string& _json);
 

@@ -24,8 +24,26 @@ ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const s
 
 ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 	OT_rJSON_parseDOC(doc, _json.c_str());
+
 	ReturnMessage msg;
-	msg.setFromJsonObject(doc);
+
+	if (doc.IsObject()) {
+		try {
+			msg.setFromJsonObject(doc);
+		}
+		catch (const std::exception& _e) {
+			msg = ot::ReturnMessage::Failed;
+			msg = "Failed to deserialize return message \"" + _json + "\" with error: "  + std::string(_e.what());
+		}
+		catch (...) {
+			msg = ot::ReturnMessage::Failed;
+			msg = "Failed to deserialize return message \"" + _json + "\": Unknown error";
+		}
+	}
+	else {
+		msg = ot::ReturnMessage::Failed;
+		msg = "Failed to deserialize return message \"" + _json + "\": Invalid format";
+	}
 	return msg;
 }
 
