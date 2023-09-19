@@ -147,7 +147,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			}	
 		}
 	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped)
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 	{
 		// Get item information
 		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
@@ -182,7 +182,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		return response.toJson();
 
 	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped)
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 	{
 		ot::UID uidOrigin = ot::rJSON::getULongLong(_doc,OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId);
 		ot::UID uidDestination = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId);

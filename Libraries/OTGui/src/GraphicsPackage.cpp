@@ -5,7 +5,7 @@
 
 
 // OpenTwin header
-#include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
@@ -13,14 +13,14 @@
 #define OT_JSON_Member_Title "Title"
 #define OT_JSON_Member_Collections "Collections"
 
-ot::GraphicsEditorPackage::GraphicsEditorPackage(const std::string& _packageName, const std::string& _editorTitle) 
+ot::GraphicsItemPickerPackage::GraphicsItemPickerPackage(const std::string& _packageName, const std::string& _editorTitle)
 	: m_name(_packageName), m_title(_editorTitle) {}
 
-ot::GraphicsEditorPackage::~GraphicsEditorPackage() {
+ot::GraphicsItemPickerPackage::~GraphicsItemPickerPackage() {
 	this->memFree();
 }
 
-void ot::GraphicsEditorPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+void ot::GraphicsItemPickerPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	OT_rJSON_createValueArray(collectionArr);
 	for (auto c : m_collections) {
 		OT_rJSON_createValueObject(collectionObj);
@@ -32,7 +32,7 @@ void ot::GraphicsEditorPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSO
 	ot::rJSON::add(_document, _object, OT_JSON_Member_Collections, collectionArr);
 }
 
-void ot::GraphicsEditorPackage::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsItemPickerPackage::setFromJsonObject(OT_rJSON_val& _object) {
 	this->memFree();
 
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
@@ -59,10 +59,10 @@ void ot::GraphicsEditorPackage::setFromJsonObject(OT_rJSON_val& _object) {
 	}
 }
 
-void ot::GraphicsEditorPackage::addCollection(GraphicsCollectionCfg* _collection) {
+void ot::GraphicsItemPickerPackage::addCollection(GraphicsCollectionCfg* _collection) {
 	m_collections.push_back(_collection);
 }
 
-void ot::GraphicsEditorPackage::memFree(void) {
+void ot::GraphicsItemPickerPackage::memFree(void) {
 	for (auto c : m_collections) delete c;
 }

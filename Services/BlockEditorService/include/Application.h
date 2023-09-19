@@ -46,8 +46,8 @@ public:
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleNewGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleNewGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleGraphicsSelectionChanged, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
 	
 	std::string createEmptyTestEditor(void);

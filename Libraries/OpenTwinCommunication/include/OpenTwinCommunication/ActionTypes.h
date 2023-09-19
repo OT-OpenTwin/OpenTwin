@@ -220,10 +220,10 @@
 
 
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor "UI.GraphicsEditor.CreateEmpty"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped "UI.GraphicsEditor.Item.Dropped"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemRemoved "UI.GraphicsEditor.Item.Removed"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped "UI.GraphicsEditor.Connection.Dropped"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionRemoved "UI.GraphicsEditor.Connection.Removed"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem "UI.GraphicsEditor.Item.Add"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem "UI.GraphicsEditor.Item.Remove"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged "UI.GraphicsEditor.SelectionChanged"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"

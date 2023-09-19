@@ -1,7 +1,7 @@
 #include "BlockItemManager.h"
 
 #include "OTGui/GraphicsCollectionCfg.h"
-#include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
 #include "BlockItemDatabaseAccess.h"
@@ -44,9 +44,9 @@ void BlockItemManager::OrderUIToCreateBlockPicker()
 	}
 }
 
-ot::GraphicsEditorPackage* BlockItemManager::BuildUpBlockPicker()
+ot::GraphicsItemPickerPackage* BlockItemManager::BuildUpBlockPicker()
 {
-	ot::GraphicsEditorPackage* pckg = new ot::GraphicsEditorPackage("Data Processing", "Data Processing");
+	ot::GraphicsItemPickerPackage* pckg = new ot::GraphicsItemPickerPackage("Data Processing", "Data Processing");
 	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
 	ot::GraphicsCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsCollectionCfg("Database", "Database");
 	ot::GraphicsCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsCollectionCfg("Visualization", "Visualization");

@@ -22,7 +22,7 @@ class QGridLayout;
 
 namespace ot {
 
-	class GraphicsEditorPackage;
+	class GraphicsItemPickerPackage;
 	class GraphicsCollectionCfg;
 	class GraphicsItemCfg;
 	class GraphicsView;
@@ -39,7 +39,7 @@ namespace ot {
 		void setOrientation(Qt::Orientation _orientation);
 		Qt::Orientation orientation(void) const;
 
-		void add(const ot::GraphicsEditorPackage& _pckg);
+		void add(const ot::GraphicsItemPickerPackage& _pckg);
 		void add(ot::GraphicsCollectionCfg* _topLevelCollection);
 		void add(const std::list<ot::GraphicsCollectionCfg*>& _topLevelCollections);
 

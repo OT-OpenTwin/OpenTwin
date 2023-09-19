@@ -7,13 +7,14 @@
 #pragma once
 
 // OpenTwin header
+#include "OpenTwinCore/Size2D.h"
+#include "OpenTwinCore/Point2D.h"
+#include "OpenTwinCore/SimpleFactory.h"
+#include "OpenTwinCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/Border.h"
 #include "OTGui/Margins.h"
 #include "OTGui/Font.h"
-#include "OpenTwinCore/Size2D.h"
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCore/Serializable.h"
 
 // std header
 #include <string>
@@ -56,6 +57,10 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_tile = _title; };
 		const std::string& title(void) const { return m_tile; };
 
+		void setPosition(double _x, double _y) { this->setPosition(Point2DD(_x, _y)); };
+		void setPosition(const Point2DD& _pos) { m_pos = _pos; };
+		const Point2DD& position(void) { return m_pos; };
+
 		void setSize(const ot::Size2D& _size) { m_size = _size; };
 		const ot::Size2D& size(void) const { return m_size; };
 
@@ -71,6 +76,7 @@ namespace ot {
 	private:
 		std::string m_name;
 		std::string m_tile;
+		Point2DD m_pos;
 		Size2D m_size;
 		Margins m_margins;
 		GraphicsItemFlag m_flags;

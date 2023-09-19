@@ -1,4 +1,4 @@
-//! @file GraphicsEditorPackage.h
+//! @file GraphicsPackage.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -17,10 +17,10 @@ namespace ot {
 
 	class GraphicsCollectionCfg;
 	
-	class OT_GUI_API_EXPORT GraphicsEditorPackage : public ot::Serializable {
+	class OT_GUI_API_EXPORT GraphicsItemPickerPackage : public ot::Serializable {
 	public:
-		GraphicsEditorPackage(const std::string& _packageName, const std::string& _editorTitle);
-		virtual ~GraphicsEditorPackage();
+		GraphicsItemPickerPackage(const std::string& _packageName, const std::string& _editorTitle);
+		virtual ~GraphicsItemPickerPackage();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -45,8 +45,9 @@ namespace ot {
 		std::string m_name;
 		std::string m_title;
 
-		GraphicsEditorPackage() = delete;
-		GraphicsEditorPackage(const GraphicsEditorPackage&) = delete;
-		GraphicsEditorPackage& operator = (const GraphicsEditorPackage&) = delete;
+		GraphicsItemPickerPackage() = delete;
+		GraphicsItemPickerPackage(const GraphicsItemPickerPackage&) = delete;
+		GraphicsItemPickerPackage& operator = (const GraphicsItemPickerPackage&) = delete;
 	};
+
 }

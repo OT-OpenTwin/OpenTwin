@@ -2148,7 +2148,7 @@ void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
 	}
 	
 	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDropped);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _item->graphicsItemName());
 	
 	ot::Point2DD itmPos(_item->getQGraphicsItem()->pos().x(), _item->getQGraphicsItem()->pos().y());

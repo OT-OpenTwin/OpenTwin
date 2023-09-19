@@ -45,6 +45,11 @@ namespace ot {
 		//! @param _y The Y value to set
 		void setY(T _y) { m_y = _y; };
 
+		//! @brief Set the X and Y value
+		//! @param _x The X value to set
+		//! @param _y The y value to set
+		void set(T _x, T _y) { m_x = _x; m_y = _y; };
+
 	protected:
 		T		m_x;			//! The current X value
 		T		m_y;			//! The current Y value

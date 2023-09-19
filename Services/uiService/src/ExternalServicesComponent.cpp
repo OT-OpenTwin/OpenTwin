@@ -38,7 +38,7 @@
 #include "OpenTwinFoundation/Dispatcher.h"
 #include "OpenTwinFoundation/TableRange.h"
 #include "OpenTwinFoundation/ContextMenu.h"
-#include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -2822,7 +2822,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				//ot::BlockEditorConfigurationPackage pckg;
 				OT_rJSON_val configurationObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
 
-				ot::GraphicsEditorPackage pckg("", "");
+				ot::GraphicsItemPickerPackage pckg("", "");
 				pckg.setFromJsonObject(configurationObj);
 
 				AppBase::instance()->createEmptyGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), owner);

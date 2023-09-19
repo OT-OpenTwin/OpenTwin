@@ -42,7 +42,7 @@
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsEditorPackage.h">
+    <ClInclude Include="include\OTGui\GraphicsPackage.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h">
@@ -80,7 +80,7 @@
     <ClCompile Include="src\GraphicsCollectionCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsEditorPackage.cpp">
+    <ClCompile Include="src\GraphicsPackage.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsItemCfg.cpp">

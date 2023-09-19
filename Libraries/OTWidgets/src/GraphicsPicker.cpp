@@ -13,7 +13,7 @@
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
-#include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OpenTwinCore/Logger.h"
 
 // Qt header
@@ -67,7 +67,7 @@ Qt::Orientation ot::GraphicsPicker::orientation(void) const {
 	return m_splitter->orientation();
 }
 
-void ot::GraphicsPicker::add(const ot::GraphicsEditorPackage& _pckg) {
+void ot::GraphicsPicker::add(const ot::GraphicsItemPickerPackage& _pckg) {
 	this->addCollections(_pckg.collections(), nullptr);
 }
 

@@ -22,6 +22,7 @@
 #define OT_JSON_MEMBER_Radius "Radius" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                      ^O^^^^^^   //.:## > ##:.//^^  3
 #define OT_JSON_MEMBER_RadiusX "RadiusX" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                           ^O^^^^^^   //.:## > ##:.//^^   3
 #define OT_JSON_MEMBER_RadiusY "RadiusY"
+#define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_IsMaster "IsMaster"
 #define OT_JSON_MEMBER_TextFont "TextFont"
 #define OT_JSON_MEMBER_TextColor "TextColor"
@@ -32,11 +33,15 @@
 
 #define OT_JSON_VALUE_Connectable "Connectable"
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter) {}
+ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter) {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
 void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+	OT_rJSON_createValueObject(posObj);
+	m_pos.addToJsonObject(_document, posObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Position, posObj);
+
 	OT_rJSON_createValueObject(sizeObj);
 	m_size.addToJsonObject(_document, sizeObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Size, sizeObj);
@@ -58,6 +63,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Title, String);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Position, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Size, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
@@ -67,9 +73,11 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	m_tile = _object[OT_JSON_MEMBER_Title].GetString();
 	m_alignment = ot::stringToAlignment(_object[OT_JSON_MEMBER_Alignment].GetString());
 
+	OT_rJSON_val posObj = _object[OT_JSON_MEMBER_Position].GetObject();
 	OT_rJSON_val sizeObj = _object[OT_JSON_MEMBER_Size].GetObject();
 	OT_rJSON_val marginObj = _object[OT_JSON_MEMBER_Margin].GetObject();
 
+	m_pos.setFromJsonObject(posObj);
 	m_size.setFromJsonObject(sizeObj);
 	m_margins.setFromJsonObject(marginObj);
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "OTGui/GraphicsCollectionCfg.h"
-#include "OTGui/GraphicsEditorPackage.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
 #include <memory>
