@@ -4,7 +4,7 @@ List of services
 The following sections describe the purpose and operation of the individual services.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: Core Services:
 
    authorisation_service
@@ -15,7 +15,7 @@ The following sections describe the purpose and operation of the individual serv
    logger_service
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: OpenTwin Services:
 
    model_service
