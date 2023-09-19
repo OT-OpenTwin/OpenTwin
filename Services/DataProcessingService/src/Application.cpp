@@ -116,12 +116,25 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			const std::string queryDimension = dbAccess->getQueryDimension();
 			const std::string projectName = "With Resultcollection";/*dbAccess->getSelectedProjectName();*/
 			
+			std::list<std::string> msmdNames{ "MSMD 101", "MSMD 111" , "MSMD 121" };
 			std::list<std::string> quantityNames{ "Quantity 1", "Quantity 2" };
-			std::list<std::string> msmdNames{ "MSMD 0", "MSMD 1" , "MSMD 2" };
+
+			EntityProperties properties;
+			EntityPropertiesSelection::createProperty("Query Specification", "Measurement Series", msmdNames, "", "default", properties);
+			EntityPropertiesSelection::createProperty("Query Specification", "Quantity", quantityNames, "", "default", properties);
 			
-			dbAccess->UpdateBasicProperties(msmdNames, quantityNames);
+			OT_rJSON_createDOC(requestDoc);
+			ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities);
+			ot::UIDList ids{ dbAccess->getEntityID() };
+			ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityIDList, ids);
+			ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_JSON, properties.getJSON(nullptr,true));
+
+			sendMessage(true, OT_INFO_SERVICE_TYPE_MODEL, requestDoc);
+
+			/*dbAccess->UpdateBasicProperties(msmdNames, quantityNames);
 			dbAccess->StoreToDataBase();
-			m_modelComponent->addEntitiesToModel({ dbAccess->getEntityID() }, { dbAccess->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added properties");
+			m_modelComponent->addEntitiesToModel({ dbAccess->getEntityID() }, { dbAccess->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added properties");*/
+
 			//m_modelComponent->updatePropertyGrid();
 			/*auto propBase = dbAccess->getProperties().getProperty("Measurement Series");
 			if (propBase != nullptr)

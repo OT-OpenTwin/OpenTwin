@@ -169,6 +169,8 @@ public:
 	std::list<ot::UID> getIDsOfFolderItemsOfType(const std::string &folder, const std::string &className, bool recursive);
 	std::list<EntityBase*> getListOfSelectedEntities(const std::string &typeFilter);
 	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);
+	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);
+
 
 	void getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions);
 	void getEntityNames(std::list<ot::UID> &entityIDList, std::list<std::string> &entityNames);

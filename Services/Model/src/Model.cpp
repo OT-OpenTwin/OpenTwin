@@ -1344,6 +1344,36 @@ void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const std:
 	}
 }
 
+void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const std::string& propertiesJson)
+{
+	EntityProperties properties;
+	properties.buildFromJSON(propertiesJson);
+
+	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
+
+	bool anyPropertyAdded = false;
+
+	// Now we loop through all entities
+	for (auto entityID : entityIDList)
+	{
+		EntityBase* entity = getEntity(entityID);
+		assert(entity != nullptr);
+
+		for (auto prop : allProperties)
+		{
+			EntityPropertiesBase* newProperty = prop->createCopy();
+			entity->getProperties().updateProperty(newProperty, prop->getGroup());
+			entity->setModified();
+			anyPropertyAdded = true;
+		}
+	}
+
+	if (anyPropertyAdded)
+	{
+		updatePropertyGrid();
+	}
+}
+
 void Model::deleteSelectedShapes(void)
 {
 	std::list<EntityBase *> selectedEntities;

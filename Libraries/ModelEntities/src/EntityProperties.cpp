@@ -41,6 +41,27 @@ bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::str
 	return true;
 }
 
+bool EntityProperties::updateProperty(EntityPropertiesBase* prop, const std::string& group)
+{
+	EntityPropertiesBase* property = getProperty(prop->getName());
+
+	if (property != nullptr)
+	{
+		propertiesList.remove(property);
+		properties.erase(prop->getName());
+		delete property;
+		property = nullptr;
+	}
+
+	prop->setGroup(group);
+	prop->setContainer(this);
+	properties[prop->getName()] = prop;
+
+	propertiesList.push_back(prop);
+
+	return true;
+}
+
 bool EntityProperties::deleteProperty(const std::string &name)
 {
 	EntityPropertiesBase *property = getProperty(name);

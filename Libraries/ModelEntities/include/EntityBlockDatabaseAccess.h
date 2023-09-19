@@ -11,8 +11,6 @@ public:
 	std::string getSelectedProjectName();
 	std::string getQueryDimension();
 
-	void UpdateBasicProperties(std::list<std::string>& measurementSeries, std::list<std::string>& quantities);
-
 protected:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;

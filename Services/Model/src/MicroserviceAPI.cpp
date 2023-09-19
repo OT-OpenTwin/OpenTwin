@@ -928,6 +928,15 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 			globalModel->addPropertiesToEntities(entityIDList, propertiesJson);
 		}
+		else if (action == OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities)
+		{
+			if (globalModel == nullptr) throw std::exception("No model created yet");
+
+			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::string propertiesJson = doc[OT_ACTION_PARAM_MODEL_JSON].GetString();
+
+			globalModel->updatePropertiesOfEntities(entityIDList, propertiesJson);
+		}
 		else if (action == OT_ACTION_CMD_MODEL_DeleteProperty)
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");

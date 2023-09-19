@@ -16,6 +16,7 @@ public:
 	virtual ~EntityProperties();
 
 	bool createProperty(EntityPropertiesBase *property, const std::string &group);
+	bool updateProperty(EntityPropertiesBase *property, const std::string &group);
 	bool deleteProperty(const std::string &name);
 	bool propertyExists(const std::string &name);
 

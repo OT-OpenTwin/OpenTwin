@@ -108,6 +108,7 @@
 #define OT_ACTION_CMD_MODEL_CheckParentUpdates "Model.CheckParentUpdates"
 #define OT_ACTION_CMD_MODEL_ActivateVersion "Model.ActivateVersion"
 #define OT_ACTION_CMD_MODEL_AddPropertiesToEntities "Model.Entities.AddProperty"
+#define OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities "Model.Entities.UpdateProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
 
