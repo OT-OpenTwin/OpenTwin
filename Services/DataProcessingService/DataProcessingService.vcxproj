@@ -199,6 +199,7 @@
     <ClCompile Include="src\PipelineManager.cpp" />
     <ClCompile Include="src\PipelineSink.cpp" />
     <ClCompile Include="src\PipelineSource.cpp" />
+    <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
     <ClCompile Include="src\ResultCollectionHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
@@ -214,6 +215,7 @@
     <ClInclude Include="include\BlockItemDataProcessing.h" />
     <ClInclude Include="include\BlockItemPlot1D.h" />
     <ClInclude Include="include\BlockItemPython.h" />
+    <ClInclude Include="include\BufferBlockDatabaseAccess.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />
@@ -223,6 +225,7 @@
     <ClInclude Include="include\PipelineManager.h" />
     <ClInclude Include="include\PipelineSink.h" />
     <ClInclude Include="include\PipelineSource.h" />
+    <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />
     <ClInclude Include="include\ResultCollectionHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>

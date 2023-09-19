@@ -17,6 +17,7 @@
 
 #include "BlockEntityHandler.h"
 #include "PipelineManager.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
 
 // Forward declaration
 namespace ot {
@@ -119,6 +120,6 @@ private:
 	virtual ~Application();
 
 	ot::MenuButtonDescription _buttonRunPipeline;
-
 	PipelineManager _pipelineManager;
+	PropertyHandlerDatabaseAccessBlock _propertyHandlerDBAccessBlocks;
 };

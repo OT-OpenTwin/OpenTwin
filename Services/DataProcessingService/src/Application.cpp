@@ -109,44 +109,51 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
 		ClassFactory classFactory;
 		auto entBase =	m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), classFactory);
-		auto dbAccess =	dynamic_cast<EntityBlockDatabaseAccess*>(entBase);
+		auto dbAccess =	std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
+
 		if (dbAccess != nullptr)
 		{
-			const std::string queryDimension = dbAccess->getQueryDimension();
-			const std::string projectName = dbAccess->getSelectedProjectName();
-			
-			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-			CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
-			if (access.ConnectedWithCollection())
+			if (_propertyHandlerDBAccessBlocks.requiresUpdate(dbAccess))
 			{
-				auto rmd = access.getMeasurementCampaignMetadata(m_modelComponent);
-				auto msmds = access.getMeasurementMetadata(m_modelComponent);
-
-				MeasurementCampaignFactory factory;
-				MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
-				std::map <std::string, MetadataQuantity> quantities = measurementCampaign.getMetadataQuantities();
-				std::list<std::string> quantityNames;
-				for (auto& quantity : quantities)
+				const std::string projectName = dbAccess->getSelectedProjectName();
+				auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+				CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
+				if (access.ConnectedWithCollection())
 				{
-					quantityNames.push_back(quantity.first);
-				}
-				std::list<std::string> msmdNames;
-				for (auto& msmd : msmds)
-				{
-					msmdNames.push_back(msmd->getName());
-				}
-				EntityProperties properties;
-				EntityPropertiesSelection::createProperty("Query Specification", "Measurement Series", msmdNames, "", "default", properties);
-				EntityPropertiesSelection::createProperty("Query Specification", "Quantity", quantityNames, "", "default", properties);
+					auto rmd = access.getMeasurementCampaignMetadata(m_modelComponent);
+					auto msmds = access.getMeasurementMetadata(m_modelComponent);
 
-				OT_rJSON_createDOC(requestDoc);
-				ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities);
-				ot::UIDList ids{ dbAccess->getEntityID() };
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityIDList, ids);
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_JSON, properties.getJSON(nullptr, true));
+					MeasurementCampaignFactory factory;
+					MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
+					std::map <std::string, MetadataQuantity> quantities = measurementCampaign.getMetadataQuantities();
+					std::list<std::string> quantityNames;
+					for (auto& quantity : quantities)
+					{
+						quantityNames.push_back(quantity.first);
+					}
+					std::list<std::string> msmdNames;
+					for (auto& msmd : msmds)
+					{
+						msmdNames.push_back(msmd->getName());
+					}
+					std::map <std::string, MetadataParameter> parameters = measurementCampaign.getMetadataParameter();
+					std::list<std::string> parameterNames;
+					for (auto parameter : parameters)
+					{
+						parameterNames.push_back(parameter.first);
+					}
 
-				sendMessage(true, OT_INFO_SERVICE_TYPE_MODEL, requestDoc);
-			}	
+					auto requestDoc = _propertyHandlerDBAccessBlocks.Update(dbAccess, quantityNames, parameterNames, msmdNames);
+					sendMessage(true, OT_INFO_SERVICE_TYPE_MODEL, requestDoc);
+				}
+
+			}
+			const std::string queryDimension = dbAccess->getQueryDimension();
+		}
+		else
+		{
+			delete entBase;
+			entBase = nullptr;
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
@@ -172,8 +179,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			dependencies.setPythonScriptFolderID(entityInfo.getID());
 		}
 
-		//                                                                                     \/     This value was the UID send from the UI before. Instead of 0 the new UID should be passed
-		auto blockEntity = BlockEntityHandler::GetInstance().CreateBlock(editorName, itemName, 0);
+		auto blockEntity = BlockEntityHandler::GetInstance().CreateBlock(editorName, itemName, m_modelComponent->createEntityUID());
 		if (blockEntity != nullptr)
 		{
 			ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
