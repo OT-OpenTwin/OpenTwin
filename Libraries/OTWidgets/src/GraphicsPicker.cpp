@@ -67,7 +67,7 @@ Qt::Orientation ot::GraphicsPicker::orientation(void) const {
 	return m_splitter->orientation();
 }
 
-void ot::GraphicsPicker::add(const ot::GraphicsNewEditorPackage& _pckg) {
+void ot::GraphicsPicker::add(const ot::GraphicsCollectionPackage& _pckg) {
 	this->addCollections(_pckg.collections(), nullptr);
 }
 

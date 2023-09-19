@@ -218,7 +218,7 @@
 #define OT_ACTION_CMD_PYTHON_Request_Initialization "Python.Request.Initialize"
 #define OT_ACTION_CMD_PYTHON_Initialization "Python.Initialize"
 
-
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker "UI.GraphicsPicker.Fill"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor "UI.GraphicsEditor.CreateEmpty"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems "UI.GraphicsEditor.Item.Add"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItems "UI.GraphicsEditor.Item.Remove"
