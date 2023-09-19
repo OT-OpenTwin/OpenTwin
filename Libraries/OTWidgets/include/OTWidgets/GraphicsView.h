@@ -49,10 +49,17 @@ namespace ot {
 		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);
 
 	signals:
-		//! @brief Will be emitted when an item was created by the user
-		//! The provided item is the item that was created
-		void itemCreated(ot::GraphicsItem * _item);
-		void connectionCreated(ot::GraphicsItem* _item);
+		//! @brief Will be emitted when an item was dropped into the scene by the user
+		//! @param _name Item name
+		//! @param _pos Item scene position
+		void itemRequested(const QString& _name, const QPointF& _pos);
+
+		//! @brief Will be emitted when a connection was "dropped" by the user
+		//! @param _fromUid Source item UID
+		//! @param _fromConnector Source connector (child of source item)
+		//! @param _toUid Destination item UID
+		//! @param _toConnector Destination connector (child of destination item)
+		void connectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;

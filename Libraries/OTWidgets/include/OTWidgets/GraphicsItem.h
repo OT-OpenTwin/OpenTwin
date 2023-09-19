@@ -20,7 +20,7 @@
 // std header
 #include <list>
 
-#define OT_GRAPHICSITEM_MIMETYPE_Configuration "GraphicsItem.Configuration"
+#define OT_GRAPHICSITEM_MIMETYPE_ItemName "GraphicsItem.Name"
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsPathItem "OT_GIPath"
@@ -110,6 +110,8 @@ namespace ot {
 
 		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
 
+		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
+
 		// ###############################################################################################################################################
 
 		// Generalized functionallity
@@ -126,9 +128,6 @@ namespace ot {
 
 		void setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags);
 		ot::GraphicsItem::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
-
-		void setConfiguration(const std::string& _jsonDocument) { m_configuration = _jsonDocument; };
-		const std::string& configuration(void) const { return m_configuration; };
 
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void) { return m_scene; }
@@ -173,7 +172,6 @@ namespace ot {
 		bool m_isContainerItem;
 		bool m_hasHover;
 		std::string m_uid;
-		std::string m_configuration;
 		std::string m_name;
 		ot::Alignment m_alignment;
 		GraphicsItemFlag m_flags;
@@ -222,6 +220,8 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+
+		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

@@ -61,7 +61,7 @@ namespace ot {
 	public:
 		//! @brief Constructor
 		//! @param _editorName The unique name for the editor.
-		GraphicsNewEditorPackage(const std::string& _editorName, const std::string& _editorTitle);
+		GraphicsNewEditorPackage(const std::string& _editorName = std::string(), const std::string& _editorTitle = std::string());
 		virtual ~GraphicsNewEditorPackage();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -81,7 +81,6 @@ namespace ot {
 		std::string m_name;
 		std::string m_title;
 
-		GraphicsNewEditorPackage() = delete;
 		GraphicsNewEditorPackage(const GraphicsNewEditorPackage&) = delete;
 		GraphicsNewEditorPackage& operator = (const GraphicsNewEditorPackage&) = delete;
 	};
@@ -96,7 +95,7 @@ namespace ot {
 	//! Note that the request to the UI must be send manually by providing this object (serialized) as the package
 	class OT_GUI_API_EXPORT GraphicsScenePackage : public ot::Serializable {
 	public:
-		GraphicsScenePackage(const std::string& _editorName);
+		GraphicsScenePackage(const std::string& _editorName = std::string());
 		virtual ~GraphicsScenePackage();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -121,6 +120,51 @@ namespace ot {
 		std::string m_name;
 		std::list<ot::GraphicsItemCfg*> m_items;
 
+		GraphicsScenePackage(const GraphicsScenePackage&) = delete;
+		GraphicsScenePackage& operator = (const GraphicsScenePackage&) = delete;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_GUI_API_EXPORT GraphicsConnectionPackage : public ot::Serializable {
+	public:
+		struct ConnectionInfo {
+			std::string fromUID;
+			std::string fromConnectable;
+			std::string toUID;
+			std::string toConnectable;
+		};
+
+		GraphicsConnectionPackage(const std::string& _editorName = std::string());
+		virtual ~GraphicsConnectionPackage();
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& name(void) const { return m_name; };
+
+		void addConnection(const std::string& _fromUid, const std::string& _fromConnectable, const std::string& _toUid, const std::string& _toConnectable);
+		void addConnection(const GraphicsConnectionPackage::ConnectionInfo& _info) { m_connections.push_back(_info); };
+		const std::list<ConnectionInfo>& connections(void) const { return m_connections; };
+
+	private:
+		std::string m_name;
+		std::list<ConnectionInfo> m_connections;
+
+		GraphicsConnectionPackage(const GraphicsConnectionPackage&) = delete;
+		GraphicsConnectionPackage& operator = (const GraphicsConnectionPackage&) = delete;
 	};
 
 }

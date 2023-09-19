@@ -149,7 +149,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			}	
 		}
 	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems)
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 	{
 		// Get item information
 		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
@@ -190,7 +190,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		pckg.addItem(itm);
 
 		OT_rJSON_createDOC(reqDoc);
-		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems);
+		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
 
 		OT_rJSON_createValueObject(pckgDoc);
 		pckg.addToJsonObject(reqDoc, pckgDoc);
@@ -200,14 +200,32 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		m_uiComponent->sendMessage(true, reqDoc);
 
 	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnections)
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 	{
-		ot::UID uidOrigin = ot::rJSON::getULongLong(_doc,OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId);
-		ot::UID uidDestination = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId);
-		std::string connectorNameOrigin = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName);
-		std::string connectorNameDestination = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName);
+		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		
+		OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
+		OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+		
+		ot::GraphicsConnectionPackage pckg;
+		pckg.setFromJsonObject(pckgObj);
 
-		BlockEntityHandler::GetInstance().AddBlockConnection(uidOrigin, uidDestination, connectorNameOrigin, connectorNameDestination);
+		// Store connection information
+		for (auto c : pckg.connections()) {
+			BlockEntityHandler::GetInstance().AddBlockConnection(c.fromUID, c.toUID, c.fromConnectable, c.toConnectable);
+		}
+
+		
+		// Request UI to add connection
+		OT_rJSON_createDOC(reqDoc);
+		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+
+		OT_rJSON_createValueObject(reqPckgObj);
+		pckg.addToJsonObject(reqDoc, reqPckgObj);
+		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+
+		ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+		m_uiComponent->sendMessage(true, reqDoc);
 	}
 
 	return ""; // Return empty string if the request does not expect a return

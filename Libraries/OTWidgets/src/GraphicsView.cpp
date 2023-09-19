@@ -93,7 +93,7 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 
 	newConnection->connectItems(_origin, _dest);
 
-	emit connectionCreated(newConnection);
+	emit connectionRequested(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
@@ -215,7 +215,7 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 
 void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty() && m_dropEnabled) {
+	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
 		_event->acceptProposedAction();
 	}
 	else {
@@ -225,78 +225,21 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 
 void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	if (!m_dropEnabled) {
-		_event->acceptProposedAction();
 		return;
 	}
-	QByteArray cfgRaw = _event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration);
-	if (cfgRaw.isEmpty()) {
+	QString itemName = _event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_ItemName);
+	if (itemName.isEmpty()) {
 		OT_LOG_W("Drop event reqected: MimeData not matching");
 		return;
 	}
 
-	// Generate configuration from raw data
-	ot::GraphicsItemCfg* cfg = nullptr;
-	try {
-		OT_rJSON_parseDOC(cfgDoc, cfgRaw.toStdString().c_str());
-		OT_rJSON_val cfgObj = cfgDoc.GetObject();
-		cfg = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(cfgObj);
-		cfg->setFromJsonObject(cfgObj);
-	}
-	catch (const std::exception& e) {
-		OT_LOG_EAS(e.what());
-		if (cfg) delete cfg;
-		cfg = nullptr;
-		return;
-	}
-	catch (...) {
-		OT_LOG_EA("Unknown error");
-		if (cfg) delete cfg;
-		cfg = nullptr;
-		return;
-	}
-
-	if (cfg == nullptr) {
-		OT_LOG_WA("No config created");
-		return;
-	}
-
-	// Store current event position to position the new item at this pos
-	QPointF position = this->mapToScene(_event->pos());
-
-	// Create graphics item from configuration
-	ot::GraphicsItem* newItem = nullptr;
-	try {
-		newItem = ot::GraphicsFactory::itemFromConfig(cfg);
-		newItem->setGraphicsItemFlags(newItem->graphicsItemFlags() | ot::GraphicsItem::ItemNetworkContext | ot::GraphicsItem::ItemIsMoveable);
-		
-		// Move to new location
-		newItem->getRootItem()->getQGraphicsItem()->setPos(position);
-
-		emit itemCreated(newItem);
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-		if (newItem) delete newItem;
-		delete cfg;
-		return;
-	}
-	catch (...) {
-		OT_LOG_EA("Unknown error occured");
-		if (newItem) delete newItem;
-		delete cfg;
-		return;
-	}
-
-	//newBlock->moveBy(position.x(), position.y());
-
-	delete cfg;
-
+	emit itemRequested(itemName, this->mapToScene(_event->pos()));
 	_event->acceptProposedAction();
 }
 
 void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_Configuration).isEmpty() && m_dropEnabled) {
+	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
 		_event->acceptProposedAction();
 	}
 	else {

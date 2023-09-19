@@ -115,6 +115,20 @@ QPointF ot::GraphicsLayoutItem::getGraphicsItemScenePos(void) const {
 	return m_layoutWrap->scenePos();
 }
 
+ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName) {
+	if (_itemName == this->graphicsItemName()) return this;
+	std::list<QGraphicsLayoutItem*> lst;
+	this->getAllItems(lst);
+	for (auto i : lst) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+		if (itm) {
+			auto r = itm->findItem(_itemName);
+			if (r) return r;
+		}
+	}
+	return nullptr;
+}
+
 void ot::GraphicsLayoutItem::createLayoutWrapperAndGroup(QGraphicsLayout* _layout) {
 	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);

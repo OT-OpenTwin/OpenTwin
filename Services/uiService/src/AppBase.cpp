@@ -57,6 +57,7 @@
 #include "OpenTwinCommunication/UiTypes.h"
 #include "OpenTwinFoundation/SettingsData.h"
 #include "OpenTwinFoundation/OTObject.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -2064,8 +2065,8 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 
 	AppBase::instance()->addTabToCentralView(_title, newEditor);
 	m_graphicsViews.store(_owner, newEditor);
-	connect(newEditor, &ot::GraphicsView::itemCreated, this, &AppBase::slotGraphicsItemDroppend);
-	connect(newEditor, &ot::GraphicsView::connectionCreated, this, &AppBase::slotGraphicsConnectionDroppend);
+	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
+	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 }
 
@@ -2152,7 +2153,7 @@ AppBase * AppBase::instance(void) {
 	return g_app;
 }
 
-void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
+void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2160,35 +2161,27 @@ void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
 	}
 	
 	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _item->graphicsItemName());
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _name.toStdString());
 	
-	ot::Point2DD itmPos(_item->getQGraphicsItem()->pos().x(), _item->getQGraphicsItem()->pos().y());
+	ot::Point2DD itmPos(_pos.x(), _pos.y());
 	OT_rJSON_createValueObject(itemPosObj);
 	itmPos.addToJsonObject(doc, itemPosObj);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
 
 	try {
-		auto owner = m_graphicsViews.findOwner(view);
+		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_E("Failed to send http request");
-			delete _item; // We need to delete the item, since the item was only created but not stored anywhere
 			return;
 		}
 
 		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
-		
 		if (responseObj != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Drop failed: " + responseObj.getWhat());
-			delete _item;
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
 			return;
-		}
-		else {
-			OT_rJSON_parseDOC(paramDoc, responseObj.getWhat().c_str());
-			_item->setGraphicsItemUid(ot::rJSON::getString(paramDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId));
-			view->addItem(_item);
 		}
 
 	}
@@ -2200,38 +2193,36 @@ void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
 	}
 }
 
-void AppBase::slotGraphicsConnectionDroppend(ot::GraphicsItem * _connectionItem) {
-	/*
+void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
 	}
 
-	ot::GraphicsConnectionItem* itm = view->getConnection(_connectionUid);
-	if (itm == nullptr) {
-		OT_LOG_E("Failed to get connection from view");
-		return;
-	}
-
-	otAssert(itm->graphicsItemUid() == _connectionUid, "UID mismatch");
 	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionDropped);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId, itm->originItem()->getRootItem()->graphicsItemUid());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId, itm->destItem()->getRootItem()->graphicsItemUid());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName, itm->originItem()->graphicsItemName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName, itm->destItem()->graphicsItemName());
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
 
+	ot::GraphicsConnectionPackage pckg;
+	pckg.addConnection(_fromUid, _fromConnector, _toUid, _toConnector);
+
+	OT_rJSON_createValueObject(pckgObj);
+	pckg.addToJsonObject(doc, pckgObj);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	
 	try {
-		auto owner = m_graphicsViews.findOwner(view);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
-		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_E("Invalid response: " + response);
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
 		}
 	}
 	catch (const std::exception& _e) {
@@ -2240,7 +2231,6 @@ void AppBase::slotGraphicsConnectionDroppend(ot::GraphicsItem * _connectionItem)
 	catch (...) {
 		OT_LOG_E("[FATAL] Unknown error");
 	}
-	*/
 }
 
 void AppBase::slotGraphicsSelectionChanged(void) {

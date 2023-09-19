@@ -488,8 +488,8 @@ public:
 	std::string getCredentialUserPasswordClear(void) { return m_userPassword; }
 
 public slots:
-	void slotGraphicsItemDroppend(ot::GraphicsItem * _item);
-	void slotGraphicsConnectionDroppend(ot::GraphicsItem * _connectionItem);
+	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
+	void slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 	void slotGraphicsSelectionChanged(void);
 
 private slots:

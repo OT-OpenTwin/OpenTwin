@@ -2837,7 +2837,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems) {
+			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem) {
 				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
@@ -2857,8 +2857,35 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					}
 				}
 			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnections) {
-				OT_LOG_EA("Not implemented yet");
+			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
+				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+
+				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
+				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+
+				ot::GraphicsConnectionPackage pckg;
+				pckg.setFromJsonObject(pckgObj);
+
+				ot::GraphicsView* editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
+				
+				for (auto c : pckg.connections()) {
+					ot::GraphicsItem* src = editor->getItem(c.fromUID);
+					ot::GraphicsItem* dest = editor->getItem(c.toUID);
+
+					if (src && dest) {
+						ot::GraphicsItem* srcConn = src->findItem(c.fromConnectable);
+						ot::GraphicsItem* destConn = src->findItem(c.fromConnectable);
+						if (srcConn && destConn) {
+							editor->addConnection(srcConn, destConn);
+						}
+						else {
+							OT_LOG_EA("Invalid graphics item name");
+						}
+					}
+					else {
+						OT_LOG_EA("Invalid graphics item UID");
+					}
+				}
 			}
 			else
 			{

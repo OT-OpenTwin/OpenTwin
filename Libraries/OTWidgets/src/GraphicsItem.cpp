@@ -40,7 +40,7 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 		QDrag drag(m_widget);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText("OT_BLOCK");
-		mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_Configuration, QByteArray::fromStdString(m_owner->configuration()));
+		mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_ItemName, QByteArray::fromStdString(m_owner->graphicsItemName()));
 
 		// Create drag
 		drag.setMimeData(mimeData);
@@ -86,14 +86,16 @@ ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	return this;
 }
 
+ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
+	if (_itemName == m_name) return this;
+	else return nullptr;
+}
+
 void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect) {
 	if (m_parent) {
 		m_parent->handleItemClickEvent(_event, _rect);
 	}
 	else if (m_flags & ot::GraphicsItem::ItemPreviewContext) {
-		// Start drag since its a preview item
-		otAssert(!m_configuration.empty(), "No configuration set");
-
 		if (_event->button() == Qt::LeftButton) {
 			if (m_drag == nullptr) {
 				m_drag = new GraphicsItemDrag(this);
@@ -275,6 +277,19 @@ QPointF ot::GraphicsGroupItem::getGraphicsItemScenePos(void) const {
 void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) {
+	if (_itemName == this->graphicsItemName()) return this;
+
+	for (auto i : this->childItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+		if (itm) {
+			auto r = itm->findItem(_itemName);
+			if (r) return r;
+		}
+	}
+	return nullptr;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -88,6 +88,8 @@ namespace ot {
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return m_layoutWrap->getQGraphicsLayoutItem(); };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return m_layoutWrap->getQGraphicsItem(); };
 
+		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
+
 	protected:
 		//! @brief Call this function from the item constructor to create the layout wrapper instance
 		void createLayoutWrapperAndGroup(QGraphicsLayout* _layout);
