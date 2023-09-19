@@ -43,7 +43,7 @@ namespace ot {
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
 		void setGraphicsViewName(const std::string& _name) { m_viewName = _name; };
-		const std::string& graphcisViewName(void) const { return m_viewName; };
+		const std::string& graphicsViewName(void) const { return m_viewName; };
 
 		void addItem(ot::GraphicsItem* _item);
 		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);

@@ -44,9 +44,9 @@ void BlockItemManager::OrderUIToCreateBlockPicker()
 	}
 }
 
-ot::GraphicsItemPickerPackage* BlockItemManager::BuildUpBlockPicker()
+ot::GraphicsNewEditorPackage* BlockItemManager::BuildUpBlockPicker()
 {
-	ot::GraphicsItemPickerPackage* pckg = new ot::GraphicsItemPickerPackage("Data Processing", "Data Processing");
+	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage("Data Processing", "Data Processing");
 	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
 	ot::GraphicsCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsCollectionCfg("Database", "Database");
 	ot::GraphicsCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsCollectionCfg("Visualization", "Visualization");

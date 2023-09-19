@@ -101,49 +101,48 @@ namespace ot {
 
 		//! @brief Store the provided object for the given owner
 		//! The manager takes ownership of the object
-		void store(const ot::Owner<K>& _owner, V* _obj) { objectList(_owner)->push_back(_obj); };
+		void store(const ot::Owner<K>& _owner, V* _obj) { this->objectList(_owner).push_back(_obj); };
 
 		//! @brief Will clean up the memory while removing all entries
 		void free(void) {
-			for (auto it : m_data) {
+			for (auto it : this->m_data) {
 				for (auto obj : *it.second) { delete obj.second; };
 				delete it.second;
 			}
-			m_data.clear();
+			this->m_data.clear();
 		}
 
 		//! @brief Clean up the memory for the given owner and remove its entries
 		//! @param _owner The object owner
 		void free(const ot::Owner<K>& _owner) {
-			auto it = m_data.find(_owner);
-			if (it != m_data.end()) {
+			auto it = this->m_data.find(_owner);
+			if (it != this->m_data.end()) {
 				for (auto obj : *it->second) delete obj;
 				delete it->second;
 				
-				remove(_owner);
+				this->remove(_owner);
 			}
 		}
 
 		//! @brief Remove all entries for the given owner
 		//! Callee takes ownership of affected objects
 		//! @param _owner The object owner
-		void remove(const ot::Owner<K>& _owner) { m_data.erase(_owner); };
+		void remove(const ot::Owner<K>& _owner) { this->m_data.erase(_owner); };
 
 		//! @brief Remove all entries for all owners
-		//! Callee takes ownership of all objects stored
 		void removeAll(void) {
-			for (auto it : m_data) { delete it.second; }
-			m_data.clear();
+			for (auto it : this->m_data) { delete it.second; }
+			this->m_data.clear();
 		}
 
 		//! @brief Returns true if there exists an entry for the provided owner
-		bool contains(const ot::Owner<K>& _owner) { return m_data.count(_owner) > 0; };
+		bool contains(const ot::Owner<K>& _owner) { return this->m_data.count(_owner) > 0; };
 
 		//! @brief Return the owner data
-		std::list<V*>* const operator[](const ot::Owner<K>& _owner) { return objectList(_owner); };
+		std::list<V*>& operator[](const ot::Owner<K>& _owner) { return this->objectList(_owner); };
 
 		ot::Owner<K> findOwner(V* _obj) {
-			for (auto it : m_data) {
+			for (auto it : this->m_data) {
 				for (auto e : *it.second) {
 					if (e == _obj) return it.first;
 				}
@@ -155,15 +154,15 @@ namespace ot {
 	private:
 
 		//! @brief Return object list for the given owner
-		std::list<V*>* objectList(const ot::Owner<K>& _owner) {
-			auto it = m_data.find(_owner);
-			if (it == m_data.end()) {
+		std::list<V*>& objectList(const ot::Owner<K>& _owner) {
+			auto it = this->m_data.find(_owner);
+			if (it == this->m_data.end()) {
 				std::list<V*>* newList = new std::list<V*>;
-				m_data.insert_or_assign(_owner, newList);
-				return newList;
+				this->m_data.insert_or_assign(_owner, newList);
+				return *newList;
 			}
 			else {
-				return it->second;
+				return *it->second;
 			}
 		};
 

@@ -451,6 +451,8 @@ public:
 
 	void createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::ServiceOwner_t _owner);
 
+	ot::GraphicsView * findGraphicsEditor(const std::string& _name, ot::ServiceOwner_t _owner);
+
 	// ######################################################################################################################
 
 	// Prompt

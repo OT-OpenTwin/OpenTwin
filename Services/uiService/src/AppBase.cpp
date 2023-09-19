@@ -2069,6 +2069,17 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 }
 
+ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::ServiceOwner_t _owner) {
+	if (!m_graphicsViews.contains(_owner)) return nullptr;
+	std::list<ot::GraphicsView *>& lst = m_graphicsViews[_owner];
+
+	for (auto v : lst) {
+		if (v->graphicsViewName() == _name) return v;
+	}
+	OT_LOG_WAS("Graphics Editor \"" + _name + "\" does not exist for the given owner");
+	return nullptr;
+}
+
 // ######################################################################################################################
 
 // Slots
@@ -2148,7 +2159,7 @@ void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
 	}
 	
 	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _item->graphicsItemName());
 	
 	ot::Point2DD itmPos(_item->getQGraphicsItem()->pos().x(), _item->getQGraphicsItem()->pos().y());
@@ -2158,7 +2169,7 @@ void AppBase::slotGraphicsItemDroppend(ot::GraphicsItem * _item) {
 
 	try {
 		auto owner = m_graphicsViews.findOwner(view);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2252,7 +2263,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 	try {
 		ot::GraphicsView* view = scene->getGraphicsView();
 		auto owner = m_graphicsViews.findOwner(view);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphcisViewName());
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_EA("Failed to send http request");

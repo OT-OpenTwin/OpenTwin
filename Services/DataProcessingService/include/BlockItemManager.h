@@ -8,5 +8,5 @@ public:
 	void OrderUIToCreateBlockPicker();
 
 private:
-	ot::GraphicsItemPickerPackage* BuildUpBlockPicker();
+	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 };

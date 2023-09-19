@@ -51,21 +51,60 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
+		//! @brief Set item name
+		//! The item name must be unique for one item picker.
 		void setName(const std::string& _name) { m_name = _name; };
+
+		//! @brief Item name
+		//! The item name must be unique for one item picker.
 		const std::string& name(void) const { return m_name; };
 
+		//! @brief Set item title
+		//! The item title will be displayed to the user when needed.
 		void setTitle(const std::string& _title) { m_tile = _title; };
+
+		//! @brief Item title
+		//! The item title will be displayed to the user when needed.
 		const std::string& title(void) const { return m_tile; };
 
+		//! @brief Set item position
+		//! If the item is the root item, the position is the scene position.
+		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
+		//! @param _x X position
+		//! @param _y Y position
 		void setPosition(double _x, double _y) { this->setPosition(Point2DD(_x, _y)); };
+
+		//! @brief Set item position
+		//! If the item is the root item, the position is the scene position.
+		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
+		//! @param _pos Item position
 		void setPosition(const Point2DD& _pos) { m_pos = _pos; };
+
+		//! @brief Item position
+		//! If the item is the root item, the position is the scene position.
+		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
 		const Point2DD& position(void) { return m_pos; };
 
+		//! @brief Set item size.
+		//! @param _size Size to set
 		void setSize(const ot::Size2D& _size) { m_size = _size; };
+
+		//! @brief Item size
 		const ot::Size2D& size(void) const { return m_size; };
 
-		void setMargins(const Margins& _margin) { m_margins = _margin; };
-		const Margins& margins(void) const { return m_margins; };
+		//! @brief Set item margins
+		//! @param _top Top margin
+		//! @param _right Right margin
+		//! @param _bottom Bottom margin
+		//! @param _left Left margin
+		void setMargins(double _top, double _right, double _bottom, double _left) { this->setMargins(ot::MarginsD(_top, _right, _bottom, _left)); };
+
+		//! @brief Set item margins
+		//! @param _margins Margins to set
+		void setMargins(const MarginsD& _margins) { m_margins = _margins; };
+
+		//! @brief Item margins
+		const MarginsD& margins(void) const { return m_margins; };
 
 		void setGraphicsItemFlags(GraphicsItemFlag _flags) { m_flags = _flags; };
 		GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
@@ -78,7 +117,7 @@ namespace ot {
 		std::string m_tile;
 		Point2DD m_pos;
 		Size2D m_size;
-		Margins m_margins;
+		MarginsD m_margins;
 		GraphicsItemFlag m_flags;
 		ot::Alignment m_alignment;
 	};

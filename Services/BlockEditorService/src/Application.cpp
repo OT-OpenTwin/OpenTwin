@@ -241,7 +241,7 @@ std::string Application::createEmptyTestEditor(void) {
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to create empty block editor";
 		}*/
 
-		ot::GraphicsItemPickerPackage pckg("TestPackage", "Test title");
+		ot::GraphicsNewEditorPackage pckg("TestPackage", "Test title");
 		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("A", "A");
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1", "1");
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
