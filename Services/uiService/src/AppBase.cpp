@@ -2070,11 +2070,12 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 }
 
 ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::ServiceOwner_t _owner) {
-	if (!m_graphicsViews.contains(_owner)) return nullptr;
-	std::list<ot::GraphicsView *>& lst = m_graphicsViews[_owner];
+	if (m_graphicsViews.contains(_owner)) {
+		std::list<ot::GraphicsView*>& lst = m_graphicsViews[_owner];
 
-	for (auto v : lst) {
-		if (v->graphicsViewName() == _name) return v;
+		for (auto v : lst) {
+			if (v->graphicsViewName() == _name) return v;
+		}
 	}
 	OT_LOG_WAS("Graphics Editor \"" + _name + "\" does not exist for the given owner");
 	return nullptr;

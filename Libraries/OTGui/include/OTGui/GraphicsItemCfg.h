@@ -112,9 +112,13 @@ namespace ot {
 		void setAlignment(ot::Alignment _align) { m_alignment = _align; };
 		ot::Alignment alignment(void) const { return m_alignment; };
 
+		void setUid(const std::string& _uid) { m_uid = _uid; };
+		const std::string& uid(void) const { return m_uid; };
+
 	private:
 		std::string m_name;
 		std::string m_tile;
+		std::string m_uid;
 		Point2DD m_pos;
 		Size2D m_size;
 		MarginsD m_margins;

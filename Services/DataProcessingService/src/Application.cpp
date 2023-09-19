@@ -14,6 +14,8 @@
 
 // Open twin header
 #include "OpenTwinCore/ReturnMessage.h"
+#include "OpenTwinCore/Owner.h"
+#include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinCommunication/ActionTypes.h"
@@ -153,6 +155,10 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
 		
+		OT_rJSON_val posObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
+		ot::Point2DD pos;
+		pos.setFromJsonObject(posObj);
+
 		// Generate UID
 		
 		std::string itemUid = "Some fancy new UID"; // <----- Add code here to generate the new UID
@@ -175,11 +181,23 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
 		}
 
-		OT_rJSON_createDOC(argDoc);
-		ot::rJSON::add(argDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, itemUid);
-		
-		ot::ReturnMessage response(ot::ReturnMessage::Ok, ot::rJSON::toJSON(argDoc));
-		return response.toJson();
+		ot::GraphicsScenePackage pckg("Data Processing");
+
+		//                           \/ ------ Here the new configuration has to be created
+		ot::GraphicsItemCfg* itm = nullptr;
+		itm->setPosition(pos);
+		itm->setUid(itemUid);
+		pckg.addItem(itm);
+
+		OT_rJSON_createDOC(reqDoc);
+		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItems);
+
+		OT_rJSON_createValueObject(pckgDoc);
+		pckg.addToJsonObject(reqDoc, pckgDoc);
+		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+
+		ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+		m_uiComponent->sendMessage(true, reqDoc);
 
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnections)

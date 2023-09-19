@@ -10,6 +10,7 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
+#define OT_JSON_MEMBER_Uid "UID"
 #define OT_JSON_MEMBER_Name "Name" // <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Text "Text" //  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                          ^O^^^^^^// '## w ##' //^^3
 #define OT_JSON_MEMBER_Size "Size" //   <^^\\ '## < ##' \\ ^^^^^^O^                                                                                       ^O^^^^^^// '## w ##' //^^3
@@ -54,6 +55,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _document.GetAllocator()), _document.GetAllocator());
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Flags, flagArr);
 
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Uid, m_uid);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Title, m_tile);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Alignment, ot::toString(m_alignment));
@@ -61,6 +63,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 }
 
 void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Uid, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Position, Object);
@@ -69,6 +72,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Alignment, String);
 
+	m_uid = _object[OT_JSON_MEMBER_Uid].GetString();
 	m_name = _object[OT_JSON_MEMBER_Name].GetString();
 	m_tile = _object[OT_JSON_MEMBER_Title].GetString();
 	m_alignment = ot::stringToAlignment(_object[OT_JSON_MEMBER_Alignment].GetString());

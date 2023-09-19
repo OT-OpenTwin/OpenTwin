@@ -88,6 +88,8 @@ void ot::GraphicsNewEditorPackage::setFromJsonObject(OT_rJSON_val& _object) {
 	ot::GraphicsCollectionPackage::setFromJsonObject(_object);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Title, String);
+	m_name = ot::rJSON::getString(_object, OT_JSON_Member_Name);
+	m_title = ot::rJSON::getString(_object, OT_JSON_Member_Title);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -131,7 +133,10 @@ void ot::GraphicsScenePackage::setFromJsonObject(OT_rJSON_val& _object) {
 		OT_rJSON_val itemObj = itemsArr[i].GetObject();
 		ot::GraphicsItemCfg* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(itemObj);
 		OTAssertNullptr(itm);
-		if (itm) m_items.push_back(itm);
+		if (itm) {
+			itm->setFromJsonObject(itemObj);
+			if (itm) m_items.push_back(itm);
+		}
 	}
 }
 

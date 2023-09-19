@@ -2837,9 +2837,16 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsScenePackage pckg("");
 				pckg.setFromJsonObject(configurationObj);
 
-				auto editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
+				ot::GraphicsView * editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
 				
-				// ...
+				for (auto itm : pckg.items()) {
+					ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm);
+					if (i) {
+						i->getQGraphicsItem()->setPos(QPointF(itm->position().x(), itm->position().y()));
+						editor->addItem(i);
+						OT_LOG_W("Added at: " + std::to_string(itm->position().x()) + "; " + std::to_string(itm->position().y()));
+					}
+				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnections) {
 				OT_LOG_EA("Not implemented yet");
