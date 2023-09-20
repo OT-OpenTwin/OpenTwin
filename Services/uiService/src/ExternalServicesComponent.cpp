@@ -2857,6 +2857,19 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					}
 				}
 			}
+			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem) {
+				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+				std::list<std::string> itemUids = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+
+				ot::GraphicsView* editor = AppBase::instance()->findGraphicsEditor(editorName, owner);
+
+				if (editor) {
+					for (auto u : itemUids) {
+						editor->removeItem(u);
+					}
+				}
+			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
 				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
 
@@ -2885,6 +2898,21 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					else {
 						OT_LOG_EA("Invalid graphics item UID");
 					}
+				}
+			}
+			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection) {
+				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+
+				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
+				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+
+				ot::GraphicsConnectionPackage pckg;
+				pckg.setFromJsonObject(pckgObj);
+
+				ot::GraphicsView* editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
+
+				for (auto c : pckg.connections()) {
+					editor->removeConnection(c.fromUID, c.fromConnectable, c.toUID, c.toConnectable);
 				}
 			}
 			else

@@ -81,6 +81,29 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _
 	}
 }
 
+void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
+	auto it = m_items.find(_item->graphicsItemUid());
+	if (it != m_items.end()) {
+		OT_LOG_EAS("An item with the ID \"" + _item->graphicsItemUid() + "\" already exists in this view");
+		delete _item;
+		return;
+	}
+
+	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
+	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
+}
+
+void ot::GraphicsView::removeItem(const std::string& _itemUid) {
+	auto it = m_items.find(_itemUid);
+	if (it == m_items.end()) {
+		OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
+		return;
+	}
+
+	m_scene->removeItem(it->second->getQGraphicsItem());
+	m_items.erase(_itemUid);
+}
+
 void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest) {
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
 	QPen p;
@@ -96,16 +119,8 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	emit connectionRequested(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 }
 
-void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
-	auto it = m_items.find(_item->graphicsItemUid());
-	if (it != m_items.end()) {
-		OT_LOG_EAS("An item with the ID \"" + _item->graphicsItemUid() + "\" already exists in this view");
-		delete _item;
-		return;
-	}
+void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
 
-	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
-	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
 }
 
 // ########################################################################################################
