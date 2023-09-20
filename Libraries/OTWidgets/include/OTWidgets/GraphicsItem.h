@@ -65,7 +65,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
 		enum GraphicsItemEvent {
-			Resized
+			ItemMoved
 		};
 
 		enum GraphicsItemFlag {

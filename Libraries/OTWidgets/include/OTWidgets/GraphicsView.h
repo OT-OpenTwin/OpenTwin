@@ -49,6 +49,7 @@ namespace ot {
 		void removeItem(const std::string& _itemUid);
 		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);
 		void removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
+		void requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 
 	signals:
 		//! @brief Will be emitted when an item was dropped into the scene by the user

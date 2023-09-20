@@ -29,7 +29,6 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
 		m_owner->handleItemMoved();
-		m_owner->raiseEvent(ot::GraphicsItem::Resized);
 	}
 	return QGraphicsWidget::itemChange(_change, _value);
 }

@@ -125,7 +125,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
-	this->raiseEvent(ot::GraphicsItem::Resized); //ToDo: Seperate function
+	this->raiseEvent(ot::GraphicsItem::ItemMoved);
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
@@ -358,7 +358,7 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
 	OTAssertNullptr(_sender);
 	return;
-	if (_event == ot::GraphicsItem::Resized) {
+	if (_event == ot::GraphicsItem::ItemMoved) {
 		ot::GraphicsItem* mas = nullptr;
 		for (auto itm : m_items) {
 			if (itm.isMaster) {

@@ -22,9 +22,6 @@ ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_d
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 	this->setAlignment(Qt::AlignAbsolute);
-
-	// ToDo: This is required while working with proxy widgets, but we should not use em
-	this->setMouseTracking(true);
 }
 
 ot::GraphicsView::~GraphicsView() {
@@ -91,6 +88,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
+	_item->setGraphicsScene(m_scene);
 }
 
 void ot::GraphicsView::removeItem(const std::string& _itemUid) {
@@ -111,13 +109,11 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	p.setWidth(1);
 	
 	m_scene->addItem(newConnection);
+	newConnection->connectItems(_origin, _dest);
+	newConnection->setGraphicsScene(m_scene);
 
 	std::string itmKey = ot::GraphicsConnectionItem::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 	m_connections.insert_or_assign(itmKey, newConnection);
-
-	newConnection->connectItems(_origin, _dest);
-
-	emit connectionRequested(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 }
 
 void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
@@ -131,6 +127,17 @@ void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::
 	it->second->disconnectItems();
 	m_scene->removeItem(it->second->getQGraphicsItem());
 	m_connections.erase(key);
+}
+
+void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+	std::string key = ot::GraphicsConnectionItem::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
+	auto it = m_connections.find(key);
+	if (it != m_connections.end()) {
+		OT_LOG_W("Connection for key \"" + key + "\" already exists (same origin and destination in one scene)");
+		return;
+	}
+
+	emit connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
 // ########################################################################################################
@@ -172,18 +179,6 @@ void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 		m_lastPanPos = _event->pos();
 		m_isPressed = true;
 	}
-	else if (_event->button() == Qt::LeftButton) {
-		
-		QGraphicsItem* itm = m_scene->itemAt(mapToScene(_event->pos()), QTransform());
-		if (itm)
-		{
-			QGraphicsProxyWidget* proxy = dynamic_cast<QGraphicsProxyWidget*>(itm);
-			if (proxy) {
-				//proxy->setFlag(QGraphicsItem::ItemIsMovable);
-				//proxy->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
-			}
-		}
-	}
 }
 
 void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
@@ -193,17 +188,6 @@ void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
 	if (_event->button() == Qt::MiddleButton) {
 		m_isPressed = false;
 		viewport()->setCursor(Qt::CrossCursor);
-	}
-	else if (_event->button() == Qt::LeftButton) {
-		QGraphicsItem* itm = m_scene->itemAt(mapToScene(_event->pos()), QTransform());
-		if (itm)
-		{
-			QGraphicsProxyWidget* proxy = dynamic_cast<QGraphicsProxyWidget*>(itm);
-			if (proxy) {
-				//proxy->setFlag(QGraphicsItem::ItemIsMovable, false);
-				//proxy->setFlag(QGraphicsItem::ItemSendsGeometryChanges, false);
-			}
-		}
 	}
 }
 

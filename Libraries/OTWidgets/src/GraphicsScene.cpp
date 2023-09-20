@@ -88,7 +88,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 			return;
 		}
 		OT_LOG_D("New conncetion");
-		m_view->addConnection(m_connectionOrigin, _item);
+		m_view->requestConnection(m_connectionOrigin->getRootItem()->graphicsItemUid(), m_connectionOrigin->graphicsItemName(), _item->getRootItem()->graphicsItemUid(), _item->graphicsItemName());
 		this->stopConnection();
 	}
 }
