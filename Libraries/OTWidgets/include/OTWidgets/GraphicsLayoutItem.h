@@ -41,8 +41,6 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
-		virtual QRectF getGraphicsItemBoundingRect(void) const override;
-		virtual QPointF getGraphicsItemScenePos(void) const override;
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return m_group; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return m_group; };
 
@@ -83,8 +81,6 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
-		virtual QRectF getGraphicsItemBoundingRect(void) const override;
-		virtual QPointF getGraphicsItemScenePos(void) const override;
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return m_layoutWrap->getQGraphicsLayoutItem(); };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return m_layoutWrap->getQGraphicsItem(); };
 

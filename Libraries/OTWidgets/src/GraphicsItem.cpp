@@ -46,10 +46,10 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 		drag.setMimeData(mimeData);
 
 		// Create preview
-		QPixmap prev(m_owner->getGraphicsItemBoundingRect().size().toSize());
+		QPixmap prev(m_owner->getQGraphicsItem()->boundingRect().size().toSize());
 		QPainter p(&prev);
 		QStyleOptionGraphicsItem opt;
-		p.fillRect(QRect(QPoint(0, 0), m_owner->getGraphicsItemBoundingRect().size().toSize()), Qt::gray);
+		p.fillRect(QRect(QPoint(0, 0), m_owner->getQGraphicsItem()->boundingRect().size().toSize()), Qt::gray);
 
 		// Paint
 		m_owner->callPaint(&p, &opt, m_widget);
@@ -120,7 +120,7 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) _painter->fillRect(this->getGraphicsItemBoundingRect(), Qt::GlobalColor::green);
+	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) _painter->fillRect(this->getQGraphicsItem()->boundingRect(), Qt::GlobalColor::green);
 }
 
 void ot::GraphicsItem::handleItemMoved(void) {
@@ -264,14 +264,6 @@ void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	QGraphicsItemGroup::paint(_painter, _opt, _widget);
-}
-
-QRectF ot::GraphicsGroupItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsGroupItem::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
 }
 
 void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -478,14 +470,6 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	_painter->drawRoundedRect(this->boundingRect(), m_cornerRadius, m_cornerRadius);
 }
 
-QRectF ot::GraphicsRectangularItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsRectangularItem::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
 	QGraphicsItem::mousePressEvent(_event);
@@ -584,14 +568,6 @@ void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphi
 	_painter->drawEllipse(this->boundingRect().center(), m_radiusX, m_radiusY);
 }
 
-QRectF ot::GraphicsEllipseItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsEllipseItem::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleItemClickEvent(_event, boundingRect());
 	QGraphicsItem::mousePressEvent(_event);
@@ -688,14 +664,6 @@ QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _cha
 	return QGraphicsTextItem::itemChange(_change, _value);
 }
 
-QRectF ot::GraphicsTextItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsTextItem::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -775,14 +743,6 @@ void ot::GraphicsImageItem::paint(QPainter* _painter, const QStyleOptionGraphics
 	QGraphicsPixmapItem::paint(_painter, _opt, _widget);
 }
 
-QRectF ot::GraphicsImageItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsImageItem::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
@@ -828,14 +788,6 @@ void ot::GraphicsPathItem::callPaint(QPainter* _painter, const QStyleOptionGraph
 	this->paint(_painter, _opt, _widget);
 }
 
-QRectF ot::GraphicsPathItem::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsPathItem::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	// Ignore
 }
@@ -873,8 +825,8 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 	}
 	
 	this->setPathPoints(
-		m_origin->getGraphicsItemScenePos() + m_origin->getGraphicsItemBoundingRect().center(),
-		m_dest->getGraphicsItemScenePos() + m_dest->getGraphicsItemBoundingRect().center()
+		m_origin->getQGraphicsItem()->pos() + m_origin->getQGraphicsItem()->boundingRect().center(),
+		m_dest->getQGraphicsItem()->pos() + m_dest->getQGraphicsItem()->boundingRect().center()
 	);
 }
 

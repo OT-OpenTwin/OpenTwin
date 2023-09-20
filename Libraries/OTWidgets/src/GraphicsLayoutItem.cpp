@@ -48,14 +48,6 @@ void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::G
 	m_group->setGraphicsItemFlags(_flags);
 }
 
-QRectF ot::GraphicsLayoutItemWrapper::getGraphicsItemBoundingRect(void) const {
-	return this->boundingRect();
-}
-
-QPointF ot::GraphicsLayoutItemWrapper::getGraphicsItemScenePos(void) const {
-	return this->scenePos();
-}
-
 void ot::GraphicsLayoutItemWrapper::setParentGraphicsItem(GraphicsItem* _itm) {
 	OTAssertNullptr(m_group);
 	m_group->setParentGraphicsItem(_itm);
@@ -103,16 +95,6 @@ void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGra
 			OT_LOG_EA("Item cast failed");
 		}
 	}
-}
-
-QRectF ot::GraphicsLayoutItem::getGraphicsItemBoundingRect(void) const {
-	OTAssertNullptr(m_layoutWrap);
-	return m_layoutWrap->boundingRect();
-}
-
-QPointF ot::GraphicsLayoutItem::getGraphicsItemScenePos(void) const {
-	OTAssertNullptr(m_layoutWrap);
-	return m_layoutWrap->scenePos();
 }
 
 ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName) {
