@@ -18,8 +18,13 @@ ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _ow
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
 
 void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	this->handleItemClickEvent(_event, boundingRect());
+	GraphicsItem::handleMousePressEvent(_event);
 	QGraphicsWidget::mousePressEvent(_event);
+}
+
+void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleMouseReleaseEvent(_event);
+	QGraphicsWidget::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

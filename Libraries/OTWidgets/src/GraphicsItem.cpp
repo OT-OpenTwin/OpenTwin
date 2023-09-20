@@ -28,7 +28,7 @@ ot::GraphicsItemDrag::GraphicsItemDrag(GraphicsItem* _owner) : m_widget(nullptr)
 
 ot::GraphicsItemDrag::~GraphicsItemDrag() {}
 
-void ot::GraphicsItemDrag::queue(QWidget* _widget, const QRectF& _rect) {
+void ot::GraphicsItemDrag::queue(QWidget* _widget) {
 	m_queueCount++;
 	m_widget = _widget;
 	QMetaObject::invokeMethod(this, &GraphicsItemDrag::slotQueue, Qt::QueuedConnection);
@@ -81,6 +81,11 @@ void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _
 	this->graphicsItemFlagsChanged(m_flags);
 }
 
+ot::GraphicsScene* ot::GraphicsItem::graphicsScene(void) {
+	if (m_parent) return m_parent->graphicsScene();
+	return m_scene;
+}
+
 ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	if (m_parent) return m_parent->getRootItem();
 	return this;
@@ -91,16 +96,16 @@ ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 	else return nullptr;
 }
 
-void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect) {
+void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
-		m_parent->handleItemClickEvent(_event, _rect);
+		m_parent->handleMousePressEvent(_event);
 	}
 	else if (m_flags & ot::GraphicsItem::ItemPreviewContext) {
 		if (_event->button() == Qt::LeftButton) {
 			if (m_drag == nullptr) {
 				m_drag = new GraphicsItemDrag(this);
 			}
-			m_drag->queue(_event->widget(), _rect);
+			m_drag->queue(_event->widget());
 		}
 	}
 	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
@@ -108,6 +113,15 @@ void ot::GraphicsItem::handleItemClickEvent(QGraphicsSceneMouseEvent* _event, co
 			OTAssertNullptr(m_scene); // Ensure the finalizeItem() method calls setGraphicsScene()
 			m_scene->startConnection(this);
 		}
+	}
+}
+
+void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	if (m_parent) {
+		m_parent->handleMousePressEvent(_event);
+	}
+	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
+		
 	}
 }
 
@@ -126,6 +140,13 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
 	this->raiseEvent(ot::GraphicsItem::ItemMoved);
+
+	// For root items we notify the view
+	if (m_parent == nullptr) {
+		otAssert(!m_uid.empty(), "Root items should always have a valid uid");
+		OTAssertNullptr(m_scene); // Scene was not set when adding this item (all root items should have their scene set)
+		m_scene->getGraphicsView()->notifyItemMoved(this);
+	}
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
@@ -252,8 +273,13 @@ QVariant ot::GraphicsGroupItem::itemChange(QGraphicsItem::GraphicsItemChange _ch
 }
 
 void ot::GraphicsGroupItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	GraphicsItem::handleMousePressEvent(_event);
 	QGraphicsItemGroup::mousePressEvent(_event);
+}
+
+void ot::GraphicsGroupItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleMouseReleaseEvent(_event);
+	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -471,8 +497,13 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 }
 
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	GraphicsItem::handleMousePressEvent(_event);
 	QGraphicsItem::mousePressEvent(_event);
+}
+
+void ot::GraphicsRectangularItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleMouseReleaseEvent(_event);
+	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsRectangularItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
@@ -569,8 +600,13 @@ void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphi
 }
 
 void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	GraphicsItem::handleMousePressEvent(_event);
 	QGraphicsItem::mousePressEvent(_event);
+}
+
+void ot::GraphicsEllipseItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleMouseReleaseEvent(_event);
+	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsEllipseItem::setRadius(int _x, int _y) {
@@ -653,8 +689,13 @@ void ot::GraphicsTextItem::paint(QPainter* _painter, const QStyleOptionGraphicsI
 }
 
 void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	GraphicsItem::handleMousePressEvent(_event);
 	QGraphicsItem::mousePressEvent(_event);
+}
+
+void ot::GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleMouseReleaseEvent(_event);
+	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
 QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -730,8 +771,13 @@ QVariant ot::GraphicsImageItem::itemChange(QGraphicsItem::GraphicsItemChange _ch
 }
 
 void ot::GraphicsImageItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleItemClickEvent(_event, boundingRect());
+	GraphicsItem::handleMousePressEvent(_event);
 	QGraphicsItem::mousePressEvent(_event);
+}
+
+void ot::GraphicsImageItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	GraphicsItem::handleMouseReleaseEvent(_event);
+	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsImageItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

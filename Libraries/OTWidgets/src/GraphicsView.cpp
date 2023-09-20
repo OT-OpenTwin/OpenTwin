@@ -140,6 +140,10 @@ void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std:
 	emit connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
+void ot::GraphicsView::notifyItemMoved(ot::GraphicsItem* _item) {
+	emit itemMoved(_item->graphicsItemName(), _item->getQGraphicsItem()->pos());
+}
+
 // ########################################################################################################
 
 // Protected: Slots

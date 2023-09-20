@@ -45,7 +45,7 @@ namespace ot {
 		GraphicsItemDrag(GraphicsItem* _owner);
 		virtual ~GraphicsItemDrag();
 
-		void queue(QWidget* _widget, const QRectF& _rect);
+		void queue(QWidget* _widget);
 
 	private slots:
 		void slotQueue(void);
@@ -69,9 +69,9 @@ namespace ot {
 		};
 
 		enum GraphicsItemFlag {
-			NoFlags            = 0x00, //! @brief No graphics item flags
-			ItemIsConnectable  = 0x01, //! @brief Item can be used as source or destination of a conncetion
-			ItemIsMoveable     = 0x02, //! @brief The item can be moved by a user
+			NoFlags = 0x00, //! @brief No graphics item flags
+			ItemIsConnectable = 0x01, //! @brief Item can be used as source or destination of a conncetion
+			ItemIsMoveable = 0x02, //! @brief The item can be moved by a user
 			ItemPreviewContext = 0x10, //! @brief Item is placed in a preview (preview box)
 			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
 		};
@@ -107,7 +107,8 @@ namespace ot {
 
 		// Generalized functionallity
 
-		void handleItemClickEvent(QGraphicsSceneMouseEvent* _event, const QRectF& _rect);
+		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
+		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
 
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
@@ -121,7 +122,7 @@ namespace ot {
 		ot::GraphicsItem::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
 
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
-		GraphicsScene* graphicsScene(void) { return m_scene; }
+		GraphicsScene* graphicsScene(void);
 
 		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
 		bool hasHover(void) const { return m_hasHover; };		
@@ -167,6 +168,7 @@ namespace ot {
 		ot::Alignment m_alignment;
 		GraphicsItemFlag m_flags;
 
+		QPointF m_moveStartPt;
 		GraphicsItem* m_parent;
 		GraphicsItemDrag* m_drag;
 		GraphicsScene* m_scene;
@@ -200,6 +202,7 @@ namespace ot {
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
@@ -268,6 +271,7 @@ namespace ot {
 		virtual void setGeometry(const QRectF& rect) override;
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -313,6 +317,7 @@ namespace ot {
 		virtual void setGeometry(const QRectF& rect) override;
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -353,6 +358,7 @@ namespace ot {
 		virtual void setGeometry(const QRectF& rect) override;
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
@@ -391,6 +397,7 @@ namespace ot {
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 

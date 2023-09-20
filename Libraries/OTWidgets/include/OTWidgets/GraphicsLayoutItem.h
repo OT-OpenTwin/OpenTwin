@@ -32,6 +32,7 @@ namespace ot {
 		virtual ~GraphicsLayoutItemWrapper();
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
