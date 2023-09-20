@@ -2193,6 +2193,46 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	}
 }
 
+void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos) {
+	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	OT_rJSON_createDOC(doc);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, _uid);
+
+	ot::Point2DD itmPos(_newPos.x(), _newPos.y());
+	OT_rJSON_createValueObject(itemPosObj);
+	itmPos.addToJsonObject(doc, itemPosObj);
+	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
+
+	try {
+		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
+		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
+
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
 void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {

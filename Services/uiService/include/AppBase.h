@@ -489,6 +489,7 @@ public:
 
 public slots:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
+	void slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos);
 	void slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 	void slotGraphicsSelectionChanged(void);
 

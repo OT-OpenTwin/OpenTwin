@@ -187,8 +187,30 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 }
 
 std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _document) {
+	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	return std::string();
+	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
+	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+
+	ot::GraphicsConnectionPackage pckg;
+	pckg.setFromJsonObject(pckgObj);
+
+	// Here we would check and remove the connection information
+
+
+	// Request UI to add connections
+	OT_rJSON_createDOC(reqDoc);
+	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection);
+
+	// Add received package to reuest (all connections are allowed)
+	OT_rJSON_createValueObject(reqPckgObj);
+	pckg.addToJsonObject(reqDoc, reqPckgObj);
+	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+
+	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	m_uiComponent->sendMessage(true, reqDoc);
+
+	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
 
 std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document) {

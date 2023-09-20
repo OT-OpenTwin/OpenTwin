@@ -65,7 +65,8 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
 		enum GraphicsItemEvent {
-			ItemMoved
+			ItemMoved,
+			ItemResized
 		};
 
 		enum GraphicsItemFlag {
@@ -82,6 +83,16 @@ namespace ot {
 
 		// ###############################################################################################################################################
 
+		// Pure virtual functions
+
+		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
+
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
+
+		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
+
+		// ###############################################################################################################################################
+
 		// Virtual functions
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
@@ -89,30 +100,18 @@ namespace ot {
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
-		// ###############################################################################################################################################
-
-		// Pure virtual functions
-
-		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
-
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
-
-		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
-
-		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
 		// ###############################################################################################################################################
 
-		// Generalized functionallity
+		// Event handler
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
-
-		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
-
 		void handleItemMoved(void);
+		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		// ###############################################################################################################################################
 

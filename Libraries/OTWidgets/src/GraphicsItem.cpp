@@ -76,6 +76,23 @@ ot::GraphicsItem::~GraphicsItem() {
 	if (m_drag) delete m_drag;
 }
 
+// ###############################################################################################################################################
+
+// Virtual functions
+
+bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) { m_flags |= GraphicsItem::ItemIsConnectable; }
+	m_uid = _cfg->uid();
+	m_name = _cfg->name();
+	m_alignment = _cfg->alignment();
+	return true;
+}
+
+ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
+	if (_itemName == m_name) return this;
+	else return nullptr;
+}
+
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	m_flags = _flags;
 	this->graphicsItemFlagsChanged(m_flags);
@@ -89,11 +106,6 @@ ot::GraphicsScene* ot::GraphicsItem::graphicsScene(void) {
 ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	if (m_parent) return m_parent->getRootItem();
 	return this;
-}
-
-ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
-	if (_itemName == m_name) return this;
-	else return nullptr;
 }
 
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
@@ -113,6 +125,11 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 			OTAssertNullptr(m_scene); // Ensure the finalizeItem() method calls setGraphicsScene()
 			m_scene->startConnection(this);
 		}
+		else {
+			auto qitm = this->getQGraphicsItem();
+			OTAssertNullptr(qitm);
+			m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
+		}
 	}
 }
 
@@ -121,16 +138,18 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 		m_parent->handleMousePressEvent(_event);
 	}
 	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
-		
+		if (m_flags & ot::GraphicsItem::ItemIsConnectable) {
+		}
+		else {
+			auto qitm = this->getQGraphicsItem();
+			OTAssertNullptr(qitm);
+			// Check if the item has moved after the user released the mouse
+			if (qitm->pos() != m_moveStartPt) {
+				OTAssertNullptr(m_scene);
+				m_scene->getGraphicsView()->notifyItemMoved(this);
+			}
+		}
 	}
-}
-
-bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) { m_flags |= GraphicsItem::ItemIsConnectable; }
-	m_uid = _cfg->uid();
-	m_name = _cfg->name();
-	m_alignment = _cfg->alignment();
-	return true;
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -384,7 +403,7 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
 	OTAssertNullptr(_sender);
 	return;
-	if (_event == ot::GraphicsItem::ItemMoved) {
+	if (_event == ot::GraphicsItem::ItemResized) {
 		ot::GraphicsItem* mas = nullptr;
 		for (auto itm : m_items) {
 			if (itm.isMaster) {
@@ -397,10 +416,11 @@ void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, 
 		if (mas == nullptr) {
 			OT_LOG_EA("No master item found");
 		}
-
-		for (auto itm : m_items) {
-			if (itm.item != _sender && !itm.isMaster) {
-				itm.item->setGraphicsItemRequestedSize(mas->getQGraphicsItem()->boundingRect().size());
+		else {
+			for (auto itm : m_items) {
+				if (itm.item != _sender && !itm.isMaster) {
+					itm.item->setGraphicsItemRequestedSize(mas->getQGraphicsItem()->boundingRect().size());
+				}
 			}
 		}
 	}
