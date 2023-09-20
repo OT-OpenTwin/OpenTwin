@@ -72,5 +72,5 @@ private:
 	const std::string _propertyValueP3 = "P3 query value";
 
 
-	std::list<std::string> _comparators = {"<", "<=", "=", ">", ">=", ""};
+	std::list<std::string> _comparators = {"<", "<=", "=", ">", ">=", " "};
 };

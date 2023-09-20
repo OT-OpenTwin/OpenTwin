@@ -56,10 +56,34 @@ EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependenci
 	EntityProperties properties;
 
 	//EntityPropertiesSelection::createProperty(groupName1, propertyNameMSMD, msmdNames, buffer.SelectedMSMD, "default", properties);
-	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupQuantity(), dbAccessEntity->getPropertyNameQuantity(), buffer.QuantityNames, buffer.SelectedQuantity, "default", properties);
-	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupParameter1(), dbAccessEntity->getPropertyNameParameter1(), buffer.ParameterNames, buffer.SelectedParameter1, "default", properties);
-	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupParameter2(), dbAccessEntity->getPropertyNameParameter2(), buffer.ParameterNames, buffer.SelectedParameter2, "default", properties);
-	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupParameter3(), dbAccessEntity->getPropertyNameParameter3(), buffer.ParameterNames, buffer.SelectedParameter3, "default", properties);
+	
+	auto oldBaseQuantity = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameQuantity());
+	auto oldSelectionQuantity = dynamic_cast<EntityPropertiesSelection*>(oldBaseQuantity);
+	EntityPropertiesSelection* quantity = new EntityPropertiesSelection(*oldSelectionQuantity);
+	quantity->resetOptions(buffer.QuantityNames);
+	quantity->setValue(buffer.SelectedQuantity);
+	properties.createProperty(quantity, dbAccessEntity->getGroupQuantity());
+
+	auto oldBaseParameter1 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameParameter1());
+	auto oldSelectionParameter1 = dynamic_cast<EntityPropertiesSelection*>(oldBaseParameter1);
+	EntityPropertiesSelection* parameter1 = new EntityPropertiesSelection(*oldSelectionParameter1);
+	parameter1->resetOptions(buffer.ParameterNames);
+	parameter1->setValue(buffer.SelectedParameter1);
+	properties.createProperty(parameter1, dbAccessEntity->getGroupParameter1());
+
+	auto oldBaseParameter2 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameParameter2());
+	auto oldSelectionParameter2 = dynamic_cast<EntityPropertiesSelection*>(oldBaseParameter2);
+	EntityPropertiesSelection* parameter2 = new EntityPropertiesSelection(*oldSelectionParameter2);
+	parameter2->resetOptions(buffer.ParameterNames);
+	parameter2->setValue(buffer.SelectedParameter2);
+	properties.createProperty(parameter2, dbAccessEntity->getGroupParameter2());
+	
+	auto oldBaseParameter3 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameParameter3());
+	auto oldSelectionParameter3 = dynamic_cast<EntityPropertiesSelection*>(oldBaseParameter3);
+	EntityPropertiesSelection* parameter3 = new EntityPropertiesSelection(*oldSelectionParameter3);
+	parameter3->resetOptions(buffer.ParameterNames);
+	parameter3->setValue(buffer.SelectedParameter3);
+	properties.createProperty(parameter3, dbAccessEntity->getGroupParameter3());
 
 	return properties;
 }
@@ -75,6 +99,10 @@ const MeasurementCampaign PropertyHandlerDatabaseAccessBlock::GetMeasurementCamp
 		MeasurementCampaignFactory factory;
 		const MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
 		return measurementCampaign;
+	}
+	else
+	{
+		throw std::exception("Could not connect with collection");
 	}
 }
 
@@ -161,7 +189,7 @@ void PropertyHandlerDatabaseAccessBlock::getSelectedValues(std::shared_ptr<Entit
 	outParameter3Value = parameter3Selection->getValue();
 }
 
-void PropertyHandlerDatabaseAccessBlock::getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type)
+void PropertyHandlerDatabaseAccessBlock::getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type, bool& outParameter2Visible, bool& outParameter3Visible)
 {
 	auto baseQuantity = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyDataTypeQuantity());
 	auto quantityType = dynamic_cast<EntityPropertiesString*>(baseQuantity);
@@ -174,10 +202,12 @@ void PropertyHandlerDatabaseAccessBlock::getDataTypes(std::shared_ptr<EntityBloc
 	auto baseParameter2 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyDataTypeParameter2());
 	auto parameter2Type= dynamic_cast<EntityPropertiesString*>(baseParameter2);
 	outParameter2Type = parameter2Type->getValue();
+	outParameter2Visible = parameter2Type->getVisible();
 
 	auto baseParameter3 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyDataTypeParameter3());
 	auto parameter3Type= dynamic_cast<EntityPropertiesString*>(baseParameter3);
 	outParameter3Type = parameter3Type->getValue();
+	outParameter3Visible = parameter3Type->getVisible();
 
 }
 
@@ -186,39 +216,40 @@ EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateSelectionProperties(s
 	auto& buffer = _bufferedInformation[dbAccessEntity->getEntityID()];
 
 	std::string quantityType, parameter1Type, parameter2Type, parameter3Type;
-	getDataTypes(dbAccessEntity, quantityType, parameter1Type, parameter2Type, parameter3Type);
+	bool parameter2Visible, parameter3Visible;
+	getDataTypes(dbAccessEntity, quantityType, parameter1Type, parameter2Type, parameter3Type, parameter2Visible, parameter3Visible);
 
+	auto& oldProperties = dbAccessEntity->getProperties();
 	EntityProperties properties;
 	if (quantityType != buffer.dataTypeQuantity)
 	{
-		CreateUpdatedTypeProperty(dbAccessEntity->getGroupQuantity(), dbAccessEntity->getPropertyDataTypeQuantity(), buffer.dataTypeQuantity, properties);
+		
+		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeQuantity()), buffer.dataTypeQuantity, properties);
 	}
 	
 	if (parameter1Type != buffer.dataTypeParameter1)
 	{
-		CreateUpdatedTypeProperty(dbAccessEntity->getGroupParameter1(), dbAccessEntity->getPropertyDataTypeParameter1(), buffer.dataTypeParameter1, properties);
+		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeParameter1()) , buffer.dataTypeParameter1, properties);
 	}
 	
 	if (parameter2Type != buffer.dataTypeParameter2)
 	{
-		CreateUpdatedTypeProperty(dbAccessEntity->getGroupParameter2(), dbAccessEntity->getPropertyDataTypeParameter2(), buffer.dataTypeParameter2, properties);
+		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeParameter2()), buffer.dataTypeParameter2, properties);
 	}
 	
 	if (parameter3Type != buffer.dataTypeParameter3)
 	{
-		CreateUpdatedTypeProperty(dbAccessEntity->getGroupParameter3(), dbAccessEntity->getPropertyDataTypeParameter3(), buffer.dataTypeParameter3, properties);
+		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeParameter3()), buffer.dataTypeParameter3, properties);
 	}
 	return properties;
 }
 
-void PropertyHandlerDatabaseAccessBlock::CreateUpdatedTypeProperty(const std::string& group, const std::string& name, const std::string& value, EntityProperties& properties)
+void PropertyHandlerDatabaseAccessBlock::CreateUpdatedTypeProperty(EntityPropertiesBase* oldEntity, const std::string& value, EntityProperties& properties)
 {
-	EntityPropertiesString* typeLabel = new EntityPropertiesString();
-	typeLabel->setReadOnly(true);
-	typeLabel->setName(name);
-	typeLabel->setGroup(group);
-	typeLabel->setValue(value);
-	properties.createProperty(typeLabel, group);
+	auto stringProp = dynamic_cast<EntityPropertiesString*>(oldEntity);
+	EntityPropertiesString* newProperty = new EntityPropertiesString(*stringProp);
+	newProperty->setValue(value);
+	properties.createProperty(newProperty, newProperty->getGroup());
 }
 
 
