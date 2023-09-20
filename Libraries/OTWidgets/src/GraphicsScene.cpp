@@ -75,8 +75,8 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		p.setWidth(1);
 		m_pathItem->setPen(p);
 		m_pathItem->setPathPoints(
-			m_connectionOrigin->getQGraphicsItem()->pos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(),
-			m_connectionOrigin->getQGraphicsItem()->pos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center()
+			m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(),
+			m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center()
 		);
 		this->addItem(m_pathItem->getQGraphicsItem());
 		

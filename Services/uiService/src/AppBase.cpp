@@ -2243,7 +2243,7 @@ void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const
 	OT_rJSON_createDOC(doc);
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
 
-	ot::GraphicsConnectionPackage pckg;
+	ot::GraphicsConnectionPackage pckg(view->graphicsViewName());
 	pckg.addConnection(_fromUid, _fromConnector, _toUid, _toConnector);
 
 	OT_rJSON_createValueObject(pckgObj);
@@ -2252,7 +2252,6 @@ void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const
 	
 	try {
 		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_E("Failed to send http request");

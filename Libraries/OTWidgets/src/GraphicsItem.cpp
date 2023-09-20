@@ -909,8 +909,8 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 	}
 	
 	this->setPathPoints(
-		m_origin->getQGraphicsItem()->pos() + m_origin->getQGraphicsItem()->boundingRect().center(),
-		m_dest->getQGraphicsItem()->pos() + m_dest->getQGraphicsItem()->boundingRect().center()
+		m_origin->getQGraphicsItem()->scenePos() + m_origin->getQGraphicsItem()->boundingRect().center(),
+		m_dest->getQGraphicsItem()->scenePos() + m_dest->getQGraphicsItem()->boundingRect().center()
 	);
 }
 
