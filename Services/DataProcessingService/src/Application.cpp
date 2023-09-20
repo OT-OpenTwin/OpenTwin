@@ -113,6 +113,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 		if (dbAccess != nullptr)
 		{
+			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+			_propertyHandlerDBAccessBlocks.PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
 			/*if (_propertyHandlerDBAccessBlocks.requiresUpdate(dbAccess))
 			{
 
@@ -275,6 +277,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	 BlockEntityHandler::GetInstance().setModelComponent(_model);
 	_pipelineManager.setModelComponent(_model);
+	_propertyHandlerDBAccessBlocks.setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

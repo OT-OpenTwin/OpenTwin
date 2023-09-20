@@ -7,39 +7,6 @@
 #include "MeasurementCampaignFactory.h"
 #include "OpenTwinCommunication/Msg.h"
 
-void PropertyHandlerDatabaseAccessBlock::Buffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity)
-{
-	//if (_bufferedInformation.find(dbAccessEntity->getEntityID()) == _bufferedInformation.end())
-	//{
-	//	BufferBlockDatabaseAccess buffer;
-	//	buffer.SelectedProject= dbAccessEntity->getSelectedProjectName();
-	//	buffer.SelectedQueryDimension = dbAccessEntity->getQueryDimension();
-
-	//	if (dbAccessEntity->getProperties().propertyExists(_quantityPropertyName))
-	//	{
-	//		auto baseQuantityProperty = dbAccessEntity->getProperties().getProperty(_quantityPropertyName);
-	//		auto baseMSMDProperty = dbAccessEntity->getProperties().getProperty(_msmdPropertyName);
-	//		auto quantitySelection = dynamic_cast<EntityPropertiesSelection*>(baseQuantityProperty);
-	//		auto msmdSelection = dynamic_cast<EntityPropertiesSelection*>(baseMSMDProperty);
-
-	//		buffer.QuantityNames = quantitySelection->getOptions();
-	//		buffer.MeasurementMetadataNames = msmdSelection->getOptions();
-	//		buffer.SelectedMSMD = msmdSelection->getValue();
-	//	}
-	//	else
-	//	{
-	//		buffer.QuantityNames = {};
-	//		buffer.MeasurementMetadataNames = {};
-	//		buffer.SelectedMSMD = "";
-	//	}
-	//	_bufferedInformation[dbAccessEntity->getEntityID()] = std::move(buffer);
-	//}
-	//else
-	//{
-	//	assert(0);
-	//}
-}
-
 void PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
 	const MeasurementCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
@@ -65,15 +32,15 @@ void PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shar
 	UpdateBuffer(dbAccessEntity, msmdNames, quantityNames, parameterNames);
 
 	const std::string propertyNameMSMD = dbAccessEntity->getPropertyNameMeasurementSeries();
-	const std::string propertyNameQuantity = "dbAccessEntity->getPropertyNameQuantity()";
-	const std::string propertyNameParameter = "dbAccessEntity->getPropertyNameParameter()";
-
-	const std::string groupName1 = "";
+	
 	BufferBlockDatabaseAccess& buffer = _bufferedInformation[dbAccessEntity->getEntityID()];
 	EntityProperties properties;
+
 	//EntityPropertiesSelection::createProperty(groupName1, propertyNameMSMD, msmdNames, buffer.SelectedMSMD, "default", properties);
-	EntityPropertiesSelection::createProperty(groupName1, propertyNameQuantity, quantityNames, buffer.SelectedQuantity1, "default", properties);
-	EntityPropertiesSelection::createProperty(groupName1, propertyNameParameter, parameterNames, buffer.SelectedParameter1, "default", properties);
+	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupQuantity(), dbAccessEntity->getPropertyNameQuantity(), quantityNames, buffer.SelectedQuantity, "default", properties);
+	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupParameter1(), dbAccessEntity->getPropertyNameParameter1(), parameterNames, buffer.SelectedParameter1, "default", properties);
+	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupParameter2(), dbAccessEntity->getPropertyNameParameter2(), parameterNames, buffer.SelectedParameter2, "default", properties);
+	EntityPropertiesSelection::createProperty(dbAccessEntity->getGroupParameter3(), dbAccessEntity->getPropertyNameParameter3(), parameterNames, buffer.SelectedParameter3, "default", properties);
 
 	const ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
 	RequestPropertyUpdate(modelServiceURL, entityIDs, properties.getJSON(nullptr,false));
@@ -107,25 +74,24 @@ void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string
 	}
 }
 
-void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::list<std::string> msmdNames, std::list<std::string> parameterNames, std::list<std::string> quantityNames)
+void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::list<std::string>& msmdNames, std::list<std::string>& parameterNames, std::list<std::string>& quantityNames)
 {
 	BufferBlockDatabaseAccess buffer;
 	buffer.SelectedProject = dbAccessEntity->getSelectedProjectName();
-	buffer.SelectedQueryDimension =	dbAccessEntity->getQueryDimension();
-
+	
 	buffer.SelectedMSMD = "";
+	buffer.SelectedQuantity = "";
 	buffer.SelectedParameter1 = "";
-	buffer.SelectedQuantity1 = "";
+	buffer.SelectedParameter2 = "";
+	buffer.SelectedParameter3 = "";
 	buffer.MeasurementMetadataNames.reserve(msmdNames.size());
 	buffer.QuantityNames.reserve(quantityNames.size());
 	buffer.ParameterNames.reserve(parameterNames.size());
 
 
-	 //dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameMeasurementSeries());
-	auto quantityPropertyBase = dbAccessEntity->getProperties().getProperty("");
-	auto parameterPropertyBase = dbAccessEntity->getProperties().getProperty("");
-	auto quantityPropertySelection = dynamic_cast<EntityPropertiesSelection*>(quantityPropertyBase);
-	auto parameterPropertySelection = dynamic_cast<EntityPropertiesSelection*>(parameterPropertyBase);
+	//dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameMeasurementSeries());
+	std::string selectedQuantity, selectedParameter1, selectedParameter2, selectedParameter3;
+	getSelectedValues(dbAccessEntity,selectedQuantity,selectedParameter1, selectedParameter2, selectedParameter3);
 
 	/*for (std::string msmdName : msmdNames)
 	{
@@ -138,17 +104,25 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 
 	for (std::string& parameterName : parameterNames)
 	{
-		if (parameterName == parameterPropertySelection->getValue())
+		if (parameterName == selectedParameter1)
 		{
 			buffer.SelectedParameter1 = parameterName;
+		}
+		if (parameterName == selectedParameter2)
+		{
+			buffer.SelectedParameter2 = parameterName;
+		}
+		if (parameterName == selectedParameter3)
+		{
+			buffer.SelectedParameter3 = parameterName;
 		}
 		buffer.ParameterNames.push_back(parameterName);
 	}
 	for (std::string& quantityName : quantityNames)
 	{
-		if (quantityName == quantityPropertySelection->getValue())
+		if (quantityName == selectedQuantity)
 		{
-			buffer.SelectedQuantity1 = quantityName;
+			buffer.SelectedQuantity = quantityName;
 		}
 		buffer.QuantityNames.push_back(quantityName);
 	}
@@ -156,33 +130,54 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 	_bufferedInformation[dbAccessEntity->getEntityID()] = buffer;
 }
 
+void PropertyHandlerDatabaseAccessBlock::getSelectedValues(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityValue, std::string& outParameter1Value, std::string& outParameter2Value, std::string& outParameter3Value)
+{
+	auto baseQuantity= dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameQuantity());
+	auto quantitySelection = dynamic_cast<EntityPropertiesSelection*>(baseQuantity);
+	outQuantityValue = quantitySelection->getValue();
+
+	auto baseParameter1 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameParameter1());
+	auto parameter1Selection = dynamic_cast<EntityPropertiesSelection*>(baseParameter1);
+	outParameter1Value = parameter1Selection->getValue();
+
+	auto baseParameter2 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameParameter2());
+	auto parameter2Selection = dynamic_cast<EntityPropertiesSelection*>(baseParameter2);
+	outParameter2Value = parameter2Selection->getValue();
+
+	auto baseParameter3 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameParameter3());
+	auto parameter3Selection = dynamic_cast<EntityPropertiesSelection*>(baseParameter3);
+	outParameter3Value = parameter3Selection->getValue();
+}
+
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
 	if (_bufferedInformation.find(dbAccessEntity->getEntityID()) != _bufferedInformation.end())
 	{
-		auto oldBuffer = _bufferedInformation[dbAccessEntity->getEntityID()];
+		auto buffer = _bufferedInformation[dbAccessEntity->getEntityID()];
 		auto baseMSMDProperty = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameMeasurementSeries());
 		auto msmdSelection = dynamic_cast<EntityPropertiesSelection*>(baseMSMDProperty);
 
-		if (oldBuffer.SelectedProject != dbAccessEntity->getSelectedProjectName())
+
+		if (buffer.SelectedProject != dbAccessEntity->getSelectedProjectName())
 		{
 			UpdateAllCampaignDependencies(dbAccessEntity,sessionServiceURL,modelServiceURL);
 			//Update all
+			return;
 		}
-		else if (oldBuffer.SelectedMSMD != msmdSelection->getValue())
-		{
-			//Update nothing yet (refresh Campaign metadata later on)
-		}
-		else if (oldBuffer.SelectedQueryDimension != dbAccessEntity->getQueryDimension())
-		{
-			//UpdateNumberQueryDimensions();
-			//Update number of entries
-		}
+
+		//if (buffer.SelectedParameter1 != parameter1Selection->getValue() || buffer.SelectedParameter2 != parameter2Selection->getValue() || buffer.SelectedParameter3 != parameter3Selection->getValue())
+		//{
+		//	return;
+		//}
+		//else if (buffer.SelectedMSMD != msmdSelection->getValue())
+		//{
+		//	//Update nothing yet (refresh Campaign metadata later on)
+		//}
 	}
 	else
 	{
-		Buffer(dbAccessEntity);
-		//UpdateAll();
+		UpdateAllCampaignDependencies(dbAccessEntity, sessionServiceURL, modelServiceURL);
+		
 		//Total update;
 	}
 }

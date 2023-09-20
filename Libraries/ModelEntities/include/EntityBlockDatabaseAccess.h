@@ -12,6 +12,17 @@ public:
 	std::string getQueryDimension();
 	const std::string& getPropertyNameMeasurementSeries() { return _msmdPropertyName; }
 	
+	const std::string& getPropertyNameQuantity() { return _propertyNameQuantity; }
+	const std::string& getPropertyNameParameter1() { return _propertyNameP1; }
+	const std::string& getPropertyNameParameter2() { return _propertyNameP2; }
+	const std::string& getPropertyNameParameter3() { return _propertyNameP3; }
+	
+	const std::string& getGroupQuantity() { return _groupQuantitySetttings; }
+	const std::string& getGroupParameter1() { return _groupParamSettings1; }
+	const std::string& getGroupParameter2() { return _groupParamSettings2; }
+	const std::string& getGroupParameter3() { return _groupParamSettings3; }
+
+
 	virtual bool updateFromProperties() override;
 protected:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
