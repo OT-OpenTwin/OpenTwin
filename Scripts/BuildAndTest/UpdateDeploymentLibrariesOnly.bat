@@ -39,8 +39,6 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat"
 
 ECHO Delete libraries
 
-REM DEL "%OPENTWIN_DEPLOYMENT_DIR%\BlockEditor.dll"
-REM DEL "%OPENTWIN_DEPLOYMENT_DIR%\BlockEditorAPI.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\BlockEditorService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenTwinSystem.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenTwinCore.dll"
@@ -95,8 +93,6 @@ REM ====================================================================
 
 ECHO Copy libraries
 
-REM COPY "%OT_BLOCKEDITOR_ROOT%\%OT_DLLR%\BlockEditor.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-REM COPY "%OT_BLOCKEDITORAPI_ROOT%\%OT_DLLR%\BlockEditorAPI.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_CORE_ROOT%\%OT_DLLR%\OpenTwinCore.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_SYSTEM_ROOT%\%OT_DLLR%\OpenTwinSystem.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_COMMUNICATION_ROOT%\%OT_DLLR%\OpenTwinCommunication.dll" "%OPENTWIN_DEPLOYMENT_DIR%"

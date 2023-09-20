@@ -120,16 +120,6 @@ ECHO ===============================================================
 CALL "%OT_COMMUNICATION_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: BlockEditorAPI
-ECHO ===============================================================
-REM CALL "%OT_BLOCKEDITORAPI_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
-ECHO Build Library: BlockEditor
-ECHO ===============================================================
-REM CALL "%OT_BLOCKEDITOR_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
 ECHO Build Library: DataStorage
 ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\build.bat" %1 %2
