@@ -13,6 +13,7 @@
 
 // Open twin header
 #include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinCommunication/Msg.h"
@@ -126,13 +127,13 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	// Here we would now check and store the item information
 
 	// Create package
-	ot::GraphicsScenePackage pckg("Data Processing");
+	ot::GraphicsScenePackage pckg("TestPackage");
 
 	// Create item configuration for the item to add
 	ot::GraphicsItemCfg* itm = nullptr;
 	if (itemName == EXAMPLE_NAME_Block1) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block1);
-	if (itemName == EXAMPLE_NAME_Block2) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block2);
-	if (itemName == EXAMPLE_NAME_Block3) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block3);
+	else if (itemName == EXAMPLE_NAME_Block2) itm = ottest::createTestBlock2(EXAMPLE_NAME_Block2);
+	else if (itemName == EXAMPLE_NAME_Block3) itm = ottest::createTestBlock3(EXAMPLE_NAME_Block3);
 	else {
 		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
 		return OT_ACTION_RETURN_VALUE_FAILED;
@@ -144,19 +145,19 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	OT_rJSON_createDOC(reqDoc);
 	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
 
-	OT_rJSON_createValueObject(pckgDoc);
-	pckg.addToJsonObject(reqDoc, pckgDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+	OT_rJSON_createValueObject(pckgObj);
+	pckg.addToJsonObject(reqDoc, pckgObj);
+	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 
 	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
 	m_uiComponent->sendMessage(true, reqDoc);
 
-	return std::string(OT_ACTION_RETURN_VALUE_OK);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, ot::rJSON::toJSON(pckgObj));
 }
 
 std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document) {
 
-	return std::string();
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document) {
@@ -183,7 +184,7 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
 	m_uiComponent->sendMessage(true, reqDoc);
 
-	return std::string(OT_ACTION_RETURN_VALUE_OK);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _document) {
@@ -206,29 +207,24 @@ std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _docum
 	OT_rJSON_createValueObject(reqPckgObj);
 	pckg.addToJsonObject(reqDoc, reqPckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, editorName);
 
 	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
 	m_uiComponent->sendMessage(true, reqDoc);
 
-	return std::string(OT_ACTION_RETURN_VALUE_OK);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document) {
 	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	auto sel = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
-	std::string msg = "Selection changed: [";
-	bool f = true;
-	for (auto s : sel) {
-		if (!f) msg.append("; ");
-		f = false;
-		msg.append(std::to_string(s));
-	}
-	msg.append("]\n");
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+}
 
-	m_uiComponent->displayMessage(msg);
+std::string Application::handleGraphicsItemMoved(OT_rJSON_doc& _document) {
 
-	return std::string(OT_ACTION_RETURN_VALUE_OK);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::createEmptyTestEditor(void) {

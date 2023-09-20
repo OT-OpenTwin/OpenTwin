@@ -2851,6 +2851,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				for (auto itm : pckg.items()) {
 					ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm);
 					if (i) {
+						i->setGraphicsItemFlags(i->graphicsItemFlags() | ot::GraphicsItem::ItemIsMoveable | ot::GraphicsItem::ItemNetworkContext);
 						i->getQGraphicsItem()->setPos(QPointF(itm->position().x(), itm->position().y()));
 						editor->addItem(i);
 						OT_LOG_W("Added at: " + std::to_string(itm->position().x()) + "; " + std::to_string(itm->position().y()));

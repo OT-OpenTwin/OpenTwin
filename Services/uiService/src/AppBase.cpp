@@ -2302,8 +2302,9 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 		
 		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-		if (rMsg == ot::ReturnMessage::Failed) {
-			OT_LOG_E(rMsg.getWhat());
+		if (rMsg != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + rMsg.getWhat());
+			return;
 		}
 	}
 	catch (const std::exception& _e) {
