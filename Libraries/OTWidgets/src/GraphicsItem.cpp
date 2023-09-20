@@ -798,6 +798,10 @@ void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsIt
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+std::string ot::GraphicsConnectionItem::buildKey(const std::string& _originUid, const std::string& _originItemName, const std::string& _destUid, const std::string& _destItemName) {
+	return _originUid + "|" + _originItemName + "|" + _destUid + "|" + _destItemName;
+}
+
 ot::GraphicsConnectionItem::GraphicsConnectionItem() : m_origin(nullptr), m_dest(nullptr) {
 	
 }
@@ -816,6 +820,17 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	m_origin->storeConnection(this);
 	m_dest->storeConnection(this);
 	this->updateConnection();
+}
+
+void ot::GraphicsConnectionItem::disconnectItems(void) {
+	if (m_origin) {
+		m_origin->forgetConnection(this);
+		m_origin = nullptr;
+	}
+	if (m_dest) {
+		m_dest->forgetConnection(this);
+		m_dest = nullptr;
+	}
 }
 
 void ot::GraphicsConnectionItem::updateConnection(void) {

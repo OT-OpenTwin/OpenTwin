@@ -112,7 +112,8 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	
 	m_scene->addItem(newConnection);
 
-	m_connections.insert_or_assign(newConnection->graphicsItemUid(), newConnection);
+	std::string itmKey = ot::GraphicsConnectionItem::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
+	m_connections.insert_or_assign(itmKey, newConnection);
 
 	newConnection->connectItems(_origin, _dest);
 
@@ -120,7 +121,16 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 }
 
 void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+	std::string key = ot::GraphicsConnectionItem::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
+	auto it = m_connections.find(key);
+	if (it == m_connections.end()) {
+		OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
+		return;
+	}
 
+	it->second->disconnectItems();
+	m_scene->removeItem(it->second->getQGraphicsItem());
+	m_connections.erase(key);
 }
 
 // ########################################################################################################

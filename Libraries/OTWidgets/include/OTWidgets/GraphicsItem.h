@@ -443,6 +443,8 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public GraphicsPathItem {
 	public:
+		static std::string buildKey(const std::string& _originUid, const std::string& _originItemName, const std::string& _destUid, const std::string& _destItemName);
+
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();
 
@@ -450,6 +452,7 @@ namespace ot {
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsConnectionItem); };
 
 		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
+		void disconnectItems(void);
 
 		void updateConnection(void);
 

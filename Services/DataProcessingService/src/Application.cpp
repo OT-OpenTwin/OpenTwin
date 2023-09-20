@@ -215,7 +215,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			BlockEntityHandler::GetInstance().AddBlockConnection(c.fromUID, c.toUID, c.fromConnectable, c.toConnectable);
 		}
 
-		
 		// Request UI to add connections
 		OT_rJSON_createDOC(reqDoc);
 		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
