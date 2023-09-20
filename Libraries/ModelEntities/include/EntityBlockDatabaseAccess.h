@@ -17,6 +17,11 @@ public:
 	const std::string& getPropertyNameParameter2() { return _propertyNameP2; }
 	const std::string& getPropertyNameParameter3() { return _propertyNameP3; }
 	
+	const std::string& getPropertyDataTypeQuantity() { return _propertyDataTypeQuantity; }
+	const std::string& getPropertyDataTypeParameter1() { return _propertyDataTypeP1; }
+	const std::string& getPropertyDataTypeParameter2() { return _propertyDataTypeP2; }
+	const std::string& getPropertyDataTypeParameter3() { return _propertyDataTypeP3; }
+	
 	const std::string& getGroupQuantity() { return _groupQuantitySetttings; }
 	const std::string& getGroupParameter1() { return _groupParamSettings1; }
 	const std::string& getGroupParameter2() { return _groupParamSettings2; }

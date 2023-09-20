@@ -13,6 +13,21 @@ EntityProperties::~EntityProperties()
 	deleteAllProperties();
 }
 
+void EntityProperties::merge(EntityProperties& other)
+{
+	for (auto prop : other.propertiesList)
+	{
+		EntityPropertiesBase* property = getProperty(prop->getName());
+		if (property == nullptr)
+		{
+			properties[prop->getName()] = prop;
+			propertiesList.push_back(prop);
+		}
+	}
+	other.properties.clear();
+	other.propertiesList.clear();
+}
+
 void EntityProperties::deleteAllProperties(void)
 {
 	// Delete all properties

@@ -15,11 +15,15 @@ public:
 private:
 	std::map<ot::UID, BufferBlockDatabaseAccess> _bufferedInformation;
 	
-	void UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	EntityProperties UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	EntityProperties UpdateSelectionProperties(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity);
 
 	const MeasurementCampaign GetMeasurementCampaign(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
 	void RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON);
-	void UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::list<std::string>& msmdNames, std::list<std::string>& parameterNames, std::list<std::string>& quantityNames);
+	
+	
+	void UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const MeasurementCampaign& campaignMetadata);
 	void getSelectedValues(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityValue, std::string& outParameter1Value, std::string& outParameter2Value, std::string& outParameter3Value);
-
+	void getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type);
+	void CreateUpdatedTypeProperty(const std::string& group, const std::string& name, const std::string& value, EntityProperties& properties);
 };

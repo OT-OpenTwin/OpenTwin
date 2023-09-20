@@ -92,6 +92,7 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MeasurementCampaign& meas
 				{
 					auto valueEntry = dynamic_cast<MetadataEntryArray*>(entry.get());
 					parameter.values = valueEntry->getValues();
+					parameter.typeName = valueEntry->getValues().begin()->getTypeName();
 				}
 				else
 				{

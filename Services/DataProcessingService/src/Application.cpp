@@ -115,48 +115,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		{
 			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
 			_propertyHandlerDBAccessBlocks.PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
-			/*if (_propertyHandlerDBAccessBlocks.requiresUpdate(dbAccess))
-			{
-
-				const std::string projectName = dbAccess->getSelectedProjectName();
-				auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-				CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
-				if (access.ConnectedWithCollection())
-				{
-					auto rmd = access.getMeasurementCampaignMetadata(m_modelComponent);
-					auto msmds = access.getMeasurementMetadata(m_modelComponent);
-
-					MeasurementCampaignFactory factory;
-					MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
-					std::map <std::string, MetadataQuantity> quantities = measurementCampaign.getMetadataQuantities();
-					std::list<std::string> quantityNames;
-					for (auto& quantity : quantities)
-					{
-						quantityNames.push_back(quantity.first);
-					}
-					std::list<std::string> msmdNames;
-					for (auto& msmd : msmds)
-					{
-						msmdNames.push_back(msmd->getName());
-					}
-					std::map <std::string, MetadataParameter> parameters = measurementCampaign.getMetadataParameter();
-					std::list<std::string> parameterNames;
-					for (auto parameter : parameters)
-					{
-						parameterNames.push_back(parameter.first);
-					}
-
-					auto requestDoc = _propertyHandlerDBAccessBlocks.Update(dbAccess, quantityNames, parameterNames, msmdNames);
-					sendMessage(true, OT_INFO_SERVICE_TYPE_MODEL, requestDoc);
-				}
-
-			}
-			const std::string queryDimension = dbAccess->getQueryDimension();*/
-		}
-		else
-		{
-			delete entBase;
-			entBase = nullptr;
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)

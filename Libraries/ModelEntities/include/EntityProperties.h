@@ -15,6 +15,8 @@ public:
 	EntityProperties(const EntityProperties &other);
 	virtual ~EntityProperties();
 
+	void merge(EntityProperties& other);
+
 	bool createProperty(EntityPropertiesBase *property, const std::string &group);
 	bool updateProperty(EntityPropertiesBase *property, const std::string &group);
 	bool deleteProperty(const std::string &name);
