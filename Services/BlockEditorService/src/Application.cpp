@@ -23,6 +23,61 @@
 
 Application * g_instance{ nullptr };
 
+#define EXAMPLE_NAME_Block1 "Alpha 1"
+#define EXAMPLE_NAME_Block2 "Beta 2"
+#define EXAMPLE_NAME_Block3 "Gamma 3"
+
+namespace ottest {
+	static unsigned long long currentBlockUid = 0;
+
+
+	ot::GraphicsItemCfg* createTestBlock1(const std::string& _name) {
+		ot::GraphicsFlowItemCfg flow;
+		flow.setTitleBackgroundColor(0, 255, 0);
+		//flow->setBackgroundImagePath("Default/python");
+
+		flow.addInput("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addInput("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
+		flow.addInput("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
+		flow.addOutput("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addOutput("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addOutput("SomeOut3", "Error", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Red);
+
+		return flow.createGraphicsItem(_name, _name);
+	}
+
+	ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
+		ot::GraphicsFlowItemCfg flow;
+		flow.setTitleBackgroundColor(255, 0, 0);
+		//flow->setBackgroundImagePath("Default/python");
+
+		flow.addInput("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addInput("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
+		flow.addInput("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
+		flow.addOutput("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addOutput("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+
+		return flow.createGraphicsItem(_name, _name);
+	}
+
+	ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
+		ot::GraphicsFlowItemCfg flow;
+		flow.setTitleBackgroundColor(0, 0, 255);
+		//flow->setBackgroundImagePath("Default/python");
+
+		flow.addInput("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addOutput("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addOutput("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+
+		return flow.createGraphicsItem(_name, _name);
+	}
+
+}
+
+
+
+
+
 Application * Application::instance(void) {
 	if (g_instance == nullptr) { g_instance = new Application; }
 	return g_instance;
@@ -58,11 +113,43 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 }
 
 std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
-	std::string name = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-	ot::UID uid = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+	// We allow all items and do NOT store any information
+	
+	// Get item information
+	std::string itemName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	m_uiComponent->displayMessage("New item dropped { name: \"" + name + "\", UID: \"" + std::to_string(uid) + "\" } at editor { name: \"" + editorName + "\" }\n");
+	OT_rJSON_val posObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
+	ot::Point2DD pos;
+	pos.setFromJsonObject(posObj);
+
+	// Here we would now check and store the item information
+
+	// Create package
+	ot::GraphicsScenePackage pckg("Data Processing");
+
+	// Create item configuration for the item to add
+	ot::GraphicsItemCfg* itm = nullptr;
+	if (itemName == EXAMPLE_NAME_Block1) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block1);
+	if (itemName == EXAMPLE_NAME_Block2) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block2);
+	if (itemName == EXAMPLE_NAME_Block3) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block3);
+	else {
+		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+	itm->setPosition(pos);
+	itm->setUid(std::to_string(++ottest::currentBlockUid));
+	pckg.addItem(itm);
+
+	OT_rJSON_createDOC(reqDoc);
+	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+
+	OT_rJSON_createValueObject(pckgDoc);
+	pckg.addToJsonObject(reqDoc, pckgDoc);
+	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+
+	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	m_uiComponent->sendMessage(true, reqDoc);
 
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
@@ -70,15 +157,26 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document) {
 	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	ot::UID originUid = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId);
-	std::string originConnectable = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName);
+	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
+	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
 
-	ot::UID destUid = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_DestId);
-	std::string destConnectable = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName);
+	ot::GraphicsConnectionPackage pckg;
+	pckg.setFromJsonObject(pckgObj);
 
-	m_uiComponent->displayMessage("New connection dropped { o.i: \"" + std::to_string(originUid) + "\", o.c: \"" + originConnectable + 
-		"\", d.i: \"" + std::to_string(destUid) + "\", d.c: \"" + destConnectable + 
-		"\" } at editor { name: \"" + editorName + "\" }\n");
+	// Here we would check and store the connection information
+
+
+	// Request UI to add connections
+	OT_rJSON_createDOC(reqDoc);
+	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+
+	// Add received package to reuest (all connections are allowed)
+	OT_rJSON_createValueObject(reqPckgObj);
+	pckg.addToJsonObject(reqDoc, reqPckgObj);
+	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+
+	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	m_uiComponent->sendMessage(true, reqDoc);
 
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
@@ -101,136 +199,6 @@ std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document)
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
 
-ot::GraphicsItemCfg* createTestBlock(const std::string& _name) {
-	ot::GraphicsImageItemCfg* bot = new ot::GraphicsImageItemCfg;
-	bot->setSize(ot::Size2D(100, 60));
-	bot->setName(_name + "i");
-	bot->setTitle(_name + "i");
-	bot->setImagePath("Default/BugGreen");
-	bot->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-	ot::GraphicsTextItemCfg* topA = new ot::GraphicsTextItemCfg("Senor");
-	topA->setName(_name + "tA");
-	topA->setTitle(_name + "tA");
-
-	ot::GraphicsTextItemCfg* topB = new ot::GraphicsTextItemCfg("Buggo");
-	topB->setName(_name + "tB");
-	topB->setTitle(_name + "tB");
-
-	ot::GraphicsVBoxLayoutItemCfg* top = new ot::GraphicsVBoxLayoutItemCfg;
-	top->setName(_name + "t");
-	top->setTitle(_name + "t");
-	top->addChildItem(topA);
-	top->addChildItem(topB);
-	top->setSize(ot::Size2D(100, 50));
-
-	ot::GraphicsRectangularItemCfg* backgr = new ot::GraphicsRectangularItemCfg;
-	backgr->setName(_name + "b");
-	backgr->setTitle(_name + "b");
-	backgr->setCornerRadius(5);
-	backgr->setSize(ot::Size2D(100, 50));
-
-	ot::GraphicsStackItemCfg* cfgTop = new ot::GraphicsStackItemCfg;
-	cfgTop->setName(_name + "s");
-	cfgTop->setTitle(_name + "s");
-	cfgTop->addItemTop(bot, false);
-	cfgTop->addItemTop(top, true);
-
-	ot::GraphicsStackItemCfg* cfg = new ot::GraphicsStackItemCfg;
-	cfg->setName(_name);
-	cfg->setTitle(_name);
-	cfg->setSize(ot::Size2D(100, 50));
-	cfg->addItemTop(backgr, false);
-	cfg->addItemTop(cfgTop, true);
-
-	return cfg;
-}
-
-ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
-	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
-	centralLayout->setName(_name);
-	centralLayout->setTitle(_name);
-
-	ot::GraphicsTextItemCfg* title = new ot::GraphicsTextItemCfg;
-	title->setName("Title");
-	title->setText("Title");
-
-	ot::GraphicsRectangularItemCfg* leftRect = new ot::GraphicsRectangularItemCfg;
-	leftRect->setName("Left");
-	leftRect->setSize(ot::Size2D(20, 20));
-	leftRect->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-	centralLayout->addChildItem(title);
-	centralLayout->addChildItem(leftRect);
-
-	return centralLayout;
-}
-
-ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
-	ot::GraphicsVBoxLayoutItemCfg* centralLayout = new ot::GraphicsVBoxLayoutItemCfg;
-	centralLayout->setName(_name);
-	
-	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
-	tit->setText(_name);
-	
-	ot::GraphicsGridLayoutItemCfg* grid = new ot::GraphicsGridLayoutItemCfg(2, 3);
-	grid->setColumnStretch(1, 1);
-
-	ot::GraphicsHBoxLayoutItemCfg* b1 = new ot::GraphicsHBoxLayoutItemCfg;
-	ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
-	r1->setSize(ot::Size2D(10, 10));
-	r1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-	ot::GraphicsTextItemCfg* t1 = new ot::GraphicsTextItemCfg;
-	t1->setText("Test 1");
-	b1->addChildItem(r1);
-	b1->addChildItem(t1);
-	b1->addStrech(1);
-
-	ot::GraphicsHBoxLayoutItemCfg* b2 = new ot::GraphicsHBoxLayoutItemCfg;
-	ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
-	r2->setSize(ot::Size2D(10, 10));
-	r2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-	ot::GraphicsTextItemCfg* t2 = new ot::GraphicsTextItemCfg;
-	t2->setText("Test 2");
-	b2->addChildItem(r2);
-	b2->addChildItem(t2);
-	b2->addStrech(1);
-
-	ot::GraphicsHBoxLayoutItemCfg* b3 = new ot::GraphicsHBoxLayoutItemCfg;
-	ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
-	r3->setSize(ot::Size2D(10, 10));
-	r3->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-	ot::GraphicsTextItemCfg* t3 = new ot::GraphicsTextItemCfg;
-	t3->setText("Test 3");
-	b3->addChildItem(r3);
-	b3->addChildItem(t3);
-	b3->addStrech(1);
-
-	centralLayout->addChildItem(tit);
-	centralLayout->addChildItem(grid, 1);
-
-	grid->addChildItem(0, 0, b1);
-	grid->addChildItem(0, 2, b2);
-	grid->addChildItem(1, 2, b3);
-
-	return centralLayout;
-}
-
-ot::GraphicsItemCfg* createTestBlock4(const std::string& _name) {
-	ot::GraphicsFlowItemCfg flow;
-	flow.setTitleBackgroundColor(255, 0, 0);
-	//flow->setBackgroundImagePath("Default/python");
-
-	flow.addInput("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-	flow.addInput("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-	flow.addInput("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
-	flow.addOutput("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-	flow.addOutput("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
-	flow.addOutput("SomeOut3", "Error", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Red);
-
-	return flow.createGraphicsItem(_name, _name);
-}
-
 std::string Application::createEmptyTestEditor(void) {
 	if (m_uiComponent) {
 		/*ot::BlockEditorConfigurationPackage pckg("AlwaysNumberOne", "Block Editor");
@@ -246,9 +214,10 @@ std::string Application::createEmptyTestEditor(void) {
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("1", "1");
 		ot::GraphicsCollectionCfg* a2 = new ot::GraphicsCollectionCfg("2", "2");
 		a->addChildCollection(a1);
-		a1->addItem(createTestBlock4("Alpha 1"));
+		a1->addItem(ottest::createTestBlock1(EXAMPLE_NAME_Block1));
+		a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
 		a->addChildCollection(a2);
-		a2->addItem(createTestBlock4("Alpha 2"));
+		a2->addItem(ottest::createTestBlock3(EXAMPLE_NAME_Block3));
 		pckg.addCollection(a);
 
 		OT_rJSON_createDOC(doc);
