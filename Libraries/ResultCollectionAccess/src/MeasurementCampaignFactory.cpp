@@ -70,7 +70,9 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MeasurementCampaign& meas
 {
 	for (auto msmd : msmds)
 	{
-		SeriesMetadata seriesMetadata (msmd->getName());
+		std::string entityName = msmd->getName();
+		const std::string name = entityName.substr(entityName.find_last_of("/") +1);
+		SeriesMetadata seriesMetadata (name);
 		
 		const GenericDocument* parameterTopLevel = msmd->getDocument(msmd->getParameterDocumentName());
 		const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();

@@ -10,9 +10,51 @@ public:
 	void createProperties();
 	std::string getSelectedProjectName();
 	std::string getQueryDimension();
-
+	const std::string& getPropertyNameMeasurementSeries() { return _msmdPropertyName; }
+	
+	virtual bool updateFromProperties() override;
 protected:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
+private:
+	bool SetVisibleParameter2(bool visible);
+	bool SetVisibleParameter3(bool visible);
+
+	const std::string _propertyNameDimension = "Outcome dimension";
+	const std::string _propertyValueDimension1 = "1D";
+	const std::string _propertyValueDimension2 = "2D";
+	const std::string _propertyValueDimension3 = "3D";
+	const std::string _propertyValueDimensionCustom = "custom";
+
+	const std::string _msmdPropertyName = "Measurement series";
+
+	const std::string _groupQuerySettings = "Query settings";
+
+	const std::string _groupQuantitySetttings = "Quantity settings";
+	const std::string _propertyNameQuantity = "Name";
+	const std::string _propertyDataTypeQuantity = "Data type";
+	const std::string _propertyComparator = "Comparator";
+	const std::string _propertyValueQuantity = "Value";
+
+	const std::string _groupParamSettings1 = "Parameter 1";
+	const std::string _propertyNameP1 = "P1 name";
+	const std::string _propertyDataTypeP1 = "P1 data type";
+	const std::string _propertyComparatorP1 = "P1 comparator";
+	const std::string _propertyValueP1 = "P1 query value";
+
+	const std::string _groupParamSettings2 = "Parameter 2";
+	const std::string _propertyNameP2 = "P2 name";
+	const std::string _propertyDataTypeP2 = "P2 data type";
+	const std::string _propertyComparatorP2 = "P2 comparator";
+	const std::string _propertyValueP2 = "P2 query value";
+
+	const std::string _groupParamSettings3 = "Parameter 3";
+	const std::string _propertyNameP3 = "P3 name";
+	const std::string _propertyDataTypeP3 = "P3 data type";
+	const std::string _propertyComparatorP3 = "P3 comparator";
+	const std::string _propertyValueP3 = "P3 query value";
+
+
+	std::list<std::string> _comparators = {"<", "<=", "=", ">", ">="};
 };

@@ -2,20 +2,23 @@
 #include "BufferBlockDatabaseAccess.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "EntityBlockDatabaseAccess.h"
+#include "MeasurementCampaign.h"
+#include "OpenTwinFoundation/BusinessLogicHandler.h"
 
 #include <map>
 #include <memory>
 
-class PropertyHandlerDatabaseAccessBlock
+class PropertyHandlerDatabaseAccessBlock : public BusinessLogicHandler
 {
 public:
-	bool requiresUpdate(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity);
-	OT_rJSON_doc Update(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity,std::list<std::string>& quantityNames, std::list<std::string>& parameterNames, std::list<std::string>& msmdNames);
+	void PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity,const std::string& sessionServiceURL, const std::string& modelServiceURL);
 private:
 	std::map<ot::UID, BufferBlockDatabaseAccess> _bufferedInformation;
-	const std::string _msmdPropertyName = "Measurement Series";
-	const std::string _quantityPropertyName = "Quantity";
-	const std::string _groupQuerySpecifications = "Query Specifications";
-
+	
 	void Buffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity);
+	void UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+
+	const MeasurementCampaign GetMeasurementCampaign(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	void RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON);
+	void UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::list<std::string> msmdNames, std::list<std::string> parameterNames, std::list<std::string> quantityNames);
 };

@@ -113,8 +113,9 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 		if (dbAccess != nullptr)
 		{
-			if (_propertyHandlerDBAccessBlocks.requiresUpdate(dbAccess))
+			/*if (_propertyHandlerDBAccessBlocks.requiresUpdate(dbAccess))
 			{
+
 				const std::string projectName = dbAccess->getSelectedProjectName();
 				auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
 				CrossCollectionAccess access(projectName, instance()->sessionServiceURL(), modelService->serviceURL());
@@ -148,7 +149,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 				}
 
 			}
-			const std::string queryDimension = dbAccess->getQueryDimension();
+			const std::string queryDimension = dbAccess->getQueryDimension();*/
 		}
 		else
 		{

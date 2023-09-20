@@ -14,6 +14,7 @@ public:
 	void AddMetadata(std::shared_ptr<MetadataEntry> metadata) { _metaData[metadata->getEntryName()] = metadata; }
 	const std::list<MetadataParameter>& getParameter() const { return _parameter; }
 	const std::list<MetadataQuantity>& getQuantities() const { return _quantity; }
+	const std::string getName()const { return _name; }
 private:
 	const std::string _name;
 	
