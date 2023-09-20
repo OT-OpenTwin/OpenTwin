@@ -66,8 +66,8 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItem::GraphicsItem(bool _containerItem) : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
-	m_isContainerItem(_containerItem), m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_requestedSize(10., 10.)
+ot::GraphicsItem::GraphicsItem() : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
+	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_requestedSize(10., 10.)
 {
 
 }
@@ -260,7 +260,7 @@ void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsGroupItem::GraphicsGroupItem(bool _containerItem) : ot::GraphicsItem(_containerItem) {
+ot::GraphicsGroupItem::GraphicsGroupItem() {
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
@@ -335,7 +335,7 @@ ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) 
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsStackItem::GraphicsStackItem() : GraphicsGroupItem(true) {
+ot::GraphicsStackItem::GraphicsStackItem() {
 
 }
 
@@ -437,7 +437,7 @@ void ot::GraphicsStackItem::memClear(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsRectangularItem::GraphicsRectangularItem() : ot::GraphicsItem(false), m_size(10, 10), m_cornerRadius(0) {
+ot::GraphicsRectangularItem::GraphicsRectangularItem() : m_size(10, 10), m_cornerRadius(0) {
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
@@ -543,7 +543,7 @@ void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsEllipseItem::GraphicsEllipseItem() : ot::GraphicsItem(false), m_radiusX(5), m_radiusY(5) {
+ot::GraphicsEllipseItem::GraphicsEllipseItem() : m_radiusX(5), m_radiusY(5) {
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
@@ -641,7 +641,8 @@ void ot::GraphicsEllipseItem::setRadius(int _x, int _y) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsTextItem::GraphicsTextItem() : ot::GraphicsItem(false) {
+ot::GraphicsTextItem::GraphicsTextItem()
+{
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
@@ -731,7 +732,8 @@ QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _cha
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsImageItem::GraphicsImageItem() : ot::GraphicsItem(false) {
+ot::GraphicsImageItem::GraphicsImageItem()
+{
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
@@ -820,7 +822,8 @@ void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsPathItem::GraphicsPathItem() : ot::GraphicsItem(false) {
+ot::GraphicsPathItem::GraphicsPathItem()
+{
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 

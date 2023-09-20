@@ -77,8 +77,7 @@ namespace ot {
 			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
 		};
 
-		//! @param _containerItem If true the item will work as a container and create a group for grouping child items
-		GraphicsItem(bool _containerItem = false);
+		GraphicsItem();
 		virtual ~GraphicsItem();
 
 		// ###############################################################################################################################################
@@ -136,8 +135,6 @@ namespace ot {
 		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
 		GraphicsItem* getRootItem(void);
 
-		bool isContainerItem(void) const { return m_isContainerItem; };
-
 		void storeConnection(GraphicsConnectionItem* _connection);
 
 		//! @brief Removes the collection from the list (item will not be destroyed)
@@ -160,7 +157,6 @@ namespace ot {
 		QRectF calculateDrawRect(const QRectF& _rect) const;
 
 	private:
-		bool m_isContainerItem;
 		bool m_hasHover;
 		std::string m_uid;
 		std::string m_name;
@@ -176,6 +172,9 @@ namespace ot {
 
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
+
+		GraphicsItem(const GraphicsItem&) = delete;
+		GraphicsItem& operator = (const GraphicsItem&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -186,7 +185,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsGroupItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
 	public:
-		GraphicsGroupItem(bool _containerItem = false);
+		GraphicsGroupItem();
 		virtual ~GraphicsGroupItem();
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
@@ -213,6 +212,10 @@ namespace ot {
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
+
+	private:
+		GraphicsGroupItem(const GraphicsGroupItem&) = delete;
+		GraphicsGroupItem& operator = (const GraphicsGroupItem&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -247,6 +250,9 @@ namespace ot {
 		void memClear(void);
 
 		std::list<GraphicsStackItemEntry> m_items;
+
+		GraphicsStackItem(const GraphicsStackItem&) = delete;
+		GraphicsStackItem& operator = (const GraphicsStackItem&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

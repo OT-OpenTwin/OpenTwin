@@ -53,7 +53,7 @@ void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::G
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsLayoutItem::GraphicsLayoutItem() : ot::GraphicsItem(true), m_layoutWrap(nullptr) {}
+ot::GraphicsLayoutItem::GraphicsLayoutItem() : m_layoutWrap(nullptr) {}
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 
