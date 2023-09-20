@@ -41,20 +41,15 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
-		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return m_group; };
-		virtual QGraphicsItem* getQGraphicsItem(void) override { return m_group; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem); };
 
-		virtual void setParentGraphicsItem(GraphicsItem* _itm) override;
-
-		GraphicsGroupItem* getGroupItem(void) { return m_group; };
-
 	private:
 		GraphicsLayoutItem* m_owner;
-		GraphicsGroupItem* m_group;
-
+		
 		GraphicsLayoutItemWrapper() = delete;
 		GraphicsLayoutItemWrapper(const GraphicsLayoutItemWrapper&) = delete;
 		GraphicsLayoutItemWrapper& operator = (const GraphicsLayoutItemWrapper&) = delete;
@@ -88,9 +83,7 @@ namespace ot {
 
 	protected:
 		//! @brief Call this function from the item constructor to create the layout wrapper instance
-		void createLayoutWrapperAndGroup(QGraphicsLayout* _layout);
-
-		void addChildToGroup(ot::GraphicsItem* _item);
+		void createLayoutWrapper(QGraphicsLayout* _layout);
 
 	private:
 		GraphicsLayoutItemWrapper* m_layoutWrap;

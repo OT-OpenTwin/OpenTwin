@@ -12,10 +12,7 @@
 
 ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner) : m_owner(_owner) {
 	OTAssertNullptr(m_owner);
-	m_group = new ot::GraphicsGroupItem;
-	m_group->addToGroup(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
-	this->setParentGraphicsItem(m_group);
 }
 
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
@@ -42,16 +39,8 @@ void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOp
 }
 
 void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	OTAssertNullptr(m_group);
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	m_group->setGraphicsItemFlags(_flags);
-}
-
-void ot::GraphicsLayoutItemWrapper::setParentGraphicsItem(GraphicsItem* _itm) {
-	OTAssertNullptr(m_group);
-	m_group->setParentGraphicsItem(_itm);
-	ot::GraphicsItem::setParentGraphicsItem(m_group);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -111,18 +100,13 @@ ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName)
 	return nullptr;
 }
 
-void ot::GraphicsLayoutItem::createLayoutWrapperAndGroup(QGraphicsLayout* _layout) {
+void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 	m_layoutWrap->setParentGraphicsItem(this);
 	m_layoutWrap->setLayout(_layout);
 	// Refresh the parent item
 	this->setParentGraphicsItem(nullptr);
-}
-
-void ot::GraphicsLayoutItem::addChildToGroup(ot::GraphicsItem* _item) {
-	OTAssertNullptr(m_layoutWrap);
-	m_layoutWrap->getGroupItem()->addToGroup(_item->getQGraphicsItem());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -133,7 +117,7 @@ void ot::GraphicsLayoutItem::addChildToGroup(ot::GraphicsItem* _item) {
 
 ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem) 
 {
-	this->createLayoutWrapperAndGroup(this);
+	this->createLayoutWrapper(this);
 }
 
 bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -155,7 +139,6 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			i->setParentGraphicsItem(this);
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
-			this->addChildToGroup(i);
 			if (itm.second > 0) this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
 		}
 		else {
@@ -208,7 +191,7 @@ bool ot::GraphicsHBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem) 
 {
-	this->createLayoutWrapperAndGroup(this);
+	this->createLayoutWrapper(this);
 }
 
 bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -234,7 +217,6 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				i->setParentGraphicsItem(this);
 				OTAssertNullptr(i->getQGraphicsLayoutItem());
 				this->addItem(i->getQGraphicsLayoutItem(), x, y);
-				this->addChildToGroup(i);
 			}
 			y++;
 		}
