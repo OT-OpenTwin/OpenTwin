@@ -154,6 +154,11 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
 }
 
+std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document) {
+
+	return std::string();
+}
+
 std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document) {
 	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
@@ -179,6 +184,11 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return std::string(OT_ACTION_RETURN_VALUE_OK);
+}
+
+std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _document) {
+
+	return std::string();
 }
 
 std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document) {

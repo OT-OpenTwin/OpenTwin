@@ -212,7 +212,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 		// Store connection information
 		for (auto c : pckg.connections()) {
-			BlockEntityHandler::GetInstance().AddBlockConnection(c.fromUID, c.toUID, c.fromConnectable, c.toConnectable);
+			//BlockEntityHandler::GetInstance().AddBlockConnection(c.fromUID, c.toUID, c.fromConnectable, c.toConnectable);
 		}
 
 		// Request UI to add connections
