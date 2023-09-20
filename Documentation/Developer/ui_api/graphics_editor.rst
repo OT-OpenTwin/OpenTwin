@@ -88,20 +88,146 @@ The item picker displays the different items for the user where he can drag them
 
       // Create the request that will be send to the UI:
 
-      // (1) Create request document
-      OT_rJSON_createDOC(requestObj);  
-      ot::rJSON::add(requestObj, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker);
+         // (1) Create request document
+         OT_rJSON_createDOC(requestObj);  
+         ot::rJSON::add(requestObj, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker);
 
-      // (2) Add package
-	   OT_rJSON_createValueObject(pckgObj);
-	   pckg.addToJsonObject(requestObj, pckgObj);
-	   ot::rJSON::add(requestObj, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+         // (2) Add package
+         OT_rJSON_createValueObject(pckgObj);
+         pckg.addToJsonObject(requestObj, pckgObj);
+         ot::rJSON::add(requestObj, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 
-      // (3) Add required service information
-	   ot::GlobalOwner::instance().addToJsonObject(requestObj, requestObj);
+         // (3) Add required service information
+         ot::GlobalOwner::instance().addToJsonObject(requestObj, requestObj);
 
-      // (4) Create request
-	   std::string request = ot::rJSON::toJSON(requestObj);
+         // (4) Create request
+         std::string request = ot::rJSON::toJSON(requestObj);
+   }
+
+
+Add Items to View
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: c++
+
+   #include "OTCore/Owner.h"
+   #include "OTGui/GraphicsPackage.h"
+
+   void foo(void) {
+      // Create items to add to the scene
+      ...
+
+      // Create package
+      ot::GraphicsScenePackage pckg("My Graphics View Name");
+      pckg.addItem(myFirstItem);
+      pckg.addItem(mySecondItem);
+      ...
+
+      // Create request
+      OT_rJSON_createDOC(reqDoc);
+      OT_rJSON_createValueObject(pckgObj);
+      pckg.addToJsonObject(reqDoc, pckgObj);
+
+      ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+      ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+      ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+
+      // Create request that should be send to the UI
+      std::string request = ot::rJSON::toJSON(reqDoc);
+
+      // Send request
+      ...
+   }
+
+Remove Items from View
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: c++
+
+   #include "OTCore/Owner.h"
+
+   void foo(void) {
+      std::list<std::string> items;
+
+      // Add item UIDs to the list above (items to be removed)
+      ...
+
+      // Create request
+      OT_rJSON_createDOC(reqDoc);
+      ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem);
+      ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, "My Graphics View Name");
+      ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, items);
+      ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+
+      // Create request that should be send to the UI
+      std::string request = ot::rJSON::toJSON(reqDoc);
+
+      // Send request
+      ...
+   }
+
+Add Connections
+^^^^^^^^^^^^^^^
+
+.. code-block:: c++
+
+   #include "OTCore/Owner.h"
+   #include "OTGui/GraphicsPackage.h"
+
+   void foo(void) {
+      // Create package
+      ot::GraphicsConnectionPackage pckg("My Graphics View Name");
+
+      // Fill package
+      pckg.addConnection(sourceUid, sourceName, destinationUid, destinationName);
+      ...
+
+      // Create request
+      OT_rJSON_createDOC(reqDoc);
+      OT_rJSON_createValueObject(pckgObj);
+      pckg.addToJsonObject(reqDoc, pckgObj);
+
+      ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+      ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+      ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+
+      // Create request that should be send to the UI
+      std::string request = ot::rJSON::toJSON(reqDoc);
+
+      // Send request
+      ...
+   }
+
+Remove Connections
+^^^^^^^^^^^^^^^^^^
+
+.. code-block:: c++
+
+   #include "OTCore/Owner.h"
+   #include "OTGui/GraphicsPackage.h"
+
+   void foo(void) {
+      // Create package
+      ot::GraphicsConnectionPackage pckg("My Graphics View Name");
+
+      // Fill package
+      pckg.addConnection(sourceUid, sourceName, destinationUid, destinationName);
+      ...
+
+      // Create request
+      OT_rJSON_createDOC(reqDoc);
+      OT_rJSON_createValueObject(pckgObj);
+      pckg.addToJsonObject(reqDoc, pckgObj);
+
+      ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection);
+      ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+      ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+
+      // Create request that should be send to the UI
+      std::string request = ot::rJSON::toJSON(reqDoc);
+
+      // Send request
+      ...
    }
 
 =============
