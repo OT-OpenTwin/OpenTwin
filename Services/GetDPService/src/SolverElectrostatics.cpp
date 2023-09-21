@@ -325,6 +325,10 @@ void SolverElectrostatics::writeJacobian(std::ofstream& controlFile)
         "           { Region All; Jacobian Vol; }\n"
         "    }\n"
         "  }\n"
+        "  { Name Sur; \n"
+        "    Case{ { Region All; Jacobian Sur; }\n"
+        "    }\n"
+        "  }\n"
         "}\n\n";
 }
 
@@ -627,6 +631,14 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
             }
 
             potentialFile.close();
+
+            // Now we extract the potential data for the surface
+            potentialList.clear();
+
+            for (auto node : nodeList)
+            {
+                potentialList.push_back(nodeToPotentialMap[node]);
+            }
 
             // Create the surface mesh item if needed
             long long visualizationMeshID = -1;

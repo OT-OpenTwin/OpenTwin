@@ -17,6 +17,7 @@
 #include <vtkFloatArray.h>
 #include <vtkCell.h>
 #include <vtkCellData.h>
+#include <vtkTriangle.h>
 #include <vtkTetra.h>
 
 DataSourceUnstructuredMesh::DataSourceUnstructuredMesh()
@@ -62,28 +63,54 @@ bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity)
 
 	if (cellData == nullptr) return false;
 
-	vtkCellArray* cellArray = vtkCellArray::New();
-	size_t index = 0;
-
-	for (size_t cell = 0; cell < numberCells; cell++)
+	if (cellData[0] == 3)
 	{
-		vtkSmartPointer<vtkTetra> tetra = vtkSmartPointer<vtkTetra>::New();
-		assert(cellData[index] == 4); // Ensure that we have four nodes
-		tetra->GetPointIds()->SetId(0, cellData[index + 1]);
-		tetra->GetPointIds()->SetId(1, cellData[index + 2]);
-		tetra->GetPointIds()->SetId(2, cellData[index + 3]);
-		tetra->GetPointIds()->SetId(3, cellData[index + 4]);
-		assert(cellData[index + 5] == 10); // Ensure that we have a tetrahedron type
+		vtkCellArray* cellArray = vtkCellArray::New();
+		size_t index = 0;
 
-		index += 6;
-		cellArray->InsertNextCell(tetra);
+		for (size_t cell = 0; cell < numberCells; cell++)
+		{
+			vtkSmartPointer<vtkTriangle> triangle = vtkSmartPointer<vtkTriangle>::New();
+			assert(cellData[index] == 3); // Ensure that we have three nodes
+			triangle->GetPointIds()->SetId(0, cellData[index + 1]);
+			triangle->GetPointIds()->SetId(1, cellData[index + 2]);
+			triangle->GetPointIds()->SetId(2, cellData[index + 3]);
+			assert(cellData[index + 4] == 5); // Ensure that we have a triangle type
+			index += 5;
+			cellArray->InsertNextCell(triangle);
+		}
+
+		vtkGrid->SetPoints(points);
+		vtkGrid->SetCells(VTK_TRIANGLE, cellArray);
+
 	}
+	else if (cellData[0] == 4)
+	{
+		vtkCellArray* cellArray = vtkCellArray::New();
+		size_t index = 0;
 
-	vtkGrid->SetPoints(points);
-	vtkGrid->SetCells(VTK_TETRA, cellArray);
+		for (size_t cell = 0; cell < numberCells; cell++)
+		{
+			vtkSmartPointer<vtkTetra> tetra = vtkSmartPointer<vtkTetra>::New();
+			assert(cellData[index] == 4); // Ensure that we have four nodes
+			tetra->GetPointIds()->SetId(0, cellData[index + 1]);
+			tetra->GetPointIds()->SetId(1, cellData[index + 2]);
+			tetra->GetPointIds()->SetId(2, cellData[index + 3]);
+			tetra->GetPointIds()->SetId(3, cellData[index + 4]);
+			assert(cellData[index + 5] == 10); // Ensure that we have a tetrahedron type
 
-	//size_t testP = vtkGrid->GetNumberOfPoints();
-	//size_t testC = vtkGrid->GetNumberOfCells();
+			index += 6;
+			cellArray->InsertNextCell(tetra);
+		}
+
+		vtkGrid->SetPoints(points);
+		vtkGrid->SetCells(VTK_TETRA, cellArray);
+	}
+	else
+	{
+		assert(0); // Unknown mesh
+		return false;
+	}
 
 	return true;
 }
