@@ -3,6 +3,7 @@
 #include "VtkDriverUnstructuredScalarVolume.h"
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
+#include "DataSourceUnstructuredMesh.h"
 
 #include "EntityVis2D3D.h"
 #include "EntityMeshCartesianData.h"
@@ -33,6 +34,7 @@
 #include <vtkActor.h>
 #include <vtkNew.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkCellDataToPointData.h>
 #include <vtkProperty.h>
 #include <vtkPolyData.h>
 #include <vtkFloatArray.h>
@@ -40,8 +42,9 @@
 #include <vtkPlane.h>
 #include <vtkRectilinearGrid.h>
 #include <vtkCutter.h>
-#include <vtkArrowSource.h>
+#include <vtkSphereSource.h>
 #include <vtkGlyph3D.h>
+#include <vtkInformation.h>
 #include <vtkLookupTable.h>
 #include <vtkExtractRectilinearGrid.h>
 #include <vtkDoubleArray.h>
@@ -53,10 +56,14 @@
 #include <vtkLookupTable.h>
 #include <vtkMaskPoints.h>
 #include <vtkBandedPolyDataContourFilter.h>
+#include <vtkGeometryFilter.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkPlaneCutter.h>
+#include <vtkHedgeHog.h>
 
 VtkDriverUnstructuredScalarVolume::VtkDriverUnstructuredScalarVolume() {}
 
-VtkDriverUnstructuredScalarVolume::~VtkDriverUnstructuredScalarVolume() 
+VtkDriverUnstructuredScalarVolume::~VtkDriverUnstructuredScalarVolume()
 {
 	DeletePropertyData();
 }
@@ -64,6 +71,7 @@ VtkDriverUnstructuredScalarVolume::~VtkDriverUnstructuredScalarVolume()
 void VtkDriverUnstructuredScalarVolume::CheckForModelUpdates()
 {
 	bool requiresModelUpdate = scalingData->UpdateMinMaxProperties(scalarRange[0], scalarRange[1]);
+
 	if (requiresModelUpdate)
 	{
 		long long entityID, entityVersion;
@@ -81,94 +89,67 @@ void VtkDriverUnstructuredScalarVolume::DeletePropertyData(void)
 		delete planeData;
 		planeData = nullptr;
 	}
+
 	if (scalingData != nullptr)
 	{
 		delete scalingData;
 		scalingData = nullptr;
 	}
+
+	if (visData != nullptr)
+	{
+		delete visData;
+		visData = nullptr;
+	}
 }
-#include <vtkPlaneCutter.h>
 
+std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerItem* dataItem)
+{
+	objectsToDelete.clear();
 
-std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerItem *dataItem) {
 	updateTopoEntityID.clear();
 	updateTopoEntityVersion.clear();
+
 	std::time_t timer = time(nullptr);
 	reportTime("VTK image creation started", timer);
 
-	osg::Node *node = new osg::Switch;
-	
-	auto * dataSource = dynamic_cast<DataSourceResult3D*>(dataItem);
+	osg::Node* node = new osg::Switch;
+
+	dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
 	assert(dataSource != nullptr);
 
+	if (dataSource == nullptr) return "";
 
-	////Settup grid
-	//vtkRectilinearGrid* grid = vtkRectilinearGrid::New();
-	//vtkNew<vtkDoubleArray> xCoo, yCoo, zCoo;
-	//
-	//int numberOfNodesPerDimension = 13;
-	//int numberOfNodesTotal = std::pow(numberOfNodesPerDimension, 3);
+	vtkNew<vtkCellDataToPointData> cellToPoint;
 
-	//grid->SetDimensions(numberOfNodesPerDimension, numberOfNodesPerDimension, numberOfNodesPerDimension);
-	//int answ = xCoo->Resize(numberOfNodesPerDimension);
-	//answ = yCoo->Resize(numberOfNodesPerDimension);
-	//answ = zCoo->Resize(numberOfNodesPerDimension);
-	//for (double i = 0; i < numberOfNodesPerDimension; i++)
-	//{
-	//	xCoo->InsertNextValue(i);
-	//	yCoo->InsertNextValue(i);
-	//	zCoo->InsertNextValue(i);
-	//}
-	//grid->SetXCoordinates(xCoo);
-	//grid->SetYCoordinates(yCoo);
-	//grid->SetZCoordinates(zCoo);
+	dataConnection = nullptr;
 
-	//vtkNew<vtkDoubleArray> vectorData;
-	//vectorData->SetNumberOfComponents(3);
-	//vectorData->SetNumberOfTuples(numberOfNodesTotal);
+	if (dataSource->GetHasCellScalar())
+	{
+		cellToPoint->SetInputData(dataSource->GetVtkGrid());
+		cellToPoint->ProcessAllArraysOn();
+		cellToPoint->Update();
 
-	//for (int i = 0; i < numberOfNodesTotal; i++)
-	//{
-	//	int value = 13;
-	//	vectorData->SetTuple3(i, value, value, value);
-	//}
-	//grid->GetPointData()->SetVectors(vectorData);
-	//grid->GetPointData()->Update();
+		dataConnection = cellToPoint->GetOutputPort();
+	}
 
-	//auto temp = grid->GetPointData()->GetVectors();
+	if (   visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface
+		|| visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Points)
+	{
+		Assemble3DNode(node);
+	}
+	else
+	{
+		Assemble2DNode(node);
+	}
 
-	////Cutting data set
-	//vtkNew<vtkPlane> plane;
-	//plane->SetNormal(0, 0, 1);
-	//double minOffset = (grid->GetXCoordinates()->GetTuple1(1) - grid->GetXCoordinates()->GetTuple1(0)) / 1000;
-	////double minDyn = grid->GetXCoordinates()->GetTuple1(0) * minOffset;
-	//double x = grid->GetXCoordinates()->GetTuple1(0) + minOffset;
-	//double y = grid->GetYCoordinates()->GetTuple1(0) + minOffset;
-	//double z = grid->GetZCoordinates()->GetTuple1(0) + minOffset;
-	//
-	//plane->SetOrigin(x,y,z);
+	CheckForModelUpdates();
 
-	////vtkNew<vtkPlaneCutter> cutter;
-
-	//vtkCutter* cutter = vtkCutter::New();
-	//cutter->SetInputData(grid);
-	//cutter->SetCutFunction(plane);
-	//
-	////cutter->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, vtkDataSetAttributes::VECTORS);
-	//cutter->Update();
-	//auto cutterTemp = cutter->GetOutput();
-
-	//vtkNew<vtkVectorNorm> norm;
-	//norm->SetInputConnection(cutter->GetOutputPort());
-	//norm->NormalizeOff();
-	//norm->Update();
-	//double* range = norm->GetOutput()->GetScalarRange();
-
-	auto output = ApplyCutplane(dataSource, node);
-
-	AssembleNode(output, node);
-
-	//CheckForModelUpdates();
+	for (auto item : objectsToDelete)
+	{
+		item->Delete();
+	}
+	objectsToDelete.clear();
 
 	// Now we serialize the node information and return it as a string
 	std::stringstream dataOut;
@@ -185,12 +166,11 @@ std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerI
 	return dataOut.str();
 }
 
-//#include <vtkStructuredDataPlaneCutter.h> with version 9.2
-vtkAlgorithmOutput * VtkDriverUnstructuredScalarVolume::ApplyCutplane(DataSourceResult3D *dataSource, osg::Node * parent)
-{	
+vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* parent)
+{
 	assert(planeData != nullptr);
 	assert(planeData->GetNormalDescription() != PlaneProperties::UNKNOWN);
-	
+
 	double normalX(0.), normalY(0.), normalZ(0.);
 
 	if (planeData->GetNormalDescription() == PlaneProperties::X)
@@ -199,7 +179,7 @@ vtkAlgorithmOutput * VtkDriverUnstructuredScalarVolume::ApplyCutplane(DataSource
 		normalY = 0;
 		normalZ = 0;
 	}
-	else if(planeData->GetNormalDescription() == PlaneProperties::Y)
+	else if (planeData->GetNormalDescription() == PlaneProperties::Y)
 	{
 		normalX = 0;
 		normalY = 1;
@@ -224,11 +204,9 @@ vtkAlgorithmOutput * VtkDriverUnstructuredScalarVolume::ApplyCutplane(DataSource
 		}
 	}
 
-
 	vtkNew<vtkPlane> plane;
-	plane->SetNormal(normalX, normalY,normalZ);
+	plane->SetNormal(normalX, normalY, normalZ);
 	double x(0), y(0), z(0);
-
 
 	planeData->GetCenterValueX() < dataSource->GetXMinCoordinate() ? x = dataSource->GetXMinCoordinate() :
 		planeData->GetCenterValueX() > dataSource->GetXMaxCoordinate() ? x = dataSource->GetXMaxCoordinate() :
@@ -240,199 +218,164 @@ vtkAlgorithmOutput * VtkDriverUnstructuredScalarVolume::ApplyCutplane(DataSource
 		planeData->GetCenterValueZ() > dataSource->GetZMaxCoordinate() ? z = dataSource->GetZMaxCoordinate() :
 		z = planeData->GetCenterValueZ();
 
-	plane->SetOrigin(x,y,z);
+	plane->SetOrigin(x, y, z);
 
 	vtkCutter* planeCut = vtkCutter::New();
-	planeCut->SetInputData(dataSource->GetVtkGrid());
+	objectsToDelete.push_back(planeCut);
+
+	if (dataConnection != nullptr) planeCut->SetInputConnection(dataConnection);
+	else planeCut->SetInputData(dataSource->GetVtkGrid());
+
 	planeCut->SetCutFunction(plane);
 	planeCut->Update();
 
-	auto temp = planeCut->GetOutput()->GetPointData()->GetVectors();
+	scalarRange = planeCut->GetOutput()->GetScalarRange();
 
-	vtkVectorNorm * vectorNorm = vtkVectorNorm::New();
-	vectorNorm->SetInputConnection(planeCut->GetOutputPort());
-	vectorNorm->SetNormalize(false);
-	vectorNorm->Update();
-	scalarRange = vectorNorm->GetOutput()->GetScalarRange();
+	// Create the mesh visualization
+	if (visData->GetShow2dMesh())
+	{
+		vtkNew<vtkFeatureEdges> edges;
+		edges->SetInputConnection(planeCut->GetOutputPort());
+		edges->BoundaryEdgesOn();
+		edges->ColoringOff();
 
+		vtkNew<vtkPolyDataMapper> planeMapper;
+		planeMapper->SetInputConnection(edges->GetOutputPort());
+		planeMapper->SetScalarModeToUseCellData();
 
-	vtkNew<vtkFeatureEdges> edges;
-	edges->SetInputConnection(planeCut->GetOutputPort());
-	edges->BoundaryEdgesOn();
-	edges->SetColoring(false);
+		vtkNew<vtkActor> planeActor;
+		planeActor->SetMapper(planeMapper);
+		planeActor->GetProperty()->SetColor(visData->GetColor2dMeshR(), visData->GetColor2dMeshG(), visData->GetColor2dMeshB());
 
-	vtkNew<vtkPolyDataMapper> planeMapper;
-	planeMapper->SetInputConnection(edges->GetOutputPort());
-
-	vtkNew<vtkActor> planeActor;
-	planeActor->SetMapper(planeMapper);
-	planeActor->GetProperty()->SetColor(1,1,1);
-
-	osg::Node *planeNode = VTKActorToOSG(planeActor);
-	dynamic_cast<osg::Switch *>(parent)->addChild(planeNode);
+		osg::Node* planeNode = VTKActorToOSG(planeActor);
+		dynamic_cast<osg::Switch*>(parent)->addChild(planeNode);
+	}
 
 	return planeCut->GetOutputPort();
 }
 
-void VtkDriverUnstructuredScalarVolume::AssembleNode(vtkAlgorithmOutput * input, osg::Node *parent)
+vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::GetPointSource(void)
 {
-	   	 
-	vtkAlgorithmOutput * visualization = SetScalarValues(input);
+	vtkNew<vtkSphereSource> sphere;
 
-	if (vis2D3DData->GetSelectedVisType() == PropertiesVis2D3D::VisualizationType::Arrows)
+	sphere->SetRadius(1.0);
+	sphere->SetPhiResolution(6);
+	sphere->SetThetaResolution(6);
+
+	vtkPolyDataNormals* shadedSphere = vtkPolyDataNormals::New();
+	objectsToDelete.push_back(shadedSphere);
+
+	shadedSphere->SetInputConnection(sphere->GetOutputPort());
+	shadedSphere->SetFeatureAngle(80.0);
+	shadedSphere->FlipNormalsOff();
+	shadedSphere->Update();
+
+	return shadedSphere->GetOutputPort();
+}
+
+void VtkDriverUnstructuredScalarVolume::Assemble3DNode(osg::Node* parent)
+{
+	if (visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface)
 	{
-		visualization = AddNodeVectors(visualization);
+		assert(0); // Not yet implemented
 	}
-	else if (vis2D3DData->GetSelectedVisType() == PropertiesVis2D3D::VisualizationType::Contour)
+	else if (visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Points)
 	{
+		AddNodePoints(parent);
+	}
+	else
+	{
+		assert(0); // Unknown type
+	}
+}
 
-		auto bf = vtkBandedPolyDataContourFilter::New();
-		bf->SetInputConnection(visualization);
-		bf->SetGenerateContourEdges(true);
-		bf->SetScalarModeToValue();
-		bf->GenerateValues(scalingData->GetColourResolution(), scalarRange);
-		bf->Update();
+void VtkDriverUnstructuredScalarVolume::Assemble2DNode(osg::Node* parent)
+{
+	vtkAlgorithmOutput *scalar = ApplyCutplane(parent);
 
-		//vtkNew<vtkLookupTable> lut;
-		//lut->SetNumberOfTableValues(scalingData->GetColourResolution());
-		//lut->SetTableRange(scalarRange);
-		//lut->SetHueRange(.667, 0.0);
-		//lut->SetAlphaRange(1., 1.);
-		//lut->IndexedLookupOff();
-		//lut->Build();
+	vtkNew<vtkBandedPolyDataContourFilter> bf;
+	bf->SetInputConnection(scalar);
+	bf->SetGenerateContourEdges(true);
+	bf->SetScalarModeToValue();
+	bf->GenerateValues(scalingData->GetColourResolution(), scalarRange);
+	bf->Update();
 
+	if (visData->GetShow2dIsolines())
+	{
 		vtkNew<vtkPolyDataMapper> edgeMapper;
 		edgeMapper->SetInputData(bf->GetContourEdgesOutput());
 		edgeMapper->SetResolveCoincidentTopologyToPolygonOffset();
-		
+
 		vtkNew<vtkActor> edgeActor;
 		edgeActor->SetMapper(edgeMapper);
-		edgeActor->GetProperty()->SetColor(0, 0, 0);
-		osg::Node * edgeNode = VTKActorToOSG(edgeActor);
-		dynamic_cast<osg::Switch *>(parent)->addChild(edgeNode);
+		edgeActor->GetProperty()->SetColor(visData->GetColor2dIsolinesR(), visData->GetColor2dIsolinesG(), visData->GetColor2dIsolinesB());
 
-		//vtkNew<vtkPolyDataMapper> testAusgabe;
-		//testAusgabe->SetInputConnection(bf->GetOutputPort());
-		//testAusgabe->SetLookupTable(lut);
-		//testAusgabe->SetScalarRange(scalarRange);
-		//testAusgabe->SetScalarModeToUsePointData();
-		//testAusgabe->SetColorModeToMapScalars();
-		
-		//testAusgabe->Update();
-
-		//vtkNew<vtkActor> testAktor;
-		//testAktor->SetMapper(testAusgabe);
-
-		//osg::Node *cutNode = VTKActorToOSG(testAktor);
-		//dynamic_cast<osg::Switch *>(parent)->addChild(cutNode);
-		//input->Delete();
-
-
-		//visualization = bf->GetOutputPort();
-	}
-	else if (vis2D3DData->GetSelectedVisType() == PropertiesVis2D3D::VisualizationType::UNKNOWN)
-	{
-		throw std::invalid_argument("Unsuported 2D3D visualization type");
-	}
-	//Banded filter für Contour! 
-	if (visualization == nullptr)
-	{
-		throw std::logic_error("Failed to create a visualization output.");
+		osg::Node* edgeNode = VTKActorToOSG(edgeActor);
+		dynamic_cast<osg::Switch*>(parent)->addChild(edgeNode);
 	}
 
-	vtkNew<vtkPolyDataMapper> vectorFieldMapper;
-	vectorFieldMapper->SetInputConnection(visualization);
-	SetColouring(vectorFieldMapper);
-	vectorFieldMapper->UseLookupTableScalarRangeOn();
-	vectorFieldMapper->SetScalarModeToUsePointData();
-	vectorFieldMapper->SetColorModeToMapScalars();
-	//vectorFieldMapper->SetScalarVisibility(false);
+	vtkNew<vtkPolyDataMapper> scalarFieldMapper;
+	scalarFieldMapper->SetInputConnection(bf->GetOutputPort());
+	SetColouring(scalarFieldMapper);
+	scalarFieldMapper->UseLookupTableScalarRangeOn();
+	scalarFieldMapper->SetScalarModeToUseCellData();
 
-	vtkNew<vtkActor> vectorFieldActor;
-	vectorFieldActor->SetMapper(vectorFieldMapper);
+	vtkNew<vtkActor> scalarFieldActor;
+	scalarFieldActor->SetMapper(scalarFieldMapper);
 
-	osg::Node *cutNode = VTKActorToOSG(vectorFieldActor);
-	dynamic_cast<osg::Switch *>(parent)->addChild(cutNode);
-	input->Delete();
-	visualization->Delete();
+	osg::Node* cutNode = VTKActorToOSG(scalarFieldActor);
+	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-vtkAlgorithmOutput * VtkDriverUnstructuredScalarVolume::SetScalarValues(vtkAlgorithmOutput * input)
-{
-	if (vis2D3DData->GetSelectedVisComp() == PropertiesVis2D3D::VisualizationComponent::Abs)
-	{
-		vtkVectorNorm * vectorNorm = vtkVectorNorm::New();
-		vectorNorm->SetInputConnection(input);
-		vectorNorm->SetNormalize(false);
-		vectorNorm->Update();
-		scalarRange = vectorNorm->GetOutput()->GetScalarRange();
-		return vectorNorm->GetOutputPort();
-	}
-	else if (vis2D3DData->GetSelectedVisComp() == PropertiesVis2D3D::VisualizationComponent::UNKNOWN)
-	{
-		throw std::invalid_argument("Unsupported visualization component");
-	}
-	else
-	{
-		vtkExtractVectorComponents* vectorComponent = vtkExtractVectorComponents::New();
-		vectorComponent->SetInputConnection(input);
-		vectorComponent->Update();
-		vectorComponent->SetExtractToFieldData(false);
-		if (vis2D3DData->GetSelectedVisComp() == PropertiesVis2D3D::VisualizationComponent::X)
-		{
-			scalarRange = vectorComponent->GetOutput(0)->GetScalarRange();
-			return vectorComponent->GetOutputPort(0);
-		}
-		else if (vis2D3DData->GetSelectedVisComp() == PropertiesVis2D3D::VisualizationComponent::Y)
-		{
-			scalarRange = vectorComponent->GetOutput(1)->GetScalarRange();
-			return vectorComponent->GetOutputPort(1);
-		}
-		else
-		{
-			scalarRange = vectorComponent->GetOutput(2)->GetScalarRange();
-			return vectorComponent->GetOutputPort(2);
-		}
-	}
-	return nullptr;
-}
-
-vtkAlgorithmOutput * VtkDriverUnstructuredScalarVolume::AddNodeVectors(vtkAlgorithmOutput * input)
+void VtkDriverUnstructuredScalarVolume::AddNodePoints(osg::Node* parent)
 {
 	vtkNew<vtkMaskPoints> downSampling;
-	downSampling->SetInputConnection(input);
-	downSampling->SetOnRatio(vis2D3DData->GetDownsamplingRate());
+
+	if (dataConnection != nullptr) downSampling->SetInputConnection(dataConnection);
+	else downSampling->SetInputData(dataSource->GetVtkGrid());
+
+	downSampling->SetOnRatio(visData->GetDownsamplingRate());
+	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 
-	// Add glyphs for vector visualization
-	vtkNew<vtkArrowSource> arrow;
-	arrow->SetTipResolution(6);
-	arrow->SetTipRadius(0.1);
-	arrow->SetTipLength(0.35);
-	arrow->SetShaftResolution(6);
-	arrow->SetShaftRadius(0.03);
+	scalarRange = downSampling->GetOutput()->GetScalarRange();
 
-	vtkGlyph3D* glyph = vtkGlyph3D::New();
-	glyph->SetSourceConnection(arrow->GetOutputPort());
+	vtkNew<vtkPolyDataMapper> scalarFieldMapper;
+	vtkNew<vtkGlyph3D> glyph;
+	vtkNew<vtkHedgeHog> hedgehog;
+
+	glyph->SetSourceConnection(GetPointSource());
 	glyph->SetInputConnection(downSampling->GetOutputPort());
-	glyph->SetColorModeToColorByScalar();
-	glyph->SetVectorModeToUseVector();
 	glyph->ScalingOn();
+	glyph->SetColorModeToColorByScalar();
+	glyph->SetScaleModeToScaleByScalar();
 	double normalization = std::abs(scalarRange[1]);
 	if (normalization != 0)
 	{
-		glyph->SetScaleFactor(1 / normalization);
+		glyph->SetScaleFactor(visData->GetPointScale() / normalization);
 	}
 	else
 	{
-		glyph->SetScaleFactor(1);
+		glyph->SetScaleFactor(visData->GetPointScale());
 	}
 	glyph->OrientOn();
 	glyph->Update();
-	return glyph->GetOutputPort();
+
+	scalarFieldMapper->SetInputConnection(glyph->GetOutputPort());
+
+	SetColouring(scalarFieldMapper);
+	scalarFieldMapper->UseLookupTableScalarRangeOn();
+	scalarFieldMapper->SetScalarModeToUsePointData();
+	scalarFieldMapper->SetColorModeToMapScalars();
+
+	vtkNew<vtkActor> scalarFieldActor;
+	scalarFieldActor->SetMapper(scalarFieldMapper);
+
+	osg::Node* cutNode = VTKActorToOSG(scalarFieldActor);
+	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-void VtkDriverUnstructuredScalarVolume::SetColouring(vtkPolyDataMapper * mapper)
+void VtkDriverUnstructuredScalarVolume::SetColouring(vtkPolyDataMapper* mapper)
 {
 	vtkNew<vtkLookupTable> lut;
 	lut->SetNumberOfTableValues(scalingData->GetColourResolution());
@@ -440,7 +383,7 @@ void VtkDriverUnstructuredScalarVolume::SetColouring(vtkPolyDataMapper * mapper)
 	lut->SetAlphaRange(1., 1.);
 	lut->IndexedLookupOff();
 	lut->SetVectorModeToMagnitude();
-	
+
 	assert(scalingData != nullptr);
 	assert(scalarRange != nullptr);
 
@@ -501,10 +444,10 @@ void VtkDriverUnstructuredScalarVolume::SetColouring(vtkPolyDataMapper * mapper)
 	mapper->SetLookupTable(lut);
 }
 
-void VtkDriverUnstructuredScalarVolume::setProperties(EntityVis2D3D *visEntity) 
+void VtkDriverUnstructuredScalarVolume::setProperties(EntityVis2D3D* visEntity)
 {
 	DeletePropertyData();
 	planeData = new PropertyBundleDataHandlePlane(visEntity);
 	scalingData = new PropertyBundleDataHandleScaling(visEntity);
-	vis2D3DData = new PropertyBundleDataHandleVis2D3D(visEntity);
+	visData = new PropertyBundleDataHandleVisUnstructuredScalar(visEntity);
 }

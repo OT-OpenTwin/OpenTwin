@@ -241,12 +241,6 @@
     <ClInclude Include="include\PropertyBundleDataHandleVis2D3D.h">
       <Filter>Header Files\PropertyBundleDataHandle</Filter>
     </ClInclude>
-    <ClInclude Include="include\PropertiesPointSelection.h">
-      <Filter>Header Files\PropertyBundleDescription</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PropertiesComponentSelection.h">
-      <Filter>Header Files\PropertyBundleDescription</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityFile.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -348,6 +342,24 @@
     </ClInclude>
     <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVector.h">
       <Filter>Header Files\PropertyBundleDataHandle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BSONToVariableConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityBlockPython.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VariableToBSONConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertiesVisUnstructuredScalar.h">
+      <Filter>Header Files\PropertyBundleDescription</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredScalar.h">
+      <Filter>Header Files\PropertyBundleDataHandle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyBundleVisUnstructuredScalar.h">
+      <Filter>Header Files\PropertyBundle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -604,6 +616,21 @@
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyBundleVisUnstructuredVector.cpp">
+      <Filter>Source Files\PropertyBundle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BSONToVariableConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityBlockPython.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VariableToBSONConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredScalar.cpp">
+      <Filter>Source Files\PropertyBundleDataHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleVisUnstructuredScalar.cpp">
       <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
   </ItemGroup>
