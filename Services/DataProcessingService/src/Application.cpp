@@ -161,8 +161,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 	{
-		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-		
+				
 		OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 		OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
 		
@@ -171,7 +170,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 
 		// Store connection information
 		for (auto c : pckg.connections()) {
-			//BlockEntityHandler::GetInstance().AddBlockConnection(c.fromUID, c.toUID, c.fromConnectable, c.toConnectable);
+			BlockEntityHandler::GetInstance().AddBlockConnection(std::stoll(c.fromUID), std::stoll(c.toUID), c.fromConnectable, c.toConnectable);
 		}
 
 		// Request UI to add connections

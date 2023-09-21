@@ -62,9 +62,26 @@ OT_rJSON_doc BlockItemManager::CreateBlockItem(const std::string blockName, ot::
 
 ot::GraphicsItemCfg* BlockItemManager::GetBlockConfiguration(const std::string& blockName)
 {
-	BlockItemDatabaseAccess dbA;
 
-	return dbA.GetBlock();
+	BlockItemDatabaseAccess dbA;
+	BlockItemPlot1D plot;
+	BlockItemPython python;
+	if (blockName == dbA.getBlockName())
+	{
+		return dbA.GetBlock();
+	}
+	else if (blockName == plot.getBlockName())
+	{
+		return plot.GetBlock();
+	}
+	else if (blockName == python.getBlockName())
+	{
+		return python.GetBlock();
+	}
+	else
+	{
+		throw std::exception("Block type not supported.");
+	}
 }
 
 ot::GraphicsNewEditorPackage* BlockItemManager::BuildUpBlockPicker()
