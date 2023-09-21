@@ -40,26 +40,23 @@
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
 #include <vtkPlane.h>
-#include <vtkRectilinearGrid.h>
 #include <vtkCutter.h>
 #include <vtkSphereSource.h>
 #include <vtkGlyph3D.h>
 #include <vtkInformation.h>
 #include <vtkLookupTable.h>
-#include <vtkExtractRectilinearGrid.h>
 #include <vtkDoubleArray.h>
-#include <vtkRectilinearGridGeometryFilter.h>
 #include <vtkCellData.h>
 #include <vtkFeatureEdges.h>
-#include <vtkExtractVectorComponents.h>
-#include <vtkVectorNorm.h>
 #include <vtkLookupTable.h>
 #include <vtkMaskPoints.h>
 #include <vtkBandedPolyDataContourFilter.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPlaneCutter.h>
-#include <vtkHedgeHog.h>
+#include <vtkContourFilter.h>
+#include <vtkPlanes.h>
+#include <vtkDataArray.h>
 
 VtkDriverUnstructuredScalarVolume::VtkDriverUnstructuredScalarVolume() {}
 
@@ -130,7 +127,13 @@ std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerI
 		cellToPoint->ProcessAllArraysOn();
 		cellToPoint->Update();
 
+		scalarRange = cellToPoint->GetOutput()->GetScalarRange();
+
 		dataConnection = cellToPoint->GetOutputPort();
+	}
+	else
+	{
+		scalarRange = dataSource->GetVtkGrid()->GetScalarRange();
 	}
 
 	if (   visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface
@@ -166,7 +169,7 @@ std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerI
 	return dataOut.str();
 }
 
-vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* parent)
+void VtkDriverUnstructuredScalarVolume::SetPlaneProperties(vtkPlane* plane)
 {
 	assert(planeData != nullptr);
 	assert(planeData->GetNormalDescription() != PlaneProperties::UNKNOWN);
@@ -204,7 +207,6 @@ vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* 
 		}
 	}
 
-	vtkNew<vtkPlane> plane;
 	plane->SetNormal(normalX, normalY, normalZ);
 	double x(0), y(0), z(0);
 
@@ -219,6 +221,12 @@ vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* 
 		z = planeData->GetCenterValueZ();
 
 	plane->SetOrigin(x, y, z);
+}
+
+vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* parent)
+{
+	vtkNew<vtkPlane> plane;
+	SetPlaneProperties(plane);
 
 	vtkCutter* planeCut = vtkCutter::New();
 	objectsToDelete.push_back(planeCut);
@@ -258,9 +266,9 @@ vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::GetPointSource(void)
 {
 	vtkNew<vtkSphereSource> sphere;
 
-	sphere->SetRadius(1.0);
+	sphere->SetRadius(0.1);
 	sphere->SetPhiResolution(6);
-	sphere->SetThetaResolution(6);
+	sphere->SetThetaResolution(12);
 
 	vtkPolyDataNormals* shadedSphere = vtkPolyDataNormals::New();
 	objectsToDelete.push_back(shadedSphere);
@@ -277,7 +285,7 @@ void VtkDriverUnstructuredScalarVolume::Assemble3DNode(osg::Node* parent)
 {
 	if (visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface)
 	{
-		assert(0); // Not yet implemented
+		AddIsosurfaces(parent);
 	}
 	else if (visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Points)
 	{
@@ -342,7 +350,6 @@ void VtkDriverUnstructuredScalarVolume::AddNodePoints(osg::Node* parent)
 
 	vtkNew<vtkPolyDataMapper> scalarFieldMapper;
 	vtkNew<vtkGlyph3D> glyph;
-	vtkNew<vtkHedgeHog> hedgehog;
 
 	glyph->SetSourceConnection(GetPointSource());
 	glyph->SetInputConnection(downSampling->GetOutputPort());
@@ -369,6 +376,70 @@ void VtkDriverUnstructuredScalarVolume::AddNodePoints(osg::Node* parent)
 	scalarFieldMapper->SetColorModeToMapScalars();
 
 	vtkNew<vtkActor> scalarFieldActor;
+	scalarFieldActor->SetMapper(scalarFieldMapper);
+
+	osg::Node* cutNode = VTKActorToOSG(scalarFieldActor);
+	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
+}
+
+void VtkDriverUnstructuredScalarVolume::AddIsosurfaces(osg::Node* parent)
+{
+	vtkNew<vtkContourFilter> contourFilter;
+
+	if (dataConnection != nullptr) contourFilter->SetInputConnection(dataConnection);
+	else contourFilter->SetInputData(dataSource->GetVtkGrid());
+
+	auto scalingMethod = scalingData->GetScalingMethod();
+	double minVal, maxVal;
+	if (scalingMethod == ScalingProperties::ScalingMethod::rangeScale)
+	{
+		minVal = scalingData->GetRangeMin();
+		maxVal = scalingData->GetRangeMax();
+		if (minVal > maxVal)
+		{
+			//ToDo: UI display message
+			minVal = maxVal;
+		}
+	}
+	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
+	{
+		minVal = scalarRange[0];
+		maxVal = scalarRange[1];
+	}
+	else
+	{
+		throw std::invalid_argument("Not supported scaling method");
+	}
+
+	if (visData->GetNumberIsosurfaces() == 1)
+	{
+		minVal = maxVal = 0.5 * (minVal + maxVal);
+	}
+	else
+	{
+		double delta = 0.01 * (maxVal - minVal);
+
+		minVal += delta;
+		maxVal -= delta;
+	}
+
+	contourFilter->GenerateValues(visData->GetNumberIsosurfaces(), minVal, maxVal); // (numContours, rangeStart, rangeEnd)
+
+	vtkNew<vtkPolyDataNormals> normals;
+	normals->SetInputConnection(contourFilter->GetOutputPort());
+	normals->SetFeatureAngle(45);
+	normals->AutoOrientNormalsOn();
+
+	vtkNew<vtkPolyDataMapper> scalarFieldMapper;
+
+	SetColouring(scalarFieldMapper);
+	scalarFieldMapper->SetInputConnection(normals->GetOutputPort());
+	scalarFieldMapper->UseLookupTableScalarRangeOn();
+	scalarFieldMapper->ScalarVisibilityOn();
+	scalarFieldMapper->SetScalarModeToUsePointData();
+
+	vtkNew<vtkActor> scalarFieldActor;
+	scalarFieldActor->GetProperty();
 	scalarFieldActor->SetMapper(scalarFieldMapper);
 
 	osg::Node* cutNode = VTKActorToOSG(scalarFieldActor);

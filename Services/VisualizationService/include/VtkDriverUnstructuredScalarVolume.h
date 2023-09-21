@@ -36,8 +36,10 @@ private:
 	vtkAlgorithmOutput* ApplyCutplane(osg::Node* parent);
 	void Assemble2DNode(osg::Node* parent);
 	void Assemble3DNode(osg::Node* parent);
+	void SetPlaneProperties(vtkPlane* plane);
 
 	void AddNodePoints(osg::Node* parent);
+	void AddIsosurfaces(osg::Node* parent);
 	void SetColouring(vtkPolyDataMapper* mapper);
 	vtkAlgorithmOutput* GetPointSource(void);
 
