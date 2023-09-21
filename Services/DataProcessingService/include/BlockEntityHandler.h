@@ -10,7 +10,7 @@ class BlockEntityHandler  : public BusinessLogicHandler
 public:
 
 	static BlockEntityHandler& GetInstance();
-	std::shared_ptr <EntityBlock> CreateBlock(const std::string& editorName, const std::string& blockName, ot::UID itemID);
+	ot::UID CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void AddBlockConnection(ot::UID idOrigin, ot::UID idDestination, const std::string& connectorOrigin, const std::string& connectorDest);
 	void RegisterBlockEntity(const std::string& key, std::function < std::shared_ptr<EntityBlock>()> factoryMethod);
 

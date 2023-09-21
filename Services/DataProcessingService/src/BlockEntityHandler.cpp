@@ -11,10 +11,9 @@ BlockEntityHandler& BlockEntityHandler::GetInstance()
 	return instance;
 }
 
-std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& editorName, const std::string& blockName, ot::UID itemID)
+ot::UID BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
 	std::shared_ptr<EntityBlock> blockEntity = nullptr;
-
 	if (_blockEntityFactories.find(blockName) == _blockEntityFactories.end())
 	{
 		assert(0);
@@ -31,10 +30,17 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlock(const std::string& 
 	
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
-	blockEntity->setBlockID(itemID);
-	blockEntity->StoreToDataBase(); //Needs to be moved to the place in code where the location is being set
+	blockEntity->setBlockID(_modelComponent->createEntityUID());
 
-	return blockEntity;
+	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+	blockCoordinates->setCoordinates(position);
+	blockCoordinates->StoreToDataBase();
+
+	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
+	blockEntity->StoreToDataBase();
+	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
+
+	return blockEntity->getBlockID();
 }
 
 void BlockEntityHandler::AddBlockConnection(ot::UID idOrigin, ot::UID idDestination, const std::string& connectorOrigin, const std::string& connectorDest)

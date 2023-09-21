@@ -15,6 +15,7 @@
 #include "OpenTwinFoundation/UiComponent.h"
 
 #include "EntityBlockDatabaseAccess.h"
+#include "OpenTwinCommunication/Msg.h"
 
 void BlockItemManager::OrderUIToCreateBlockPicker()
 {
@@ -44,9 +45,31 @@ void BlockItemManager::OrderUIToCreateBlockPicker()
 	}
 }
 
+OT_rJSON_doc BlockItemManager::CreateBlockItem(const std::string blockName, ot::UID blockID, ot::Point2DD& position)
+{
+	std::shared_ptr<ot::GraphicsScenePackage> block = GetBlockConfiguration(blockName, blockID, position);
+	ot::GraphicsScenePackage pckg("Data Processing");
+	OT_rJSON_createDOC(reqDoc);
+	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+
+	OT_rJSON_createValueObject(pckgDoc);
+	pckg.addToJsonObject(reqDoc, pckgDoc);
+	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+
+	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	return reqDoc;
+}
+
+ot::GraphicsItemCfg* BlockItemManager::GetBlockConfiguration(const std::string& blockName)
+{
+	BlockItemDatabaseAccess dbA;
+
+	return dbA.GetBlock();
+}
+
 ot::GraphicsNewEditorPackage* BlockItemManager::BuildUpBlockPicker()
 {
-	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage("Data Processing", "Data Processing");
+	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
 	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
 	ot::GraphicsCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsCollectionCfg("Database", "Database");
 	ot::GraphicsCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsCollectionCfg("Visualization", "Visualization");
@@ -70,4 +93,19 @@ ot::GraphicsNewEditorPackage* BlockItemManager::BuildUpBlockPicker()
 	pckg->addCollection(mathBlockCollection);
 
 	return pckg;
+}
+
+std::shared_ptr<ot::GraphicsScenePackage> BlockItemManager::GetBlockConfiguration(const std::string blockName, ot::UID blockID, ot::Point2DD& position)
+{
+	ot::GraphicsScenePackage* pckg = new ot::GraphicsScenePackage(_packageName);
+
+	BlockItemDatabaseAccess dbA;
+	BlockItemPlot1D plot;
+	BlockItemPython python;
+
+	ot::GraphicsItemCfg* block = dbA.GetBlock();
+	block->setPosition(position);
+	block->setUid(std::to_string(blockID));
+	pckg->addItem(block);
+	return std::shared_ptr<ot::GraphicsScenePackage>(pckg);
 }

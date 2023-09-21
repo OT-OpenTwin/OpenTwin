@@ -76,7 +76,7 @@ void Application::run(void)
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPlot1D.h"
 #include "MeasurementCampaignHandler.h"
-
+#include "EntityCoordinates2D.h"
 #include "DataBase.h"
 #include "CrossCollectionAccess.h"
 #include "MeasurementCampaignFactory.h"
@@ -119,18 +119,14 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 	{
-		// Get item information
 		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
 		
 		OT_rJSON_val posObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
-		ot::Point2DD pos;
-		pos.setFromJsonObject(posObj);
-
-		// Generate UID
+		ot::Point2DD position;
+		position.setFromJsonObject(posObj);
 		
-		std::string itemUid = "Some fancy new UID"; // <----- Add code here to generate the new UID
-		
+		//Needs to be set once but modelConnect event cannot be used currently, since the modelstate in that point in time is a dummy.
 		ExternalDependencies dependencies;
 		if (dependencies.getPythonScriptFolderID() == 0)
 		{
@@ -140,20 +136,16 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			dependencies.setPythonScriptFolderID(entityInfo.getID());
 		}
 
-		auto blockEntity = BlockEntityHandler::GetInstance().CreateBlock(editorName, itemName, m_modelComponent->createEntityUID());
-		if (blockEntity != nullptr)
-		{
-			ot::UIDList topoEntID{ blockEntity->getEntityID() }, topoEntVers{ blockEntity->getEntityStorageVersion() }, dataEnt{};
-			std::list<bool> forceVis{false,false};
-			m_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEnt, dataEnt, dataEnt, "Added Block: " + itemName);
-		}
+		ot::UID blockID = BlockEntityHandler::GetInstance().CreateBlockEntity(editorName, itemName,position);
+		BlockItemManager blockItemManager;
+		//OT_rJSON_doc reqDoc = blockItemManager.CreateBlockItem(itemName, blockID, position);
 
 		ot::GraphicsScenePackage pckg("Data Processing");
 
-		//                           \/ ------ Here the new configuration has to be created
-		ot::GraphicsItemCfg* itm = nullptr;
-		itm->setPosition(pos);
-		itm->setUid(itemUid);
+		
+		ot::GraphicsItemCfg* itm = blockItemManager.GetBlockConfiguration(itemName);
+		itm->setPosition(position);
+		itm->setUid(std::to_string(blockID));
 		pckg.addItem(itm);
 
 		OT_rJSON_createDOC(reqDoc);
