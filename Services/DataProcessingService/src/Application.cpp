@@ -88,18 +88,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			//_pipelineManager.RunAll();
-			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(),nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			//std::list<std::string>projects{"KWT_Demo"};
-			//block->createProperties(projects, *projects.begin());
-			
-			//BlockHandlerDatabaseAccess dbAccess(block.get());
-			//BlockHandler::genericDataBlock parameter, result;
-			//result = dbAccess.Execute(parameter);
-
-			//std::unique_ptr<EntityBlockDatabaseAccess> block(new EntityBlockDatabaseAccess(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
-			//BlockHandlerPlot1D plot;
-			//plot.Execute(result);
+			_pipelineManager.RunAll();
 		}
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
