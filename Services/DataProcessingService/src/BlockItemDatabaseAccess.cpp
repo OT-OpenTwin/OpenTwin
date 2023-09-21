@@ -18,6 +18,7 @@ std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()
 	dbAccessBlockEntity->createProperties();
 
 	dbAccessBlockEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C0"));
+	dbAccessBlockEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C1"));
 	return dbAccessBlockEntity;
 }
 
@@ -25,4 +26,5 @@ std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()
 void BlockItemDatabaseAccess::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
 	block->addOutput("C0", "Data output", ot::GraphicsFlowConnectorCfg::Square);
+	block->addOutput("C1", "Parameter 1", ot::GraphicsFlowConnectorCfg::Square);
 }
