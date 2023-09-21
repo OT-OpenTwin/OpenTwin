@@ -21,7 +21,8 @@ public:
 	std::list<ot::BlockConnection> getAllOutgoingConnections() const {	return _outgoingConnections;	}
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	
-	void AddConnector(const ot::Connector& connector) { _connectors.push_back(connector); }
+	void AddConnector(const ot::Connector& connector);
+	void RemoveConnector(const ot::Connector& connector);
 	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
 
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }

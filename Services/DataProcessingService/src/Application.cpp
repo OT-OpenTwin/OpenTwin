@@ -211,6 +211,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	blockItemManger.OrderUIToCreateBlockPicker();
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
+
+	_propertyHandlerDBAccessBlocks.setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)

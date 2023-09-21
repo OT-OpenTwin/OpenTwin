@@ -6,12 +6,15 @@
 #include "CrossCollectionAccess.h"
 #include "MeasurementCampaignFactory.h"
 #include "OpenTwinCommunication/Msg.h"
+#include "BlockItemDatabaseAccess.h"
+#include "ClassFactory.h"
+#include "OpenTwinCore/Owner.h"
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
 	if (_bufferedInformation.find(dbAccessEntity->getEntityID()) != _bufferedInformation.end())
 	{
-		auto buffer = _bufferedInformation[dbAccessEntity->getEntityID()];
+		auto& buffer = _bufferedInformation[dbAccessEntity->getEntityID()];
 		auto baseMSMDProperty = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyNameMeasurementSeries());
 		auto msmdSelection = dynamic_cast<EntityPropertiesSelection*>(baseMSMDProperty);
 
@@ -23,6 +26,45 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 			campaignDependendProperties.merge(selectionDependendProperties);
 			ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
 			RequestPropertyUpdate(modelServiceURL, entityIDs, campaignDependendProperties.getJSON(nullptr, false));
+		}
+		else if (buffer.selectedDimension != dbAccessEntity->getQueryDimension())
+		{
+			buffer.selectedDimension = dbAccessEntity->getQueryDimension();
+			ot::UID blockUID = dbAccessEntity->getBlockID();
+			ot::GraphicsItemCfg* blockConfig = nullptr;
+
+			if (buffer.selectedDimension == "1D")
+			{
+				BlockItemDatabaseAccess dbAccessBlock;
+				blockConfig = dbAccessBlock.GetBlock();
+				dbAccessEntity->RemoveConnector(ot::Connector(ot::ConnectorType::Source, "C1"));
+				dbAccessEntity->RemoveConnector(ot::Connector(ot::ConnectorType::Source, "C2"));
+
+			}
+			else if (buffer.selectedDimension == "2D")
+			{
+				BlockItemDatabaseAccess dbAccessBlock(BlockItemDatabaseAccess::d2);
+				blockConfig = dbAccessBlock.GetBlock();
+				dbAccessEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C1"));
+				dbAccessEntity->RemoveConnector(ot::Connector(ot::ConnectorType::Source, "C2"));
+			}
+			else if (buffer.selectedDimension == "3D")
+			{
+				BlockItemDatabaseAccess dbAccessBlock(BlockItemDatabaseAccess::d3);
+				blockConfig = dbAccessBlock.GetBlock();
+				dbAccessEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C1"));
+				dbAccessEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C2"));
+			}
+			blockConfig->setUid(std::to_string(blockUID));
+			ot::UIDList positionEntity{ dbAccessEntity->getCoordinateEntityID() };
+			std::list<ot::EntityInformation> entityInfo;
+			_modelComponent->getEntityInformation(positionEntity, entityInfo);
+			ClassFactory classFactory;
+			auto entBase =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.begin()->getID(), entityInfo.begin()->getVersion(),classFactory);
+			std::unique_ptr<EntityCoordinates2D> entCoo(dynamic_cast<EntityCoordinates2D*>(entBase));
+			blockConfig->setPosition(entCoo->getCoordinates());
+
+			RefreshBlock(blockConfig);
 		}
 		else
 		{
@@ -138,7 +180,8 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 {
 	BufferBlockDatabaseAccess buffer;
 	buffer.SelectedProject = dbAccessEntity->getSelectedProjectName();
-	
+	buffer.selectedDimension = dbAccessEntity->getQueryDimension();
+
 	std::map <std::string, MetadataParameter> parameters = campaignMetadata.getMetadataParameter();
 	std::map <std::string, MetadataQuantity> quantities = campaignMetadata.getMetadataQuantities();
 	std::list<SeriesMetadata> seriesMetadata = campaignMetadata.getSeriesMetadata();
@@ -270,6 +313,27 @@ void PropertyHandlerDatabaseAccessBlock::CreateUpdatedTypeProperty(EntityPropert
 	EntityPropertiesString* newProperty = new EntityPropertiesString(*stringProp);
 	newProperty->setValue(value);
 	properties.createProperty(newProperty, newProperty->getGroup());
+}
+
+void PropertyHandlerDatabaseAccessBlock::RefreshBlock(ot::GraphicsItemCfg* blockConfig)
+{
+	OT_rJSON_createDOC(deleteReqDoc);
+	ot::GlobalOwner::instance().addToJsonObject(deleteReqDoc, deleteReqDoc);
+	ot::rJSON::add(deleteReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem);
+	ot::rJSON::add(deleteReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, "Data Processing");
+	std::list<std::string> uids{ blockConfig->uid()};
+	ot::rJSON::add(deleteReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, uids);
+	_uiComponent->sendMessage(true, deleteReqDoc);
+
+	ot::GraphicsScenePackage pckg("Data Processing");
+	pckg.addItem(blockConfig);
+	OT_rJSON_createDOC(createReqDoc);
+	ot::GlobalOwner::instance().addToJsonObject(createReqDoc, createReqDoc);
+	ot::rJSON::add(createReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+	OT_rJSON_createValueObject(pckgDoc);
+	pckg.addToJsonObject(createReqDoc, pckgDoc);
+	ot::rJSON::add(createReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+	_uiComponent->sendMessage(true, createReqDoc);
 }
 
 

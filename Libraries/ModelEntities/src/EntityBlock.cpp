@@ -5,6 +5,38 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 {
 }
 
+void EntityBlock::AddConnector(const ot::Connector& connector)
+{
+	bool exists = false;
+	for (auto& currentConnector : _connectors)
+	{
+		if (connector.getConnectorName() == currentConnector.getConnectorName())
+		{
+			exists = true;
+		}
+	}
+	if (!exists)
+	{
+		_connectors.push_back(connector);
+	}
+	setModified();
+}
+
+void EntityBlock::RemoveConnector(const ot::Connector& connector)
+{
+	bool exists = false;
+	std::list<ot::Connector> newConnectorList;
+	for (auto& currentConnector : _connectors)
+	{
+		if (connector.getConnectorName() != currentConnector.getConnectorName())
+		{
+			newConnectorList.push_back(currentConnector);
+		}
+	}
+	_connectors = newConnectorList;
+	setModified();
+}
+
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);

@@ -16,6 +16,8 @@ struct BufferBlockDatabaseAccess
 	std::string dataTypeParameter2 = "";
 	std::string dataTypeParameter3 = "";
 
+	std::string selectedDimension = "";
+
 	std::list<std::string> QuantityNames;
 	std::list<std::string> ParameterNames;
 	std::list<std::string> MeasurementMetadataNames;

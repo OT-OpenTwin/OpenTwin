@@ -13,7 +13,7 @@ namespace ot
 		Connector();
 		ConnectorType getConnectorType() const { return _connectorType; }
 		const std::string& getConnectorName() const { return _connectorName; }
-
+		bool operator==(const Connector& other) { return _connectorName == other._connectorName; }
 		virtual bsoncxx::builder::basic::document SerializeBSON() const  override;
 		virtual void DeserializeBSON(bsoncxx::v_noabi::types::b_document& storage) override;
 
