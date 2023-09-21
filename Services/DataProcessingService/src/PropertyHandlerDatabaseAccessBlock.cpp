@@ -24,6 +24,20 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 			ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
 			RequestPropertyUpdate(modelServiceURL, entityIDs, campaignDependendProperties.getJSON(nullptr, false));
 		}
+		else
+		{
+			std::string quantityValue, parameterValue1, parameterValue2, parameterValue3;
+			getSelectedValues(dbAccessEntity, quantityValue, parameterValue1, parameterValue2, parameterValue3);
+			if ( buffer.SelectedQuantity != quantityValue || buffer.SelectedParameter1 != parameterValue1 || buffer.SelectedParameter2 != parameterValue2 || buffer.SelectedParameter3 != parameterValue3)
+			{
+				EntityProperties selectionDependendProperties = UpdateSelectionProperties(dbAccessEntity);
+				if (selectionDependendProperties.getNumberOfProperties() > 0)
+				{
+					ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
+					RequestPropertyUpdate(modelServiceURL, entityIDs, selectionDependendProperties.getJSON(nullptr, false));
+				}
+			}
+		}
 
 		//if (buffer.SelectedParameter1 != parameter1Selection->getValue() || buffer.SelectedParameter2 != parameter2Selection->getValue() || buffer.SelectedParameter3 != parameter3Selection->getValue())
 		//{
@@ -144,6 +158,7 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 			buffer.SelectedQuantity = quantityName;
 			buffer.dataTypeQuantity = quantity.second.typeName;
 		}
+		buffer.dataTypesByName[quantityName] = quantity.second.typeName;
 		buffer.QuantityNames.push_back(quantityName);
 	}
 	for (auto parameter : parameters)
@@ -164,6 +179,7 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 			buffer.SelectedParameter3 = parameterName;
 			buffer.dataTypeParameter3 = parameter.second.typeName;
 		}
+		buffer.dataTypesByName[parameterName] = parameter.second.typeName;
 		buffer.ParameterNames.push_back(parameterName);
 	}
 
@@ -189,7 +205,7 @@ void PropertyHandlerDatabaseAccessBlock::getSelectedValues(std::shared_ptr<Entit
 	outParameter3Value = parameter3Selection->getValue();
 }
 
-void PropertyHandlerDatabaseAccessBlock::getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type, bool& outParameter2Visible, bool& outParameter3Visible)
+void PropertyHandlerDatabaseAccessBlock::getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type)
 {
 	auto baseQuantity = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyDataTypeQuantity());
 	auto quantityType = dynamic_cast<EntityPropertiesString*>(baseQuantity);
@@ -202,45 +218,49 @@ void PropertyHandlerDatabaseAccessBlock::getDataTypes(std::shared_ptr<EntityBloc
 	auto baseParameter2 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyDataTypeParameter2());
 	auto parameter2Type= dynamic_cast<EntityPropertiesString*>(baseParameter2);
 	outParameter2Type = parameter2Type->getValue();
-	outParameter2Visible = parameter2Type->getVisible();
 
 	auto baseParameter3 = dbAccessEntity->getProperties().getProperty(dbAccessEntity->getPropertyDataTypeParameter3());
 	auto parameter3Type= dynamic_cast<EntityPropertiesString*>(baseParameter3);
 	outParameter3Type = parameter3Type->getValue();
-	outParameter3Visible = parameter3Type->getVisible();
-
 }
 
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateSelectionProperties(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity)
 {
 	auto& buffer = _bufferedInformation[dbAccessEntity->getEntityID()];
 
+	std::string selectedQuantity, selectedParameter1, selectedParameter2, selectedParameter3;
+	getSelectedValues(dbAccessEntity, selectedQuantity, selectedParameter1, selectedParameter2, selectedParameter3);
+	buffer.SelectedQuantity = selectedQuantity;
+	buffer.SelectedParameter1 = selectedParameter1;
+	buffer.SelectedParameter2 = selectedParameter2;
+	buffer.SelectedParameter3 = selectedParameter3;
+	
 	std::string quantityType, parameter1Type, parameter2Type, parameter3Type;
-	bool parameter2Visible, parameter3Visible;
-	getDataTypes(dbAccessEntity, quantityType, parameter1Type, parameter2Type, parameter3Type, parameter2Visible, parameter3Visible);
+	getDataTypes(dbAccessEntity, quantityType, parameter1Type, parameter2Type, parameter3Type);
 
-	auto& oldProperties = dbAccessEntity->getProperties();
 	EntityProperties properties;
-	if (quantityType != buffer.dataTypeQuantity)
+	auto& oldProperties = dbAccessEntity->getProperties();
+	if (quantityType != buffer.dataTypesByName[buffer.SelectedQuantity])
 	{
-		
+		buffer.dataTypeQuantity = buffer.dataTypesByName[buffer.SelectedQuantity];
 		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeQuantity()), buffer.dataTypeQuantity, properties);
 	}
-	
-	if (parameter1Type != buffer.dataTypeParameter1)
+	if (parameter1Type != buffer.dataTypesByName[buffer.SelectedParameter1])
 	{
+		buffer.dataTypeParameter1 = buffer.dataTypesByName[buffer.SelectedParameter1];
 		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeParameter1()) , buffer.dataTypeParameter1, properties);
 	}
-	
-	if (parameter2Type != buffer.dataTypeParameter2)
+	if (parameter2Type != buffer.dataTypesByName[buffer.SelectedParameter2])
 	{
+		buffer.dataTypeParameter2 = buffer.dataTypesByName[buffer.SelectedParameter2];
 		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeParameter2()), buffer.dataTypeParameter2, properties);
 	}
-	
-	if (parameter3Type != buffer.dataTypeParameter3)
+	if (parameter3Type != buffer.dataTypesByName[buffer.SelectedParameter3])
 	{
+		buffer.dataTypeParameter3 = buffer.dataTypesByName[buffer.SelectedParameter3];
 		CreateUpdatedTypeProperty(oldProperties.getProperty(dbAccessEntity->getPropertyDataTypeParameter3()), buffer.dataTypeParameter3, properties);
 	}
+
 	return properties;
 }
 

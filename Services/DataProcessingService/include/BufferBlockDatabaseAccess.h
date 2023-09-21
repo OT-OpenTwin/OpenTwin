@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <list>
+#include <map>
 struct BufferBlockDatabaseAccess
 {
 	std::string SelectedProject = "";
@@ -18,4 +19,5 @@ struct BufferBlockDatabaseAccess
 	std::list<std::string> QuantityNames;
 	std::list<std::string> ParameterNames;
 	std::list<std::string> MeasurementMetadataNames;
+	std::map<std::string, std::string> dataTypesByName;
 };
