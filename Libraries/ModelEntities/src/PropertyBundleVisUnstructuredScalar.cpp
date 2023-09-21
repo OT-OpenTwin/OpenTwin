@@ -18,7 +18,7 @@ void PropertyBundleVisUnstructuredScalar:: SetProperties(EntityBase * thisObject
 	EntityPropertiesColor::createProperty(groupNameContour, properties.GetName2DIsolineColor(), { 0, 0, 0 }, defaultCategory, thisObject->getProperties());
 
 	EntityPropertiesDouble::createProperty(groupNamePoints, properties.GetNamePointScale(), 1., defaultCategory, thisObject->getProperties());
-	EntityPropertiesInteger::createProperty(groupNamePoints, properties.GetNamePlotDownSampling(), 0., defaultCategory, thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(groupNamePoints, properties.GetNameMaxPoints(), 1000, defaultCategory, thisObject->getProperties());
 }
 
 bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * thisObject)
@@ -30,7 +30,7 @@ bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * 
 	EntityPropertiesColor* color2dMesh = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DMeshColor()));
 	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetNameShow2DIsolines()));
 	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DIsolineColor()));
-	EntityPropertiesInteger* downSampling = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNamePlotDownSampling()));
+	EntityPropertiesInteger* maxPoints = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxPoints()));
 
 	assert(visType != nullptr);
 
@@ -40,9 +40,9 @@ bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * 
 	if (type == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface)
 	{
 		bool changes = false;
-		if (downSampling->getVisible())
+		if (maxPoints->getVisible())
 		{
-			downSampling->setVisible(false);
+			maxPoints->setVisible(false);
 			changes |= true;
 		}
 		if (pointScale->getVisible())
@@ -80,9 +80,9 @@ bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * 
 	else if (type == PropertiesVisUnstructuredScalar::VisualizationType::Points)
 	{
 		bool changes = false;
-		if (!downSampling->getVisible())
+		if (!maxPoints->getVisible())
 		{
-			downSampling->setVisible(true);
+			maxPoints->setVisible(true);
 			changes |= true;
 		}
 		if (!pointScale->getVisible())
@@ -120,9 +120,9 @@ bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * 
 	else if(type == PropertiesVisUnstructuredScalar::VisualizationType::Contour2D)
 	{
 		bool changes = false;
-		if (downSampling->getVisible())
+		if (maxPoints->getVisible())
 		{
-			downSampling->setVisible(false);
+			maxPoints->setVisible(false);
 			changes |= true;
 		}
 		if (pointScale->getVisible())

@@ -22,7 +22,7 @@ public:
 	const std::string GetNameVisComponent(void) { return nameVisComponent; }
 	const std::string GetNamePhase(void) { return namePhase; }
 	const std::string GetNameTime(void) { return nameTime; }
-	const std::string GetNamePlotDownSampling(void) { return namePlotDownSampling; }
+	const std::string GetNameMaxArrows(void) { return nameMaxArrows; }
 	const std::string GetNameArrowType(void) { return nameArrowType; }
 	const std::string GetNameArrowScale(void) { return nameArrowScale; }
 	const std::string GetNameShow2DMesh(void) { return nameShow2dMesh; }
@@ -67,7 +67,7 @@ private:
 	const std::string nameVisComponent = "Component";
 	const std::string namePhase = "Phase";
 	const std::string nameTime = "Time";
-	const std::string namePlotDownSampling = "Down Sampling";
+	const std::string nameMaxArrows = "Max. Arrows";
 	const std::string nameArrowType = "Arrow Type";
 	const std::string nameArrowScale = "Arrow Scale";
 

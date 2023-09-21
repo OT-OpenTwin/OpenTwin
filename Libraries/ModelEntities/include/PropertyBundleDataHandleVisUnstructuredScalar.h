@@ -8,7 +8,7 @@ public:
 	PropertyBundleDataHandleVisUnstructuredScalar(EntityBase * thisObject);
 
 	const PropertiesVisUnstructuredScalar::VisualizationType GetSelectedVisType(void) const { return selectedVisType; }
-	const int GetDownsamplingRate(void) const { return downsamplingRate; }
+	const int GetMaxPoints(void) const { return maxPoints; }
 	const double GetPointScale(void) { return pointScale; }
 	const int GetNumberIsosurfaces(void) { return numberIsosurfaces; }
 	const bool GetShow2dMesh(void) { return show2dMesh; }
@@ -23,7 +23,7 @@ public:
 private:
 	PropertiesVisUnstructuredScalar properties;
 	PropertiesVisUnstructuredScalar::VisualizationType selectedVisType;
-	int downsamplingRate;
+	int maxPoints;
 	double pointScale;
 	int numberIsosurfaces;
 	bool show2dMesh;

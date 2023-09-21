@@ -9,7 +9,7 @@ public:
 
 	const PropertiesVisUnstructuredVector::VisualizationType GetSelectedVisType(void) const { return selectedVisType; }
 	const PropertiesVisUnstructuredVector::VisualizationComponent GetSelectedVisComp(void) const {return selectedVisComp; }
-	const int GetDownsamplingRate(void) const { return downsamplingRate; }
+	const int getMaxArrows(void) const { return maxArrows; }
 	const PropertiesVisUnstructuredVector::VisualizationArrowType GetSelectedArrowType(void) { return selectedArrowType; }
 	const double GetArrowScale(void) { return arrowScale; }
 	const bool GetShow2dMesh(void) { return show2dMesh; }
@@ -25,7 +25,7 @@ private:
 	PropertiesVisUnstructuredVector properties;
 	PropertiesVisUnstructuredVector::VisualizationType selectedVisType;
 	PropertiesVisUnstructuredVector::VisualizationComponent selectedVisComp;
-	int downsamplingRate;
+	int maxArrows;
 	PropertiesVisUnstructuredVector::VisualizationArrowType selectedArrowType;
 	double arrowScale;
 	bool show2dMesh;

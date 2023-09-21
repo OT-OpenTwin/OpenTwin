@@ -407,7 +407,7 @@ void VtkDriverUnstructuredVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input
 {
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
-	downSampling->SetOnRatio(visData->GetDownsamplingRate());
+	downSampling->SetMaximumNumberOfPoints(std::max(1, visData->getMaxArrows()));
 	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 

@@ -11,7 +11,7 @@ public:
 	};
 
 	const std::string GetNameVisType(void) { return nameVisType; }
-	const std::string GetNamePlotDownSampling(void) { return namePlotDownSampling; }
+	const std::string GetNameMaxPoints(void) { return nameMaxPoints; }
 	const std::string GetNamePointScale(void) { return namePointScale; }
 	const std::string GetNameNumberIsosurfaces(void) { return nameNumberIsosurfaces; }
 	const std::string GetNameShow2DMesh(void) { return nameShow2dMesh; }
@@ -32,7 +32,7 @@ public:
 
 private:
 	const std::string nameVisType = "Type";
-	const std::string namePlotDownSampling = "Down Sampling";
+	const std::string nameMaxPoints = "Max. Points";
 	const std::string namePointScale = "Point Scale";
 	const std::string nameNumberIsosurfaces = "Number Isosurfaces";
 

@@ -12,9 +12,9 @@ void PropertyBundleDataHandleVisUnstructuredScalar::LoadCurrentData(EntityBase *
 	assert(visType != nullptr);
 	selectedVisType = properties.GetVisualizationType(visType->getValue());
 
-	auto downSamplingEnt = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNamePlotDownSampling()));
-	assert(downSamplingEnt != nullptr);
-	downsamplingRate = downSamplingEnt->getValue();
+	auto maxPointsEnt = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxPoints()));
+	assert(maxPointsEnt != nullptr);
+	maxPoints = maxPointsEnt->getValue();
 
 	auto pointScaleEnt = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetNamePointScale()));
 	assert(pointScaleEnt != nullptr);

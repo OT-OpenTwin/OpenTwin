@@ -342,7 +342,7 @@ void VtkDriverUnstructuredScalarVolume::AddNodePoints(osg::Node* parent)
 	if (dataConnection != nullptr) downSampling->SetInputConnection(dataConnection);
 	else downSampling->SetInputData(dataSource->GetVtkGrid());
 
-	downSampling->SetOnRatio(visData->GetDownsamplingRate());
+	downSampling->SetMaximumNumberOfPoints(std::max(1, visData->GetMaxPoints()));
 	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 

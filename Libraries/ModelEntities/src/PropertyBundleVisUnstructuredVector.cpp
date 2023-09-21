@@ -32,7 +32,7 @@ void PropertyBundleVisUnstructuredVector:: SetProperties(EntityBase * thisObject
 	EntityPropertiesBoolean::createProperty(groupNameContour, properties.GetNameShow2DIsolines(), true, defaultCategory, thisObject->getProperties());
 	EntityPropertiesColor::createProperty(groupNameContour, properties.GetName2DIsolineColor(), { 0, 0, 0 }, defaultCategory, thisObject->getProperties());
 
-	EntityPropertiesInteger::createProperty(groupNameArrows, properties.GetNamePlotDownSampling(), 0., defaultCategory, thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(groupNameArrows, properties.GetNameMaxArrows(), 1000, defaultCategory, thisObject->getProperties());
 }
 
 bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * thisObject)
@@ -45,11 +45,11 @@ bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * 
 	EntityPropertiesColor* color2dMesh = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DMeshColor()));
 	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetNameShow2DIsolines()));
 	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DIsolineColor()));
-	EntityPropertiesInteger* downSampling = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNamePlotDownSampling()));
+	EntityPropertiesInteger* maxArrows = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxArrows()));
 
 	assert(visType != nullptr);
 	assert(visComp != nullptr);
-	assert(downSampling != nullptr);
+	assert(maxArrows != nullptr);
 
 	PropertiesVisUnstructuredVector::VisualizationType type = properties.GetVisualizationType(visType->getValue());
 	assert(type != PropertiesVisUnstructuredVector::VisualizationType::UNKNOWN);
@@ -62,9 +62,9 @@ bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * 
 			visComp->setVisible(false);
 			changes = true;
 		}
-		if (!downSampling->getVisible())
+		if (!maxArrows->getVisible())
 		{
-			downSampling->setVisible(true);
+			maxArrows->setVisible(true);
 			changes |= true;
 		}
 		if (!arrowType->getVisible())
@@ -107,9 +107,9 @@ bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * 
 			visComp->setVisible(false);
 			changes = true;
 		}
-		if (!downSampling->getVisible())
+		if (!maxArrows->getVisible())
 		{
-			downSampling->setVisible(true);
+			maxArrows->setVisible(true);
 			changes |= true;
 		}
 		if (!arrowType->getVisible())
@@ -152,9 +152,9 @@ bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * 
 			visComp->setVisible(true);
 			changes = true;
 		}
-		if (downSampling->getVisible())
+		if (maxArrows->getVisible())
 		{
-			downSampling->setVisible(false);
+			maxArrows->setVisible(false);
 			changes |= true;
 		}
 		if (arrowType->getVisible())
