@@ -16,9 +16,9 @@ void PropertyBundleDataHandleVisUnstructuredVector::LoadCurrentData(EntityBase *
 	assert(visComp != nullptr);
 	selectedVisComp = properties.GetVisualizationComponent(visComp->getValue());
 
-	auto downSamplingEnt = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNamePlotDownSampling()));
-	assert(downSamplingEnt != nullptr);
-	downsamplingRate = downSamplingEnt->getValue();
+	auto maxArrowsEnt = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxArrows()));
+	assert(maxArrowsEnt != nullptr);
+	maxArrows = maxArrowsEnt->getValue();
 
 	auto arrowTypeEnt = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameArrowType()));
 	assert(arrowTypeEnt != nullptr);
