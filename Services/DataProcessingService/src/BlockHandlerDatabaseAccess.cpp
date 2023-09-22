@@ -2,6 +2,7 @@
 #include "BlockHandlerDatabaseAccess.h"
 #include "ResultCollectionHandler.h"
 #include "OpenTwinCore/JSONToVariableConverter.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity)
 {
@@ -12,11 +13,25 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	_resultCollectionExists = resultCollectionHandler.CollectionExists(resultCollectionName);
 	if (_resultCollectionExists)
 	{
-
 		const std::string dbURL = "Projects";
 	
 		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
 	}
+
+	
+	OT_rJSON_createDOC(query);
+	OT_rJSON_createDOC(projection);
+	ot::rJSON::add(projection, "Value", 1);
+	ot::rJSON::add(projection, "P1", 1);
+	ot::rJSON::add(projection, "_id", 0);
+	
+	auto buffer =	PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
+	auto selectedQuantity =	buffer.quantities[buffer.SelectedQuantity];
+	ot::rJSON::add(query, "Quantity", selectedQuantity.quantityIndex);
+
+	_queryString = ot::rJSON::toJSON(query);
+	_projectionString = ot::rJSON::toJSON(projection);
+
 }
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
@@ -30,12 +45,7 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)
 {
-	OT_rJSON_createDOC(query);
-	//ot::rJSON::add(query, "P_1", 1);
-	OT_rJSON_createDOC(projection);
-	ot::rJSON::add(projection, "Value", 1);
-	ot::rJSON::add(projection, "_id", 0);
-	auto dbResponse = _dataStorageAccess->GetAllDocuments(/*ot::rJSON::toJSON(query)*/ "{}", ot::rJSON::toJSON(projection), 0);
+	auto dbResponse = _dataStorageAccess->GetAllDocuments(_queryString, _projectionString, 0);
 	bool success = dbResponse.getSuccess();
 
 	auto resultDoc = ot::rJSON::fromJSON(dbResponse.getResult());

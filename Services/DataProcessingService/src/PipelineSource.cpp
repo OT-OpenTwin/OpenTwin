@@ -2,6 +2,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "BlockHandlerDatabaseAccess.h"
 
+
 PipelineSource::PipelineSource(std::shared_ptr<EntityBlock> blockEntity)
     : PipelineItem(blockEntity), _handler(nullptr)
 {

@@ -12,6 +12,13 @@
 class PropertyHandlerDatabaseAccessBlock : public BusinessLogicHandler
 {
 public:
+	static PropertyHandlerDatabaseAccessBlock& instance()
+	{
+		static PropertyHandlerDatabaseAccessBlock INSTANCE;
+		return INSTANCE;
+	}
+
+	BufferBlockDatabaseAccess& getBuffer(ot::UID id) { return _bufferedInformation[id];}
 	void PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity,const std::string& sessionServiceURL, const std::string& modelServiceURL);
 private:
 	std::map<ot::UID, BufferBlockDatabaseAccess> _bufferedInformation;
@@ -27,4 +34,5 @@ private:
 	void getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type);
 	void CreateUpdatedTypeProperty(EntityPropertiesBase* oldEntity, const std::string& value, EntityProperties& properties);
 	void RefreshBlock(ot::GraphicsItemCfg* blockConfig);
+	PropertyHandlerDatabaseAccessBlock() {};
 };

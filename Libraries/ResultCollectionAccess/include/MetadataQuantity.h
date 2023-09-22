@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <memory>
 
 #include "OpenTwinCore/Variable.h"
 #include "MetadataEntry.h"

@@ -103,7 +103,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (dbAccess != nullptr)
 		{
 			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-			_propertyHandlerDBAccessBlocks.PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+			PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
@@ -201,7 +201,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
-	_propertyHandlerDBAccessBlocks.setUIComponent(_ui);
+	PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -217,7 +217,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	 BlockEntityHandler::GetInstance().setModelComponent(_model);
 	_pipelineManager.setModelComponent(_model);
-	_propertyHandlerDBAccessBlocks.setModelComponent(_model);
+	PropertyHandlerDatabaseAccessBlock::instance().setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

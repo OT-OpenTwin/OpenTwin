@@ -121,5 +121,4 @@ private:
 
 	ot::MenuButtonDescription _buttonRunPipeline;
 	PipelineManager _pipelineManager;
-	PropertyHandlerDatabaseAccessBlock _propertyHandlerDBAccessBlocks;
 };

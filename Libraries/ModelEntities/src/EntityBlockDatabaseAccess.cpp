@@ -168,3 +168,62 @@ void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(bsoncxx::document::
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }
+
+const std::string& EntityBlockDatabaseAccess::getQuantityQueryValue()
+{
+	auto baseProp = getProperties().getProperty(_propertyValueQuantity);
+	auto valueProp =	dynamic_cast<EntityPropertiesString*>(baseProp);
+	return valueProp->getValue();
+	
+}
+
+const std::string& EntityBlockDatabaseAccess::getQuantityQueryComparator()
+{
+	auto baseProp = getProperties().getProperty(_propertyComparator);
+	auto selectProp =	dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	return selectProp->getValue();
+}
+
+const std::string& EntityBlockDatabaseAccess::getParameter1QueryValue()
+{
+	auto baseProp = getProperties().getProperty(_propertyValueP1);
+	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	return valueProp->getValue();
+}
+
+const std::string& EntityBlockDatabaseAccess::getParameter1QueryComparator()
+{
+	auto baseProp = getProperties().getProperty(_propertyComparatorP1);
+	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	return selectProp->getValue();
+}
+
+const std::string& EntityBlockDatabaseAccess::getParameter2QueryValue()
+{
+	
+	auto baseProp = getProperties().getProperty(_propertyValueP2);
+	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	return valueProp->getValue();
+}
+
+const std::string& EntityBlockDatabaseAccess::getParameter2QueryComparator()
+{
+	auto baseProp = getProperties().getProperty(_propertyComparatorP2);
+	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	return selectProp->getValue();
+}
+
+
+const std::string& EntityBlockDatabaseAccess::getParameter3QueryValue()
+{
+	auto baseProp = getProperties().getProperty(_propertyValueP3);
+	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	return valueProp->getValue();
+}
+
+const std::string& EntityBlockDatabaseAccess::getParameter3QueryComparator()
+{
+	auto baseProp = getProperties().getProperty(_propertyComparatorP3);
+	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	return selectProp->getValue();
+}

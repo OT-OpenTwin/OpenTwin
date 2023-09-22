@@ -2,6 +2,11 @@
 #include <string>
 #include <list>
 #include <map>
+
+#include "MetadataParameter.h"
+#include "MetadataQuantity.h"
+
+
 struct BufferBlockDatabaseAccess
 {
 	std::string SelectedProject = "";
@@ -22,4 +27,8 @@ struct BufferBlockDatabaseAccess
 	std::list<std::string> ParameterNames;
 	std::list<std::string> MeasurementMetadataNames;
 	std::map<std::string, std::string> dataTypesByName;
+
+	std::map <std::string, MetadataParameter> parameters;
+	std::map <std::string, MetadataQuantity> quantities	;
+
 };

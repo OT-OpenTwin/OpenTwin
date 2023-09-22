@@ -6,6 +6,7 @@
 #include <list>
 #include <map>
 #include <stdint.h>
+#include <memory>
 
 struct __declspec(dllexport) MetadataParameter
 {
