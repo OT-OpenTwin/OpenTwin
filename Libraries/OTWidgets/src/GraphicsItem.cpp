@@ -822,42 +822,51 @@ void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsPathItem::GraphicsPathItem()
+ot::GraphicsLineItem::GraphicsLineItem()
 {
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
-ot::GraphicsPathItem::~GraphicsPathItem() {
+ot::GraphicsLineItem::~GraphicsLineItem() {
 
 }
 
-void ot::GraphicsPathItem::setPathPoints(const QPointF& _origin, const QPointF& _dest) {
-	m_origin = _origin;
-	m_dest = _dest;
-
-	QPainterPath pth(m_origin);
-	pth.lineTo(m_dest);
-
-	this->setPath(pth);
-}
-
-bool ot::GraphicsPathItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsLineItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	// Ignore, return false in case the setup is called to ensure this item wont be setup
 	return false;
 }
 
-QVariant ot::GraphicsPathItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+QSizeF ot::GraphicsLineItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	switch (_hint) {
+	case Qt::MinimumSize:
+	case Qt::PreferredSize:
+	case Qt::MaximumSize:
+		return this->boundingRect().size();
+	default:
+		OT_LOG_EA("Unknown Qt::SizeHint");
+		break;
+	}
+	return _constrains;
+}
+
+void ot::GraphicsLineItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	this->setPos(_rect.topLeft());
+	QGraphicsLayoutItem::setGeometry(_rect);
+}
+
+QVariant ot::GraphicsLineItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
 		this->handleItemMoved();
 	}
-	return QGraphicsPathItem::itemChange(_change, _value);
+	return QGraphicsLineItem::itemChange(_change, _value);
 }
 
-void ot::GraphicsPathItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+void ot::GraphicsLineItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsPathItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsLineItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
 	// Ignore
 }
 
@@ -908,10 +917,12 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 		return;
 	}
 	
-	this->setPathPoints(
-		m_origin->getQGraphicsItem()->scenePos() + m_origin->getQGraphicsItem()->boundingRect().center(),
-		m_dest->getQGraphicsItem()->scenePos() + m_dest->getQGraphicsItem()->boundingRect().center()
-	);
+	QPointF orig = m_origin->getQGraphicsItem()->scenePos()  + m_origin->getQGraphicsItem()->boundingRect().center();
+	QPointF dest = m_dest->getQGraphicsItem()->scenePos() + m_dest->getQGraphicsItem()->boundingRect().center();
+
+	OT_LOG_W("Updating coonection { O.X = " + std::to_string(orig.x()) + "; O.Y = " + std::to_string(orig.y()) + "; D.X = " + std::to_string(dest.x()) + "; D.Y = " + std::to_string(dest.y()) + " }");
+
+	this->setLine(QLineF(orig, dest));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

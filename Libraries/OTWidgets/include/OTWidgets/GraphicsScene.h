@@ -15,7 +15,7 @@ namespace ot {
 
 	class GraphicsView;
 	class GraphicsItem;
-	class GraphicsPathItem;
+	class GraphicsLineItem;
 
 	//! @brief Graphics Scene for ot::GraphicsItem
 	//! Adding QGraphicsItems to the scene that do not inherit ot::GraphicsItem might lead to undefined behavior
@@ -50,7 +50,7 @@ namespace ot {
 		int m_gridSize;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
-		GraphicsPathItem* m_pathItem;
+		GraphicsLineItem* m_lineItem;
 		GraphicsScene();
 	};
 

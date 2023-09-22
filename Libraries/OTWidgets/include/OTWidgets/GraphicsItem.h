@@ -23,7 +23,7 @@
 #define OT_GRAPHICSITEM_MIMETYPE_ItemName "GraphicsItem.Name"
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
-#define OT_SimpleFactoryJsonKeyValue_GraphicsPathItem "OT_GIPath"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsLineItem "OT_GILine"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsGroupItem "OT_GIGroup"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsStackItem "OT_GIStack"
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItem "OT_GIImage"
@@ -396,8 +396,7 @@ namespace ot {
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem); };
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-
-		virtual void setGeometry(const QRectF& rect) override;
+		virtual void setGeometry(const QRectF& _rect) override;
 
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
@@ -421,19 +420,20 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsPathItem : public QGraphicsPathItem, public ot::GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsLineItem : public QGraphicsLineItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
 	public:
-		GraphicsPathItem();
-		virtual ~GraphicsPathItem();
-
-		void setPathPoints(const QPointF& _origin, const QPointF& _dest);
+		GraphicsLineItem();
+		virtual ~GraphicsLineItem();
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
+		virtual void setGeometry(const QRectF& _rect) override;
 
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPathItem); };
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLineItem); };
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
@@ -441,10 +441,6 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-	private:
-		QPointF m_origin;
-		QPointF m_dest;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -453,7 +449,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public GraphicsPathItem {
+	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public GraphicsLineItem {
 	public:
 		static std::string buildKey(const std::string& _originUid, const std::string& _originItemName, const std::string& _destUid, const std::string& _destItemName);
 

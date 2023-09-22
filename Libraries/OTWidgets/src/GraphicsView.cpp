@@ -22,6 +22,8 @@ ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_d
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 	this->setAlignment(Qt::AlignAbsolute);
+
+	this->setUpdatesEnabled(true);
 }
 
 ot::GraphicsView::~GraphicsView() {

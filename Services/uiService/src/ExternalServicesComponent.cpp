@@ -2854,7 +2854,6 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 						i->setGraphicsItemFlags(i->graphicsItemFlags() | ot::GraphicsItem::ItemIsMoveable | ot::GraphicsItem::ItemNetworkContext);
 						i->getQGraphicsItem()->setPos(QPointF(itm->position().x(), itm->position().y()));
 						editor->addItem(i);
-						OT_LOG_W("Added at: " + std::to_string(itm->position().x()) + "; " + std::to_string(itm->position().y()));
 					}
 				}
 			}
@@ -2888,7 +2887,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 					if (src && dest) {
 						ot::GraphicsItem* srcConn = src->findItem(c.fromConnectable);
-						ot::GraphicsItem* destConn = src->findItem(c.fromConnectable);
+						ot::GraphicsItem* destConn = dest->findItem(c.toConnectable);
 						if (srcConn && destConn) {
 							editor->addConnection(srcConn, destConn);
 						}

@@ -161,8 +161,6 @@ std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document) {
 }
 
 std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document) {
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
 	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
 

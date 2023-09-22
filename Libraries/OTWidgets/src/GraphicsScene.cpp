@@ -13,7 +13,7 @@
 #include <QtGui/qevent.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::GraphicsScene::GraphicsScene(GraphicsView* _view) : m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_pathItem(nullptr) {
+ot::GraphicsScene::GraphicsScene(GraphicsView* _view) : m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_lineItem(nullptr) {
 
 }
 
@@ -56,9 +56,9 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 }
 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
-	if (m_pathItem) {
+	if (m_lineItem) {
 		OTAssertNullptr(m_connectionOrigin);
-		m_pathItem->setPathPoints(m_connectionOrigin->getQGraphicsItem()->pos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(), _event->scenePos());
+		m_lineItem->setLine(QLineF(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(), _event->scenePos()));
 	}
 	QGraphicsScene::mouseMoveEvent(_event);
 }
@@ -69,16 +69,16 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		m_connectionOrigin = _item;
 
 		// ToDo: add preview line
-		m_pathItem = new GraphicsPathItem;
+		m_lineItem = new GraphicsLineItem;
 		QPen p;
 		p.setColor(QColor(64, 64, 255));
 		p.setWidth(1);
-		m_pathItem->setPen(p);
-		m_pathItem->setPathPoints(
+		m_lineItem->setPen(p);
+		m_lineItem->setLine(QLineF(
 			m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(),
 			m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center()
-		);
-		this->addItem(m_pathItem->getQGraphicsItem());
+		));
+		this->addItem(m_lineItem->getQGraphicsItem());
 		
 		return;
 	}
@@ -95,10 +95,10 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 
 void ot::GraphicsScene::stopConnection(void) {
 	// Stop connection
-	if (m_pathItem) {
-		removeItem(m_pathItem);
-		delete m_pathItem;
-		m_pathItem = nullptr;
+	if (m_lineItem) {
+		removeItem(m_lineItem);
+		delete m_lineItem;
+		m_lineItem = nullptr;
 		m_connectionOrigin = nullptr;
 	}
 }
