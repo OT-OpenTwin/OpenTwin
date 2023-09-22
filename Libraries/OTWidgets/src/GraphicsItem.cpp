@@ -90,7 +90,19 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 	if (_itemName == m_name) return this;
-	else return nullptr;
+	
+	OTAssertNullptr(this->getQGraphicsItem());
+	ot::GraphicsItem* ret = nullptr;
+
+	for (auto c : this->getQGraphicsItem()->childItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(c);
+		if (itm) {
+			ret = itm->findItem(_itemName);
+			if (ret) break;
+		}
+	}
+
+	return ret;
 }
 
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -159,7 +171,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
 	this->raiseEvent(ot::GraphicsItem::ItemMoved);
-
+	
 	// For root items we notify the view
 	if (m_parent == nullptr) {
 		otAssert(!m_uid.empty(), "Root items should always have a valid uid");
@@ -920,7 +932,7 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 	QPointF orig = m_origin->getQGraphicsItem()->scenePos()  + m_origin->getQGraphicsItem()->boundingRect().center();
 	QPointF dest = m_dest->getQGraphicsItem()->scenePos() + m_dest->getQGraphicsItem()->boundingRect().center();
 
-	OT_LOG_W("Updating coonection { O.X = " + std::to_string(orig.x()) + "; O.Y = " + std::to_string(orig.y()) + "; D.X = " + std::to_string(dest.x()) + "; D.Y = " + std::to_string(dest.y()) + " }");
+	//OT_LOG_W("Updating coonection { O.X = " + std::to_string(orig.x()) + "; O.Y = " + std::to_string(orig.y()) + "; D.X = " + std::to_string(dest.x()) + "; D.Y = " + std::to_string(dest.y()) + " }");
 
 	this->setLine(QLineF(orig, dest));
 }
