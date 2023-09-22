@@ -38,11 +38,11 @@ std::list<std::shared_ptr<EntityBlock>> PipelineManager::GetAllBlockEntities()
 
 void PipelineManager::CreatePipelines(std::list<std::shared_ptr<EntityBlock>>& allBlockEntities)
 {
+	
 	for (auto blockEntity : allBlockEntities)
 	{
 		std::list<ot::Connector> allConnectors = blockEntity->getAllConnectors();
 		std::list<ot::BlockConnection> allConnections = blockEntity->getAllOutgoingConnections();
-
 		for (ot::Connector& connector : allConnectors)
 		{
 			if (connector.getConnectorType() == ot::ConnectorType::Source)
@@ -51,7 +51,11 @@ void PipelineManager::CreatePipelines(std::list<std::shared_ptr<EntityBlock>>& a
 				if (hasOutgoingConnection)
 				{
 					Pipeline newPipeline;
-					newPipeline.SetSource(new PipelineSource(blockEntity));
+					if (_pipelineSources.find(blockEntity->getBlockID()) == _pipelineSources.end())
+					{
+						_pipelineSources[blockEntity->getBlockID()] = new PipelineSource(blockEntity);
+					}
+					newPipeline.SetSource(_pipelineSources[blockEntity->getBlockID()]);
 					AddFiltersAndSinks(newPipeline, allConnections, allBlockEntities);
 					pipelines.push_back(newPipeline);
 				}
@@ -71,17 +75,25 @@ void PipelineManager::AddFiltersAndSinks(Pipeline& newPipeline, std::list<ot::Bl
 			{
 				for (auto& connector : blockEntity->getAllConnectors())
 				{
-					if (connector.getConnectorType() == ot::ConnectorType::Filter)
+					if (connection.getConnectorDestination() == connector.getConnectorName())
 					{
-						newPipeline.AddFilter(PipelineFilter(blockEntity));
-					}
-					else if (connector.getConnectorType() == ot::ConnectorType::Sink)
-					{
-						newPipeline.AddSink(PipelineSink(blockEntity));
-					}
-					else
-					{
-						assert(0);
+						if (connector.getConnectorType() == ot::ConnectorType::Filter)
+						{
+							newPipeline.AddFilter(PipelineFilter(blockEntity));
+						}
+						else if (connector.getConnectorType() == ot::ConnectorType::Sink)
+						{
+							if (_pipelineSinks.find(blockEntity->getBlockID()) == _pipelineSinks.end())
+							{
+								_pipelineSinks[blockEntity->getBlockID()] = new PipelineSink(blockEntity);
+							}
+							newPipeline.AddSink(_pipelineSinks[blockEntity->getBlockID()]);
+							_pipelineSinks[blockEntity->getBlockID()]->setConnectorAssoziation(connection.getConnectorOrigin(), connection.getConnectorDestination());
+						}
+						else
+						{
+							assert(0);
+						}
 					}
 				}
 				break;

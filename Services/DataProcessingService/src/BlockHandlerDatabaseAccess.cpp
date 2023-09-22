@@ -6,6 +6,9 @@
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity)
 {
+
+	_dataConnectorName = "C0"; // Should come from entity
+	_parameterConnectorName = "C1"; // -"-
 	const std::string projectName =	blockEntity->getSelectedProjectName();
 
 	ResultCollectionHandler resultCollectionHandler;
@@ -22,16 +25,14 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	OT_rJSON_createDOC(query);
 	OT_rJSON_createDOC(projection);
 	ot::rJSON::add(projection, "Value", 1);
-	ot::rJSON::add(projection, "P1", 1);
+	ot::rJSON::add(projection, "P_1", 1);
 	ot::rJSON::add(projection, "_id", 0);
 	
-	auto buffer =	PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
-	auto selectedQuantity =	buffer.quantities[buffer.SelectedQuantity];
+	_collectionInfos =	&PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
+	auto selectedQuantity = _collectionInfos->quantities[_collectionInfos->SelectedQuantity];
 	ot::rJSON::add(query, "Quantity", selectedQuantity.quantityIndex);
-
 	_queryString = ot::rJSON::toJSON(query);
 	_projectionString = ot::rJSON::toJSON(projection);
-
 }
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
@@ -45,22 +46,37 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)
 {
-	auto dbResponse = _dataStorageAccess->GetAllDocuments(_queryString, _projectionString, 0);
-	bool success = dbResponse.getSuccess();
-
-	auto resultDoc = ot::rJSON::fromJSON(dbResponse.getResult());
-	auto allEntries = resultDoc["Documents"].GetArray();
-	
-	BlockHandler::genericDataBlock result;
-	ot::JSONToVariableConverter converter;
-	for (uint32_t i = 0; i < allEntries.Size(); i++)
+	if (_output.size() == 0)
 	{
-		if (!allEntries[i].IsNull())
+		auto selectedParameter = _collectionInfos->parameters[_collectionInfos->SelectedParameter1];
+		auto& temp = selectedParameter.values;
+		std::vector<ot::Variable> parameterValues(temp.begin(), temp.end());
+
+		auto dbResponse = _dataStorageAccess->GetAllDocuments(_queryString, _projectionString, 0);
+		bool success = dbResponse.getSuccess();
+
+		auto resultDoc = ot::rJSON::fromJSON(dbResponse.getResult());
+		auto allEntries = resultDoc["Documents"].GetArray();
+
+		BlockHandler::genericDataBlock result;
+		ot::JSONToVariableConverter converter;
+
+		for (uint32_t i = 0; i < allEntries.Size(); i++)
 		{
-			auto tt = allEntries[i].GetObject();
-			result.push_back(converter(tt["Value"]));
+			if (!allEntries[i].IsNull())
+			{
+				auto arrayEntry = allEntries[i].GetObject();
+				result[_dataConnectorName].push_back(converter(arrayEntry["Value"]));
+				int32_t parameterIndexZeroBased = arrayEntry["P_1"].GetInt() - 1;
+				result[_parameterConnectorName].push_back(parameterValues[parameterIndexZeroBased]);
+			}
 		}
+		_output = std::move(result);
+
+		return _output;
 	}
-	
-	return result;
+	else
+	{
+		return _output;
+	}
 }

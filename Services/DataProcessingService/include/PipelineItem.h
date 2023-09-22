@@ -4,7 +4,7 @@
 class PipelineItem
 {
 public:
-	using genericDataBlock = std::list<ot::Variable>;
+	using genericDataBlock = std::map<std::string,std::list<ot::Variable>>;
 	PipelineItem(std::shared_ptr<EntityBlock> blockEntity)
 		:_blockEntity(blockEntity){}
 protected:

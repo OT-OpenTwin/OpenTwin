@@ -9,11 +9,16 @@ PipelineSink::PipelineSink(std::shared_ptr<EntityBlock> blockEntity)
 	EntityBlockPlot1D* plotter = dynamic_cast<EntityBlockPlot1D*>(_blockEntity.get());
 	if (plotter != nullptr)
 	{
-		_handler = new BlockHandlerPlot1D(plotter);
+		_handler = new BlockHandlerPlot1D(plotter, "C1", "C0"); //Should come from the BlockPlot1D entity
 	}
 }
 
 void PipelineSink::ProcessData(genericDataBlock& inputData)
 {
 	_handler->Execute(inputData);
+}
+
+void PipelineSink::setConnectorAssoziation(const std::string& otherCon, const std::string& inCon)
+{
+	_handler->addConnectorAssoziation(otherCon, inCon);
 }

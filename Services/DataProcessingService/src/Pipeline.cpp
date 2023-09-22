@@ -11,8 +11,8 @@ void Pipeline::RunPipeline()
 	{
 		sourceData = filter.FilterData(sourceData);
 	}
-	for (PipelineSink& sink : _sinks)
+	for (PipelineSink* sink : _sinks)
 	{
-		sink.ProcessData(sourceData);
+		sink->ProcessData(sourceData);
 	}
 }

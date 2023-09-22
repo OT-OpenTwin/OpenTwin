@@ -115,7 +115,8 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MeasurementCampaign& meas
 		{
 			MetadataQuantity quantity;
 			quantity.quantityAbbreviation = quantityDocument->getDocumentName();
-			
+			const std::string abbrev = quantity.quantityAbbreviation;
+			quantity.quantityIndex = std::stoi(abbrev.substr(abbrev.find("_") + 1, abbrev.size()));
 			auto quantityFields = ExtractMetadataFields(*quantityDocument);
 			for (std::shared_ptr<MetadataEntry> entry : quantityFields)
 			{

@@ -3,6 +3,7 @@
 #include "OpenTwinCore/rJSON.h"
 #include "DataBase.h"
 #include "OpenTwinCommunication/Msg.h"
+#include "OpenTwinCore/ReturnMessage.h"
 
 ResultCollectionHandler::ResultCollectionHandler()
 {
@@ -22,8 +23,8 @@ std::string ResultCollectionHandler::getProjectCollection(const std::string& pro
 	
 	std::string response;
 	Application::instance()->sendHttpRequest(ot::EXECUTE, _authorizationServiceURL, doc, response);
-	
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::ReturnMessage responseMessage =ot::ReturnMessage::fromJson(response);
+	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
 	const std::string collectionName = responseDoc[OT_PARAM_AUTH_PROJECT_COLLECTION].GetString();
 	
 	return collectionName;

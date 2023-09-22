@@ -13,10 +13,10 @@ public:
 	void RunPipeline();
 	void SetSource(PipelineSource* sourceBlock) { _sourceBlock = sourceBlock; };
 	void AddFilter(PipelineFilter&& newFilter) { _filter.push_back(newFilter); };
-	void AddSink(PipelineSink&& newSink) { _sinks.push_back(newSink); };
+	void AddSink(PipelineSink* newSink) { _sinks.push_back(newSink); };
 
 private:
 	PipelineSource* _sourceBlock;
 	std::list<PipelineFilter> _filter;
-	std::list<PipelineSink> _sinks;
+	std::list<PipelineSink*> _sinks;
 };
