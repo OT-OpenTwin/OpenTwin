@@ -114,6 +114,7 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 }
 
 std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
+
 	// We allow all items and do NOT store any information
 	
 	// Get item information
@@ -125,6 +126,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	pos.setFromJsonObject(posObj);
 
 	// Here we would now check and store the item information
+	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
 
 	// Create package
 	ot::GraphicsScenePackage pckg("TestPackage");
@@ -150,6 +152,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 
 	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, ot::rJSON::toJSON(pckgObj));
@@ -168,7 +171,7 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	pckg.setFromJsonObject(pckgObj);
 
 	// Here we would check and store the connection information
-
+	OT_LOG_D("Handling new graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to add connections
 	OT_rJSON_createDOC(reqDoc);
@@ -195,7 +198,7 @@ std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _docum
 	pckg.setFromJsonObject(pckgObj);
 
 	// Here we would check and remove the connection information
-
+	OT_LOG_D("Handling remove graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to add connections
 	OT_rJSON_createDOC(reqDoc);
@@ -217,10 +220,22 @@ std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document)
 	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	auto sel = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
+	OT_LOG_D("Graphics Editor selection changed ( editor = \"" + editorName + "\" )");
+
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleGraphicsItemMoved(OT_rJSON_doc& _document) {
+	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, Object);
+
+	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	std::string itemUid = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+
+	ot::Point2DD itmPos;
+	OT_rJSON_val itemPosObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
+	itmPos.setFromJsonObject(itemPosObj);
+
+	OT_LOG_D("Graphics Editor item moved ( editor = \"" + editorName + "\"; uid = \"" + itemUid + "\"; x = " + std::to_string(itmPos.x()) + "; y = " + std::to_string(itmPos.y()) + " )");
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
@@ -256,7 +271,9 @@ std::string Application::createEmptyTestEditor(void) {
 
 		std::string response;
 		std::string req = ot::rJSON::toJSON(doc);
-		OT_LOG_D("GraphicsEditor requested with: " + req);
+
+		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
+
 		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
 			return OT_ACTION_RETURN_VALUE_FAILED;
 		}
