@@ -16,8 +16,8 @@
 #define OT_JSON_Member_Items "Items"
 #define OT_JSON_Member_SourceUid "Source.UID"
 #define OT_JSON_Member_SourceName "Source.Name"
-#define OT_JSON_Member_DestinationUid "Source.UID"
-#define OT_JSON_Member_DestinationName "Source.Name"
+#define OT_JSON_Member_DestinationUid "Destination.UID"
+#define OT_JSON_Member_DestinationName "Destination.Name"
 #define OT_JSON_Member_Collections "Collections"
 #define OT_JSON_Member_Connections "Connections"
 
