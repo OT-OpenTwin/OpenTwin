@@ -71,7 +71,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		// ToDo: add preview line
 		m_pathItem = new GraphicsPathItem;
 		QPen p;
-		p.setColor(QColor(64, 255, 64));
+		p.setColor(QColor(64, 64, 255));
 		p.setWidth(1);
 		m_pathItem->setPen(p);
 		m_pathItem->setPathPoints(
