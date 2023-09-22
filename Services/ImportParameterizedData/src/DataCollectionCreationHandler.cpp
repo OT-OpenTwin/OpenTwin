@@ -201,6 +201,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
 				valuePointer++;
 			}
+			qcCreator.Flush(dataStorageAccess);
 			fieldCounter++;
 		}
 		allMetadata.push_back(metadataBuffer);
