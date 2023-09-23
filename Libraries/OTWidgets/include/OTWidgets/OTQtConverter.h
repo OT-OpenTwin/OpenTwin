@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OpenTwinCore/Color.h"
+#include  "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -18,6 +19,7 @@ namespace ot {
 
 		//! @brief Convert OpenTwin Color to Qt Color
 		OT_WIDGETS_API_EXPORTONLY QColor toQt(const ot::Color& _color);
+		OT_WIDGETS_API_EXPORTONLY Qt::Alignment toQt(ot::Alignment _alignment);
 
 	}
 }

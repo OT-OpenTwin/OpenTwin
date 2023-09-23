@@ -53,19 +53,21 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
-	itmTxt->setName(m_name + "_tit");
+	itmTxt->setName(m_name + "_ctit");
 	itmTxt->setText(m_text);
 	itmTxt->setTextColor(m_textColor);
 	itmTxt->setTextFont(m_font);
 
 	if (_isLeft) {
-		itmTxt->setAlignment(ot::AlignTopLeft);
+		itm->setAlignment(ot::AlignLeft);
+		itmTxt->setAlignment(ot::AlignLeft);
 
 		_gridLayout->addChildItem(_row, ot::intern::flcLeftConnector, itm);
 		_gridLayout->addChildItem(_row, ot::intern::flcLeftTitle, itmTxt);
 	}
 	else {
-		itmTxt->setAlignment(ot::AlignTopRight);
+		itm->setAlignment(ot::AlignRight);
+		itmTxt->setAlignment(ot::AlignRight);
 
 		_gridLayout->addChildItem(_row, ot::intern::flcRightConnector, itm);
 		_gridLayout->addChildItem(_row, ot::intern::flcRightTitle, itmTxt);

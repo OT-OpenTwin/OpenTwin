@@ -7,6 +7,7 @@
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/OTQtConverter.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
 
@@ -144,6 +145,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
 			if (itm.second > 0) this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
+			this->setAlignment(i->getQGraphicsLayoutItem(), ot::OTQtConverter::toQt(i->graphicsItemAlignment()));
 		}
 		else {
 			this->addStretch(itm.second);
@@ -220,7 +222,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				}
 				i->setParentGraphicsItem(this);
 				OTAssertNullptr(i->getQGraphicsLayoutItem());
-				this->addItem(i->getQGraphicsLayoutItem(), x, y);
+				this->addItem(i->getQGraphicsLayoutItem(), x, y, OTQtConverter::toQt(i->graphicsItemAlignment()));
 			}
 			y++;
 		}
