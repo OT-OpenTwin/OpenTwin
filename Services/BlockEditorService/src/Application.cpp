@@ -34,7 +34,7 @@ namespace ottest {
 	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
 		ot::GraphicsFlowConnectorCfg cfg;
 
-		cfg.setTextColor(ot::Color(255, 255, 255));
+		cfg.setTextColor(ot::Color(0, 0, 0));
 
 		return cfg;
 	}
@@ -42,15 +42,15 @@ namespace ottest {
 	ot::GraphicsItemCfg* createTestBlock1(const std::string& _name) {
 		ot::GraphicsFlowItemCfg flow;
 		flow.setTitleBackgroundColor(0, 255, 0);
+		flow.setBackgroundImagePath("Images/Test2");
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
+		flow.setBackgroundColor(ot::Color(255, 255, 255));
 		//flow->setBackgroundImagePath("Default/python");
 
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-		flow.addLeft("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
 		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
-		flow.addRight("SomeOut3", "Error", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Red);
 
 		return flow.createGraphicsItem(_name, _name);
 	}
