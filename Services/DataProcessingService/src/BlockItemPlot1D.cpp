@@ -13,8 +13,8 @@ static BlockEntityFactoryRegistrar factoryEntry("Plot 1D", BlockItemPlot1D::Crea
 
 void BlockItemPlot1D::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
-	block->addLeft("C0", "X-Axis", ot::GraphicsFlowConnectorCfg::Square);
-	block->addLeft("C1", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
+	block->addLeft("C0", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
+	block->addLeft("C1", "X-Axis", ot::GraphicsFlowConnectorCfg::Square);
 }
 
 std::shared_ptr<EntityBlock> BlockItemPlot1D::CreateBlockEntity()
