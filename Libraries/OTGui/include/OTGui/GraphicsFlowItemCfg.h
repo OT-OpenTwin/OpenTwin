@@ -49,8 +49,7 @@ namespace ot {
 		void setFigure(GraphicsFlowConnectorCfg::ConnectorFigure _figure) { m_figure = _figure; };
 		GraphicsFlowConnectorCfg::ConnectorFigure figure(void) const { return m_figure; };
 
-		//! @brief Creates a graphics item corresponding to the 
-		void addToGrid(int _row, int _connectorColumn, int _titleColumn, GraphicsGridLayoutItemCfg* _gridLayout);
+		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft);
 
 	private:
 		ot::GraphicsItemCfg* createConnectorItem(void);
@@ -86,50 +85,50 @@ namespace ot {
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Conector figure
-		void addInput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure);
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure);
 
 		//! @brief Add a connector on the left side of the FlowItem
 		//! The default connector style will be applied
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Conector figure
-		void addInput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color);
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color);
 
 		//! @brief Add a connector on the left side of the FlowItem
 		//! The default connector style will be applied
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Conector figure
-		void addInput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color);
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color);
 
 		//! @brief Add the provided connector as input
 		//! @param _input Connector configuration
-		void addInput(const GraphicsFlowConnectorCfg& _input);
+		void addLeft(const GraphicsFlowConnectorCfg& _input);
 
 		//! @brief Add a connector on the right side of the FlowItem
 		//! The default connector style will be applied
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Connector figure
-		void addOutput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure);
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure);
 
 		//! @brief Add a connector on the right side of the FlowItem
 		//! The default connector style will be applied
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Connector figure
-		void addOutput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color);
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color);
 
 		//! @brief Add a connector on the right side of the FlowItem
 		//! The default connector style will be applied
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Connector figure
-		void addOutput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color);
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color);
 
 		//! @brief Add the provided connector as output
 		//! @param _input Connector configuration
-		void addOutput(const GraphicsFlowConnectorCfg& _output);
+		void addRight(const GraphicsFlowConnectorCfg& _output);
 
 		//! @brief Replace the current background painter
 		//! The item takes ownership
@@ -171,8 +170,8 @@ namespace ot {
 
 		GraphicsFlowConnectorCfg m_defaultConnectorStyle;
 
-		std::list<GraphicsFlowConnectorCfg> m_inputs;
-		std::list<GraphicsFlowConnectorCfg> m_outputs;
+		std::list<GraphicsFlowConnectorCfg> m_left;
+		std::list<GraphicsFlowConnectorCfg> m_right;
 
 		GraphicsFlowItemCfg(GraphicsFlowItemCfg&) = delete;
 		GraphicsFlowItemCfg& operator = (GraphicsFlowItemCfg&) = delete;

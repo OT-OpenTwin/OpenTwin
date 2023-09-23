@@ -25,14 +25,14 @@ std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()
 
 void BlockItemDatabaseAccess::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
-	block->addOutput("C0", "Data output", ot::GraphicsFlowConnectorCfg::Square);
-	block->addOutput("C1", "Parameter 1", ot::GraphicsFlowConnectorCfg::Square);
+	block->addRight("C0", "Data output", ot::GraphicsFlowConnectorCfg::Square);
+	block->addRight("C1", "Parameter 1", ot::GraphicsFlowConnectorCfg::Square);
 	if (_queryDimension != d1)
 	{
-		block->addOutput("C2", "Parameter 2", ot::GraphicsFlowConnectorCfg::Square);
+		block->addRight("C2", "Parameter 2", ot::GraphicsFlowConnectorCfg::Square);
 	}
 	if (_queryDimension == d3)
 	{
-		block->addOutput("C3", "Parameter 3", ot::GraphicsFlowConnectorCfg::Square);
+		block->addRight("C3", "Parameter 3", ot::GraphicsFlowConnectorCfg::Square);
 	}
 }

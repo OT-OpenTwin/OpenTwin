@@ -9,6 +9,21 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/Painter2D.h"
 
+namespace ot {
+	namespace intern {
+
+		// Column description
+		enum FlowLayoutColumns {
+			flcLeftConnector,
+			flcLeftTitle,
+			flcSpacer,
+			flcRightTitle,
+			flcRightConnector,
+			flcCount // Number of columns (keep this at the end of the enum)
+		};
+	}
+}
+
 ot::GraphicsFlowConnectorCfg::GraphicsFlowConnectorCfg() : m_figure(ot::GraphicsFlowConnectorCfg::Square) {}
 
 ot::GraphicsFlowConnectorCfg::GraphicsFlowConnectorCfg(const GraphicsFlowConnectorCfg& _other) {
@@ -30,7 +45,7 @@ ot::GraphicsFlowConnectorCfg& ot::GraphicsFlowConnectorCfg::operator = (const Gr
 	return *this;
 }
 
-void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, int _connectorColumn, int _titleColumn, GraphicsGridLayoutItemCfg* _gridLayout) {
+void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
@@ -43,8 +58,20 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, int _connectorColumn, int
 	itmTxt->setTextColor(m_textColor);
 	itmTxt->setTextFont(m_font);
 
-	_gridLayout->addChildItem(_row, _connectorColumn, itm);
-	_gridLayout->addChildItem(_row, _titleColumn, itmTxt);
+	if (_isLeft) {
+		itmTxt->setAlignment(ot::AlignTopLeft);
+
+		_gridLayout->addChildItem(_row, ot::intern::flcLeftConnector, itm);
+		_gridLayout->addChildItem(_row, ot::intern::flcLeftTitle, itmTxt);
+	}
+	else {
+		itmTxt->setAlignment(ot::AlignTopRight);
+
+		_gridLayout->addChildItem(_row, ot::intern::flcRightConnector, itm);
+		_gridLayout->addChildItem(_row, ot::intern::flcRightTitle, itmTxt);
+	}
+
+	
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
@@ -163,16 +190,16 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	tLay->addStrech(1);
 
 	// Central grid
-	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_inputs.size(), m_outputs.size()), 5);
+	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_left.size(), m_right.size()), 5);
 	cLay->setName(_name + "_cLay");
 
 	int ix = 0;
-	for (auto c : m_inputs) {
-		c.addToGrid(ix++, 0, 1, cLay);
+	for (auto c : m_left) {
+		c.addToGrid(ix++, cLay, true);
 	}
 	ix = 0;
-	for (auto c : m_outputs) {
-		c.addToGrid(ix++, 4, 3, cLay);
+	for (auto c : m_right) {
+		c.addToGrid(ix++, cLay, false);
 	}
 
 	cLay->setColumnStretch(2, 1);
@@ -208,70 +235,70 @@ ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() : m_backgroundPainter(nullptr), m
 
 ot::GraphicsFlowItemCfg::~GraphicsFlowItemCfg() {}
 
-void ot::GraphicsFlowItemCfg::addInput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure) {
+void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure) {
 	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
 
-	this->addInput(cfg);
+	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addInput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
-	cfg.setName(_name);
-	cfg.setText(_title);
-	cfg.setFigure(_figure);
-	cfg.setPrimaryColor(ot::Color(_color));
-
-	this->addInput(cfg);
-}
-
-void ot::GraphicsFlowItemCfg::addInput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
-	cfg.setName(_name);
-	cfg.setText(_title);
-	cfg.setFigure(_figure);
-	cfg.setPrimaryColor(_color);
-
-	this->addInput(cfg);
-}
-
-void ot::GraphicsFlowItemCfg::addInput(const GraphicsFlowConnectorCfg& _input) {
-	m_inputs.push_back(_input);
-}
-
-void ot::GraphicsFlowItemCfg::addOutput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
-	cfg.setName(_name);
-	cfg.setText(_title);
-	cfg.setFigure(_figure);
-
-	this->addOutput(cfg);
-}
-
-void ot::GraphicsFlowItemCfg::addOutput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
+void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
 	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
 	cfg.setPrimaryColor(ot::Color(_color));
 
-	this->addOutput(cfg);
+	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addOutput(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color) {
+void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color) {
 	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
 	cfg.setPrimaryColor(_color);
 
-	this->addOutput(cfg);
+	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addOutput(const GraphicsFlowConnectorCfg& _output) {
-	m_outputs.push_back(_output);
+void ot::GraphicsFlowItemCfg::addLeft(const GraphicsFlowConnectorCfg& _input) {
+	m_left.push_back(_input);
+}
+
+void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure) {
+	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+	cfg.setName(_name);
+	cfg.setText(_title);
+	cfg.setFigure(_figure);
+
+	this->addRight(cfg);
+}
+
+void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
+	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+	cfg.setName(_name);
+	cfg.setText(_title);
+	cfg.setFigure(_figure);
+	cfg.setPrimaryColor(ot::Color(_color));
+
+	this->addRight(cfg);
+}
+
+void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color) {
+	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+	cfg.setName(_name);
+	cfg.setText(_title);
+	cfg.setFigure(_figure);
+	cfg.setPrimaryColor(_color);
+
+	this->addRight(cfg);
+}
+
+void ot::GraphicsFlowItemCfg::addRight(const GraphicsFlowConnectorCfg& _output) {
+	m_right.push_back(_output);
 }
 
 void ot::GraphicsFlowItemCfg::setBackgroundPainter(ot::Painter2D* _painter) {

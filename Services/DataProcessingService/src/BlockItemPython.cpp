@@ -14,8 +14,8 @@ BlockItemPython::BlockItemPython()
 
 void BlockItemPython::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {
-	block->addInput("C0", "Parameter", ot::GraphicsFlowConnectorCfg::Square);
-	block->addOutput("C0", "Output", ot::GraphicsFlowConnectorCfg::Square);
+	block->addLeft("C0", "Parameter", ot::GraphicsFlowConnectorCfg::Square);
+	block->addRight("C0", "Output", ot::GraphicsFlowConnectorCfg::Square);
 }
 
 std::shared_ptr<EntityBlock> BlockItemPython::CreateBlockEntity()
