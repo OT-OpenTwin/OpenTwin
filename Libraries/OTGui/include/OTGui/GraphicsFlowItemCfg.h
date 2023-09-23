@@ -165,7 +165,7 @@ namespace ot {
 	private:
 		ot::Painter2D* m_backgroundPainter;
 		ot::Painter2D* m_titleBackgroundPainter;
-
+		
 		std::string m_backgroundImagePath;
 
 		GraphicsFlowConnectorCfg m_defaultConnectorStyle;

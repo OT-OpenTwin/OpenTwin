@@ -31,10 +31,18 @@ Application * g_instance{ nullptr };
 namespace ottest {
 	static unsigned long long currentBlockUid = 0;
 
+	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
+		ot::GraphicsFlowConnectorCfg cfg;
+
+		cfg.setTextColor(ot::Color(255, 255, 255));
+
+		return cfg;
+	}
 
 	ot::GraphicsItemCfg* createTestBlock1(const std::string& _name) {
 		ot::GraphicsFlowItemCfg flow;
 		flow.setTitleBackgroundColor(0, 255, 0);
+		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		//flow->setBackgroundImagePath("Default/python");
 
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
@@ -50,6 +58,7 @@ namespace ottest {
 	ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
 		ot::GraphicsFlowItemCfg flow;
 		flow.setTitleBackgroundColor(255, 0, 0);
+		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		//flow->setBackgroundImagePath("Default/python");
 
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
@@ -64,6 +73,7 @@ namespace ottest {
 	ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 		ot::GraphicsFlowItemCfg flow;
 		flow.setTitleBackgroundColor(0, 0, 255);
+		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		//flow->setBackgroundImagePath("Default/python");
 
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
