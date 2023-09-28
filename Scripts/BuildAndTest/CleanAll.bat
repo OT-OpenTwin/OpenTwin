@@ -100,6 +100,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Services\BlockEditorService\clean.bat"
 ECHO Clean: Cartesian Mesh Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\CartesianMeshService\clean.bat"
 
+ECHO Clean: Circuit Simulator Service
+CALL "%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\clean.bat"
+
 ECHO Clean: FITTD Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\FITTDService\clean.bat"
 

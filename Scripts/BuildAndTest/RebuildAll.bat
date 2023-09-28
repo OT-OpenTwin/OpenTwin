@@ -290,6 +290,11 @@ ECHO Build Service: DataProcessingService
 ECHO ===============================================================
 CALL "%OT_DATA_PROCESSING_SERVICE_ROOT%\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Service: CircuitSimulatorService
+ECHO ===============================================================
+CALL "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\build.bat" %1 %2
+
 REM ====================================================================
 REM Build the executables
 REM ====================================================================
