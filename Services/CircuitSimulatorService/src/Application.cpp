@@ -25,6 +25,10 @@
 
 Application * g_instance{ nullptr };
 
+#define EXAMPLE_NAME_BLOCK1 "First"
+#define EXAMPLE_NAME_Block2 "Second"
+
+
 Application * Application::instance(void) {
 	if (g_instance == nullptr) { g_instance = new Application; }
 	return g_instance;
@@ -59,7 +63,36 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 	return std::string();
 }
 
-std::string Application:: createNewCircuitEditor()
+namespace ottest
+{
+	ot::GraphicsItemCfg* createTestBlock1(const std::string _name)
+	{
+		ot::GraphicsFlowItemCfg flow;
+		flow.setTitleBackgroundColor(0, 255, 0);
+		flow.setBackgroundImagePath("Default/Cuboid");
+		flow.setBackgroundColor(ot::Color(0, 255, 255));
+
+		flow.addLeft("Input1", "Connect", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Black);
+		flow.addRight("Output1", "Connect", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Black);
+
+		return flow.createGraphicsItem(_name, _name);
+	}
+
+	ot::GraphicsItemCfg* createTestBlock2(const std::string _name)
+	{
+		ot::GraphicsFlowItemCfg flow;
+		flow.setTitleBackgroundColor(0, 255, 0);
+		flow.setBackgroundImagePath("Default/Cylinder");
+		flow.setBackgroundColor(ot::Color(0, 255, 255));
+
+		flow.addLeft("Input1", "Connect", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addRight("Output1", "Connect", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
+
+		return flow.createGraphicsItem(_name, _name);
+	}
+}
+
+std::string Application:: createNewCircuitEditor(void)
 {
 	if (m_uiComponent) {
 		
@@ -69,8 +102,8 @@ std::string Application:: createNewCircuitEditor()
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
 		
 		a->addChildCollection(a1);
-		//a1->addItem(ottest::createTestBlock1(EXAMPLE_NAME_Block1)); // In die Funktion kommt wie bei playground getItem bspw.
-		//a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
+		a1->addItem(ottest::createTestBlock1(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
+		a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
 		
 		pckg.addCollection(a);
 
@@ -94,6 +127,12 @@ std::string Application:: createNewCircuitEditor()
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
+
+
+	
+
+
+
 
 // ##################################################################################################################################################################################################################
 
@@ -125,7 +164,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
 	_ui->addMenuButton("Circuit Simulator", "Edit","New Circuit", "New Circuit", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add","Default");
-	
+	_ui->addMenuButton("Circuit Simulator","Simulate","New Simulation","New Simulation", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add", "Default");
+
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
 }

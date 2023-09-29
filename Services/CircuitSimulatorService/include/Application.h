@@ -29,7 +29,7 @@ public:
 	static void deleteInstance(void);
 
 private:
-	std::string createNewCircuitEditor();
+	
 	Application();
 	virtual ~Application();
 public:
@@ -45,7 +45,8 @@ public:
 	// The last parameter are flags describing the allowed message types for this handler
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-
+	std::string createNewCircuitEditor(void);
+	
 	// ##################################################################################################################################################################################################################
 
 	// Required functions
