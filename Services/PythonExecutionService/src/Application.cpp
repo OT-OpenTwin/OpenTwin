@@ -20,6 +20,10 @@
 #include "OpenTwinCore/TypeNames.h"
 #include "TemplateDefaultManager.h"
 #include "SubprocessDebugConfigurator.h"
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+#include "DataBase.h"
+#include "OpenTwinCore/ReturnMessage.h"
 
 Application * g_instance{ nullptr };
 
@@ -66,10 +70,6 @@ void Application::run(void)
 	}
 }
 
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
-#include "DataBase.h"
-#include "OpenTwinCore/ReturnMessage.h"
 
 std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
 {
@@ -155,19 +155,34 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 #ifdef _DEBUG
-	SubprocessDebugConfigurator configurator;
-	auto modelService = m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
-	std::string urlModelservice = modelService.service->serviceURL();
-	int startPort = SubprocessHandler::getStartPort();
-	std::string subserviceURL = m_serviceURL.substr(0, m_serviceURL.find(":") + 1) + std::to_string(startPort);
-	configurator.CreateConfiguration(m_serviceURL, subserviceURL, urlModelservice, m_databaseURL, m_serviceID, m_sessionID);
-	_subprocessHandler = new SubprocessHandler(m_serviceURL);
-	_subprocessHandler->setSubprocessURL(subserviceURL);
+	try
+	{
+		SubprocessDebugConfigurator configurator;
+		auto modelService = m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
+		std::string urlModelservice = modelService.service->serviceURL();
+		int startPort = SubprocessHandler::getStartPort();
+		std::string subserviceURL = m_serviceURL.substr(0, m_serviceURL.find(":") + 1) + std::to_string(startPort);
+		configurator.CreateConfiguration(m_serviceURL, subserviceURL, urlModelservice, m_databaseURL, m_serviceID, m_sessionID);
+		_subprocessHandler = new SubprocessHandler(m_serviceURL);
+		_subprocessHandler->setSubprocessURL(subserviceURL);
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		throw e;
+	}
 #else
-	_subprocessHandler = new SubprocessHandler(m_serviceURL);
-	std::thread workerThread(&SubprocessHandler::Create, _subprocessHandler, m_serviceURL);
-	workerThread.detach();
-
+	try
+	{
+		_subprocessHandler = new SubprocessHandler(m_serviceURL);
+		std::thread workerThread(&SubprocessHandler::Create, _subprocessHandler, m_serviceURL);
+		workerThread.detach();
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		throw e;
+	}
 #endif // DEBUG
 }
 
