@@ -20,6 +20,7 @@ namespace ot {
 	namespace components {
 		class UiComponent;
 		class ModelComponent;
+		
 	}
 }
 
@@ -45,8 +46,26 @@ public:
 	// The last parameter are flags describing the allowed message types for this handler
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleNewGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleRemoveGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
+	
 	std::string createNewCircuitEditor(void);
 	
+	//NgSpice functions
+	std::string ngSpice_Initialize();
+	static int MySendCharFunction( char*, int, void*);
+	
+	static int MySendStat(char*, int, void*);
+	static int MyControlledExit(int, bool imidiate, bool quitexit, int, void*);
+	//int SendData(pvecvaluesall, int, int, void*);
+	//int SendInitData(pvecinfoall, int, void*);
+	//int BGThreadRunning(NG_BOOL, int, void*);
+
+
+
+
 	// ##################################################################################################################################################################################################################
 
 	// Required functions
