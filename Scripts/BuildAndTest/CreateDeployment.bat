@@ -190,6 +190,9 @@ REM PYTHON
 COPY "%PYTHON310_ROOT%\python310.dll" "%OT_DEPLOYMENT_DIR%"
 XCOPY /S "%PYTHON310_ROOT%\Lib" "%OT_DEPLOYMENT_DIR%\Python" 
 
+REM NGSpice
+COPY "%NGSPICE_ROOT%\visualc\sharedspice\Release.x64\ngspice.dll" "%OT_DEPLOYMENT_DIR%"
+
 REM Visual Studio Redistributables
 MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
 COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
