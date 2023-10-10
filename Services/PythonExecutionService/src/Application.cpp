@@ -154,6 +154,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
+	OT_LOG_D("Starting to create the subprocess");
 #ifdef _DEBUG
 	try
 	{

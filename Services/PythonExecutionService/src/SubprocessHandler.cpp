@@ -151,6 +151,7 @@ bool SubprocessHandler::CheckAlive(OT_PROCESS_HANDLE& handle)
 		return false;
 	}
 #else
+	OT_LOG_D("Failed to detect Windows os")
 	#error ("Function is implemented only for Windows OS");
 #endif // OT_OS_WINDOWS
 
