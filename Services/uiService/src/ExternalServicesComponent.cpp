@@ -3515,6 +3515,7 @@ void ExternalServicesComponent::closeProject(bool saveChanges) {
 		app->clearNavigationTree();
 		app->clearPropertyGrid();
 		app->contextMenuManager()->serviceDisconnected(nullptr);
+		app->globalGraphicsPicker()->clear();
 
 		// Clear all maps
 		m_serviceToUidMap.clear();

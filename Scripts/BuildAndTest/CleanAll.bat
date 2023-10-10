@@ -31,12 +31,6 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 REM ################################################################################################################################
 REM LIBRARIES
 
-ECHO Clean: BlockEditorAPI
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\BlockEditorAPI\clean.bat"
-
-ECHO Clean: BlockEditor
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\BlockEditor\clean.bat"
-
 ECHO Clean: CADModelEntities
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\CADModelEntities\clean.bat"
 
@@ -45,9 +39,6 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\DataStorage\clean.bat"
 
 ECHO Clean: OTGui Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTGui\clean.bat"
-
-ECHO Clean: OT Qt Wrapper Library
-CALL "%OT_QTWRAPPER_ROOT%\clean.bat"
 
 ECHO Clean: OTWidgets Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets\clean.bat"

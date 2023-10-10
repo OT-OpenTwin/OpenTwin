@@ -80,17 +80,18 @@ void ot::GraphicsPicker::add(const std::list<ot::GraphicsCollectionCfg*>& _topLe
 }
 
 void ot::GraphicsPicker::clear(void) {
-	m_navigation->treeWidget()->clear();
-	for (auto d : m_previewData) {
-		for (auto e : *d.second) delete e;
-		delete d.second;
-	}
-	m_previewData.clear();
 	for (auto v : m_views) {
 		m_viewLayout->removeWidget(v);
 		delete v;
 	}
 	m_views.clear();
+
+	for (auto d : m_previewData) {
+		for (auto e : *d.second) delete e;
+		delete d.second;
+	}
+	m_previewData.clear();
+	m_navigation->treeWidget()->clear();
 }
 
 // ##############################################################################################################################

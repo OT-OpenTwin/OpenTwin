@@ -693,8 +693,7 @@ QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constra
 	case Qt::MaximumSize:
 	{
 		QFontMetrics m(this->font());
-#pragma message("[OpenTwin] [Warning] Presentation fix in use!")
-		return QSizeF(m.width(this->toPlainText()), m.height()) + QSizeF(4., 4.);
+		return QSizeF(m.width(this->toPlainText()), m.height());
 	}
 	default:
 		OT_LOG_EA("Unknown Qt::SizeHint");
@@ -711,14 +710,7 @@ void ot::GraphicsTextItem::paint(QPainter* _painter, const QStyleOptionGraphicsI
 void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
-
-#pragma message("[OpenTwin] [Warning] Presentation fix in use!")
-	if (QString::fromStdString(this->graphicsItemName()).endsWith("_tit")) {
-		this->setPos(_rect.topLeft() + QPointF(0., 1.));
-	}
-	else {
-		this->setPos(_rect.topLeft() - QPointF(0., 3.));
-	}
+	this->setPos(_rect.topLeft());
 }
 
 void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
