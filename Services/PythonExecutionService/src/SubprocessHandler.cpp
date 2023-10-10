@@ -6,6 +6,7 @@
 #include "OpenTwinCommunication/Msg.h"
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinCore/TypeNames.h"
+#include "OpenTwinCore/Logger.h"
 
 #include <assert.h>
 
@@ -21,10 +22,12 @@ SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
 	if (envValue == "")
 	{
 		baseDirectory = ot::os::getExecutablePath();
+		OT_LOG_D("OPENTWIN_DEV_ROOT env was not found. Using executable path: " + baseDirectory);
 	}
 	else
 	{
 		baseDirectory = envValue;
+		OT_LOG_D("Found OPENTWIN_DEV_ROOT env: " + baseDirectory);
 	}
 	
 	if (baseDirectory == "")
@@ -56,15 +59,18 @@ std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParame
 		std::string messageBody =  ot::rJSON::toJSON(scriptsAndParameter);
 		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, messageBody, response, 0))
 		{
+			OT_LOG_D("Failed tot execute python script");
 			assert(0); //What now?
 		}
+		OT_LOG_D("Python script successfully executed");
 		return response;
 	}
 	else
 	{
+		OT_LOG_D("Subprocess not responding.");
 		Close();
 		RunWithNextFreeURL(_urlThisProcess);
-		ot::ReturnMessage message(ot::ReturnMessage::Failed, "Process not reachable.");
+		ot::ReturnMessage message(ot::ReturnMessage::Failed, "Process not reachable."); //ToDo: Maybe better another trial. With max of 3 trials?
 		return message.toJson();
 	}
 }
@@ -96,6 +102,7 @@ void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 		std::string commandLine = _launcherPath + " \"" + _subprocessPath + "\" \"" + urlSubprocess + "\" \"" + urlThisService+ "\" \"unused\" \"unused\" ";
 		
 		ot::app::RunResult result = ot::app::GeneralError;
+		OT_LOG_D("Trying to launch subprocess as " + urlSubprocess);
 		result = ot::app::runApplication(_launcherPath, commandLine, _subprocess, false, 0);
 
 		assert(result == ot::app::OK); //ToDo: When would this case occure?
@@ -107,6 +114,7 @@ void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 			if (receivedNotification)
 			{
 				_urlSubprocess = urlSubprocess;
+				OT_LOG_D("Subprocess started successfully");
 				break;
 			}
 		}

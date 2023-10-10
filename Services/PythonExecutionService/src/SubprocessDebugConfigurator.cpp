@@ -4,14 +4,15 @@
 #include <assert.h>
 #include <fstream>
 #include "DataBase.h"
+#include "OpenTwinCore/Logger.h"
 
 void SubprocessDebugConfigurator::CreateConfiguration(const std::string& urlThisService, const std::string& urlSubProcess, const std::string& urlModelService, const std::string& urlDataBase, const int serviceID, const std::string& sessionID)
 {
 	std::string filePath = GetConfigurationFilePath() + "\\pythonexecution.cfg";
+	OT_LOG_D("Creating config file: " + filePath);
 	std::ofstream fileWriter;
 	fileWriter.open(filePath, std::ios::out);
 	
-		
 	if (fileWriter.is_open())
 	{
 		std::string userName = DataBase::GetDataBase()->getUserName();
@@ -44,5 +45,6 @@ std::string SubprocessDebugConfigurator::GetConfigurationFilePath()
 	std::string envName = "OPENTWIN_DEV_ROOT";
 	const char* deploymentFolder = ot::os::getEnvironmentVariable(envName.c_str());
 	assert(deploymentFolder != ""); 
+	OT_LOG_E("Could not get OPENTWIN_DEV_ROOT");
 	return std::string(deploymentFolder) + "\\Deployment";
 }

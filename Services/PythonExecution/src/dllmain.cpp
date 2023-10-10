@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include "MinimalSubService.h"
 #include "ActionHandler.h"
+#include "OpenTwinCore/rJSON.h"
+#include "OpenTwinCommunication/ServiceLogNotifier.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -55,13 +57,21 @@ extern "C" {
 		// *****************
 	};
 
-#include "OpenTwinCore/rJSON.h"
+
 	// This function is called once upon startup of this service
 	_declspec(dllexport) int init(const char * _urlOwn, const char * _urlMasterService, const char * unused1, const char * unused2)
 	{
-		MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
-		actionHandler = new ActionHandler(MinimalSubService::INSTANCE().getMasterServiceURl());
-
-		return 0;
+		ot::ServiceLogNotifier::initialize("PythonSubprocess", "", true);
+		try
+		{
+			MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
+			actionHandler = new ActionHandler(MinimalSubService::INSTANCE().getMasterServiceURl());
+			return 0;
+		}
+		catch (std::exception& e)
+		{
+			OT_LOG_E(e.what());
+			throw e;
+		}
 	};
 }
