@@ -98,6 +98,9 @@ Now open the configuration file ``mongod.cfg`` in a text editor (e.g., notepad.e
       authorization: disabled
 
 
+.. warning::
+   Note that MongoDB uses two blank spaces for the settings indentation. An invalid indentation may lead to the Mongo Database Server crashing upon startup.
+
 
 In a first step, please update the content of the configuration file at the highlighted positions above. This assumes that the database server is running locally on your system, therefore the IP address of the server is set to ``127.0.0.1`` (= localhost). If you are installing the server components on a public IP address, the necessary changes will be explained later in this document. For now, you can proceed by specifying ``127.0.0.1``.
 
@@ -170,6 +173,10 @@ In a next step, the authentication should be enabled for the data base. Therefor
 
     security:
       authorization: enabled
+
+
+.. warning::
+   Note that MongoDB uses two blank spaces for the settings indentation. An invalid indentation may lead to the Mongo Database Server crashing upon startup.
 
 
 Afterward, restart the database server as described above and ensure that the server is running properly.
