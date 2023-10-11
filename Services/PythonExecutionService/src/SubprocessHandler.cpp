@@ -76,18 +76,26 @@ std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParame
 }
 
 void SubprocessHandler::Create(const std::string& urlThisProcess)
-{	
-	assert(_launcherPath != "" && _subprocessPath != "");
-
-	if (CheckAlive(_subprocess))
+{
+	try
 	{
-		if (PingSubprocess())
-		{
-			Close();
-		}
-	}
+		assert(_launcherPath != "" && _subprocessPath != "");
 
-	RunWithNextFreeURL(urlThisProcess);
+		if (CheckAlive(_subprocess))
+		{
+			if (PingSubprocess())
+			{
+				Close();
+			}
+		}
+
+		RunWithNextFreeURL(urlThisProcess);
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		throw e;
+	}
 }
 
 void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
