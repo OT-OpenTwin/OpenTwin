@@ -48,18 +48,18 @@
 //! @brief Log a information message according to the service logger configuration.
 //! Information messages should contain general information.
 //! @param ___text The log message.
-#define OT_LOG_I(___text) OT_LOG(___text, ot::DEFAULT_LOG)
+#define OT_LOG_I(___text) OT_LOG(___text, ot::INFORMATION_LOG)
 
 //! @brief Log a information message according to the service logger configuration and otAssert with the provided message.
 //! Note that the provided text should be a C-String
 //! Information messages should contain general information.
 //! @param ___text The log message.
-#define OT_LOG_IA(___text) otAssert(0, ___text); OT_LOG(___text, ot::DEFAULT_LOG)
+#define OT_LOG_IA(___text) otAssert(0, ___text); OT_LOG(___text, ot::INFORMATION_LOG)
 
 //! @brief Log a information message according to the service logger configuration and assert.
 //! Information messages should contain general information.
 //! @param ___text The log message.
-#define OT_LOG_IAS(___text) otAssert(0, ""); OT_LOG(___text, ot::DEFAULT_LOG)
+#define OT_LOG_IAS(___text) otAssert(0, ""); OT_LOG(___text, ot::INFORMATION_LOG)
 
 //! @brief Log a detailed information message according to the service logger configuration.
 //! Detailed information messages may contain more information than regular information messages.
@@ -110,7 +110,7 @@ namespace ot {
 	//! @brief Log message verbouse level
 	enum LogFlag {
 		NO_LOG                          = 0x0000, //! @brief No log flags
-		DEFAULT_LOG                     = 0x0001, //! @brief Information log (few logs)
+		INFORMATION_LOG                 = 0x0001, //! @brief Information log (few logs)
 		DETAILED_LOG                    = 0x0002, //! @brief Detailed log (more logs)
 		WARNING_LOG                     = 0x0004, //! @brief Warning log
 		ERROR_LOG                       = 0x0008, //! @brief Error log
@@ -133,7 +133,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT LogMessage : public Serializable {
 	public:
 		LogMessage();
-		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, ot::LogFlag _flags = ot::DEFAULT_LOG);
+		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, ot::LogFlag _flags = ot::INFORMATION_LOG);
 		LogMessage(const LogMessage& _other);
 		virtual ~LogMessage();
 
@@ -268,7 +268,7 @@ namespace ot {
 		//! @param _text The message thext
 		//! @param _functionName The name of the function
 		//! @param _logFlags The flags that should be set for the log message
-		void dispatch(const std::string& _text, const std::string& _functionName = std::string(), ot::LogFlag _logFlags = ot::DEFAULT_LOG);
+		void dispatch(const std::string& _text, const std::string& _functionName = std::string(), ot::LogFlag _logFlags = ot::INFORMATION_LOG);
 
 		//! @brief Dispatch a log message with the provided params
 		//! Will set the current system time as message creation time

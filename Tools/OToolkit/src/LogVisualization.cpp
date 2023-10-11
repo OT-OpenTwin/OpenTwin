@@ -552,7 +552,7 @@ QString LogVisualization::logMessageTypeString(const ot::LogMessage& _msg) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_DETAILED);
 	}
-	if (_msg.flags() & ot::DEFAULT_LOG) {
+	if (_msg.flags() & ot::INFORMATION_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_INFO);
 	}

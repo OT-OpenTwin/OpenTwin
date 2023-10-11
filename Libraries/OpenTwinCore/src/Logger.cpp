@@ -82,7 +82,7 @@ void ot::LogMessage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jso
 	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_DataVersion, "1.0");
 
 	OT_rJSON_createValueArray(flagArr);
-	if (m_flags & DEFAULT_LOG) flagArr.PushBack(rapidjson::Value("Default", _document.GetAllocator()), _document.GetAllocator());
+	if (m_flags & INFORMATION_LOG) flagArr.PushBack(rapidjson::Value("Information", _document.GetAllocator()), _document.GetAllocator());
 	if (m_flags & DETAILED_LOG) flagArr.PushBack(rapidjson::Value("Detailed", _document.GetAllocator()), _document.GetAllocator());
 	if (m_flags & WARNING_LOG) flagArr.PushBack(rapidjson::Value("Warning", _document.GetAllocator()), _document.GetAllocator());
 	if (m_flags & ERROR_LOG) flagArr.PushBack(rapidjson::Value("Error", _document.GetAllocator()), _document.GetAllocator());
@@ -110,7 +110,7 @@ void ot::LogMessage::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	for (rapidjson::SizeType i = 0; i < flagsArr.Size(); i++) {
 		OT_rJSON_checkArrayEntryType(flagsArr, i, String);
 		std::string f = flagsArr[i].GetString();
-		if (f == "Default") m_flags |= DEFAULT_LOG;
+		if (f == "Information") m_flags |= INFORMATION_LOG;
 		else if (f == "Detailed") m_flags |= DETAILED_LOG;
 		else if (f == "Warning") m_flags |= WARNING_LOG;
 		else if (f == "Error") m_flags |= ERROR_LOG;
@@ -203,7 +203,7 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 }
 
 void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
-	if (_str == "DEFAULT_LOG") m_logFlags |= ot::DEFAULT_LOG;
+	if (_str == "INFORMATION_LOG") m_logFlags |= ot::INFORMATION_LOG;
 	else if (_str == "DETAILED_LOG") m_logFlags |= ot::DETAILED_LOG;
 	else if (_str == "WARNING_LOG") m_logFlags |= ot::WARNING_LOG;
 	else if (_str == "ERROR_LOG") m_logFlags |= ot::ERROR_LOG;

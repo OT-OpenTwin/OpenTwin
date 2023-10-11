@@ -72,9 +72,9 @@ When creating the Service Logger instance, it sets the logging options from the 
         
         A union of multiple flags can be created by splitting them with a '|' character (without any blank space)
 
-        * DEFAULT_LOG: *General log*
+        * INFORMATION_LOG: *General information log*
         
-        * DETAILED_LOG: *Detailed log*
+        * DETAILED_LOG: *Detailed information log*
         
         * WARNING_LOG: *Warning log*
 
