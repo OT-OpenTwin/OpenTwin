@@ -5,7 +5,7 @@
 class __declspec(dllexport) EntityFileText : public EntityFile
 {
 public:
-	EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactory* factory, const std::string& owner);
+	EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityFileText"; };

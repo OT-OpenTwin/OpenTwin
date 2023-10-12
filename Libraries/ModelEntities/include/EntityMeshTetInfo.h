@@ -9,7 +9,7 @@
 class __declspec(dllexport) EntityMeshTetInfo : public EntityBase
 {
 public:
-	EntityMeshTetInfo(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityMeshTetInfo(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityMeshTetInfo();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

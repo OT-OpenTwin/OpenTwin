@@ -7,7 +7,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityVis2D3D::EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityVis2D3D::EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, factory, owner),
 	resultType(EntityResultBase::UNKNOWN),
 	sourceID(0),

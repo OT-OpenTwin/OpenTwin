@@ -9,7 +9,7 @@
 class __declspec(dllexport) EntityMeshCartesianNodes : public EntityBase
 {
 public:
-	EntityMeshCartesianNodes(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityMeshCartesianNodes(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityMeshCartesianNodes();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

@@ -15,7 +15,7 @@ class EntityBinaryData;
 class __declspec(dllexport) EntityMeshTetData : public EntityContainer
 {
 public:
-	EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityMeshTetData();
 
 	virtual bool considerForPropertyFilter(void) override { return true; };

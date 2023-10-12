@@ -10,7 +10,7 @@
 
 
 template <class T>
-EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, factory, owner),
 	tableDataStorageId(-1),
 	tableDataStorageVersion(-1)

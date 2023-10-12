@@ -11,7 +11,7 @@ class __declspec(dllexport) EntityParameterizedDataTable : public EntityResultTa
 {
 public:
 	enum HeaderOrientation {horizontal,vertical};
-	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	void SetTableDimensions(uint32_t numberOfRows, uint32_t numberOfColumns);
 	void SetSourceFile(std::string sourceFileName, std::string sourceFilePath);
 	virtual std::string getClassName(void) { return "EntityParameterizedDataTable"; };

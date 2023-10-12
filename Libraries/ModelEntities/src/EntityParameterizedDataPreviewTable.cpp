@@ -1,6 +1,6 @@
 #include "EntityParameterizedDataPreviewTable.h"
 
-EntityParameterizedDataPreviewTable::EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityParameterizedDataPreviewTable::EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	: EntityResultTable<std::string>(ID, parent, mdl, ms, factory, owner)
 {
 }

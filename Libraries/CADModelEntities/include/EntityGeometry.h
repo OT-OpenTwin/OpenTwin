@@ -14,7 +14,7 @@
 class __declspec(dllexport) EntityGeometry : public EntityContainer
 {
 public:
-	EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityGeometry();
 
 	void		 setBrep(TopoDS_Shape shape);

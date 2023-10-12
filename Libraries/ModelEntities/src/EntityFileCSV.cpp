@@ -2,7 +2,7 @@
 
 #include <OpenTwinCommunication/ActionTypes.h>
 
-EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}
 
 std::string EntityFileCSV::getRowDelimiter()

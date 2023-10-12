@@ -5,7 +5,7 @@
 class __declspec(dllexport) EntityResearchMetadata : public EntityWithDynamicFields
 {
 public:
-	EntityResearchMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactory* factory, const std::string& owner);
+	EntityResearchMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 
 	std::string getClassName() override { return "EntityResearchMetadata"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };

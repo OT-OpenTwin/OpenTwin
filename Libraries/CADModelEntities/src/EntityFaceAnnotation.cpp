@@ -15,7 +15,7 @@
 #include "TopoDS.hxx"
 #include "TopoDS_Shell.hxx"
 
-EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, factory, owner),
 	facetsStorageID(-1)
 {

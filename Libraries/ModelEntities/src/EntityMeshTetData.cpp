@@ -10,7 +10,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, factory, owner),
 	meshNodes(nullptr),
 	meshNodesStorageId(-1),

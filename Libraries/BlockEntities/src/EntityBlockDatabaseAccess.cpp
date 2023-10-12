@@ -1,8 +1,8 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
-EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactory* factory, const std::string& owner)
-	:EntityBlock(ID,parent,obs,ms,factory,owner)
+EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 }
 
@@ -34,9 +34,9 @@ void EntityBlockDatabaseAccess::createProperties()
 	getProperties().createProperty(projectList, "Database");
 
 	//Basic properties:
-	EntityPropertiesSelection::createProperty(_groupQuerySettings, _propertyNameDimension, { _propertyValueDimension1,_propertyValueDimension2, _propertyValueDimension3, _propertyValueDimensionCustom}, _propertyValueDimension1, "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupQuerySettings, _propertyNameDimension, { _propertyValueDimension1,_propertyValueDimension2, _propertyValueDimension3, _propertyValueDimensionCustom }, _propertyValueDimension1, "default", getProperties());
 	//EntityPropertiesSelection::createProperty(_groupQuerySettings, _msmdPropertyName, {}, "", "default", getProperties());
-	
+
 	//Quantity Settings
 	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyNameQuantity, {}, "", "default", getProperties());
 	EntityPropertiesString* typeLabelQuantity = new EntityPropertiesString();
@@ -47,7 +47,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	getProperties().createProperty(typeLabelQuantity, _groupQuantitySetttings);
 
 	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyComparator, _comparators, "", "default", getProperties());
-	EntityPropertiesString::createProperty(_groupQuantitySetttings,_propertyValueQuantity, "", "default", getProperties());
+	EntityPropertiesString::createProperty(_groupQuantitySetttings, _propertyValueQuantity, "", "default", getProperties());
 
 	//Parameter 1 settings
 	EntityPropertiesSelection::createProperty(_groupParamSettings1, _propertyNameP1, {}, "", "default", getProperties());
@@ -57,9 +57,9 @@ void EntityBlockDatabaseAccess::createProperties()
 	typeLabelP1->setGroup(_groupParamSettings1);
 	typeLabelP1->setValue("");
 	getProperties().createProperty(typeLabelP1, _groupParamSettings1);
-	EntityPropertiesSelection::createProperty(_groupParamSettings1,_propertyComparatorP1, _comparators, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings1, _propertyComparatorP1, _comparators, "", "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings1, _propertyValueP1, "", "default", getProperties());
-	
+
 	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyNameP2, {}, "", "default", getProperties());
 	EntityPropertiesString* typeLabelP2 = new EntityPropertiesString();
 	typeLabelP2->setReadOnly(true);
@@ -86,17 +86,17 @@ void EntityBlockDatabaseAccess::createProperties()
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 {
-	auto propertyBase =	getProperties().getProperty("Projectname");
-	auto selectedProjectName = dynamic_cast<EntityPropertiesProjectList*>(propertyBase); 
+	auto propertyBase = getProperties().getProperty("Projectname");
+	auto selectedProjectName = dynamic_cast<EntityPropertiesProjectList*>(propertyBase);
 	assert(selectedProjectName != nullptr);
-	
+
 	return  selectedProjectName->getValue();
 }
 
 std::string EntityBlockDatabaseAccess::getQueryDimension()
 {
 	auto propertyBase = getProperties().getProperty("Outcome dimension");
-	auto outcome= dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto outcome = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(outcome != nullptr);
 
 	return outcome->getValue();
@@ -106,8 +106,8 @@ bool EntityBlockDatabaseAccess::SetVisibleParameter2(bool visible)
 {
 	const bool isVisible = getProperties().getProperty(_propertyNameP2)->getVisible();
 	const bool refresh = isVisible != visible;
-	if(refresh)
-	{ 
+	if (refresh)
+	{
 		getProperties().getProperty(_propertyNameP2)->setVisible(visible);
 		getProperties().getProperty(_propertyDataTypeP2)->setVisible(visible);
 		getProperties().getProperty(_propertyComparatorP2)->setVisible(visible);
@@ -134,7 +134,7 @@ bool EntityBlockDatabaseAccess::SetVisibleParameter3(bool visible)
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
 {
-	auto baseProperty =	getProperties().getProperty(_propertyNameDimension);
+	auto baseProperty = getProperties().getProperty(_propertyNameDimension);
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 	bool refresh = false;
 	if (selectionProperty->getValue() == _propertyValueDimension1)
@@ -172,15 +172,15 @@ void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(bsoncxx::document::
 const std::string& EntityBlockDatabaseAccess::getQuantityQueryValue()
 {
 	auto baseProp = getProperties().getProperty(_propertyValueQuantity);
-	auto valueProp =	dynamic_cast<EntityPropertiesString*>(baseProp);
+	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
 	return valueProp->getValue();
-	
+
 }
 
 const std::string& EntityBlockDatabaseAccess::getQuantityQueryComparator()
 {
 	auto baseProp = getProperties().getProperty(_propertyComparator);
-	auto selectProp =	dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	return selectProp->getValue();
 }
 
@@ -200,7 +200,7 @@ const std::string& EntityBlockDatabaseAccess::getParameter1QueryComparator()
 
 const std::string& EntityBlockDatabaseAccess::getParameter2QueryValue()
 {
-	
+
 	auto baseProp = getProperties().getProperty(_propertyValueP2);
 	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
 	return valueProp->getValue();

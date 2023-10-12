@@ -1,8 +1,8 @@
 #include "EntityBlockPython.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
-EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactory* factory, const std::string& owner)
-	:EntityBlock(ID,parent,obs,ms,factory,owner)
+EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 }
 
@@ -36,8 +36,8 @@ void EntityBlockPython::createProperties(const std::string& scriptFolder, ot::UI
 std::string EntityBlockPython::getSelectedScript()
 {
 	auto propBase = getProperties().getProperty("Script");
-	auto scriptSelection =	dynamic_cast<EntityPropertiesEntityList*>(propBase);
+	auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
 	assert(scriptSelection != nullptr);
-	
+
 	return scriptSelection->getValueName();
 }

@@ -11,7 +11,7 @@
 #include "BsonArrayTypeGetterWrapper.h"
 
 template <class T>
-EntityResultTableData<T>::EntityResultTableData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityResultTableData<T>::EntityResultTableData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms,  factory, owner)
 {
 	className = className + "_" + ot::TemplateTypeName<T>::getTypeName();

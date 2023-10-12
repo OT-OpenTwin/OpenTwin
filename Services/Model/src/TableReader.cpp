@@ -20,7 +20,7 @@ TableReader::~TableReader()
 
 }
 
-std::string TableReader::readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner)
+std::string TableReader::readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner)
 {
 	assert(model != nullptr);
 

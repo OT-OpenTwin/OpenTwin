@@ -8,7 +8,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshCartesianItem::EntityMeshCartesianItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityMeshCartesianItem::EntityMeshCartesianItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs,  ms,  factory, owner),
 	mesh(nullptr),
 	colorRGB{0.0, 0.0, 0.0}

@@ -4,7 +4,7 @@
 #include <OpenTwinCore/TypeNames.h>
 #include <OpenTwinCommunication/ActionTypes.h>
 
-EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityBase(ID,parent,obs,ms,factory,owner)
 {
 }

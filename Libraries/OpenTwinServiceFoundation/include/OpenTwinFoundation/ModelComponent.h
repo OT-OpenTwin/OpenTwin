@@ -26,7 +26,7 @@
 class EntityBase;
 class EntityResult1D;
 class EntityPlot1D;
-class ClassFactory;
+class ClassFactoryHandler;
 class EntityResultText;
 class EntityGeometry;
 
@@ -53,7 +53,7 @@ namespace ot {
 			// Model management
 
 			std::string getCurrentModelVersion(void);
-			EntityBase * readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactory &classFactory);
+			EntityBase * readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactoryHandler &classFactory);
 			UID getCurrentVisualizationModelID(void);
 
 			std::list<std::string> getListOfFolderItems(const std::string & _folder);

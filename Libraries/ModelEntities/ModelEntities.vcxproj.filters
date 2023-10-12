@@ -298,12 +298,6 @@
     <ClInclude Include="include\EntityFileText.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityBlock.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EntityBlockDatabaseAccess.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="include\Connector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -312,9 +306,6 @@
     </ClInclude>
     <ClInclude Include="include\SerializeWithBSON.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EntityBlockPlot1D.h">
-      <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityCoordinates2D.h">
       <Filter>Header Files\Entities</Filter>
@@ -346,9 +337,6 @@
     <ClInclude Include="include\BSONToVariableConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityBlockPython.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\VariableToBSONConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -369,6 +357,12 @@
     </ClInclude>
     <ClInclude Include="include\PropertyBundleVisUnstructuredScalarSurface.h">
       <Filter>Header Files\PropertyBundle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ClassFactoryHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ClassFactoryHandlerAbstract.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -588,20 +582,11 @@
     <ClCompile Include="src\EntityFileText.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityBlockDatabaseAccess.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityBlock.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\Connector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockConnection.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityBlockPlot1D.cpp">
-      <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityCoordinates2D.cpp">
       <Filter>Source Files\Entities</Filter>
@@ -628,9 +613,6 @@
       <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
     <ClCompile Include="src\BSONToVariableConverter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityBlockPython.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\VariableToBSONConverter.cpp">

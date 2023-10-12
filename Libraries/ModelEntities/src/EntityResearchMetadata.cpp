@@ -2,7 +2,7 @@
 
 #include "OpenTwinCommunication/ActionTypes.h"
 
-EntityResearchMetadata::EntityResearchMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactory* factory, const std::string& owner)
+EntityResearchMetadata::EntityResearchMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	: EntityWithDynamicFields(ID, parent, mdl, ms, factory, owner)
 {
 }

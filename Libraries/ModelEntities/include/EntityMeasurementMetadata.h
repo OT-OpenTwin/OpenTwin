@@ -5,7 +5,7 @@
 class __declspec(dllexport) EntityMeasurementMetadata : public EntityWithDynamicFields
 {
 public:
-	EntityMeasurementMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactory* factory, const std::string& owner);
+	EntityMeasurementMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	std::string getClassName() override { return "EntityMeasurementMetadata"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;

@@ -15,7 +15,7 @@ class EntityCartesianVector;
 class __declspec(dllexport) EntityMeshCartesianData : public EntityContainer
 {
 public:
-	EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityMeshCartesianData();
 
 	virtual bool considerForPropertyFilter(void) override { return true; };

@@ -84,7 +84,7 @@ public:
 	static void readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::Edge> &edges);
 	/** ************************************************************************************************************************************************/
 private:
-	ClassFactory* classFactory;
+	ClassFactoryHandler* classFactory;
 	bool isConnected;
 	std::string projectName;
 	std::string databaseServerURL;

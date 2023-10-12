@@ -11,7 +11,7 @@ class __declspec(dllexport) EntityResult1D : public EntityContainer
 public:
 	enum tDataType {EMPTY, REAL, IMAG, COMPLEX};
 
-	EntityResult1D(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityResult1D(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityResult1D();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

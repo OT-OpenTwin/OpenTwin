@@ -24,11 +24,9 @@
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.hpp" />
     <ClInclude Include="include\BSONToVariableConverter.h" />
+    <ClInclude Include="include\ClassFactoryHandler.h" />
+    <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
     <ClInclude Include="include\Connector.h" />
-    <ClInclude Include="include\EntityBlock.h" />
-    <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
-    <ClInclude Include="include\EntityBlockPlot1D.h" />
-    <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityMeasurementMetadata.h" />
     <ClInclude Include="include\EntityResearchMetadata.h" />
@@ -140,10 +138,6 @@
     <ClCompile Include="src\EntityAnnotationData.cpp" />
     <ClCompile Include="src\EntityBase.cpp" />
     <ClCompile Include="src\EntityBinaryData.cpp" />
-    <ClCompile Include="src\EntityBlock.cpp" />
-    <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
-    <ClCompile Include="src\EntityBlockPlot1D.cpp" />
-    <ClCompile Include="src\EntityBlockPython.cpp" />
     <ClCompile Include="src\EntityCartesianVector.cpp" />
     <ClCompile Include="src\EntityContainer.cpp" />
     <ClCompile Include="src\EntityCompressedVector.cpp" />

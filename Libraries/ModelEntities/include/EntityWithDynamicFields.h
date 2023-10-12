@@ -19,7 +19,7 @@
 class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer
 {
 public:
-	EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactory* factory, const std::string& owner);
+	EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 
 	void InsertInField(std::string fieldName, std::list<ot::Variable> values, std::string documentName = "/");
 

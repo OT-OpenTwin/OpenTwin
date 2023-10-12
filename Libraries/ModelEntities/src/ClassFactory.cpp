@@ -54,11 +54,7 @@
 #include "EntityResearchMetadata.h"
 #include "EntitySolverGetDP.h"
 #include "EntityMeasurementMetadata.h"
-#include "EntityBlock.h"
-#include "EntityBlockDatabaseAccess.h"
-#include "EntityBlockPlot1D.h"
 #include "EntityCoordinates2D.h"
-#include "EntityBlockPython.h"
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
 
@@ -304,25 +300,9 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	{
 		return new EntitySolverGetDP(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityBlock")
-	{
-		return new EntityBlock(0, nullptr, nullptr, nullptr, this, "");
-	}
-	else if (entityType == "EntityBlockDatabaseAccess")
-	{
-		return new EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, this, "");
-	}
-	else if (entityType == "EntityBlockPlot1D")
-	{
-		return new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, this, "");
-	}
 	else if (entityType == "EntityCoordinates2D")
 	{
 		return new EntityCoordinates2D(0, nullptr, nullptr, nullptr, nullptr, "");
-	}
-	else if (entityType == "EntityBlockPython")
-	{
-		return new EntityBlockPython(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
 	else if (entityType == "EntityVisUnstructuredScalarSurface")
 	{
@@ -346,6 +326,6 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	}
 	else
 	{
-		return nullptr;
+		return ClassFactoryHandlerAbstract::CreateEntity(entityType);
 	}
 }

@@ -9,7 +9,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, factory, owner),
 	textData(nullptr),
 	textDataStorageId(-1),

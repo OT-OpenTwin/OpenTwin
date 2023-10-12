@@ -2,7 +2,7 @@
 #include "../include/EntityResultUnstructuredMesh.h"
 #include "DataBase.h"
 
-EntityResultUnstructuredMesh::EntityResultUnstructuredMesh(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityResultUnstructuredMesh::EntityResultUnstructuredMesh(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityBase(ID,parent,obs,ms,factory,owner)
 {}
 
@@ -62,7 +62,7 @@ void EntityResultUnstructuredMesh::setMeshData(size_t numberPoints, size_t numbe
 	xcoord = ycoord = zcoord = cellData = nullptr;
 }
 
-void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, double *&x, double *&y, double *&z, ClassFactory *factory)
+void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, double *&x, double *&y, double *&z, ClassFactoryHandler* factory)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 
@@ -141,7 +141,7 @@ void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, doub
 	}
 }
 
-void EntityResultUnstructuredMesh::GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells, ClassFactory* factory)
+void EntityResultUnstructuredMesh::GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells, ClassFactoryHandler* factory)
 {
 	if (_cellData == nullptr)
 	{

@@ -15,7 +15,7 @@
 #include "BRepBuilderAPI_Transform.hxx"
 #include "gp_Ax1.hxx"
 
-EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, factory, owner),
 	brepStorageID(-1),
 	facetsStorageID(-1),

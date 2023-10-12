@@ -167,7 +167,7 @@ std::string ot::components::ModelComponent::getCurrentModelVersion(void)
 	return modelVersion;
 }
 
-EntityBase * ot::components::ModelComponent::readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactory &classFactory)
+EntityBase * ot::components::ModelComponent::readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactoryHandler&classFactory)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 

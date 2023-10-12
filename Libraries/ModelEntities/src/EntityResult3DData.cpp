@@ -2,7 +2,7 @@
 #include "../include/EntityResult3DData.h"
 #include "DataBase.h"
 
-EntityResult3DData::EntityResult3DData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityResult3DData::EntityResult3DData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityBase(ID,parent,obs,ms,factory,owner)
 {}
 

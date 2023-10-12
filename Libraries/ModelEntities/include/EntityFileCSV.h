@@ -4,7 +4,7 @@
 class __declspec(dllexport) EntityFileCSV : public EntityFileText
 {
 public:
-	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	void setRowDelimiter(std::string delim) { _rowDelimiter = delim; };
 	void setColumnDelimiter(std::string delim) { _columnDelimiter = delim; };
 	std::string getRowDelimiter() ;

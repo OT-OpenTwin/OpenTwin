@@ -11,7 +11,7 @@
 
 #include <OpenTwinCommunication/ActionTypes.h>
 
-EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs,  ms,  factory, owner),
 	mesh(nullptr),
 	meshDataTets(nullptr),

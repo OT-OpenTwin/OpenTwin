@@ -10,7 +10,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshCartesianData::EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityMeshCartesianData::EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, factory, owner),
 	meshFaces(nullptr),
 	meshFacesStorageId(-1),

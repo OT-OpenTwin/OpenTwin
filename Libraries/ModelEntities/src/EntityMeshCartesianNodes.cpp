@@ -5,7 +5,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshCartesianNodes::EntityMeshCartesianNodes(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityMeshCartesianNodes::EntityMeshCartesianNodes(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, factory, owner)
 {
 	

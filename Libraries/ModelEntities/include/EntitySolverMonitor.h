@@ -7,7 +7,7 @@ class __declspec(dllexport) EntitySolverMonitor : public EntityContainer
 {
 public:
 
-	EntitySolverMonitor(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntitySolverMonitor(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntitySolverMonitor();
 
 	virtual void addVisualizationNodes(void) override;

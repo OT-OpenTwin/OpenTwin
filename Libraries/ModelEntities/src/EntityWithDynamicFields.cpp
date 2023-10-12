@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "BSONToVariableConverter.h"
 
-EntityWithDynamicFields::EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactory* factory, const std::string& owner)
+EntityWithDynamicFields::EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	: EntityContainer(ID, parent, mdl, ms, factory, owner)
 {
 	_bsonDocumentsByName["/"];

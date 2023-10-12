@@ -46,6 +46,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenTwinCommunication.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenTwinServiceFoundation.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ModelEntities.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\CADModelEntities.dll"
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\BlockEntities.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\Model.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\Viewer.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\DataStorage.dll"
@@ -108,7 +109,7 @@ COPY "%OT_QWTWRAPPER_ROOT%\%OT_DLLR%\QwtWrapper.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_GUI_ROOT%\%OT_DLLR%\OTGui.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_SCI_ROOT%\%OT_DLLR%\OTsci.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_WIDGETS_ROOT%\%OT_DLLR%\OTWidgets.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-
+COPY "%OT_BLOCKENTITIES_ROOT%\%OT_DLLR%\BlockEntities.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 REM ====================================================================
 REM  Copy Services
 REM ====================================================================
@@ -138,7 +139,6 @@ COPY "%OT_PYTHON_EXECUTION_ROOT%\%OT_DLLR%\PythonExecution.dll" "%OPENTWIN_DEPLO
 COPY "%OT_BLOCKEDITORSERVICE_ROOT%\%OT_DLLR%\BlockEditorService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_DATA_PROCESSING_SERVICE_ROOT%\%OT_DLLR%\DataProcessingService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\%OT_DLLR%\CircuitSimulatorService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-
 
 COPY "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\open_twin.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 

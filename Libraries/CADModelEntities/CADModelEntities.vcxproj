@@ -137,6 +137,8 @@
       <SDLCheck>
       </SDLCheck>
       <MinimalRebuild />
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,6 +165,8 @@
       </SDLCheck>
       <MinimalRebuild>
       </MinimalRebuild>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,7 +176,8 @@
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);$(SIM_PLAT_ROOT)\Libraries\ModelEntities\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\Debug;$(MONGO_C_ROOT)\Debug\lib;$(MONGO_CXX_ROOT)\Debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -185,6 +190,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);$(OC_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -209,6 +216,8 @@
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);$(OC_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

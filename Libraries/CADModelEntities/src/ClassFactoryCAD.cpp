@@ -10,9 +10,6 @@
 
 EntityBase *ClassFactoryCAD::CreateEntity(const std::string &entityType)
 {
-	EntityBase *entity = ClassFactory::CreateEntity(entityType);
-	if (entity != nullptr) return entity;
-
 	if (entityType == "EntityBrep")
 	{
 		return new EntityBrep(0, nullptr, nullptr, nullptr, this, "");
@@ -34,6 +31,5 @@ EntityBase *ClassFactoryCAD::CreateEntity(const std::string &entityType)
 		return new EntityUnits(0, nullptr, nullptr, nullptr, this, "");
 	}
 
-	assert(0); // Unknown entity
-	return nullptr;
+	return ClassFactoryHandlerAbstract::CreateEntity(entityType);
 }

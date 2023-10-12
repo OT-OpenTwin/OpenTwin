@@ -10,7 +10,7 @@
 class __declspec(dllexport) EntityVis2D3D : public EntityContainer
 {
 public:
-	EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityVis2D3D();
 
 	virtual void addVisualizationNodes(void) override;

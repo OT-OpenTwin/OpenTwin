@@ -5,7 +5,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityResult1DData::EntityResult1DData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityResult1DData::EntityResult1DData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms,  factory, owner)
 {
 	

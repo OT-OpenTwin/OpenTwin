@@ -2,7 +2,7 @@
 
 #include <OpenTwinCommunication/ActionTypes.h>
 
-EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityContainer(ID,parent,obs,ms,factory,owner){}
 
 EntitySolverMonitor::~EntitySolverMonitor(){}

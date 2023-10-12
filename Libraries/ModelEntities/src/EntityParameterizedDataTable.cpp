@@ -1,7 +1,7 @@
 #include "EntityParameterizedDataTable.h"
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityParameterizedDataTable::EntityParameterizedDataTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityParameterizedDataTable::EntityParameterizedDataTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityResultTable<std::string>(ID,parent,mdl,ms,factory,owner)
 {
 }

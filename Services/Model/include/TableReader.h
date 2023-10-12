@@ -6,7 +6,7 @@
 class Model;
 class EntityObserver;
 class ModelState;
-class ClassFactory;
+class ClassFactoryHandler;
 
 class TableReader
 {
@@ -16,7 +16,7 @@ public:
 
 	void setModel(Model *mdl) { model = mdl; }
 
-	std::string readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	std::string readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, ClassFactoryHandler *factory, const std::string &owner);
 
 private:
 	bool readNextLine(std::ifstream &file, std::string &line);

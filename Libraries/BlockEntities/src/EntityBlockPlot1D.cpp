@@ -1,8 +1,8 @@
 #include "EntityBlockPlot1D.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
-EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactory* factory, const std::string& owner)
-	:EntityBlock(ID,parent,obs,ms,factory,owner)
+EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 }
 

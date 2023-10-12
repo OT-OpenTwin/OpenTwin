@@ -8,7 +8,7 @@
 class __declspec(dllexport) EntityUnits : public EntityBase
 {
 public:
-	EntityUnits(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityUnits(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }

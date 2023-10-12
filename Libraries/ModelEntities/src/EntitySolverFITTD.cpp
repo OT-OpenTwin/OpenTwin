@@ -4,7 +4,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntitySolverFITTD::EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntitySolverFITTD::EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntitySolver(ID, parent, obs, ms, factory, owner)
 {
 }

@@ -10,7 +10,7 @@
 #include "BRepTools_ShapeSet.hxx"
 #include "BRepTools.hxx"
 
-EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, factory, owner)
 {
 	transformMatrix = gp_Trsf();

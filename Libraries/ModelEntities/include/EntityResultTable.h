@@ -11,7 +11,7 @@ template <class T>
 class __declspec(dllexport) EntityResultTable : public EntityBase
 {
 public:
-	EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityResultTable();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

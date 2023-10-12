@@ -7,7 +7,7 @@
 class __declspec(dllexport) EntityResult3D : public EntityVis2D3D
 {
 public:
-	EntityResult3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityResult3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 
 	virtual std::string getClassName(void) override { return "EntityResult3D"; }
 	

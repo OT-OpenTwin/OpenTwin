@@ -11,7 +11,7 @@ class EntityMeshCartesianFace;
 class __declspec(dllexport) EntityMeshCartesianFaceList : public EntityBase
 {
 public:
-	EntityMeshCartesianFaceList(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityMeshCartesianFaceList(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityMeshCartesianFaceList();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

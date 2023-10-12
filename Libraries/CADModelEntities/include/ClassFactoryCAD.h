@@ -1,8 +1,15 @@
+/*****************************************************************//**
+ * \file   ClassFactoryCAD.h
+ * \brief  Should NEVER EVER get any attributes. Diamond 
+ * 
+ * \author Wagner
+ * \date   September 2023
+ *********************************************************************/
 #pragma once
 
-#include "ClassFactory.h"
+#include "ClassFactoryHandlerAbstract.h"
 
-class __declspec(dllexport) ClassFactoryCAD : public ClassFactory
+class __declspec(dllexport) ClassFactoryCAD : public ClassFactoryHandlerAbstract
 {
 public:
 	ClassFactoryCAD() {};

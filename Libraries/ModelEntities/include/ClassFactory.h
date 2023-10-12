@@ -1,15 +1,11 @@
 #pragma once
-#pragma warning(disable : 4251)
+#include "ClassFactoryHandlerAbstract.h"
 
-#include <string>
 class EntityBase;
 
-class _declspec(dllexport) ClassFactory
+class _declspec(dllexport) ClassFactory : public ClassFactoryHandlerAbstract
 {
 public:
-	ClassFactory() {};
-	virtual ~ClassFactory() {};
-
-	virtual EntityBase *CreateEntity(const std::string &entityType);
+	virtual EntityBase* CreateEntity(const std::string& className) override;
 };
 

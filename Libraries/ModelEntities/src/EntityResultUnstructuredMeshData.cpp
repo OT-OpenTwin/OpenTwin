@@ -2,7 +2,7 @@
 #include "../include/EntityResultUnstructuredMeshData.h"
 #include "DataBase.h"
 
-EntityResultUnstructuredMeshData::EntityResultUnstructuredMeshData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactory * factory, const std::string & owner)
+EntityResultUnstructuredMeshData::EntityResultUnstructuredMeshData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityBase(ID,parent,obs,ms,factory,owner)
 {}
 
@@ -60,7 +60,7 @@ void EntityResultUnstructuredMeshData::setData(long long numberPoints, long long
 	pointScalar = pointVector = cellScalar = cellVector = nullptr;
 }
 
-void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector, ClassFactory* factory)
+void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector, ClassFactoryHandler* factory)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 

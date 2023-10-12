@@ -7,7 +7,7 @@
 
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
-EntityBase::EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner) :
+EntityBase::EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	entityID(ID),
 	entityStorageVersion(0),
 	initiallyHidden(false),
@@ -232,7 +232,7 @@ ot::UID EntityBase::createEntityUID(void)
 	return getUidGenerator()->getUID();
 }
 
-EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactory* factory)
+EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 

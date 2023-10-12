@@ -15,7 +15,7 @@
 #include "OpenTwinCore/rJSON.h"
 
 class EntityBase;
-class ClassFactory;
+class ClassFactoryHandler;
 
 class  __declspec(dllexport) EntityObserver
 {
@@ -35,7 +35,7 @@ public:
 class  __declspec(dllexport) EntityBase
 {
 public:
-	EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler *factory, const std::string &owner);
 	virtual ~EntityBase();
 
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
@@ -80,7 +80,7 @@ public:
 	void setObserver(EntityObserver *obs) { observer = obs; };
 	EntityObserver *getObserver(void) { return observer; };
 
-	ClassFactory *getClassFactory(void) { return classFactory; };
+	ClassFactoryHandler *getClassFactory(void) { return classFactory; };
 
 	EntityProperties &getProperties(void) { return properties; };
 
@@ -119,7 +119,7 @@ protected:
 
 	ot::UID createEntityUID(void);
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
-	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactory* factory = nullptr);
+	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory = nullptr);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
 	void entityIsStored(void);
 
@@ -141,6 +141,6 @@ private:
 	EntityObserver     *observer;
 	bool			    isModified;
 	ModelState		   *modelState;
-	ClassFactory       *classFactory;
+	ClassFactoryHandler *classFactory;
 };
 

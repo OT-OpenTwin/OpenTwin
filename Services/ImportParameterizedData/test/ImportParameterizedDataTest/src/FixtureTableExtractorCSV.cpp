@@ -10,7 +10,7 @@ void FixtureTableExtractorCSV::LoadFileWithSemicolonRowDelimiter(std::string nam
 
 void FixtureTableExtractorCSV::LoadFileContent(std::string fullPath)
 {
-	DataSourceHandler sourceHandler("");
+	DataSourceHandler sourceHandler;
 	auto fileContent = sourceHandler.ExtractFileContentAsBinary(fullPath);
 	auto extractorCSV = new TableExtractorCSV();
 	extractorCSV->SetFileContent(fileContent);

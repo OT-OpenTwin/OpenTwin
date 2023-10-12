@@ -12,7 +12,7 @@ class __declspec(dllexport) EntityParameterizedDataPreviewTable : public EntityR
 {
 public:
 
-	EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual std::string getClassName(void) { return "EntityParameterizedDataPreviewTable"; };
 	
 	std::vector<std::pair<ot::UID, ot::UID>> GetLastStatusOfPreview() { return _displayedRanges; };

@@ -9,7 +9,7 @@
 class __declspec(dllexport) EntitySolverPHREEC : public EntitySolver
 {
 public:
-	EntitySolverPHREEC(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactory *factory, const std::string &owner);
+	EntitySolverPHREEC(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntitySolverPHREEC();
 
 	virtual std::string getClassName(void) override { return "EntitySolverPHREEC"; } ;
