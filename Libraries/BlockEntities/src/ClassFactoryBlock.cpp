@@ -24,6 +24,5 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 		return new EntityBlockPython(0, nullptr, nullptr, nullptr, this, "");
 	}
 	
-	assert(0); // Unknown entity
-	return nullptr;
+	return ClassFactoryHandlerAbstract::CreateEntity(entityType);
 }

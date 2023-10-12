@@ -11,8 +11,6 @@ public:
 	ClassFactoryModel();
 	virtual ~ClassFactoryModel();
 
-	virtual EntityBase *CreateEntity(const std::string &entityType) override;
-
 private:
 	ClassFactoryCAD* _cadEntityHandler = nullptr;
 	ClassFactoryBlock* _blockEntityHandler = nullptr;

@@ -22,10 +22,3 @@ ClassFactoryModel::~ClassFactoryModel()
 	if (_blockEntityHandler != nullptr) { delete _blockEntityHandler; _blockEntityHandler = nullptr; }
 	if (_generalEntityHandler != nullptr) { delete _generalEntityHandler; _generalEntityHandler = nullptr; }
 }
-
-EntityBase *ClassFactoryModel::CreateEntity(const std::string &entityType)
-{
-	EntityBase* entity = CreateEntity(entityType);
-	assert(entity != nullptr);
-	return entity;
-}
