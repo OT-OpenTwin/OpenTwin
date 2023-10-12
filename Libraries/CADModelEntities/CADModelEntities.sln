@@ -28,7 +28,6 @@ Global
 		{6AEAE82B-D76E-4F9D-B378-3357A476EEFC}.DebugTest|x64.ActiveCfg = Debug|x64
 		{6AEAE82B-D76E-4F9D-B378-3357A476EEFC}.DebugTest|x64.Build.0 = Debug|x64
 		{6AEAE82B-D76E-4F9D-B378-3357A476EEFC}.Release|x64.ActiveCfg = Release|x64
-		{6AEAE82B-D76E-4F9D-B378-3357A476EEFC}.Release|x64.Build.0 = Release|x64
 		{6AEAE82B-D76E-4F9D-B378-3357A476EEFC}.ReleaseTest|x64.ActiveCfg = Release|x64
 		{6AEAE82B-D76E-4F9D-B378-3357A476EEFC}.ReleaseTest|x64.Build.0 = Release|x64
 	EndGlobalSection
