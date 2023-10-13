@@ -81,4 +81,6 @@ private:
 
 
 	std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", " " };
+
+	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 };

@@ -2814,7 +2814,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2825,7 +2825,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2838,7 +2838,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2858,7 +2858,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
 				std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 				std::list<std::string> itemUids = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
@@ -2871,7 +2871,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2901,7 +2901,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::ownerFromJson(_doc);
+				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();

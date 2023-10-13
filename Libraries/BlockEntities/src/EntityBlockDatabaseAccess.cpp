@@ -25,6 +25,7 @@ void EntityBlockDatabaseAccess::addVisualizationNodes(void)
 		treeIcons.addToJsonDoc(&doc);
 
 		getObserver()->sendMessageToViewer(doc);
+		
 	}
 }
 
@@ -130,6 +131,11 @@ bool EntityBlockDatabaseAccess::SetVisibleParameter3(bool visible)
 		this->setModified();
 	}
 	return refresh;
+}
+
+ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
+{
+	return nullptr;
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()

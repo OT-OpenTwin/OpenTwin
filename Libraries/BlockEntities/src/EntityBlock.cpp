@@ -40,9 +40,11 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);
+	
 	storage.append(
 		bsoncxx::builder::basic::kvp("BlockID", static_cast<int64_t>(_blockID)),
-		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(_coordinate2DEntityID))
+		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(_coordinate2DEntityID)),
+		bsoncxx::builder::basic::kvp("OwnerID", static_cast<int32_t>(_owner.id()))
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
@@ -67,7 +69,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	_blockID = static_cast<ot::UID>(doc_view["BlockID"].get_int64());
 	_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
-
+	_owner.setId(static_cast<ot::serviceID_t>(doc_view["OwnerID"].get_int32()));
 	auto allOutgoingConnections = doc_view["Connections"].get_array();
 	for (auto& element : allOutgoingConnections.value)
 	{

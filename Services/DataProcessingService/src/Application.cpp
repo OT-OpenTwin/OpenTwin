@@ -129,23 +129,23 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		BlockItemManager blockItemManager;
 		//OT_rJSON_doc reqDoc = blockItemManager.CreateBlockItem(itemName, blockID, position);
 
-		ot::GraphicsScenePackage pckg("Data Processing");
+		//ot::GraphicsScenePackage pckg("Data Processing");
 
-		
-		ot::GraphicsItemCfg* itm = blockItemManager.GetBlockConfiguration(itemName);
-		itm->setPosition(position);
-		itm->setUid(std::to_string(blockID));
-		pckg.addItem(itm);
+		//
+		//ot::GraphicsItemCfg* itm = blockItemManager.GetBlockConfiguration(itemName);
+		//itm->setPosition(position);
+		//itm->setUid(std::to_string(blockID));
+		//pckg.addItem(itm);
 
-		OT_rJSON_createDOC(reqDoc);
-		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+		//OT_rJSON_createDOC(reqDoc);
+		//ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
 
-		OT_rJSON_createValueObject(pckgDoc);
-		pckg.addToJsonObject(reqDoc, pckgDoc);
-		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+		//OT_rJSON_createValueObject(pckgDoc);
+		//pckg.addToJsonObject(reqDoc, pckgDoc);
+		//ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
 
-		ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
-		m_uiComponent->sendMessage(true, reqDoc);
+		//ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+		//m_uiComponent->sendMessage(true, reqDoc);
 
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)

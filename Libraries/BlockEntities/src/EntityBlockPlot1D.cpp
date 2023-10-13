@@ -81,3 +81,8 @@ void EntityBlockPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view& do
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }
+
+ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
+{
+	return nullptr;
+}

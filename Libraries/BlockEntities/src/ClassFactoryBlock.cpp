@@ -7,11 +7,7 @@
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 {
-	if (entityType == "EntityBlock")
-	{
-		return new EntityBlock(0, nullptr, nullptr, nullptr, this, "");
-	}
-	else if (entityType == "EntityBlockPlot1D")
+	if (entityType == "EntityBlockPlot1D")
 	{
 		return new EntityBlockPlot1D(0, nullptr, nullptr, nullptr, this, "");
 	}

@@ -18,4 +18,5 @@ public:
 private:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 };

@@ -1,8 +1,10 @@
 #include "EntityBlockPython.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
+
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+	:EntityBlock(ID, parent, obs, ms, factory, owner), 
+	_colourTitle(ot::Color::Blue), _colourBackground(ot::Color::White), _position(0,0)
 {
 }
 
@@ -25,6 +27,22 @@ void EntityBlockPython::addVisualizationNodes(void)
 		treeIcons.addToJsonDoc(&doc);
 
 		getObserver()->sendMessageToViewer(doc);
+
+		ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
+		blockCfg->setUid(std::to_string(_blockID));
+		blockCfg->setPosition(_position);
+		ot::GraphicsScenePackage pckg("Data Processing");
+		pckg.addItem(blockCfg);
+
+		OT_rJSON_createDOC(reqDoc);
+		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+		_owner.addToJsonObject(reqDoc, reqDoc);
+
+		OT_rJSON_createValueObject(pckgDoc);
+		pckg.addToJsonObject(reqDoc, pckgDoc);
+		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+
+		getObserver()->sendMessageToViewer(reqDoc);
 	}
 }
 
@@ -40,4 +58,22 @@ std::string EntityBlockPython::getSelectedScript()
 	assert(scriptSelection != nullptr);
 
 	return scriptSelection->getValueName();
+}
+
+ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
+{
+	ot::GraphicsFlowItemCfg* block = new ot::GraphicsFlowItemCfg;
+
+	block->setTitleBackgroundColor(_colourTitle.rInt(), _colourTitle.gInt(), _colourTitle.bInt());
+	block->setBackgroundColor(_colourBackground.rInt(), _colourBackground.gInt(), _colourBackground.gInt());
+
+	block->addLeft("C0", "Parameter", ot::GraphicsFlowConnectorCfg::Square);
+	block->addRight("C0", "Output", ot::GraphicsFlowConnectorCfg::Square);
+
+	//if (_imageName != "")
+	//{
+	//	block->setBackgroundImagePath("default/" + _imageName);
+	//}
+
+	return block->createGraphicsItem("Python", "Python");
 }

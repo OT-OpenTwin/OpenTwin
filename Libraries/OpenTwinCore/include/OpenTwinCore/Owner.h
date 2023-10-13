@@ -52,6 +52,17 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+		//GlobalOwner(const GlobalOwner&) = delete; 
+		// Konkretes Problem: BlockEntities muss eine Nachricht an das UI schicken und Owner wird mittlerweile als Member vorrausgesetzt. 
+		// Darum muss es möglich sein einen Owner Member zu haben, welcher aber auch serializable ist. Aktuell ist nur GlobalOwner serializeable.
+		// Besser: Owner serializable und GlobalOwner nur als Singleton
+		// Außerdem: 
+		// - Mehrere Klassen in einer Header
+		// - Redundante Kommentare. An der Stelle addToJsonObject wäre gerade ein besserer Kommentar nötig
+		// - Overload von addToJsonObject mit nur dem Document?
+		// - Warum muss Owner ein Template sein?
+		// - Warum nicht von Serializable ableiten?
+		// 
 	//! @brief Owner type used for services
 	typedef Owner<ot::serviceID_t> ServiceOwner_t;
 
@@ -61,26 +72,26 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class OT_CORE_API_EXPORT GlobalOwner : public ot::Owner<ot::serviceID_t> {
+	class OT_CORE_API_EXPORT ServiceOwner : public ServiceOwner_t
+	{
 	public:
-		static GlobalOwner& instance(void);
+		ServiceOwner(ot::serviceID_t id = ot::invalidServiceID) : ServiceOwner_t(id) {};
 
-		//! @brief Retreives the global owner id from the provided json object
-		//! @param _object The json object containing the global owner id
-		//! @param _id Where to write data to
-		static bool getIdFromJson(OT_rJSON_val& _object, ot::serviceID_t& _id);
-
-		//! @brief Retreives the global owner from the provided json object
-		//! @param _object The json object containing the global owner id
-		static ot::ServiceOwner_t ownerFromJson(OT_rJSON_val& _object);
-
-		//! @brief Add the global owner id to the provided json object
-		//! @param _doc The json document
-		//! @param _object The object to add the data to
+		bool getIdFromJson(OT_rJSON_val& _object, ot::serviceID_t& _id);
+		ot::ServiceOwner_t ownerFromJson(OT_rJSON_val& _object);
 		void addToJsonObject(OT_rJSON_doc& _doc, OT_rJSON_val& _object);
 
 	private:
-		GlobalOwner() : Owner<ot::serviceID_t>(ot::invalidServiceID) {};
+		const std::string m_jsonMemberName = "goid_";
+	};
+
+	class OT_CORE_API_EXPORT GlobalOwner : public ServiceOwner {
+	public:
+		static GlobalOwner& instance(void);
+
+		
+	private:
+		GlobalOwner() : ServiceOwner() {};
 		virtual ~GlobalOwner() {};
 
 		GlobalOwner(const GlobalOwner&) = delete;
