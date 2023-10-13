@@ -1,6 +1,7 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 
 #include "Application.h"
 #include "ClassFactory.h"
@@ -27,11 +28,11 @@ ot::UID BlockEntityHandler::CreateBlockEntity(const std::string& editorName, con
 	
 	std::string entName = CreateNewUniqueTopologyName(_blockFolder+"/"+ editorName, blockName);
 	blockEntity->setName(entName);
-	
-	blockEntity->setEntityID(_modelComponent->createEntityUID());
+	blockEntity->SetOwnerServiceID(ot::OwnerServiceGlobal::instance().getId());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
+	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setBlockID(_modelComponent->createEntityUID());
-
+	blockEntity->SetGraphicsScenePackageName("Data Processing");
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->StoreToDataBase();

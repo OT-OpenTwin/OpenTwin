@@ -104,7 +104,7 @@ void EntityBase::StoreToDataBase(void)
 	resetModified();
 }
 
-void EntityBase::StoreToDataBase(ot::UID givenEntityVersion )
+void EntityBase::StoreToDataBase(ot::UID givenEntityVersion)
 {
 	if (!getModified()) return;
 

@@ -35,10 +35,14 @@ public:
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 	void SetOwnerServiceID(ot::serviceID_t& ownerID) { _owner.setId(ownerID); }
 	void SetOwnerServiceID(const ot::serviceID_t&& ownerID) { _owner.setId(ownerID); }
+	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
+
 protected:
 	ot::UID _blockID = 0;
 	ot::UID _coordinate2DEntityID = 0;
 	ot::OwnerService _owner;
+	std::string	_graphicsScenePackage;
+
 	std::list<ot::Connector> _connectors;
 	std::list<ot::BlockConnection> _outgoingConnections;
 

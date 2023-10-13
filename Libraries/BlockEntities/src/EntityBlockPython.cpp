@@ -4,7 +4,7 @@
 
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner), 
-	_colourTitle(ot::Color::Blue), _colourBackground(ot::Color::White), _position(0,0)
+	_colourTitle(ot::Color::Blue), _colourBackground(ot::Color::White)
 {
 }
 
@@ -28,10 +28,15 @@ void EntityBlockPython::addVisualizationNodes(void)
 
 		getObserver()->sendMessageToViewer(doc);
 
+		std::map<ot::UID, EntityBase*> entityMap;
+		EntityBase* entBase = readEntityFromEntityID(this, _coordinate2DEntityID, entityMap);
+		std::unique_ptr<EntityCoordinates2D> entCoordinate( dynamic_cast<EntityCoordinates2D*>(entBase));
+
 		ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
 		blockCfg->setUid(std::to_string(_blockID));
-		blockCfg->setPosition(_position);
-		ot::GraphicsScenePackage pckg("Data Processing");
+		blockCfg->setPosition(entCoordinate->getCoordinates());
+		
+		ot::GraphicsScenePackage pckg(_graphicsScenePackage);
 		pckg.addItem(blockCfg);
 
 		OT_rJSON_createDOC(reqDoc);
@@ -69,11 +74,6 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 
 	block->addLeft("C0", "Parameter", ot::GraphicsFlowConnectorCfg::Square);
 	block->addRight("C0", "Output", ot::GraphicsFlowConnectorCfg::Square);
-
-	//if (_imageName != "")
-	//{
-	//	block->setBackgroundImagePath("default/" + _imageName);
-	//}
 
 	return block->createGraphicsItem("Python", "Python");
 }

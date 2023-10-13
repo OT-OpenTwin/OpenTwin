@@ -17,12 +17,9 @@ private:
 	ot::Color _colourTitle;
 	ot::Color _colourBackground;
 
-
 	std::string _blockTitle = "";
 	std::string _blockName = "";
 	std::string _imageName = "";
-
-	ot::Point2DD _position;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 };
