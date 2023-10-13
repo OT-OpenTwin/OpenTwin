@@ -13,9 +13,6 @@
     <ClCompile Include="src\Logger.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Owner.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Point2D.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -61,6 +58,15 @@
     <ClCompile Include="src\ReturnMessage.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Owner.cpp">
+      <Filter>src\Owner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OwnerServiceGlobal.cpp">
+      <Filter>src\Owner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OwnerService.cpp">
+      <Filter>src\Owner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h">
@@ -88,9 +94,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenTwinCore\OTClassHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OpenTwinCore\Owner.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OpenTwinCore\PerformanceTests.h">
@@ -165,6 +168,18 @@
     <ClInclude Include="include\OpenTwinCore\JSONToVariableConverter.h">
       <Filter>include\VariableType</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\Owner.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\OwnerManagerTemplate.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\OwnerService.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\OwnerServiceGlobal.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -181,6 +196,12 @@
     </Filter>
     <Filter Include="src\Variable">
       <UniqueIdentifier>{cf7eae33-666c-468a-823f-a33dc893eda9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Owner">
+      <UniqueIdentifier>{786c0c6a-b16f-4378-920d-b23d5783c2bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Owner">
+      <UniqueIdentifier>{535507a4-a4fb-42be-9614-b9301bf40ec8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
@@ -153,7 +153,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
 	pckg.addToJsonObject(reqDoc, pckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 
-	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
@@ -194,7 +194,7 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	pckg.addToJsonObject(reqDoc, reqPckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 
-	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -223,7 +223,7 @@ std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _docum
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, editorName);
 
-	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -250,7 +250,7 @@ std::string Application:: createNewCircuitEditor(void)
 
 		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-		ot::GlobalOwner::instance().addToJsonObject(doc, doc); //Eigentlich nur die OT_JSON_MEMBER_GlobalOwnerId gewrapped
+		ot::OwnerServiceGlobal::instance().addToJsonObject(doc, doc); //Eigentlich nur die OT_JSON_MEMBER_OwnerServiceGlobalId gewrapped
 
 		std::string response;
 		std::string req = ot::rJSON::toJSON(doc);

@@ -1,7 +1,7 @@
 #include "BlockItemPython.h"
 #include "ExternalDependencies.h"
 #include "BlockEntityFactoryRegistrar.h"
-
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 
 
 BlockItemPython::BlockItemPython()
@@ -22,7 +22,7 @@ std::shared_ptr<EntityBlock> BlockItemPython::CreateBlockEntity()
 {
 	std::shared_ptr<EntityBlockPython> pythonEnt (new EntityBlockPython(0, nullptr, nullptr, nullptr, nullptr, ""));
 
-	pythonEnt->SetOwnerServiceID(ot::GlobalOwner::instance().id());
+	pythonEnt->SetOwnerServiceID(ot::OwnerServiceGlobal::instance().getId());
 	ExternalDependencies dependency;
 	pythonEnt->createProperties(ot::FolderNames::PythonScriptFolder,dependency.getPythonScriptFolderID());
 	pythonEnt->AddConnector(ot::Connector(ot::ConnectorType::Filter, "C0"));

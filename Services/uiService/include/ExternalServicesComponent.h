@@ -39,7 +39,7 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/Flags.h"
 #include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerService.h"
 #include "OpenTwinCommunication/UiTypes.h"
 
 class WebsocketClient;
@@ -225,7 +225,7 @@ public:
 	// Messaging
 
 	bool sendHttpRequest(RequestType operation, const std::string &url, rapidjson::Document &doc, std::string &response);
-	bool sendHttpRequest(RequestType operation, ot::ServiceOwner_t _service, rapidjson::Document &doc, std::string &response);
+	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, rapidjson::Document &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response);
 	bool sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender);

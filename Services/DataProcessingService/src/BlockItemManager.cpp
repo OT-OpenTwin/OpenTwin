@@ -9,7 +9,7 @@
 #include "BlockItemPython.h"
 
 #include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 #include "OpenTwinCommunication/Msg.h"
 #include "Application.h"
 #include "OpenTwinFoundation/UiComponent.h"
@@ -27,7 +27,7 @@ void BlockItemManager::OrderUIToCreateBlockPicker()
 
 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-	ot::GlobalOwner::instance().addToJsonObject(doc, doc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(doc, doc);
 
 	std::string response;
 	std::string req = ot::rJSON::toJSON(doc);
@@ -56,7 +56,7 @@ OT_rJSON_doc BlockItemManager::CreateBlockItem(const std::string blockName, ot::
 	pckg.addToJsonObject(reqDoc, pckgDoc);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
 
-	ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
 	return reqDoc;
 }
 

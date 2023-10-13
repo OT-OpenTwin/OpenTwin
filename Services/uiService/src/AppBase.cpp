@@ -2058,7 +2058,7 @@ ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
 	return m_graphicsPickerDock->pickerWidget();
 }
 
-void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::ServiceOwner_t _owner) {
+void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner) {
 	ot::GraphicsView* newEditor = new ot::GraphicsView;
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setDropsEnabled(true);
@@ -2070,7 +2070,7 @@ void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString&
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 }
 
-ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::ServiceOwner_t _owner) {
+ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::OwnerService _owner) {
 	if (m_graphicsViews.contains(_owner)) {
 		std::list<ot::GraphicsView*>& lst = m_graphicsViews[_owner];
 
@@ -2170,7 +2170,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
 
 	try {
-		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
+		ot::OwnerService owner(m_graphicsViews.findOwner(view).getId());
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
@@ -2210,7 +2210,7 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
 
 	try {
-		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
+		ot::OwnerService owner (m_graphicsViews.findOwner(view).getId());
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
@@ -2251,7 +2251,7 @@ void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 	
 	try {
-		ot::ServiceOwner_t owner = m_graphicsViews.findOwner(view);
+		ot::OwnerService owner(m_graphicsViews.findOwner(view).getId());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2292,7 +2292,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 
 	try {
 		ot::GraphicsView* view = scene->getGraphicsView();
-		auto owner = m_graphicsViews.findOwner(view);
+		ot::OwnerService owner(m_graphicsViews.findOwner(view).getId());
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {

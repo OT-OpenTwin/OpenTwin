@@ -10,7 +10,7 @@
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/rJSON.h"	            						// rapidjson wrapper
 #include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 
 #include "OpenTwinCommunication/ActionTypes.h"						// action member and types definition
 #include "OpenTwinCommunication/IpConverter.h"						// extract IP information from sender information
@@ -227,7 +227,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 		OT_rJSON_parseDOC(reply, response.c_str());
 		OT_rJSON_docCheck(reply);
 		m_application->setServiceID(ot::rJSON::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
-		ot::GlobalOwner::instance().setId(m_application->serviceID());
+		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 
@@ -327,7 +327,7 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 		OT_rJSON_parseDOC(reply, response.c_str());
 		OT_rJSON_docCheck(reply);
 		m_application->setServiceID(ot::rJSON::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
-		ot::GlobalOwner::instance().setId(m_application->serviceID());
+		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 

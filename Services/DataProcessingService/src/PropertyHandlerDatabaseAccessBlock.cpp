@@ -8,7 +8,7 @@
 #include "OpenTwinCommunication/Msg.h"
 #include "BlockItemDatabaseAccess.h"
 #include "ClassFactory.h"
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
@@ -318,7 +318,7 @@ void PropertyHandlerDatabaseAccessBlock::CreateUpdatedTypeProperty(EntityPropert
 void PropertyHandlerDatabaseAccessBlock::RefreshBlock(ot::GraphicsItemCfg* blockConfig)
 {
 	OT_rJSON_createDOC(deleteReqDoc);
-	ot::GlobalOwner::instance().addToJsonObject(deleteReqDoc, deleteReqDoc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(deleteReqDoc, deleteReqDoc);
 	ot::rJSON::add(deleteReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem);
 	ot::rJSON::add(deleteReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, "Data Processing");
 	std::list<std::string> uids{ blockConfig->uid()};
@@ -328,7 +328,7 @@ void PropertyHandlerDatabaseAccessBlock::RefreshBlock(ot::GraphicsItemCfg* block
 	ot::GraphicsScenePackage pckg("Data Processing");
 	pckg.addItem(blockConfig);
 	OT_rJSON_createDOC(createReqDoc);
-	ot::GlobalOwner::instance().addToJsonObject(createReqDoc, createReqDoc);
+	ot::OwnerServiceGlobal::instance().addToJsonObject(createReqDoc, createReqDoc);
 	ot::rJSON::add(createReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
 	OT_rJSON_createValueObject(pckgDoc);
 	pckg.addToJsonObject(createReqDoc, pckgDoc);

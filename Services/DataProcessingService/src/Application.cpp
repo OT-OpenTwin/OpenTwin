@@ -14,14 +14,13 @@
 
 // Open twin header
 #include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
-
 
 #include "BlockItemManager.h"
 #include "ClassFactory.h"
@@ -144,7 +143,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		//pckg.addToJsonObject(reqDoc, pckgDoc);
 		//ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
 
-		//ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+		//ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
 		//m_uiComponent->sendMessage(true, reqDoc);
 
 	}
@@ -170,7 +169,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		pckg.addToJsonObject(reqDoc, reqPckgObj);
 		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 
-		ot::GlobalOwner::instance().addToJsonObject(reqDoc, reqDoc);
+		ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
 		m_uiComponent->sendMessage(true, reqDoc);
 	}
 

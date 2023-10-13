@@ -44,7 +44,7 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(
 		bsoncxx::builder::basic::kvp("BlockID", static_cast<int64_t>(_blockID)),
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(_coordinate2DEntityID)),
-		bsoncxx::builder::basic::kvp("OwnerID", static_cast<int32_t>(_owner.id()))
+		bsoncxx::builder::basic::kvp("OwnerID", static_cast<int32_t>(_owner.getId()))
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();

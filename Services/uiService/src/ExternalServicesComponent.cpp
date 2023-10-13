@@ -28,7 +28,11 @@
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/Color.h"
-#include "OpenTwinCore/Owner.h"
+
+#include "OpenTwinCore/OwnerManagerTemplate.h"
+#include "OpenTwinCore/OwnerService.h"
+#include "OpenTwinCore/OwnerServiceGlobal.h"
+
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OpenTwinCommunication/IpConverter.h"
@@ -2814,7 +2818,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
+				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2825,7 +2829,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
+				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2838,7 +2842,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
+				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2858,7 +2862,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
+				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 				std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 				std::list<std::string> itemUids = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
@@ -2871,7 +2875,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
+				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -2901,7 +2905,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection) {
-				ot::ServiceOwner_t owner = ot::GlobalOwner::instance().ownerFromJson(_doc);
+				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
 				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
@@ -3023,10 +3027,10 @@ size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
 	return 0;
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::ServiceOwner_t _service, rapidjson::Document& doc, std::string& response) {
-	auto it = m_serviceIdMap.find(_service.id());
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::OwnerService _service, rapidjson::Document& doc, std::string& response) {
+	auto it = m_serviceIdMap.find(_service.getId());
 	if (it == m_serviceIdMap.end()) {
-		OT_LOG_E("Failed to find service with id \"" + std::to_string(_service.id()) + "\"");
+		OT_LOG_E("Failed to find service with id \"" + std::to_string(_service.getId()) + "\"");
 		return false;
 	}
 	return sendHttpRequest(operation, it->second->serviceURL(), doc, response);

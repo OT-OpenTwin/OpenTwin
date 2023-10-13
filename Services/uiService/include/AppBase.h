@@ -22,7 +22,9 @@
 #include <akWidgets/aWindow.h>
 
 #include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/Owner.h"
+#include "OpenTwinCore/OwnerService.h"
+#include "OpenTwinCore/OwnerManagerTemplate.h"
+
 #include "OpenTwinFoundation/UserCredentials.h"
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
@@ -449,9 +451,9 @@ public:
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
-	void createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::ServiceOwner_t _owner);
+	void createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner);
 
-	ot::GraphicsView * findGraphicsEditor(const std::string& _name, ot::ServiceOwner_t _owner);
+	ot::GraphicsView * findGraphicsEditor(const std::string& _name, ot::OwnerService _owner);
 
 	// ######################################################################################################################
 
