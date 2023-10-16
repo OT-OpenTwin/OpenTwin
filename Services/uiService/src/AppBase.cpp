@@ -2058,16 +2058,24 @@ ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
 	return m_graphicsPickerDock->pickerWidget();
 }
 
-void AppBase::createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner) {
-	ot::GraphicsView* newEditor = new ot::GraphicsView;
+ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner) {
+	ot::GraphicsView* newEditor = this->findGraphicsEditor(_name, _owner);
+	if (newEditor != nullptr) {
+		OT_LOG_D("Graphics Editor \"" + _name + "\" already exists. Skipping creation");
+		return newEditor;
+	}
+
+	newEditor = new ot::GraphicsView;
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setDropsEnabled(true);
 
-	AppBase::instance()->addTabToCentralView(_title, newEditor);
+	this->addTabToCentralView(_title, newEditor);
 	m_graphicsViews.store(_owner, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
+
+	return newEditor;
 }
 
 ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::OwnerService _owner) {
@@ -2078,8 +2086,16 @@ ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::Owne
 			if (v->graphicsViewName() == _name) return v;
 		}
 	}
-	OT_LOG_WAS("Graphics Editor \"" + _name + "\" does not exist for the given owner");
+
 	return nullptr;
+}
+
+ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner) {
+	ot::GraphicsView* v = this->findGraphicsEditor(_name, _owner);
+	if (v) return v;
+
+	OT_LOG_D("Graphics Editor \"" + _name + "\" does not exist for the given owner. Creating new empty editor");
+	return this->createNewGraphicsEditor(_name, _title, _owner);
 }
 
 // ######################################################################################################################

@@ -2837,7 +2837,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsNewEditorPackage pckg("", "");
 				pckg.setFromJsonObject(pckgObj);
 
-				AppBase::instance()->createEmptyGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), owner);
+				AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), owner);
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
@@ -2850,7 +2850,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsScenePackage pckg("");
 				pckg.setFromJsonObject(pckgObj);
 
-				ot::GraphicsView * editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
+				ot::GraphicsView * editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), owner);
 				
 				for (auto itm : pckg.items()) {
 					ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm);
@@ -2866,7 +2866,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 				std::list<std::string> itemUids = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
-				ot::GraphicsView* editor = AppBase::instance()->findGraphicsEditor(editorName, owner);
+				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), owner);
 
 				if (editor) {
 					for (auto u : itemUids) {
@@ -2883,7 +2883,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsConnectionPackage pckg;
 				pckg.setFromJsonObject(pckgObj);
 
-				ot::GraphicsView* editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
+				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), owner);
 				
 				for (auto c : pckg.connections()) {
 					ot::GraphicsItem* src = editor->getItem(c.fromUID);
@@ -2913,7 +2913,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsConnectionPackage pckg;
 				pckg.setFromJsonObject(pckgObj);
 
-				ot::GraphicsView* editor = AppBase::instance()->findGraphicsEditor(pckg.name(), owner);
+				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), owner);
 
 				for (auto c : pckg.connections()) {
 					editor->removeConnection(c.fromUID, c.fromConnectable, c.toUID, c.toConnectable);

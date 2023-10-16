@@ -451,9 +451,11 @@ public:
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
-	void createEmptyGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner);
+	ot::GraphicsView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner);
 
-	ot::GraphicsView * findGraphicsEditor(const std::string& _name, ot::OwnerService _owner);
+	ot::GraphicsView* findGraphicsEditor(const std::string& _name, ot::OwnerService _owner);
+
+	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner);
 
 	// ######################################################################################################################
 
