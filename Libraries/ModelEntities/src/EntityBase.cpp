@@ -19,9 +19,16 @@ EntityBase::EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, Mode
 	manageParentVisibility(true),
 	manageChildVisibility(true),
 	modelState(ms),
-	classFactory(factory),
 	owningService(owner)
 {
+	if (factory != nullptr && factory->GetChainRoot() != nullptr)
+	{
+		classFactory = factory->GetChainRoot();
+	}
+	else
+	{
+		classFactory = factory;
+	}
 }
 
 EntityBase::~EntityBase() 

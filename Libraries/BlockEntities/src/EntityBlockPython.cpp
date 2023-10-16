@@ -44,7 +44,7 @@ void EntityBlockPython::addVisualizationNodes(void)
 		_owner.addToJsonObject(reqDoc, reqDoc);
 
 		OT_rJSON_createValueObject(pckgDoc);
-		pckg.addToJsonObject(reqDoc, pckgDoc);
+		pckg.addToJsonObject(reqDoc, pckgDoc); 
 		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
 
 		getObserver()->sendMessageToViewer(reqDoc);

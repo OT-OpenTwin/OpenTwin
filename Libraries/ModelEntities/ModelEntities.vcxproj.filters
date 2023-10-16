@@ -44,6 +44,9 @@
     <Filter Include="Source Files\PropertyBundleDataHandle">
       <UniqueIdentifier>{99d1975b-1e86-4d98-9de8-f89fe1363ed3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ClassFactory">
+      <UniqueIdentifier>{1f88b2c5-9712-47c9-a76b-1441fd294116}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EntityProperties.h">
@@ -56,9 +59,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ClassFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityBase.h">
@@ -358,11 +358,14 @@
     <ClInclude Include="include\PropertyBundleVisUnstructuredScalarSurface.h">
       <Filter>Header Files\PropertyBundle</Filter>
     </ClInclude>
+    <ClInclude Include="include\ClassFactory.h">
+      <Filter>Header Files\ClassFactory</Filter>
+    </ClInclude>
     <ClInclude Include="include\ClassFactoryHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ClassFactory</Filter>
     </ClInclude>
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ClassFactory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,18 +20,19 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntityBlock"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
+	
 	void setBlockID(ot::UID blockID) { _blockID = blockID; }
-
 	ot::UID getBlockID() const { return _blockID; }
+	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
+	
 	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
 	std::list<ot::BlockConnection> getAllOutgoingConnections() const { return _outgoingConnections; }
-	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
 	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
 
-	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 	void SetOwnerServiceID(ot::serviceID_t& ownerID) { _owner.setId(ownerID); }
 	void SetOwnerServiceID(const ot::serviceID_t&& ownerID) { _owner.setId(ownerID); }

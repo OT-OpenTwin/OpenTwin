@@ -67,7 +67,7 @@ std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParame
 	}
 	else
 	{
-		OT_LOG_D("Subprocess not responding.");
+		OT_LOG_D("Subprocess not responding 2_3.");
 		Close();
 		RunWithNextFreeURL(_urlThisProcess);
 		ot::ReturnMessage message(ot::ReturnMessage::Failed, "Process not reachable."); //ToDo: Maybe better another trial. With max of 3 trials?
