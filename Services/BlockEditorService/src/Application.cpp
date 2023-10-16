@@ -27,6 +27,7 @@ Application * g_instance{ nullptr };
 #define EXAMPLE_NAME_Block1 "Alpha 1"
 #define EXAMPLE_NAME_Block2 "Beta 2"
 #define EXAMPLE_NAME_Block3 "Gamma 3"
+#define EXAMPLE_NAME_Block4 "Delta 4"
 
 namespace ottest {
 	static unsigned long long currentBlockUid = 0;
@@ -82,6 +83,76 @@ namespace ottest {
 
 		return flow.createGraphicsItem(_name, _name);
 	}
+
+	ot::GraphicsItemCfg* createTestItem1(const std::string& _name) {
+		ot::GraphicsVBoxLayoutItemCfg* root = new ot::GraphicsVBoxLayoutItemCfg;
+		root->setName(_name);
+		root->setTitle(_name);
+
+		ot::GraphicsHBoxLayoutItemCfg* top = new ot::GraphicsHBoxLayoutItemCfg;
+		top->setName(_name + "_top");
+
+		ot::GraphicsGridLayoutItemCfg* mid = new ot::GraphicsGridLayoutItemCfg(2, 3);
+		mid->setName(_name + "_mid");
+
+		ot::GraphicsHBoxLayoutItemCfg* bot = new ot::GraphicsHBoxLayoutItemCfg;
+		bot->setName(_name + "_bot");
+
+		root->addChildItem(top);
+		root->addChildItem(mid);
+		root->addChildItem(bot);
+
+		ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
+		r1->setName(_name + "_r1");
+		r1->setSize(ot::Size2D(10, 10));
+
+		ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
+		r2->setName(_name + "_r2");
+		r2->setSize(ot::Size2D(15, 15));
+
+		ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
+		r3->setName(_name + "_r3");
+		r3->setSize(ot::Size2D(5, 5));
+
+		ot::GraphicsRectangularItemCfg* r4 = new ot::GraphicsRectangularItemCfg;
+		r4->setName(_name + "_r4");
+		r4->setSize(ot::Size2D(20, 20));
+
+		ot::GraphicsRectangularItemCfg* r5 = new ot::GraphicsRectangularItemCfg;
+		r5->setName(_name + "_r5");
+		r5->setSize(ot::Size2D(12, 12));
+
+		ot::GraphicsRectangularItemCfg* r6 = new ot::GraphicsRectangularItemCfg;
+		r6->setName(_name + "_r6");
+		r6->setSize(ot::Size2D(12, 12));
+
+		ot::GraphicsRectangularItemCfg* r7 = new ot::GraphicsRectangularItemCfg;
+		r7->setName(_name + "_r7");
+		r7->setSize(ot::Size2D(12, 12));
+
+		ot::GraphicsRectangularItemCfg* r8 = new ot::GraphicsRectangularItemCfg;
+		r8->setName(_name + "_r8");
+		r8->setSize(ot::Size2D(8, 8));
+		r8->setAlignment(ot::AlignLeft);
+
+		top->addStrech(1);
+		top->addChildItem(r1);
+		top->addStrech(1);
+
+		mid->addChildItem(0, 0, r2);
+		mid->addChildItem(0, 1, r3);
+		mid->addChildItem(1, 1, r4);
+		mid->addChildItem(1, 2, r5);
+
+		bot->addChildItem(r6);
+		bot->addStrech(1);
+		bot->addChildItem(r7);
+
+		root->addChildItem(r8);
+
+		return root;
+	}
+
 
 }
 
@@ -142,6 +213,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	if (itemName == EXAMPLE_NAME_Block1) itm = ottest::createTestBlock1(EXAMPLE_NAME_Block1);
 	else if (itemName == EXAMPLE_NAME_Block2) itm = ottest::createTestBlock2(EXAMPLE_NAME_Block2);
 	else if (itemName == EXAMPLE_NAME_Block3) itm = ottest::createTestBlock3(EXAMPLE_NAME_Block3);
+	else if (itemName == EXAMPLE_NAME_Block4) itm = ottest::createTestItem1(EXAMPLE_NAME_Block4);
 	else {
 		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
 		return OT_ACTION_RETURN_VALUE_FAILED;
@@ -265,6 +337,7 @@ std::string Application::createEmptyTestEditor(void) {
 		a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
 		a->addChildCollection(a2);
 		a2->addItem(ottest::createTestBlock3(EXAMPLE_NAME_Block3));
+		a2->addItem(ottest::createTestItem1(EXAMPLE_NAME_Block4));
 		pckg.addCollection(a);
 
 		OT_rJSON_createDOC(doc);
