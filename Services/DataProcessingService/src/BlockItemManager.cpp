@@ -25,7 +25,7 @@ void BlockItemManager::OrderUIToCreateBlockPicker()
 	OT_rJSON_createValueObject(pckgObj);
 	graphicsEditorPackage->addToJsonObject(doc, pckgObj);
 
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor);
+	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 	ot::OwnerServiceGlobal::instance().addToJsonObject(doc, doc);
 

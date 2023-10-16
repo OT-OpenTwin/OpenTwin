@@ -2828,7 +2828,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateEmptyGraphicsEditor) {
+			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor) {
 				ot::OwnerService owner = ot::OwnerServiceGlobal::instance().ownerFromJson(_doc);
 
 				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
