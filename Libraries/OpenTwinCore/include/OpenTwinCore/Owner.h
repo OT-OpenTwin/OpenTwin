@@ -45,20 +45,4 @@ namespace ot {
 	private:
 		T m_id;
 	};
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Konkretes Problem: BlockEntities muss eine Nachricht an das UI schicken und Owner wird mittlerweile als Member vorrausgesetzt. 
-		// Darum muss es möglich sein einen Owner Member zu haben, welcher aber auch serializable ist. Aktuell ist nur GlobalOwner serializeable.
-		// Besser: Owner serializable und GlobalOwner nur als Singleton
-		// Außerdem: 
-		// - Redundante Kommentare. An der Stelle addToJsonObject wäre gerade ein besserer Kommentar nötig
-		// - Overload von addToJsonObject mit nur dem Document?
-		// - Warum muss Owner ein Template sein?
-		// - Warum nicht von Serializable ableiten?
-		// 
 }

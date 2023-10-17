@@ -65,6 +65,7 @@ extern "C" {
 		try
 		{
 			MinimalSubService::INSTANCE().Startup(_urlOwn, _urlMasterService);
+			OT_LOG_D("Starting Initialization of PythonExecution subservice");
 			actionHandler = new ActionHandler(MinimalSubService::INSTANCE().getMasterServiceURl());
 			return 0;
 		}
