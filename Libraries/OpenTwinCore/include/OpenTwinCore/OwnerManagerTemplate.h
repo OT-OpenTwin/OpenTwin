@@ -17,7 +17,9 @@ namespace ot
 		//! @brief Will clean up the memory while removing all entries
 		void free(void) {
 			for (auto it : this->m_data) {
-				for (auto obj : *it.second) { delete obj.second; };
+				for (auto obj : *it.second) {
+					if (obj) delete obj;
+				}
 				delete it.second;
 			}
 			this->m_data.clear();

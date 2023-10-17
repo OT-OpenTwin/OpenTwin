@@ -3434,13 +3434,14 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 	}
 }
 
-void ExternalServicesComponent::closeProject(bool saveChanges) {
+void ExternalServicesComponent::closeProject(bool _saveChanges) {
 	try {
 		UserSettings::instance()->clear();
 
 		AppBase * app{ AppBase::instance() };
 
-		std::cout << "Closing project: Start" << std::endl;
+		OT_LOG_D("Closing project { name = \"" + app->getCurrentProjectName() + "\"; SaveChanges = " + (_saveChanges ? "True" : "False"));
+
 		std::string projectName = app->getCurrentProjectName();
 		if (projectName.length() == 0) { return; }
 
@@ -3455,14 +3456,14 @@ void ExternalServicesComponent::closeProject(bool saveChanges) {
 
 		std::string response;
 		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, response)) {
-			assert(0); // Failed to send 
+			OT_LOG_EA("Failed to send shutdown session request to LSS");
 		}
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			assert(0); // ERROR
+			OT_LOG_EAS("Invalid response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
+			OT_LOG_WAS("Invalid response: " + response);
 		}
 
 #ifdef OT_USE_GSS

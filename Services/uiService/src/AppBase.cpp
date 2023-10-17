@@ -1742,6 +1742,7 @@ void AppBase::switchToTab(const std::string &menu) {
 }
 
 void AppBase::closeAllViewerTabs(void) {
+	m_graphicsViews.free();
 	uiAPI::tabWidget::closeAllTabs(m_tabViewWidget);
 }
 
