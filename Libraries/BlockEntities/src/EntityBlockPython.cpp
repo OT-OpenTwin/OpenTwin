@@ -31,6 +31,7 @@ void EntityBlockPython::addVisualizationNodes(void)
 		std::map<ot::UID, EntityBase*> entityMap;
 		EntityBase* entBase = readEntityFromEntityID(this, _coordinate2DEntityID, entityMap);
 		std::unique_ptr<EntityCoordinates2D> entCoordinate( dynamic_cast<EntityCoordinates2D*>(entBase));
+		entCoordinate->setObserver(nullptr);
 
 		ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
 		blockCfg->setUid(std::to_string(_blockID));
