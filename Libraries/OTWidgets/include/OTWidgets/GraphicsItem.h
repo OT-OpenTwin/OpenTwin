@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTGui/GuiTypes.h"
+#include "OTGui/Margins.h"
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Flags.h"
 
@@ -62,6 +63,8 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	//! @brief Base class for all OpenTwin GraphicsItems
+	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
 	public:
 		enum GraphicsItemEvent {
@@ -112,6 +115,9 @@ namespace ot {
 		void handleItemMoved(void);
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
+		//! @brief Will expand the size according to the margins
+		QSizeF handleGetGraphicsItemSizeHint(const QSizeF& _sizeHint) const;
+
 		// ###############################################################################################################################################
 
 		// Getter / Setter
@@ -140,9 +146,6 @@ namespace ot {
 		//! @brief Removes the collection from the list (item will not be destroyed)
 		void forgetConnection(GraphicsConnectionItem* _connection);
 
-		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) { m_requestedSize = _size; };
-		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
-
 		void setGraphicsItemAlignment(ot::Alignment _align) { m_alignment = _align; };
 		ot::Alignment graphicsItemAlignment(void) const { return m_alignment; };
 
@@ -154,21 +157,24 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 	protected:
-		QRectF calculateDrawRect(const QRectF& _rect) const;
+		//! @brief Calculates the draw rect for the item
+		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
+		//! @param _innerMinSize Item minimum size
+		//! @param _innerMaxSize Item maximum size
+		//QRectF calculateInnerRect(const QSizeF& _innerMinSize, const QSizeF& _innerMaxSize) const;
 
 	private:
 		bool m_hasHover;
 		std::string m_uid;
 		std::string m_name;
 		ot::Alignment m_alignment;
+		ot::MarginsD m_margins;
 		GraphicsItemFlag m_flags;
 
-		QPointF m_moveStartPt;
-		GraphicsItem* m_parent;
-		GraphicsItemDrag* m_drag;
-		GraphicsScene* m_scene;
-
-		QSizeF m_requestedSize;
+		QPointF m_moveStartPt; //! @brief Item move origin
+		GraphicsItem* m_parent; //! @brief Parent graphics item
+		GraphicsItemDrag* m_drag; //! @brief Drag instance
+		GraphicsScene* m_scene; //! @brief Graphics scene
 
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
@@ -284,8 +290,6 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
 		void setRectangleSize(const QSizeF& _size);
 		const QSizeF& rectangleSize(void) const { return m_size; };

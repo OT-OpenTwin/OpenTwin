@@ -19,12 +19,14 @@ ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _ow
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
 
 void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
+	OTAssertNullptr(m_owner);
+	m_owner->handleMousePressEvent(_event);
 	QGraphicsWidget::mousePressEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
+	OTAssertNullptr(m_owner);
+	m_owner->handleMouseReleaseEvent(_event);
 	QGraphicsWidget::mouseReleaseEvent(_event);
 }
 
@@ -33,6 +35,7 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 }
 
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	OTAssertNullptr(m_owner);
 	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
 		m_owner->handleItemMoved();
 	}

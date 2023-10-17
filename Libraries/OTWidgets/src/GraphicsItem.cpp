@@ -67,7 +67,7 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsItem::GraphicsItem() : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
-	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_requestedSize(10., 10.)
+	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter)
 {
 
 }
@@ -85,6 +85,7 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_uid = _cfg->uid();
 	m_name = _cfg->name();
 	m_alignment = _cfg->alignment();
+	m_margins = _cfg->margins();
 	return true;
 }
 
@@ -119,6 +120,10 @@ ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	if (m_parent) return m_parent->getRootItem();
 	return this;
 }
+
+// ###############################################################################################################################################
+
+// Event handler
 
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
@@ -164,14 +169,10 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	}
 }
 
-void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) _painter->fillRect(this->getQGraphicsItem()->boundingRect(), Qt::GlobalColor::green);
-}
-
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
 	this->raiseEvent(ot::GraphicsItem::ItemMoved);
-	
+
 	// For root items we notify the view
 	if (m_parent == nullptr) {
 		otAssert(!m_uid.empty(), "Root items should always have a valid uid");
@@ -179,6 +180,20 @@ void ot::GraphicsItem::handleItemMoved(void) {
 		m_scene->getGraphicsView()->notifyItemMoved(this);
 	}
 }
+
+void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) {
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), Qt::GlobalColor::green);
+	}
+}
+
+QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(const QSizeF& _sizeHint) const {
+	return _sizeHint + QSizeF(m_margins.left() + m_margins.right(), m_margins.top() + m_margins.bottom());
+}
+
+// ###############################################################################################################################################
+
+// Getter / Setter
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
 	m_connections.push_back(_connection);
@@ -208,49 +223,50 @@ void ot::GraphicsItem::removeGraphicsItemEventHandler(ot::GraphicsItem* _handler
 
 // Protected: Helper
 
-QRectF ot::GraphicsItem::calculateDrawRect(const QRectF& _rect) const {
-	// Size
-	QSizeF s(_rect.size());
-	if (s.width() > m_requestedSize.width()) { s.setWidth(m_requestedSize.width()); }
-	if (s.height() > m_requestedSize.height()) { s.setHeight(m_requestedSize.height()); }
+/*
+QRectF ot::GraphicsItem::calculateInnerRect(const QSizeF& _innerMinSize, const QSizeF& _innerMaxSize) const {
+	// Calculate size
+	QSizeF minSize = _innerMinSize + QSizeF(m_margins.left() + m_margins.right(), m_margins.top() + m_margins.bottom());
+	QSizeF maxSize = _innerMaxSize + QSizeF(m_margins.left() + m_margins.right(), m_margins.top() + m_margins.bottom());
+	QSizeF s = minSize.expandedTo(m_geometryRect.size()).boundedTo(maxSize);
 
 	// Position
 	QPointF p; // Top left coord
 	switch (m_alignment)
 	{
 	case ot::AlignCenter:
-		p.setX(_rect.x() + ((_rect.width() / 2.) - (s.width() / 2.)));
-		p.setY(_rect.y() + ((_rect.height() / 2.) - (s.height() / 2.)));
+		p.setX(m_geometryRect.x() + ((m_geometryRect.width() / 2.) - (s.width() / 2.)));
+		p.setY(m_geometryRect.y() + ((m_geometryRect.height() / 2.) - (s.height() / 2.)));
 		break;
 	case ot::AlignTop:
-		p.setX(_rect.x() + ((_rect.width() / 2.) - (s.width() / 2.)));
-		p.setY(_rect.y());
+		p.setX(m_geometryRect.x() + ((m_geometryRect.width() / 2.) - (s.width() / 2.)));
+		p.setY(m_geometryRect.y());
 		break;
 	case ot::AlignTopRight:
-		p.setX(_rect.x() + (_rect.width() - s.width()));
-		p.setY(_rect.y());
+		p.setX(m_geometryRect.x() + (m_geometryRect.width() - s.width()));
+		p.setY(m_geometryRect.y());
 		break;
 	case ot::AlignRight:
-		p.setX(_rect.x() + (_rect.width() - s.width()));
-		p.setY(_rect.y() + ((_rect.height() / 2.) - (s.height() / 2.)));
+		p.setX(m_geometryRect.x() + (m_geometryRect.width() - s.width()));
+		p.setY(m_geometryRect.y() + ((m_geometryRect.height() / 2.) - (s.height() / 2.)));
 		break;
 	case ot::AlignBottomRight:
-		p.setX(_rect.x() + (_rect.width() - s.width()));
-		p.setY(_rect.y() + (_rect.height() - s.height()));
+		p.setX(m_geometryRect.x() + (m_geometryRect.width() - s.width()));
+		p.setY(m_geometryRect.y() + (m_geometryRect.height() - s.height()));
 		break;
 	case ot::AlignBottom:
-		p.setX(_rect.x() + ((_rect.width() / 2.) - (s.width() / 2.)));
-		p.setY(_rect.y() + (_rect.height() - s.height()));
+		p.setX(m_geometryRect.x() + ((m_geometryRect.width() / 2.) - (s.width() / 2.)));
+		p.setY(m_geometryRect.y() + (m_geometryRect.height() - s.height()));
 		break;
 	case ot::AlignBottomLeft:
-		p.setX(_rect.x());
-		p.setY(_rect.y() + (_rect.height() - s.height()));
+		p.setX(m_geometryRect.x());
+		p.setY(m_geometryRect.y() + (m_geometryRect.height() - s.height()));
 		break;
 	case ot::AlignLeft:
-		p.setX(_rect.x());
-		p.setY(_rect.y() + ((_rect.height() / 2.) - (s.height() / 2.)));
+		p.setX(m_geometryRect.x());
+		p.setY(m_geometryRect.y() + ((m_geometryRect.height() / 2.) - (s.height() / 2.)));
 	case ot::AlignTopLeft:
-		p = _rect.topLeft();
+		p = m_geometryRect.topLeft();
 		break;
 	default:
 		OT_LOG_EA("Unknown alignment provided");
@@ -259,6 +275,7 @@ QRectF ot::GraphicsItem::calculateDrawRect(const QRectF& _rect) const {
 
 	return QRectF(p, s);
 }
+*/
 
 void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 	for (auto itm : m_eventHandler) {
@@ -431,7 +448,7 @@ void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, 
 		else {
 			for (auto itm : m_items) {
 				if (itm.item != _sender && !itm.isMaster) {
-					itm.item->setGraphicsItemRequestedSize(mas->getQGraphicsItem()->boundingRect().size());
+					//itm.item->setGraphicsItemRequestedSize(mas->getQGraphicsItem()->boundingRect().size());
 				}
 			}
 		}
@@ -536,12 +553,6 @@ void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _eve
 void ot::GraphicsRectangularItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleMouseReleaseEvent(_event);
 	QGraphicsItem::mouseReleaseEvent(_event);
-}
-
-void ot::GraphicsRectangularItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
-	if (_size == m_size) return;
-	this->prepareGeometryChange();
-	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
 }
 
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
