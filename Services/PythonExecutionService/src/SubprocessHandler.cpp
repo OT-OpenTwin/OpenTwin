@@ -15,28 +15,15 @@
 SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
 	:_urlThisProcess(urlThisService)
 {
-	std::string envName = "OPENTWIN_DEV_ROOT";
-	const char* envValue = ot::os::getEnvironmentVariable(envName.c_str());
-
-	std::string baseDirectory;
-	if (envValue == "")
-	{
-		baseDirectory = ot::os::getExecutablePath();
-		OT_LOG_D("OPENTWIN_DEV_ROOT env was not found. Using executable path: " + baseDirectory);
-	}
-	else
-	{
-		baseDirectory = envValue;
-		OT_LOG_D("Found OPENTWIN_DEV_ROOT env: " + baseDirectory);
-	}
+	std::string baseDirectory = ot::os::getExecutablePath();
 	
 	if (baseDirectory == "")
 	{
-		throw std::exception("Failed to determine launcherpath");
+		throw std::exception("Failed to determine executable path.");
 	}
 
-	_launcherPath = baseDirectory + "\\Deployment\\open_twin.exe";
-	_subprocessPath = baseDirectory + "\\Deployment\\PythonExecution.dll";
+	_launcherPath = baseDirectory + "\\open_twin.exe";
+	_subprocessPath = baseDirectory + "\\PythonExecution.dll";
 	
 	OT_rJSON_createDOC(pingDoc);
 	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
@@ -59,7 +46,7 @@ std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParame
 		std::string messageBody =  ot::rJSON::toJSON(scriptsAndParameter);
 		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, messageBody, response, 0))
 		{
-			OT_LOG_D("Failed tot execute python script");
+			OT_LOG_D("Failed to execute python script");
 			assert(0); //What now?
 		}
 		OT_LOG_D("Python script successfully executed");
@@ -67,7 +54,7 @@ std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParame
 	}
 	else
 	{
-		OT_LOG_D("Subprocess not responding 2_3.");
+		OT_LOG_D("Subprocess not responding");
 		Close();
 		RunWithNextFreeURL(_urlThisProcess);
 		ot::ReturnMessage message(ot::ReturnMessage::Failed, "Process not reachable."); //ToDo: Maybe better another trial. With max of 3 trials?
@@ -104,6 +91,9 @@ void SubprocessHandler::RunWithNextFreeURL(const std::string& urlThisService)
 	std::unique_lock<std::mutex> lock(mtx);
 
 	int counter = 0;
+	OT_LOG_D("Trying to start subprocess with launcher path:" + _launcherPath);
+	OT_LOG_D("Trying to start subprocess with subprocess path:" + _subprocessPath);
+
 	while(true)
 	{
 		std::string urlSubprocess = urlThisService.substr(0, urlThisService.find(':') + 1) + std::to_string(_startPort + counter);
