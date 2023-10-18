@@ -169,7 +169,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		pckg.addToJsonObject(reqDoc, reqPckgObj);
 		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 
-		ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
+		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+
 		m_uiComponent->sendMessage(true, reqDoc);
 	}
 

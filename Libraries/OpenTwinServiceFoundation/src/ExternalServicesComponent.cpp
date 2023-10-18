@@ -120,16 +120,16 @@ void ot::intern::ExternalServicesComponent::deleteInstance(void) {
 // ##########################################################################################################################################
 
 int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _application, const std::string& _localDirectoryServiceURL, const std::string& _ownURL) {
-	OT_LOG_D("Starting foundation startup");
+	OT_LOG_D("Foundation startup...");
 
 	if (m_componentState != WaitForStartup) {
-		otAssert(0, "Component startup already performed");
+		OT_LOG_EA("Component startup already performed");
 		return -30;
 	}
 
 	m_application = _application;
 	if (m_application == nullptr) {
-		otAssert(0, "nullptr provided");
+		OT_LOG_EA("nullptr as application instance provided");
 		return -1;
 	}
 
@@ -139,7 +139,7 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 
 	m_componentState = WaitForInit;
 
-	OT_LOG_D("Foundation startup completed (ServiceURL = \"" + m_application->serviceURL() + "\"; LDS = \"" + m_application->directoryServiceURL() + "\")");
+	OT_LOG_D("Foundation startup completed { \"ServiceName\": \"" + m_application->serviceName() + "\"; \"ServiceType\": \"" + m_application->serviceType() + "\"; \"ServiceURL\": \"" + m_application->serviceURL() + "\"; \"LDS\": \"" + m_application->directoryServiceURL() + "\" }");
 
 	// Run the init checker thread to ensure that the service will shutdown if the lds died during the startup of this service
 	std::thread t{ initChecker };

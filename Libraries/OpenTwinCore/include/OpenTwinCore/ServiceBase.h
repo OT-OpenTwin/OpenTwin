@@ -12,6 +12,7 @@
 // Open Twin header
 #include "OpenTwinCore/CoreAPIExport.h"
 #include "OpenTwinCore/CoreTypes.h"
+#include "OpenTwinCore/BasicServiceInformation.h"
 
 // C++ header
 #include <string>
@@ -99,6 +100,8 @@ namespace ot {
 
 		//! @brief Return the site ID
 		std::string siteId(void) const { return m_siteId; };
+
+		BasicServiceInformation getBasicServiceInformation(void) const { return BasicServiceInformation(m_serviceName, m_serviceType); };
 
 	protected:
 		serviceID_t				m_serviceID;		//! @brief Service ID

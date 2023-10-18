@@ -32,12 +32,12 @@ namespace ot {
 		bool operator != (const Owner<T>& _other) const { return m_id != _other.m_id; };
 		bool operator < (T _id) const { return m_id <= _id; };
 		bool operator < (const Owner<T>& _other) const { return m_id < _other.m_id; };
-		bool operator <= (T _id) const { return m_id <= _id; };
-		bool operator <= (const Owner<T>& _other) const { return m_id <= _other.m_id; };
-		bool operator > (T _id) const { return m_id > _id; };
-		bool operator > (const Owner<T>& _other) const { return m_id > _other.m_id; };
-		bool operator >= (T _id) const { return m_id >= _id; };
-		bool operator >= (const Owner<T>& _other) const { return m_id >= _other.m_id; };
+		//bool operator <= (T _id) const { return m_id <= _id; };
+		//bool operator <= (const Owner<T>& _other) const { return m_id <= _other.m_id; };
+		//bool operator > (T _id) const { return m_id > _id; };
+		//bool operator > (const Owner<T>& _other) const { return m_id > _other.m_id; };
+		//bool operator >= (T _id) const { return m_id >= _id; };
+		//bool operator >= (const Owner<T>& _other) const { return m_id >= _other.m_id; };
 
 		void setId(const T& _id) { m_id = _id; };
 		T getId(void) const { return m_id; };

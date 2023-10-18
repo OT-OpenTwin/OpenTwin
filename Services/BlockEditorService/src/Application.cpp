@@ -12,7 +12,6 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/OwnerServiceGlobal.h"
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
@@ -229,7 +228,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	pckg.addToJsonObject(reqDoc, pckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 
-	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
@@ -260,7 +259,8 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	pckg.addToJsonObject(reqDoc, reqPckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 
-	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -288,7 +288,8 @@ std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _docum
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, editorName);
 
-	ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -346,7 +347,7 @@ std::string Application::createEmptyTestEditor(void) {
 
 		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-		ot::OwnerServiceGlobal::instance().addToJsonObject(doc, doc); //Eigentlich nur die OT_JSON_MEMBER_OwnerServiceGlobalId gewrapped
+		this->getBasicServiceInformation().addToJsonObject(doc, doc);
 
 		std::string response;
 		std::string req = ot::rJSON::toJSON(doc);

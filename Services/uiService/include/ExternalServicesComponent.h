@@ -40,6 +40,7 @@
 #include "OpenTwinCore/Flags.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/OwnerService.h"
+#include "OpenTwinCore/BasicServiceInformation.h"
 #include "OpenTwinCommunication/UiTypes.h"
 
 class WebsocketClient;
@@ -226,6 +227,7 @@ public:
 
 	bool sendHttpRequest(RequestType operation, const std::string &url, rapidjson::Document &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, rapidjson::Document &doc, std::string &response);
+	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, rapidjson::Document &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response);
 	bool sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender);
@@ -334,7 +336,8 @@ private:
 	ak::UID getServiceUiUid(ot::ServiceBase * _service);
 
 	ot::ServiceBase * getService(ot::serviceID_t _serviceID);
-	ot::ServiceBase * getServiceFromName(const std::string & _serviceName);
+	ot::ServiceBase * getService(const ot::BasicServiceInformation& _serviceInfo);
+	ot::ServiceBase * getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
 	// #################################################################
 

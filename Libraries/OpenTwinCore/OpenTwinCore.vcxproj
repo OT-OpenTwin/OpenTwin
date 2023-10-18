@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BasicServiceInformation.cpp" />
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\VariableToJSONConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OpenTwinCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OpenTwinCore\Color.h" />
     <ClInclude Include="include\OpenTwinCore\CoreAPIExport.h" />
     <ClInclude Include="include\OpenTwinCore\EncodingConverter_ISO88591ToUTF8.h" />

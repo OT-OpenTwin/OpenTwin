@@ -2059,10 +2059,10 @@ ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
 	return m_graphicsPickerDock->pickerWidget();
 }
 
-ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner) {
-	ot::GraphicsView* newEditor = this->findGraphicsEditor(_name, _owner);
+ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
+	ot::GraphicsView* newEditor = this->findGraphicsEditor(_name, _serviceInfo);
 	if (newEditor != nullptr) {
-		OT_LOG_D("Graphics Editor \"" + _name + "\" already exists. Skipping creation");
+		OT_LOG_D("Graphics Editor already exists. Skipping creation. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 		return newEditor;
 	}
 
@@ -2071,17 +2071,19 @@ ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, con
 	newEditor->setDropsEnabled(true);
 
 	this->addTabToCentralView(_title, newEditor);
-	m_graphicsViews.store(_owner, newEditor);
+	m_graphicsViews.store(_serviceInfo, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 
+	OT_LOG_D("Editor created { \"Editor.Name\": \"" + _name  + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+
 	return newEditor;
 }
 
-ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::OwnerService _owner) {
-	if (m_graphicsViews.contains(_owner)) {
-		std::list<ot::GraphicsView*>& lst = m_graphicsViews[_owner];
+ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo) {
+	if (m_graphicsViews.contains(_serviceInfo)) {
+		std::list<ot::GraphicsView*>& lst = m_graphicsViews[_serviceInfo];
 
 		for (auto v : lst) {
 			if (v->graphicsViewName() == _name) return v;
@@ -2091,12 +2093,12 @@ ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::Owne
 	return nullptr;
 }
 
-ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner) {
-	ot::GraphicsView* v = this->findGraphicsEditor(_name, _owner);
+ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
+	ot::GraphicsView* v = this->findGraphicsEditor(_name, _serviceInfo);
 	if (v) return v;
 
-	OT_LOG_D("Graphics Editor \"" + _name + "\" does not exist for the given owner. Creating new empty editor");
-	return this->createNewGraphicsEditor(_name, _title, _owner);
+	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
 }
 
 // ######################################################################################################################
@@ -2187,10 +2189,11 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
 
 	try {
-		ot::OwnerService owner(m_graphicsViews.findOwner(view).getId());
+		
+		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2227,10 +2230,10 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
 
 	try {
-		ot::OwnerService owner (m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2268,9 +2271,9 @@ void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const
 	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
 	
 	try {
-		ot::OwnerService owner(m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2309,10 +2312,10 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 
 	try {
 		ot::GraphicsView* view = scene->getGraphicsView();
-		ot::OwnerService owner(m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
 		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, owner, doc, response)) {
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_EA("Failed to send http request");
 			return;
 		}

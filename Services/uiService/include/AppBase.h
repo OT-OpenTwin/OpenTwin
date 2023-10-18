@@ -451,11 +451,11 @@ public:
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
-	ot::GraphicsView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner);
+	ot::GraphicsView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
 
-	ot::GraphicsView* findGraphicsEditor(const std::string& _name, ot::OwnerService _owner);
+	ot::GraphicsView* findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo);
 
-	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::OwnerService _owner);
+	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
 
 	// ######################################################################################################################
 
@@ -614,7 +614,7 @@ private:
 	std::string					m_currentStateWindow;
 	std::string					m_currentStateColorStyle;
 
-	ot::ServiceOwnerManagerTemplate<ot::GraphicsView> m_graphicsViews;
+	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsView> m_graphicsViews;
 
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;

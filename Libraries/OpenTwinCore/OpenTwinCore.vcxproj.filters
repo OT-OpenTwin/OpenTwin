@@ -67,6 +67,9 @@
     <ClCompile Include="src\OwnerService.cpp">
       <Filter>src\Owner</Filter>
     </ClCompile>
+    <ClCompile Include="src\BasicServiceInformation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenTwinCore\Color.h">
@@ -179,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="include\OpenTwinCore\OwnerServiceGlobal.h">
       <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\BasicServiceInformation.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
