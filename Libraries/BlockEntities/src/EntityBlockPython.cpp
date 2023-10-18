@@ -31,7 +31,8 @@ void EntityBlockPython::addVisualizationNodes(void)
 		std::map<ot::UID, EntityBase*> entityMap;
 		EntityBase* entBase = readEntityFromEntityID(this, _coordinate2DEntityID, entityMap);
 		std::unique_ptr<EntityCoordinates2D> entCoordinate( dynamic_cast<EntityCoordinates2D*>(entBase));
-		entCoordinate->setObserver(nullptr);
+		if(entCoordinate->getObserver() != nullptr){ entCoordinate->setObserver(nullptr); }
+			
 
 		ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
 		blockCfg->setUid(std::to_string(_blockID));
@@ -49,6 +50,26 @@ void EntityBlockPython::addVisualizationNodes(void)
 		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
 
 		getObserver()->sendMessageToViewer(reqDoc);
+
+
+		ot::GraphicsConnectionPackage connectionPckg;
+
+		// Store connection information
+		for (auto& connection : _outgoingConnections) {
+			ot::GraphicsConnectionPackage::ConnectionInfo connectionItem;
+			connectionItem.fromConnectable = connection.getConnectorOrigin();
+			connectionItem.toConnectable = connection.getConnectorDestination();
+			connectionItem.fromUID = std::to_string(getBlockID());
+			connectionItem.toUID = std::to_string( connection.getIDDestination());
+		}
+
+		// Request UI to add connections
+		OT_rJSON_createDOC(connectionReqDoc);
+		ot::rJSON::add(connectionReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+
+		OT_rJSON_createValueObject(reqConnectionPckgObj);
+		connectionPckg.addToJsonObject(connectionReqDoc, reqConnectionPckgObj);
+		ot::rJSON::add(connectionReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqConnectionPckgObj);
 	}
 }
 
