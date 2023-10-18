@@ -131,6 +131,12 @@ private:
 	QAction *					m_exportButton;
 };
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 class LogVisualizationItemViewDialog : public QDialog {
 	Q_OBJECT
 public:
@@ -147,13 +153,19 @@ public:
 
 private slots:
 	void slotRecenter(void);
+	void slotDisplayMessageText(int _state);
 
 private:
+	std::string findJsonSyntax(std::string _str);
+
+	ot::LogMessage m_msg;
+
 	QShortcut* m_closeShortcut;
 	QShortcut* m_recenterShortcut;
 	QVBoxLayout* m_centralLayout;
 	QGridLayout* m_dataLayout;
 	QVBoxLayout* m_bigVLayout;
+	QHBoxLayout* m_messageTitleLayout;
 	QHBoxLayout* m_buttonLayout;
 
 	QLabel* m_timeL;
@@ -164,6 +176,7 @@ private:
 	QLineEdit* m_senderName;
 	QLabel* m_messageTypeL;
 	QLineEdit* m_messageType;
+	QCheckBox* m_findMessageSyntax;
 
 	QLabel* m_functionL;
 	QLineEdit* m_function;

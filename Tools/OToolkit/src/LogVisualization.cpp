@@ -685,48 +685,56 @@ bool LogVisualization::disconnectFromLogger(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMessage& _msg, size_t _index, QWidget* _parent) : QDialog(_parent) {
+LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMessage& _msg, size_t _index, QWidget* _parent) 
+	: QDialog(_parent), m_msg(_msg)
+{
 	// Create layouts
 	m_centralLayout = new QVBoxLayout;
 	m_dataLayout = new QGridLayout;
 	m_bigVLayout = new QVBoxLayout;
+	m_messageTitleLayout = new QHBoxLayout;
 	m_buttonLayout = new QHBoxLayout;
 
 	// Create controls
 	m_timeL = new QLabel("Time (Global):");
-	m_time = new QLineEdit(QString::fromStdString(_msg.globalSystemTime()));
+	m_time = new QLineEdit(QString::fromStdString(m_msg.globalSystemTime()));
 	m_time->setReadOnly(true);
 
 	m_timeLocalL = new QLabel("Time (Local):");
-	m_timeLocal = new QLineEdit(QString::fromStdString(_msg.localSystemTime()));
+	m_timeLocal = new QLineEdit(QString::fromStdString(m_msg.localSystemTime()));
 	m_timeLocal->setReadOnly(true);
 
 	m_senderNameL = new QLabel("Sender:");
-	m_senderName = new QLineEdit(QString::fromStdString(_msg.serviceName()));
+	m_senderName = new QLineEdit(QString::fromStdString(m_msg.serviceName()));
 	m_senderName->setReadOnly(true);
 
 	m_messageTypeL = new QLabel("Type:");
-	m_messageType = new QLineEdit(LogVisualization::logMessageTypeString(_msg));
+	m_messageType = new QLineEdit(LogVisualization::logMessageTypeString(m_msg));
 	m_messageType->setReadOnly(true);
 
 	m_functionL = new QLabel("Function:");
-	m_function = new QLineEdit(QString::fromStdString(_msg.functionName()));
+	m_function = new QLineEdit(QString::fromStdString(m_msg.functionName()));
 	m_function->setReadOnly(true);
 
+	m_findMessageSyntax = new QCheckBox("Syntax check");
+	m_findMessageSyntax->setToolTip("If active, a syntax check on the message will be performed.\n"
+		"If for example a JSON document was found inside the message, the json document will be displayed indented.");
+
+
 	m_messageL = new QLabel("Message text:");
-	m_message = new QPlainTextEdit(QString::fromStdString(_msg.text()));
+	m_message = new QPlainTextEdit(QString::fromStdString(m_msg.text()));
 	m_message->setReadOnly(true);
 
 	m_okButton = new QPushButton("Ok");
 	m_okButton->setMinimumWidth(100);
-	connect(m_okButton, &QPushButton::clicked, this, &LogVisualizationItemViewDialog::close);
+	this->connect(m_okButton, &QPushButton::clicked, this, &LogVisualizationItemViewDialog::close);
 
 	// Create shortcuts
 	m_closeShortcut = new QShortcut(QKeySequence("Esc"), this);
-	connect(m_closeShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::close);
+	this->connect(m_closeShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::close);
 
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this);
-	connect(m_recenterShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::slotRecenter);
+	this->connect(m_recenterShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::slotRecenter);
 
 	// Setup layouts
 	this->setLayout(m_centralLayout);
@@ -742,10 +750,15 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	m_dataLayout->addWidget(m_senderName, 2, 1);
 	m_dataLayout->addWidget(m_messageTypeL, 3, 0);
 	m_dataLayout->addWidget(m_messageType, 3, 1);
+	m_dataLayout->addWidget(m_findMessageSyntax, 4, 1);
+
+	m_messageTitleLayout->addWidget(m_messageL, 0);
+	m_messageTitleLayout->addStretch(1);
+	m_messageTitleLayout->addWidget(m_findMessageSyntax, 0);
 
 	m_bigVLayout->addWidget(m_functionL, 0);
 	m_bigVLayout->addWidget(m_function, 0);
-	m_bigVLayout->addWidget(m_messageL, 0);
+	m_bigVLayout->addLayout(m_messageTitleLayout, 0);
 	m_bigVLayout->addWidget(m_message, 1);
 
 	m_buttonLayout->addStretch(1);
@@ -753,20 +766,44 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	m_buttonLayout->addStretch(1);
 
 	// Setup window
-	setWindowTitle("MessageViewer (Message #" + QString::number(_index) + ") | OToolkit");
-	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
-	setWindowIcon(AppBase::instance()->windowIcon());
+	this->setWindowTitle("MessageViewer (Message #" + QString::number(_index) + ") | OToolkit");
+	this->setWindowFlag(Qt::WindowContextHelpButtonHint, false);
+	this->setWindowIcon(AppBase::instance()->windowIcon());
 
-	setMinimumSize(400, 300);
-	setFocusPolicy(Qt::ClickFocus);
+	this->setMinimumSize(400, 300);
+	this->setFocusPolicy(Qt::ClickFocus);
 	
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	move(s.value("LogVisualizationItemViewDialog.X", 0).toInt(), s.value("LogVisualizationItemViewDialog.Y", 0).toInt());
-	resize(s.value("LogVisualizationItemViewDialog.W", 800).toInt(), s.value("LogVisualizationItemViewDialog.H", 600).toInt());
+	this->move(s.value("LogVisualizationItemViewDialog.X", 0).toInt(), s.value("LogVisualizationItemViewDialog.Y", 0).toInt());
+	this->resize(s.value("LogVisualizationItemViewDialog.W", 800).toInt(), s.value("LogVisualizationItemViewDialog.H", 600).toInt());
+	m_findMessageSyntax->setChecked(s.value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
+
+	this->slotDisplayMessageText((int)m_findMessageSyntax->checkState());
+
+	// Connect signals
+	this->connect(m_findMessageSyntax, &QCheckBox::stateChanged, this, &LogVisualizationItemViewDialog::slotDisplayMessageText);
 }
 
 LogVisualizationItemViewDialog::~LogVisualizationItemViewDialog() {
 	
+}
+
+void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
+	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	s.setValue("LogVisualizationItemViewDialog.X", pos().x());
+	s.setValue("LogVisualizationItemViewDialog.Y", pos().y());
+	s.setValue("LogVisualizationItemViewDialog.W", size().width());
+	s.setValue("LogVisualizationItemViewDialog.H", size().height());
+	s.setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
+}
+
+void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {
+	if (!geometry().contains(_event->globalPos())) {
+		close();
+	}
+	else {
+		QDialog::mousePressEvent(_event);
+	}
 }
 
 bool LogVisualizationItemViewDialog::eventFilter(QObject* _obj, QEvent* _event)
@@ -794,25 +831,54 @@ bool LogVisualizationItemViewDialog::event(QEvent* _event)
 	return QDialog::event(_event); // Pass the event to the base class
 }
 
-void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {
-	if (!geometry().contains(_event->globalPos())) {
-		close();
-	}
-	else {
-		QDialog::mousePressEvent(_event);
-	}
-}
-
 void LogVisualizationItemViewDialog::slotRecenter(void) {
 	this->move(0, 0);
 	this->resize(800, 600);
 }
 
-void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	s.setValue("LogVisualizationItemViewDialog.X", pos().x());
-	s.setValue("LogVisualizationItemViewDialog.Y", pos().y());
-	s.setValue("LogVisualizationItemViewDialog.W", size().width());
-	s.setValue("LogVisualizationItemViewDialog.H", size().height());
+void LogVisualizationItemViewDialog::slotDisplayMessageText(int _state) {
+	if (m_findMessageSyntax->isChecked()) {
+		std::string res;
+		std::string str = m_msg.text();
 
+		// JSON check
+		str = this->findJsonSyntax(str);
+
+		// Check if the buffer string contains information
+		if (!str.empty()) {
+			res.append(str);
+		}
+
+		// Display result string
+		m_message->setPlainText(QString::fromStdString(res));
+	}
+	else {
+		m_message->setPlainText(QString::fromStdString(m_msg.text()));
+	}
+}
+
+std::string LogVisualizationItemViewDialog::findJsonSyntax(std::string _str) {
+	std::string ret;
+
+	size_t ixBegin = _str.find('{');
+	while (ixBegin != std::string::npos) {
+		size_t ixEnd = _str.find('}', ixBegin);
+		if (ixEnd != std::string::npos) {
+			ret.append(_str.substr(0, ixBegin - 1));
+			std::string json = _str.substr(ixBegin, ixEnd - ixBegin);
+			QJsonParseError err;
+			QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(json), &err);
+			if (err.error == QJsonParseError::NoError) {
+				json = '\n' + doc.toJson(QJsonDocument::Indented).toStdString() + '\n';
+			}
+			ret.append(json);
+			_str = _str.substr(ixEnd + 1);
+		}
+	}
+
+	// Check if the buffer string contains information
+	if (!_str.empty()) {
+		ret.append(_str);
+	}
+	return ret;
 }
