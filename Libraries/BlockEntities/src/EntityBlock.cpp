@@ -44,7 +44,8 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(
 		bsoncxx::builder::basic::kvp("BlockID", static_cast<int64_t>(_blockID)),
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(_coordinate2DEntityID)),
-		bsoncxx::builder::basic::kvp("OwnerID", static_cast<int32_t>(_owner.getId())),
+		bsoncxx::builder::basic::kvp("ServiceName", _owner.serviceName()),
+		bsoncxx::builder::basic::kvp("ServiceType", _owner.serviceType()),
 		bsoncxx::builder::basic::kvp("GraphicPackageName", _graphicsScenePackage)
 	);
 
@@ -71,7 +72,8 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	
 	_blockID = static_cast<ot::UID>(doc_view["BlockID"].get_int64());
 	_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
-	_owner.setId(static_cast<ot::serviceID_t>(doc_view["OwnerID"].get_int32()));
+	_owner.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
+	_owner.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	_graphicsScenePackage = doc_view["GraphicPackageName"].get_utf8().value.data();
 
 	auto allOutgoingConnections = doc_view["Connections"].get_array();

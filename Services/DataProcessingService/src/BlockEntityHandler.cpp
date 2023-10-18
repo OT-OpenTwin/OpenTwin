@@ -1,7 +1,6 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/OwnerServiceGlobal.h"
 
 #include "Application.h"
 #include "ClassFactory.h"
@@ -28,7 +27,7 @@ ot::UID BlockEntityHandler::CreateBlockEntity(const std::string& editorName, con
 	
 	std::string entName = CreateNewUniqueTopologyName(_blockFolder+"/"+ editorName, blockName);
 	blockEntity->setName(entName);
-	blockEntity->SetOwnerServiceID(ot::OwnerServiceGlobal::instance().getId());
+	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setBlockID(_modelComponent->createEntityUID());

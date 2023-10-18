@@ -2,6 +2,7 @@
 #include "EntityBase.h"
 #include "OpenTwinCore/CoreTypes.h"
 #include "OpenTwinCore/Point2D.h"
+#include "OpenTwinCore/BasicServiceInformation.h"
 #include "EntityCoordinates2D.h"
 
 #include "Connector.h"
@@ -11,7 +12,6 @@
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
-#include "OpenTwinCore/OwnerService.h"
 
 class __declspec(dllexport) EntityBlock : public EntityBase
 {
@@ -34,14 +34,13 @@ public:
 	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
 
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
-	void SetOwnerServiceID(ot::serviceID_t& ownerID) { _owner.setId(ownerID); }
-	void SetOwnerServiceID(const ot::serviceID_t&& ownerID) { _owner.setId(ownerID); }
+	void SetServiceInformation(const ot::BasicServiceInformation& _info) { _owner = _info; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
 
 protected:
 	ot::UID _blockID = 0;
 	ot::UID _coordinate2DEntityID = 0;
-	ot::OwnerService _owner;
+	ot::BasicServiceInformation _owner;
 	std::string	_graphicsScenePackage;
 
 	std::list<ot::Connector> _connectors;
