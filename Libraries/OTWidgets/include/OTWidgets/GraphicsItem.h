@@ -120,7 +120,9 @@ namespace ot {
 		//! @brief Will expand the size according to the margins
 		QSizeF handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const;
 
-		QRectF handleGetGraphicsItemBoundingRect(const QRectF& _rect, const QSizeF& _maxSize) const;
+		//! @brief Calculates the actual bounding rect including margins and requested size.
+		//! @param _rect The default item rect (the size should be the prefferred item size)
+		QRectF handleGetGraphicsItemBoundingRect(const QRectF& _rect) const;
 
 		// ###############################################################################################################################################
 
@@ -159,6 +161,9 @@ namespace ot {
 		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
 		QSizeF applyGraphicsItemMargins(const QSizeF& _size) const;
+
+		void setGraphicsItemRequestedSize(const QSizeF& _size);
+		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -212,6 +217,8 @@ namespace ot {
 		virtual void prepareGraphicsItemGeometryChange(void) override;
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
+
+		virtual QRectF boundingRect(void) const override;
 
 		virtual void setGeometry(const QRectF& rect) override;
 
@@ -382,6 +389,8 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
+		virtual QRectF boundingRect(void) const override;
+
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void setGeometry(const QRectF& rect) override;
@@ -422,6 +431,8 @@ namespace ot {
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual void setGeometry(const QRectF& _rect) override;
 
+		virtual QRectF boundingRect(void) const override;
+
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
@@ -453,6 +464,8 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual void setGeometry(const QRectF& _rect) override;
+
+		virtual QRectF boundingRect(void) const override;
 
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 

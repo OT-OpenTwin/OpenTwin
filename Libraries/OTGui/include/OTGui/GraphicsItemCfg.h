@@ -85,6 +85,12 @@ namespace ot {
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
 		const Point2DD& position(void) { return m_pos; };
 
+		void setMinimumSize(const ot::Size2DD& _size) { m_minSize = _size; };
+		const ot::Size2DD& minimumSize(void) const { return m_minSize; };
+
+		void setMaximumSize(const ot::Size2DD& _size) { m_maxSize = _size; };
+		const ot::Size2DD& maximumSize(void) const { return m_maxSize; };
+
 		//! @brief Set item margins
 		//! @param _top Top margin
 		//! @param _right Right margin
@@ -113,6 +119,9 @@ namespace ot {
 		std::string m_tile;
 		std::string m_uid;
 		Point2DD m_pos;
+
+		Size2DD m_minSize;
+		Size2DD m_maxSize;
 
 		MarginsD m_margins;
 		GraphicsItemFlag m_flags;

@@ -23,6 +23,8 @@
 #define OT_JSON_MEMBER_Radius "Radius" //          <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                      ^O^^^^^^   //.:## > ##:.//^^  3
 #define OT_JSON_MEMBER_RadiusX "RadiusX" //         <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                           ^O^^^^^^   //.:## > ##:.//^^   3
 #define OT_JSON_MEMBER_RadiusY "RadiusY"
+#define OT_JSON_MEMBER_MinSize "Size.Min"
+#define OT_JSON_MEMBER_MaxSize "Size.Max"
 #define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_IsMaster "IsMaster"
 #define OT_JSON_MEMBER_TextFont "TextFont"
@@ -34,7 +36,7 @@
 
 #define OT_JSON_VALUE_Connectable "Connectable"
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter) {}
+ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX) {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
@@ -42,6 +44,14 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 	OT_rJSON_createValueObject(posObj);
 	m_pos.addToJsonObject(_document, posObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Position, posObj);
+
+	OT_rJSON_createValueObject(minSizeObj);
+	m_minSize.addToJsonObject(_document, minSizeObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_MinSize, minSizeObj);
+
+	OT_rJSON_createValueObject(maxSizeObj);
+	m_maxSize.addToJsonObject(_document, maxSizeObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_MaxSize, maxSizeObj);
 
 	OT_rJSON_createValueObject(marginObj);
 	m_margins.addToJsonObject(_document, marginObj);
@@ -63,6 +73,8 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Position, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_MinSize, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_MaxSize, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Alignment, String);
@@ -74,9 +86,13 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 
 	OT_rJSON_val posObj = _object[OT_JSON_MEMBER_Position].GetObject();
 	OT_rJSON_val marginObj = _object[OT_JSON_MEMBER_Margin].GetObject();
+	OT_rJSON_val minSizeObj = _object[OT_JSON_MEMBER_MinSize].GetObject();
+	OT_rJSON_val maxSizeObj = _object[OT_JSON_MEMBER_MaxSize].GetObject();
 
 	m_pos.setFromJsonObject(posObj);
 	m_margins.setFromJsonObject(marginObj);
+	m_minSize.setFromJsonObject(minSizeObj);
+	m_maxSize.setFromJsonObject(maxSizeObj);
 
 	m_flags = NoFlags;
 	OT_rJSON_val flagArr = _object[OT_JSON_MEMBER_Flags].GetArray();
