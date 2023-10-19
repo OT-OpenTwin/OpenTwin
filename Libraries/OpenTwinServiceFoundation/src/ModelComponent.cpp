@@ -776,6 +776,29 @@ void ot::components::ModelComponent::updatePropertyGrid()
 	}
 }
 
+void ot::components::ModelComponent::updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions)
+{
+	OT_rJSON_createDOC(requestDoc);
+	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateTopologyEntity);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, topologyEntityIDs);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, topologyEntityVersions);
+
+	// Send the command
+	std::string response;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+		std::cout << "ERROR: Failed to add entities to model: Failed to send HTTP request" << std::endl;
+		return;
+	}
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		std::cout << "ERROR: Failed to add entities to model: " << response << std::endl;
+		return;
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		std::cout << "ERROR: Failed to add entities to model: " << response << std::endl;
+		return;
+	}
+}
+
 // #########################################################################################################
 
 // Entity management helper functions

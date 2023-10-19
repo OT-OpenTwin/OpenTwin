@@ -167,7 +167,7 @@ void ModelState::modifyEntityParent(ModelStateEntity::EntityID entityID, ModelSt
 }
 
 // Remove entity from model state
-void ModelState::removeEntity(ModelStateEntity::EntityID entityID)
+void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren)
 {
 	//std::cout << "remove entity: " << entityID << std::endl;
 
@@ -185,17 +185,21 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID)
 	}
 
 	// Now remove the children of the entity
-	if (entityChildrenList.count(entityID) > 0)
+	if (considerChildren)
 	{
-		std::list<ModelStateEntity::EntityID> children = entityChildrenList[entityID];
 
-		for (auto child : children)
+		if (entityChildrenList.count(entityID) > 0)
 		{
-			removeEntity(child);
-		}
+			std::list<ModelStateEntity::EntityID> children = entityChildrenList[entityID];
 
-		// And finally remove the children information for the current entity
-		entityChildrenList.erase(entityID);
+			for (auto child : children)
+			{
+				removeEntity(child);
+			}
+
+			// And finally remove the children information for the current entity
+			entityChildrenList.erase(entityID);
+		}
 	}
 }
 

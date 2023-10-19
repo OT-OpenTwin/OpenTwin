@@ -74,7 +74,7 @@ public:
 	void modifyEntityParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID);
 
 	// Remove entity from model state
-	void removeEntity(ModelStateEntity::EntityID entityID);
+	void removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren = true);
 
 	// Determine the current modelStateVersion (the last saved one)
 	std::string getModelStateVersion(void) { return currentModelStateVersion; };

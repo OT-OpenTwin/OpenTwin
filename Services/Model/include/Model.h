@@ -42,7 +42,7 @@ public:
 
 	ot::UID				createEntityUID(void);
 	void			addEntityToMap(EntityBase *entity);
-	void			removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency);
+	void			removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren = true);
 	void		    removeEntityWithChildrenFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, std::list<EntityBase*> &removedEntities);
 
 
@@ -163,6 +163,7 @@ public:
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const std::string &properties, bool updateProperties);
+	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
 	std::list<std::string> getListOfFolderItems(const std::string &folder);
@@ -284,6 +285,8 @@ private:
 	size_t getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geometryEntities);
 	std::list<EntityBase*> getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities);
 	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, std::string>& entityProperties);
+	void addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible);
+
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer               *entityRoot;

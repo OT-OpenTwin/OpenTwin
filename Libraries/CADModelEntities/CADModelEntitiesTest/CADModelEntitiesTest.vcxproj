@@ -57,7 +57,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);$(OC_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>

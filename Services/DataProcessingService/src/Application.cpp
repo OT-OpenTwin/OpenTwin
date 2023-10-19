@@ -162,16 +162,15 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		}
 
 		// Request UI to add connections
-		OT_rJSON_createDOC(reqDoc);
-		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+		//OT_rJSON_createDOC(reqDoc);
+		//ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
 
-		OT_rJSON_createValueObject(reqPckgObj);
-		pckg.addToJsonObject(reqDoc, reqPckgObj);
-		ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+		//OT_rJSON_createValueObject(reqPckgObj);
+		//pckg.addToJsonObject(reqDoc, reqPckgObj);
+		//ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
 
-		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
 
-		m_uiComponent->sendMessage(true, reqDoc);
+		//this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
 	}
 
 	return ""; // Return empty string if the request does not expect a return

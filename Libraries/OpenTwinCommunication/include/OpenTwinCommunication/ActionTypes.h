@@ -81,6 +81,7 @@
 #define OT_ACTION_CMD_MODEL_GetListOfFolderItems "Model.FolderItems.GetList"
 #define OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType "Model.FolderIDs.GetListOfType"
 #define OT_ACTION_CMD_MODEL_AddEntities "Model.Entities.Add"
+#define OT_ACTION_CMD_MODEL_UpdateTopologyEntity "Model.Entities.Topology.Update"
 #define OT_ACTION_CMD_MODEL_DeleteEntity "Model.Entities.Delete"
 #define OT_ACTION_CMD_MODEL_AddGeometryOperation "Model.Geometryoperation.Add"
 #define OT_ACTION_CMD_MODEL_GetEntityInformationFromID "Model.Entities.GetInformationFromID"

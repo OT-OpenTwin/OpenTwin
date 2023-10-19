@@ -319,6 +319,7 @@
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(Qt_DEFINES_);%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -344,6 +345,7 @@
       <SDLCheck>
       </SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -367,6 +369,7 @@
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -390,6 +393,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

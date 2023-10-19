@@ -77,7 +77,6 @@ void EntityBase::StoreToDataBase(void)
 	assert(globalUidGenerator != nullptr);
 	if (globalUidGenerator == nullptr) return;
 
-	//setEntityStorageVersion(getEntityStorageVersion() + 1);
 	entityStorageVersion = globalUidGenerator->getUID();
 
 	entityIsStored();

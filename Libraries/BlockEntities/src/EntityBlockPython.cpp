@@ -30,8 +30,8 @@ void EntityBlockPython::addVisualizationNodes(void)
 
 		std::map<ot::UID, EntityBase*> entityMap;
 		EntityBase* entBase = readEntityFromEntityID(this, _coordinate2DEntityID, entityMap);
+		if(entBase->getObserver() != nullptr){ entBase->setObserver(nullptr); }
 		std::unique_ptr<EntityCoordinates2D> entCoordinate( dynamic_cast<EntityCoordinates2D*>(entBase));
-		if(entCoordinate->getObserver() != nullptr){ entCoordinate->setObserver(nullptr); }
 			
 
 		ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
@@ -70,6 +70,8 @@ void EntityBlockPython::addVisualizationNodes(void)
 		OT_rJSON_createValueObject(reqConnectionPckgObj);
 		connectionPckg.addToJsonObject(connectionReqDoc, reqConnectionPckgObj);
 		ot::rJSON::add(connectionReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqConnectionPckgObj);
+
+		getObserver()->sendMessageToViewer(connectionReqDoc);
 	}
 }
 

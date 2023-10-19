@@ -1,14 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model", "Model.vcxproj", "{5E111E97-82FB-4E06-AB63-113891153460}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelTest", "test\ModelTest\ModelTest.vcxproj", "{41119E9B-117D-4F70-9C20-13799271F1C3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5E111E97-82FB-4E06-AB63-113891153460} = {5E111E97-82FB-4E06-AB63-113891153460}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelTest", "ModelTest\ModelTest.vcxproj", "{41119E9B-117D-4F70-9C20-13799271F1C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

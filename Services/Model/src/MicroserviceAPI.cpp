@@ -716,6 +716,14 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 			globalModel->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, true);
 		}
+		else if (action == OT_ACTION_CMD_MODEL_UpdateTopologyEntity)
+		{
+			std::list<ot::UID> topologyEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
+			std::list<ot::UID> topologyEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
+			if (globalModel == nullptr) throw std::exception("No model created yet");
+
+			globalModel->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList);
+		}
 		else if (action == OT_ACTION_CMD_MODEL_AddGeometryOperation)
 		{
 			ot::UID geometryEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);

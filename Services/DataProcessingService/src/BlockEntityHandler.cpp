@@ -3,7 +3,7 @@
 #include "OpenTwinCommunication/ActionTypes.h"
 
 #include "Application.h"
-#include "ClassFactory.h"
+#include "ClassFactoryBlock.h"
 
 BlockEntityHandler& BlockEntityHandler::GetInstance()
 {
@@ -49,7 +49,7 @@ void BlockEntityHandler::AddBlockConnection(ot::UID idOrigin, ot::UID idDestinat
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(blockEntities, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactory classFactory;
+	ClassFactoryBlock classFactory;
 
 	for (ot::EntityInformation& entityInfo : entityInfos)
 	{
@@ -62,7 +62,7 @@ void BlockEntityHandler::AddBlockConnection(ot::UID idOrigin, ot::UID idDestinat
 			blockEnt->StoreToDataBase();
 			ot::UIDList topoEntID{ blockEnt->getEntityID() }, topoEntVer{ blockEnt->getEntityStorageVersion() }, dataEnt{};
 			std::list<bool> forceVis{ false };
-			_modelComponent->addEntitiesToModel(topoEntID, topoEntVer, forceVis, dataEnt, dataEnt, dataEnt, "Added connection to EntityBlock");
+			_modelComponent->updateTopologyEntities(topoEntID, topoEntVer);
 			break;
 		}
 	}

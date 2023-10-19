@@ -678,7 +678,7 @@ void Model::removeEntityWithChildrenFromMap(EntityBase *entity, bool keepInProje
 	removedEntities.push_back(entity);
 }
 
-void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency)
+void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren)
 {
 	if (!keepParameterDependency)
 	{
@@ -696,7 +696,7 @@ void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool ke
 
 	if (!keepInProject)
 	{
-		getStateManager()->removeEntity(entity->getEntityID());
+		getStateManager()->removeEntity(entity->getEntityID(),considerChildren);
 	}
 
 	setModified();
@@ -1869,6 +1869,70 @@ void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::s
 					getEntityProperties(child, recursive, propertyGroupFilter, entityProperties);
 				}
 			}
+		}
+	}
+}
+
+void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible)
+{
+	std::map<ot::UID, EntityBase*> entityMap;
+	std::map<EntityBase*, bool>forceEntityVisible;
+	auto fvIterator = forceVisible.begin();
+	for (EntityBase* entity: entities)
+	{
+		forceEntityVisible[entity] = *fvIterator;
+		fvIterator++;
+	}
+
+	// We sort the entitylist by the length of the name. This ensures that potential parents are added before their childs are added
+	entities.sort([](EntityBase* e1, EntityBase* e2)
+	{
+		return e1->getName().size() < e2->getName().size();
+	});
+
+	for (EntityBase* entity : entities)
+	{
+		bool addVisualizationContainer = true;
+
+		if (dynamic_cast<EntityContainer*>(entity) != nullptr)
+		{
+			addVisualizationContainer = dynamic_cast<EntityContainer*>(entity)->getCreateVisualizationItem();
+		}
+
+		GeometryOperations::EntityList allNewEntities;
+		addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainer, allNewEntities);
+
+		// Now the parent should not be empty
+		ot::UID parentID = 0;
+		if (entity->getParent() != nullptr)
+		{
+			parentID = entity->getParent()->getEntityID();
+			assert(parentID != 0);
+		}
+		else
+		{
+			assert(0); // The entity should have a parent after insertion into the model
+		}
+
+		getStateManager()->storeEntity(entity->getEntityID(), parentID, entity->getEntityStorageVersion(), ModelStateEntity::tEntityType::TOPOLOGY);
+
+		if (forceEntityVisible[entity] && entity->getInitiallyHidden())
+		{
+			assert(!entity->getModified());
+			// We add the entity to the visualization here and the forceShowEntities flag is set.
+			// In this case, the initially hidden flag shall not be considered and the entity needs to be shown 
+			// in any case.
+
+			entity->setInitiallyHidden(false);
+
+			entity->addVisualizationNodes();
+
+			entity->setInitiallyHidden(true);
+			entity->resetModified();
+		}
+		else
+		{
+			entity->addVisualizationNodes();
 		}
 	}
 }
@@ -3758,9 +3822,6 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 	std::list<ot::UID> removeFromDisplay;
 
 	version = topologyEntityVersionList.begin();
-	auto forceVisible = topologyEntityForceVisible.begin();
-
-	std::map<EntityBase *, bool> forceEntityVisible;
 
 	for (auto id : topologyEntityIDList)
 	{
@@ -3770,9 +3831,6 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 		version++;
 
 		entityList.push_back(entity);
-
-		forceEntityVisible[entity] = *forceVisible;
-		forceVisible++;
 
 		// Now check whether the entity already exists and if so, delete it and mark if for removal from the display
 		EntityBase *oldEntity = findEntityFromName(entity->getName());
@@ -3792,61 +3850,7 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 		removeShapesFromVisualization(removeFromDisplay);
 	}
 
-	// Now add all the new topology entities to the model
-
-	std::map<ot::UID, EntityBase *> entityMap;
-
-	// We sort the entitylist by the length of the name. This ensures that potential parents are added before their childs are added
-	entityList.sort([](EntityBase *e1, EntityBase *e2)
-	{
-		return e1->getName().size() < e2->getName().size();
-	});
-
-	for (EntityBase *entity : entityList)
-	{
-		bool addVisualizationContainer = true;
-
-		if (dynamic_cast<EntityContainer*>(entity) != nullptr)
-		{
-			addVisualizationContainer = dynamic_cast<EntityContainer*>(entity)->getCreateVisualizationItem();
-		}
-
-		GeometryOperations::EntityList allNewEntities;
-		addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainer, allNewEntities);
-
-		// Now the parent should not be empty
-		ot::UID parentID = 0;
-		if (entity->getParent() != nullptr)
-		{
-			parentID = entity->getParent()->getEntityID();
-			assert(parentID != 0);
-		}
-		else
-		{
-			assert(0); // The entity should have a parent after insertion into the model
-		}
-
-		getStateManager()->storeEntity(entity->getEntityID(), parentID, entity->getEntityStorageVersion(), ModelStateEntity::tEntityType::TOPOLOGY);
-
-		if (forceEntityVisible[entity] && entity->getInitiallyHidden())
-		{
-			assert(!entity->getModified());
-			// We add the entity to the visualization here and the forceShowEntities flag is set.
-			// In this case, the initially hidden flag shall not be considered and the entity needs to be shown 
-			// in any case.
-
-			entity->setInitiallyHidden(false);
-
-			entity->addVisualizationNodes();
-
-			entity->setInitiallyHidden(true);
-			entity->resetModified();
-		}
-		else
-		{
-			entity->addVisualizationNodes();
-		}
-	}
+	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible);
 
 	// Finally refresh the views and save the new model state
 	
@@ -4189,6 +4193,56 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 
 	// Update the display
 	geomEntity->addVisualizationNodes();
+}
+
+void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topoEntityVersions)
+{
+	enableQueuingHttpRequests(true);
+
+	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
+	auto version = topoEntityVersions.begin();
+	for (auto id : topoEntityIDs)
+	{
+		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(id, *version));
+		version++;
+	}
+	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+
+	auto topoEntityVersion = topoEntityVersions.begin();
+	std::list<ot::UID> removeFromDisplay;
+	std::list<EntityBase*> entityList;
+	std::list<bool> topologyEntityForceVisible;
+	const bool considerDependingDataEntities = false;
+	for (ot::UID topoEntityID : topoEntityIDs)
+	{
+		std::map<ot::UID, EntityBase*> map;
+		EntityBase* newEntity = readEntityFromEntityIDandVersion(nullptr, topoEntityID, *topoEntityVersion, map);
+		topoEntityVersion++;
+		EntityBase* oldEntity = findEntityFromName(newEntity->getName());
+		if (oldEntity == nullptr)
+		{
+			throw std::exception("Cannot update an entity that is not part of the model.");
+		}
+		removeFromDisplay.push_back(oldEntity->getEntityID());
+		// Remove the entity from the entity map and also from the model state
+		removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
+		delete oldEntity;
+		
+		entityList.push_back(newEntity);
+		topologyEntityForceVisible.push_back(false);
+	}
+
+	if (!removeFromDisplay.empty())
+	{
+		removeShapesFromVisualization(removeFromDisplay);
+	}
+
+	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible);
+
+
+	refreshAllViews();
+	enableQueuingHttpRequests(false);
+	modelChangeOperationCompleted("Entity update performed");
 }
 
 void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
