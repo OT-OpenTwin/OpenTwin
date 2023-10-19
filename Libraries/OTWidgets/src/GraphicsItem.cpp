@@ -67,7 +67,7 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsItem::GraphicsItem() : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
-	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter)
+	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX)
 {
 
 }
@@ -187,8 +187,24 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 	}
 }
 
-QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(const QSizeF& _sizeHint) const {
-	return _sizeHint + QSizeF(m_margins.left() + m_margins.right(), m_margins.top() + m_margins.bottom());
+QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const {
+	switch (_hint)
+	{
+	case Qt::MinimumSize: 
+	case Qt::PreferredSize:
+	case Qt::MinimumDescent:
+	case Qt::NSizeHints:
+		return this->applyGraphicsItemMargins(_sizeHint).expandedTo(m_minSize).boundedTo(m_maxSize);
+	case Qt::MaximumSize:
+		return this->applyGraphicsItemMargins(_sizeHint).expandedTo(m_requestedSize);
+	default:
+		OT_LOG_WA("Unknown Qt SizeHint");
+		return this->applyGraphicsItemMargins(_sizeHint);
+	}
+}
+
+QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect, const QSizeF& _maxSize) const {
+	return _rect;
 }
 
 // ###############################################################################################################################################
@@ -283,6 +299,10 @@ void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 	}
 }
 
+QSizeF ot::GraphicsItem::applyGraphicsItemMargins(const QSizeF& _size) const {
+	return QSizeF(_size.width() + m_margins.left() + m_margins.right(), _size.height() + m_margins.top() + m_margins.bottom());
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -303,7 +323,12 @@ bool ot::GraphicsGroupItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+void ot::GraphicsGroupItem::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
+}
+
 QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+
 	return this->boundingRect().size();
 }
 
@@ -499,6 +524,10 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+void ot::GraphicsRectangularItem::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
+}
+
 QSizeF ot::GraphicsRectangularItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	switch (_hint) {
 	case Qt::MinimumSize:
@@ -593,6 +622,10 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 
 	return ot::GraphicsItem::setupFromConfig(_cfg);
+}
+
+void ot::GraphicsEllipseItem::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
 }
 
 QSizeF ot::GraphicsEllipseItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
@@ -697,6 +730,10 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+void ot::GraphicsTextItem::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
+}
+
 QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	switch (_hint) {
 	case Qt::MinimumSize:
@@ -790,6 +827,10 @@ bool ot::GraphicsImageItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+void ot::GraphicsImageItem::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
+}
+
 QSizeF ot::GraphicsImageItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	switch (_hint) {
 	case Qt::MinimumSize:
@@ -858,6 +899,10 @@ ot::GraphicsLineItem::~GraphicsLineItem() {
 bool ot::GraphicsLineItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	// Ignore, return false in case the setup is called to ensure this item wont be setup
 	return false;
+}
+
+void ot::GraphicsLineItem::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
 }
 
 QSizeF ot::GraphicsLineItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {

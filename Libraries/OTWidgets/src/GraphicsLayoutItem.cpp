@@ -18,6 +18,10 @@ ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _ow
 
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
 
+void ot::GraphicsLayoutItemWrapper::prepareGraphicsItemGeometryChange(void) {
+	this->prepareGeometryChange();
+}
+
 void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	OTAssertNullptr(m_owner);
 	m_owner->handleMousePressEvent(_event);
@@ -64,6 +68,11 @@ ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	//if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
 	return ot::GraphicsItem::setupFromConfig(_cfg);
+}
+
+void ot::GraphicsLayoutItem::prepareGraphicsItemGeometryChange(void) {
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->prepareGraphicsItemGeometryChange();
 }
 
 void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {

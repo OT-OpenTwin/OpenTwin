@@ -31,6 +31,8 @@ namespace ot {
 		GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner);
 		virtual ~GraphicsLayoutItemWrapper();
 
+		virtual void prepareGraphicsItemGeometryChange(void) override;
+
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
@@ -68,6 +70,8 @@ namespace ot {
 		virtual ~GraphicsLayoutItem();
 		
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+
+		virtual void prepareGraphicsItemGeometryChange(void) override;
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) override;
 

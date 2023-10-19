@@ -34,7 +34,7 @@
 
 #define OT_JSON_VALUE_Connectable "Connectable"
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_size(10, 10), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter) {}
+ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter) {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
@@ -42,10 +42,6 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 	OT_rJSON_createValueObject(posObj);
 	m_pos.addToJsonObject(_document, posObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Position, posObj);
-
-	OT_rJSON_createValueObject(sizeObj);
-	m_size.addToJsonObject(_document, sizeObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Size, sizeObj);
 
 	OT_rJSON_createValueObject(marginObj);
 	m_margins.addToJsonObject(_document, marginObj);
@@ -67,7 +63,6 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Name, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Title, String);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Position, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Size, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Alignment, String);
@@ -78,11 +73,9 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	m_alignment = ot::stringToAlignment(_object[OT_JSON_MEMBER_Alignment].GetString());
 
 	OT_rJSON_val posObj = _object[OT_JSON_MEMBER_Position].GetObject();
-	OT_rJSON_val sizeObj = _object[OT_JSON_MEMBER_Size].GetObject();
 	OT_rJSON_val marginObj = _object[OT_JSON_MEMBER_Margin].GetObject();
 
 	m_pos.setFromJsonObject(posObj);
-	m_size.setFromJsonObject(sizeObj);
 	m_margins.setFromJsonObject(marginObj);
 
 	m_flags = NoFlags;
@@ -292,6 +285,10 @@ void ot::GraphicsRectangularItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT
 	
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CornerRadius, m_cornerRadius);
 
+	OT_rJSON_createValueObject(sizeObj);
+	m_size.addToJsonObject(_document, sizeObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Size, sizeObj);
+
 	OT_rJSON_createValueObject(backgroundPainterObj);
 	m_backgroundPainter->addToJsonObject(_document, backgroundPainterObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
@@ -307,6 +304,7 @@ void ot::GraphicsRectangularItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_CornerRadius, Int);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Border, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_BackgroundPainter, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Size, Object);
 
 	m_cornerRadius = _object[OT_JSON_MEMBER_CornerRadius].GetInt();
 
@@ -317,6 +315,9 @@ void ot::GraphicsRectangularItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 
 	OT_rJSON_val borderObj = _object[OT_JSON_MEMBER_Border].GetObject();
 	m_border.setFromJsonObject(borderObj);
+
+	OT_rJSON_val sizeObj = _object[OT_JSON_MEMBER_Size].GetObject();
+	m_size.setFromJsonObject(sizeObj);
 }
 
 void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter) {

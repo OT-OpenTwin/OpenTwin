@@ -85,13 +85,6 @@ namespace ot {
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
 		const Point2DD& position(void) { return m_pos; };
 
-		//! @brief Set item size.
-		//! @param _size Size to set
-		void setSize(const ot::Size2D& _size) { m_size = _size; };
-
-		//! @brief Item size
-		const ot::Size2D& size(void) const { return m_size; };
-
 		//! @brief Set item margins
 		//! @param _top Top margin
 		//! @param _right Right margin
@@ -120,7 +113,7 @@ namespace ot {
 		std::string m_tile;
 		std::string m_uid;
 		Point2DD m_pos;
-		Size2D m_size;
+
 		MarginsD m_margins;
 		GraphicsItemFlag m_flags;
 		ot::Alignment m_alignment;
@@ -278,9 +271,13 @@ namespace ot {
 		void setBackgroundPainer(ot::Painter2D* _painter);
 		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
 
+		void setSize(const ot::Size2DD& _size) { m_size = _size; };
+		const ot::Size2DD& size(void) const { return m_size; };
+		
 	private:
 		int m_cornerRadius;
 		ot::Border m_border;
+		ot::Size2DD m_size;
 		ot::Painter2D* m_backgroundPainter;
 
 		GraphicsRectangularItemCfg(GraphicsRectangularItemCfg&) = delete;

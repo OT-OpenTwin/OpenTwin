@@ -103,35 +103,35 @@ namespace ottest {
 
 		ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
 		r1->setName(_name + "_r1");
-		r1->setSize(ot::Size2D(10, 10));
+		r1->setSize(ot::Size2DD(10., 10.));
 
 		ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
 		r2->setName(_name + "_r2");
-		r2->setSize(ot::Size2D(15, 15));
+		r2->setSize(ot::Size2DD(15., 15.));
 
 		ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
 		r3->setName(_name + "_r3");
-		r3->setSize(ot::Size2D(5, 5));
+		r3->setSize(ot::Size2DD(5., 5.));
 
 		ot::GraphicsRectangularItemCfg* r4 = new ot::GraphicsRectangularItemCfg;
 		r4->setName(_name + "_r4");
-		r4->setSize(ot::Size2D(20, 20));
+		r4->setSize(ot::Size2DD(20., 20.));
 
 		ot::GraphicsRectangularItemCfg* r5 = new ot::GraphicsRectangularItemCfg;
 		r5->setName(_name + "_r5");
-		r5->setSize(ot::Size2D(12, 12));
+		r5->setSize(ot::Size2DD(12., 12.));
 
 		ot::GraphicsRectangularItemCfg* r6 = new ot::GraphicsRectangularItemCfg;
 		r6->setName(_name + "_r6");
-		r6->setSize(ot::Size2D(12, 12));
+		r6->setSize(ot::Size2DD(12., 12.));
 
 		ot::GraphicsRectangularItemCfg* r7 = new ot::GraphicsRectangularItemCfg;
 		r7->setName(_name + "_r7");
-		r7->setSize(ot::Size2D(12, 12));
+		r7->setSize(ot::Size2DD(12., 12.));
 
 		ot::GraphicsRectangularItemCfg* r8 = new ot::GraphicsRectangularItemCfg;
 		r8->setName(_name + "_r8");
-		r8->setSize(ot::Size2D(8, 8));
+		r8->setSize(ot::Size2DD(8., 8.));
 		r8->setAlignment(ot::AlignLeft);
 
 		top->addStrech(1);

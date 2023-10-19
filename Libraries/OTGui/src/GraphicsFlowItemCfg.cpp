@@ -89,7 +89,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
 	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(m_primaryColor));
-	itm->setSize(ot::Size2D(10, 10));
+	itm->setSize(ot::Size2DD(10., 10.));
 	itm->setBorder(ot::Border(m_secondaryColor, 1));
 
 	return itm;
@@ -157,7 +157,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	bor->setCornerRadius(5);
 	bor->setName(_name + "_bor");
-	bor->setSize(ot::Size2D(200, 200));
+	bor->setSize(ot::Size2DD(200., 200.));
 	root->addItemTop(bor, false);
 
 	// Layout
@@ -175,7 +175,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	tBor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	tBor->setName(_name + "_tBor");
 	tBor->setCornerRadius(5);
-	tBor->setSize(ot::Size2D(200, 30));
+	tBor->setSize(ot::Size2DD(200., 30.));
 	tStack->addItemTop(tBor, false);
 
 	// Title: Layout

@@ -93,6 +93,8 @@ namespace ot {
 
 		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
 
+		virtual void prepareGraphicsItemGeometryChange(void) = 0;
+
 		// ###############################################################################################################################################
 
 		// Virtual functions
@@ -116,7 +118,9 @@ namespace ot {
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		//! @brief Will expand the size according to the margins
-		QSizeF handleGetGraphicsItemSizeHint(const QSizeF& _sizeHint) const;
+		QSizeF handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const;
+
+		QRectF handleGetGraphicsItemBoundingRect(const QRectF& _rect, const QSizeF& _maxSize) const;
 
 		// ###############################################################################################################################################
 
@@ -154,6 +158,8 @@ namespace ot {
 
 		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
+		QSizeF applyGraphicsItemMargins(const QSizeF& _size) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 	protected:
@@ -175,6 +181,10 @@ namespace ot {
 		GraphicsItem* m_parent; //! @brief Parent graphics item
 		GraphicsItemDrag* m_drag; //! @brief Drag instance
 		GraphicsScene* m_scene; //! @brief Graphics scene
+
+		QSizeF m_requestedSize;
+		QSizeF m_minSize;
+		QSizeF m_maxSize;
 
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
@@ -198,6 +208,8 @@ namespace ot {
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGroupItem); };
+
+		virtual void prepareGraphicsItemGeometryChange(void) override;
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
@@ -277,6 +289,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
 
+		virtual void prepareGraphicsItemGeometryChange(void) override;
+
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual QRectF boundingRect(void) const override;
 		virtual void setGeometry(const QRectF& rect) override;
@@ -321,6 +335,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem); };
 
+		virtual void prepareGraphicsItemGeometryChange(void) override;
+
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual QRectF boundingRect(void) const override;
 		virtual void setGeometry(const QRectF& rect) override;
@@ -362,6 +378,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem); };
 
+		virtual void prepareGraphicsItemGeometryChange(void) override;
+
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -398,6 +416,8 @@ namespace ot {
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsImageItem); };
+
+		virtual void prepareGraphicsItemGeometryChange(void) override;
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual void setGeometry(const QRectF& _rect) override;
@@ -438,6 +458,8 @@ namespace ot {
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLineItem); };
+
+		virtual void prepareGraphicsItemGeometryChange(void) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
