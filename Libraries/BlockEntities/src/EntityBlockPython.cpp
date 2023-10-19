@@ -43,7 +43,7 @@ void EntityBlockPython::addVisualizationNodes(void)
 
 		OT_rJSON_createDOC(reqDoc);
 		ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-		_owner.addToJsonObject(reqDoc, reqDoc);
+		_info.addToJsonObject(reqDoc, reqDoc);
 
 		OT_rJSON_createValueObject(pckgDoc);
 		pckg.addToJsonObject(reqDoc, pckgDoc); 
@@ -60,13 +60,14 @@ void EntityBlockPython::addVisualizationNodes(void)
 			connectionItem.fromConnectable = connection.getConnectorOrigin();
 			connectionItem.toConnectable = connection.getConnectorDestination();
 			connectionItem.fromUID = std::to_string(getBlockID());
-			connectionItem.toUID = std::to_string( connection.getIDDestination());
+			connectionItem.toUID = std::to_string(connection.getIDDestination());
+			connectionPckg.addConnection(connectionItem);
 		}
 
 		// Request UI to add connections
 		OT_rJSON_createDOC(connectionReqDoc);
 		ot::rJSON::add(connectionReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
-
+		_info.addToJsonObject(connectionReqDoc, connectionReqDoc);
 		OT_rJSON_createValueObject(reqConnectionPckgObj);
 		connectionPckg.addToJsonObject(connectionReqDoc, reqConnectionPckgObj);
 		ot::rJSON::add(connectionReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqConnectionPckgObj);

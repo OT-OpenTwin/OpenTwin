@@ -168,9 +168,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		//OT_rJSON_createValueObject(reqPckgObj);
 		//pckg.addToJsonObject(reqDoc, reqPckgObj);
 		//ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
-
-
-		//this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
 	}
 
 	return ""; // Return empty string if the request does not expect a return

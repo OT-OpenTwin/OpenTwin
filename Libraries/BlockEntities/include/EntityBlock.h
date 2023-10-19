@@ -34,13 +34,13 @@ public:
 	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
 
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
-	void SetServiceInformation(const ot::BasicServiceInformation& _info) { _owner = _info; }
+	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
 
 protected:
 	ot::UID _blockID = 0;
 	ot::UID _coordinate2DEntityID = 0;
-	ot::BasicServiceInformation _owner;
+	ot::BasicServiceInformation _info;
 	std::string	_graphicsScenePackage;
 
 	std::list<ot::Connector> _connectors;
