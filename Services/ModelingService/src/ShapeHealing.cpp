@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "EntityCache.h"
 #include "ClassFactoryCAD.h"
+#include "ClassFactory.h"
 
 #include <OpenTwinFoundation/ModelComponent.h>
 #include <OpenTwinFoundation/uiComponent.h>
@@ -57,6 +58,10 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	for (auto shape : selectedGeometryEntities)
 	{
 		ClassFactoryCAD classFactory;
+		ClassFactory baseFactory;
+		classFactory.SetNextHandler(&baseFactory);
+		baseFactory.SetChainRoot(&classFactory);
+
 		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(application->modelComponent()->readEntityFromEntityIDandVersion(shape.getID(), shape.getVersion(), classFactory));
 
 		if (geometryEntity->getEditable())

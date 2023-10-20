@@ -4,6 +4,7 @@
 
 #include "EntityGeometry.h"
 #include "ClassFactoryCAD.h"
+#include "ClassFactory.h"
 
 #include <OpenTwinFoundation/EntityInformation.h>
 #include <OpenTwinFoundation/ModelComponent.h>
@@ -125,7 +126,11 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	entityCache->prefetchEntities(allGeomEntities);
 
 	// Load all geometry entities and determine a list of their brep ids
+	ClassFactory baseFactory;
 	ClassFactoryCAD classFactory;
+	classFactory.SetNextHandler(&baseFactory);
+	baseFactory.SetChainRoot(&classFactory);
+
 	EntityGeometry *baseEntity = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseEntityInfo.getID(), baseEntityInfo.getVersion()));
 	if (baseEntity == nullptr) { assert(0); return; }
 

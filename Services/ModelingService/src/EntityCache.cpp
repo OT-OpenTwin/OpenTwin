@@ -1,6 +1,7 @@
 #include "EntityCache.h"
 #include "EntityBase.h"
 #include "ClassFactoryCAD.h"
+#include "ClassFactory.h"
 #include "DataBase.h"
 
 #include <OpenTwinFoundation/ModelComponent.h>
@@ -67,6 +68,10 @@ EntityBase *EntityCache::getEntity(ot::UID entityID, ot::UID entityVersion)
 
 		// We have not yet cached this item, so let's read it from the data base
 		ClassFactoryCAD classFactory;
+		ClassFactory baseFactory;
+		classFactory.SetNextHandler(&baseFactory);
+		baseFactory.SetChainRoot(&classFactory);
+
 		entity = modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory);
 	}
 	else

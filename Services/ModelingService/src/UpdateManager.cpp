@@ -2,6 +2,7 @@
 
 #include "DataBase.h"
 #include "ClassFactoryCAD.h"
+#include "ClassFactory.h"
 #include "EntityGeometry.h"
 #include "Transformations.h"
 #include "BooleanOperations.h"
@@ -107,7 +108,9 @@ std::list<ot::UID> UpdateManager::updateParents(std::list<ot::UID> &entityIDs, s
 void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, std::map<ot::UID, ot::UID> &entityVersionMap, std::list<ot::UID> &modifiedEntities)
 {
 	ClassFactoryCAD classFactory;
-
+	ClassFactory baseFactory;
+	classFactory.SetNextHandler(&baseFactory);
+	baseFactory.SetChainRoot(&classFactory);
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
 	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
@@ -235,6 +238,9 @@ bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEn
 
 	// Load the base and tool breps
 	ClassFactoryCAD classFactory;
+	ClassFactory baseFactory;
+	classFactory.SetNextHandler(&baseFactory);
+	baseFactory.SetChainRoot(&classFactory);
 
 	EntityGeometry *baseShape = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseShapeID, baseShapeVersion));
 	assert(baseShape != nullptr);
@@ -354,6 +360,9 @@ std::list<ot::UID> UpdateManager::updateEntities(std::list<ot::UID> &entityIDs, 
 void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, ot::UID brepVersion, bool itemsVisible, std::list<ot::UID> &modifiedEntities)
 {
 	ClassFactoryCAD classFactory;
+	ClassFactory baseFactory;
+	classFactory.SetNextHandler(&baseFactory);
+	baseFactory.SetChainRoot(&classFactory);
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
 	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
