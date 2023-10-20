@@ -25,6 +25,7 @@
 #define OT_JSON_MEMBER_RadiusY "RadiusY"
 #define OT_JSON_MEMBER_MinSize "Size.Min"
 #define OT_JSON_MEMBER_MaxSize "Size.Max"
+#define OT_JSON_MEMBER_IsSlave "IsSlave"
 #define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_IsMaster "IsMaster"
 #define OT_JSON_MEMBER_TextFont "TextFont"
@@ -137,12 +138,13 @@ void ot::GraphicsStackItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON
 
 
 	OT_rJSON_createValueArray(itemArr);
-	for (auto itm : m_items) {
+	for (const GraphicsStackItemCfgEntry& itm : m_items) {
 		OT_rJSON_createValueObject(itemObj);
 		OT_rJSON_createValueObject(itemContObj);
 		itm.item->addToJsonObject(_document, itemContObj);
 		ot::rJSON::add(_document, itemObj, OT_JSON_MEMBER_Item, itemContObj);
 		ot::rJSON::add(_document, itemObj, OT_JSON_MEMBER_IsMaster, itm.isMaster);
+		ot::rJSON::add(_document, itemObj, OT_JSON_MEMBER_IsSlave, itm.isSlave);
 		itemArr.PushBack(itemObj, _document.GetAllocator());
 	}
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Items, itemArr);
@@ -172,6 +174,7 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(OT_rJSON_val & _object) {
 
 				GraphicsStackItemCfgEntry e;
 				e.isMaster = itemObj[OT_JSON_MEMBER_IsMaster].GetBool();
+				e.isSlave = itemObj[OT_JSON_MEMBER_IsSlave].GetBool();
 				e.item = itm;
 				m_items.push_back(e);
 			}
@@ -192,16 +195,18 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(OT_rJSON_val & _object) {
 	}
 }
 
-void ot::GraphicsStackItemCfg::addItemTop(ot::GraphicsItemCfg* _item, bool _isMaster) {
+void ot::GraphicsStackItemCfg::addItemTop(ot::GraphicsItemCfg* _item, bool _isMaster, bool _isSlave) {
 	GraphicsStackItemCfgEntry e;
 	e.isMaster = _isMaster;
+	e.isSlave = _isSlave;
 	e.item = _item;
 	m_items.push_back(e);
 }
 
-void ot::GraphicsStackItemCfg::addItemBottom(ot::GraphicsItemCfg* _item, bool _isMaster) {
+void ot::GraphicsStackItemCfg::addItemBottom(ot::GraphicsItemCfg* _item, bool _isMaster, bool _isSlave) {
 	GraphicsStackItemCfgEntry e;
 	e.isMaster = _isMaster;
+	e.isSlave = _isSlave;
 	e.item = _item;
 	m_items.push_front(e);
 }

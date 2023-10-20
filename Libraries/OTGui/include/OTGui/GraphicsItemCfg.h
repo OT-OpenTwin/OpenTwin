@@ -139,6 +139,7 @@ namespace ot {
 		struct GraphicsStackItemCfgEntry {
 			ot::GraphicsItemCfg* item;
 			bool isMaster;
+			bool isSlave;
 		};
 
 		GraphicsStackItemCfg();
@@ -157,8 +158,19 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg); };
 
-		void addItemTop(ot::GraphicsItemCfg* _item, bool _isMaster);
-		void addItemBottom(ot::GraphicsItemCfg* _item, bool _isMaster);
+		//! @brief Will add the provided item on the top of the stack (Zn)
+		//! If multiple master items are provided, the biggest size will be used
+		//! @param _item Item to add
+		//! @param _isMaster If true, all slave items will be expanded to match the master size
+		//! @param _isSlave If true, the item will adjust its size according to the size of the master item(s)
+		void addItemTop(ot::GraphicsItemCfg* _item, bool _isMaster, bool _isSlave);
+
+		//! @brief Will add the provided item at the bottom of the stack (Z0)
+		//! If multiple master items are provided, the biggest size will be used
+		//! @param _item Item to add
+		//! @param _isMaster If true, all slave items will be expanded to match the master size
+		//! @param _isSlave If true, the item will adjust its size according to the size of the master item(s)
+		void addItemBottom(ot::GraphicsItemCfg* _item, bool _isMaster, bool _isSlave);
 
 		//! @brief Returns a list with all items in the stack
 		//! 0: bottom, n: top

@@ -244,8 +244,8 @@ void ot::GraphicsItem::removeGraphicsItemEventHandler(ot::GraphicsItem* _handler
 }
 
 void ot::GraphicsItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
-	this->prepareGraphicsItemGeometryChange();
 	m_requestedSize = _size;
+	this->prepareGraphicsItemGeometryChange();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -434,6 +434,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			if (i) {
 				GraphicsStackItemEntry e;
 				e.isMaster = itm.isMaster;
+				e.isSlave = itm.isSlave;
 				e.item = i;
 				i->setParentGraphicsItem(this);
 				if (e.isMaster) {
@@ -473,26 +474,21 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 }
 
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
-	OTAssertNullptr(_sender);
-	return;
 	if (_event == ot::GraphicsItem::ItemResized) {
-		ot::GraphicsItem* mas = nullptr;
+		QSizeF masterSize(-1., -1.);
 		for (auto itm : m_items) {
 			if (itm.isMaster) {
-				if (mas != nullptr) {
-					OT_LOG_EA("Multiple master items not supported yet");
-				}
-				mas = itm.item;
+				masterSize = masterSize.expandedTo(itm.item->getQGraphicsItem()->boundingRect().size());
 			}
 		}
-		if (mas == nullptr) {
-			OT_LOG_EA("No master item found");
+		if (masterSize.width() < 0. || masterSize.height() < 0.) {
+			OT_LOG_WA("It appears that no master item was provided to this stack item");
+			return;
 		}
-		else {
-			for (auto itm : m_items) {
-				if (itm.item != _sender && !itm.isMaster) {
-					//itm.item->setGraphicsItemRequestedSize(mas->getQGraphicsItem()->boundingRect().size());
-				}
+
+		for (GraphicsStackItemEntry itm : m_items) {
+			if (itm.isSlave) {
+				itm.item->setGraphicsItemRequestedSize(masterSize);
 			}
 		}
 	}
@@ -606,8 +602,12 @@ void ot::GraphicsRectangularItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _e
 }
 
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
+	// Avoid resizing if the size did not change
+	if (m_size == _size) return;
+
 	m_size = _size;
 	this->setGeometry(QRectF(this->pos(), m_size));
+	this->raiseEvent(GraphicsItem::ItemResized);
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -966,7 +966,7 @@ void ot::GraphicsLineItem::setGeometry(const QRectF& _rect) {
 }
 
 QRectF ot::GraphicsLineItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QGraphicsLineItem::boundingRect().size()));
+	return this->handleGetGraphicsItemBoundingRect(QRectF(this->pos(), QGraphicsLineItem::boundingRect().size()));
 	//return QGraphicsLineItem::boundingRect();
 }
 

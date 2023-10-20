@@ -254,6 +254,7 @@ namespace ot {
 		struct GraphicsStackItemEntry {
 			ot::GraphicsItem* item;
 			bool isMaster;
+			bool isSlave;
 		};
 
 		GraphicsStackItem();
