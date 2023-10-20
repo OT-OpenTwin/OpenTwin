@@ -229,6 +229,10 @@ ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!"
 	size_t bufferLen;
 	getenv_s(&bufferLen, buffer, sizeof(buffer) - 1, "OPEN_TWIN_LOGGING_MODE");
 	std::string type(buffer);
+
+	while (type.length() > 0 && type.at(0) == '\"') type.erase(type.begin());
+	while (type.length() > 0 && type.at(type.length() - 1) == '\"') type.erase(type.begin() + (type.length() - 1));
+
 	if (!type.empty()) {
 		// Split
 		auto ix = type.find('|');
