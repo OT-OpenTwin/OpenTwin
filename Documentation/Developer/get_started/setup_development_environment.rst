@@ -120,7 +120,7 @@ Right-click on the corresponding line and select “Restart” from the context 
 
 In a next step, the database has to be configured. This can be done by using the Mongo-Shell which is contained in the same directory as the server executable (see above), e.g., ``C:\Program Files\MongoDB\Server\<server version, e.g., 4.4>\bin``.
 
-The shell can be opened by double-clicking on the file ``mongo.exe``:
+The shell can be opened by double-clicking on the file ``mongo.exe``.
 
 .. image:: images/mongodb_mongosh.jpg 
 
@@ -293,7 +293,16 @@ The latest stable build can be obtained and activated by executing the following
     rustup default stable latest
     rustup update
     
-The version displayed by the last command should then be 1.56.1. It is best if you stick with version 1.56.1 and don’t use a more recent version. 
+We require a particular version of Rust which can be obtained and activated by executing the following commands in a command shell:
+
+.. code-block::
+
+    rustup install 1.56.1-x86_64-pc-windows-msvc
+    rustup default 1.56.1-x86_64-pc-windows-msvc
+    rustup update
+    rustc --version
+
+The version displayed by the last command should then be 1.56.1. It is best if you stick with version 1.56.1 and don't use a more recent version. 
 
 **Install PostMan**: The PostMan software can be downloaded from the following location: https://www.postman.com/downloads. Please make sure to use the Windows 64-bit version of the tool and follow the instructions of the installation software.
 
