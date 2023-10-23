@@ -2893,13 +2893,17 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
-				for (auto c : pckg.connections()) {
-					ot::GraphicsItem* src = editor->getItem(c.fromUID);
-					ot::GraphicsItem* dest = editor->getItem(c.toUID);
-
-					if (src && dest) {
-						ot::GraphicsItem* srcConn = src->findItem(c.fromConnectable);
-						ot::GraphicsItem* destConn = dest->findItem(c.toConnectable);
+				for (const auto& connection : pckg.connections()) {
+					ot::GraphicsItem* src = editor->getItem(connection.fromUID);
+					ot::GraphicsItem* dest = editor->getItem(connection.toUID);
+					if (dest == nullptr || src == nullptr)
+					{
+						editor->bufferConnection(connection);
+					}
+					else if (!editor->connectionAlreadyExists(connection))
+					{
+						ot::GraphicsItem* srcConn = src->findItem(connection.fromConnectable);
+						ot::GraphicsItem* destConn = dest->findItem(connection.toConnectable);
 						if (srcConn && destConn) {
 							editor->addConnection(srcConn, destConn);
 						}
@@ -2907,10 +2911,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 							OT_LOG_EA("Invalid graphics item name");
 						}
 					}
-					else {
-						OT_LOG_EA("Invalid graphics item UID");
-					}
 				}
+				editor->tryAddingBufferedConnections();
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection) {
 				ot::BasicServiceInformation info;

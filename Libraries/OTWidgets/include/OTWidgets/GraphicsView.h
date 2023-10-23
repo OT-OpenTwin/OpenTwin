@@ -11,9 +11,11 @@
 
 // Qt header
 #include <QtWidgets/qgraphicsview.h>
+#include "OTGui/GraphicsPackage.h"
 
 // std header
 #include <map>
+#include <string>
 
 namespace ot {
 
@@ -39,6 +41,9 @@ namespace ot {
 		
 		GraphicsItem* getItem(const std::string& _itemUid);
 		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
+		void bufferConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
+		void tryAddingBufferedConnections();
+		bool connectionAlreadyExists(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
@@ -66,6 +71,7 @@ namespace ot {
 		//! @param _toConnector Destination connector (child of destination item)
 		void connectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 		
+
 		void itemMoved(const std::string& _uid, const QPointF& _newPos);
 
 	protected:
@@ -92,6 +98,6 @@ namespace ot {
 
 		std::map<std::string, ot::GraphicsItem*> m_items;
 		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
+		std::list<ot::GraphicsConnectionPackage::ConnectionInfo> m_bufferedConnections;
 	};
-
 }
