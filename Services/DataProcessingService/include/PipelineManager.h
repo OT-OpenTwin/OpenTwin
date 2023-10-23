@@ -11,8 +11,8 @@ public:
 	void RunAll();
 private:
 	std::list<Pipeline> pipelines;
-	std::map<ot::UID, PipelineSource*> _pipelineSources;
-	std::map<ot::UID, PipelineSink*> _pipelineSinks;
+	std::map<std::string, PipelineSource*> _pipelineSources;
+	std::map<std::string, PipelineSink*> _pipelineSinks;
 
 
 	std::list<std::shared_ptr<EntityBlock>> GetAllBlockEntities();

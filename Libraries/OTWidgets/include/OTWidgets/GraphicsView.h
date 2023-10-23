@@ -41,8 +41,7 @@ namespace ot {
 		
 		GraphicsItem* getItem(const std::string& _itemUid);
 		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
-		void bufferConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
-		void tryAddingBufferedConnections();
+		
 		bool connectionAlreadyExists(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
@@ -98,6 +97,5 @@ namespace ot {
 
 		std::map<std::string, ot::GraphicsItem*> m_items;
 		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
-		std::list<ot::GraphicsConnectionPackage::ConnectionInfo> m_bufferedConnections;
 	};
 }

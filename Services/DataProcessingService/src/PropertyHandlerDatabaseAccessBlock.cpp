@@ -31,7 +31,7 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 		else if (buffer.selectedDimension != dbAccessEntity->getQueryDimension())
 		{
 			buffer.selectedDimension = dbAccessEntity->getQueryDimension();
-			ot::UID blockUID = dbAccessEntity->getBlockID();
+			std::string blockUID = dbAccessEntity->getBlockID();
 			ot::GraphicsItemCfg* blockConfig = nullptr;
 
 			if (buffer.selectedDimension == "1D")
@@ -56,7 +56,7 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 				dbAccessEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C1"));
 				dbAccessEntity->AddConnector(ot::Connector(ot::ConnectorType::Source, "C2"));
 			}
-			blockConfig->setUid(std::to_string(blockUID));
+			blockConfig->setUid(blockUID);
 			ot::UIDList positionEntity{ dbAccessEntity->getCoordinateEntityID() };
 			std::list<ot::EntityInformation> entityInfo;
 			_modelComponent->getEntityInformation(positionEntity, entityInfo);

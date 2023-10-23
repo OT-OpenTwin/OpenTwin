@@ -2,6 +2,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
+
 #include "Application.h"
 #include "ClassFactoryBlock.h"
 
@@ -11,7 +12,7 @@ BlockEntityHandler& BlockEntityHandler::GetInstance()
 	return instance;
 }
 
-ot::UID BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
+std::string BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
 	std::shared_ptr<EntityBlock> blockEntity = nullptr;
 	if (_blockEntityFactories.find(blockName) == _blockEntityFactories.end())
@@ -43,7 +44,7 @@ ot::UID BlockEntityHandler::CreateBlockEntity(const std::string& editorName, con
 	return blockEntity->getBlockID();
 }
 
-void BlockEntityHandler::AddBlockConnection(ot::UID idOrigin, ot::UID idDestination, const std::string& connectorOrigin, const std::string& connectorDest)
+void BlockEntityHandler::AddBlockConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
 {
 	std::list<std::string> blockEntities =_modelComponent->getListOfFolderItems(_blockFolder+"/Data Processing");
 	std::list<ot::EntityInformation> entityInfos;
@@ -51,20 +52,36 @@ void BlockEntityHandler::AddBlockConnection(ot::UID idOrigin, ot::UID idDestinat
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactoryBlock classFactory;
 
+	std::list<std::shared_ptr<EntityBlock>> changedEntities;
 	for (ot::EntityInformation& entityInfo : entityInfos)
 	{
-		auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-		std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(baseEnt));
-		if (blockEnt->getBlockID() == idOrigin)
+		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		std::shared_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(baseEnt));
+		if (blockEnt->getBlockID() == connection.fromUID)
 		{
-			blockEnt->AddOutgoingConnection(ot::BlockConnection(connectorOrigin, connectorDest,idDestination));
+			blockEnt->AddOutgoingConnection(connection);
 			blockEnt->setModified();
-			blockEnt->StoreToDataBase();
-			ot::UIDList topoEntID{ blockEnt->getEntityID() }, topoEntVer{ blockEnt->getEntityStorageVersion() }, dataEnt{};
-			std::list<bool> forceVis{ false };
-			_modelComponent->updateTopologyEntities(topoEntID, topoEntVer);
-			break;
+			changedEntities.push_back(blockEnt);
 		}
+		else if (blockEnt->getBlockID() == connection.toUID)
+		{
+			blockEnt->AddIngoingConnection(connection);
+			blockEnt->setModified();
+			changedEntities.push_back(blockEnt);
+		}
+	}
+
+	ot::UIDList topoEntID, topoEntVer;
+	if(changedEntities.size() != 0)
+	{
+		for (auto blockEntity : changedEntities)
+		{
+			blockEntity->StoreToDataBase();
+			topoEntID.push_back(blockEntity->getEntityID());
+			topoEntVer.push_back(blockEntity->getEntityStorageVersion());
+		}
+			
+		_modelComponent->updateTopologyEntities(topoEntID, topoEntVer);
 	}
 }
 

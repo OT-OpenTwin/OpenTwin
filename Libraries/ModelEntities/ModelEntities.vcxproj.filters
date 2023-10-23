@@ -301,9 +301,6 @@
     <ClInclude Include="include\Connector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\SerializeWithBSON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -586,9 +583,6 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\Connector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityCoordinates2D.cpp">

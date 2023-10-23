@@ -35,7 +35,7 @@ void EntityBlockPython::addVisualizationNodes(void)
 			
 
 		ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
-		blockCfg->setUid(std::to_string(_blockID));
+		blockCfg->setUid(_blockID);
 		blockCfg->setPosition(entCoordinate->getCoordinates());
 		
 		ot::GraphicsScenePackage pckg(_graphicsScenePackage);
@@ -52,16 +52,17 @@ void EntityBlockPython::addVisualizationNodes(void)
 		getObserver()->sendMessageToViewer(reqDoc);
 
 
-		ot::GraphicsConnectionPackage connectionPckg;
+		ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
 
 		// Store connection information
-		for (auto& connection : _outgoingConnections) {
-			ot::GraphicsConnectionPackage::ConnectionInfo connectionItem;
-			connectionItem.fromConnectable = connection.getConnectorOrigin();
-			connectionItem.toConnectable = connection.getConnectorDestination();
-			connectionItem.fromUID = std::to_string(getBlockID());
-			connectionItem.toUID = std::to_string(connection.getIDDestination());
-			connectionPckg.addConnection(connectionItem);
+		for (auto& connection : _outgoingConnections) 
+		{	
+			connectionPckg.addConnection(connection.getConnection());
+		}
+
+		for (auto& connection : _ingoingConnections)
+		{
+			connectionPckg.addConnection(connection.getConnection());
 		}
 
 		// Request UI to add connections

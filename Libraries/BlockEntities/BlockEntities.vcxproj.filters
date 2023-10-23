@@ -36,6 +36,9 @@
     <ClInclude Include="include\EntityBlockPython.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\BlockConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClassFactoryBlock.cpp">
@@ -52,6 +55,9 @@
     </ClCompile>
     <ClCompile Include="src\EntityBlock.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockConnection.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

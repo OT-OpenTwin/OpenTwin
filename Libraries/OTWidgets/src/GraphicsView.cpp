@@ -80,42 +80,12 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _
 	}
 }
 
-void ot::GraphicsView::bufferConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
-{
-	m_bufferedConnections.push_back(connection);
-}
-
 bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
 {
 	std::string connectionKey = ot::GraphicsConnectionItem::buildKey(connection.fromUID, connection.fromConnectable, connection.toUID, connection.toConnectable);
-	return m_connections.find(connectionKey) != m_connections.end();
-}
+	std::string reversedConnectionKey = ot::GraphicsConnectionItem::buildKey(connection.toUID, connection.toConnectable, connection.fromUID, connection.fromConnectable);
 
-void ot::GraphicsView::tryAddingBufferedConnections()
-{
-	for (auto& connection: m_bufferedConnections)
-	{
-		ot::GraphicsItem* destinationBlock = getItem(connection.toUID);
-		ot::GraphicsItem* sourceBlock = getItem(connection.fromUID);
-		
-		if (destinationBlock != nullptr && sourceBlock != nullptr)
-		{
-			if (!connectionAlreadyExists(connection))
-			{
-				OT_LOG_D("Loading buffered connection: " + connection.fromUID + " to " + connection.toUID);
-				assert(sourceBlock != nullptr);
-				ot::GraphicsItem* srcConn = sourceBlock->findItem(connection.fromConnectable);
-				ot::GraphicsItem* destConn = destinationBlock->findItem(connection.toConnectable);
-				if (srcConn && destConn) {
-					addConnection(srcConn, destConn);
-				}
-				else 
-				{
-					OT_LOG_EA("Invalid graphics item name");
-				}
-			}
-		}
-	}
+	return (m_connections.find(connectionKey) != m_connections.end() || m_connections.find(reversedConnectionKey) != m_connections.end()) ;
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {

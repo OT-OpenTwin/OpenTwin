@@ -4,14 +4,15 @@
 #include "OpenTwinFoundation/BusinessLogicHandler.h"
 #include "EntityBlock.h"
 #include "OpenTwinCore/CoreTypes.h"
+#include "OTGui/GraphicsPackage.h"
 
 class BlockEntityHandler  : public BusinessLogicHandler
 {
 public:
 
 	static BlockEntityHandler& GetInstance();
-	ot::UID CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
-	void AddBlockConnection(ot::UID idOrigin, ot::UID idDestination, const std::string& connectorOrigin, const std::string& connectorDest);
+	std::string CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
+	void AddBlockConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
 	void RegisterBlockEntity(const std::string& key, std::function < std::shared_ptr<EntityBlock>()> factoryMethod);
 
 private:

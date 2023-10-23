@@ -22,29 +22,41 @@ public:
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	
-	void setBlockID(ot::UID blockID) { _blockID = blockID; }
-	ot::UID getBlockID() const { return _blockID; }
+	void setBlockID(ot::UID blockID) { _blockID = std::to_string(blockID); }
+	std::string getBlockID() const { return _blockID; }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	
 	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
 	std::list<ot::BlockConnection> getAllOutgoingConnections() const { return _outgoingConnections; }
+	std::list<ot::BlockConnection> getAllIngoingConnections() const { return _ingoingConnections; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
-	void AddOutgoingConnection(const ot::BlockConnection& connection) { _outgoingConnections.push_back(connection); }
+	void AddOutgoingConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection) //ToDo: Eingabe ob in oder outgoing sollte abhängig vom Typ des Connectors sein.
+	{ 
+		assert(connection.fromUID == _blockID);
+		_outgoingConnections.push_back(connection); 
+	}
+	void AddIngoingConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
+	{ 
+		assert(connection.toUID == _blockID);
+		_ingoingConnections.push_back(connection);
+	}
+
 
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
 
 protected:
-	ot::UID _blockID = 0;
+	std::string _blockID = "";
 	ot::UID _coordinate2DEntityID = 0;
 	ot::BasicServiceInformation _info;
 	std::string	_graphicsScenePackage;
 
 	std::list<ot::Connector> _connectors;
 	std::list<ot::BlockConnection> _outgoingConnections;
+	std::list<ot::BlockConnection> _ingoingConnections;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 

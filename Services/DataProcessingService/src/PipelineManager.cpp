@@ -67,15 +67,16 @@ void PipelineManager::CreatePipelines(std::list<std::shared_ptr<EntityBlock>>& a
 
 void PipelineManager::AddFiltersAndSinks(Pipeline& newPipeline, std::list<ot::BlockConnection>& allBlockConnections, std::list<std::shared_ptr<EntityBlock>>& allBlockEntities)
 {
-	for (auto& connection : allBlockConnections)
+	for (auto& blockConnection : allBlockConnections)
 	{
+		auto connection	= blockConnection.getConnection();
 		for (auto& blockEntity : allBlockEntities)
 		{
-			if (connection.getIDDestination() == blockEntity->getBlockID())
+			if (connection.fromUID == blockEntity->getBlockID())
 			{
 				for (auto& connector : blockEntity->getAllConnectors())
 				{
-					if (connection.getConnectorDestination() == connector.getConnectorName())
+					if (connection.toConnectable == connector.getConnectorName())
 					{
 						if (connector.getConnectorType() == ot::ConnectorType::Filter)
 						{
@@ -88,7 +89,7 @@ void PipelineManager::AddFiltersAndSinks(Pipeline& newPipeline, std::list<ot::Bl
 								_pipelineSinks[blockEntity->getBlockID()] = new PipelineSink(blockEntity);
 							}
 							newPipeline.AddSink(_pipelineSinks[blockEntity->getBlockID()]);
-							_pipelineSinks[blockEntity->getBlockID()]->setConnectorAssoziation(connection.getConnectorOrigin(), connection.getConnectorDestination());
+							_pipelineSinks[blockEntity->getBlockID()]->setConnectorAssoziation(connection.fromConnectable, connection.toConnectable);
 						}
 						else
 						{
@@ -112,7 +113,7 @@ bool PipelineManager::CheckIfSourceHasOutgoingConnection(ot::Connector& connecto
 	{
 		for (auto& connection : allBlockConnections)
 		{
-			if (connection.getConnectorOrigin() == connector.getConnectorName())
+			if (connection.getConnection().fromConnectable == connector.getConnectorName())
 			{
 				return true;
 			}

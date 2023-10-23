@@ -124,7 +124,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			dependencies.setPythonScriptFolderID(entityInfo.getID());
 		}
 
-		ot::UID blockID = BlockEntityHandler::GetInstance().CreateBlockEntity(editorName, itemName,position);
+		std::string blockID = BlockEntityHandler::GetInstance().CreateBlockEntity(editorName, itemName,position);
 		BlockItemManager blockItemManager;
 		//OT_rJSON_doc reqDoc = blockItemManager.CreateBlockItem(itemName, blockID, position);
 
@@ -157,8 +157,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		pckg.setFromJsonObject(pckgObj);
 
 		// Store connection information
-		for (auto c : pckg.connections()) {
-			BlockEntityHandler::GetInstance().AddBlockConnection(std::stoll(c.fromUID), std::stoll(c.toUID), c.fromConnectable, c.toConnectable);
+		for (auto connection : pckg.connections()) {
+			BlockEntityHandler::GetInstance().AddBlockConnection(connection);
 		}
 
 		// Request UI to add connections

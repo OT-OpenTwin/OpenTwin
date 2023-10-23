@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\BlockConnection.h" />
     <ClInclude Include="include\BoundingBox.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.hpp" />
@@ -128,7 +127,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
-    <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />
     <ClCompile Include="src\ClassFactory.cpp" />
