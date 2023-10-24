@@ -91,9 +91,8 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionPacka
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	auto it = m_items.find(_item->graphicsItemUid());
 	if (it != m_items.end()) {
-		OT_LOG_EAS("An item with the ID \"" + _item->graphicsItemUid() + "\" already exists in this view");
-		delete _item;
-		return;
+		OT_LOG_D("Overwriting item with the ID \"" + _item->graphicsItemUid());
+		removeItem(_item->graphicsItemUid());
 	}
 
 	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
