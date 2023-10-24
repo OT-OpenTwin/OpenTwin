@@ -57,15 +57,9 @@ void BlockEntityHandler::AddBlockConnection(const ot::GraphicsConnectionPackage:
 	{
 		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
 		std::shared_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(baseEnt));
-		if (blockEnt->getBlockID() == connection.fromUID)
+		if (blockEnt->getBlockID() == connection.fromUID || blockEnt->getBlockID() == connection.toUID)
 		{
-			blockEnt->AddOutgoingConnection(connection);
-			blockEnt->setModified();
-			changedEntities.push_back(blockEnt);
-		}
-		else if (blockEnt->getBlockID() == connection.toUID)
-		{
-			blockEnt->AddIngoingConnection(connection);
+			blockEnt->AddConnection(connection);
 			blockEnt->setModified();
 			changedEntities.push_back(blockEnt);
 		}

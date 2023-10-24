@@ -42,7 +42,7 @@ void PipelineManager::CreatePipelines(std::list<std::shared_ptr<EntityBlock>>& a
 	for (auto blockEntity : allBlockEntities)
 	{
 		std::list<ot::Connector> allConnectors = blockEntity->getAllConnectors();
-		std::list<ot::BlockConnection> allConnections = blockEntity->getAllOutgoingConnections();
+		std::list<ot::BlockConnection> allConnections = blockEntity->getAllConnections();
 		for (ot::Connector& connector : allConnectors)
 		{
 			if (connector.getConnectorType() == ot::ConnectorType::Source)

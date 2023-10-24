@@ -12,6 +12,7 @@
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsItemCfg.h"
 
 class __declspec(dllexport) EntityBlock : public EntityBase
 {
@@ -21,28 +22,18 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlock"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
-	
+	virtual void addVisualizationNodes(void) override;
+
 	void setBlockID(ot::UID blockID) { _blockID = std::to_string(blockID); }
 	std::string getBlockID() const { return _blockID; }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	
 	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
-	std::list<ot::BlockConnection> getAllOutgoingConnections() const { return _outgoingConnections; }
-	std::list<ot::BlockConnection> getAllIngoingConnections() const { return _ingoingConnections; }
+	std::list<ot::BlockConnection> getAllConnections() const { return _connections; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
-	void AddOutgoingConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection) //ToDo: Eingabe ob in oder outgoing sollte abhängig vom Typ des Connectors sein.
-	{ 
-		assert(connection.fromUID == _blockID);
-		_outgoingConnections.push_back(connection); 
-	}
-	void AddIngoingConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
-	{ 
-		assert(connection.toUID == _blockID);
-		_ingoingConnections.push_back(connection);
-	}
-
+	void AddConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
 
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
@@ -53,13 +44,19 @@ protected:
 	ot::UID _coordinate2DEntityID = 0;
 	ot::BasicServiceInformation _info;
 	std::string	_graphicsScenePackage;
+	std::string _navigationTreeIconName = "";
+	std::string _navigationTreeIconNameHidden = "";
 
 	std::list<ot::Connector> _connectors;
-	std::list<ot::BlockConnection> _outgoingConnections;
-	std::list<ot::BlockConnection> _ingoingConnections;
+	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
+	std::list<ot::BlockConnection> _connections;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+
+	void CreateNavigationTreeEntry();
+	void CreateBlockItem();
+	void CreateConnections();
 };
