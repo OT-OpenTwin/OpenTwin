@@ -32,3 +32,7 @@
 //! @param ___type The property type
 //! @param ___name The property name
 #define OT_PROPERTY_NV(___type, ___name) ___type m_##___name; void set##___name(const ___type& _##___name) { m_##___name = _##___name; }; const ___type& ___name(void) const { return m_##___name; };
+
+
+
+#define OT_DECL_NOCOPY(___class) ___class(const ___class&) = delete; ___class(const ___class&&) = delete; ___class& operator = (const ___class&) = delete;

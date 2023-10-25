@@ -21,12 +21,21 @@
   <ItemGroup>
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\Font.h" />
+    <ClInclude Include="include\OTGui\GraphicsBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsConnectionCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsEllipseItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsGridLayoutItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsHBoxLayoutItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsPackage.h" />
     <ClInclude Include="include\OTGui\GraphicsFlowItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsStackItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsVBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
     <ClInclude Include="include\OTGui\Margins.h" />
@@ -34,15 +43,24 @@
     <ClInclude Include="include\OTGui\Painter2D.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GraphicsHBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\Border.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\GraphicsBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsCollectionCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCfg.cpp" />
+    <ClCompile Include="src\GraphicsEllipseItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsGridLayoutItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPackage.cpp" />
     <ClCompile Include="src\GraphicsFlowItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfg.cpp" />
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsStackItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsTextItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsVBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
     <ClCompile Include="src\LengthLimitation.cpp" />
     <ClCompile Include="src\Margins.cpp" />

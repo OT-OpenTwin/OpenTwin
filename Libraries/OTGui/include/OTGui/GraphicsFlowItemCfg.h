@@ -14,6 +14,8 @@ namespace ot {
 
 	class GraphicsGridLayoutItemCfg;
 
+	class Painter2D;
+
 	class OT_GUI_API_EXPORTONLY GraphicsFlowConnectorCfg {
 	public:
 		enum ConnectorFigure {

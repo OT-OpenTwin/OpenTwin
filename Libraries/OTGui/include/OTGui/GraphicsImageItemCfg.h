@@ -1,4 +1,4 @@
-//! @file GraphcisLayoutItemCfg.h
+//! @file GraphicsImageItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
@@ -8,18 +8,15 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GuiTypes.h"
 
-// std header
-#include <list>
-#include <vector>
+#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsLayoutItemCfg : public GraphicsItemCfg {
+	class OT_GUI_API_EXPORTONLY GraphicsImageItemCfg : public ot::GraphicsItemCfg {
 	public:
-		GraphicsLayoutItemCfg() {};
-		virtual ~GraphicsLayoutItemCfg();
+		GraphicsImageItemCfg(const std::string& _imageSubPath = std::string());
+		virtual ~GraphicsImageItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -31,13 +28,17 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		virtual void addChildItem(ot::GraphicsItemCfg* _item) = 0;
+		//! @brief Returns the key that is used to create an instance of this class in the simple factory
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg); };
 
-	protected:
-		
+		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
+		const std::string& imagePath(void) const { return m_imageSubPath; };
+
 	private:
-		GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg&) = delete;
-		GraphicsLayoutItemCfg& operator = (const GraphicsLayoutItemCfg&) = delete;
+		std::string m_imageSubPath;
+
+		GraphicsImageItemCfg(GraphicsImageItemCfg&) = delete;
+		GraphicsImageItemCfg& operator = (GraphicsImageItemCfg&) = delete;
 	};
 
 }

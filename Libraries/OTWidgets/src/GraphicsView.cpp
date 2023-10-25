@@ -9,6 +9,7 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
 
 // Qt header
 #include <QtGui/qevent.h>

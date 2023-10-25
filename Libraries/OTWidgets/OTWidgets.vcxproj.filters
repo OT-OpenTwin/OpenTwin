@@ -40,6 +40,48 @@
     <ClCompile Include="src\OTQtConverter.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDrag.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsGroupItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsStackItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsRectangularItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEllipseItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsTextItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsImageItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsLineItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsGridLayoutItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsLayoutItemWrapper.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsBoxLayoutItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -92,6 +134,48 @@
     <ClInclude Include="include\OTWidgets\OTQtConverter.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsGroupItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsStackItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsRectangularItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsTextItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsImageItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsLayoutItemWrapper.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsVBoxLayoutItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsHBoxLayoutItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -106,7 +190,7 @@
     <QtMoc Include="include\OTWidgets\GraphicsPicker.h">
       <Filter>include\Graphics</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\GraphicsItem.h">
+    <QtMoc Include="include\OTWidgets\GraphicsItemDrag.h">
       <Filter>include\Graphics</Filter>
     </QtMoc>
   </ItemGroup>

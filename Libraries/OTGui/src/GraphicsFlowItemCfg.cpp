@@ -6,7 +6,15 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTGui/GraphicsStackItemCfg.h"
+#include "OTGui/GraphicsTextItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
+#include "OTGui/GraphicsVBoxLayoutItemCfg.h"
+#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/Painter2D.h"
 
 namespace ot {

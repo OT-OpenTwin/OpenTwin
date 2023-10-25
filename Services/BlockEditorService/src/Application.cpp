@@ -19,13 +19,17 @@
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
+#include "OTGui/GraphicsVBoxLayoutItemCfg.h"
+#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/GraphicsGridLayoutItemCfg.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
 
 Application * g_instance{ nullptr };
 
 #define EXAMPLE_NAME_Block1 "Alpha 1"
 #define EXAMPLE_NAME_Block2 "Beta 2"
-#define EXAMPLE_NAME_Block3 "Gamma 3"
+#define EXAMPLE_NAME_Block3 "Super mega ultra duper flex mex hex dex rex jax lax Gamma 3"
 #define EXAMPLE_NAME_Block4 "Delta 4"
 
 namespace ottest {

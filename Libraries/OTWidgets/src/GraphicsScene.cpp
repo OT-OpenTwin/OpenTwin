@@ -7,6 +7,7 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsLineItem.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -84,7 +85,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 	}
 	else {
 		if (m_connectionOrigin == _item) {
-			stopConnection();
+			this->stopConnection();
 			return;
 		}
 		OT_LOG_D("New conncetion");
