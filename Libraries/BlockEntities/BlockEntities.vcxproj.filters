@@ -44,7 +44,7 @@
     <ClCompile Include="src\ClassFactoryBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityBlockDatabaseAccess1.cpp">
+    <ClCompile Include="src\EntityBlockDatabaseAccess.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockPlot1D.cpp">
