@@ -5,6 +5,7 @@
 
 #include "Application.h"
 #include "ClassFactoryBlock.h"
+#include "ClassFactory.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
@@ -39,23 +40,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 
 void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionPackage::ConnectionInfo>& connections)
 {
-	std::list<std::string> blockItemNames =	_modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactoryBlock classFactory;
-	
-	std::map<std::string, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
-	for (auto& entityInfo : entityInfos)
-	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(),classFactory);
-		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
-		{
-			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
-			assert(blockEntity != nullptr);
-			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
-		}
-	}
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	for (auto& connection : connections)
@@ -106,14 +91,27 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc);
 
-	std::string response = _uiComponent->sendMessage(true, doc);
-	
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		// Message is queued, no response here
+	// Message is queued, no response here
+	_uiComponent->sendMessage(true, doc);
+}
 
-		//OT_LOG_E("Invalid response from UI");
-		//uiComponent->displayDebugMessage("Invalid response\n");
+void BlockEntityHandler::UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position)
+{
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
+	if (blockEntitiesByBlockID.find(blockID) == blockEntitiesByBlockID.end())
+	{
+		OT_LOG_EAS("Position of block item cannot be updated because a block with id: " + blockID + " was not found");
 	}
+	auto blockEntity = blockEntitiesByBlockID[blockID];
+	std::list<ot::EntityInformation> entityInfos;
+	ot::UIDList entityList{ blockEntity->getCoordinateEntityID() };
+	_modelComponent->getEntityInformation(entityList, entityInfos);
+	ClassFactory classFactory;
+	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), classFactory);
+	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
+	coordinateEnt->setCoordinates(position);
+	coordinateEnt->StoreToDataBase();
+	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Update BlockItem position");
 }
 
 void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
@@ -129,6 +127,12 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	if (plotBlock != nullptr)
 	{
 		plotBlock->createProperties();
+	}
+
+	EntityBlockDatabaseAccess* dbaBlock = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
+	if (dbaBlock != nullptr)
+	{
+		dbaBlock->createProperties();
 	}
 }
 
@@ -159,4 +163,26 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	//pckg->addCollection(mathBlockCollection);
 
 	return pckg;
+}
+
+std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
+{
+	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
+	std::list<ot::EntityInformation> entityInfos;
+	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	ClassFactoryBlock classFactory;
+
+	std::map<std::string, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
+	for (auto& entityInfo : entityInfos)
+	{
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
+		{
+			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
+			assert(blockEntity != nullptr);
+			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
+		}
+	}
+	return blockEntitiesByBlockID;
 }

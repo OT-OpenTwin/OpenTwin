@@ -107,6 +107,8 @@ namespace ot {
 		//! @throw std::exception if the member is missing or the member type is not double
 		OT_CORE_API_EXPORTONLY double getDouble(OT_rJSON_doc & _doc, const char * _member);
 
+		OT_CORE_API_EXPORTONLY OT_rJSON_val getObject(OT_rJSON_doc& _doc, const char* _member);
+
 		//! @brief Will return the uLongLong list from the specified member in the provided document
 		//! @param _doc The document
 		//! @param _member The name of the member

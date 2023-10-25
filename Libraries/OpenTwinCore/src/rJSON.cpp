@@ -115,6 +115,19 @@ double ot::rJSON::getDouble(OT_rJSON_doc & _doc, const char * _member) {
 	return _doc[_member].GetDouble();
 }
 
+OT_rJSON_val ot::rJSON::getObject(OT_rJSON_doc& _doc, const char* _member)
+{
+	memberCheck(_doc, _member);
+	if (!_doc[_member].IsObject())
+	{
+		std::string error("Member \"");
+		error.append(_member);
+		error.append("\" is not an Object type");
+		throw std::exception(error.c_str());
+	}
+	return _doc[_member].GetObject();
+}
+
 std::list<unsigned long long> ot::rJSON::getULongLongList(OT_rJSON_doc & _doc, const char * _member) {
 	memberCheck(_doc, _member);
 	if (!_doc[_member].IsArray()) {

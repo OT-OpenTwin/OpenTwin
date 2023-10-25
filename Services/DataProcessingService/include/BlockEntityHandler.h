@@ -13,11 +13,12 @@ public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionPackage::ConnectionInfo>& connections);
 	void OrderUIToCreateBlockPicker();
-
+	void UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position);
 private:
 	const std::string _blockFolder = "Blocks";
 	const std::string _packageName = "Data Processing";
 
 	void InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
+	std::map<std::string, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 };

@@ -111,6 +111,7 @@ public:
 	const std::string &getOwningService(void) { return owningService; };
 
 	virtual void detachFromHierarchy(void);
+	//virtual void onRemoveFromModelState() {}
 
 protected:
 	virtual int getSchemaVersion(void) { return 1; };

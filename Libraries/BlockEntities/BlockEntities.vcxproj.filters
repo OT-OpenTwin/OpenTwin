@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ClassFactoryBlock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityBlock.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -39,12 +36,15 @@
     <ClInclude Include="include\BlockConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ClassFactoryBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClassFactoryBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityBlockDatabaseAccess.cpp">
+    <ClCompile Include="src\EntityBlockDatabaseAccess1.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockPlot1D.cpp">

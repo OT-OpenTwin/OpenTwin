@@ -33,7 +33,7 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 
 	block->addLeft("C0", "Parameter", ot::GraphicsFlowConnectorCfg::Square);
-	block->addRight("C0", "Output", ot::GraphicsFlowConnectorCfg::Square);
+	block->addRight("C1", "Output", ot::GraphicsFlowConnectorCfg::Square);
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = "Python";

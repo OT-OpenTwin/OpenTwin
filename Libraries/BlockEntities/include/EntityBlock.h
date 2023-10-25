@@ -41,6 +41,7 @@ public:
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
+	//void onRemoveFromModelState() override;
 protected:
 	std::string _blockID = "";
 	ot::UID _coordinate2DEntityID = 0;

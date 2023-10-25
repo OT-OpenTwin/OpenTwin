@@ -124,27 +124,6 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		}
 
 		_blockEntityHandler.CreateBlockEntity(editorName, itemName,position);
-		//BlockItemManager blockItemManager;
-		//OT_rJSON_doc reqDoc = blockItemManager.CreateBlockItem(itemName, blockID, position);
-
-		//ot::GraphicsScenePackage pckg("Data Processing");
-
-		//
-		//ot::GraphicsItemCfg* itm = blockItemManager.GetBlockConfiguration(itemName);
-		//itm->setPosition(position);
-		//itm->setUid(std::to_string(blockID));
-		//pckg.addItem(itm);
-
-		//OT_rJSON_createDOC(reqDoc);
-		//ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-
-		//OT_rJSON_createValueObject(pckgDoc);
-		//pckg.addToJsonObject(reqDoc, pckgDoc);
-		//ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
-
-		//ot::OwnerServiceGlobal::instance().addToJsonObject(reqDoc, reqDoc);
-		//m_uiComponent->sendMessage(true, reqDoc);
-
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 	{
@@ -155,16 +134,15 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		ot::GraphicsConnectionPackage pckg;
 		pckg.setFromJsonObject(pckgObj);
 
-		// Store connection information
 		_blockEntityHandler.AddBlockConnection(pckg.connections());
-		
-		// Request UI to add connections
-		//OT_rJSON_createDOC(reqDoc);
-		//ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
-
-		//OT_rJSON_createValueObject(reqPckgObj);
-		//pckg.addToJsonObject(reqDoc, reqPckgObj);
-		//ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+	}
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved)
+	{
+		const std::string blockID = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+		auto positionObject = ot::rJSON::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition);
+		ot::Point2DD position;
+		position.setFromJsonObject(positionObject);
+		_blockEntityHandler.UpdateBlockPosition(blockID,position);
 	}
 
 	return ""; // Return empty string if the request does not expect a return
