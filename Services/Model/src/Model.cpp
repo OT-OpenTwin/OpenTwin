@@ -4199,7 +4199,7 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	geomEntity->addVisualizationNodes();
 }
 
-void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topoEntityVersions)
+void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topoEntityVersions, const std::string& comment)
 {
 	enableQueuingHttpRequests(true);
 
@@ -4246,7 +4246,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 
 	refreshAllViews();
 	enableQueuingHttpRequests(false);
-	modelChangeOperationCompleted("Entity update performed");
+	modelChangeOperationCompleted(comment);
 }
 
 void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)

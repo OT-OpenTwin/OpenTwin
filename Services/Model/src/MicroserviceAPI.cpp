@@ -720,9 +720,10 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		{
 			std::list<ot::UID> topologyEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
 			std::list<ot::UID> topologyEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
+			std::string comment = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Description);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			globalModel->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList);
+			globalModel->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList,comment);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_AddGeometryOperation)
 		{

@@ -163,7 +163,7 @@ public:
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const std::string &properties, bool updateProperties);
-	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion);
+	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion, const std::string& comment);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
 	std::list<std::string> getListOfFolderItems(const std::string &folder, bool recursive);

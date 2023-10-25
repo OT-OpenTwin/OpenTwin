@@ -49,10 +49,10 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	for (auto& entityInfo : entityInfos)
 	{
 		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(),classFactory);
-		assert(baseEntity != nullptr);
-		std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
-		if (blockEntity != nullptr)
+		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
+			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
+			assert(blockEntity != nullptr);
 			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
 		}
 	}
@@ -90,7 +90,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			topoEntIDs.push_back(entityForUpdate->getEntityID());
 			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
 		}
-		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers);
+		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added Connection(s) to BlockEntity(ies).");
 	}
 }
 

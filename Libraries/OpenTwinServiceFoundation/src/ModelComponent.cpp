@@ -777,13 +777,13 @@ void ot::components::ModelComponent::updatePropertyGrid()
 	}
 }
 
-void ot::components::ModelComponent::updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions)
+void ot::components::ModelComponent::updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment)
 {
 	OT_rJSON_createDOC(requestDoc);
 	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateTopologyEntity);
 	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, topologyEntityIDs);
 	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, topologyEntityVersions);
-
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Description, comment);
 	// Send the command
 	std::string response;
 	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {

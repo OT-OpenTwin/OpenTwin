@@ -79,7 +79,7 @@ namespace ot {
 			void getEntityProperties(const std::string &entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
 
 			void updatePropertyGrid();
-			void updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions);
+			void updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment);
 			
 			// Specific entity management helper functions
 			EntityPlot1D *addPlot1DEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID, std::string>> &curves);
