@@ -114,7 +114,6 @@ namespace ot {
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
-		void handleItemMoved(void);
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		//! @brief Will expand the size according to the margins
@@ -123,6 +122,8 @@ namespace ot {
 		//! @brief Calculates the actual bounding rect including margins and requested size.
 		//! @param _rect The default item rect (the size should be the prefferred item size)
 		QRectF handleGetGraphicsItemBoundingRect(const QRectF& _rect) const;
+
+		void handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value);
 
 		// ###############################################################################################################################################
 

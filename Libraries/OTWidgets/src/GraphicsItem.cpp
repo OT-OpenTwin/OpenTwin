@@ -172,11 +172,6 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	}
 }
 
-void ot::GraphicsItem::handleItemMoved(void) {
-	for (auto c : m_connections) c->updateConnection();
-	this->raiseEvent(ot::GraphicsItem::ItemMoved);
-}
-
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) {
 		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), Qt::GlobalColor::green);
@@ -207,6 +202,15 @@ QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) 
 		_rect.topLeft(), 
 		this->applyGraphicsItemMargins(_rect.size()).expandedTo(m_minSize).expandedTo(m_requestedSize).boundedTo(m_maxSize)
 	);
+}
+
+void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
+		for (auto c : m_connections) {
+			c->updateConnection();
+		}
+		this->raiseEvent(ot::GraphicsItem::ItemMoved);
+	}
 }
 
 // ###############################################################################################################################################
@@ -351,9 +355,7 @@ void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
 }
 
 QVariant ot::GraphicsGroupItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		this->handleItemMoved();
-	}
+	this->handleItemChange(_change, _value);
 	return QGraphicsItemGroup::itemChange(_change, _value);
 }
 
@@ -563,9 +565,7 @@ void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 }
 
 QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		this->handleItemMoved();
-	}
+	this->handleItemChange(_change, _value);
 	return _value;
 }
 
@@ -669,9 +669,7 @@ void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
 }
 
 QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		this->handleItemMoved();
-	}
+	this->handleItemChange(_change, _value);
 	return _value;
 }
 
@@ -806,9 +804,7 @@ void ot::GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 }
 
 QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		this->handleItemMoved();
-	}
+	this->handleItemChange(_change, _value);
 	return QGraphicsTextItem::itemChange(_change, _value);
 }
 
@@ -884,9 +880,7 @@ QRectF ot::GraphicsImageItem::boundingRect(void) const {
 }
 
 QVariant ot::GraphicsImageItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		this->handleItemMoved();
-	}
+	this->handleItemChange(_change, _value);
 	return QGraphicsPixmapItem::itemChange(_change, _value);
 }
 
@@ -965,9 +959,7 @@ QRectF ot::GraphicsLineItem::boundingRect(void) const {
 }
 
 QVariant ot::GraphicsLineItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		this->handleItemMoved();
-	}
+	this->handleItemChange(_change, _value);
 	return QGraphicsLineItem::itemChange(_change, _value);
 }
 

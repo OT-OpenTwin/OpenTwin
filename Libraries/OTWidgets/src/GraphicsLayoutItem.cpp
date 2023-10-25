@@ -40,9 +40,7 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	OTAssertNullptr(m_owner);
-	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
-		m_owner->handleItemMoved();
-	}
+	m_owner->handleItemChange(_change, _value);
 	return QGraphicsWidget::itemChange(_change, _value);
 }
 
