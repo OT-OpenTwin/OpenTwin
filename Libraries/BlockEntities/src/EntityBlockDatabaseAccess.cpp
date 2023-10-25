@@ -4,29 +4,9 @@
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-}
-
-void EntityBlockDatabaseAccess::addVisualizationNodes(void)
-{
-	if (!getName().empty())
-	{
-		TreeIcon treeIcons;
-		treeIcons.size = 32;
-
-		treeIcons.visibleIcon = "BlockDataBaseAccess";
-		treeIcons.hiddenIcon = "BlockDataBaseAccess";
-
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
-
-		treeIcons.addToJsonDoc(&doc);
-
-		getObserver()->sendMessageToViewer(doc);
-		
-	}
+	_navigationTreeIconName = "BlockDataBaseAccess";
+	_navigationTreeIconNameHidden = "BlockDataBaseAccess";
+	int sieben = 8;
 }
 
 void EntityBlockDatabaseAccess::createProperties()
@@ -135,7 +115,33 @@ bool EntityBlockDatabaseAccess::SetVisibleParameter3(bool visible)
 
 ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 {
-	return nullptr;
+	ot::GraphicsFlowItemCfg* block = new ot::GraphicsFlowItemCfg;
+
+	const ot::Color colourTitle(ot::Color::Lime);
+	const ot::Color colourBackground(ot::Color::White);
+	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
+	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
+
+	block->addRight("C0", "Quantity", ot::GraphicsFlowConnectorCfg::Square);
+	block->addRight("C1", "Parameter 1", ot::GraphicsFlowConnectorCfg::Square);
+
+	auto propertyBase =	getProperties().getProperty(_propertyNameDimension);
+	if (propertyBase != nullptr) //The method is currently also used for creating the BlockPicker preview. In this case an uninitialized Entity is used to create the clockconfig
+	{
+		auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+		const std::string queryDimension = selectionProperty->getValue();
+		if (queryDimension != _propertyValueDimension1)
+		{
+			block->addRight("C2", "Parameter 2", ot::GraphicsFlowConnectorCfg::Square);
+		}
+		if (queryDimension == _propertyValueDimension3)
+		{
+			block->addRight("C3", "Parameter 3", ot::GraphicsFlowConnectorCfg::Square);
+		}
+	}
+	const std::string blockName = getClassName();
+	const std::string blockTitel = "Database Access";
+	return block->createGraphicsItem(blockName, blockTitel);
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
