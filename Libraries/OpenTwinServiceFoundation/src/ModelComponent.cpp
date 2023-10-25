@@ -55,13 +55,14 @@ ot::components::ModelComponent::~ModelComponent()
 
 // Model management
 
-std::list<std::string> ot::components::ModelComponent::getListOfFolderItems(const std::string & _folder)
+std::list<std::string> ot::components::ModelComponent::getListOfFolderItems(const std::string & _folder, bool recursive)
 {
 	std::list<std::string> folderItems;
 
 	OT_rJSON_createDOC(requestDoc);
 	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetListOfFolderItems);
 	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Folder, _folder);
+	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Recursive, recursive);
 
 	// Send the command
 	std::string response;

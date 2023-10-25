@@ -626,10 +626,10 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		else if (action == OT_ACTION_CMD_MODEL_GetListOfFolderItems)
 		{
 			std::string folder = ot::rJSON::getString(doc, OT_ACTION_PARAM_Folder);
-
+			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			
-			return getReturnJSONFromStringList(globalModel->getListOfFolderItems(folder));
+			return getReturnJSONFromStringList(globalModel->getListOfFolderItems(folder,recursive));
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType)
 		{

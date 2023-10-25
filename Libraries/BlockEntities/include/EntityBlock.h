@@ -39,6 +39,8 @@ public:
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
 
+	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
+
 protected:
 	std::string _blockID = "";
 	ot::UID _coordinate2DEntityID = 0;
@@ -51,7 +53,6 @@ protected:
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
 	std::list<ot::BlockConnection> _connections;
 
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;

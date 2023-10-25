@@ -22,7 +22,6 @@
 #include "OpenTwinCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
 
-#include "BlockItemManager.h"
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
 
@@ -124,8 +123,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 			dependencies.setPythonScriptFolderID(entityInfo.getID());
 		}
 
-		std::string blockID = BlockEntityHandler::GetInstance().CreateBlockEntity(editorName, itemName,position);
-		BlockItemManager blockItemManager;
+		_blockEntityHandler.CreateBlockEntity(editorName, itemName,position);
+		//BlockItemManager blockItemManager;
 		//OT_rJSON_doc reqDoc = blockItemManager.CreateBlockItem(itemName, blockID, position);
 
 		//ot::GraphicsScenePackage pckg("Data Processing");
@@ -157,10 +156,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		pckg.setFromJsonObject(pckgObj);
 
 		// Store connection information
-		for (auto connection : pckg.connections()) {
-			BlockEntityHandler::GetInstance().AddBlockConnection(connection);
-		}
-
+		_blockEntityHandler.AddBlockConnection(pckg.connections());
+		
 		// Request UI to add connections
 		//OT_rJSON_createDOC(reqDoc);
 		//ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
@@ -191,9 +188,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup(pageName, groupName);
 	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
 	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "Kriging");
-
-	BlockItemManager blockItemManger;
-	blockItemManger.OrderUIToCreateBlockPicker();
+	_blockEntityHandler.setUIComponent(_ui);
+	_blockEntityHandler.OrderUIToCreateBlockPicker();
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
@@ -211,7 +207,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-	 BlockEntityHandler::GetInstance().setModelComponent(_model);
+	_blockEntityHandler.setModelComponent(_model);
 	_pipelineManager.setModelComponent(_model);
 	PropertyHandlerDatabaseAccessBlock::instance().setModelComponent(_model);
 }

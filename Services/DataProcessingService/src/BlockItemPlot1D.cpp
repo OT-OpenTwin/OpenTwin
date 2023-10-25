@@ -1,6 +1,5 @@
 #include "BlockItemPlot1D.h"
 #include "EntityBlockPlot1D.h"
-#include "BlockEntityFactoryRegistrar.h"
 
 BlockItemPlot1D::BlockItemPlot1D()
 	:BlockItemDataProcessing()
@@ -9,7 +8,6 @@ BlockItemPlot1D::BlockItemPlot1D()
 	_blockName = "Plot 1D";
 	_blockTitle = "Plot 1D";
 }
-static BlockEntityFactoryRegistrar factoryEntry("Plot 1D", BlockItemPlot1D::CreateBlockEntity);
 
 void BlockItemPlot1D::AddConnectors(ot::GraphicsFlowItemCfg* block)
 {

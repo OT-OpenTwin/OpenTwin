@@ -75,9 +75,6 @@
     <ClCompile Include="src\BlockHandlerPlot1D.cpp">
       <Filter>Source Files\BlockHandling</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockItemManager.cpp">
-      <Filter>Source Files\Blocks</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockEntityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -143,9 +140,6 @@
     <ClInclude Include="include\BlockHandlerPlot1D.h">
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockItemManager.h">
-      <Filter>Header Files\Blocks</Filter>
-    </ClInclude>
     <ClInclude Include="include\BlockEntityHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -160,9 +154,6 @@
     </ClInclude>
     <ClInclude Include="include\ExternalDependencies.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BlockEntityFactoryRegistrar.h">
-      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="include\BufferBlockDatabaseAccess.h">
       <Filter>Header Files\Blocks</Filter>

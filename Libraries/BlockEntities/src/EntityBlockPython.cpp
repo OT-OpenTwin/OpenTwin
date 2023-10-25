@@ -3,8 +3,7 @@
 
 
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner), 
-	_colourTitle(ot::Color::Blue), _colourBackground(ot::Color::White)
+	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 	_navigationTreeIconName = "python";
 	_navigationTreeIconNameHidden = "python";
@@ -26,13 +25,18 @@ std::string EntityBlockPython::getSelectedScript()
 
 ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 {
-	ot::GraphicsFlowItemCfg* block = new ot::GraphicsFlowItemCfg;
+	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
 
-	block->setTitleBackgroundColor(_colourTitle.rInt(), _colourTitle.gInt(), _colourTitle.bInt());
-	block->setBackgroundColor(_colourBackground.rInt(), _colourBackground.gInt(), _colourBackground.gInt());
+	const ot::Color colourTitle(ot::Color::Cyan);
+	const ot::Color colourBackground(ot::Color::White);
+	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
+	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 
 	block->addLeft("C0", "Parameter", ot::GraphicsFlowConnectorCfg::Square);
 	block->addRight("C0", "Output", ot::GraphicsFlowConnectorCfg::Square);
 
-	return block->createGraphicsItem("Python", "Python");
+	const std::string blockName = getClassName();
+	const std::string blockTitel = "Python";
+	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	return graphicsItemConfig;
 }

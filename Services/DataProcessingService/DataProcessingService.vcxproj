@@ -186,7 +186,6 @@
     <ClCompile Include="src\BlockEntityHandler.cpp" />
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp" />
     <ClCompile Include="src\BlockHandlerPlot1D.cpp" />
-    <ClCompile Include="src\BlockItemManager.cpp" />
     <ClCompile Include="src\BlockItemDataProcessing.cpp" />
     <ClCompile Include="src\BlockItemPlot1D.cpp" />
     <ClCompile Include="src\BlockItemPython.cpp" />
@@ -205,13 +204,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\BlockEntityFactoryRegistrar.h" />
     <ClInclude Include="include\BlockItemDatabaseAccess.h" />
     <ClInclude Include="include\BlockEntityHandler.h" />
     <ClInclude Include="include\BlockHandler.h" />
     <ClInclude Include="include\BlockHandlerDatabaseAccess.h" />
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
-    <ClInclude Include="include\BlockItemManager.h" />
     <ClInclude Include="include\BlockItemDataProcessing.h" />
     <ClInclude Include="include\BlockItemPlot1D.h" />
     <ClInclude Include="include\BlockItemPython.h" />

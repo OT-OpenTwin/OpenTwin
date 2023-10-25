@@ -48,8 +48,8 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 
 void EntityBlock::AddConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
 {
-	assert(connection.fromUID == _blockID);
 	_connections.push_back(connection);
+	setModified();
 }
 
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)

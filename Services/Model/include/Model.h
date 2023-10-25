@@ -166,7 +166,7 @@ public:
 	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
-	std::list<std::string> getListOfFolderItems(const std::string &folder);
+	std::list<std::string> getListOfFolderItems(const std::string &folder, bool recursive);
 	std::list<ot::UID> getIDsOfFolderItemsOfType(const std::string &folder, const std::string &className, bool recursive);
 	std::list<EntityBase*> getListOfSelectedEntities(const std::string &typeFilter);
 	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);

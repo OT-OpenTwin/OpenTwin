@@ -1,6 +1,5 @@
 #include "BlockItemPython.h"
 #include "ExternalDependencies.h"
-#include "BlockEntityFactoryRegistrar.h"
 #include "OpenTwinCore/OwnerServiceGlobal.h"
 
 
@@ -27,5 +26,3 @@ std::shared_ptr<EntityBlock> BlockItemPython::CreateBlockEntity()
 	pythonEnt->AddConnector(ot::Connector(ot::ConnectorType::Filter, "C1"));
 	return pythonEnt;
 }
-
-static BlockEntityFactoryRegistrar factoryEntry("Python", BlockItemPython::CreateBlockEntity);

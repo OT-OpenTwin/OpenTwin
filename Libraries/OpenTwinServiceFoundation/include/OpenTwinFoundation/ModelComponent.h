@@ -56,7 +56,7 @@ namespace ot {
 			EntityBase * readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactoryHandler &classFactory);
 			UID getCurrentVisualizationModelID(void);
 
-			std::list<std::string> getListOfFolderItems(const std::string & _folder);
+			std::list<std::string> getListOfFolderItems(const std::string & _folder, bool recursive = false);
 			void getAvailableMeshes(std::string & _meshFolderName, UID & _meshFolderID, std::string & _meshName, UID & _meshID);
 			std::list<UID> getIDsOfFolderItemsOfType(const std::string &_folder, const std::string &_entityClassName, bool recursive);
 

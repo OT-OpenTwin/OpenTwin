@@ -3723,7 +3723,7 @@ std::list<ot::UID> Model::getNewEntityIDs(unsigned long long count)
 	return newIDs;
 }
 
-std::list<std::string> Model::getListOfFolderItems(const std::string &folder)
+std::list<std::string> Model::getListOfFolderItems(const std::string &folder, bool recursive)
 {
 	std::list<std::string> folderItems;
 
@@ -3736,6 +3736,10 @@ std::list<std::string> Model::getListOfFolderItems(const std::string &folder)
 			for (auto child : container->getChildrenList())
 			{
 				folderItems.push_back(child->getName());
+				if (recursive)
+				{
+					folderItems.merge(getListOfFolderItems(child->getName(), recursive));
+				}
 			}
 		}
 	}

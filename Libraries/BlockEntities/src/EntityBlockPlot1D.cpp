@@ -4,28 +4,8 @@
 EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-}
-
-void EntityBlockPlot1D::addVisualizationNodes(void)
-{
-	if (!getName().empty())
-	{
-		TreeIcon treeIcons;
-		treeIcons.size = 32;
-
-		treeIcons.visibleIcon = "Plot1DVisible";
-		treeIcons.hiddenIcon = "Plot1DVisible";
-
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
-
-		treeIcons.addToJsonDoc(&doc);
-
-		getObserver()->sendMessageToViewer(doc);
-	}
+	_navigationTreeIconName = "Plot1DVisible";
+	_navigationTreeIconNameHidden = "Plot1DVisible";
 }
 
 void EntityBlockPlot1D::createProperties()
@@ -84,5 +64,18 @@ void EntityBlockPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view& do
 
 ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 {
-	return nullptr;
+	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
+
+	const ot::Color colourTitle(ot::Color::Yellow);
+	const ot::Color colourBackground(ot::Color::White);
+	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
+	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
+
+	block->addLeft("C0", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
+	block->addLeft("C1", "X-Axis", ot::GraphicsFlowConnectorCfg::Square);
+
+	const std::string blockName = getClassName();
+	const std::string blockTitel = "Plot 1D";
+	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	return graphicsItemConfig;
 }

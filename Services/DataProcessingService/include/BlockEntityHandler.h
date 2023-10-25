@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 
 #include "OpenTwinFoundation/BusinessLogicHandler.h"
 #include "EntityBlock.h"
@@ -9,15 +10,14 @@
 class BlockEntityHandler  : public BusinessLogicHandler
 {
 public:
-
-	static BlockEntityHandler& GetInstance();
-	std::string CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
-	void AddBlockConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
-	void RegisterBlockEntity(const std::string& key, std::function < std::shared_ptr<EntityBlock>()> factoryMethod);
+	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
+	void AddBlockConnection(const std::list<ot::GraphicsConnectionPackage::ConnectionInfo>& connections);
+	void OrderUIToCreateBlockPicker();
 
 private:
 	const std::string _blockFolder = "Blocks";
-	std::map < std::string, std::function<std::shared_ptr<EntityBlock>()>> _blockEntityFactories;
+	const std::string _packageName = "Data Processing";
 
-	BlockEntityHandler() {};
+	void InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity);
+	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 };

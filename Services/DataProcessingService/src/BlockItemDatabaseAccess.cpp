@@ -1,6 +1,5 @@
 #include "BlockItemDatabaseAccess.h"
 #include "EntityBlockDatabaseAccess.h"
-#include "BlockEntityFactoryRegistrar.h"
 
 BlockItemDatabaseAccess::BlockItemDatabaseAccess(QueryDimension dimension)
 	:BlockItemDataProcessing(), _queryDimension(dimension)
@@ -9,7 +8,7 @@ BlockItemDatabaseAccess::BlockItemDatabaseAccess(QueryDimension dimension)
 	_blockName = "Database Access"; 
 	_blockTitle = "Database Access";
 }
-static BlockEntityFactoryRegistrar factoryEntry("Database Access", BlockItemDatabaseAccess::CreateBlockEntity);
+
 
 std::shared_ptr<EntityBlock> BlockItemDatabaseAccess::CreateBlockEntity()
 {
