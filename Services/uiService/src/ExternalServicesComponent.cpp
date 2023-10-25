@@ -2894,13 +2894,13 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (const auto& connection : pckg.connections()) {
-					ot::GraphicsItem* src = editor->getItem(connection.fromUID);
-					ot::GraphicsItem* dest = editor->getItem(connection.toUID);
+					ot::GraphicsItem* src = editor->getItem(connection.originUid());
+					ot::GraphicsItem* dest = editor->getItem(connection.destUid());
 					
 					if (dest != nullptr && src != nullptr && !editor->connectionAlreadyExists(connection))
 					{
-						ot::GraphicsItem* srcConn = src->findItem(connection.fromConnectable);
-						ot::GraphicsItem* destConn = dest->findItem(connection.toConnectable);
+						ot::GraphicsItem* srcConn = src->findItem(connection.originConnectable());
+						ot::GraphicsItem* destConn = dest->findItem(connection.destConnectable());
 
 						if (srcConn && destConn) {
 							editor->addConnection(srcConn, destConn);
@@ -2925,7 +2925,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 				for (auto c : pckg.connections()) {
-					editor->removeConnection(c.fromUID, c.fromConnectable, c.toUID, c.toConnectable);
+					editor->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
 				}
 			}
 			else

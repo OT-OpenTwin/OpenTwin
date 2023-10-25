@@ -12,6 +12,7 @@
 // Qt header
 #include <QtWidgets/qgraphicsview.h>
 #include "OTGui/GraphicsPackage.h"
+#include "OTGui/GraphicsConnectionCfg.h"
 
 // std header
 #include <map>
@@ -42,7 +43,7 @@ namespace ot {
 		GraphicsItem* getItem(const std::string& _itemUid);
 		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
 		
-		bool connectionAlreadyExists(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
+		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 

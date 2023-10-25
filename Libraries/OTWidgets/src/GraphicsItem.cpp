@@ -977,10 +977,6 @@ void ot::GraphicsLineItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsIt
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-std::string ot::GraphicsConnectionItem::buildKey(const std::string& _originUid, const std::string& _originItemName, const std::string& _destUid, const std::string& _destItemName) {
-	return _originUid + "|" + _originItemName + "|" + _destUid + "|" + _destItemName;
-}
-
 ot::GraphicsConnectionItem::GraphicsConnectionItem() : m_origin(nullptr), m_dest(nullptr) {
 	
 }

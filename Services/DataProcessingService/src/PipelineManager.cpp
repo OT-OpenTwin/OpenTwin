@@ -72,11 +72,11 @@ void PipelineManager::AddFiltersAndSinks(Pipeline& newPipeline, std::list<ot::Bl
 		auto connection	= blockConnection.getConnection();
 		for (auto& blockEntity : allBlockEntities)
 		{
-			if (connection.fromUID == blockEntity->getBlockID())
+			if (connection.originUid() == blockEntity->getBlockID())
 			{
 				for (auto& connector : blockEntity->getAllConnectors())
 				{
-					if (connection.toConnectable == connector.getConnectorName())
+					if (connection.destConnectable() == connector.getConnectorName())
 					{
 						if (connector.getConnectorType() == ot::ConnectorType::Filter)
 						{
@@ -89,7 +89,7 @@ void PipelineManager::AddFiltersAndSinks(Pipeline& newPipeline, std::list<ot::Bl
 								_pipelineSinks[blockEntity->getBlockID()] = new PipelineSink(blockEntity);
 							}
 							newPipeline.AddSink(_pipelineSinks[blockEntity->getBlockID()]);
-							_pipelineSinks[blockEntity->getBlockID()]->setConnectorAssoziation(connection.fromConnectable, connection.toConnectable);
+							_pipelineSinks[blockEntity->getBlockID()]->setConnectorAssoziation(connection.originConnectable(), connection.destConnectable());
 						}
 						else
 						{
@@ -113,7 +113,7 @@ bool PipelineManager::CheckIfSourceHasOutgoingConnection(ot::Connector& connecto
 	{
 		for (auto& connection : allBlockConnections)
 		{
-			if (connection.getConnection().fromConnectable == connector.getConnectorName())
+			if (connection.getConnection().originConnectable() == connector.getConnectorName())
 			{
 				return true;
 			}

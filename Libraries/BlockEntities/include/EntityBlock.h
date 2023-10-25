@@ -9,7 +9,7 @@
 #include "BlockConnection.h"
 
 #include "OTGui/GraphicsCollectionCfg.h"
-#include "OTGui/GraphicsPackage.h"
+#include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
@@ -33,7 +33,7 @@ public:
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
-	void AddConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection);
+	void AddConnection(const ot::GraphicsConnectionCfg& connection);
 
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }

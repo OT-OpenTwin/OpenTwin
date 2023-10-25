@@ -5,13 +5,14 @@
 #include "OpenTwinFoundation/BusinessLogicHandler.h"
 #include "EntityBlock.h"
 #include "OpenTwinCore/CoreTypes.h"
+#include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 
 class BlockEntityHandler  : public BusinessLogicHandler
 {
 public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
-	void AddBlockConnection(const std::list<ot::GraphicsConnectionPackage::ConnectionInfo>& connections);
+	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections);
 	void OrderUIToCreateBlockPicker();
 	void UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position);
 private:

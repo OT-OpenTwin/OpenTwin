@@ -1,5 +1,6 @@
 #include "EntityBlock.h"
 #include "OpenTwinCommunication/ActionTypes.h"
+#include "OTGui/GraphicsPackage.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner){}
@@ -46,7 +47,7 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 	setModified();
 }
 
-void EntityBlock::AddConnection(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
+void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
 {
 	_connections.push_back(connection);
 	setModified();

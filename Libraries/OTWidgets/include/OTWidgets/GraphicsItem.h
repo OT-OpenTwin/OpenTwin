@@ -492,8 +492,6 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public GraphicsLineItem {
 	public:
-		static std::string buildKey(const std::string& _originUid, const std::string& _originItemName, const std::string& _destUid, const std::string& _destItemName);
-
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();
 

@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/GraphicsConnectionCfg.h"
 #include "OpenTwinCore/Serializable.h"
 #include "OpenTwinCore/SimpleFactory.h"
 
@@ -132,13 +133,6 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsConnectionPackage : public ot::Serializable {
 	public:
-		struct ConnectionInfo {
-			std::string fromUID;
-			std::string fromConnectable;
-			std::string toUID;
-			std::string toConnectable;
-		};
-
 		GraphicsConnectionPackage(const std::string& _editorName = std::string());
 		virtual ~GraphicsConnectionPackage();
 
@@ -156,12 +150,12 @@ namespace ot {
 		const std::string& name(void) const { return m_name; };
 
 		void addConnection(const std::string& _fromUid, const std::string& _fromConnectable, const std::string& _toUid, const std::string& _toConnectable);
-		void addConnection(const GraphicsConnectionPackage::ConnectionInfo& _info) { m_connections.push_back(_info); };
-		const std::list<ConnectionInfo>& connections(void) const { return m_connections; };
+		void addConnection(const GraphicsConnectionCfg& _info) { m_connections.push_back(_info); };
+		const std::list<GraphicsConnectionCfg>& connections(void) const { return m_connections; };
 
 	private:
 		std::string m_name;
-		std::list<ConnectionInfo> m_connections;
+		std::list<GraphicsConnectionCfg> m_connections;
 
 		GraphicsConnectionPackage(const GraphicsConnectionPackage&) = delete;
 		GraphicsConnectionPackage& operator = (const GraphicsConnectionPackage&) = delete;

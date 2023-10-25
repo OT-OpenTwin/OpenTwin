@@ -14,10 +14,6 @@
 #define OT_JSON_Member_Name "Name"
 #define OT_JSON_Member_Title "Title"
 #define OT_JSON_Member_Items "Items"
-#define OT_JSON_Member_SourceUid "Source.UID"
-#define OT_JSON_Member_SourceName "Source.Name"
-#define OT_JSON_Member_DestinationUid "Destination.UID"
-#define OT_JSON_Member_DestinationName "Destination.Name"
 #define OT_JSON_Member_Collections "Collections"
 #define OT_JSON_Member_Connections "Connections"
 
@@ -173,10 +169,7 @@ void ot::GraphicsConnectionPackage::addToJsonObject(OT_rJSON_doc& _document, OT_
 	OT_rJSON_createValueArray(cArr);
 	for (auto c : m_connections) {
 		OT_rJSON_createValueObject(cObj);
-		ot::rJSON::add(_document, cObj, OT_JSON_Member_SourceUid, c.fromUID);
-		ot::rJSON::add(_document, cObj, OT_JSON_Member_SourceName, c.fromConnectable);
-		ot::rJSON::add(_document, cObj, OT_JSON_Member_DestinationUid, c.toUID);
-		ot::rJSON::add(_document, cObj, OT_JSON_Member_DestinationName, c.toConnectable);
+		c.addToJsonObject(_document, cObj);
 		cArr.PushBack(cObj, _document.GetAllocator());
 	}
 	ot::rJSON::add(_document, _object, OT_JSON_Member_Connections, cArr);
@@ -194,28 +187,16 @@ void ot::GraphicsConnectionPackage::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_val cArr = _object[OT_JSON_Member_Connections].GetArray();
 	for (rapidjson::SizeType i = 0; i < cArr.Size(); i++) {
 		OT_rJSON_checkArrayEntryType(cArr, i, Object);
-		
 		OT_rJSON_val cObj = cArr[i].GetObject();
-		OT_rJSON_checkMember(cObj, OT_JSON_Member_SourceUid, String);
-		OT_rJSON_checkMember(cObj, OT_JSON_Member_SourceName, String);
-		OT_rJSON_checkMember(cObj, OT_JSON_Member_DestinationUid, String);
-		OT_rJSON_checkMember(cObj, OT_JSON_Member_DestinationName, String);
 
-		GraphicsConnectionPackage::ConnectionInfo info;
-		info.fromUID = cObj[OT_JSON_Member_SourceUid].GetString();
-		info.fromConnectable = cObj[OT_JSON_Member_SourceName].GetString();
-		info.toUID = cObj[OT_JSON_Member_DestinationUid].GetString();
-		info.toConnectable = cObj[OT_JSON_Member_DestinationName].GetString();
+		GraphicsConnectionCfg newConnection;
+		newConnection.setFromJsonObject(cObj);
 
-		m_connections.push_back(info);
+		m_connections.push_back(newConnection);
 	}
 }
 
 void ot::GraphicsConnectionPackage::addConnection(const std::string& _fromUid, const std::string& _fromConnectable, const std::string& _toUid, const std::string& _toConnectable) {
-	GraphicsConnectionPackage::ConnectionInfo i;
-	i.fromUID = _fromUid;
-	i.fromConnectable = _fromConnectable;
-	i.toUID = _toUid;
-	i.toConnectable = _toConnectable;
-	this->addConnection(i);
+	GraphicsConnectionCfg newConnection(_fromUid, _fromConnectable, _toUid, _toConnectable);
+	this->addConnection(newConnection);
 }

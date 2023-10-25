@@ -38,30 +38,30 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionPackage::ConnectionInfo>& connections)
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	for (auto& connection : connections)
 	{
-		if (blockEntitiesByBlockID.find(connection.fromUID) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
 		{
-			blockEntitiesByBlockID[connection.fromUID]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.fromUID]);
+			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.fromUID + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + connection.originUid() + " was not found");
 		}
-		if (blockEntitiesByBlockID.find(connection.toUID) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
 		{
-			blockEntitiesByBlockID[connection.toUID]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.toUID]);
+			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.toUID + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found");
 		}
 	}
 

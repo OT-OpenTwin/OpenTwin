@@ -80,12 +80,9 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _
 	}
 }
 
-bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionPackage::ConnectionInfo& connection)
+bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& _connection)
 {
-	std::string connectionKey = ot::GraphicsConnectionItem::buildKey(connection.fromUID, connection.fromConnectable, connection.toUID, connection.toConnectable);
-	std::string reversedConnectionKey = ot::GraphicsConnectionItem::buildKey(connection.toUID, connection.toConnectable, connection.fromUID, connection.fromConnectable);
-
-	return (m_connections.find(connectionKey) != m_connections.end() || m_connections.find(reversedConnectionKey) != m_connections.end()) ;
+	return (m_connections.find(_connection.buildKey()) != m_connections.end() || m_connections.find(_connection.buildReversedKey()) != m_connections.end()) ;
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
@@ -121,12 +118,12 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	newConnection->connectItems(_origin, _dest);
 	newConnection->setGraphicsScene(m_scene);
 
-	std::string itmKey = ot::GraphicsConnectionItem::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
+	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 	m_connections.insert_or_assign(itmKey, newConnection);
 }
 
 void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
-	std::string key = ot::GraphicsConnectionItem::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
+	std::string key = ot::GraphicsConnectionCfg::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
 	auto it = m_connections.find(key);
 	if (it == m_connections.end()) {
 		OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
@@ -139,7 +136,7 @@ void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::
 }
 
 void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
-	std::string key = ot::GraphicsConnectionItem::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
+	std::string key = ot::GraphicsConnectionCfg::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
 	auto it = m_connections.find(key);
 	if (it != m_connections.end()) {
 		OT_LOG_W("Connection for key \"" + key + "\" already exists (same origin and destination in one scene)");
