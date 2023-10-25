@@ -954,7 +954,7 @@ void ot::GraphicsLineItem::setGeometry(const QRectF& _rect) {
 }
 
 QRectF ot::GraphicsLineItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(this->pos(), QGraphicsLineItem::boundingRect().size()));
+	return this->handleGetGraphicsItemBoundingRect(QGraphicsLineItem::boundingRect());
 	//return QGraphicsLineItem::boundingRect();
 }
 
