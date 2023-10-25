@@ -2074,6 +2074,7 @@ ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, con
 	m_graphicsViews.store(_serviceInfo, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
+	connect(newEditor, &ot::GraphicsView::itemMoved, this, &AppBase::slotGraphicsItemMoved);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 
 	OT_LOG_D("Editor created { \"Editor.Name\": \"" + _name  + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");

@@ -88,6 +88,7 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_margins = _cfg->margins();
 	m_minSize = QSizeF(_cfg->minimumSize().width(), _cfg->minimumSize().height());
 	m_maxSize = QSizeF(_cfg->maximumSize().width(), _cfg->maximumSize().height());
+	m_moveStartPt = QPointF(_cfg->position().x(), _cfg->position().y());
 	return true;
 }
 
@@ -174,13 +175,6 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 void ot::GraphicsItem::handleItemMoved(void) {
 	for (auto c : m_connections) c->updateConnection();
 	this->raiseEvent(ot::GraphicsItem::ItemMoved);
-
-	// For root items we notify the view
-	if (m_parent == nullptr) {
-		otAssert(!m_uid.empty(), "Root items should always have a valid uid");
-		OTAssertNullptr(m_scene); // Scene was not set when adding this item (all root items should have their scene set)
-		m_scene->getGraphicsView()->notifyItemMoved(this);
-	}
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
