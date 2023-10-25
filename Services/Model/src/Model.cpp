@@ -3738,7 +3738,8 @@ std::list<std::string> Model::getListOfFolderItems(const std::string &folder, bo
 				folderItems.push_back(child->getName());
 				if (recursive)
 				{
-					folderItems.merge(getListOfFolderItems(child->getName(), recursive));
+					std::list<std::string> childrenList = getListOfFolderItems(child->getName(), recursive);
+					folderItems.splice(folderItems.end(),childrenList);
 				}
 			}
 		}
@@ -3804,6 +3805,7 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 	for (auto entityID : dataEntityIDList)
 	{
 		getStateManager()->storeEntity(entityID, *parentID, *entityVersion, ModelStateEntity::tEntityType::DATA);
+		setModified();
 		entityVersion++;
 		parentID++;
 	}

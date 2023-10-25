@@ -22,6 +22,7 @@ void EntityCoordinates2D::AddStorageData(bsoncxx::builder::basic::document& stor
 
 void EntityCoordinates2D::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
+	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	double locationX = doc_view["LocationX"].get_double().value;
 	double locationY = doc_view["LocationY"].get_double().value;
 	_location.setX(locationX);
