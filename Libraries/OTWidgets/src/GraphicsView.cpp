@@ -150,7 +150,7 @@ void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std:
 }
 
 void ot::GraphicsView::notifyItemMoved(ot::GraphicsItem* _item) {
-	emit itemMoved(_item->graphicsItemName(), _item->getQGraphicsItem()->pos());
+	emit itemMoved(_item->graphicsItemUid(), _item->getQGraphicsItem()->pos());
 }
 
 // ########################################################################################################
