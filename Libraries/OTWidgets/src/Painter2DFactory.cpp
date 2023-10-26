@@ -21,9 +21,16 @@ QBrush ot::Painter2DFactory::brushFromPainter2D(ot::Painter2D* _painter) {
 		ot::LinearGradientPainter2D* painter = dynamic_cast<ot::LinearGradientPainter2D*>(_painter);
 		OTAssertNullptr(painter);
 		
+		QGradientStops stops;
+		for (auto s : painter->stops()) {
+			stops.append(QGradientStop(s.pos(), ot::OTQtConverter::toQt(s.color())));
+		}
 
-
-		return QBrush();
+		QLinearGradient grad;
+		grad.setCoordinateMode(QGradient::StretchToDeviceMode);
+		grad.setStops(stops);
+		
+		return grad;
 	}
 	else {
 		OT_LOG_EAS("Unknown Painter2D provided \"" + _painter->simpleFactoryObjectKey() + "\"");

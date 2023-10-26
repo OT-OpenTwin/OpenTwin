@@ -13,16 +13,16 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT LinearGradientPainter2DStep : public ot::Serializable {
+	class OT_GUI_API_EXPORT LinearGradientPainter2DStop : public ot::Serializable {
 	public:
-		LinearGradientPainter2DStep();
-		LinearGradientPainter2DStep(double _x, double _y, const ot::Color& _color);
-		LinearGradientPainter2DStep(const LinearGradientPainter2DStep& _other);
-		virtual ~LinearGradientPainter2DStep();
+		LinearGradientPainter2DStop();
+		LinearGradientPainter2DStop(double _pos, const ot::Color& _color);
+		LinearGradientPainter2DStop(const LinearGradientPainter2DStop& _other);
+		virtual ~LinearGradientPainter2DStop();
 
-		LinearGradientPainter2DStep& operator = (const LinearGradientPainter2DStep& _other);
-		bool operator == (const LinearGradientPainter2DStep& _other) const;
-		bool operator != (const LinearGradientPainter2DStep& _other) const;
+		LinearGradientPainter2DStop& operator = (const LinearGradientPainter2DStop& _other);
+		bool operator == (const LinearGradientPainter2DStop& _other) const;
+		bool operator != (const LinearGradientPainter2DStop& _other) const;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -34,18 +34,14 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
-		void setX(double _x) { m_x = _x; };
-		double x(void) const { return m_x; };
-
-		void setY(double _y) { m_y = _y; };
-		double y(void) const { return m_y; };
+		void setPos(double _pos) { m_pos = _pos; };
+		double pos(void) const { return m_pos; };
 
 		void setColor(const ot::Color& _color) { m_color = _color; };
 		const ot::Color& color(void) const { return m_color; };
 
 	private:
-		double    m_x;
-		double    m_y;
+		double    m_pos;
 		ot::Color m_color;
 	};
 
@@ -58,7 +54,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT LinearGradientPainter2D : public ot::Painter2D {
 	public:
 		LinearGradientPainter2D();
-		LinearGradientPainter2D(const std::vector<LinearGradientPainter2DStep>& _steps);
+		LinearGradientPainter2D(const std::vector<LinearGradientPainter2DStop>& _stops);
 		virtual ~LinearGradientPainter2D();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -74,12 +70,12 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg); };
 
-		void addStep(const LinearGradientPainter2DStep& _step);
-		void setSteps(const std::vector<LinearGradientPainter2DStep>& _steps) { m_steps = _steps; };
-		const std::vector<LinearGradientPainter2DStep>& steps(void) const { return m_steps; };
+		void addStop(const LinearGradientPainter2DStop& _stop);
+		void addStops(const std::vector<LinearGradientPainter2DStop>& _stops);
+		const std::vector<LinearGradientPainter2DStop>& stops(void) const { return m_stops; };
 
 	private:
-		std::vector<LinearGradientPainter2DStep> m_steps;
+		std::vector<LinearGradientPainter2DStop> m_stops;
 
 		LinearGradientPainter2D(const LinearGradientPainter2D&) = delete;
 		LinearGradientPainter2D& operator = (const LinearGradientPainter2D&) = delete;
