@@ -28,3 +28,15 @@ Qt::Alignment ot::OTQtConverter::toQt(ot::Alignment _alignment) {
 		return Qt::AlignCenter;
 	}
 }
+
+QPoint ot::OTQtConverter::toQt(const ot::Point2D& _pt) {
+	return QPoint(_pt.x(), _pt.y());
+}
+
+QPointF ot::OTQtConverter::toQt(const ot::Point2DF& _pt) {
+	return QPointF(_pt.x(), _pt.y());
+}
+
+QPointF ot::OTQtConverter::toQt(const ot::Point2DD& _pt) {
+	return QPointF(_pt.x(), _pt.y());
+}

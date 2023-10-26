@@ -7,6 +7,12 @@
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OTGui/LinearGradientPainter2D.h"
 
+#define OT_JSON_MEMBER_Pos "Pos"
+#define OT_JSON_MEMBER_Color "Color"
+#define OT_JSON_MEMBER_Start "Start"
+#define OT_JSON_MEMBER_Stops "Stops"
+#define OT_JSON_MEMBER_FinalStop "FinalStop"
+
 static ot::SimpleFactoryRegistrar<ot::LinearGradientPainter2D> linGradCfg(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg);
 
 ot::LinearGradientPainter2DStop::LinearGradientPainter2DStop()
@@ -36,17 +42,17 @@ bool ot::LinearGradientPainter2DStop::operator != (const LinearGradientPainter2D
 }
 
 void ot::LinearGradientPainter2DStop::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, "Pos", m_pos);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Pos, m_pos);
 	OT_rJSON_createValueObject(colorObj);
 	m_color.addToJsonObject(_document, colorObj);
-	ot::rJSON::add(_document, _object, "Color", colorObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Color, colorObj);
 }
 
 void ot::LinearGradientPainter2DStop::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, "Pos", Double);
-	OT_rJSON_checkMember(_object, "Color", Object);
-	m_pos = _object["Pos"].GetDouble();
-	OT_rJSON_val colorObj = _object["Color"].GetObject();
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Pos, Double);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Color, Object);
+	m_pos = _object[OT_JSON_MEMBER_Pos].GetDouble();
+	OT_rJSON_val colorObj = _object[OT_JSON_MEMBER_Color].GetObject();
 	m_color.setFromJsonObject(colorObj);
 }
 
@@ -56,7 +62,7 @@ void ot::LinearGradientPainter2DStop::setFromJsonObject(OT_rJSON_val& _object) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::LinearGradientPainter2D::LinearGradientPainter2D() {}
+ot::LinearGradientPainter2D::LinearGradientPainter2D() : m_start(0., 0.), m_finalStop(1., 1.) {}
 
 ot::LinearGradientPainter2D::LinearGradientPainter2D(const std::vector<LinearGradientPainter2DStop>& _stops) : m_stops(_stops) {}
 
@@ -71,13 +77,24 @@ void ot::LinearGradientPainter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJ
 		s.addToJsonObject(_document, stepObj);
 		stepArr.PushBack(stepObj, _document.GetAllocator());
 	}
-	ot::rJSON::add(_document, _object, "Stops", stepArr);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Stops, stepArr);
+
+	OT_rJSON_createValueObject(startObj);
+	m_start.addToJsonObject(_document, startObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Start, startObj);
+
+	OT_rJSON_createValueObject(finalStopObj);
+	m_finalStop.addToJsonObject(_document, finalStopObj);
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_FinalStop, finalStopObj);
 }
 
 void ot::LinearGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
 	ot::Painter2D::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, "Stops", Array);
-	OT_rJSON_val stepArr = _object["Stops"].GetArray();
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Stops, Array);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Start, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_FinalStop, Object);
+
+	OT_rJSON_val stepArr = _object[OT_JSON_MEMBER_Stops].GetArray();
 	m_stops.clear();
 	for (rapidjson::SizeType i = 0; i < stepArr.Size(); i++) {
 		OT_rJSON_checkArrayEntryType(stepArr, i, Object);
@@ -86,6 +103,12 @@ void ot::LinearGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
 		newStep.setFromJsonObject(stepObj);
 		m_stops.push_back(newStep);
 	}
+
+	OT_rJSON_val startObj = _object[OT_JSON_MEMBER_Start].GetObject();
+	m_start.setFromJsonObject(startObj);
+
+	OT_rJSON_val finalStopObj = _object[OT_JSON_MEMBER_FinalStop].GetObject();
+	m_finalStop.setFromJsonObject(finalStopObj);
 }
 
 void ot::LinearGradientPainter2D::addStop(const LinearGradientPainter2DStop& _stop) {

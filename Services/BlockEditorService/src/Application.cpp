@@ -16,6 +16,7 @@
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinCommunication/Msg.h"
+
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -24,6 +25,8 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
+
+#include "OTGui/LinearGradientPainter2D.h"
 
 Application * g_instance{ nullptr };
 
@@ -76,10 +79,10 @@ namespace ottest {
 
 	ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
 		ot::GraphicsFlowItemCfg flow;
-		flow.setTitleBackgroundColor(0, 0, 255);
+		
+		flow.setTitleBackgroundGradientColor(ot::Color(ot::Color::Orange));
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
-		//flow->setBackgroundImagePath("Default/python");
-
+		
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);

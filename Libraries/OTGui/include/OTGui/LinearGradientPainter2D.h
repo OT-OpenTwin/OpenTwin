@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OpenTwinCore/Color.h"
+#include "OpenTwinCore/Point2D.h"
 #include "OTGui/Painter2D.h"
 
 #define OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg "OT_P2DCGrad"
@@ -34,6 +35,7 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
+		//! @brief Set postion of the gradient stop (0.0 - 1.0)
 		void setPos(double _pos) { m_pos = _pos; };
 		double pos(void) const { return m_pos; };
 
@@ -74,8 +76,18 @@ namespace ot {
 		void addStops(const std::vector<LinearGradientPainter2DStop>& _stops);
 		const std::vector<LinearGradientPainter2DStop>& stops(void) const { return m_stops; };
 
+		//! @brief Set the starting point for the gradient (0.0 - 1.0)
+		void setStart(const ot::Point2DD& _start) { m_start = _start; };
+		const ot::Point2DD& start(void) { return m_start; }
+
+		//! @brief Set the final stop point for the gradient (0.0 - 1.0)
+		void setFinalStop(const ot::Point2DD& _finalStop) { m_finalStop = _finalStop; };
+		const ot::Point2DD& finalStop(void) const { return m_finalStop; };
+
 	private:
 		std::vector<LinearGradientPainter2DStop> m_stops;
+		ot::Point2DD m_start;
+		ot::Point2DD m_finalStop;
 
 		LinearGradientPainter2D(const LinearGradientPainter2D&) = delete;
 		LinearGradientPainter2D& operator = (const LinearGradientPainter2D&) = delete;

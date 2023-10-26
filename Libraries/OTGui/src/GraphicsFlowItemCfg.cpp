@@ -19,6 +19,7 @@
 
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/LinearGradientPainter2D.h"
 
 namespace ot {
 	namespace intern {
@@ -328,6 +329,17 @@ void ot::GraphicsFlowItemCfg::setTitleBackgroundPainter(ot::Painter2D* _painter)
 	if (m_titleBackgroundPainter == _painter) return;
 	if (m_titleBackgroundPainter) delete m_titleBackgroundPainter;
 	m_titleBackgroundPainter = _painter;
+}
+
+void ot::GraphicsFlowItemCfg::setTitleBackgroundGradientColor(const ot::Color& _color) {
+	ot::LinearGradientPainter2D* painter = new ot::LinearGradientPainter2D;
+	painter->setStart(ot::Point2DD(0., 0.5));
+	painter->setFinalStop(ot::Point2DD(1., 0.5));
+
+	painter->addStop(ot::LinearGradientPainter2DStop(0, _color));
+	painter->addStop(ot::LinearGradientPainter2DStop(1, ot::Color(ot::Color::Silver)));
+
+	this->setTitleBackgroundPainter(painter);
 }
 
 void ot::GraphicsFlowItemCfg::setTitleBackgroundColor(const ot::Color& _color) {

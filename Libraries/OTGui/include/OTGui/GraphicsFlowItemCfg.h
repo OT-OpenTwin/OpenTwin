@@ -149,8 +149,12 @@ namespace ot {
 		void setTitleBackgroundPainter(ot::Painter2D* _painter);
 
 		//! @brief Sets the title background color
-		//! Will create a FillPainter2D and replace the current title background painter
+		//! Creates a FillPainter2D and replace the current title background painter
 		void setTitleBackgroundColor(const ot::Color& _color);
+
+		//! @brief Sets the title background painter
+		//! Creates a LinearGradientPainter2D and replace the current title background painter
+		void setTitleBackgroundGradientColor(const ot::Color& _color);
 
 		//! @brief Sets the title background color
 		//! Will create a FillPainter2D and replace the current title background painter
