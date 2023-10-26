@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{2b046295-918f-44dc-b4b0-3f6fd20038b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Painter">
+      <UniqueIdentifier>{7afd7697-ed73-4589-8ce7-15864ce295ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Painter">
+      <UniqueIdentifier>{43c034ff-a761-4975-889e-b0d48bef9242}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GuiTypes.h">
@@ -50,9 +56,6 @@
     </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\Painter2D.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsFlowItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
@@ -87,6 +90,15 @@
     <ClInclude Include="include\OTGui\GraphicsGridLayoutItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2D.h">
+      <Filter>Header Files\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\FillPainter2D.h">
+      <Filter>Header Files\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\LinearGradientPainter2D.h">
+      <Filter>Header Files\Painter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -118,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Painter2D.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsFlowItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
@@ -154,6 +163,15 @@
     </ClCompile>
     <ClCompile Include="GraphicsHBoxLayoutItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2D.cpp">
+      <Filter>Source Files\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinearGradientPainter2D.cpp">
+      <Filter>Source Files\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FillPainter2D.cpp">
+      <Filter>Source Files\Painter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

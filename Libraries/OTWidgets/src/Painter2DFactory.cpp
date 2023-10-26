@@ -5,6 +5,8 @@
 
 // OpenTwin header
 #include "OTGui/Painter2D.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/LinearGradientPainter2D.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/OTQtConverter.h"
 
@@ -15,10 +17,12 @@ QBrush ot::Painter2DFactory::brushFromPainter2D(ot::Painter2D* _painter) {
 		OTAssertNullptr(painter);
 		return QBrush(QColor(ot::OTQtConverter::toQt(painter->color())));
 	}
-	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg) {
+	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg) {
 		ot::LinearGradientPainter2D* painter = dynamic_cast<ot::LinearGradientPainter2D*>(_painter);
 		OTAssertNullptr(painter);
-		otAssert(0, "...");
+		
+
+
 		return QBrush();
 	}
 	else {

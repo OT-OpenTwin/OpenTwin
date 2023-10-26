@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/Painter2D.h"
+#include "OTGui/FillPainter2D.h"
 
 #define OT_JSON_MEMBER_Border "Border"
 #define OT_JSON_MEMBER_RadiusX "RadiusX"

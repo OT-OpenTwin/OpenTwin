@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/Painter2D.h"
+#include "OTGui/FillPainter2D.h"
 
 #define OT_JSON_MEMBER_Size "Size"
 #define OT_JSON_MEMBER_Border "Border"
