@@ -45,23 +45,38 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	for (auto& connection : connections)
 	{
+		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
 		{
-			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
+			auto& blockEntity = blockEntitiesByBlockID[connection.originUid()];
+			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
 		}
 		else
 		{
 			OT_LOG_EAS("Could not create connection since block " + connection.originUid() + " was not found");
+			continue;
 		}
 		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
 		{
+			auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
+			destConnectorIsTypeOut =  connectorHasTypeOut(blockEntity, connection.destConnectable());
+		}
+		else
+		{
+			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
+			continue;
+		}
+		
+		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
+		{
+			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
 			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found");
+			_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
 		}
 	}
 
@@ -185,4 +200,19 @@ std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllB
 		}
 	}
 	return blockEntitiesByBlockID;
+}
+
+bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName)
+{
+	auto allConnectors = blockEntity->getAllConnectors();
+	const ot::ConnectorType connectorType = allConnectors[connectorName].getConnectorType();
+	if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS("Unset connectortype of connector: " + allConnectors[connectorName].getConnectorName()); }
+	if (connectorType == ot::ConnectorType::In || connectorType == ot::ConnectorType::InOptional)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }

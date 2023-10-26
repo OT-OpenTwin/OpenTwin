@@ -15,6 +15,15 @@ void EntityBlockPlot1D::createProperties()
 	EntityPropertiesString::createProperty("Graph properties", "Y-Axis Label", "", "default", getProperties());
 	EntityPropertiesString::createProperty("Graph properties", "X-Axis Unit", "", "default", getProperties());
 	EntityPropertiesString::createProperty("Graph properties", "Y-Axis Unit", "", "default", getProperties());
+
+	const std::string connectorNameYAxis = "YAxis";
+	const std::string connectorTitleYAxis = "Y-Axis";
+	_connectorsByName[connectorNameYAxis] = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
+
+	const std::string connectorNameXAxis = "XAxis";
+	const std::string connectorTitleXAxis = "X-Axis";
+	_connectorsByName[connectorNameXAxis] = { ot::ConnectorType::In ,connectorNameXAxis, connectorTitleXAxis };
+
 }
 
 std::string EntityBlockPlot1D::getXLabel()
@@ -72,8 +81,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 
-	block->addLeft("C0", "Y-Axis", ot::GraphicsFlowConnectorCfg::Square);
-	block->addLeft("C1", "X-Axis", ot::GraphicsFlowConnectorCfg::Square);
+	AddConnectors(block.get());
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();

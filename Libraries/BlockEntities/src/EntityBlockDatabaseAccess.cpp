@@ -63,6 +63,13 @@ void EntityBlockDatabaseAccess::createProperties()
 
 	SetVisibleParameter2(false);
 	SetVisibleParameter3(false);
+
+	const std::string connectorNameQuantity = "Quantity";
+	_connectorsByName[connectorNameQuantity] = { ot::ConnectorType::Out, connectorNameQuantity, connectorNameQuantity };
+
+	const std::string connectorNameParameter1 = "Parameter1";
+	const std::string connectorTitleParameter1 = "Parameter1";
+	_connectorsByName[connectorNameParameter1] = { ot::ConnectorType::Out,connectorNameParameter1, connectorTitleParameter1 };
 }
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
@@ -122,23 +129,23 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 
-	block->addRight("C0", "Quantity", ot::GraphicsFlowConnectorCfg::Square);
-	block->addRight("C1", "Parameter 1", ot::GraphicsFlowConnectorCfg::Square);
-
 	auto propertyBase =	getProperties().getProperty(_propertyNameDimension);
-	if (propertyBase != nullptr) //The method is currently also used for creating the BlockPicker preview. In this case an uninitialized Entity is used to create the clockconfig
-	{
-		auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-		const std::string queryDimension = selectionProperty->getValue();
-		if (queryDimension != _propertyValueDimension1)
-		{
-			block->addRight("C2", "Parameter 2", ot::GraphicsFlowConnectorCfg::Square);
-		}
-		if (queryDimension == _propertyValueDimension3)
-		{
-			block->addRight("C3", "Parameter 3", ot::GraphicsFlowConnectorCfg::Square);
-		}
-	}
+
+
+	AddConnectors(block);
+	//if (propertyBase != nullptr) //The method is currently also used for creating the BlockPicker preview. In this case an uninitialized Entity is used to create the clockconfig
+	//{
+	//	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	//	const std::string queryDimension = selectionProperty->getValue();
+	//	if (queryDimension != _propertyValueDimension1)
+	//	{
+	//		block->addRight("C2", "Parameter 2", ot::GraphicsFlowConnectorCfg::Square);
+	//	}
+	//	if (queryDimension == _propertyValueDimension3)
+	//	{
+	//		block->addRight("C3", "Parameter 3", ot::GraphicsFlowConnectorCfg::Square);
+	//	}
+	//}
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
 	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);

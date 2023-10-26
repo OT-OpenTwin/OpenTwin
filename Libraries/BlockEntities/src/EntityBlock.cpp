@@ -17,34 +17,28 @@ void EntityBlock::addVisualizationNodes(void)
 
 void EntityBlock::AddConnector(const ot::Connector& connector)
 {
-	bool exists = false;
-	for (auto& currentConnector : _connectors)
+	if (_connectorsByName.find(connector.getConnectorName()) != _connectorsByName.end())
 	{
-		if (connector.getConnectorName() == currentConnector.getConnectorName())
-		{
-			exists = true;
-		}
+		_connectorsByName[connector.getConnectorName()] = connector;
+		setModified();
 	}
-	if (!exists)
+	else
 	{
-		_connectors.push_back(connector);
+		OT_LOG_D("Connector with name: " + connector.getConnectorName() + " already exists and is not added");
 	}
-	setModified();
 }
 
 void EntityBlock::RemoveConnector(const ot::Connector& connector)
 {
-	bool exists = false;
-	std::list<ot::Connector> newConnectorList;
-	for (auto& currentConnector : _connectors)
+	if (_connectorsByName.find(connector.getConnectorName()) != _connectorsByName.end())
 	{
-		if (connector.getConnectorName() != currentConnector.getConnectorName())
-		{
-			newConnectorList.push_back(currentConnector);
-		}
+		_connectorsByName.erase(connector.getConnectorName());
+		setModified();
 	}
-	_connectors = newConnectorList;
-	setModified();
+	else
+	{
+		OT_LOG_D("Connector with name: " + connector.getConnectorName() + " does not exist and cannot be removed.");
+	}
 }
 
 void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
@@ -66,9 +60,9 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
-	for (const ot::Connector& connector : _connectors)
+	for (auto& connector : _connectorsByName)
 	{
-		auto subDocument = connector.SerializeBSON();
+		auto subDocument = connector.second.SerializeBSON();
 		connectorsArray.append(subDocument);
 	}
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
@@ -98,7 +92,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		auto subDocument = element.get_value().get_document();
 		ot::Connector connector;
 		connector.DeserializeBSON(subDocument);
-		_connectors.push_back(connector);
+		_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
 	auto connections = doc_view["Connections"].get_array();
@@ -185,4 +179,32 @@ void EntityBlock::CreateConnections()
 	ot::rJSON::add(connectionReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqConnectionPckgObj);
 
 	getObserver()->sendMessageToViewer(connectionReqDoc);
+}
+
+void EntityBlock::AddConnectors(ot::GraphicsFlowItemCfg* flowBlockConfig)
+{
+	if (flowBlockConfig != nullptr)
+	{
+		for (auto connectorByName : _connectorsByName)
+		{
+			const ot::Connector& connector = connectorByName.second;
+			ot::ConnectorType connectorType = connector.getConnectorType();
+			if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS(""); };
+			const std::string connectorName = connector.getConnectorName();
+			const std::string connectorTitle = connector.getConnectorTitle();
+			if (connectorType == ot::ConnectorType::In)
+			{
+				flowBlockConfig->addLeft(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Black);
+			}
+			else if (connectorType == ot::ConnectorType::InOptional)
+			{
+				flowBlockConfig->addLeft(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
+			}
+			else if (connectorType == ot::ConnectorType::Out)
+			{
+				flowBlockConfig->addRight(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Square, ot::Color::Black);
+			}
+		}
+	}
+
 }

@@ -29,8 +29,8 @@ public:
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	const std::string& getBlockTitle() const { return _blockTitle; }
 
-	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
-	std::list<ot::BlockConnection> getAllConnections() const { return _connections; }
+	const std::map<std::string,ot::Connector>& getAllConnectors() const { return _connectorsByName; }
+	const std::list<ot::BlockConnection>& getAllConnections() const { return _connections; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
@@ -52,7 +52,7 @@ protected:
 	std::string _navigationTreeIconName = "";
 	std::string _navigationTreeIconNameHidden = "";
 
-	std::list<ot::Connector> _connectors;
+	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
 	std::list<ot::BlockConnection> _connections;
 
@@ -65,4 +65,5 @@ protected:
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();
 	void CreateConnections();
+	void AddConnectors(ot::GraphicsFlowItemCfg* flowBlockConfig);
 };

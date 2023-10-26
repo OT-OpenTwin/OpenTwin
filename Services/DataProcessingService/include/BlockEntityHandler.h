@@ -22,4 +22,5 @@ private:
 	void InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 	std::map<std::string, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
+	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 };
