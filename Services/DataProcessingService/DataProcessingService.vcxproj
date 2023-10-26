@@ -182,13 +182,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\BlockItemDatabaseAccess.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp" />
     <ClCompile Include="src\BlockHandlerPlot1D.cpp" />
-    <ClCompile Include="src\BlockItemDataProcessing.cpp" />
-    <ClCompile Include="src\BlockItemPlot1D.cpp" />
-    <ClCompile Include="src\BlockItemPython.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ExternalDependencies.cpp" />
     <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
@@ -204,14 +200,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\BlockItemDatabaseAccess.h" />
     <ClInclude Include="include\BlockEntityHandler.h" />
     <ClInclude Include="include\BlockHandler.h" />
     <ClInclude Include="include\BlockHandlerDatabaseAccess.h" />
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
-    <ClInclude Include="include\BlockItemDataProcessing.h" />
-    <ClInclude Include="include\BlockItemPlot1D.h" />
-    <ClInclude Include="include\BlockItemPython.h" />
     <ClInclude Include="include\BufferBlockDatabaseAccess.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />

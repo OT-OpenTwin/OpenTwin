@@ -153,14 +153,16 @@
   <ItemGroup>
     <ClInclude Include="include\BlockConnection.h" />
     <ClInclude Include="include\ClassFactoryBlock.h" />
+    <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityBlock.h" />
-    <ClInclude Include="include\EntityBlockDatabaseAccess.h"/>
+    <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityBlockPlot1D.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BlockConnection.cpp" />
     <ClCompile Include="src\ClassFactoryBlock.cpp" />
+    <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\EntityBlock.cpp" />
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
     <ClCompile Include="src\EntityBlockPlot1D.cpp" />

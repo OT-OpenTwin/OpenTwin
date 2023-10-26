@@ -25,7 +25,6 @@
     <ClInclude Include="include\BSONToVariableConverter.h" />
     <ClInclude Include="include\ClassFactoryHandler.h" />
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
-    <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityMeasurementMetadata.h" />
     <ClInclude Include="include\EntityResearchMetadata.h" />
@@ -130,7 +129,6 @@
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />
     <ClCompile Include="src\ClassFactory.cpp" />
-    <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\DataBase.cpp" />
     <ClCompile Include="src\EntityAnnotation.cpp" />
     <ClCompile Include="src\EntityAnnotationData.cpp" />

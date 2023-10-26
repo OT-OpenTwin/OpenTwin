@@ -298,9 +298,6 @@
     <ClInclude Include="include\EntityFileText.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\Connector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\SerializeWithBSON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -581,9 +578,6 @@
     </ClCompile>
     <ClCompile Include="src\EntityFileText.cpp">
       <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Connector.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityCoordinates2D.cpp">
       <Filter>Source Files\Entities</Filter>

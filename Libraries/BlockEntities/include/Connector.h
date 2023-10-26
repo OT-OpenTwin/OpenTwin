@@ -1,10 +1,12 @@
 #pragma once
+#pragma warning(disable:4251)
+
 #include <string>
 #include "SerializeWithBSON.h"
 
 namespace ot
 {
-	enum ConnectorType {Source = 0, Sink = 1, Filter = 2, UNKNOWN = -1};
+	enum ConnectorType {In = 0, Out = 1, InOptional = 2, UNKNOWN = -1};
 
 	class __declspec(dllexport) Connector : public SerializeWithBSON
 	{

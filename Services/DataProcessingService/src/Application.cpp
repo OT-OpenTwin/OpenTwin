@@ -86,7 +86,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			_pipelineManager.RunAll();
+			//_pipelineManager.RunAll();
 		}
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
@@ -96,13 +96,13 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
 		ClassFactory classFactory;
 		auto entBase =	m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), classFactory);
-		auto dbAccess =	std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
+		//auto dbAccess =	std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 
-		if (dbAccess != nullptr)
-		{
-			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-			PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
-		}
+		//if (dbAccess != nullptr)
+		//{
+		//	auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+		//	PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+		//}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 	{
@@ -171,7 +171,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
-	PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
+	//PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -186,8 +186,8 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	_blockEntityHandler.setModelComponent(_model);
-	_pipelineManager.setModelComponent(_model);
-	PropertyHandlerDatabaseAccessBlock::instance().setModelComponent(_model);
+	//_pipelineManager.setModelComponent(_model);
+	//PropertyHandlerDatabaseAccessBlock::instance().setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

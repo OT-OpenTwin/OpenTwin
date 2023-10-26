@@ -120,6 +120,6 @@ private:
 	virtual ~Application();
 
 	ot::MenuButtonDescription _buttonRunPipeline;
-	PipelineManager _pipelineManager;
+	//PipelineManager _pipelineManager;
 	BlockEntityHandler _blockEntityHandler;
 };
