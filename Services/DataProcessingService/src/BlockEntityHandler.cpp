@@ -18,7 +18,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	assert(baseEntity != nullptr);		
 	std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
 
-	std::string entName = CreateNewUniqueTopologyName(_blockFolder+"/"+ editorName, blockName);
+	std::string entName = CreateNewUniqueTopologyName(_blockFolder+"/"+ editorName, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);

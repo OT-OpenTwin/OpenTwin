@@ -6,7 +6,7 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 {
 	_navigationTreeIconName = "BlockDataBaseAccess";
 	_navigationTreeIconNameHidden = "BlockDataBaseAccess";
-	int sieben = 8;
+	_blockTitle = "Database Access";
 }
 
 void EntityBlockDatabaseAccess::createProperties()
@@ -140,8 +140,9 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 		}
 	}
 	const std::string blockName = getClassName();
-	const std::string blockTitel = "Database Access";
-	return block->createGraphicsItem(blockName, blockTitel);
+	const std::string blockTitel = CreateBlockHeadline();
+	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	return graphicsItemConfig;
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()

@@ -7,6 +7,7 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 {
 	_navigationTreeIconName = "python";
 	_navigationTreeIconNameHidden = "python";
+	_blockTitle = "Python";
 }
 
 void EntityBlockPython::createProperties(const std::string& scriptFolder, ot::UID scriptFolderID)
@@ -36,7 +37,7 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 	block->addRight("C1", "Output", ot::GraphicsFlowConnectorCfg::Square);
 
 	const std::string blockName = getClassName();
-	const std::string blockTitel = "Python";
+	const std::string blockTitel = CreateBlockHeadline();
 	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
 	return graphicsItemConfig;
 }

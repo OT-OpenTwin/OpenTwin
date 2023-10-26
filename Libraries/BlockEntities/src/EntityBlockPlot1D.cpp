@@ -6,6 +6,7 @@ EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObser
 {
 	_navigationTreeIconName = "Plot1DVisible";
 	_navigationTreeIconNameHidden = "Plot1DVisible";
+	_blockTitle = "Plot 1D";
 }
 
 void EntityBlockPlot1D::createProperties()
@@ -75,7 +76,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	block->addLeft("C1", "X-Axis", ot::GraphicsFlowConnectorCfg::Square);
 
 	const std::string blockName = getClassName();
-	const std::string blockTitel = "Plot 1D";
+	const std::string blockTitel = CreateBlockHeadline();
 	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
 	return graphicsItemConfig;
 }

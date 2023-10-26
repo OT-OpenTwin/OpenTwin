@@ -27,7 +27,8 @@ public:
 	void setBlockID(ot::UID blockID) { _blockID = std::to_string(blockID); }
 	std::string getBlockID() const { return _blockID; }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
-	
+	const std::string& getBlockTitle() const { return _blockTitle; }
+
 	std::list<ot::Connector> getAllConnectors() const { return _connectors; }
 	std::list<ot::BlockConnection> getAllConnections() const { return _connections; }
 
@@ -44,6 +45,7 @@ public:
 	//void onRemoveFromModelState() override;
 protected:
 	std::string _blockID = "";
+	std::string _blockTitle = "";
 	ot::UID _coordinate2DEntityID = 0;
 	ot::BasicServiceInformation _info;
 	std::string	_graphicsScenePackage;
@@ -57,6 +59,8 @@ protected:
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+
+	std::string CreateBlockHeadline();
 
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();
