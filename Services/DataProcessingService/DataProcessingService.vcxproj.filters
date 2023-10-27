@@ -31,6 +31,9 @@
     <Filter Include="Header Files\GraphHandling">
       <UniqueIdentifier>{47c53168-2789-4b63-8e14-1373dc17104c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GraphHandling">
+      <UniqueIdentifier>{c098a613-e070-4648-b5cf-0856a45e3436}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -80,6 +83,12 @@
     </ClCompile>
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graph.cpp">
+      <Filter>Source Files\GraphHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphNode.cpp">
+      <Filter>Source Files\GraphHandling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,10 +146,10 @@
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockEntityGraph.h">
+    <ClInclude Include="include\Graph.h">
       <Filter>Header Files\GraphHandling</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockEntityGraphnode.h">
+    <ClInclude Include="include\GraphNode.h">
       <Filter>Header Files\GraphHandling</Filter>
     </ClInclude>
   </ItemGroup>
