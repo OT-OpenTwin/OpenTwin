@@ -6,7 +6,6 @@
 #include "EntityCoordinates2D.h"
 
 #include "Connector.h"
-#include "BlockConnection.h"
 
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
@@ -28,17 +27,17 @@ public:
 	std::string getBlockID() const { return _blockID; }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	const std::string& getBlockTitle() const { return _blockTitle; }
+	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
+	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
+	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 
-	const std::map<std::string,ot::Connector>& getAllConnectors() const { return _connectorsByName; }
-	const std::list<ot::BlockConnection>& getAllConnections() const { return _connections; }
+	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return _connectorsByName; }
+	const std::map<std::string, ot::GraphicsConnectionCfg>& getAllConnectionsByKey() const { return _connectionsByKey; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
-	void AddConnection(const ot::GraphicsConnectionCfg& connection);
 
-	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
-	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
-	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
+	void AddConnection(const ot::GraphicsConnectionCfg& connection);
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
@@ -54,7 +53,7 @@ protected:
 
 	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
-	std::list<ot::BlockConnection> _connections;
+	std::map<std::string, ot::GraphicsConnectionCfg> _connectionsByKey;
 
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

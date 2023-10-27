@@ -6,11 +6,11 @@
 
 namespace ot
 {
-	class __declspec(dllexport) BlockConnection : public SerializeWithBSON
+	class BlockConnectionBSON : public SerializeWithBSON
 	{
 	public:
-		BlockConnection(const ot::GraphicsConnectionCfg& connection);
-		BlockConnection() {};
+		BlockConnectionBSON(const ot::GraphicsConnectionCfg& connection);
+		BlockConnectionBSON() {};
 		const ot::GraphicsConnectionCfg& getConnection() const;
 		void setConnection(const ot::GraphicsConnectionCfg& connection);
 		virtual bsoncxx::builder::basic::document SerializeBSON() const override;

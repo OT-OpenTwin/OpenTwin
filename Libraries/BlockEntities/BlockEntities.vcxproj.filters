@@ -33,7 +33,7 @@
     <ClInclude Include="include\EntityBlockPython.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockConnection.h">
+    <ClInclude Include="include\BlockConnectionBSON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ClassFactoryBlock.h">
@@ -59,7 +59,7 @@
     <ClCompile Include="src\EntityBlock.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockConnection.cpp">
+    <ClCompile Include="src\BlockConnectionBSON.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Connector.cpp">

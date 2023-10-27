@@ -1,6 +1,7 @@
 #include "EntityBlock.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OTGui/GraphicsPackage.h"
+#include "BlockConnectionBSON.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner){}
@@ -43,7 +44,7 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 
 void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
 {
-	_connections.push_back(connection);
+	_connectionsByKey[connection.buildKey()] = connection;
 	setModified();
 }
 
@@ -68,9 +69,10 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
 
 	auto connectionArray = bsoncxx::builder::basic::array();
-	for (ot::BlockConnection& connection : _connections)
+	for (auto& connection : _connectionsByKey)
 	{
-		auto subDocument = connection.SerializeBSON();
+		ot::BlockConnectionBSON serializeableConnection(connection.second);
+		auto subDocument = serializeableConnection.SerializeBSON();
 		connectionArray.append(subDocument);
 	}
 	storage.append(bsoncxx::builder::basic::kvp("Connections", connectionArray));
@@ -99,9 +101,10 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	for (auto& element : connections.value)
 	{
 		auto subDocument = element.get_value().get_document();
-		ot::BlockConnection connection;
+		ot::BlockConnectionBSON connection;
 		connection.DeserializeBSON(subDocument);
-		_connections.push_back(connection);
+		ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();
+		_connectionsByKey[graphicsConnection.buildKey()] = graphicsConnection;
 	}
 }
 
@@ -165,9 +168,9 @@ void EntityBlock::CreateConnections()
 	ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
 
 	// Store connection information
-	for (auto& connection : _connections)
+	for (auto& connection : _connectionsByKey)
 	{
-		connectionPckg.addConnection(connection.getConnection());
+		connectionPckg.addConnection(connection.second);
 	}
 
 	// Request UI to add connections
