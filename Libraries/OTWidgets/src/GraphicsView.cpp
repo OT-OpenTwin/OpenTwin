@@ -127,8 +127,12 @@ void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::
 	std::string key = ot::GraphicsConnectionCfg::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
 	auto it = m_connections.find(key);
 	if (it == m_connections.end()) {
-		OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
-		return;
+		key = ot::GraphicsConnectionCfg::buildKey(_toUid, _toConnector, _toUid, _fromConnector);
+		it = m_connections.find(key);
+		if (it == m_connections.end()) {
+			OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
+			return;
+		}
 	}
 
 	it->second->disconnectItems();
@@ -137,13 +141,10 @@ void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::
 }
 
 void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
-	std::string key = ot::GraphicsConnectionCfg::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
-	auto it = m_connections.find(key);
-	if (it != m_connections.end()) {
-		OT_LOG_W("Connection for key \"" + key + "\" already exists (same origin and destination in one scene)");
+	if (this->connectionAlreadyExists(ot::GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector))) {
+		OT_LOG_W("Connection already exists { \"Origin.UID\": \"" + _fromUid + "\", \"Origin.Conn\"" + _fromConnector + "\", \"Dest.UID\": \"" + _toUid + "\", \"Dest.Conn\": \"" + _toConnector + "\" }");
 		return;
 	}
-
 	emit connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
