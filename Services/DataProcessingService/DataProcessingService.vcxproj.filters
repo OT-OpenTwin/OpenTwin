@@ -28,6 +28,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\GraphHandling">
+      <UniqueIdentifier>{47c53168-2789-4b63-8e14-1373dc17104c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -133,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockEntityGraph.h">
+      <Filter>Header Files\GraphHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockEntityGraphnode.h">
+      <Filter>Header Files\GraphHandling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

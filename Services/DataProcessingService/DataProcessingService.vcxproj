@@ -206,8 +206,10 @@
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BufferBlockDatabaseAccess.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
+    <ClInclude Include="include\BlockEntityGraph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\BlockEntityGraphnode.h" />
     <ClInclude Include="include\Pipeline.h" />
     <ClInclude Include="include\PipelineFilter.h" />
     <ClInclude Include="include\PipelineItem.h" />
