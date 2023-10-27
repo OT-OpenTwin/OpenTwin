@@ -61,6 +61,11 @@ void ot::GraphicsConnectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	this->m_destConnectable = _object[OT_JSON_Member_DestinationName].GetString();
 }
 
+ot::GraphicsConnectionCfg ot::GraphicsConnectionCfg::getReversedConnection(void) const {
+	GraphicsConnectionCfg ret(m_destUID, m_destConnectable, m_originUID, m_originConnectable);
+	return ret;
+}
+
 std::string ot::GraphicsConnectionCfg::buildKey(void) const {
 	return this->buildKey(m_originUID, m_originConnectable, m_destUID, m_destConnectable);
 }

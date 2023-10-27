@@ -37,6 +37,9 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
+		//! @brief Create a copy of this connection but the origin an destination are swapped
+		GraphicsConnectionCfg getReversedConnection(void) const;
+
 		//! @brief Creates a key that identifies this connection
 		std::string buildKey(void) const;
 
