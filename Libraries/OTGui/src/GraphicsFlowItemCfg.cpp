@@ -62,6 +62,7 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	itm->setName(m_name);
+	//itm->setMargins(ot::MarginsD(20., 0., 0., 0));
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;

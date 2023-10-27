@@ -98,7 +98,7 @@ void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGr
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(this->boundingRect(), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(this->calculatePaintArea(m_size), m_cornerRadius, m_cornerRadius);
 }
 
 void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {

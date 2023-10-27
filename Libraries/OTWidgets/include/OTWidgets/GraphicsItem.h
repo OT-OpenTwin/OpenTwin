@@ -131,14 +131,9 @@ namespace ot {
 		void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
 
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-	protected:
 		//! @brief Calculates the draw rect for the item
 		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
-		//! @param _innerMinSize Item minimum size
-		//! @param _innerMaxSize Item maximum size
-		//QRectF calculateInnerRect(const QSizeF& _innerMinSize, const QSizeF& _innerMaxSize) const;
+		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
 	private:
 		bool m_hasHover;

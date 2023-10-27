@@ -212,10 +212,6 @@ void ot::GraphicsItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	this->prepareGraphicsItemGeometryChange();
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Protected: Helper
-
 void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 	for (auto itm : m_eventHandler) {
 		itm->graphicsItemEventHandler(this, _event);
@@ -224,4 +220,59 @@ void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 
 QSizeF ot::GraphicsItem::applyGraphicsItemMargins(const QSizeF& _size) const {
 	return QSizeF(_size.width() + m_margins.left() + m_margins.right(), _size.height() + m_margins.top() + m_margins.bottom());
+}
+
+QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
+	auto qitm = this->getQGraphicsItem();
+	OTAssertNullptr(qitm);
+	QRectF r(qitm->boundingRect());
+
+	// Adjust size
+	QSizeF s(_innerSize);
+	s = s.expandedTo(m_minSize).expandedTo(m_requestedSize).boundedTo(m_maxSize).boundedTo(r.size());
+
+	// No further adjustments needed
+	if (s.toSize() == r.size()) return r;
+
+	QPointF pt(r.topLeft());
+
+	// Align inner size
+	switch (m_alignment)
+	{
+	case ot::AlignCenter:
+		pt.setX(pt.x() + ((r.size().width() - s.width()) / 2.));
+		pt.setY(pt.y() + ((r.size().height() - s.height()) / 2.));
+		break;
+	case ot::AlignTop:
+		pt.setX(pt.x() + ((r.size().width() - s.width()) / 2.));
+		break;
+	case ot::AlignTopRight:
+		pt.setX(pt.x() + (r.size().width() - s.width()));
+		break;
+	case ot::AlignRight:
+		pt.setX(pt.x() + (r.size().width() - s.width()));
+		pt.setY(pt.y() + ((r.size().height() - s.height()) / 2.));
+		break;
+	case ot::AlignBottomRight:
+		pt.setX(pt.x() + (r.size().width() - s.width()));
+		pt.setY(pt.y() + (r.size().height() - s.height()));
+		break;
+	case ot::AlignBottom:
+		pt.setX(pt.x() + ((r.size().width() - s.width()) / 2.));
+		pt.setY(pt.y() + (r.size().height() - s.height()));
+		break;
+	case ot::AlignBottomLeft:
+		pt.setY(pt.y() + (r.size().height() - s.height()));
+		break;
+	case ot::AlignLeft:
+		pt.setY(pt.y() + ((r.size().height() - s.height()) / 2.));
+		break;
+	case ot::AlignTopLeft:
+		break;
+	default:
+		OT_LOG_EA("Unknown Alignment");
+		break;
+	}
+
+	return QRectF(pt, s);
 }
