@@ -147,7 +147,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
