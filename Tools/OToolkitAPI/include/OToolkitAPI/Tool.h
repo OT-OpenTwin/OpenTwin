@@ -14,16 +14,17 @@
 
 // Qt header
 #include <QtCore/qlist.h>
+#include <QtCore/qstring.h>
 #include <QtGui/qicon.h>
 #include <QtWidgets/qmenu.h>
 
 namespace otoolkit {
 
-	class Tool {
+	class OTOOLKITAPI_EXPORT Tool {
 		OT_DECL_NOCOPY(Tool)
 	public:
-		Tool() {};
-		virtual ~Tool() {};
+		Tool();
+		virtual ~Tool();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -33,17 +34,11 @@ namespace otoolkit {
 		//! The name will be used to create all required menu entries
 		virtual QString toolName(void) const = 0;
 
-		//! @brief Create the tool menu that will be displayed in the MenuBar->Tools->ToolName
-		//! The menu already contains the following items:
+		//! @brief Create the central widget that will be displayed to the user in the main tab view and the tool menu
+		//! //! The menu already contains the following items:
 		//!   Run / Stop (Starts or stops the tool)
 		//!   [] Autorun (Autostart mode checkbox for the tool upon OToolkit start)
-		virtual void createToolMenu(QMenu * _root) = 0;
-
-		//! @brief Create the central widget that will be displayed to the user in the main tab view
-		virtual ot::TabWidget* createCentralToolWidget(void) = 0;
-
-		//! @brief Create the widgets that will be displayed in the status bar (if tool has focus)
-		virtual QList<QWidget*> createToolStatusWidgets(void) = 0;
+		virtual ot::TabWidget* runTool(QMenu* _rootMenu) = 0;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -53,7 +48,7 @@ namespace otoolkit {
 		virtual QIcon toolIcon(void) const { return QIcon(); };
 
 		//! @brief Stop all the logic of this tool
-		virtual bool prepareToolShutdown(void) {};
+		virtual bool prepareToolShutdown(void) { return true; };
 
 		virtual void toolWasShown(void) {};
 

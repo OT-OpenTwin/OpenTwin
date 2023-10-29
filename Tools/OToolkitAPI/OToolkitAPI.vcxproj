@@ -18,11 +18,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\OToolkitAPI.cpp" />
+    <ClCompile Include="src\Tool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OToolkitAPI\OToolkitAPI.h" />
     <ClInclude Include="include\OToolkitAPI\otoolkitapi_global.h" />
     <ClInclude Include="include\OToolkitAPI\Tool.h" />
+    <ClInclude Include="include\OToolkitAPI\ToolActivityNotifier.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{11272C84-AF8E-4865-B95C-82DE5B5F391D}</ProjectGuid>

@@ -14,6 +14,9 @@
     <ClCompile Include="src\OToolkitAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OToolkitAPI\Tool.h">
@@ -23,6 +26,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OToolkitAPI\otoolkitapi_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OToolkitAPI\ToolActivityNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
