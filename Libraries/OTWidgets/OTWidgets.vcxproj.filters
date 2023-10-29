@@ -82,6 +82,9 @@
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\TabWidget.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -192,6 +195,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsItemDrag.h">
       <Filter>include\Graphics</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TabWidget.h">
+      <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
