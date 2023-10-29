@@ -1,7 +1,12 @@
+//! @file Terminal.h
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-// Toolkit header
-#include "AbstractTool.h"
+// API header
+#include "OToolkitAPI/Tool.h"
 
 // OT header
 #include "OpenTwinCommunication/CommunicationTypes.h"
@@ -121,17 +126,27 @@ private:
 
 // #####################################################################################################################################################################################
 
-class Terminal : public QObject, public OToolkitAPI::AbstractTool {
+class Terminal : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
 	Terminal();
 	virtual ~Terminal();
 
-	//! @brief Returns the unique name of this tool
-	//! @note If another tool with the same name was registered before, the instance of this tool will be destroyed
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// API base functions
+
+	//! @brief Return the unique tool name
+	//! The name will be used to create all required menu entries
 	virtual QString toolName(void) const override;
 
-	QWidget * widget(void);
+	//! @brief Create the central widget that will be displayed to the user in the main tab view
+	virtual ot::TabWidget* runTool(QMenu* _rootMenu) override;
+
+	//! @brief Stop all the logic of this tool
+	virtual bool prepareToolShutdown(void) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	void notifyItemDeleted(TerminalCollectionItem * _item);
 
@@ -205,6 +220,7 @@ private:
 
 	// Layouts
 
+	ot::TabWidget*		m_tabWidget;
 	QSplitter *			m_splitter;
 
 	QWidget *			m_leftLayoutW;

@@ -1,39 +1,50 @@
+//! @file ToolManager.h
+//! @author Alexander Kuester (alexk95)
+//! @date October 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-// Toolkit API
-#include "OToolkitAPITypes.h"
+// OToolkitAPI header
+#include "OToolkitAPI/Tool.h"
+
+// OpenTwin header
+#include "OpenTwinCore/OTClassHelper.h"
 
 // Qt header
-#include <QtCore/qstring.h>
+#include <QtWidgets/qmenu.h>
 
 // std header
-#include <map>
+#include <list>
 
-namespace OToolkitAPI {
+class ToolManager {
+	OT_DECL_NOCOPY(ToolManager)
+public:
+	static ToolManager& instance(void);
 
-	class AbstractTool;
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	class ToolManager {
-	public:
-		static ToolManager& instance(void);
+	// Setter / Getter
 
-		//! @brief Will add the provided tool to the storage
-		ToolID add(AbstractTool * _tool);
+	//! @brief Stores the provided tool
+	void addTool(otoolkit::Tool* _tool);
 
-		AbstractTool * getTool(ToolID _id);
+	//! @brief Returns the tool with the specified name
+	//! If no tool was found nullptr will be returned
+	otoolkit::Tool* findTool(const QString& _toolName);
 
-		AbstractTool * getToolByName(const QString& _name);
+	//! @brief Cleans up and deletes the tool with the provided name
+	void removeTool(const QString& _toolName);
 
-		void unloadTool(ToolID _id);
+	//! @brief Cleans up the provided tool
+	//! The tool will not be deleted
+	void removeTool(otoolkit::Tool* _tool);
 
-		void removeToolFromList(ToolID _id);
+	void clear(void);
 
-	private:
-		ToolID								m_currentId;
-		std::map<ToolID, AbstractTool *>	m_tools;
+private:
+	std::list<otoolkit::Tool *> m_tools;
 
-		ToolManager();
-		virtual ~ToolManager();
-	};
-
-}
+	ToolManager();
+	virtual ~ToolManager();
+};

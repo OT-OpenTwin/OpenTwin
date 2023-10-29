@@ -1,3 +1,8 @@
+//! @file Terminal.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include "Terminal.h"
 #include "AppBase.h"
 #include "JSONEditor.h"
@@ -368,11 +373,32 @@ void TerminalRequest::addToJsonObject(QJsonObject& _object) const {
 // #####################################################################################################################################################################################
 
 Terminal::Terminal() : m_exportLock(false) {
+	
+}
+
+Terminal::~Terminal() {
+	QSettings s("OpenTwin", "OToolkit");
+	s.setValue("Terminal.Receiver", m_receiverUrl->text());
+	s.setValue("Terminal.Message", m_messageEdit->toPlainText());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// API base functions
+
+QString Terminal::toolName(void) const {
+	return "OTerminal";
+}
+
+ot::TabWidget* Terminal::runTool(QMenu* _rootMenu) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
 	m_splitter = new QSplitter;
 	m_splitter->setObjectName("OToolkit_Terminal_MainSplitter");
+
+	m_tabWidget = new ot::TabWidget;
+	m_tabWidget->addTab(m_splitter, "");
 
 	m_leftLayoutW = new QWidget;
 	m_leftLayout = new QVBoxLayout(m_leftLayoutW);
@@ -384,10 +410,10 @@ Terminal::Terminal() : m_exportLock(false) {
 	m_rightLayout = new QVBoxLayout(m_rightLayoutW);
 
 	m_rightSplitter = new QSplitter;
-	
+
 	m_receiverBox = new QGroupBox("Configuration");
 	m_receiverLayout = new QGridLayout;
-	
+
 	m_messageBox = new QGroupBox;
 	m_messageLayout = new QVBoxLayout;
 
@@ -407,7 +433,7 @@ Terminal::Terminal() : m_exportLock(false) {
 	m_endpoint = new QComboBox;
 
 	m_btnSend = new QPushButton("Send");
-	
+
 	m_messageEdit = new JSONEditor;
 
 	m_responseEdit = new JSONEditor;
@@ -431,7 +457,7 @@ Terminal::Terminal() : m_exportLock(false) {
 	m_endpoint->addItems({ TERMINAL_TXT_ENDPOINT_EXECUTE, TERMINAL_TXT_ENDPOINT_QUEUE, TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS });
 	m_endpoint->setCurrentIndex(0);
 
-	m_progressBar->setStyleSheet("QProgressBar {border: none; text-align: center; } " 
+	m_progressBar->setStyleSheet("QProgressBar {border: none; text-align: center; } "
 		"QProgressBar::chunk {background-color: #FFE61D; width: 1px; }");
 
 	m_progressBar->setMaximumHeight(5);
@@ -485,7 +511,7 @@ Terminal::Terminal() : m_exportLock(false) {
 	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
 
 	// Restore settings
-	QSettings s("OpenTwin", applicationName());
+	QSettings s("OpenTwin", "OToolkit");
 	m_receiverUrl->setText(s.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
 	m_messageEdit->setPlainText(s.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
 
@@ -493,7 +519,7 @@ Terminal::Terminal() : m_exportLock(false) {
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
 	//m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
 	m_navigation->addTopLevelItem(m_requestsRootFilter);
-	
+
 	slotLoadRequestCollection();
 
 	// Connect signals
@@ -510,21 +536,15 @@ Terminal::Terminal() : m_exportLock(false) {
 	connect(m_shortcutClone, &QShortcut::activated, this, &Terminal::slotCloneCurrent);
 
 	TERMINAL_LOG("Terminal initialization completed");
+
+	return m_tabWidget;
 }
 
-Terminal::~Terminal() {
-	QSettings s("OpenTwin", applicationName());
-	s.setValue("Terminal.Receiver", m_receiverUrl->text());
-	s.setValue("Terminal.Message", m_messageEdit->toPlainText());
+bool Terminal::prepareToolShutdown(void) {
+	return true;
 }
 
-QString Terminal::toolName(void) const {
-	return "OTerminal";
-}
-
-QWidget * Terminal::widget(void) {
-	return m_splitter;
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
 void Terminal::notifyItemDeleted(TerminalCollectionItem * _item) {
 
@@ -565,7 +585,7 @@ void Terminal::slotSendMessage(void) {
 	// Check receiver input
 	QString rec = m_receiverUrl->text();
 	if (rec.isEmpty()) {
-		displayErrorStatusText("Input error: No receiver URL provided");
+		TERMINAL_LOGE("Input error: No receiver URL provided");
 		return;
 	}
 
@@ -577,7 +597,7 @@ void Terminal::slotSendMessage(void) {
 	else if (msgTypeString == TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS) { messageType = ot::EXECUTE_ONE_WAY_TLS; }
 	else {
 		assert(0);
-		displayErrorStatusText("Input error: Unknown endpoint selected");
+		TERMINAL_LOGE("Input error: Unknown endpoint selected");
 		return;
 	}
 
@@ -585,7 +605,7 @@ void Terminal::slotSendMessage(void) {
 	QJsonParseError * err = new QJsonParseError;
 	QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(m_messageEdit->toPlainText().toStdString()), err);
 	if (err->error != QJsonParseError::NoError) {
-		displayErrorStatusText("Invalid message format (expected JSON Object): " + err->errorString());
+		TERMINAL_LOGE("Invalid message format (expected JSON Object): " + err->errorString());
 		delete err;
 		return;
 	}
@@ -624,9 +644,9 @@ void Terminal::slotMessageSendSuccessful(const QByteArray& _response) {
 }
 
 void Terminal::slotMessageSendFailed(const QString& _errorString) {
-	setWaitingMode(false);
+	this->setWaitingMode(false);
 
-	displayErrorStatusText(_errorString);
+	TERMINAL_LOGE(_errorString);
 }
 
 void Terminal::slotServiceNameChanged(void) {
@@ -641,7 +661,7 @@ void Terminal::slotServiceNameChanged(void) {
 		int ix = m_receiverName->currentIndex();
 		if (ix < 0 || ix >= m_services.count()) {
 			assert(0);
-			displayErrorStatusText("Invalid receiver selected: \"" + txt + "\"");
+			TERMINAL_LOGE("Invalid receiver selected: \"" + txt + "\"");
 			m_receiverName->setCurrentText(TERMINAL_TXT_RECEIVER_MANUAL);
 			return;
 		}
@@ -758,7 +778,7 @@ void Terminal::slotCloneCurrent(void) {
 void Terminal::slotLoadRequestCollection(void) {
 	TERMINAL_LOG("Loading OTerminal request collection...");
 
-	QSettings s("OpenTwin", applicationName());
+	QSettings s("OpenTwin", "OToolkit");
 
 	QByteArray bArr = s.value("Terminal.RequestCollection", QByteArray()).toByteArray();
 	if (bArr.isEmpty()) {
@@ -806,7 +826,7 @@ void Terminal::slotSaveRequestCollection(void) {
 
 	QJsonDocument doc(obj);
 
-	QSettings s("OpenTwin", applicationName());
+	QSettings s("OpenTwin", "OToolkit");
 	s.setValue("Terminal.RequestCollection", doc.toJson());
 }
 
@@ -1120,7 +1140,7 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 	docObj[OT_JSON_COLLECTION_Data] = rootObject;
 
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getSaveFileName(widget(), "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	QString fn = QFileDialog::getSaveFileName(m_tabWidget, "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) {
 		return;
 	}
@@ -1140,7 +1160,7 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 
 void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getOpenFileName(widget(), "Import OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	QString fn = QFileDialog::getOpenFileName(m_tabWidget, "Import OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);

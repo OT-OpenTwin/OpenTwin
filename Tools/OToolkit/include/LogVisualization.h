@@ -1,7 +1,12 @@
+//! @file LogVisualization.h
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-// Toolkit header
-#include "AbstractTool.h"
+// API header
+#include "OToolkitAPI/Tool.h"
 
 // OT header
 #include "OpenTwinCore/Logger.h"		// LogMessage
@@ -29,28 +34,38 @@ class QLineEdit;
 class QAction;
 class QShortcut;
 
-class LogVisualization : public QObject, public OToolkitAPI::AbstractTool {
+class LogVisualization : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
+	// Static functions
+
+	static QString logMessageTypeString(const ot::LogMessage& _msg);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	LogVisualization();
 	virtual ~LogVisualization();
 
-	//! @brief Returns the unique name of this tool
-	//! @note If another tool with the same name was registered before, the instance of this tool will be destroyed
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// API base functions
+
+	//! @brief Return the unique tool name
+	//! The name will be used to create all required menu entries
 	virtual QString toolName(void) const override;
 
-	virtual QList<QWidget *> statusBarWidgets(void) const override;
+	//! @brief Create the central widget that will be displayed to the user in the main tab view
+	virtual ot::TabWidget* runTool(QMenu* _rootMenu) override;
 
-	virtual void createMenuBarEntries(QMenuBar * _menuBar) override;
+	//! @brief Stop all the logic of this tool
+	virtual bool prepareToolShutdown(void) override;
 
-	virtual bool toolPrepareShutdown(QString& _errorString) override;
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Log Visualization
 
 	void appendLogMessage(const ot::LogMessage& _msg);
 	void appendLogMessages(const QList<ot::LogMessage>& _messages);
-
-	QWidget * widget(void);
-
-	static QString logMessageTypeString(const ot::LogMessage& _msg);
 
 public slots:
 	void slotConnect(void);
@@ -87,17 +102,8 @@ private:
 
 	QTimer *					m_filterTimer;
 
-	QSplitter *					m_splitter;
-
-	QWidget *					m_centralLayoutW;
-	QVBoxLayout *				m_centralLayout;
-
-	QHBoxLayout *				m_filterLayout;
-	QVBoxLayout *				m_filterByMessageTypeLayout;
-	QGroupBox *					m_filterByMessageTypeBox;
-	QVBoxLayout *				m_filterByServiceLayout;
-	QGroupBox *					m_filterByServiceBox;
-
+	ot::TabWidget*              m_tabWidget;
+	
 	QCheckBox *					m_msgTypeFilterDetailed;
 	QCheckBox *					m_msgTypeFilterInfo;
 	QCheckBox *					m_msgTypeFilterWarning;
@@ -106,17 +112,10 @@ private:
 	QCheckBox *					m_msgTypeFilterMsgOut;
 
 	QListWidget *				m_serviceFilter;
-	QPushButton *				m_btnSelectAllServices;
-	QPushButton *				m_btnDeselectAllServices;
-
-	QHBoxLayout *				m_buttonLayout;
-
-	QLabel *					m_messageFilterL;
+	
 	QLineEdit *					m_messageFilter;
 	QCheckBox *					m_ignoreNewMessages;
 	QCheckBox *					m_autoScrollToBottom;
-	QPushButton *				m_btnClear;
-	QPushButton *				m_btnClearAll;
 	QTableWidget *				m_table;
 
 	// Status Bar

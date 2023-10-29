@@ -1,12 +1,14 @@
-/*
- * dllmain.h
- *
- *	Author: Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
 
+// OToolkit header
 #include "AppBase.h"
 #include "StatusBar.h"
+
+// OToolkitAPI header
+#include "OToolkitAPI/OToolkitAPI.h"
 
 // C++ header
 #include <Windows.h>			// windows types
@@ -16,14 +18,20 @@
 
 #include <QtCore/qfile.h>
 #include <QtWidgets/qapplication.h>
+#include <QtWidgets/qmessagebox.h>
 
 // Open Twin header
-#include "OpenTwinCore/rJSON.h"				// rapidjson wrapper
-#include "OpenTwinCore/Logger.h"		// logger
-#include "OpenTwinCommunication/actionTypes.h"		// action member and types definition
+#include "OpenTwinCore/rJSON.h"
+#include "OpenTwinCore/Logger.h"
+#include "OpenTwinCore/otAssert.h"
+#include "OpenTwinCommunication/actionTypes.h"
 
-static std::string g_serviceURL;
-static bool g_starting{ true };
+namespace otoolkit {
+	namespace intern {
+		static std::string g_serviceURL{ };
+		static bool g_starting{ true };
+	}
+}
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -44,12 +52,14 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 void mainApplicationThread()
 {
 	try {
+		// First create Qt Application instance, we do not pass any arguments
 		int argc = 0;
 		QApplication application(argc, nullptr);
 
 		// Set global text size
 		application.setStyleSheet("* { font-size: 9pt; }");
 
+		// Apply global stylesheet
 		QFile styleFile(":/OToolkit.qss");
 		if (styleFile.exists()) {
 			if (styleFile.open(QIODevice::ReadOnly)) {
@@ -58,47 +68,66 @@ void mainApplicationThread()
 			}
 		}
 
+		// Initialize API
+		otoolkit::api::initialize(AppBase::instance());
+
+		// Initialize OpenTwin API
 		ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
+
+		// Initialize OToolkit
 		AppBase::instance()->setApplicationInstance(&application);
-		AppBase::instance()->setUrl(QString::fromStdString(g_serviceURL));
+		AppBase::instance()->setUrl(QString::fromStdString(otoolkit::intern::g_serviceURL));
 
-		g_starting = false;
-		AppBase::instance()->sb()->setInfo("OToolkit running at: " + QString::fromStdString(g_serviceURL));
+		otoolkit::intern::g_starting = false;
+		AppBase::instance()->sb()->setInfo("OToolkit running at: " + QString::fromStdString(otoolkit::intern::g_serviceURL));
 
-		application.exec();
+		// Run Qt EventLoop
+		exit(application.exec());
 	}
-	catch (const std::exception & e) {
-		assert(0); // Something went wrong
+	catch (const std::exception& _e) {
+		otAssert(0, "Exception caught");
+		QMessageBox msg(QMessageBox::Critical, "Fatal Error", _e.what(), QMessageBox::Ok);
+		msg.exec();
+		exit(2);
 	}
 	catch (...) {
-		assert(0);
+		otAssert(0, "Unknown error");
+		QMessageBox msg(QMessageBox::Critical, "Fatal Error", "Unknown error occured", QMessageBox::Ok);
+		msg.exec();
+		exit(1);
 	}
-	exit(0);
 }
 
 extern "C"
 {
-	_declspec(dllexport) int init(const char * _unused1, const char * _ownIP, const char * _unused2, const char * _unused3)
+	_declspec(dllexport) int init(const char * _unused1, const char * _ownUrl, const char * _unused2, const char * _unused3)
 	{
 		try {
-			g_serviceURL = _ownIP;
+			otoolkit::intern::g_serviceURL = _ownUrl;
 
-			// Start session service health check
+			// Run the main application thread detached
 			std::thread appt(mainApplicationThread);
 			appt.detach();
+			return 0;
 		}
-		catch (const std::exception & e) {
-			assert(0); // Something went wrong
+		catch (const std::exception& _e) {
+			otAssert(0, "Exception caught");
+			QMessageBox msg(QMessageBox::Critical, "Fatal Error", _e.what(), QMessageBox::Ok);
+			msg.exec();
+			return 2;
 		}
 		catch (...) {
-			assert(0);	// Something went horribly wrong
+			otAssert(0, "Unknown error");
+			QMessageBox msg(QMessageBox::Critical, "Fatal Error", "Unknown error occured", QMessageBox::Ok);
+			msg.exec();
+			return 1;
 		}
-		return 0;
 	}
 
 	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP)
 	{
-		while (g_starting) {
+		// Ensure the initialization process is done
+		while (otoolkit::intern::g_starting) {
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(100ms);
 		}
@@ -121,36 +150,42 @@ extern "C"
 				}
 			}
 		}
-		catch (const std::exception & e) {
-			assert(0); // Error
+		catch (const std::exception & _e) {
+			otAssert(0, "Exception caught");
+			QMessageBox msg(QMessageBox::Critical, "Fatal Error", _e.what(), QMessageBox::Ok);
+			msg.exec();
+			
 		}
 		catch (...) {
-			assert(0); // Error
+			otAssert(0, "Unknown error");
+			QMessageBox msg(QMessageBox::Critical, "Fatal Error", "Unknown error occured", QMessageBox::Ok);
+			msg.exec();
 		}
 
+		// Return empty string
 		char *retval = new char[1];
 		retval[0] = 0;
 		return retval;
 	}
 
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP)
+	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderUrl)
 	{
-		return performAction(json, senderIP);
+		return performAction(_json, _senderUrl);
 	}
 
 	_declspec(dllexport) const char *getServiceURL(void)
 	{
-		char *retVal = new char[g_serviceURL.size() + 1];
-		strcpy(retVal, g_serviceURL.c_str());
+		char *retVal = new char[otoolkit::intern::g_serviceURL.size() + 1];
+		strcpy(retVal, otoolkit::intern::g_serviceURL.c_str());
 
 		return retVal;
 	}
 
-	_declspec(dllexport) void deallocateData(const char *data)
+	_declspec(dllexport) void deallocateData(const char * _data)
 	{
-		if (data != nullptr)
+		if (_data != nullptr)
 		{
-			delete[] data;
+			delete[] _data;
 		}
 	}
 }

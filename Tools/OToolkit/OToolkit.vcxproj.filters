@@ -40,12 +40,6 @@
     <Filter Include="Source Files\Tools">
       <UniqueIdentifier>{320f4f90-c82e-4670-abd8-da2e2a2fba54}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\API">
-      <UniqueIdentifier>{a4687e6c-ef65-48e5-a964-fb7c474e5911}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\API">
-      <UniqueIdentifier>{1d00f504-e330-418d-a111-8ed73e91b4e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Dialog">
       <UniqueIdentifier>{b3d9a1e6-ec6d-4d8c-b669-223f8fedb3b7}</UniqueIdentifier>
     </Filter>
@@ -72,29 +66,11 @@
     <ClCompile Include="src\Terminal.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="src\AbstractTool.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ToolManager.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ToolBar.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Directory.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
-    <ClCompile Include="src\File.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ProjectCollection.cpp">
-      <Filter>Source Files\API</Filter>
-    </ClCompile>
     <ClCompile Include="src\ConnectToLoggerDialog.cpp">
       <Filter>Source Files\Dialog</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextFinder.cpp">
-      <Filter>Source Files\Tools</Filter>
+    <ClCompile Include="src\ToolManager.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,25 +78,7 @@
       <Filter>Header Files\MovingOut</Filter>
     </ClInclude>
     <ClInclude Include="include\ToolManager.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AbstractTool.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OToolkitAPITypes.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Project.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Directory.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\File.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TextFinder.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -135,12 +93,6 @@
     </QtMoc>
     <QtMoc Include="include\StatusBar.h">
       <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\ToolBar.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\ProjectCollection.h">
-      <Filter>Header Files\API</Filter>
     </QtMoc>
     <QtMoc Include="include\ConnectToLoggerDialog.h">
       <Filter>Header Files\Dialog</Filter>

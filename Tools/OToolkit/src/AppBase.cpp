@@ -1,10 +1,19 @@
+//! @file AppBase.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// OToolkit header
 #include "AppBase.h"
+#include "ToolManager.h"
 #include "StatusBar.h"
 #include "LogVisualization.h"
 #include "Terminal.h"
-#include "TextFinder.h"
 
-// OT header
+// OToolkitAPI header
+#include "OToolkitAPI/OToolkitAPI.h"
+
+// OpenTwin header
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 #include "OpenTwinCommunication/actionTypes.h"
@@ -20,25 +29,98 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qmessagebox.h>
 
+#define APPBASE_LOG(___msg) OTOOLKIT_LOG("OToolkit", ___msg)
+#define APPBASE_LOGW(___msg) OTOOLKIT_LOGW("OToolkit", ___msg)
+#define APPBASE_LOGE(___msg) OTOOLKIT_LOGE("OToolkit", ___msg)
+
 enum InternLogType {
 	InternInfo,
 	InternWarning,
 	InternError
 };
 
-static AppBase * g_instance{ nullptr };
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Static functions
 
 AppBase * AppBase::instance(void) {
+	static AppBase* g_instance{ nullptr };
 	if (g_instance == nullptr) g_instance = new AppBase;
 	return g_instance;
 }
 
-void AppBase::closeEvent(QCloseEvent * _event) {
-	QString err;
-	if (!this->preShutdownTool(m_logger)) { _event->accept(); return; }
-	if (!this->preShutdownTool(m_terminal)) { _event->accept(); return; }
-	if (!this->preShutdownTool(m_textFinder)) { _event->accept(); return; }
+// ###########################################################################################################################################################################################################################################################################################################################
 
+// API base functions
+
+void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) {
+	if (QThread::currentThreadId() == m_mainThread) {
+		// Same thread -> direct call
+		
+		switch (_type)
+		{
+		case otoolkit::APIInterface::Information:
+			this->slotLogMessage(_sender, _message);
+			break;
+		case otoolkit::APIInterface::Warning:
+			this->slotLogWarning(_sender, _message);
+			break;
+		case otoolkit::APIInterface::Error:
+			this->slotLogError(_sender, _message);
+			break;
+		default:
+			otAssert(0, "Unknown log type");
+			this->slotLogError("OToolkit", "Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }");
+			break;
+		}
+	}
+	else {
+		// Different thread -> queue
+		switch (_type)
+		{
+		case otoolkit::APIInterface::Information:
+			QMetaObject::invokeMethod(this, "slotLogMessage", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
+			break;
+		case otoolkit::APIInterface::Warning:
+			QMetaObject::invokeMethod(this, "slotLogWarning", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
+			break;
+		case otoolkit::APIInterface::Error:
+			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
+			break;
+		default:
+			otAssert(0, "Unknown log type");
+			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, QString("Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }")));
+			break;
+		}
+	}
+}
+
+bool AppBase::addTool(otoolkit::Tool* _tool) {
+	return false;
+}
+
+void AppBase::updateStatusString(const QString& _statusText) {
+
+}
+
+void AppBase::updateStatusStringAsError(const QString& _statusText) {
+
+}
+
+void AppBase::registerToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) {
+
+}
+
+void AppBase::removeToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) {
+
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Qt base functions
+
+void AppBase::closeEvent(QCloseEvent * _event) {
+	// Save window state
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 	s.setValue("IsMaximized", isMaximized());
 	s.setValue("SizeX", size().width());
@@ -47,133 +129,90 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	s.setValue("PosY", pos().y());
 	s.setValue("WindowState", saveState());
 
-	if (m_logger) {
-		delete m_logger;
-		m_logger = nullptr;
-	}
-	if (m_textFinder) {
-		delete m_textFinder;
-		m_textFinder = nullptr;
-	}
-	if (m_terminal) {
-		delete m_terminal;
-		m_terminal = nullptr;
-	}
+	// Clear tools
+	ToolManager::instance().clear();
+
+	// Clear tabs
 	m_tabWidget->clear();
 
+	// Qt
 	QMainWindow::closeEvent(_event);
 }
 
-void AppBase::log(const QString& _sender, const QString& _message) {
-	if (QThread::currentThreadId() == m_mainThread) {
-		slotLog(_sender, _message, InternInfo);
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
+
+void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
+	QTextCursor cursor = m_output->textCursor();
+	QTextCharFormat format = cursor.charFormat();
+	QTextCharFormat formatTime = format;
+	QTextCharFormat formatSender = format;
+	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
+	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
+
+	cursor.insertText("[");
+	cursor.setCharFormat(formatTime);
+	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+	cursor.setCharFormat(format);
+	cursor.insertText("] ");
+
+	if (!_sender.isEmpty()) {
+		cursor.insertText("[");
+		cursor.setCharFormat(formatSender);
+		cursor.insertText(_sender);
+		cursor.setCharFormat(format);
+		cursor.insertText("] ");
 	}
-	else {
-		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternInfo));
-	}
+
+	cursor.insertText(_message);
+	m_output->setTextCursor(cursor);
+	m_output->append("");
 }
 
-void AppBase::logWarning(const QString& _sender, const QString& _message) {
-	if (QThread::currentThreadId() == m_mainThread) {
-		slotLog(_sender, _message, InternWarning);
-	}
-	else {
-		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternWarning));
-	}
-}
-
-void AppBase::logError(const QString& _sender, const QString& _message) {
-	if (QThread::currentThreadId() == m_mainThread) {
-		slotLog(_sender, _message, InternError);
-	}
-	else {
-		QMetaObject::invokeMethod(this, "slotLog", Qt::QueuedConnection, Q_ARG(const QString&, _sender), Q_ARG(const QString&, _message), Q_ARG(int, InternError));
-	}
-}
-
-void AppBase::showErrorPromt(const QString& _text) {
-	QMessageBox msg(QMessageBox::Critical, "Error", _text, QMessageBox::Ok, this);
-	msg.exec();
-}
-
-void AppBase::slotProcessMessage(const QString& _message) {
-	try {
-		std::string msgStd = _message.toStdString();
-		OT_rJSON_parseDOC(inboundAction, msgStd.c_str());
-		if (inboundAction.IsObject()) {
-
-			std::string action = ot::rJSON::getString(inboundAction, OT_ACTION_MEMBER);
-
-			if (action == OT_ACTION_CMD_Log) {
-				OT_rJSON_checkMember(inboundAction, OT_ACTION_PARAM_LOG, Object);
-				OT_rJSON_val logObj = inboundAction[OT_ACTION_PARAM_LOG].GetObject();
-
-				ot::LogMessage msg;
-				msg.setFromJsonObject(logObj);
-				msg.setCurrentTimeAsGlobalSystemTime();
-				
-				m_logger->appendLogMessage(msg);
-			}
-		}
-		else {
-			m_statusBar->setErrorInfo("The received message is not a JSON object");
-		}
-	}
-	catch (const std::exception& _e) {
-		m_statusBar->setErrorInfo(_e.what());
-	}
-	catch (...) {
-		m_statusBar->setErrorInfo("Unknown error occured while processing message");
-	}
-}
-
-void AppBase::slotDockWidgetVisibilityChanged(bool _visible) {
-	m_outputAction->setChecked(_visible);
-}
-
-void AppBase::slotToggleOutput(void) {
-	m_outputDock->setVisible(!m_outputDock->isVisible());
-}
-
-void AppBase::slotSettings(void) {
-
-}
-
-void AppBase::slotClose(void) {
-	close();
-}
-
-void AppBase::slotInitialize(void) {
-	OTOOLKIT_LOG("OToolkit", "Starting initialize...");
-
-	// Create tools
-	m_logger = new LogVisualization;
-	m_terminal = new Terminal;
-	m_textFinder = new TextFinder;
-
-	m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
-	m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
-	m_tabWidget->addTab(m_textFinder->widget(), "Text Finder");
-
-	// Setup menu
-	m_logger->createMenuBarEntries(m_menuBar);
-	m_terminal->createMenuBarEntries(m_menuBar);
-	m_textFinder->createMenuBarEntries(m_menuBar);
-
-	// Setup information
-	m_statusBar->setCurrentTool(m_logger);
-}
-
-void AppBase::slotLog(const QString& _sender, const QString& _message, int _type) {
+void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 	QTextCursor cursor = m_output->textCursor();
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
 	QTextCharFormat formatSender = format;
 	QTextCharFormat formatWarn = format;
-	QTextCharFormat formatError = format;
 	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
 	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
 	formatWarn.setForeground(QBrush(QColor(255, 242, 0)));
+
+	cursor.insertText("[");
+	cursor.setCharFormat(formatTime);
+	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+	cursor.setCharFormat(format);
+	cursor.insertText("] ");
+
+	if (!_sender.isEmpty()) {
+		cursor.insertText("[");
+		cursor.setCharFormat(formatSender);
+		cursor.insertText(_sender);
+		cursor.setCharFormat(format);
+		cursor.insertText("] ");
+	}
+
+	cursor.insertText("[");
+	cursor.setCharFormat(formatWarn);
+	cursor.insertText("Warning");
+	cursor.setCharFormat(format);
+	cursor.insertText("] ");
+
+	cursor.insertText(_message);
+	m_output->setTextCursor(cursor);
+	m_output->append("");
+}
+
+void AppBase::slotLogError(const QString& _sender, const QString& _message) {
+	QTextCursor cursor = m_output->textCursor();
+	QTextCharFormat format = cursor.charFormat();
+	QTextCharFormat formatTime = format;
+	QTextCharFormat formatSender = format;
+	QTextCharFormat formatError = format;
+	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
+	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
 	formatError.setForeground(QBrush(QColor(255, 0, 0)));
 
 	cursor.insertText("[");
@@ -190,23 +229,35 @@ void AppBase::slotLog(const QString& _sender, const QString& _message, int _type
 		cursor.insertText("] ");
 	}
 
-	if (_type == InternWarning) {
-		cursor.insertText("[");
-		cursor.setCharFormat(formatWarn);
-		cursor.insertText("Warning");
-		cursor.setCharFormat(format);
-		cursor.insertText("] ");
-	} else if (_type == InternError) {
-		cursor.insertText("[");
-		cursor.setCharFormat(formatError);
-		cursor.insertText("Error");
-		cursor.setCharFormat(format);
-		cursor.insertText("] ");
-	}
+	cursor.insertText("[");
+	cursor.setCharFormat(formatError);
+	cursor.insertText("Error");
+	cursor.setCharFormat(format);
+	cursor.insertText("] ");
 
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
 	m_output->append("");
+}
+
+void AppBase::slotInitialize(void) {
+	OTOOLKIT_LOG("OToolkit", "Starting initialize...");
+	/*
+	// Create tools
+	m_logger = new LogVisualization;
+	m_terminal = new Terminal;
+
+	m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
+	m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
+	m_tabWidget->addTab(m_textFinder->widget(), "Text Finder");
+
+	// Setup menu
+	m_logger->createMenuBarEntries(m_menuBar);
+	m_terminal->createMenuBarEntries(m_menuBar);
+
+	// Setup information
+	m_statusBar->setCurrentTool(m_logger);
+	*/
 }
 
 void AppBase::slotRecenter(void) {
@@ -233,30 +284,25 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	m_output->setReadOnly(true);
 
 	// Setup window
-	setCentralWidget(m_tabWidget);
-	setWindowTitle(APP_BASE_APP_NAME);
-	setWindowIcon(QIcon(":/images/OToolkit.png"));
+	this->setCentralWidget(m_tabWidget);
+	this->setWindowTitle(APP_BASE_APP_NAME);
+	this->setWindowIcon(QIcon(":/images/OToolkit.png"));
 
 	m_outputDock->setWidget(m_output);
-	addDockWidget(Qt::BottomDockWidgetArea, m_outputDock);
+	this->addDockWidget(Qt::BottomDockWidgetArea, m_outputDock);
 
 	// Setup status
 	m_statusBar = new StatusBar;
-	setStatusBar(m_statusBar);
+	this->setStatusBar(m_statusBar);
 
 	// Setup menu
 	m_menuBar = new QMenuBar;
-	setMenuBar(m_menuBar);
+	this->setMenuBar(m_menuBar);
 
 	QMenu * fileMenu = m_menuBar->addMenu("File");
-	m_outputAction = fileMenu->addAction(QIcon(":/images/Log.png"), "Output");
-	fileMenu->addSeparator();
 	m_settingsAction = fileMenu->addAction(QIcon(":/images/Settings.png"), "Settings");
 	fileMenu->addSeparator();
-	m_exitAction = fileMenu->addAction(QIcon(":/images/Exit.png"), "Exit");
-
-	m_outputAction->setCheckable(true);
-	m_outputAction->setChecked(true);
+	QAction * exitAction = fileMenu->addAction(QIcon(":/images/Exit.png"), "Exit");
 
 	// Setup global shortcuts
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);
@@ -269,43 +315,23 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	int posX = s.value("PosX", 0).toInt();
 	int posY = s.value("PosY", 0).toInt();
 
-	move(posX, posY);
+	this->move(posX, posY);
 
-	if (isMax) showMaximized();
+	if (isMax) {
+		this->showMaximized();
+	}
 	else {
-		resize(sizeX, sizeY);
-		showNormal();
+		this->resize(sizeX, sizeY);
+		this->showNormal();
 	}
 
-	restoreState(s.value("WindowState", "").toByteArray());
-	m_outputAction->setChecked(m_outputDock->isVisible());
+	this->restoreState(s.value("WindowState", "").toByteArray());
 
-	connect(m_outputDock, &QDockWidget::visibilityChanged, this, &AppBase::slotDockWidgetVisibilityChanged);
-	connect(m_outputAction, &QAction::triggered, this, &AppBase::slotToggleOutput);
-	connect(m_settingsAction, &QAction::triggered, this, &AppBase::slotSettings);
-	connect(m_exitAction, &QAction::triggered, this, &AppBase::slotClose);
+	//connect(m_settingsAction, &QAction::triggered, this, &AppBase::slotSettings);
+	connect(exitAction, &QAction::triggered, this, &AppBase::close);
 	connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 
-	log("OToolkit", "Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
+	APPBASE_LOG("Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
-}
-
-bool AppBase::preShutdownTool(OToolkitAPI::AbstractTool* _tool) {
-	if (_tool) {
-		QString err;
-		if (!_tool->toolPrepareShutdown(err)) {
-			QMessageBox msg(
-				QMessageBox::Critical,
-				"Error",
-				"Failed to prepare tool \"" + _tool->toolName() + "\" for shutdown.\nError:\n" + err + "\n\nDo you want to continue? All unsaved changes will be lost.",
-				QMessageBox::Yes | QMessageBox::No,
-				this
-			);
-			if (msg.exec() != QMessageBox::Yes) {
-				return false;
-			}
-		}
-	}
-	return true;
 }

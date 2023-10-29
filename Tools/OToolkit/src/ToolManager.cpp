@@ -1,54 +1,92 @@
-// Toolkit API header
-#include "ToolManager.h"
-#include "AbstractTool.h"
+//! @file ToolManager.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date October 2023
+// ###########################################################################################################################################################################################################################################################################################################################
 
-OToolkitAPI::ToolManager& OToolkitAPI::ToolManager::instance(void) {
-	static ToolManager g_instance;
+#pragma once
+
+// OToolkit header
+#include "ToolManager.h"
+
+// OToolkitAPI header
+#include "OToolkitAPI/OToolkitAPI.h"
+
+// OpenTwin header
+#include "OpenTwinCore/otAssert.h"
+
+#define TOOLMANAGER_LOG(___msg) OTOOLKIT_LOG("ToolManager", ___msg)
+#define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)
+#define TOOLMANAGER_LOGE(___msg) OTOOLKIT_LOGE("ToolManager", ___msg)
+
+ToolManager& ToolManager::instance(void) {
+	static ToolManager g_instance{ };
 	return g_instance;
 }
 
-OToolkitAPI::ToolID OToolkitAPI::ToolManager::add(AbstractTool * _tool) {
-	if (_tool == nullptr) return 0;
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	_tool->setToolId(++m_currentId);
-	m_tools.insert_or_assign(_tool->toolId(), _tool);
-	return _tool->toolId();
+// Setter / Getter
+
+void ToolManager::addTool(otoolkit::Tool* _tool) {
+	for (otoolkit::Tool* t : m_tools) {
+		if (t->toolName() == _tool->toolName()) {
+			TOOLMANAGER_LOGW("Tool already exists");
+			return;
+		}
+	}
+	m_tools.push_back(_tool);
 }
 
-OToolkitAPI::AbstractTool * OToolkitAPI::ToolManager::getTool(ToolID _id) {
-	auto it = m_tools.find(_id);
-	if (it == m_tools.end()) {
-		assert(0); // no tool found
-		return nullptr;
+otoolkit::Tool* ToolManager::findTool(const QString& _toolName) {
+	for (otoolkit::Tool* t : m_tools) {
+		if (t->toolName() == _toolName) {
+			return t;
+		}
 	}
-	return it->second;
-}
-
-OToolkitAPI::AbstractTool * OToolkitAPI::ToolManager::getToolByName(const QString& _name) {
-	for (auto t : m_tools) {
-		if (t.second->toolName() == _name) { return t.second; };
-	}
-	assert(0); // Invalid name
 	return nullptr;
 }
 
-void OToolkitAPI::ToolManager::unloadTool(ToolID _id) {
-	AbstractTool * tool = getTool(_id);
-	if (tool == nullptr) return;
+void ToolManager::removeTool(const QString& _toolName) {
+	otoolkit::Tool* tool = this->findTool(_toolName);
+	if (tool == nullptr) {
+		TOOLMANAGER_LOGE("Tool not found { \"Name\": \"" + _toolName + "\" }");
+		return;
+	}
+	this->removeTool(tool);
 	delete tool;
-	m_tools.erase(_id);
 }
 
-void OToolkitAPI::ToolManager::removeToolFromList(ToolID _id) {
-	m_tools.erase(_id);
-}
+void ToolManager::removeTool(otoolkit::Tool* _tool) {
+	// Remove from list
+	auto it = std::find(m_tools.begin(), m_tools.end(), _tool);
+	if (it == m_tools.end()) {
+		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + _tool->toolName() + "\" }");
+		return;
+	}
+	m_tools.erase(it);
 
-// ######################################################################################################################################
-
-OToolkitAPI::ToolManager::ToolManager() : m_currentId(0) {
+	// Clean up data
 	
 }
 
-OToolkitAPI::ToolManager::~ToolManager() {
+void ToolManager::clear(void) {
+	// Clear all tools
+	for (otoolkit::Tool* t : m_tools) {
+		if (t) {
+			delete t;
+		}
+	}
+	m_tools.clear();
+}
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private
+
+ToolManager::ToolManager() {
+
+}
+
+ToolManager::~ToolManager() {
+	this->clear();
 }
