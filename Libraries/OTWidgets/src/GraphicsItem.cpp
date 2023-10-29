@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsStackItem.h"
 #include "OTWidgets/GraphicsItemDrag.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -15,6 +16,7 @@
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/KeyMap.h"
+#include "OpenTwinCore/Logger.h"
 
 #include <QtCore/qmimedata.h>
 #include <QtCore/qmath.h>
@@ -176,6 +178,15 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 			c->updateConnection();
 		}
 		this->raiseEvent(ot::GraphicsItem::ItemMoved);
+	}
+}
+
+void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
+	if (m_parent) {
+		if (m_parent->simpleFactoryObjectKey() != OT_SimpleFactoryJsonKeyValue_GraphicsStackItem) {
+			OT_LOG_D("Rectangle geometry requested { \"ItemName\": \"" + this->graphicsItemName() + "\", \"Width\": " + std::to_string(_geom.size().width()) + ", \"Height\": " + std::to_string(_geom.size().height()) + " }");
+			this->setGraphicsItemRequestedSize(_geom.size());
+		}
 	}
 }
 

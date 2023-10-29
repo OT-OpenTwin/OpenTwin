@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OpenTwinCore/KeyMap.h"
+#include "OpenTwinCore/Logger.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTWidgets/GraphicsRectangularItem.h"
 #include "OTWidgets/Painter2DFactory.h"
@@ -78,6 +79,8 @@ void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+
+	this->handleSetItemGeometry(_rect);
 }
 
 QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

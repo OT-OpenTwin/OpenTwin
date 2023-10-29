@@ -90,6 +90,8 @@ namespace ot {
 
 		void handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value);
 
+		void handleSetItemGeometry(const QRectF& _geom);
+
 		// ###############################################################################################################################################
 
 		// Getter / Setter
