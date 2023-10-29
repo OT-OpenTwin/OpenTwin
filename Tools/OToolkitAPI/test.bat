@@ -27,7 +27,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : OToolkit
+ECHO Testing Project : OToolkitAPI
 
 REM Open project
 
@@ -54,20 +54,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_OTOOLKIT_ROOT%\OToolkit.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_OTOOLKITAPI_ROOT%\OToolkitAPI.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OT_OTOOLKIT_ROOT%\x64\Debug\OToolkitTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitDebugReport.xml"
+	"%OT_OTOOLKITAPI_ROOT%\x64\Debug\OToolkitAPITest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitAPIDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitDebugReport.xml" "OToolkit" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OToolkitDebugReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitAPIDebugReport.xml" "OToolkitAPI" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OToolkitAPIDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_OTOOLKIT_ROOT%\OToolkit.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_OTOOLKITAPI_ROOT%\OToolkitAPI.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OT_OTOOLKIT_ROOT%\x64\Release\OToolkitTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitReleaseReport.xml"
+	"%OT_OTOOLKITAPI_ROOT%\x64\Release\OToolkitAPITest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitAPIReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitReleaseReport.xml" "OToolkit" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OToolkitReleaseReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Reports\OToolkitAPIReleaseReport.xml" "OToolkitAPI" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OToolkitAPIReleaseReport.xml"
 ) 
   
 GOTO END
