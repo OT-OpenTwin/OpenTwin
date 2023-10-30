@@ -23,5 +23,4 @@ private:
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 	std::map<std::string, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
-	bool connectionAlreadyExists(std::shared_ptr<EntityBlock>blockEntity, const ot::GraphicsConnectionCfg& connection);
 };

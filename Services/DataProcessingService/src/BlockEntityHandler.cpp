@@ -46,20 +46,12 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	for (auto& connection : connections)
 	{
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
-		bool connectionExists = false;
 
 		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
 		{
 			auto& blockEntity = blockEntitiesByBlockID[connection.originUid()];
-			connectionExists = connectionAlreadyExists(blockEntity, connection);
-			if (!connectionExists)
-			{
-				originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
-			}
-			else
-			{
-				_uiComponent->displayMessage("The same connection cannot be created twice.\n");
-			}
+			
+			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
 		}
 		else
 		{
@@ -67,30 +59,27 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			continue;
 		}
 
-		if (!connectionExists)
+		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
 		{
-			if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
-			{
-				auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
-				destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
-			}
-			else
-			{
-				OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
-				continue;
-			}
+			auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
+			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
+		}
+		else
+		{
+			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
+			continue;
+		}
 
-			if (originConnectorIsTypeOut != destConnectorIsTypeOut)
-			{
-				blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
-				entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
-				blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
-				entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
-			}
-			else
-			{
-				_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-			}
+		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
+		{
+			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
+			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
+		}
+		else
+		{
+			_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
 		}
 	}
 
@@ -229,12 +218,4 @@ bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockE
 	{
 		return true;
 	}
-}
-
-bool BlockEntityHandler::connectionAlreadyExists(std::shared_ptr<EntityBlock> blockEntity, const ot::GraphicsConnectionCfg& connection)
-{
-	const std::string connectionKey = connection.buildKey();
-	const std::string reversedConnectionKey = connection.buildReversedKey();
-	auto allConnectionsByKey = blockEntity->getAllConnectionsByKey();
-	return (allConnectionsByKey.find(connectionKey) != allConnectionsByKey.end() || allConnectionsByKey.find(reversedConnectionKey) != allConnectionsByKey.end());
 }
