@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\BlockHandler.cpp" />
     <ClCompile Include="src\Graph.cpp" />
     <ClCompile Include="src\GraphNode.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />

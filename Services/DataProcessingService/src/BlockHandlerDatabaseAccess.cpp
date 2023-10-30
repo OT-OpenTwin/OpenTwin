@@ -13,6 +13,8 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	_isValid  = resultCollectionHandler.CollectionExists(resultCollectionName);
 	if (_isValid)
 	{
+		_quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
+		_parameterConnectorName =  blockEntity->getConnectorParameter1().getConnectorName();
 		//const std::string dbURL = "Projects";
 		//_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
 		//
@@ -42,14 +44,15 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 	}
 }
 
-void BlockHandlerDatabaseAccess::executeSpecialized()
+bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
+	genericDataBlock quantity{0,2,4,8,16,32,64,128,256,512,1024};
+	genericDataBlock parameter{ 0,1,2,3,4,5,6,7,8,9,10 };
 
-}
+	_dataPerPort[_quantityConnectorName] = quantity;
+	_dataPerPort[_parameterConnectorName] = parameter;
 
-void BlockHandlerDatabaseAccess::setData(genericDataBlock& data, const std::string& targetPort)
-{
-	assert(0); //Currently the DB block has no inputs and thus, does not need to get any data
+	return true;
 }
 
 //BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)

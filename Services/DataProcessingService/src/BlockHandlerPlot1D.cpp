@@ -13,15 +13,20 @@ BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const Han
 	
 	_xunit = blockEntity->getXUnit();
 	_yunit = blockEntity->getYUnit();
-}
-void BlockHandlerPlot1D::executeSpecialized()
-{
 
+	_xDataConnector = blockEntity->getConnectorXAxis().getConnectorName();
+	_yDataConnector = blockEntity->getConnectorYAxis().getConnectorName();
 }
-void BlockHandlerPlot1D::setData(genericDataBlock& data, const std::string& targetPort)
+bool BlockHandlerPlot1D::executeSpecialized()
 {
+	bool allSet = (_dataPerPort.find(_xDataConnector) != _dataPerPort.end()) && (_dataPerPort.find(_yDataConnector) != _dataPerPort.end());
+	if (allSet)
+	{
 
+	}
+	return allSet;
 }
+
 //
 //BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::genericDataBlock& inputData)
 //{

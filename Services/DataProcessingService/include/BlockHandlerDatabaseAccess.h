@@ -9,17 +9,15 @@ class BlockHandlerDatabaseAccess : public BlockHandler
 public:
 	BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap);
 	~BlockHandlerDatabaseAccess();
-
-	void executeSpecialized() override;
-	void setData(genericDataBlock& data, const std::string& targetPort) override;
 	
+	bool executeSpecialized() override;	
 
 protected:
 	DataStorageAPI::DocumentAccess* _dataStorageAccess = nullptr;
 	BufferBlockDatabaseAccess* _collectionInfos = nullptr;
 	genericDataBlock _output;
 	bool _isValid = true;
-	std::string _dataConnectorName;
+	std::string _quantityConnectorName;
 	std::string _parameterConnectorName;
 
 	std::string _queryString;

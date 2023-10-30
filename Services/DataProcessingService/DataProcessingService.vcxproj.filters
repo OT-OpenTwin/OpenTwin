@@ -93,6 +93,9 @@
     <ClCompile Include="src\ValidityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockHandler.cpp">
+      <Filter>Source Files\BlockHandling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">

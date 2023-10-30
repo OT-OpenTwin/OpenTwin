@@ -16,8 +16,8 @@ public:
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 
-	const ot::Connector getXAxisConnector() const { return _xAxisConnector; }
-	const ot::Connector getYAxisConnector() const { return _yAxisConnector; }
+	const ot::Connector getConnectorXAxis() const { return _xAxisConnector; }
+	const ot::Connector getConnectorYAxis() const { return _yAxisConnector; }
 
 private:
 	ot::Connector _xAxisConnector;
