@@ -23,6 +23,8 @@ void PipelineHandler::initiate(const std::map<std::string, std::shared_ptr<Graph
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
 		std::shared_ptr<GraphNode> graphNode = graphNodesByBlockID.find(blockEntity->getBlockID())->second;
 		_blockHandlerByGraphNode[graphNode] = createBlockHandler(blockEntity);
+		_blockHandlerByGraphNode[graphNode]->setModelComponent(_modelComponent);
+		_blockHandlerByGraphNode[graphNode]->setUIComponent(_uiComponent);
 	}
 }
 

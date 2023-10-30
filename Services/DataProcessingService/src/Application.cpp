@@ -179,7 +179,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
 	_validityHandler.setUIComponent(_ui);
-	//PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
+	_pipelineHandler.setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -194,8 +194,8 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	_blockEntityHandler.setModelComponent(_model);
-	//_pipelineManager.setModelComponent(_model);
-	//PropertyHandlerDatabaseAccessBlock::instance().setModelComponent(_model);
+	_pipelineHandler.setModelComponent(_model);
+	
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

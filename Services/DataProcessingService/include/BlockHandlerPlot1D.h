@@ -1,6 +1,7 @@
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockPlot1D.h"
+#include "OpenTwinCore/FolderNames.h"
 
 class BlockHandlerPlot1D : public BlockHandler
 {
@@ -9,15 +10,11 @@ public:
 	virtual bool executeSpecialized() override;
 
 private:
-	ot::components::ModelComponent* _modelComponent;
-	
-	std::vector<double> _xValues;
-	std::vector<double> _yValues;
 	std::string _xDataConnector;
 	std::string _yDataConnector;
 
-	std::string _resultFolder = "Results/";
-	std::string _plotName = "Plot";
+	std::string _resultFolder = ot::FolderNames::ResultFolder + "/";
+	std::string _plotName;
 	std::string _curveName = "Curve";
 
 	std::string _xlabel;
@@ -25,5 +22,5 @@ private:
 	std::string _ylabel;
 	std::string _yunit;
 
-	bool _done = false;
+	std::vector<double> transformDataToDouble(genericDataBlock& data);
 };
