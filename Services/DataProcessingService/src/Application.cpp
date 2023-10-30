@@ -86,7 +86,8 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
-			//_pipelineManager.RunAll();
+			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
+			_validityHandler.blockDiagramIsValid(allBlockEntities);
 		}
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
@@ -171,6 +172,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
+	_validityHandler.setUIComponent(_ui);
 	//PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
 }
 
