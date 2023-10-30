@@ -32,7 +32,8 @@ public:
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { _coordinate2DEntityID = coordinateEntityID; };
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return _connectorsByName; }
-	const std::map<std::string, ot::GraphicsConnectionCfg>& getAllConnectionsByKey() const { return _connectionsByKey; }
+	const bool hasConnector(const std::string& connectorName) const { return _connectorsByName.find(connectorName) != _connectorsByName.end(); }
+	const std::list<ot::GraphicsConnectionCfg>& getAllConnections() const { return _connections; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
@@ -53,7 +54,7 @@ protected:
 
 	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
-	std::map<std::string, ot::GraphicsConnectionCfg> _connectionsByKey;
+	std::list<ot::GraphicsConnectionCfg> _connections;
 
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

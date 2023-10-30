@@ -30,6 +30,7 @@
     <ClCompile Include="src\TestGraphNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\FixtureEntityBlockGraph.h" />
     <ClInclude Include="include\FixtureGraph.h" />
   </ItemGroup>
   <ItemDefinitionGroup />

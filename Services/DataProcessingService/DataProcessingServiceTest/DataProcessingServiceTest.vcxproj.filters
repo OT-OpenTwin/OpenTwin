@@ -12,10 +12,13 @@
     <ClCompile Include="src\FixtureGraph.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestGraph.cpp" />
+    <ClCompile Include="src\TestGraphNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureGraph.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\FixtureEntityBlockGraph.h" />
   </ItemGroup>
 </Project>

@@ -2,19 +2,21 @@
 #include "GraphNode.h"
 
 #include <list>
+#include <vector>
+#include <memory>
 
 class Graph
 {
 public:
 
-	GraphNode* addNode();
-	//GraphNode* getNode(int nodeID);
-	const std::list<GraphNode>& getContainedNodes() const { return _nodes; };
-	const bool hasCycles(const GraphNode& startNode) const; //Depth first search
+	std::shared_ptr<GraphNode> addNode();
+	std::shared_ptr<GraphNode> getNode(int nodeID);
+	const std::list<std::shared_ptr<GraphNode>> getContainedNodes() const { return _nodes; };
+	const bool hasCycles(const std::shared_ptr<GraphNode> startNode) const; //Depth first search
 
-private:
+protected:
 	int _counter = 0;
-	std::list<GraphNode> _nodes;
+	std::list<std::shared_ptr<GraphNode>> _nodes;
 
-	bool TraverseNodesUntilCycle(const GraphNode& node, std::vector<bool>& visited, std::vector<bool>& recursiveStack) const;
+	bool TraverseNodesUntilCycle(const std::shared_ptr<GraphNode> node, std::vector<bool>& visited, std::vector<bool>& recursiveStack) const;
 };

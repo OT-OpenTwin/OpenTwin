@@ -3,11 +3,10 @@
 Graph FixtureGraph::getGraphWithCycle()
 {
 	Graph graph;
-	
-	GraphNode* zero = graph.addNode();
-	GraphNode* one = graph.addNode();
-	GraphNode* two = graph.addNode();
-	GraphNode* three = graph.addNode();
+	std::shared_ptr<GraphNode> zero = graph.addNode();
+	std::shared_ptr<GraphNode> one = graph.addNode();
+	std::shared_ptr<GraphNode> two = graph.addNode();
+	std::shared_ptr<GraphNode> three = graph.addNode();
 	
 	zero->addSucceedingNode(one);
 	zero->addSucceedingNode(two);
@@ -23,10 +22,10 @@ Graph FixtureGraph::getGraphWithoutCycle()
 {
 	Graph graph;
 
-	GraphNode* zero = graph.addNode();
-	GraphNode* one = graph.addNode();
-	GraphNode* two = graph.addNode();
-	GraphNode* three = graph.addNode();
+	std::shared_ptr<GraphNode> zero = graph.addNode();
+	std::shared_ptr<GraphNode> one = graph.addNode();
+	std::shared_ptr<GraphNode> two = graph.addNode();
+	std::shared_ptr<GraphNode> three = graph.addNode();
 
 	zero->addSucceedingNode(one);
 	zero->addSucceedingNode(two);

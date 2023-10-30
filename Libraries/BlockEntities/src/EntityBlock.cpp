@@ -44,7 +44,7 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 
 void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
 {
-	_connectionsByKey[connection.buildKey()] = connection;
+	_connections.push_back(connection);
 	setModified();
 }
 
@@ -69,9 +69,9 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
 
 	auto connectionArray = bsoncxx::builder::basic::array();
-	for (auto& connection : _connectionsByKey)
+	for (auto& connection : _connections)
 	{
-		ot::BlockConnectionBSON serializeableConnection(connection.second);
+		ot::BlockConnectionBSON serializeableConnection(connection);
 		auto subDocument = serializeableConnection.SerializeBSON();
 		connectionArray.append(subDocument);
 	}
@@ -104,7 +104,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		ot::BlockConnectionBSON connection;
 		connection.DeserializeBSON(subDocument);
 		ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();
-		_connectionsByKey[graphicsConnection.buildKey()] = graphicsConnection;
+		_connections.push_back(graphicsConnection);
 	}
 }
 
@@ -168,9 +168,9 @@ void EntityBlock::CreateConnections()
 	ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
 
 	// Store connection information
-	for (auto& connection : _connectionsByKey)
+	for (auto& connection : _connections)
 	{
-		connectionPckg.addConnection(connection.second);
+		connectionPckg.addConnection(connection);
 	}
 
 	// Request UI to add connections

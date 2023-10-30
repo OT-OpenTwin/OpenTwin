@@ -2,14 +2,26 @@
 
 #include "Graph.h"
 
-GraphNode* Graph::addNode()
+std::shared_ptr<GraphNode> Graph::addNode()
 {
-	_nodes.push_back(GraphNode(_counter));
+	_nodes.push_back(std::shared_ptr<GraphNode>(new GraphNode(_counter)));
 	_counter++;
-	return &_nodes.back();
+	return _nodes.back();
 }
 
-const bool Graph::hasCycles(const GraphNode& startNode) const
+std::shared_ptr<GraphNode> Graph::getNode(int nodeID)
+{
+	for (auto node : _nodes)
+	{
+		if (node->getNodeID() == nodeID)
+		{
+			return node;
+		}
+	}
+	return std::shared_ptr<GraphNode>(nullptr);
+}
+
+const bool Graph::hasCycles(const std::shared_ptr<GraphNode> startNode) const
 {
 	//Depth first search algorithm
 
@@ -19,19 +31,19 @@ const bool Graph::hasCycles(const GraphNode& startNode) const
 	return hasCycle;
 }
 
-bool Graph::TraverseNodesUntilCycle(const GraphNode& node, std::vector<bool>& visited, std::vector<bool>& recursiveStack) const
+bool Graph::TraverseNodesUntilCycle(const std::shared_ptr<GraphNode> node, std::vector<bool>& visited, std::vector<bool>& recursiveStack) const
 {
-	if (visited[node.getNodeID()] == false)
+	if (visited[node->getNodeID()] == false)
 	{
-		visited[node.getNodeID()] = true;
-		recursiveStack[node.getNodeID()] = true;
+		visited[node->getNodeID()] = true;
+		recursiveStack[node->getNodeID()] = true;
 		
-		const std::list<const GraphNode*> adjacentNodes = node.getSucceedingNodes();
+		const std::list<std::shared_ptr<GraphNode>> adjacentNodes = node->getSucceedingNodes();
 		for (auto adjacentNode : adjacentNodes)
 		{
 			if (!visited[adjacentNode->getNodeID()])
 			{
-				if (TraverseNodesUntilCycle(*adjacentNode, visited, recursiveStack))
+				if (TraverseNodesUntilCycle(adjacentNode, visited, recursiveStack))
 				{
 					return true;
 				}
@@ -42,6 +54,6 @@ bool Graph::TraverseNodesUntilCycle(const GraphNode& node, std::vector<bool>& vi
 			}
 		}
 	}
-	recursiveStack[node.getNodeID()] = false;
+	recursiveStack[node->getNodeID()] = false;
 	return false;
 }

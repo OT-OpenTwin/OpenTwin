@@ -4,25 +4,25 @@
 TEST(Graph, AddingOneGraphNode)
 {
 	Graph graph;
-	GraphNode* node = graph.addNode();
+	std::shared_ptr<GraphNode> node = graph.addNode();
 	EXPECT_EQ(node->getNodeID(), 0);
 }
 
 TEST(Graph, AddingTwoGraphNodes)
 {
 	Graph graph;
-	GraphNode* nodeOne = graph.addNode();
+	std::shared_ptr<GraphNode> nodeOne = graph.addNode();
 	ASSERT_EQ(nodeOne->getNodeID(), 0);
-	GraphNode* nodeTwo = graph.addNode();
+	std::shared_ptr<GraphNode> nodeTwo = graph.addNode();
 	EXPECT_EQ(nodeTwo->getNodeID(), 1);
 }
 
 TEST_F(FixtureGraph, CycleDetected)
 {
 	const Graph graphWithCycle = getGraphWithCycle();
-	const std::list<GraphNode> nodes = graphWithCycle.getContainedNodes();
+	const std::list<std::shared_ptr<GraphNode>> nodes = graphWithCycle.getContainedNodes();
 	bool cycleDetectedGlobal = false;
-	for (const GraphNode& node : nodes)
+	for (const std::shared_ptr<GraphNode>& node : nodes)
 	{
 		const bool cycleDetected = graphWithCycle.hasCycles(node);
 		cycleDetectedGlobal |= cycleDetected;
@@ -33,9 +33,9 @@ TEST_F(FixtureGraph, CycleDetected)
 TEST_F(FixtureGraph, NoCycleDetected)
 {
 	const Graph graphWithCycle = getGraphWithoutCycle();
-	const std::list<GraphNode> nodes = graphWithCycle.getContainedNodes();
+	const std::list<std::shared_ptr<GraphNode>> nodes = graphWithCycle.getContainedNodes();
 	bool cycleDetectedGlobal = false;
-	for (const GraphNode& node : nodes)
+	for (const std::shared_ptr<GraphNode> node : nodes)
 	{
 		const bool cycleDetected = graphWithCycle.hasCycles(node);
 		cycleDetectedGlobal |= cycleDetected;

@@ -90,6 +90,9 @@
     <ClCompile Include="src\GraphNode.cpp">
       <Filter>Source Files\GraphHandling</Filter>
     </ClCompile>
+    <ClCompile Include="src\ValidityHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="include\GraphNode.h">
       <Filter>Header Files\GraphHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValidityHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
