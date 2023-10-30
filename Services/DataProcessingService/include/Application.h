@@ -16,7 +16,7 @@
 #include <string>
 
 #include "BlockEntityHandler.h"
-#include "PipelineManager.h"
+#include "PipelineHandler.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
 #include "ValidityHandler.h"
 
@@ -121,7 +121,7 @@ private:
 	virtual ~Application();
 
 	ot::MenuButtonDescription _buttonRunPipeline;
-	//PipelineManager _pipelineManager;
+	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	ValidityHandler _validityHandler;
 };

@@ -35,6 +35,9 @@ public:
 	const std::string& getParameter3QueryValue();
 	const std::string& getParameter3QueryComparator();
 
+	const ot::Connector getConnectorQuantity() const { return _connectorQuantity; }
+	const ot::Connector getConnectorParameter1() const { return _connectorParameter1; }
+
 	virtual bool updateFromProperties() override;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
@@ -80,6 +83,8 @@ private:
 	const std::string _propertyComparatorP3 = "P3 comparator";
 	const std::string _propertyValueP3 = "P3 query value";
 
-
 	std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", " " };
+
+	ot::Connector _connectorQuantity;
+	ot::Connector _connectorParameter1;
 };

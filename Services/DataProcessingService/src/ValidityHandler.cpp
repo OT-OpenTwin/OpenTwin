@@ -4,6 +4,8 @@
 
 bool ValidityHandler::blockDiagramIsValid(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
+	_rootNodes.clear();
+	_entityByGraphNode.clear();
 	return allRequiredConnectionsSet(allBlockEntitiesByBlockID) && hasNoCycle(allBlockEntitiesByBlockID);
 }
 
@@ -90,28 +92,26 @@ bool ValidityHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlo
 
 bool ValidityHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
-	std::map<std::shared_ptr<GraphNode>, std::shared_ptr<EntityBlock>> entityByGraphNode;
-	const Graph graph = buildGraph(allBlockEntitiesByBlockID,entityByGraphNode);
+	const Graph graph = buildGraph(allBlockEntitiesByBlockID);
 	auto& allNodes = graph.getContainedNodes();
-	std::list<std::shared_ptr<GraphNode>> rootNodes;
-
+	
 	for (std::shared_ptr<GraphNode> node : allNodes)
 	{
 		if (node->getRankIncomming() == 0)
 		{
-			rootNodes.push_back(node);
+			_rootNodes.push_back(node);
 		}
 	}
 
 	bool anyCycleExists = false;
 	std::string uiMessage = "";
-	for (std::shared_ptr<GraphNode> node : rootNodes)
+	for (std::shared_ptr<GraphNode> node : _rootNodes)
 	{
 		const bool hasCycle = graph.hasCycles(node);
 
 		if (hasCycle)
 		{
-			std::shared_ptr<EntityBlock> blockEntity = entityByGraphNode.find(node)->second;
+			std::shared_ptr<EntityBlock> blockEntity = _entityByGraphNode.find(node)->second;
 			const std::string nameWithoutRoot = getNameWithoutRoot(blockEntity);
 			uiMessage += "Cycle detected starting from block \"" + nameWithoutRoot + "\"\n";
 		}
@@ -124,17 +124,19 @@ bool ValidityHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlo
 	return !anyCycleExists;
 }
 
-Graph ValidityHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID, std::map<std::shared_ptr<GraphNode>, std::shared_ptr<EntityBlock>>& entityByGraphNode)
+Graph ValidityHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	Graph graph;
-	std::map<std::string, std::shared_ptr<GraphNode>> graphNodeByBlockID;
 	
 
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
 		const std::string& blockID = blockEntityByBlockID.first;
+		const std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
+
 		std::shared_ptr<GraphNode> node = graph.addNode();
-		graphNodeByBlockID[blockID] = node;
+		_graphNodeByBlockID[blockID] = node;
+		_entityByGraphNode[node] = blockEntity;
 	}
 
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
@@ -146,30 +148,33 @@ Graph ValidityHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBl
 		auto& connectorsByName = blockEntity->getAllConnectorsByName();
 		for (const ot::GraphicsConnectionCfg& connection : connections)
 		{
-			const std::string* connectorName = nullptr;
+			const std::string* thisConnectorName = nullptr;
+			const std::string* otherConnectorName = nullptr;
 			const std::string* pairedBlockID = nullptr;
 
 			if (connection.destUid() == blockID)
 			{
-				connectorName = &connection.destConnectable();
+				thisConnectorName = &connection.destConnectable();
+				otherConnectorName = &connection.originConnectable();
 				pairedBlockID = &connection.originUid();
 			}
 			else
 			{
-				connectorName = &connection.originConnectable();
+				thisConnectorName = &connection.originConnectable();
+				otherConnectorName = &connection.destConnectable();
 				pairedBlockID = &connection.destUid();
 			}
 
-			auto connectorByName = connectorsByName.find(*connectorName);
+			auto connectorByName = connectorsByName.find(*thisConnectorName);
 			ot::Connector connector = connectorByName->second;
 			assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
 
-			std::shared_ptr<GraphNode> thisNode = graphNodeByBlockID[blockID];
-			std::shared_ptr<GraphNode> pairedNode = graphNodeByBlockID[*pairedBlockID];
+			std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
+			std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
 
 			if (connector.getConnectorType() == ot::ConnectorType::Out)
 			{
-				thisNode->addSucceedingNode(pairedNode);
+				thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
 			}
 			else
 			{

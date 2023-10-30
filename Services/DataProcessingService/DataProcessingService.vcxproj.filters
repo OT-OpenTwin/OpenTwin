@@ -51,7 +51,7 @@
     <ClCompile Include="src\Pipeline.cpp">
       <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="src\PipelineManager.cpp">
+    <ClCompile Include="src\PipelineHandler.cpp">
       <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp">
@@ -104,7 +104,7 @@
     <ClInclude Include="include\ModelNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PipelineManager.h">
+    <ClInclude Include="include\PipelineHandler.h">
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\Pipeline.h">

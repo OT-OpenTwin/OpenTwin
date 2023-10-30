@@ -1,20 +1,27 @@
-//#pragma once
-//#include "BlockHandlerPlot1D.h"
+#include "BlockHandlerPlot1D.h"
 //#include "EntityPlot1D.h"
 //#include "EntityResult1D.h"
 //#include "OpenTwinCommunication/ActionTypes.h"
 //#include "Application.h"
-//
-//BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const std::string xDataConnector, const std::string yDataConnector)
-//	:_xDataConnector(xDataConnector), _yDataConnector(yDataConnector)
-//{
-//	_xlabel = blockEntity->getXLabel();
-//	_ylabel = blockEntity->getYLabel();
-//	
-//	_xunit = blockEntity->getXUnit();
-//	_yunit = blockEntity->getYUnit();
-//	_modelComponent = Application::instance()->modelComponent();
-//}
+#include "GraphNode.h"
+
+BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const HandlerMap& handlerMap)
+	:BlockHandler(handlerMap)
+{
+	_xlabel = blockEntity->getXLabel();
+	_ylabel = blockEntity->getYLabel();
+	
+	_xunit = blockEntity->getXUnit();
+	_yunit = blockEntity->getYUnit();
+}
+void BlockHandlerPlot1D::executeSpecialized()
+{
+
+}
+void BlockHandlerPlot1D::setData(genericDataBlock& data, const std::string& targetPort)
+{
+
+}
 //
 //BlockHandler::genericDataBlock BlockHandlerPlot1D::Execute(BlockHandler::genericDataBlock& inputData)
 //{

@@ -195,7 +195,7 @@
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\Pipeline.cpp" />
     <ClCompile Include="src\PipelineFilter.cpp" />
-    <ClCompile Include="src\PipelineManager.cpp" />
+    <ClCompile Include="src\PipelineHandler.cpp" />
     <ClCompile Include="src\PipelineSink.cpp" />
     <ClCompile Include="src\PipelineSource.cpp" />
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
@@ -218,7 +218,7 @@
     <ClInclude Include="include\Pipeline.h" />
     <ClInclude Include="include\PipelineFilter.h" />
     <ClInclude Include="include\PipelineItem.h" />
-    <ClInclude Include="include\PipelineManager.h" />
+    <ClInclude Include="include\PipelineHandler.h" />
     <ClInclude Include="include\PipelineSink.h" />
     <ClInclude Include="include\PipelineSource.h" />
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />

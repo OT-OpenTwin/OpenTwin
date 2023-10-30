@@ -16,7 +16,13 @@ public:
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 
+	const ot::Connector getXAxisConnector() const { return _xAxisConnector; }
+	const ot::Connector getYAxisConnector() const { return _yAxisConnector; }
+
 private:
+	ot::Connector _xAxisConnector;
+	ot::Connector _yAxisConnector;
+
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

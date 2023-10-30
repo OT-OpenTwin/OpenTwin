@@ -1,49 +1,57 @@
-//#pragma once
-//#include "BlockHandlerDatabaseAccess.h"
-//#include "ResultCollectionHandler.h"
+#include "BlockHandlerDatabaseAccess.h"
+#include "ResultCollectionHandler.h"
 //#include "OpenTwinCore/JSONToVariableConverter.h"
 //#include "PropertyHandlerDatabaseAccessBlock.h"
-//
-//BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity)
-//{
-//
-//	_dataConnectorName = "C0"; // Should come from entity
-//	_parameterConnectorName = "C1"; // -"-
-//	const std::string projectName =	blockEntity->getSelectedProjectName();
-//
-//	ResultCollectionHandler resultCollectionHandler;
-//	std::string resultCollectionName = resultCollectionHandler.getProjectCollection(projectName) + ".results";
-//	_resultCollectionExists = resultCollectionHandler.CollectionExists(resultCollectionName);
-//	if (_resultCollectionExists)
-//	{
-//		const std::string dbURL = "Projects";
-//	
-//		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
-//	}
-//
-//	
-//	OT_rJSON_createDOC(query);
-//	OT_rJSON_createDOC(projection);
-//	ot::rJSON::add(projection, "Value", 1);
-//	ot::rJSON::add(projection, "P_1", 1);
-//	ot::rJSON::add(projection, "_id", 0);
-//	
-//	_collectionInfos =	&PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
-//	auto selectedQuantity = _collectionInfos->quantities[_collectionInfos->SelectedQuantity];
-//	ot::rJSON::add(query, "Quantity", selectedQuantity.quantityIndex);
-//	_queryString = ot::rJSON::toJSON(query);
-//	_projectionString = ot::rJSON::toJSON(projection);
-//}
-//
-//BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
-//{
-//	if (_dataStorageAccess != nullptr)
-//	{
-//		delete _dataStorageAccess;
-//		_dataStorageAccess = nullptr;
-//	}
-//}
-//
+
+BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
+	:BlockHandler(handlerMap)
+{
+	const std::string projectName =	blockEntity->getSelectedProjectName();
+
+	ResultCollectionHandler resultCollectionHandler;
+	std::string resultCollectionName = resultCollectionHandler.getProjectCollection(projectName) + ".results";
+	_isValid  = resultCollectionHandler.CollectionExists(resultCollectionName);
+	if (_isValid)
+	{
+		//const std::string dbURL = "Projects";
+		//_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
+		//
+		//OT_rJSON_createDOC(query);
+		//OT_rJSON_createDOC(projection);
+		//ot::rJSON::add(projection, "Value", 1);
+		//ot::rJSON::add(projection, "P_1", 1);
+		//ot::rJSON::add(projection, "_id", 0);
+	
+
+		//const MeasurementCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
+		//_collectionInfos =	&PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
+		//auto selectedQuantity = _collectionInfos->quantities[_collectionInfos->SelectedQuantity];
+		//
+		//ot::rJSON::add(query, "Quantity", selectedQuantity.quantityIndex);
+		//_queryString = ot::rJSON::toJSON(query);
+		//_projectionString = ot::rJSON::toJSON(projection);
+	}
+}
+
+BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
+{
+	if (_dataStorageAccess != nullptr)
+	{
+		delete _dataStorageAccess;
+		_dataStorageAccess = nullptr;
+	}
+}
+
+void BlockHandlerDatabaseAccess::executeSpecialized()
+{
+
+}
+
+void BlockHandlerDatabaseAccess::setData(genericDataBlock& data, const std::string& targetPort)
+{
+	assert(0); //Currently the DB block has no inputs and thus, does not need to get any data
+}
+
 //BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)
 //{
 //	if (_output.size() == 0)

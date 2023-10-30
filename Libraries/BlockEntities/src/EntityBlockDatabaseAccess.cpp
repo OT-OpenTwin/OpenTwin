@@ -7,6 +7,16 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 	_navigationTreeIconName = "BlockDataBaseAccess";
 	_navigationTreeIconNameHidden = "BlockDataBaseAccess";
 	_blockTitle = "Database Access";
+
+
+	const std::string connectorNameQuantity = "Quantity";
+	_connectorQuantity = { ot::ConnectorType::Out, connectorNameQuantity, connectorNameQuantity };
+	_connectorsByName[connectorNameQuantity] = _connectorQuantity;
+
+	const std::string connectorNameParameter1 = "Parameter1";
+	const std::string connectorTitleParameter1 = "Parameter 1";
+	_connectorParameter1 = { ot::ConnectorType::Out,connectorNameParameter1, connectorTitleParameter1 };
+	_connectorsByName[connectorNameParameter1] = _connectorParameter1;
 }
 
 void EntityBlockDatabaseAccess::createProperties()
@@ -63,13 +73,6 @@ void EntityBlockDatabaseAccess::createProperties()
 
 	SetVisibleParameter2(false);
 	SetVisibleParameter3(false);
-
-	const std::string connectorNameQuantity = "Quantity";
-	_connectorsByName[connectorNameQuantity] = { ot::ConnectorType::Out, connectorNameQuantity, connectorNameQuantity };
-
-	const std::string connectorNameParameter1 = "Parameter1";
-	const std::string connectorTitleParameter1 = "Parameter1";
-	_connectorsByName[connectorNameParameter1] = { ot::ConnectorType::Out,connectorNameParameter1, connectorTitleParameter1 };
 }
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()

@@ -87,7 +87,13 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-			_validityHandler.blockDiagramIsValid(allBlockEntities);
+			const bool isValid = _validityHandler.blockDiagramIsValid(allBlockEntities);
+			if (isValid)
+			{
+				const std::list<std::shared_ptr<GraphNode>>& rootNodes= _validityHandler.getRootNodes();
+				const std::map<std::string, std::shared_ptr<GraphNode>> graphNodesByBlockID = _validityHandler.getgraphNodesByBlockID();
+				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID,allBlockEntities);
+			}
 		}
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)

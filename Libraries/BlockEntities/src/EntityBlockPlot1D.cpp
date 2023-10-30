@@ -7,6 +7,16 @@ EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObser
 	_navigationTreeIconName = "Plot1DVisible";
 	_navigationTreeIconNameHidden = "Plot1DVisible";
 	_blockTitle = "Plot 1D";
+
+	const std::string connectorNameYAxis = "YAxis";
+	const std::string connectorTitleYAxis = "Y-Axis";
+	_yAxisConnector = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
+	_connectorsByName[connectorNameYAxis] = _yAxisConnector;
+
+	const std::string connectorNameXAxis = "XAxis";
+	const std::string connectorTitleXAxis = "X-Axis";
+	_xAxisConnector = { ot::ConnectorType::In ,connectorNameXAxis, connectorTitleXAxis };
+	_connectorsByName[connectorNameXAxis] = _xAxisConnector;
 }
 
 void EntityBlockPlot1D::createProperties()
@@ -15,15 +25,6 @@ void EntityBlockPlot1D::createProperties()
 	EntityPropertiesString::createProperty("Graph properties", "Y-Axis Label", "", "default", getProperties());
 	EntityPropertiesString::createProperty("Graph properties", "X-Axis Unit", "", "default", getProperties());
 	EntityPropertiesString::createProperty("Graph properties", "Y-Axis Unit", "", "default", getProperties());
-
-	const std::string connectorNameYAxis = "YAxis";
-	const std::string connectorTitleYAxis = "Y-Axis";
-	_connectorsByName[connectorNameYAxis] = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
-
-	const std::string connectorNameXAxis = "XAxis";
-	const std::string connectorTitleXAxis = "X-Axis";
-	_connectorsByName[connectorNameXAxis] = { ot::ConnectorType::In ,connectorNameXAxis, connectorTitleXAxis };
-
 }
 
 std::string EntityBlockPlot1D::getXLabel()
