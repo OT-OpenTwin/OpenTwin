@@ -13,7 +13,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	ResultCollectionHandler resultCollectionHandler;
 	std::string resultCollectionName = resultCollectionHandler.getProjectCollection(projectName) + ".results";
 	_isValid  = resultCollectionHandler.CollectionExists(resultCollectionName);
-	if (_isValid)
+	if (_isValid && false)
 	{
 		_quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
 		_parameterConnectorName =  blockEntity->getConnectorParameter1().getConnectorName();
@@ -144,14 +144,6 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 			}
 		}
 
-		
-		
-		//_collectionInfos =	&PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
-		//auto selectedQuantity = _collectionInfos->quantities[_collectionInfos->SelectedQuantity];
-		//
-		//ot::rJSON::add(query, "Quantity", selectedQuantity.quantityIndex);
-		//_queryString = ot::rJSON::toJSON(query);
-		//_projectionString = ot::rJSON::toJSON(projection);
 	}
 }
 

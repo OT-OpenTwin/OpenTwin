@@ -16,6 +16,15 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 	const std::string connectorNameParameter1 = "Parameter1";
 	const std::string connectorTitleParameter1 = "Parameter 1";
 	_connectorParameter1 = { ot::ConnectorType::Out,connectorNameParameter1, connectorTitleParameter1 };
+
+	const std::string connectorNameParameter2 = "Parameter2";
+	const std::string connectorTitleParameter2 = "Parameter 2";
+	_connectorParameter2 = { ot::ConnectorType::Out,connectorNameParameter2, connectorTitleParameter2 };
+
+	const std::string connectorNameParameter3 = "Parameter3";
+	const std::string connectorTitleParameter3 = "Parameter 3";
+	_connectorParameter3 = { ot::ConnectorType::Out,connectorNameParameter3, connectorTitleParameter3 };
+
 	_connectorsByName[connectorNameParameter1] = _connectorParameter1;
 }
 
@@ -121,6 +130,51 @@ bool EntityBlockDatabaseAccess::SetVisibleParameter3(bool visible)
 		this->setModified();
 	}
 	return refresh;
+}
+
+void EntityBlockDatabaseAccess::UpdateBlockConfig()
+{
+	bool updateOfDimensionality = getProperties().getProperty(_propertyNameDimension)->needsUpdate();
+	if (updateOfDimensionality)
+	{
+		const std::string queryDimension = getQueryDimension();
+		if (_propertyValueDimension2 == queryDimension)
+		{
+			if (_connectorsByName.find(_connectorParameter3.getConnectorName()) != _connectorsByName.end())
+			{
+				_connectorsByName.erase(_connectorParameter3.getConnectorName());
+			}
+			if (_connectorsByName.find(_connectorParameter2.getConnectorName()) == _connectorsByName.end())
+			{
+				_connectorsByName[_connectorParameter2.getConnectorName()] = _connectorParameter2;
+			}
+		}
+		else if (_propertyValueDimension3 == queryDimension)
+		{
+			if (_connectorsByName.find(_connectorParameter2.getConnectorName()) == _connectorsByName.end())
+			{
+				_connectorsByName[_connectorParameter2.getConnectorName()] = _connectorParameter2;
+			}
+			if (_connectorsByName.find(_connectorParameter3.getConnectorName()) == _connectorsByName.end())
+			{
+				_connectorsByName[_connectorParameter3.getConnectorName()] = _connectorParameter3;
+			}
+		}
+		else
+		{
+			assert(_propertyValueDimension1 == queryDimension);
+			if (_connectorsByName.find(_connectorParameter3.getConnectorName()) != _connectorsByName.end())
+			{
+				_connectorsByName.erase(_connectorParameter3.getConnectorName());
+			}
+			if (_connectorsByName.find(_connectorParameter2.getConnectorName()) != _connectorsByName.end())
+			{
+				_connectorsByName.erase(_connectorParameter2.getConnectorName());
+			}
+		}
+
+		CreateBlockItem();
+	}
 }
 
 ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()

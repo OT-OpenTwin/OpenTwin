@@ -10,7 +10,7 @@ class BlockHandlerDatabaseAccess : public BlockHandler
 public:
 	BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap);
 	~BlockHandlerDatabaseAccess();
-	
+
 	bool executeSpecialized() override;	
 
 private:

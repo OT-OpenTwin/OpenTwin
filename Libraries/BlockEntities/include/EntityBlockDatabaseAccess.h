@@ -6,6 +6,7 @@ class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 public:
 	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
+
 	void createProperties();
 	std::string getSelectedProjectName();
 	std::string getQueryDimension();
@@ -53,6 +54,7 @@ protected:
 private:
 	bool SetVisibleParameter2(bool visible);
 	bool SetVisibleParameter3(bool visible);
+	void UpdateBlockConfig();
 
 	const std::string _propertyNameDimension = "Outcome dimension";
 	const std::string _propertyValueDimension1 = "1D";
@@ -92,4 +94,6 @@ private:
 
 	ot::Connector _connectorQuantity;
 	ot::Connector _connectorParameter1;
+	ot::Connector _connectorParameter2;
+	ot::Connector _connectorParameter3;
 };
