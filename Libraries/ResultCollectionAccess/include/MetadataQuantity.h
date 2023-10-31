@@ -15,4 +15,5 @@ struct __declspec(dllexport) MetadataQuantity
 	std::string typeName;
 	int32_t quantityIndex;
 	std::map < std::string, std::shared_ptr<MetadataEntry>> metaData;
+	static const std::string getFieldName() { return "Quantity"; }
 };

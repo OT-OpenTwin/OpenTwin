@@ -2,8 +2,9 @@
 #include "BlockHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "Document/DocumentAccess.h"
-#include "BufferBlockDatabaseAccess.h"
-//
+#include "MeasurementCampaign.h"
+
+
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
 public:
@@ -12,9 +13,8 @@ public:
 	
 	bool executeSpecialized() override;	
 
-protected:
+private:
 	DataStorageAPI::DocumentAccess* _dataStorageAccess = nullptr;
-	BufferBlockDatabaseAccess* _collectionInfos = nullptr;
 	genericDataBlock _output;
 	bool _isValid = true;
 	std::string _quantityConnectorName;
@@ -22,4 +22,6 @@ protected:
 
 	std::string _queryString;
 	std::string _projectionString;
+
+	const MeasurementCampaign getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
 };

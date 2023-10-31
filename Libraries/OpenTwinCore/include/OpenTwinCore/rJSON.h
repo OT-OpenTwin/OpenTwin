@@ -191,6 +191,8 @@ namespace ot {
 		//! @param _value The value to set to the member
 		OT_CORE_API_EXPORTONLY void add(OT_rJSON_doc & _doc, const std::string & _member, unsigned long long _value);
 
+		OT_CORE_API_EXPORTONLY void add(OT_rJSON_doc& _doc, const std::string& _member, long long _value);
+
 		//! @brief Will add the provided member and value to the provided document
 		//! @param _doc The document
 		//! @param _member The name of the member to add

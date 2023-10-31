@@ -26,12 +26,17 @@ public:
 	const std::string& getGroupParameter2() { return _groupParamSettings2; }
 	const std::string& getGroupParameter3() { return _groupParamSettings3; }
 
+	const std::string& getSelectedQuantityName();
 	const std::string& getQuantityQueryValue();
 	const std::string& getQuantityQueryComparator();
+
+	const std::string& getSelectedParameter1Name();
 	const std::string& getParameter1QueryValue();
 	const std::string& getParameter1QueryComparator();
+
 	const std::string& getParameter2QueryValue();
 	const std::string& getParameter2QueryComparator();
+
 	const std::string& getParameter3QueryValue();
 	const std::string& getParameter3QueryComparator();
 

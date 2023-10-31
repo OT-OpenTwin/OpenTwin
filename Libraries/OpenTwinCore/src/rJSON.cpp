@@ -264,6 +264,10 @@ void ot::rJSON::add(OT_rJSON_doc & _doc, const std::string & _member, unsigned l
 	_doc.AddMember(rapidjson::Value(_member.c_str(), _doc.GetAllocator()), rapidjson::Value(_value), _doc.GetAllocator());
 }
 
+OT_CORE_API_EXPORTONLY void ot::rJSON::add(OT_rJSON_doc& _doc, const std::string& _member, long long _value){
+	_doc.AddMember(rapidjson::Value(_member.c_str(), _doc.GetAllocator()), rapidjson::Value(_value), _doc.GetAllocator());
+}
+
 void ot::rJSON::add(OT_rJSON_doc & _doc, const std::string & _member, const double *_values, int size) {
 	rapidjson::Value doubleArr(rapidjson::kArrayType);
 	doubleArr.Reserve(size, _doc.GetAllocator());

@@ -192,6 +192,13 @@ void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(bsoncxx::document::
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }
 
+const std::string& EntityBlockDatabaseAccess::getSelectedQuantityName()
+{
+	auto baseProp = getProperties().getProperty(_propertyNameQuantity);
+	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	return selectProp->getValue();
+}
+
 const std::string& EntityBlockDatabaseAccess::getQuantityQueryValue()
 {
 	auto baseProp = getProperties().getProperty(_propertyValueQuantity);
@@ -203,6 +210,13 @@ const std::string& EntityBlockDatabaseAccess::getQuantityQueryValue()
 const std::string& EntityBlockDatabaseAccess::getQuantityQueryComparator()
 {
 	auto baseProp = getProperties().getProperty(_propertyComparator);
+	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	return selectProp->getValue();
+}
+
+const std::string& EntityBlockDatabaseAccess::getSelectedParameter1Name()
+{
+	auto baseProp = getProperties().getProperty(_propertyNameP1);
 	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	return selectProp->getValue();
 }
