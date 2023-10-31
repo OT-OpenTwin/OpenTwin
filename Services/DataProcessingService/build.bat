@@ -59,7 +59,7 @@ IF %DEBUG%==1 (
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_DATA_PROCESSING_SERVICE_ROOT%\test\DataProcessingServiceTest.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_DATA_PROCESSING_SERVICE_ROOT%\DataProcessingService.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
 
 GOTO END
