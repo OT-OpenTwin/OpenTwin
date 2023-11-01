@@ -23,7 +23,6 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
-	blockEntity->setBlockID(_modelComponent->createEntityUID());
 	blockEntity->SetGraphicsScenePackageName(_packageName);
 	
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));

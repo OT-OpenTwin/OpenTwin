@@ -138,11 +138,13 @@ void EntityBlockDatabaseAccess::UpdateBlockConfig()
 	if (updateOfDimensionality)
 	{
 		const std::string queryDimension = getQueryDimension();
+		std::list<std::string> connectorsForRemoval;
 		if (_propertyValueDimension2 == queryDimension)
 		{
 			if (_connectorsByName.find(_connectorParameter3.getConnectorName()) != _connectorsByName.end())
 			{
 				_connectorsByName.erase(_connectorParameter3.getConnectorName());
+				connectorsForRemoval.push_back(_connectorParameter3.getConnectorName());
 			}
 			if (_connectorsByName.find(_connectorParameter2.getConnectorName()) == _connectorsByName.end())
 			{
@@ -166,14 +168,93 @@ void EntityBlockDatabaseAccess::UpdateBlockConfig()
 			if (_connectorsByName.find(_connectorParameter3.getConnectorName()) != _connectorsByName.end())
 			{
 				_connectorsByName.erase(_connectorParameter3.getConnectorName());
+				connectorsForRemoval.push_back(_connectorParameter3.getConnectorName());
 			}
 			if (_connectorsByName.find(_connectorParameter2.getConnectorName()) != _connectorsByName.end())
 			{
 				_connectorsByName.erase(_connectorParameter2.getConnectorName());
+				connectorsForRemoval.push_back(_connectorParameter3.getConnectorName());
 			}
 		}
 
 		CreateBlockItem();
+		UpdateConnections(connectorsForRemoval);
+	}
+}
+
+void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connectorsForRemoval)
+{
+	std::list<ot::GraphicsConnectionCfg> connectionsForRemoval;
+	std::list<ot::GraphicsConnectionCfg> remainingConnections;
+	
+	for (auto& connection : _connections)
+	{
+		std::string connectorOfThisBlock;
+		if (connection.destUid() == getBlockID())
+		{
+			connectorOfThisBlock = connection.destConnectable();
+		}
+		else
+		{
+			connectorOfThisBlock = connection.originConnectable();
+		}
+		bool removeConnection = false;
+
+		for (std::string& connectorName : connectorsForRemoval)
+		{
+			if (connectorName == connectorOfThisBlock)
+			{
+				removeConnection = true;
+				break;
+			}
+		}
+		if (removeConnection)
+		{
+			connectionsForRemoval.push_back(connection);
+		}
+		else
+		{
+			remainingConnections.push_back(connection);
+		}
+	}
+	_connections = std::move(remainingConnections);
+	RemoveConnectionsAtConnectedEntities(connectionsForRemoval);
+	
+}
+
+void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval)
+{
+	if (connectionsForRemoval.size() != 0)
+	{
+		ot::UIDList entitiesForUpdate;
+		std::map<ot::UID, std::list<ot::GraphicsConnectionCfg*>> connectionsForRemovalByEntityID;
+		for (auto& connection : connectionsForRemoval)
+		{
+			if (connection.destUid() == getBlockID())
+			{
+				entitiesForUpdate.push_back(std::stoull(connection.originUid()));
+			}
+			else
+			{
+				entitiesForUpdate.push_back(std::stoull(connection.destUid()));
+			}
+		}
+		std::map<ot::UID, EntityBase*> entityMap;
+		for (const ot::UID& entityID : entitiesForUpdate)
+		{
+			EntityBase* entityBase = readEntityFromEntityID(nullptr, entityID, entityMap);
+			assert(entityBase != nullptr);
+			std::unique_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(entityBase));
+			assert(blockEntity != nullptr);
+
+			for (auto connection : connectionsForRemovalByEntityID[entityID])
+			{
+				blockEntity->RemoveConnection(*connection);
+			}
+			blockEntity->StoreToDataBase();
+			getModelState()->modifyEntityVersion(blockEntity->getEntityID(), blockEntity->getEntityStorageVersion());
+		}
+		CreateConnections();
 	}
 }
 
@@ -229,6 +310,9 @@ bool EntityBlockDatabaseAccess::updateFromProperties()
 		refresh = SetVisibleParameter2(true);
 		refresh |= SetVisibleParameter3(true);
 	}
+	
+	UpdateBlockConfig();
+
 	if (refresh)
 	{
 		getProperties().forceResetUpdateForAllProperties();

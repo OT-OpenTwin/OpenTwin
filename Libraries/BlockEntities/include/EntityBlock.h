@@ -23,8 +23,7 @@ public:
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	virtual void addVisualizationNodes(void) override;
 
-	void setBlockID(ot::UID blockID) { _blockID = std::to_string(blockID); }
-	std::string getBlockID() const { return _blockID; }
+	std::string getBlockID() const { return std::to_string(getEntityID()); }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	const std::string& getBlockTitle() const { return _blockTitle; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
@@ -39,12 +38,10 @@ public:
 	void RemoveConnector(const ot::Connector& connector);
 
 	void AddConnection(const ot::GraphicsConnectionCfg& connection);
+	void RemoveConnection(const ot::GraphicsConnectionCfg& connectionForRemoval);
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
-
-	//void onRemoveFromModelState() override;
 protected:
-	std::string _blockID = "";
 	std::string _blockTitle = "";
 	ot::UID _coordinate2DEntityID = 0;
 	ot::BasicServiceInformation _info;

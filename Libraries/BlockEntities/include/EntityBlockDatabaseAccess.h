@@ -55,6 +55,8 @@ private:
 	bool SetVisibleParameter2(bool visible);
 	bool SetVisibleParameter3(bool visible);
 	void UpdateBlockConfig();
+	void UpdateConnections(std::list<std::string>& connectorsForRemoval);
+	void RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval);
 
 	const std::string _propertyNameDimension = "Outcome dimension";
 	const std::string _propertyValueDimension1 = "1D";

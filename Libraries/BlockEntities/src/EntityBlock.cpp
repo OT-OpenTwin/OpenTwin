@@ -2,6 +2,7 @@
 #include "OpenTwinCommunication/ActionTypes.h"
 #include "OTGui/GraphicsPackage.h"
 #include "BlockConnectionBSON.h"
+#include "EntityBlock.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner){}
@@ -48,12 +49,22 @@ void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
 	setModified();
 }
 
+void EntityBlock::RemoveConnection(const ot::GraphicsConnectionCfg& connectionForRemoval)
+{
+	for (auto connection = _connections.begin(); connection != _connections.end(); connection++)
+	{
+		if (connection->buildKey() == connectionForRemoval.buildKey() || connection->buildReversedKey() == connectionForRemoval.buildKey())
+		{
+			_connections.erase(connection);
+		}
+	}
+}
+
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);
 	
 	storage.append(
-		bsoncxx::builder::basic::kvp("BlockID", _blockID),
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(_coordinate2DEntityID)),
 		bsoncxx::builder::basic::kvp("ServiceName", _info.serviceName()),
 		bsoncxx::builder::basic::kvp("ServiceType", _info.serviceType()),
@@ -82,7 +93,6 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	
-	_blockID = doc_view["BlockID"].get_utf8().value.data();
 	_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
 	_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
 	_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
@@ -146,7 +156,7 @@ void EntityBlock::CreateBlockItem()
 	assert(entCoordinate != nullptr);
 
 	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
-	blockCfg->setUid(_blockID);
+	blockCfg->setUid(getBlockID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
 
 	ot::GraphicsScenePackage pckg(_graphicsScenePackage);
