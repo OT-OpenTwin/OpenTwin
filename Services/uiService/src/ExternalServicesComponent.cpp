@@ -2870,16 +2870,31 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::BasicServiceInformation info;
 				info.setFromJsonObject(_doc);
 
-				std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 				std::list<std::string> itemUids = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
-				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
+				if (_doc.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName)) {
+					// Specific view
 
-				if (editor) {
-					for (auto u : itemUids) {
-						editor->removeItem(u);
+					std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
+
+					if (editor) {
+						for (auto u : itemUids) {
+							editor->removeItem(u);
+						}
 					}
 				}
+				else {
+					// Any view
+
+					std::list<ot::GraphicsView *> views = AppBase::instance()->getAllGraphicsEditors();
+					for (auto v : views) {
+						for (auto uid : itemUids) {
+							v->removeItem(uid);
+						}
+					}
+				}
+				
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
 				ot::BasicServiceInformation info;
@@ -2922,10 +2937,24 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ot::GraphicsConnectionPackage pckg;
 				pckg.setFromJsonObject(pckgObj);
 
-				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+				if (!pckg.name().empty()) {
+					// Specific editor
 
-				for (auto c : pckg.connections()) {
-					editor->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
+					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+
+					for (auto c : pckg.connections()) {
+						editor->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
+					}
+				}
+				else {
+					// Any editor
+
+					std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+					for (auto v : views) {
+						for (auto c : pckg.connections()) {
+							v->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
+						}
+					}
 				}
 			}
 			else

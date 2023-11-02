@@ -64,6 +64,24 @@ namespace ot
 			throw std::exception("Owner not found");
 		}
 
+		std::list<ot::Owner<K>> getAllOwners(void) {
+			std::list<ot::Owner<K>> lst;
+			for (auto o : m_data) {
+				lst.push_back(o.first);
+			}
+			return lst;
+		}
+
+		std::list<V*> getAll(void) {
+			std::list<V*> lst;
+			for (auto e : m_data) {
+				for (auto i : *e.second) {
+					lst.push_back(i);
+				}
+			}
+			return lst;
+		}
+
 	private:
 
 		//! @brief Return object list for the given owner

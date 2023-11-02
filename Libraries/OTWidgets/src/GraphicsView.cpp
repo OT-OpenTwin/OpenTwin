@@ -101,7 +101,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 void ot::GraphicsView::removeItem(const std::string& _itemUid) {
 	auto it = m_items.find(_itemUid);
 	if (it == m_items.end()) {
-		OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
+		//OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
 		return;
 	}
 
@@ -130,7 +130,7 @@ void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::
 		key = ot::GraphicsConnectionCfg::buildKey(_toUid, _toConnector, _toUid, _fromConnector);
 		it = m_connections.find(key);
 		if (it == m_connections.end()) {
-			OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
+			//OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
 			return;
 		}
 	}

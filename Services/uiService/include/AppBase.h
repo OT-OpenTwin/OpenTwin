@@ -457,6 +457,8 @@ public:
 
 	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
 
+	std::list<ot::GraphicsView*> getAllGraphicsEditors(void);
+
 	// ######################################################################################################################
 
 	// Prompt

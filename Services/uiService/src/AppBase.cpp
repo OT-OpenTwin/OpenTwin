@@ -2102,6 +2102,10 @@ ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, 
 	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
 }
 
+std::list<ot::GraphicsView*> AppBase::getAllGraphicsEditors(void) {
+	return m_graphicsViews.getAll();
+}
+
 // ######################################################################################################################
 
 // Slots
