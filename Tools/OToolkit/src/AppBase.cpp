@@ -167,7 +167,34 @@ void AppBase::setUrl(const QString& _url) {
 // Public: Slots
 
 void AppBase::slotProcessMessage(const QString& _json) {
+	try {
+		std::string msgStd = _json.toStdString();
+		OT_rJSON_parseDOC(inboundAction, msgStd.c_str());
+		if (inboundAction.IsObject()) {
 
+			std::string action = ot::rJSON::getString(inboundAction, OT_ACTION_MEMBER);
+
+			if (action == OT_ACTION_CMD_Log) {
+				OT_rJSON_checkMember(inboundAction, OT_ACTION_PARAM_LOG, Object);
+				OT_rJSON_val logObj = inboundAction[OT_ACTION_PARAM_LOG].GetObject();
+
+				ot::LogMessage msg;
+				msg.setFromJsonObject(logObj);
+				msg.setCurrentTimeAsGlobalSystemTime();
+
+				m_logger->appendLogMessage(msg);
+			}
+		}
+		else {
+			this->updateStatusStringAsError("The received message is not a JSON object");
+		}
+	}
+	catch (const std::exception& _e) {
+		this->updateStatusStringAsError(_e.what());
+	}
+	catch (...) {
+		this->updateStatusStringAsError("Unknown error occured while processing message");
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

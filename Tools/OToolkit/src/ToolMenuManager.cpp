@@ -16,6 +16,7 @@ ToolMenuManager::ToolMenuManager(const QString& _toolName)
 {
 	m_run = this->addAction("Run");
 	m_autorun = this->addAction("Autorun");
+	this->addSeparator();
 	m_autorun->setCheckable(true);
 
 	auto settings = AppBase::instance()->createSettingsInstance();
