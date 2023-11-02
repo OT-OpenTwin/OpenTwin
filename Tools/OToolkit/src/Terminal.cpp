@@ -390,7 +390,7 @@ QString Terminal::toolName(void) const {
 	return "OTerminal";
 }
 
-QWidget* Terminal::runTool(QMenu* _rootMenu) {
+QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
@@ -1136,8 +1136,8 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 	_filter->addToJsonObject(rootObject);
 	docObj[OT_JSON_COLLECTION_Data] = rootObject;
 
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getSaveFileName(m_splitter, "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	QString fn = QFileDialog::getSaveFileName(m_splitter, "Export OTerminal Collection", settings->value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) {
 		return;
 	}
@@ -1156,8 +1156,8 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 }
 
 void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getOpenFileName(m_splitter, "Import OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	QString fn = QFileDialog::getOpenFileName(m_splitter, "Import OTerminal Collection", settings->value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);
@@ -1206,8 +1206,8 @@ void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 
 	if (_filter->merge(impRoot, true)) {
 		TERMINAL_LOG("Terminal collection import successful");
-		s.setValue("Terminal.LastCollection", fn);
-		slotSaveRequestCollection();
+		settings->setValue("Terminal.LastCollection", fn);
+		this->slotSaveRequestCollection();
 	}
 	else {
 		TERMINAL_LOGE("Terminal collection import failed");

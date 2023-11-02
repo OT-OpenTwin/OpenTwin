@@ -13,8 +13,6 @@
 #include <QtCore/qthread.h>
 #include <QtWidgets/qmainwindow.h>
 
-#define APP_BASE_APP_NAME "OToolkit"
-
 class ToolManager;
 class LogVisualization;
 class Terminal;
@@ -48,6 +46,8 @@ public:
 
 	virtual void removeToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) override;
 
+	virtual otoolkit::SettingsRef createSettingsInstance(void) override;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Qt base functions
@@ -63,6 +63,9 @@ public:
 
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
 	QApplication* applicationInstance(void) { return m_app; };
+
+public slots:
+	void slotProcessMessage(const QString& _json);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

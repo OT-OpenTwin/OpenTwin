@@ -97,7 +97,7 @@ void StatusManager::setCurrentTool(const QString& _toolName) {
 	}
 }
 
-void StatusManager::addTool(const QString& _toolName, const QList<QWidget*>& _widgets) {
+void StatusManager::addTool(const QString& _toolName, const std::list<QWidget*>& _widgets) {
 	// Ensure that the tool did not register already
 	auto it = m_toolWidgets.find(_toolName);
 	if (it != m_toolWidgets.end()) {

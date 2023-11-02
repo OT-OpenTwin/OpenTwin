@@ -66,16 +66,16 @@ LogVisualization::LogVisualization()
 }
 
 LogVisualization::~LogVisualization() {
-	QSettings s("OpenTwin", "OToolkit");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
-	s.setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
+	settings->setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
 
-	s.setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
-	s.setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
-	s.setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
-	s.setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
-	s.setValue("LogVisualization.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
-	s.setValue("LogVisualization.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
 
 	QJsonArray serviceFilterArr;
 	for (int i = 0; i < m_serviceFilter->count(); i++) {
@@ -85,20 +85,20 @@ LogVisualization::~LogVisualization() {
 		serviceFilterArr.push_back(serviceObj);
 	}
 	QJsonDocument serviceFilterDoc(serviceFilterArr);
-	s.setValue("LogVisualization.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
+	settings->setValue("LogVisualization.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
 
 	QString tableColumnWidths;
 	for (int i = 0; i < m_table->columnCount(); i++) {
 		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
 	}
-	s.setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
+	settings->setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
 }
 
 QString LogVisualization::toolName(void) const {
 	return QString("Log Visualization");
 }
 
-QWidget* LogVisualization::runTool(QMenu* _rootMenu) {
+QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
@@ -151,6 +151,10 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu) {
 	m_messageCountLabel = new QLabel;
 	m_errorCountLabel = new QLabel;
 	m_warningCountLabel = new QLabel;
+
+	_statusWidgets.push_back(m_errorCountLabel);
+	_statusWidgets.push_back(m_warningCountLabel);
+	_statusWidgets.push_back(m_messageCountLabel);
 
 	// Setup layouts
 	centralLayout->addLayout(filterLayout);
@@ -332,8 +336,8 @@ void LogVisualization::slotAutoConnect(void) {
 }
 
 void LogVisualization::slotImport(void) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getOpenFileName(m_table, "Import Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	QString fn = QFileDialog::getOpenFileName(m_table, "Import Log Messages", settings->value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);
@@ -377,7 +381,7 @@ void LogVisualization::slotImport(void) {
 	this->slotClear();
 	this->appendLogMessages(msg);
 
-	s.setValue("LogVisualization.LastExportedFile", fn);
+	settings->setValue("LogVisualization.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
 }
 
@@ -387,8 +391,8 @@ void LogVisualization::slotExport(void) {
 		return;
 	}
 
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getSaveFileName(m_table, "Export Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	QString fn = QFileDialog::getSaveFileName(m_table, "Export Log Messages", settings->value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
 	
 	QFile f(fn);
@@ -409,7 +413,7 @@ void LogVisualization::slotExport(void) {
 	f.write(QByteArray::fromStdString(ot::rJSON::toJSON(doc)));
 	f.close();
 
-	s.setValue("LogVisualization.LastExportedFile", fn);
+	settings->setValue("LogVisualization.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully exported to file \"" + fn + "\"");
 }
 
@@ -418,11 +422,11 @@ void LogVisualization::slotClear(void) {
 	m_messages.clear();
 	m_errorCount = 0;
 	m_warningCount = 0;
-	updateCountLabels();
+	this->updateCountLabels();
 }
 
 void LogVisualization::slotClearAll(void) {
-	slotClear();
+	this->slotClear();
 	m_serviceFilter->clear();
 	LOGVIS_LOG("LogVisualization Clear All completed");
 }
@@ -438,14 +442,14 @@ void LogVisualization::slotSelectAllServices(void) {
 	m_filterLock = true;
 	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Checked);
 	m_filterLock = false;
-	slotFilterChanged();
+	this->slotFilterChanged();
 }
 
 void LogVisualization::slotDeselectAllServices(void) {
 	m_filterLock = true;
 	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Unchecked);
 	m_filterLock = false;
-	slotFilterChanged();
+	this->slotFilterChanged();
 }
 
 void LogVisualization::slotAutoScrollToBottomChanged(void) {
@@ -469,10 +473,10 @@ void LogVisualization::slotUpdateCheckboxColors(void) {
 }
 
 void LogVisualization::slotToggleAutoConnect(void) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	bool is = !s.value("LogVisualization.AutoConnect", false).toBool();
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	bool is = !settings->value("LogVisualization.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(is ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
-	s.setValue("LogVisualization.AutoConnect", is);
+	settings->setValue("LogVisualization.AutoConnect", is);
 }
 
 void LogVisualization::slotViewCellContent(QTableWidgetItem* _itm) {
@@ -508,15 +512,15 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	else {
 		iconItm->setIcon(QIcon(":/images/Info.png"));
 	}
-	iniTableItem(r, tIcon, iconItm);
+	this->iniTableItem(r, tIcon, iconItm);
 
 	
-	iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
-	iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.globalSystemTime())));
-	iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.localSystemTime())));
-	iniTableItem(r, tService, new QTableWidgetItem(serviceName));
-	iniTableItem(r, tFunction, new QTableWidgetItem(QString::fromStdString(_msg.functionName())));
-	iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.text())));
+	this->iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
+	this->iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.globalSystemTime())));
+	this->iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.localSystemTime())));
+	this->iniTableItem(r, tService, new QTableWidgetItem(serviceName));
+	this->iniTableItem(r, tFunction, new QTableWidgetItem(QString::fromStdString(_msg.functionName())));
+	this->iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.text())));
 
 	// Store message
 	m_messages.push_back(_msg);
@@ -544,10 +548,10 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	m_filterLock = false;
 
 	// Update status labels (warnings and errors were increased while checking the typeString)
-	updateCountLabels();
+	this->updateCountLabels();
 
 	// Check the filter for the new entry
-	checkEntryFilter(r);
+	this->checkEntryFilter(r);
 }
 
 void LogVisualization::appendLogMessages(const QList<ot::LogMessage>& _messages) {
@@ -783,10 +787,10 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	this->setMinimumSize(400, 300);
 	this->setFocusPolicy(Qt::ClickFocus);
 	
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	this->move(s.value("LogVisualizationItemViewDialog.X", 0).toInt(), s.value("LogVisualizationItemViewDialog.Y", 0).toInt());
-	this->resize(s.value("LogVisualizationItemViewDialog.W", 800).toInt(), s.value("LogVisualizationItemViewDialog.H", 600).toInt());
-	m_findMessageSyntax->setChecked(s.value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	this->move(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt());
+	this->resize(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), settings->value("LogVisualizationItemViewDialog.H", 600).toInt());
+	m_findMessageSyntax->setChecked(settings->value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
 
 	this->slotDisplayMessageText((int)m_findMessageSyntax->checkState());
 
@@ -799,12 +803,12 @@ LogVisualizationItemViewDialog::~LogVisualizationItemViewDialog() {
 }
 
 void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	s.setValue("LogVisualizationItemViewDialog.X", pos().x());
-	s.setValue("LogVisualizationItemViewDialog.Y", pos().y());
-	s.setValue("LogVisualizationItemViewDialog.W", size().width());
-	s.setValue("LogVisualizationItemViewDialog.H", size().height());
-	s.setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	settings->setValue("LogVisualizationItemViewDialog.X", pos().x());
+	settings->setValue("LogVisualizationItemViewDialog.Y", pos().y());
+	settings->setValue("LogVisualizationItemViewDialog.W", size().width());
+	settings->setValue("LogVisualizationItemViewDialog.H", size().height());
+	settings->setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
 }
 
 void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {

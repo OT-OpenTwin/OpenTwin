@@ -25,10 +25,14 @@
 #define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)
 #define TOOLMANAGER_LOGE(___msg) OTOOLKIT_LOGE("ToolManager", ___msg)
 
-ToolManager::ToolManager()
-	: m_statusManager(nullptr), m_dockManager(nullptr)
+ToolManager::ToolManager(QMainWindow* _mainWindow)
 {
+	m_tabManager = new TabManager;
+	m_menuManager = new MenuManager;
+	m_statusManager = new StatusManager;
+	m_dockManager = new DockManager(_mainWindow, m_menuManager);
 
+	this->connect(m_tabManager, &TabManager::currentToolChanged, this, &ToolManager::currentToolChanged);
 }
 
 ToolManager::~ToolManager() {
@@ -123,8 +127,14 @@ void ToolManager::runToolTriggered(void) {
 
 	}
 	else {
-		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm));
+		std::list<QWidget*> status;
+		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status));
+		m_statusManager->addTool(it->first, status);
 	}
+}
+
+void ToolManager::currentToolChanged(const QString& _toolName) {
+	m_statusManager->setCurrentTool(_toolName);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

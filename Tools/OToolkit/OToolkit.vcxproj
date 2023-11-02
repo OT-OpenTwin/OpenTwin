@@ -35,7 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DockManager.h" />
-    <ClInclude Include="include\TabManager.h" />
+    <QtMoc Include="include\TabManager.h" />
     <QtMoc Include="include\ToolMenuManager.h" />
     <ClInclude Include="include\ToolRuntimeHandler.h" />
     <QtMoc Include="include\MenuManager.h" />

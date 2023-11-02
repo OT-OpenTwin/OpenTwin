@@ -9,6 +9,7 @@
 #include "OpenTwinCore/OTClassHelper.h"
 
 // Qt header
+#include <QtCore/qstring.h>
 #include <QtWidgets/qmenu.h>
 
 class QAction;
@@ -20,7 +21,7 @@ public:
 	ToolMenuManager(const QString& _toolName);
 	virtual ~ToolMenuManager();
 
-	QString toolName(void) const;
+	QString toolName(void) const { return m_toolName; };
 
 	QAction* runAction(void) { return m_run; };
 	QAction* autorunAction(void) { return m_autorun; };
@@ -31,9 +32,10 @@ signals:
 
 private slots:
 	void slotRun(void);
-	void slotAutorun(void);
+	void slotAutorun(bool _checked);
 
 private:
+	QString m_toolName;
 	QAction* m_run;
 	QAction* m_autorun;
 

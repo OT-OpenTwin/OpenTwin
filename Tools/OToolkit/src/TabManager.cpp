@@ -13,8 +13,9 @@
 #define TAB_LOGW(___msg) OTOOLKIT_LOGW("CentralView", ___msg)
 #define TAB_LOGE(___msg) OTOOLKIT_LOGE("CentralView", ___msg)
 
-TabManager::TabManager() {
-
+TabManager::TabManager() : m_currentIx(-1) {
+	this->setObjectName("OToolkit_MainTabWidget");
+	this->connect(this, &ot::TabWidget::currentChanged, this, &TabManager::slotTabChanged);
 }
 
 TabManager::~TabManager() {
@@ -23,6 +24,7 @@ TabManager::~TabManager() {
 
 void TabManager::addTool(const QString& _toolName, QWidget* _toolWidget) {
 	auto it = m_data.find(_toolName);
+
 	if (it != m_data.end()) {
 		TAB_LOGE("Tool already has its central view");
 		return;
@@ -30,6 +32,10 @@ void TabManager::addTool(const QString& _toolName, QWidget* _toolWidget) {
 
 	this->addTab(_toolWidget, _toolName);
 	m_data.insert_or_assign(_toolName, _toolWidget);
+
+	if (m_data.size() == 1) {
+		QMetaObject::invokeMethod(this, "slotTabChanged", Qt::QueuedConnection, Q_ARG(int, 0));
+	}
 }
 
 void TabManager::removeTool(const QString& _toolName) {
@@ -40,4 +46,10 @@ void TabManager::removeTool(const QString& _toolName) {
 		}
 	}
 	m_data.erase(_toolName);
+}
+
+void TabManager::slotTabChanged(int _ix) {
+	if (_ix >= 0 && _ix < this->count()) {
+		emit currentToolChanged(this->tabText(_ix));
+	}
 }

@@ -128,19 +128,23 @@ void AppBase::removeToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifi
 
 }
 
+otoolkit::SettingsRef AppBase::createSettingsInstance(void) {
+	return std::shared_ptr<QSettings>(new QSettings("OpenTwin", "OToolkit"));
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Qt base functions
 
 void AppBase::closeEvent(QCloseEvent * _event) {
 	// Save window state
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	s.setValue("IsMaximized", isMaximized());
-	s.setValue("SizeX", size().width());
-	s.setValue("SizeY", size().height());
-	s.setValue("PosX", pos().x());
-	s.setValue("PosY", pos().y());
-	s.setValue("WindowState", saveState());
+	otoolkit::SettingsRef settings = this->createSettingsInstance();
+	settings->setValue("IsMaximized", isMaximized());
+	settings->setValue("SizeX", size().width());
+	settings->setValue("SizeY", size().height());
+	settings->setValue("PosX", pos().x());
+	settings->setValue("PosY", pos().y());
+	settings->setValue("WindowState", saveState());
 
 	// Clear tools
 	m_toolManager->clear();
@@ -156,6 +160,14 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 void AppBase::setUrl(const QString& _url) {
 	m_url = _url;
 	APPBASE_LOG("OToolkit url set to: " + m_url);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Public: Slots
+
+void AppBase::slotProcessMessage(const QString& _json) {
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -285,7 +297,7 @@ void AppBase::slotInitializeTools(void) {
 	//m_terminal->createMenuBarEntries(m_menuBar);
 
 
-	APPBASE_LOG("Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
+	APPBASE_LOG("Welcome to OToolkit (Build: " __DATE__ " " __TIME__ ")");
 }
 
 void AppBase::slotRecenter(void) {
@@ -298,26 +310,9 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	otoolkit::api::initialize(this);
 
 	// Create tool manager
-	m_toolManager = new ToolManager;
-
-	// Tab manager
-	TabManager* tabManager = new TabManager;
-	tabManager->setObjectName("OToolkit_MainTabWidget");
-	m_toolManager->setTabManager(tabManager);
-
-	// Menu manager
-	MenuManager* menuManager = new MenuManager;
-	this->setMenuBar(menuManager);
-	m_toolManager->setMenuManager(menuManager);
-
-	// Dock manager
-	DockManager* dockManager = new DockManager(this, menuManager);
-	m_toolManager->setDockManager(dockManager);
-
-	// Status manager
-	StatusManager* statusManager = new StatusManager;
-	this->setStatusBar(statusManager);
-	m_toolManager->setStatusManager(statusManager);
+	m_toolManager = new ToolManager(this);
+	this->setMenuBar(m_toolManager->menuManager());
+	this->setStatusBar(m_toolManager->statusManager());
 
 	// Create output
 	m_output = new QTextEdit;
@@ -331,12 +326,12 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	m_output->setFont(f);
 	m_output->setReadOnly(true);
 
-	this->setCentralWidget(tabManager);
-	this->setWindowTitle(APP_BASE_APP_NAME);
+	this->setCentralWidget(m_toolManager->tabManager());
+	this->setWindowTitle("OToolkit");
 	this->setWindowIcon(QIcon(":/images/OToolkit.png"));
 
 	outputDock->setWidget(m_output);
-	dockManager->add("", outputDock, Qt::BottomDockWidgetArea);
+	m_toolManager->dockManager()->add("", outputDock, Qt::BottomDockWidgetArea);
 
 	// Setup global shortcuts
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);
@@ -344,12 +339,12 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	// Restore settings
 	this->setObjectName("OToolkit_MainWindow");
 
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	bool isMax = s.value("IsMaximized", false).toBool();
-	int sizeX = s.value("SizeX", 800).toInt();
-	int sizeY = s.value("SizeY", 600).toInt();
-	int posX = s.value("PosX", 0).toInt();
-	int posY = s.value("PosY", 0).toInt();
+	otoolkit::SettingsRef settings = this->createSettingsInstance();
+	bool isMax = settings->value("IsMaximized", false).toBool();
+	int sizeX = settings->value("SizeX", 800).toInt();
+	int sizeY = settings->value("SizeY", 600).toInt();
+	int posX = settings->value("PosX", 0).toInt();
+	int posY = settings->value("PosY", 0).toInt();
 
 	this->move(posX, posY);
 
@@ -361,11 +356,11 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 		this->showNormal();
 	}
 
-	this->restoreState(s.value("WindowState", "").toByteArray());
+	this->restoreState(settings->value("WindowState", "").toByteArray());
 
 	//connect(menuManager, &MenuManager::settingsRequested, this, &AppBase::slotSettings);
-	connect(menuManager, &MenuManager::exitRequested , this, &AppBase::close);
-	connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
+	this->connect(m_toolManager->menuManager(), &MenuManager::exitRequested , this, &AppBase::close);
+	this->connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitializeTools, Qt::QueuedConnection);
 }

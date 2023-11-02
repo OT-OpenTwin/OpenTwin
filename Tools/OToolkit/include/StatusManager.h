@@ -6,12 +6,12 @@
 #pragma once
 
 // Qt header
-#include <QtCore/qlist.h>
 #include <QtCore/qstring.h>
 #include <QtWidgets/qstatusbar.h>	// Base class
 
 // std header
 #include <map>
+#include <list>
 
 class QTimer;
 class QLabel;
@@ -30,7 +30,7 @@ public:
 
 	void setCurrentTool(const QString& _toolName);
 
-	void addTool(const QString& _toolName, const QList<QWidget*>& _widgets);
+	void addTool(const QString& _toolName, const std::list<QWidget*>& _widgets);
 	void removeTool(const QString& _toolName);
 
 private slots:
@@ -46,6 +46,6 @@ private:
 	QLabel *					m_stretchLabel;
 
 	QString						m_currentTool;
-	std::map<QString, QList<QWidget*>> m_toolWidgets;
+	std::map<QString, std::list<QWidget*>> m_toolWidgets;
 
 };
