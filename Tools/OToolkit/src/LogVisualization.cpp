@@ -98,7 +98,7 @@ QString LogVisualization::toolName(void) const {
 	return QString("Log Visualization");
 }
 
-ot::TabWidget* LogVisualization::runTool(QMenu* _rootMenu) {
+QWidget* LogVisualization::runTool(QMenu* _rootMenu) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
@@ -115,9 +115,6 @@ ot::TabWidget* LogVisualization::runTool(QMenu* _rootMenu) {
 	// Create controls
 	QSplitter* splitter = new QSplitter;
 	splitter->setOrientation(Qt::Orientation::Vertical);
-
-	m_tabWidget = new ot::TabWidget;
-	m_tabWidget->addTab(splitter, "");
 
 	QLabel* messageFilterL = new QLabel("Message contains:");
 	m_messageFilter = new QLineEdit;
@@ -303,7 +300,7 @@ ot::TabWidget* LogVisualization::runTool(QMenu* _rootMenu) {
 
 	LOGVIS_LOG("Initialization completed");
 
-	return m_tabWidget;
+	return splitter;
 }
 
 //QList<QWidget *> LogVisualization::statusBarWidgets(void) const {
@@ -336,7 +333,7 @@ void LogVisualization::slotAutoConnect(void) {
 
 void LogVisualization::slotImport(void) {
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getOpenFileName(m_tabWidget, "Import Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	QString fn = QFileDialog::getOpenFileName(m_table, "Import Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);
@@ -391,7 +388,7 @@ void LogVisualization::slotExport(void) {
 	}
 
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getSaveFileName(m_tabWidget, "Export Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	QString fn = QFileDialog::getSaveFileName(m_table, "Export Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
 	
 	QFile f(fn);
@@ -482,7 +479,7 @@ void LogVisualization::slotViewCellContent(QTableWidgetItem* _itm) {
 	size_t i = 0;
 	for (auto itm : m_messages) {
 		if (i++ == _itm->row()) {
-			LogVisualizationItemViewDialog dia(itm, i, m_tabWidget);
+			LogVisualizationItemViewDialog dia(itm, i, m_table);
 			dia.exec();
 			return;
 		}

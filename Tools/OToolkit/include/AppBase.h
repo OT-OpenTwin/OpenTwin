@@ -15,13 +15,11 @@
 
 #define APP_BASE_APP_NAME "OToolkit"
 
-class StatusBar;
+class ToolManager;
 class LogVisualization;
 class Terminal;
 
 class QTabWidget;
-class QMenuBar;
-class QDockWidget;
 class QTextEdit;
 class QAction;
 class QApplication;
@@ -60,9 +58,7 @@ public:
 
 	// Setter / Getter
 
-	StatusBar * sb(void) { return m_statusBar; };
-
-	void setUrl(const QString& _url) { m_url = _url; };
+	void setUrl(const QString& _url);
 	const QString& url(void) const { return m_url; };
 
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
@@ -76,7 +72,9 @@ private slots:
 	void slotLogMessage(const QString& _sender, const QString& _message);
 	void slotLogWarning(const QString& _sender, const QString& _message);
 	void slotLogError(const QString& _sender, const QString& _message);
-	void slotInitialize(void);
+	void slotSetStatus(const QString& _text);
+	void slotSetErrorStatus(const QString& _text);
+	void slotInitializeTools(void);
 	void slotRecenter(void);
 
 private:
@@ -86,17 +84,12 @@ private:
 
 	QString				m_url;
 
-	QTabWidget *		m_tabWidget;
-	StatusBar *			m_statusBar;
-	QMenuBar *			m_menuBar;
-
+	ToolManager*        m_toolManager;
+	
 	LogVisualization *	m_logger;
 	Terminal *			m_terminal;
 
-	QDockWidget *		m_outputDock;
 	QTextEdit *			m_output;
-
-	QAction *			m_settingsAction;
 	QApplication*		m_app;
 
 	QShortcut* m_recenterShortcut;

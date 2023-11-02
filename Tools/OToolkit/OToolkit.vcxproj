@@ -22,18 +22,28 @@
     <ClCompile Include="src\AppBase.cpp" />
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\DockManager.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
-    <ClCompile Include="src\StatusBar.cpp" />
+    <ClCompile Include="src\MenuManager.cpp" />
+    <ClCompile Include="src\StatusManager.cpp" />
+    <ClCompile Include="src\TabManager.cpp" />
     <ClCompile Include="src\Terminal.cpp" />
     <ClCompile Include="src\ToolManager.cpp" />
+    <ClCompile Include="src\ToolMenuManager.cpp" />
+    <ClCompile Include="src\ToolRuntimeHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ToolManager.h" />
+    <ClInclude Include="include\DockManager.h" />
+    <ClInclude Include="include\TabManager.h" />
+    <QtMoc Include="include\ToolMenuManager.h" />
+    <ClInclude Include="include\ToolRuntimeHandler.h" />
+    <QtMoc Include="include\MenuManager.h" />
+    <QtMoc Include="include\ToolManager.h" />
     <QtMoc Include="include\ConnectToLoggerDialog.h" />
     <QtMoc Include="include\Terminal.h" />
     <QtMoc Include="include\LogVisualization.h" />
-    <QtMoc Include="include\StatusBar.h" />
+    <QtMoc Include="include\StatusManager.h" />
     <QtMoc Include="include\AppBase.h" />
     <ClInclude Include="include\JSONEditor.h" />
   </ItemGroup>
@@ -118,12 +128,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(ProjectDir)include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <PreprocessorDefinitions>_WINDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTWidgets.lib;OToolkitAPI.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;OTWidgets.lib;OToolkitAPI.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -147,12 +158,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(ProjectDir)include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTWidgets.lib;OToolkitAPI.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;OTWidgets.lib;OToolkitAPI.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>

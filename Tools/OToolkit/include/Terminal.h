@@ -141,7 +141,7 @@ public:
 	virtual QString toolName(void) const override;
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
-	virtual ot::TabWidget* runTool(QMenu* _rootMenu) override;
+	virtual QWidget* runTool(QMenu* _rootMenu) override;
 
 	//! @brief Stop all the logic of this tool
 	virtual bool prepareToolShutdown(void) override;
@@ -220,7 +220,6 @@ private:
 
 	// Layouts
 
-	ot::TabWidget*		m_tabWidget;
 	QSplitter *			m_splitter;
 
 	QWidget *			m_leftLayoutW;

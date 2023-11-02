@@ -5,8 +5,11 @@
 
 // OToolkit header
 #include "AppBase.h"
+#include "TabManager.h"
 #include "ToolManager.h"
-#include "StatusBar.h"
+#include "DockManager.h"
+#include "MenuManager.h"
+#include "StatusManager.h"
 #include "LogVisualization.h"
 #include "Terminal.h"
 
@@ -96,15 +99,25 @@ void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogTy
 }
 
 bool AppBase::addTool(otoolkit::Tool* _tool) {
-	return false;
+	return m_toolManager->addTool(_tool);
 }
 
 void AppBase::updateStatusString(const QString& _statusText) {
-
+	if (QThread::currentThreadId() == m_mainThread) {
+		this->slotSetStatus(_statusText);
+	}
+	else {
+		QMetaObject::invokeMethod(this, "slotSetStatus", Qt::QueuedConnection, Q_ARG(QString, _statusText));
+	}
 }
 
 void AppBase::updateStatusStringAsError(const QString& _statusText) {
-
+	if (QThread::currentThreadId() == m_mainThread) {
+		this->slotSetErrorStatus(_statusText);
+	}
+	else {
+		QMetaObject::invokeMethod(this, "slotSetErrorStatus", Qt::QueuedConnection, Q_ARG(QString, _statusText));
+	}
 }
 
 void AppBase::registerToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) {
@@ -130,13 +143,19 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	s.setValue("WindowState", saveState());
 
 	// Clear tools
-	ToolManager::instance().clear();
-
-	// Clear tabs
-	m_tabWidget->clear();
+	m_toolManager->clear();
 
 	// Qt
 	QMainWindow::closeEvent(_event);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+void AppBase::setUrl(const QString& _url) {
+	m_url = _url;
+	APPBASE_LOG("OToolkit url set to: " + m_url);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -240,24 +259,33 @@ void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 	m_output->append("");
 }
 
-void AppBase::slotInitialize(void) {
-	OTOOLKIT_LOG("OToolkit", "Starting initialize...");
-	/*
+void AppBase::slotSetStatus(const QString& _text) {
+	m_toolManager->statusManager()->setInfo(_text);
+}
+
+void AppBase::slotSetErrorStatus(const QString& _text) {
+	m_toolManager->statusManager()->setErrorInfo(_text);
+}
+
+void AppBase::slotInitializeTools(void) {
+	
 	// Create tools
 	m_logger = new LogVisualization;
 	m_terminal = new Terminal;
 
-	m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
-	m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
-	m_tabWidget->addTab(m_textFinder->widget(), "Text Finder");
+	m_toolManager->addTool(m_logger);
+	m_toolManager->addTool(m_terminal);
+
+	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
+	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
+	//m_tabWidget->addTab(m_textFinder->widget(), "Text Finder");
 
 	// Setup menu
-	m_logger->createMenuBarEntries(m_menuBar);
-	m_terminal->createMenuBarEntries(m_menuBar);
+	//m_logger->createMenuBarEntries(m_menuBar);
+	//m_terminal->createMenuBarEntries(m_menuBar);
 
-	// Setup information
-	m_statusBar->setCurrentTool(m_logger);
-	*/
+
+	APPBASE_LOG("Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
 }
 
 void AppBase::slotRecenter(void) {
@@ -266,16 +294,36 @@ void AppBase::slotRecenter(void) {
 }
 
 AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
-	setObjectName("OToolkit_MainWindow");
+	// Initialize Toolkit API
+	otoolkit::api::initialize(this);
 
-	// Create controls
-	m_tabWidget = new QTabWidget;
-	m_tabWidget->setObjectName("OToolkit_MainTabWidget");
+	// Create tool manager
+	m_toolManager = new ToolManager;
 
-	m_outputDock = new QDockWidget("Output");
+	// Tab manager
+	TabManager* tabManager = new TabManager;
+	tabManager->setObjectName("OToolkit_MainTabWidget");
+	m_toolManager->setTabManager(tabManager);
+
+	// Menu manager
+	MenuManager* menuManager = new MenuManager;
+	this->setMenuBar(menuManager);
+	m_toolManager->setMenuManager(menuManager);
+
+	// Dock manager
+	DockManager* dockManager = new DockManager(this, menuManager);
+	m_toolManager->setDockManager(dockManager);
+
+	// Status manager
+	StatusManager* statusManager = new StatusManager;
+	this->setStatusBar(statusManager);
+	m_toolManager->setStatusManager(statusManager);
+
+	// Create output
 	m_output = new QTextEdit;
-
-	m_outputDock->setObjectName("OToolkit_Dock_Output");
+	QDockWidget* outputDock = new QDockWidget("Output");
+	
+	outputDock->setObjectName("OToolkit_Dock_Output");
 	m_output->setObjectName("OToolkit_Output");
 
 	QFont f = m_output->font();
@@ -283,31 +331,19 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	m_output->setFont(f);
 	m_output->setReadOnly(true);
 
-	// Setup window
-	this->setCentralWidget(m_tabWidget);
+	this->setCentralWidget(tabManager);
 	this->setWindowTitle(APP_BASE_APP_NAME);
 	this->setWindowIcon(QIcon(":/images/OToolkit.png"));
 
-	m_outputDock->setWidget(m_output);
-	this->addDockWidget(Qt::BottomDockWidgetArea, m_outputDock);
-
-	// Setup status
-	m_statusBar = new StatusBar;
-	this->setStatusBar(m_statusBar);
-
-	// Setup menu
-	m_menuBar = new QMenuBar;
-	this->setMenuBar(m_menuBar);
-
-	QMenu * fileMenu = m_menuBar->addMenu("File");
-	m_settingsAction = fileMenu->addAction(QIcon(":/images/Settings.png"), "Settings");
-	fileMenu->addSeparator();
-	QAction * exitAction = fileMenu->addAction(QIcon(":/images/Exit.png"), "Exit");
+	outputDock->setWidget(m_output);
+	dockManager->add("", outputDock, Qt::BottomDockWidgetArea);
 
 	// Setup global shortcuts
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);
 
 	// Restore settings
+	this->setObjectName("OToolkit_MainWindow");
+
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
 	bool isMax = s.value("IsMaximized", false).toBool();
 	int sizeX = s.value("SizeX", 800).toInt();
@@ -327,11 +363,9 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 
 	this->restoreState(s.value("WindowState", "").toByteArray());
 
-	//connect(m_settingsAction, &QAction::triggered, this, &AppBase::slotSettings);
-	connect(exitAction, &QAction::triggered, this, &AppBase::close);
+	//connect(menuManager, &MenuManager::settingsRequested, this, &AppBase::slotSettings);
+	connect(menuManager, &MenuManager::exitRequested , this, &AppBase::close);
 	connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 
-	APPBASE_LOG("Welcome to " APP_BASE_APP_NAME " (Build: " __DATE__ " " __TIME__ ")");
-
-	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(this, &AppBase::slotInitializeTools, Qt::QueuedConnection);
 }

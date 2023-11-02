@@ -15,8 +15,10 @@ namespace otoolkit {
 			if (g_interface == nullptr) {
 				g_interface = _interface;
 			}
+			else {
+				otAssert(g_interface != _interface, "Global Interface already set");
+			}
 			OTAssertNullptr(g_interface);
-			otAssert(g_interface != _interface, "Global Interface already set");
 			return g_interface;
 		}
 	}
@@ -47,8 +49,6 @@ void otoolkit::api::initialize(APIInterface* _interface) {
 	if (instance != _interface) {
 		return;
 	}
-
-	OTOOLKIT_LOG("API", "Initialization done");
 }
 
 otoolkit::APIInterface* otoolkit::api::getGlobalInterface(void) {

@@ -6,7 +6,7 @@
 #include "Terminal.h"
 #include "AppBase.h"
 #include "JSONEditor.h"
-#include "StatusBar.h"
+#include "StatusManager.h"
 
 // OT header
 #include "OpenTwinCommunication/Msg.h"
@@ -57,9 +57,9 @@
 
 #define TERMINAL_TXT_RESPONSE_LENGTH_PREFIX "Response legnth: "
 
-#define TERMINAL_LOG(___message) OTOOLKIT_LOG("OTerminal", ___message)
-#define TERMINAL_LOGW(___message) OTOOLKIT_LOGW("OTerminal", ___message)
-#define TERMINAL_LOGE(___message) OTOOLKIT_LOGE("OTerminal", ___message)
+#define TERMINAL_LOG(___message) OTOOLKIT_LOG("Terminal", ___message)
+#define TERMINAL_LOGW(___message) OTOOLKIT_LOGW("Terminal", ___message)
+#define TERMINAL_LOGE(___message) OTOOLKIT_LOGE("Terminal", ___message)
 
 #define TERMINAL_KEYSEQ_Save "Ctrl+S"
 #define TERMINAL_KEYSEQ_Send "Ctrl+Return"
@@ -390,15 +390,12 @@ QString Terminal::toolName(void) const {
 	return "OTerminal";
 }
 
-ot::TabWidget* Terminal::runTool(QMenu* _rootMenu) {
+QWidget* Terminal::runTool(QMenu* _rootMenu) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
 	m_splitter = new QSplitter;
 	m_splitter->setObjectName("OToolkit_Terminal_MainSplitter");
-
-	m_tabWidget = new ot::TabWidget;
-	m_tabWidget->addTab(m_splitter, "");
 
 	m_leftLayoutW = new QWidget;
 	m_leftLayout = new QVBoxLayout(m_leftLayoutW);
@@ -450,7 +447,7 @@ ot::TabWidget* Terminal::runTool(QMenu* _rootMenu) {
 	rFont.setFamily("Consolas");
 	m_receiverName->setFont(rFont);
 
-	initializeServices(); // this call will add the last service information
+	this->initializeServices(); // this call will add the last service information
 	m_receiverName->addItems({ TERMINAL_TXT_RECEIVER_MANUAL, TERMINAL_TXT_RECEIVER_EDIT });
 	m_receiverName->setCurrentText(m_receiverName->itemText(m_receiverName->count() - 2));
 
@@ -520,7 +517,7 @@ ot::TabWidget* Terminal::runTool(QMenu* _rootMenu) {
 	//m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
 	m_navigation->addTopLevelItem(m_requestsRootFilter);
 
-	slotLoadRequestCollection();
+	this->slotLoadRequestCollection();
 
 	// Connect signals
 	connect(m_navigation, &QTreeWidget::customContextMenuRequested, this, &Terminal::slotShowNavigationContextMenu);
@@ -537,7 +534,7 @@ ot::TabWidget* Terminal::runTool(QMenu* _rootMenu) {
 
 	TERMINAL_LOG("Terminal initialization completed");
 
-	return m_tabWidget;
+	return m_splitter;
 }
 
 bool Terminal::prepareToolShutdown(void) {
@@ -787,7 +784,7 @@ void Terminal::slotLoadRequestCollection(void) {
 	}
 	QJsonDocument requestConfigDoc = QJsonDocument::fromJson(bArr);
 	if (!requestConfigDoc.isObject()) {
-		AppBase::instance()->sb()->setErrorInfo("Failed to load request collection");
+		otoolkit::api::getGlobalInterface()->updateStatusStringAsError("Failed to load request collection");
 		TERMINAL_LOGE("Terminal request collection load failed: JSON document is not an object");
 		return;
 	}
@@ -800,7 +797,7 @@ void Terminal::slotLoadRequestCollection(void) {
 
 	// Check version
 	if (obj[OT_JSON_COLLECTION_Version].toString() != INFO_COLLECTION_VERSION) {
-		AppBase::instance()->sb()->setErrorInfo("Failed to load request collection");
+		otoolkit::api::getGlobalInterface()->updateStatusStringAsError("Failed to load request collection");
 		TERMINAL_LOGE("Terminal request collection load failed: Invalid version");
 		return;
 	}
@@ -1140,7 +1137,7 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 	docObj[OT_JSON_COLLECTION_Data] = rootObject;
 
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getSaveFileName(m_tabWidget, "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	QString fn = QFileDialog::getSaveFileName(m_splitter, "Export OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) {
 		return;
 	}
@@ -1160,7 +1157,7 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 
 void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getOpenFileName(m_tabWidget, "Import OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	QString fn = QFileDialog::getOpenFileName(m_splitter, "Import OTerminal Collection", s.value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);

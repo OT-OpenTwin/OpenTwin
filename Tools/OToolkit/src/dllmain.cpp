@@ -5,7 +5,7 @@
 
 // OToolkit header
 #include "AppBase.h"
-#include "StatusBar.h"
+#include "StatusManager.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -25,6 +25,10 @@
 #include "OpenTwinCore/Logger.h"
 #include "OpenTwinCore/otAssert.h"
 #include "OpenTwinCommunication/actionTypes.h"
+
+#define DLLMAIN_LOG(___msg) OTOOLKIT_LOG("main", ___msg)
+#define DLLMAIN_LOGW(___msg) OTOOLKIT_LOGW("main", ___msg)
+#define DLLMAIN_LOGE(___msg) OTOOLKIT_LOGE("main", ___msg)
 
 namespace otoolkit {
 	namespace intern {
@@ -68,8 +72,8 @@ void mainApplicationThread()
 			}
 		}
 
-		// Initialize API
-		otoolkit::api::initialize(AppBase::instance());
+		// Create application instance, the application instance will initialize the toolkit api
+		AppBase::instance();
 
 		// Initialize OpenTwin API
 		ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
@@ -79,7 +83,6 @@ void mainApplicationThread()
 		AppBase::instance()->setUrl(QString::fromStdString(otoolkit::intern::g_serviceURL));
 
 		otoolkit::intern::g_starting = false;
-		AppBase::instance()->sb()->setInfo("OToolkit running at: " + QString::fromStdString(otoolkit::intern::g_serviceURL));
 
 		// Run Qt EventLoop
 		exit(application.exec());
