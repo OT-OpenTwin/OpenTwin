@@ -12,6 +12,7 @@
 #include "StatusManager.h"
 #include "LogVisualization.h"
 #include "Terminal.h"
+#include "FAR.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -310,10 +311,10 @@ void AppBase::slotInitializeTools(void) {
 	
 	// Create tools
 	m_logger = new LogVisualization;
-	m_terminal = new Terminal;
-
+	
 	m_toolManager->addTool(m_logger);
-	m_toolManager->addTool(m_terminal);
+	m_toolManager->addTool(new Terminal);
+	m_toolManager->addTool(new FAR);
 
 	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
 	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");

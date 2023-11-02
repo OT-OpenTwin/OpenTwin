@@ -90,8 +90,7 @@ private:
 	ToolManager*        m_toolManager;
 	
 	LogVisualization *	m_logger;
-	Terminal *			m_terminal;
-
+	
 	QTextEdit *			m_output;
 	QApplication*		m_app;
 

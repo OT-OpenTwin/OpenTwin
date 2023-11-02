@@ -23,6 +23,7 @@
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DockManager.cpp" />
+    <ClCompile Include="src\FAR.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="include\DockManager.h" />
     <QtMoc Include="include\TabManager.h" />
     <QtMoc Include="include\ToolMenuManager.h" />
+    <ClInclude Include="include\FAR.h" />
     <ClInclude Include="include\ToolRuntimeHandler.h" />
     <QtMoc Include="include\MenuManager.h" />
     <QtMoc Include="include\ToolManager.h" />
