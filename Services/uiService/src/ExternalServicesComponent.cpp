@@ -941,6 +941,14 @@ void ExternalServicesComponent::removeShapesFromVisualization(ModelUIDtype visua
 {
 	try {
 		AppBase::instance()->getViewerComponent()->removeShapes(visualizationModelID, entityID);
+		
+		//If entity is has a block item associated, it gets removed from all editors.
+		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+		for (auto view : views) {
+			for (auto uid : entityID) {
+				view->removeItem(std::to_string(uid));
+			}
+		}
 	}
 	catch (...) {
 		assert(0); // Error handling
