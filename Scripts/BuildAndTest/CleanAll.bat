@@ -61,9 +61,6 @@ CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem\clean.bat"
 ECHO Clean: Qwt Wrapper
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper\clean.bat"
 
-ECHO Clean: OTsci
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTsci\clean.bat"
-
 ECHO Clean: Rubberband Engine Library: Core
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore\clean.bat"
 
@@ -141,6 +138,15 @@ CALL "%OPENTWIN_DEV_ROOT%\Services\uiService\clean.bat"
 
 ECHO Clean: Visualization Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\VisualizationService\clean.bat"
+
+REM ################################################################################################################################
+REM TOOLS
+
+ECHO Clean: OToolkitAPI
+CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\clean.bat"
+
+ECHO Clean: OToolkit
+CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\clean.bat"
 
 GOTO END
 
