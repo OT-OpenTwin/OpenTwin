@@ -161,9 +161,6 @@
     <ClCompile Include="src\GraphicsVBoxLayoutItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsHBoxLayoutItemCfg.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\Painter2D.cpp">
       <Filter>Source Files\Painter</Filter>
     </ClCompile>
@@ -172,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="src\FillPainter2D.cpp">
       <Filter>Source Files\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsHBoxLayoutItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

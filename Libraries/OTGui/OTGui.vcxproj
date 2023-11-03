@@ -45,7 +45,6 @@
     <ClInclude Include="include\OTGui\Painter2D.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GraphicsHBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\Border.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FillPainter2D.cpp" />
@@ -55,6 +54,7 @@
     <ClCompile Include="src\GraphicsConnectionCfg.cpp" />
     <ClCompile Include="src\GraphicsEllipseItemCfg.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsHBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPackage.cpp" />
     <ClCompile Include="src\GraphicsFlowItemCfg.cpp" />
