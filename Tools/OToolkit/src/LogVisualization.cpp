@@ -878,8 +878,8 @@ std::string LogVisualizationItemViewDialog::findJsonSyntax(std::string _str) {
 	while (ixBegin != std::string::npos) {
 		size_t ixEnd = _str.find('}', ixBegin);
 		if (ixEnd != std::string::npos) {
-			ret.append(_str.substr(0, ixBegin - 1));
-			std::string json = _str.substr(ixBegin, ixEnd - ixBegin);
+			ret.append(_str.substr(0, ixBegin));
+			std::string json = _str.substr(ixBegin, (ixEnd - ixBegin) + 1);
 			QJsonParseError err;
 			QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(json), &err);
 			if (err.error == QJsonParseError::NoError) {
@@ -887,6 +887,10 @@ std::string LogVisualizationItemViewDialog::findJsonSyntax(std::string _str) {
 			}
 			ret.append(json);
 			_str = _str.substr(ixEnd + 1);
+			ixBegin = _str.find('{');
+		}
+		else {
+			ixBegin = std::string::npos;
 		}
 	}
 
