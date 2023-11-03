@@ -2062,7 +2062,7 @@ ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
 ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
 	ot::GraphicsView* newEditor = this->findGraphicsEditor(_name, _serviceInfo);
 	if (newEditor != nullptr) {
-		OT_LOG_D("Graphics Editor already exists. Skipping creation. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
@@ -2077,7 +2077,7 @@ ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, con
 	connect(newEditor, &ot::GraphicsView::itemMoved, this, &AppBase::slotGraphicsItemMoved);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 
-	OT_LOG_D("Editor created { \"Editor.Name\": \"" + _name  + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _name  + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" } Test { \"Test\": \"Tt\" }");
 
 	return newEditor;
 }
