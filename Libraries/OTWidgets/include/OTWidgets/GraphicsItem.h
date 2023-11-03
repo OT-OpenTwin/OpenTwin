@@ -73,6 +73,8 @@ namespace ot {
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
+		virtual void removeAllConnections(void);
+
 		// ###############################################################################################################################################
 
 		// Event handler

@@ -15,6 +15,25 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 
 }
 
+ot::GraphicsConnectionCfg ot::GraphicsConnectionItem::getConnectionInformation(void) const {
+	ot::GraphicsConnectionCfg info;
+	if (m_origin) {
+		info.setOriginUid(m_origin->getRootItem()->graphicsItemUid());
+		info.setOriginConnectable(m_origin->graphicsItemName());
+	}
+	else {
+		OT_LOG_WA("No origin item set");
+	}
+	if (m_dest) {
+		info.setDestUid(m_dest->getRootItem()->graphicsItemUid());
+		info.setDestConnectable(m_dest->graphicsItemName());
+	}
+	else {
+		OT_LOG_WA("No dest item set");
+	}
+	return info;
+}
+
 void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
 	OTAssertNullptr(_origin);
 	OTAssertNullptr(_dest);

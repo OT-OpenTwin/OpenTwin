@@ -48,3 +48,10 @@ void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::G
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
 }
+
+void ot::GraphicsLayoutItemWrapper::removeAllConnections(void) {
+	ot::GraphicsItem::removeAllConnections();
+
+	OTAssertNullptr(m_owner);
+	m_owner->removeAllConnections();
+}

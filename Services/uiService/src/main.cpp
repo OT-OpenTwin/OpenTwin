@@ -20,8 +20,10 @@
 int main(int argc, char *argv[])
 {
 	try {
+		QByteArray loggingenv = qgetenv("OPEN_TWIN_LOGGING_URL");
+
 		// Initialize logging
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, "", false);
+		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
 
 		AppBase * app = AppBase::instance();
 		app->setSiteID(0);

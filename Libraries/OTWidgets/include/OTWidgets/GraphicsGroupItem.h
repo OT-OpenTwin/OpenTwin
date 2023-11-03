@@ -19,6 +19,8 @@ namespace ot {
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
+		virtual void removeAllConnections(void) override;
+
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsGroupItem); };
 

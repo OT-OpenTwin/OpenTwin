@@ -10,11 +10,30 @@
 
 ot::GraphicsLayoutItem::GraphicsLayoutItem() : m_layoutWrap(nullptr) {}
 
-ot::GraphicsLayoutItem::~GraphicsLayoutItem() {}
+ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
+
+}
 
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	//if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
 	return ot::GraphicsItem::setupFromConfig(_cfg);
+}
+
+void ot::GraphicsLayoutItem::removeAllConnections(void) {
+	ot::GraphicsItem::removeAllConnections();
+
+	std::list<QGraphicsLayoutItem*> items;
+	this->getAllItems(items);
+
+	for (auto i : items) {
+		ot::GraphicsItem* item = dynamic_cast<ot::GraphicsItem*>(i);
+		if (item) {
+			item->removeAllConnections();
+		}
+		else {
+			OT_LOG_EA("GraphicsItem cast failed");
+		}
+	}
 }
 
 void ot::GraphicsLayoutItem::prepareGraphicsItemGeometryChange(void) {

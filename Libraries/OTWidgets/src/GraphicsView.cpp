@@ -90,7 +90,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	auto it = m_items.find(_item->graphicsItemUid());
 	if (it != m_items.end()) {
 		OT_LOG_D("Overwriting item with the ID \"" + _item->graphicsItemUid());
-		removeItem(_item->graphicsItemUid());
+		this->removeItem(_item->graphicsItemUid());
 	}
 
 	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
@@ -105,7 +105,9 @@ void ot::GraphicsView::removeItem(const std::string& _itemUid) {
 		return;
 	}
 
+	it->second->removeAllConnections();
 	m_scene->removeItem(it->second->getQGraphicsItem());
+	delete it->second;
 	m_items.erase(_itemUid);
 }
 
@@ -116,28 +118,42 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest)
 	p.setWidth(1);
 	
 	m_scene->addItem(newConnection);
-	newConnection->connectItems(_origin, _dest);
 	newConnection->setGraphicsScene(m_scene);
+	newConnection->connectItems(_origin, _dest);
 
 	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 	m_connections.insert_or_assign(itmKey, newConnection);
 }
 
-void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
-	std::string key = ot::GraphicsConnectionCfg::buildKey(_fromUid, _fromConnector, _toUid, _toConnector);
-	auto it = m_connections.find(key);
+void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation) {
+	auto it = m_connections.find(_connectionInformation.buildKey());
 	if (it == m_connections.end()) {
-		key = ot::GraphicsConnectionCfg::buildKey(_toUid, _toConnector, _toUid, _fromConnector);
-		it = m_connections.find(key);
+		it = m_connections.find(_connectionInformation.buildReversedKey());
 		if (it == m_connections.end()) {
-			//OT_LOG_EAS("Connection for key \"" + key + "\" could not be found");
+			OT_LOG_W("Connection not found { \"OriginUID\": \"" + _connectionInformation.originUid() + 
+				"\", \"OriginConnectable\": \"" + _connectionInformation.originConnectable() + 
+				"\", \"DestUID\": \"" + _connectionInformation.destUid() + 
+				"\", \"DestConnectable\": \"" + _connectionInformation.destConnectable() + "\" }");
 			return;
 		}
 	}
 
+	// Remove connection from items
 	it->second->disconnectItems();
+
+	// Remove connection from view
 	m_scene->removeItem(it->second->getQGraphicsItem());
-	m_connections.erase(key);
+
+	// Destroy connection
+	delete it->second;
+
+	// Erase connection from map
+	m_connections.erase(_connectionInformation.buildKey());
+	m_connections.erase(_connectionInformation.buildReversedKey());
+}
+
+void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+	this->removeConnection(GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector));
 }
 
 void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
@@ -169,25 +185,25 @@ void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 	else {
 		factor = 0.9;
 	}
-	scale(factor, factor);
-	update();
+	this->scale(factor, factor);
+	this->update();
 
-	setTransformationAnchor(anchor);
+	this->setTransformationAnchor(anchor);
 
-	viewAll();
+	this->viewAll();
 }
 
 void ot::GraphicsView::enterEvent(QEvent* _event)
 {
 	QGraphicsView::enterEvent(_event);
-	viewport()->setCursor(Qt::CrossCursor);
+	this->viewport()->setCursor(Qt::CrossCursor);
 }
 
 void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 {
 	QGraphicsView::mousePressEvent(_event);
 	if (_event->button() == Qt::MiddleButton) {
-		viewport()->setCursor(Qt::ClosedHandCursor);
+		this->viewport()->setCursor(Qt::ClosedHandCursor);
 		m_lastPanPos = _event->pos();
 		m_isPressed = true;
 	}
@@ -199,15 +215,15 @@ void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
 
 	if (_event->button() == Qt::MiddleButton) {
 		m_isPressed = false;
-		viewport()->setCursor(Qt::CrossCursor);
+		this->viewport()->setCursor(Qt::CrossCursor);
 	}
 }
 
 void ot::GraphicsView::mouseMoveEvent(QMouseEvent* _event)
 {
 	if (m_isPressed) {
-		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->x() - m_lastPanPos.x()));
-		verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->y() - m_lastPanPos.y()));
+		this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->x() - m_lastPanPos.x()));
+		this->verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->y() - m_lastPanPos.y()));
 		m_lastPanPos = _event->pos();
 		_event->accept();
 	}
@@ -221,7 +237,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 	if (_event->key() == Qt::Key_Space)
 	{
 		// Reset the view
-		resetView();
+		this->resetView();
 	}
 }
 
@@ -231,7 +247,7 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 {
 	QGraphicsView::resizeEvent(_event);
 
-	viewAll();
+	this->viewAll();
 }
 
 void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {

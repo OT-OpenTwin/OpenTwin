@@ -53,6 +53,7 @@ namespace ot {
 		void addItem(ot::GraphicsItem* _item);
 		void removeItem(const std::string& _itemUid);
 		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);
+		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 
 		void requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
@@ -71,7 +72,6 @@ namespace ot {
 		//! @param _toConnector Destination connector (child of destination item)
 		void connectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 		
-
 		void itemMoved(const std::string& _uid, const QPointF& _newPos);
 
 	protected:

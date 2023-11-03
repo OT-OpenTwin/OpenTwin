@@ -77,19 +77,24 @@ ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 	return ret;
 }
 
-void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	m_flags = _flags;
-	this->graphicsItemFlagsChanged(m_flags);
-}
+void ot::GraphicsItem::removeAllConnections(void) {
+	if (m_connections.empty()) return;
 
-ot::GraphicsScene* ot::GraphicsItem::graphicsScene(void) {
-	if (m_parent) return m_parent->graphicsScene();
-	return m_scene;
-}
+	GraphicsScene* scene = this->graphicsScene();
+	if (scene == nullptr) {
+		OT_LOG_EA("No graphics scene set");
+		return;
+	}
+	GraphicsView* view = scene->getGraphicsView();
+	OTAssertNullptr(view);
 
-ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
-	if (m_parent) return m_parent->getRootItem();
-	return this;
+	std::list<ot::GraphicsConnectionCfg> lst;
+	for (const auto& connection : m_connections) {
+		lst.push_back(connection->getConnectionInformation());
+	}
+	for (const auto& connection : lst) {	
+		view->removeConnection(connection);
+	}
 }
 
 // ###############################################################################################################################################
@@ -193,6 +198,29 @@ void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 // ###############################################################################################################################################
 
 // Getter / Setter
+
+void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	m_flags = _flags;
+	this->graphicsItemFlagsChanged(m_flags);
+}
+
+ot::GraphicsScene* ot::GraphicsItem::graphicsScene(void) {
+	if (m_parent) {
+		return m_parent->graphicsScene();
+	}
+	else {
+		return m_scene;
+	}
+}
+
+ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
+	if (m_parent) {
+		return m_parent->getRootItem();
+	}
+	else {
+		return this;
+	}
+}
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
 	m_connections.push_back(_connection);

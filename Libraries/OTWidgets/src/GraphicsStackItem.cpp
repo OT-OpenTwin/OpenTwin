@@ -18,7 +18,7 @@ ot::GraphicsStackItem::GraphicsStackItem() : m_isFirstPaint(true) {
 }
 
 ot::GraphicsStackItem::~GraphicsStackItem() {
-	this->memClear();
+	//this->memClear();
 }
 
 bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -68,6 +68,13 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	}
 
 	return ot::GraphicsGroupItem::setupFromConfig(_cfg);
+}
+
+void ot::GraphicsStackItem::removeAllConnections(void) {
+	ot::GraphicsGroupItem::removeAllConnections();
+	for (auto itm : m_items) {
+		itm.item->removeAllConnections();
+	}
 }
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

@@ -21,6 +21,10 @@ bool ot::GraphicsGroupItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+void ot::GraphicsGroupItem::removeAllConnections(void) {
+	ot::GraphicsItem::removeAllConnections();
+}
+
 void ot::GraphicsGroupItem::prepareGraphicsItemGeometryChange(void) {
 	this->prepareGeometryChange();
 }
