@@ -51,13 +51,19 @@ void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
 
 void EntityBlock::RemoveConnection(const ot::GraphicsConnectionCfg& connectionForRemoval)
 {
-	for (auto connection = _connections.begin(); connection != _connections.end(); connection++)
+	auto connection = _connections.begin();
+	while(connection != _connections.end())
 	{
 		if (connection->buildKey() == connectionForRemoval.buildKey() || connection->buildReversedKey() == connectionForRemoval.buildKey())
 		{
-			_connections.erase(connection);
+			connection = _connections.erase(connection);
+		}
+		else
+		{
+			connection++;
 		}
 	}
+	setModified();
 }
 
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)

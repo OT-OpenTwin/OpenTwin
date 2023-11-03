@@ -173,7 +173,7 @@ void EntityBlockDatabaseAccess::UpdateBlockConfig()
 			if (_connectorsByName.find(_connectorParameter2.getConnectorName()) != _connectorsByName.end())
 			{
 				_connectorsByName.erase(_connectorParameter2.getConnectorName());
-				connectorsForRemoval.push_back(_connectorParameter3.getConnectorName());
+				connectorsForRemoval.push_back(_connectorParameter2.getConnectorName());
 			}
 		}
 
@@ -238,6 +238,7 @@ void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<o
 			{
 				entitiesForUpdate.push_back(std::stoull(connection.destUid()));
 			}
+			connectionsForRemovalByEntityID[entitiesForUpdate.back()].push_back(&connection);
 		}
 		std::map<ot::UID, EntityBase*> entityMap;
 		for (const ot::UID& entityID : entitiesForUpdate)
