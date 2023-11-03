@@ -1,3 +1,8 @@
+//! @file LogVisualization.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include "LogVisualization.h"
 #include "AppBase.h"
 #include "ConnectToLoggerDialog.h"
@@ -54,36 +59,78 @@ enum tableColumns {
 	tCount
 };
 
-LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m_errorCount(0) {
+LogVisualization::LogVisualization()
+	: m_filterLock(false), m_warningCount(0), m_errorCount(0)
+{
+	
+}
+
+LogVisualization::~LogVisualization() {
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+
+	settings->setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
+
+	settings->setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
+	settings->setValue("LogVisualization.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
+
+	QJsonArray serviceFilterArr;
+	for (int i = 0; i < m_serviceFilter->count(); i++) {
+		QJsonObject serviceObj;
+		serviceObj["Name"] = m_serviceFilter->item(i)->text();
+		serviceObj["Active"] = (m_serviceFilter->item(i)->checkState() == Qt::Checked);
+		serviceFilterArr.push_back(serviceObj);
+	}
+	QJsonDocument serviceFilterDoc(serviceFilterArr);
+	settings->setValue("LogVisualization.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
+
+	QString tableColumnWidths;
+	for (int i = 0; i < m_table->columnCount(); i++) {
+		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
+	}
+	settings->setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
+}
+
+QString LogVisualization::toolName(void) const {
+	return QString("Log Visualization");
+}
+
+QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
-	m_centralLayoutW = new QWidget;
-	m_centralLayout = new QVBoxLayout(m_centralLayoutW);
+	QWidget* centralLayoutW = new QWidget;
+	QVBoxLayout* centralLayout = new QVBoxLayout(centralLayoutW);
 
-	m_filterLayout = new QHBoxLayout;
-	m_filterByMessageTypeBox = new QGroupBox("Type Filter");
-	m_filterByMessageTypeLayout = new QVBoxLayout(m_filterByMessageTypeBox);
-	m_filterByServiceBox = new QGroupBox("Service Filter");
-	m_filterByServiceLayout = new QVBoxLayout(m_filterByServiceBox);
-	m_buttonLayout = new QHBoxLayout;
+	QHBoxLayout* filterLayout = new QHBoxLayout;
+	QGroupBox*   filterByMessageTypeBox = new QGroupBox("Type Filter");
+	QVBoxLayout* filterByMessageTypeLayout = new QVBoxLayout(filterByMessageTypeBox);
+	QGroupBox*   filterByServiceBox = new QGroupBox("Service Filter");
+	QVBoxLayout* filterByServiceLayout = new QVBoxLayout(filterByServiceBox);
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	m_splitter = new QSplitter;
-	m_splitter->setOrientation(Qt::Orientation::Vertical);
+	QSplitter* splitter = new QSplitter;
+	splitter->setOrientation(Qt::Orientation::Vertical);
 
-	m_messageFilterL = new QLabel("Message contains:");
+	QLabel* messageFilterL = new QLabel("Message contains:");
 	m_messageFilter = new QLineEdit;
 	m_messageFilter->setPlaceholderText("<Confirm by pressing return>");
 	m_messageFilter->setMinimumWidth(250);
 
 	m_ignoreNewMessages = new QCheckBox("Ignore new messages");
 	m_autoScrollToBottom = new QCheckBox("Auto scroll to bottom");
-	m_btnClear = new QPushButton("Clear");
-	m_btnClear->setToolTip("Will clear the Log Messages");
 
-	m_btnClearAll = new QPushButton("Clear All");
-	m_btnClearAll->setToolTip("Will clear the Log Messages and the Service Filter list");
+	QPushButton* btnClear = new QPushButton("Clear");
+	btnClear->setToolTip("Will clear the Log Messages");
+	this->connect(btnClear, &QPushButton::clicked, this, &LogVisualization::slotClear);
+	
+	QPushButton* btnClearAll = new QPushButton("Clear All");
+	btnClearAll->setToolTip("Will clear the Log Messages and the Service Filter list");
+	this->connect(btnClearAll, &QPushButton::clicked, this, &LogVisualization::slotClearAll);
 
 	m_table = new QTableWidget(0, tCount);
 
@@ -95,41 +142,48 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	m_msgTypeFilterMsgOut = new QCheckBox("Outgoing Message");
 
 	m_serviceFilter = new QListWidget;
-	m_btnSelectAllServices = new QPushButton("Select All");
-	m_btnDeselectAllServices = new QPushButton("Deselect All");
+	QPushButton* btnSelectAllServices = new QPushButton("Select All");
+	this->connect(btnSelectAllServices, &QPushButton::clicked, this, &LogVisualization::slotSelectAllServices);
+	
+	QPushButton* btnDeselectAllServices = new QPushButton("Deselect All");
+	this->connect(btnDeselectAllServices, &QPushButton::clicked, this, &LogVisualization::slotDeselectAllServices);
 
 	m_messageCountLabel = new QLabel;
 	m_errorCountLabel = new QLabel;
 	m_warningCountLabel = new QLabel;
 
+	_statusWidgets.push_back(m_errorCountLabel);
+	_statusWidgets.push_back(m_warningCountLabel);
+	_statusWidgets.push_back(m_messageCountLabel);
+
 	// Setup layouts
-	m_centralLayout->addLayout(m_filterLayout);
-	m_centralLayout->addLayout(m_buttonLayout);
+	centralLayout->addLayout(filterLayout);
+	centralLayout->addLayout(buttonLayout);
 
-	m_filterLayout->addWidget(m_filterByMessageTypeBox, 0);
-	m_filterLayout->addWidget(m_filterByServiceBox, 1);
+	filterLayout->addWidget(filterByMessageTypeBox, 0);
+	filterLayout->addWidget(filterByServiceBox, 1);
 
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterDetailed);
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterInfo);
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterWarning);
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgIn);
-	m_filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgOut);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterDetailed);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterInfo);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterWarning);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgIn);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgOut);
 
-	m_filterByServiceLayout->addWidget(m_serviceFilter);
-	m_filterByServiceLayout->addWidget(m_btnSelectAllServices);
-	m_filterByServiceLayout->addWidget(m_btnDeselectAllServices);
+	filterByServiceLayout->addWidget(m_serviceFilter);
+	filterByServiceLayout->addWidget(btnSelectAllServices);
+	filterByServiceLayout->addWidget(btnDeselectAllServices);
 
-	m_buttonLayout->addWidget(m_messageFilterL);
-	m_buttonLayout->addWidget(m_messageFilter);
-	m_buttonLayout->addStretch(1);
-	m_buttonLayout->addWidget(m_ignoreNewMessages, 0);
-	m_buttonLayout->addWidget(m_autoScrollToBottom, 0);
-	m_buttonLayout->addWidget(m_btnClear, 0);
-	m_buttonLayout->addWidget(m_btnClearAll, 0);
+	buttonLayout->addWidget(messageFilterL);
+	buttonLayout->addWidget(m_messageFilter);
+	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(m_ignoreNewMessages, 0);
+	buttonLayout->addWidget(m_autoScrollToBottom, 0);
+	buttonLayout->addWidget(btnClear, 0);
+	buttonLayout->addWidget(btnClearAll, 0);
 
-	m_splitter->addWidget(m_centralLayoutW);
-	m_splitter->addWidget(m_table);
+	splitter->addWidget(centralLayoutW);
+	splitter->addWidget(m_table);
 
 	// Setup controls
 	m_msgTypeFilterDetailed->setChecked(true);
@@ -150,11 +204,11 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_splitter->setStretchFactor(1, 1);
+	splitter->setStretchFactor(1, 1);
 
 	// Restore settings
-	QSettings s("OpenTwin", applicationName());
-	
+	QSettings s("OpenTwin", "OToolkit");
+
 	QString tableColumnWidths = s.value("LogVisualization.Table.ColumnWidth", "").toString();
 	QStringList tableColumnWidthsList = tableColumnWidths.split(";", QString::SkipEmptyParts);
 	if (tableColumnWidthsList.count() == m_table->columnCount()) {
@@ -185,7 +239,7 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 
 					if (serviceObj.contains("Name") && serviceObj.contains("Active")) {
 						if (serviceObj["Name"].isString() && serviceObj["Active"].isBool()) {
-							QListWidgetItem * nItm = new QListWidgetItem(serviceObj["Name"].toString());
+							QListWidgetItem* nItm = new QListWidgetItem(serviceObj["Name"].toString());
 							nItm->setFlags(nItm->flags() | Qt::ItemIsUserCheckable);
 							nItm->setCheckState((serviceObj["Active"].toBool() ? Qt::Checked : Qt::Unchecked));
 							m_serviceFilter->addItem(nItm);
@@ -198,9 +252,9 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	}
 
 	// Initialize colors and text
-	slotUpdateCheckboxColors();
-	updateCountLabels();
-	
+	this->slotUpdateCheckboxColors();
+	this->updateCountLabels();
+
 	// Connect checkbox color signals
 	connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
 	connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LogVisualization::slotUpdateCheckboxColors);
@@ -213,8 +267,6 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 
 	// Connect signals
 	connect(m_messageFilter, &QLineEdit::returnPressed, this, &LogVisualization::slotFilterChanged);
-	connect(m_btnClear, &QPushButton::clicked, this, &LogVisualization::slotClear);
-	connect(m_btnClearAll, &QPushButton::clicked, this, &LogVisualization::slotClearAll);
 
 	connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
 	connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
@@ -223,8 +275,6 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 	connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
 	connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LogVisualization::slotFilterChanged);
 
-	connect(m_btnSelectAllServices, &QPushButton::clicked, this, &LogVisualization::slotSelectAllServices);
-	connect(m_btnDeselectAllServices, &QPushButton::clicked, this, &LogVisualization::slotDeselectAllServices);
 
 	connect(m_serviceFilter, &QListWidget::itemChanged, this, &LogVisualization::slotFilterChanged);
 
@@ -232,64 +282,15 @@ LogVisualization::LogVisualization() : m_filterLock(false), m_warningCount(0), m
 
 	connect(m_table, &QTableWidget::itemDoubleClicked, this, &LogVisualization::slotViewCellContent);
 
-	LOGVIS_LOG("LogVisualization initialization completed.");
-}
-
-LogVisualization::~LogVisualization() {
-	QSettings s("OpenTwin", applicationName());
-
-	s.setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
-
-	s.setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
-	s.setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
-	s.setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
-	s.setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
-	s.setValue("LogVisualization.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
-	s.setValue("LogVisualization.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
-
-	QJsonArray serviceFilterArr;
-	for (int i = 0; i < m_serviceFilter->count(); i++) {
-		QJsonObject serviceObj;
-		serviceObj["Name"] = m_serviceFilter->item(i)->text();
-		serviceObj["Active"] = (m_serviceFilter->item(i)->checkState() == Qt::Checked);
-		serviceFilterArr.push_back(serviceObj);
-	}
-	QJsonDocument serviceFilterDoc(serviceFilterArr);
-	s.setValue("LogVisualization.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
-
-	QString tableColumnWidths;
-	for (int i = 0; i < m_table->columnCount(); i++) {
-		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
-	}
-	s.setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
-}
-
-QString LogVisualization::toolName(void) const {
-	return QString("Log Visualization");
-}
-
-QList<QWidget *> LogVisualization::statusBarWidgets(void) const {
-	QList<QWidget *> ret;
-	
-	ret.push_back(m_errorCountLabel);
-	ret.push_back(m_warningCountLabel);
-	ret.push_back(m_messageCountLabel);
-
-	return ret;
-}
-
-void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
-	QSettings s("OpenTwin", applicationName());
-
-	QMenu * topLvlMenu = _menuBar->addMenu("Log Visualization");
-	m_connectButton = topLvlMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
-	m_autoConnect = topLvlMenu->addAction("Auto-Connect");
+	// Create menu bar
+	m_connectButton = _rootMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
+	m_autoConnect = _rootMenu->addAction("Auto-Connect");
 	bool needAutoConnect = s.value("LogVisualization.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
 
-	topLvlMenu->addSeparator();
-	m_importButton = topLvlMenu->addAction(QIcon(":images/Import.png"), "Import");
-	m_exportButton = topLvlMenu->addAction(QIcon(":images/Export.png"), "Export");
+	_rootMenu->addSeparator();
+	m_importButton = _rootMenu->addAction(QIcon(":images/Import.png"), "Import");
+	m_exportButton = _rootMenu->addAction(QIcon(":images/Export.png"), "Export");
 
 	connect(m_connectButton, &QAction::triggered, this, &LogVisualization::slotConnect);
 	connect(m_autoConnect, &QAction::triggered, this, &LogVisualization::slotToggleAutoConnect);
@@ -300,13 +301,30 @@ void LogVisualization::createMenuBarEntries(QMenuBar * _menuBar) {
 		LOGVIS_LOG("Auto connect requested, request queued");
 		QMetaObject::invokeMethod(this, &LogVisualization::slotAutoConnect, Qt::QueuedConnection);
 	}
+
+	LOGVIS_LOG("Initialization completed");
+
+	return splitter;
 }
 
-bool LogVisualization::toolPrepareShutdown(QString& _errorString) {
-	if (this->disconnectFromLogger()) return true;
-	
-	_errorString = "Failed to send deregistration request to LoggerService \"" + QString::fromStdString(m_loggerUrl) + "\"";
-	return false;
+//QList<QWidget *> LogVisualization::statusBarWidgets(void) const {
+//	QList<QWidget *> ret;
+//	
+//	ret.push_back(m_errorCountLabel);
+//	ret.push_back(m_warningCountLabel);
+//	ret.push_back(m_messageCountLabel);
+//
+//	return ret;
+//}
+
+bool LogVisualization::prepareToolShutdown(void) {
+	if (this->disconnectFromLogger()) {
+		return true;
+	}
+	else {
+		LOGVIS_LOGE("Failed to send deregistration request to LoggerService \"" + QString::fromStdString(m_loggerUrl) + "\"");
+		return false;
+	}
 }
 
 void LogVisualization::slotConnect(void) {
@@ -318,8 +336,8 @@ void LogVisualization::slotAutoConnect(void) {
 }
 
 void LogVisualization::slotImport(void) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getOpenFileName(widget(), "Import Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	QString fn = QFileDialog::getOpenFileName(m_table, "Import Log Messages", settings->value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);
@@ -363,7 +381,7 @@ void LogVisualization::slotImport(void) {
 	this->slotClear();
 	this->appendLogMessages(msg);
 
-	s.setValue("LogVisualization.LastExportedFile", fn);
+	settings->setValue("LogVisualization.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
 }
 
@@ -373,8 +391,8 @@ void LogVisualization::slotExport(void) {
 		return;
 	}
 
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	QString fn = QFileDialog::getSaveFileName(widget(), "Export Log Messages", s.value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	QString fn = QFileDialog::getSaveFileName(m_table, "Export Log Messages", settings->value("LogVisualization.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
 	
 	QFile f(fn);
@@ -395,7 +413,7 @@ void LogVisualization::slotExport(void) {
 	f.write(QByteArray::fromStdString(ot::rJSON::toJSON(doc)));
 	f.close();
 
-	s.setValue("LogVisualization.LastExportedFile", fn);
+	settings->setValue("LogVisualization.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully exported to file \"" + fn + "\"");
 }
 
@@ -404,11 +422,11 @@ void LogVisualization::slotClear(void) {
 	m_messages.clear();
 	m_errorCount = 0;
 	m_warningCount = 0;
-	updateCountLabels();
+	this->updateCountLabels();
 }
 
 void LogVisualization::slotClearAll(void) {
-	slotClear();
+	this->slotClear();
 	m_serviceFilter->clear();
 	LOGVIS_LOG("LogVisualization Clear All completed");
 }
@@ -424,14 +442,14 @@ void LogVisualization::slotSelectAllServices(void) {
 	m_filterLock = true;
 	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Checked);
 	m_filterLock = false;
-	slotFilterChanged();
+	this->slotFilterChanged();
 }
 
 void LogVisualization::slotDeselectAllServices(void) {
 	m_filterLock = true;
 	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Unchecked);
 	m_filterLock = false;
-	slotFilterChanged();
+	this->slotFilterChanged();
 }
 
 void LogVisualization::slotAutoScrollToBottomChanged(void) {
@@ -455,17 +473,17 @@ void LogVisualization::slotUpdateCheckboxColors(void) {
 }
 
 void LogVisualization::slotToggleAutoConnect(void) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	bool is = !s.value("LogVisualization.AutoConnect", false).toBool();
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	bool is = !settings->value("LogVisualization.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(is ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
-	s.setValue("LogVisualization.AutoConnect", is);
+	settings->setValue("LogVisualization.AutoConnect", is);
 }
 
 void LogVisualization::slotViewCellContent(QTableWidgetItem* _itm) {
 	size_t i = 0;
 	for (auto itm : m_messages) {
 		if (i++ == _itm->row()) {
-			LogVisualizationItemViewDialog dia(itm, i, widget());
+			LogVisualizationItemViewDialog dia(itm, i, m_table);
 			dia.exec();
 			return;
 		}
@@ -494,15 +512,15 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	else {
 		iconItm->setIcon(QIcon(":/images/Info.png"));
 	}
-	iniTableItem(r, tIcon, iconItm);
+	this->iniTableItem(r, tIcon, iconItm);
 
 	
-	iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
-	iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.globalSystemTime())));
-	iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.localSystemTime())));
-	iniTableItem(r, tService, new QTableWidgetItem(serviceName));
-	iniTableItem(r, tFunction, new QTableWidgetItem(QString::fromStdString(_msg.functionName())));
-	iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.text())));
+	this->iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
+	this->iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.globalSystemTime())));
+	this->iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.localSystemTime())));
+	this->iniTableItem(r, tService, new QTableWidgetItem(serviceName));
+	this->iniTableItem(r, tFunction, new QTableWidgetItem(QString::fromStdString(_msg.functionName())));
+	this->iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.text())));
 
 	// Store message
 	m_messages.push_back(_msg);
@@ -530,20 +548,16 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	m_filterLock = false;
 
 	// Update status labels (warnings and errors were increased while checking the typeString)
-	updateCountLabels();
+	this->updateCountLabels();
 
 	// Check the filter for the new entry
-	checkEntryFilter(r);
+	this->checkEntryFilter(r);
 }
 
 void LogVisualization::appendLogMessages(const QList<ot::LogMessage>& _messages) {
 	for (auto m : _messages) {
 		appendLogMessage(m); 
 	}
-}
-
-QWidget * LogVisualization::widget(void) {
-	return m_splitter;
 }
 
 QString LogVisualization::logMessageTypeString(const ot::LogMessage& _msg) {
@@ -773,10 +787,10 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	this->setMinimumSize(400, 300);
 	this->setFocusPolicy(Qt::ClickFocus);
 	
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	this->move(s.value("LogVisualizationItemViewDialog.X", 0).toInt(), s.value("LogVisualizationItemViewDialog.Y", 0).toInt());
-	this->resize(s.value("LogVisualizationItemViewDialog.W", 800).toInt(), s.value("LogVisualizationItemViewDialog.H", 600).toInt());
-	m_findMessageSyntax->setChecked(s.value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	this->move(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt());
+	this->resize(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), settings->value("LogVisualizationItemViewDialog.H", 600).toInt());
+	m_findMessageSyntax->setChecked(settings->value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
 
 	this->slotDisplayMessageText((int)m_findMessageSyntax->checkState());
 
@@ -789,12 +803,12 @@ LogVisualizationItemViewDialog::~LogVisualizationItemViewDialog() {
 }
 
 void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	s.setValue("LogVisualizationItemViewDialog.X", pos().x());
-	s.setValue("LogVisualizationItemViewDialog.Y", pos().y());
-	s.setValue("LogVisualizationItemViewDialog.W", size().width());
-	s.setValue("LogVisualizationItemViewDialog.H", size().height());
-	s.setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	settings->setValue("LogVisualizationItemViewDialog.X", pos().x());
+	settings->setValue("LogVisualizationItemViewDialog.Y", pos().y());
+	settings->setValue("LogVisualizationItemViewDialog.W", size().width());
+	settings->setValue("LogVisualizationItemViewDialog.H", size().height());
+	settings->setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
 }
 
 void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {

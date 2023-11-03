@@ -85,6 +85,9 @@
     <ClCompile Include="src\TabWidget.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\DockWatcherAction.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -197,6 +200,9 @@
       <Filter>include\Graphics</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TabWidget.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\DockWatcherAction.h">
       <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>

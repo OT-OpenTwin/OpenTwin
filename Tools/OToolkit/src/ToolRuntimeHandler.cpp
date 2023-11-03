@@ -1,19 +1,15 @@
-//! @file JSONEditor.h
+//! @file ToolRuntimeHandler.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date November 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#pragma once
+// Toolkit header
+#include "ToolRuntimeHandler.h"
 
-// Qt header
-#include <QtWidgets/qplaintextedit.h>
+ToolRuntimeHandler::ToolRuntimeHandler(otoolkit::Tool* _tool) : m_tool(_tool), m_isRunning(false) {
 
-class JSONEditor : public QPlainTextEdit {
-public:
-	JSONEditor();
-	JSONEditor(const QString& _initialText);
-	virtual ~JSONEditor();
+}
 
-private:
-	void ini(void);
-};
+ToolRuntimeHandler::~ToolRuntimeHandler() {
+	//if (m_tool) delete m_tool;
+}

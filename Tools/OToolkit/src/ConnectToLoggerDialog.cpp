@@ -1,3 +1,8 @@
+//! @file ConnectToLoggerDialog.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include "ConnectToLoggerDialog.h"
 #include "AppBase.h"
 
@@ -19,7 +24,7 @@
 #define DIA_LOGE(___message) OTOOLKIT_LOGE("Logger Service Connector", ___message)
 
 ConnectToLoggerDialog::ConnectToLoggerDialog(bool _isAutoConnect) : m_success(false) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
 	// Create layouts
 	m_centralLayout = new QVBoxLayout(this);
@@ -28,7 +33,7 @@ ConnectToLoggerDialog::ConnectToLoggerDialog(bool _isAutoConnect) : m_success(fa
 	
 	// Create controls
 	m_urlL = new QLabel("URL:");
-	m_url = new QLineEdit(s.value("LoggerServiceURL", "").toString());
+	m_url = new QLineEdit(settings->value("LoggerServiceURL", "").toString());
 
 	m_btnConnect = new QPushButton("Connect");
 	m_btnCancel = new QPushButton("Cancel");
@@ -99,11 +104,11 @@ void ConnectToLoggerDialog::slotRegisterFail(void) {
 }
 
 void ConnectToLoggerDialog::slotDone(void) {
-	QSettings s("OpenTwin", APP_BASE_APP_NAME);
-	s.setValue("LoggerServiceURL", m_url->text());
+	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	settings->setValue("LoggerServiceURL", m_url->text());
 
 	m_success = true;
-	close();
+	this->close();
 }
 
 void ConnectToLoggerDialog::worker(QString _url) {

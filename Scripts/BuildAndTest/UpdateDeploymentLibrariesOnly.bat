@@ -147,6 +147,7 @@ REM  Copy Tools
 REM ====================================================================
 
 ECHO Copy Tools
+COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\x64\Release\OToolkitAPI.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\x64\Release\OToolkit.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
 REM ====================================================================

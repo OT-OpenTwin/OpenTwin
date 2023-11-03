@@ -7,9 +7,9 @@ $(LocalDebuggerEnvironment)
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2023-10-29T13:54:28.7669710Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-02T22:04:34.0687311Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2023-10-29T13:54:29.0118917Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-02T22:04:34.2384636Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

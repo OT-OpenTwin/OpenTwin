@@ -1,54 +1,147 @@
-// Toolkit API header
+//! @file ToolManager.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date October 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
+#pragma once
+
+// OToolkit header
 #include "ToolManager.h"
-#include "AbstractTool.h"
+#include "TabManager.h"
+#include "DockManager.h"
+#include "MenuManager.h"
+#include "StatusManager.h"
+#include "ToolMenuManager.h"
+#include "ToolRuntimeHandler.h"
 
-OToolkitAPI::ToolManager& OToolkitAPI::ToolManager::instance(void) {
-	static ToolManager g_instance;
-	return g_instance;
+// OToolkitAPI header
+#include "OToolkitAPI/OToolkitAPI.h"
+#include "OToolkitAPI/Tool.h"
+
+// OpenTwin header
+#include "OpenTwinCore/otAssert.h"
+
+#define TOOLMANAGER_LOG(___msg) OTOOLKIT_LOG("ToolManager", ___msg)
+#define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)
+#define TOOLMANAGER_LOGE(___msg) OTOOLKIT_LOGE("ToolManager", ___msg)
+
+ToolManager::ToolManager(QMainWindow* _mainWindow)
+{
+	m_tabManager = new TabManager;
+	m_menuManager = new MenuManager;
+	m_statusManager = new StatusManager;
+	m_dockManager = new DockManager(_mainWindow, m_menuManager);
+
+	this->connect(m_tabManager, &TabManager::currentToolChanged, this, &ToolManager::currentToolChanged);
 }
 
-OToolkitAPI::ToolID OToolkitAPI::ToolManager::add(AbstractTool * _tool) {
-	if (_tool == nullptr) return 0;
-
-	_tool->setToolId(++m_currentId);
-	m_tools.insert_or_assign(_tool->toolId(), _tool);
-	return _tool->toolId();
+ToolManager::~ToolManager() {
+	this->clear();
 }
 
-OToolkitAPI::AbstractTool * OToolkitAPI::ToolManager::getTool(ToolID _id) {
-	auto it = m_tools.find(_id);
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+bool ToolManager::addTool(otoolkit::Tool* _tool) {
+	otoolkit::Tool* t = this->findTool(_tool->toolName());
+	if (t != nullptr) {
+		TOOLMANAGER_LOGW("Tool already exists");
+		return false;
+	}
+	m_tools.insert_or_assign(_tool->toolName(), new ToolRuntimeHandler(_tool));
+
+	// Create menu and connect the run signal
+	ToolMenuManager* tmm = m_menuManager->addToolMenu(_tool->toolName());
+	this->connect(tmm, &ToolMenuManager::runRequested, this, &ToolManager::runToolTriggered);
+
+	return true;
+}
+
+otoolkit::Tool* ToolManager::findTool(const QString& _toolName) {
+	auto it = m_tools.find(_toolName);
 	if (it == m_tools.end()) {
-		assert(0); // no tool found
 		return nullptr;
 	}
-	return it->second;
+	return it->second->tool();
 }
 
-OToolkitAPI::AbstractTool * OToolkitAPI::ToolManager::getToolByName(const QString& _name) {
-	for (auto t : m_tools) {
-		if (t.second->toolName() == _name) { return t.second; };
+void ToolManager::removeTool(const QString& _toolName) {
+	otoolkit::Tool* tool = this->findTool(_toolName);
+	if (tool == nullptr) {
+		TOOLMANAGER_LOGE("Tool not found { \"Name\": \"" + _toolName + "\" }");
+		return;
 	}
-	assert(0); // Invalid name
-	return nullptr;
-}
-
-void OToolkitAPI::ToolManager::unloadTool(ToolID _id) {
-	AbstractTool * tool = getTool(_id);
-	if (tool == nullptr) return;
+	this->removeTool(tool);
 	delete tool;
-	m_tools.erase(_id);
 }
 
-void OToolkitAPI::ToolManager::removeToolFromList(ToolID _id) {
-	m_tools.erase(_id);
+void ToolManager::removeTool(otoolkit::Tool* _tool) {
+	QString toolName = _tool->toolName();
+
+	// Remove from list
+	auto it = m_tools.find(toolName);
+	if (it == m_tools.end()) {
+		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + toolName + "\" }");
+		return;
+	}
+	m_tools.erase(it);
+
+	// Clean up data
+	this->fwdRemoveTool(toolName);
 }
 
-// ######################################################################################################################################
-
-OToolkitAPI::ToolManager::ToolManager() : m_currentId(0) {
+void ToolManager::clear(void) {
+	// Clear all tools
+	for (auto t : m_tools) {
+		if (t.second) {
+			delete t.second;
+		}
+		this->fwdRemoveTool(t.first);
+	}
 	
+	m_tools.clear();
 }
 
-OToolkitAPI::ToolManager::~ToolManager() {
+void ToolManager::runToolTriggered(void) {
+	ToolMenuManager* tmm = dynamic_cast<ToolMenuManager*>(sender());
+	if (tmm == nullptr) {
+		TOOLMANAGER_LOGE("Invalid sender");
+		return;
+	}
 
+	auto it = m_tools.find(tmm->toolName());
+	if (it == m_tools.end()) {
+		TOOLMANAGER_LOGE("Tool not found { \"ToolName\": \"" + tmm->toolName() + "\" }");
+		return;
+	}
+
+	if (it->second->isRunning()) {
+		// Stop the tool
+
+
+
+		// ....
+
+
+
+	}
+	else {
+		std::list<QWidget*> status;
+		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status));
+		m_statusManager->addTool(it->first, status);
+	}
+}
+
+void ToolManager::currentToolChanged(const QString& _toolName) {
+	m_statusManager->setCurrentTool(_toolName);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private
+
+void ToolManager::fwdRemoveTool(const QString& _toolName) {
+	m_dockManager->removeTool(_toolName);
+	m_statusManager->removeTool(_toolName);
 }

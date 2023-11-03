@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
@@ -49,6 +50,7 @@
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />

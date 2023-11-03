@@ -305,6 +305,11 @@ ECHO ===============================================================
 CALL "%OT_UI_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: OToolkitAPI
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Executable: OToolkit
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\build.bat" %1 %2

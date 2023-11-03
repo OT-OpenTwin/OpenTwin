@@ -5,15 +5,23 @@
 
 #pragma once
 
+// Toolkit API header
 #include "OToolkitAPI/otoolkitapi_global.h"
 #include "OToolkitAPI/Tool.h"
 #include "OToolkitAPI/ToolActivityNotifier.h"
+
+// std header
+#include <memory>
 
 #define OTOOLKIT_LOG(___sender, ___message) otoolkit::api::getGlobalInterface()->log(___sender, otoolkit::APIInterface::Information, ___message);
 #define OTOOLKIT_LOGW(___sender, ___message) otoolkit::api::getGlobalInterface()->log(___sender, otoolkit::APIInterface::Warning, ___message);
 #define OTOOLKIT_LOGE(___sender, ___message) otoolkit::api::getGlobalInterface()->log(___sender, otoolkit::APIInterface::Error, ___message);
 
+class QSettings;
+
 namespace otoolkit {
+
+	typedef std::shared_ptr<QSettings> SettingsRef;
 
 	class OTOOLKITAPI_EXPORT APIInterface
 	{
@@ -35,6 +43,8 @@ namespace otoolkit {
 		virtual void registerToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) = 0;
 
 		virtual void removeToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) = 0;
+
+		virtual SettingsRef createSettingsInstance(void) = 0;
 
 	protected:
 		APIInterface();

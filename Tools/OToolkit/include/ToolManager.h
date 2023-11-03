@@ -1,39 +1,78 @@
+//! @file ToolManager.h
+//! @author Alexander Kuester (alexk95)
+//! @date October 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-// Toolkit API
-#include "OToolkitAPITypes.h"
+// Toolkit header
+#include "ToolRuntimeHandler.h"
+
+// OpenTwin header
+#include "OpenTwinCore/OTClassHelper.h"
 
 // Qt header
 #include <QtCore/qstring.h>
+#include <QtCore/qobject.h>
+#include <QtWidgets/qmenu.h>
 
 // std header
 #include <map>
 
-namespace OToolkitAPI {
+class TabManager;
+class DockManager;
+class MenuManager;
+class StatusManager;
 
-	class AbstractTool;
+class QMainWindow;
 
-	class ToolManager {
-	public:
-		static ToolManager& instance(void);
+namespace otoolkit { class Tool; };
 
-		//! @brief Will add the provided tool to the storage
-		ToolID add(AbstractTool * _tool);
+class ToolManager : public QObject {
+	Q_OBJECT
+	OT_DECL_NOCOPY(ToolManager)
+public:
+	ToolManager(QMainWindow* _mainWindow);
+	virtual ~ToolManager();
 
-		AbstractTool * getTool(ToolID _id);
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-		AbstractTool * getToolByName(const QString& _name);
+	// Setter / Getter
 
-		void unloadTool(ToolID _id);
+	//! @brief Stores the provided tool
+	bool addTool(otoolkit::Tool* _tool);
 
-		void removeToolFromList(ToolID _id);
+	//! @brief Returns the tool with the specified name
+	//! If no tool was found nullptr will be returned
+	otoolkit::Tool* findTool(const QString& _toolName);
 
-	private:
-		ToolID								m_currentId;
-		std::map<ToolID, AbstractTool *>	m_tools;
+	//! @brief Cleans up and deletes the tool with the provided name
+	void removeTool(const QString& _toolName);
 
-		ToolManager();
-		virtual ~ToolManager();
-	};
+	//! @brief Cleans up the provided tool
+	//! The tool will not be deleted
+	void removeTool(otoolkit::Tool* _tool);
 
-}
+	void clear(void);
+
+	TabManager* tabManager(void) { return m_tabManager; };
+	DockManager* dockManager(void) { return m_dockManager; };
+	MenuManager* menuManager(void) { return m_menuManager; };
+	StatusManager* statusManager(void) { return m_statusManager; };
+
+private slots:
+	void runToolTriggered(void);
+	void currentToolChanged(const QString& _toolName);
+
+private:
+	void fwdRemoveTool(const QString& _toolName);
+
+	std::map<QString, ToolRuntimeHandler*> m_tools;
+	
+	TabManager* m_tabManager;
+	DockManager* m_dockManager;
+	MenuManager* m_menuManager;
+	StatusManager* m_statusManager;
+
+	ToolManager() = delete;
+};

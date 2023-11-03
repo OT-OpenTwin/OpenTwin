@@ -10,13 +10,17 @@
 
 // OpenTwin header
 #include "OpenTwinCore/OTClassHelper.h"
-#include "OTWidgets/TabWidget.h"
 
 // Qt header
 #include <QtCore/qlist.h>
 #include <QtCore/qstring.h>
 #include <QtGui/qicon.h>
 #include <QtWidgets/qmenu.h>
+
+// std header
+#include <list>
+
+class QWidget;
 
 namespace otoolkit {
 
@@ -38,7 +42,7 @@ namespace otoolkit {
 		//! //! The menu already contains the following items:
 		//!   Run / Stop (Starts or stops the tool)
 		//!   [] Autorun (Autostart mode checkbox for the tool upon OToolkit start)
-		virtual ot::TabWidget* runTool(QMenu* _rootMenu) = 0;
+		virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) = 0;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
