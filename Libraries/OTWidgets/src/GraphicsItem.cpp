@@ -189,7 +189,6 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 	if (m_parent) {
 		if (m_parent->simpleFactoryObjectKey() != OT_SimpleFactoryJsonKeyValue_GraphicsStackItem) {
-			OT_LOG_D("Rectangle geometry requested { \"ItemName\": \"" + this->graphicsItemName() + "\", \"Width\": " + std::to_string(_geom.size().width()) + ", \"Height\": " + std::to_string(_geom.size().height()) + " }");
 			this->setGraphicsItemRequestedSize(_geom.size());
 		}
 	}

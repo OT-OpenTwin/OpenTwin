@@ -272,7 +272,7 @@ int AppBase::run() {
 		m_isInitialized = true;
 		*/
 		// Create default UI
-		OT_LOG_I("Create default UI");
+		OT_LOG_D("Creating default GUI");
 		m_mainWindow = uiAPI::createWindow(m_uid);
 		uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 		uiAPI::window::setWindowIcon(m_mainWindow, uiAPI::getApplicationIcon("OpenTwin"));
@@ -283,7 +283,7 @@ int AppBase::run() {
 		m_timerRestoreStateAfterTabChange = uiAPI::createTimer(m_uid);
 		uiAPI::registerUidNotifier(m_timerRestoreStateAfterTabChange, this);
 		
-		OT_LOG_I("Restore UI settings: colorStyle");
+		OT_LOG_D("Restoring settings: ColorStyle");
 		// Restore last set colorStyle
 		{
 			UserManagement uM;
@@ -324,7 +324,7 @@ int AppBase::run() {
 #endif // _DEBUG
 
 		// Run the application
-		OT_LOG_I("Entering the main event loop");
+		OT_LOG_D("Executing main event loop");
 		int status = uiAPI::exec();
 
 		// Store last settings
@@ -418,7 +418,7 @@ void AppBase::notify(
 	try {
 		// Timer restore settings after tab change
 		if (_senderId == m_timerRestoreStateAfterTabChange && _eventType == etTimeout) {
-			OT_LOG_I("Restore UI settings: Restore window state");
+			OT_LOG_D("Restoring window state");
 
 			// Check restore state, if failed set minimum size for central widget to avoid size bug
 			if (m_currentStateWindow.empty()) {
@@ -433,8 +433,6 @@ void AppBase::notify(
 			saveState();
 
 			uiAPI::dock::setVisible(m_docks.debug, m_isDebug);
-
-			OT_LOG_I("Restore UI settings: Restore window state completed");
 		}
 		/*// Debug
 		else if (_senderId == m_ttb.pFile.gDebug_aDebug && _eventType == etClicked) {
@@ -1218,7 +1216,7 @@ void AppBase::createUi(void) {
 	// From this point on exceptions can be displayed in a message box since the UI is created
 	try {
 		try {
-			OT_LOG_I("create UI");
+			OT_LOG_D("Creating UI");
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize Wrapper");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 1);
 			uiAPI::window::setStatusLabelVisible(m_mainWindow);
@@ -1245,7 +1243,7 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Create docks
-			OT_LOG_I("create docks");
+			OT_LOG_D("Creating dock windows");
 
 			m_docks.debug = uiAPI::createDock(m_uid, "Debug");
 			m_docks.output = uiAPI::createDock(m_uid, TITLE_DOCK_OUTPUT);
@@ -1259,7 +1257,7 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Create widgets
-			OT_LOG_I("create widgets");
+			OT_LOG_I("Creating widgets");
 
 			m_widgets.debug = uiAPI::createTextEdit(m_uid);
 			m_widgets.output = uiAPI::createTextEdit(m_uid, BUILD_INFO);
@@ -1287,7 +1285,7 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Setup widgets
-			OT_LOG_I("setup widgets");
+			OT_LOG_D("Settings up widgets");
 
 			uiAPI::tree::setAutoSelectAndDeselectChildrenEnabled(m_widgets.projectNavigation, true);
 			uiAPI::tree::setMultiSelectionEnabled(m_widgets.projectNavigation, true);
@@ -1327,7 +1325,7 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Display docks
-			OT_LOG_I("display docks");
+			OT_LOG_D("Settings up dock window visibility");
 
 			uiAPI::window::addDock(m_mainWindow, m_docks.output, dockBottom);
 			uiAPI::window::addDock(m_mainWindow, m_docks.projectNavigation, dockLeft);
@@ -1380,18 +1378,7 @@ void AppBase::createUi(void) {
 
 			m_debugNotifier->setOutputUid(m_widgets.debug);
 
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Find fonts");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 40);
-
 			// #######################################################################
-
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize model component");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 50);
-
-			// ######################################################################################################################
-
-			// Create the model component 
-			OT_LOG_I("create external services component");
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize viewer component");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 70);
@@ -1399,7 +1386,7 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Create the viewer component
-			OT_LOG_I("create viewer component");
+			OT_LOG_D("Creating viewer component");
 
 			m_viewerComponent = new ViewerComponent();
 			ViewerAPI::registerNotifier(m_viewerComponent);
@@ -1407,7 +1394,7 @@ void AppBase::createUi(void) {
 			m_viewerComponent->setDataBaseConnectionInformation(m_dataBaseURL, m_userName, m_userPassword);
 			m_viewerComponent->setNavigationUid(m_widgets.projectNavigation);
 
-			OT_LOG_I("reading fonts");
+			OT_LOG_D("Reading fonts");
 			QString fontPath = QCoreApplication::applicationDirPath();
 			fontPath.append("/fonts/Vera.ttf");
 			if (!QFile::exists(fontPath))
@@ -1451,7 +1438,7 @@ void AppBase::createUi(void) {
 			uiAPI::window::setStatusProgressVisible(m_mainWindow, false);
 
 			uiAPI::setSurfaceFormatDefaultSamplesCount(4);
-			OT_LOG_I("UI creation completed");
+			OT_LOG_D("UI creation completed");
 		}
 		catch (const aException & e) { throw aException(e, "ini()"); }
 		catch (const std::exception & e)
