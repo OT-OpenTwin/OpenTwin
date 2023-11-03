@@ -219,7 +219,7 @@ void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connec
 	}
 	_connections = std::move(remainingConnections);
 	RemoveConnectionsAtConnectedEntities(connectionsForRemoval);
-	
+	CreateConnections();
 }
 
 void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval)
@@ -254,7 +254,6 @@ void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<o
 			blockEntity->StoreToDataBase();
 			getModelState()->modifyEntityVersion(blockEntity->getEntityID(), blockEntity->getEntityStorageVersion());
 		}
-		CreateConnections();
 	}
 }
 
