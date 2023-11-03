@@ -50,3 +50,6 @@ x64
 
 # VS internal build directory
 /**/.vs
+
+# User project data
+*.vcxproj.user

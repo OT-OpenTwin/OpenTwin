@@ -57,3 +57,6 @@ bld/
 [Ll]og/
 [Ll]ogs/
 /LastCoverageResults.log
+
+# User project data
+*.vcxproj.user
