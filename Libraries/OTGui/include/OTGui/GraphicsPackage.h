@@ -108,7 +108,10 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
-
+		
+		/// /// <summary>
+		/// Takes over ownership.
+		/// </summary>
 		void addItem(GraphicsItemCfg* _item);
 		const std::list<GraphicsItemCfg*>& items(void) const { return m_items; };
 

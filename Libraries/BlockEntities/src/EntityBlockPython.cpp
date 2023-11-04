@@ -26,7 +26,7 @@ std::string EntityBlockPython::getSelectedScript()
 
 ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 {
-	ot::GraphicsFlowItemCfg* block = new ot::GraphicsFlowItemCfg();
+	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
 
 	const ot::Color colourTitle(ot::Color::Cyan);
 	const ot::Color colourBackground(ot::Color::White);
@@ -35,7 +35,7 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
-	AddConnectors(block);
+	AddConnectors(block.get());
 	
 	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
 	return graphicsItemConfig;

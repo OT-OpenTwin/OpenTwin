@@ -260,30 +260,15 @@ void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<o
 
 ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 {
-	ot::GraphicsFlowItemCfg* block = new ot::GraphicsFlowItemCfg;
+	std::unique_ptr<ot::GraphicsFlowItemCfg> block( new ot::GraphicsFlowItemCfg());
 
 	const ot::Color colourTitle(ot::Color::Lime);
 	const ot::Color colourBackground(ot::Color::White);
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 
-	auto propertyBase =	getProperties().getProperty(_propertyNameDimension);
+	AddConnectors(block.get());
 
-
-	AddConnectors(block);
-	//if (propertyBase != nullptr) //The method is currently also used for creating the BlockPicker preview. In this case an uninitialized Entity is used to create the clockconfig
-	//{
-	//	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-	//	const std::string queryDimension = selectionProperty->getValue();
-	//	if (queryDimension != _propertyValueDimension1)
-	//	{
-	//		block->addRight("C2", "Parameter 2", ot::GraphicsFlowConnectorCfg::Square);
-	//	}
-	//	if (queryDimension == _propertyValueDimension3)
-	//	{
-	//		block->addRight("C3", "Parameter 3", ot::GraphicsFlowConnectorCfg::Square);
-	//	}
-	//}
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
 	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
