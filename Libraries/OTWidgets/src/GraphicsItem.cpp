@@ -153,7 +153,7 @@ void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOpti
 
 QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const {
 	// The adjusted size is the size hint expanded to the minimum size, bound to maximum size and with margins applied
-	QSizeF adjustedSize = this->applyGraphicsItemMargins(_sizeHint).expandedTo(m_minSize).boundedTo(m_maxSize);
+	QSizeF adjustedSize = _sizeHint.expandedTo(m_minSize).boundedTo(m_maxSize);
 
 	switch (_hint)
 	{
@@ -161,19 +161,19 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 	case Qt::PreferredSize:
 	case Qt::MinimumDescent:
 	case Qt::NSizeHints:
-		return adjustedSize;
+		break;
 	case Qt::MaximumSize:
-		return adjustedSize.expandedTo(m_requestedSize).boundedTo(m_maxSize); // Stretch to requested size
+		adjustedSize = adjustedSize.expandedTo(m_requestedSize);
 	default:
 		OT_LOG_WA("Unknown Qt SizeHint");
-		return adjustedSize;
 	}
+	return this->applyGraphicsItemMargins(adjustedSize.boundedTo(m_maxSize));
 }
 
 QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) const {
 	return QRectF(
-		_rect.topLeft(), 
-		this->applyGraphicsItemMargins(_rect.size()).expandedTo(m_minSize).expandedTo(m_requestedSize).boundedTo(m_maxSize)
+		_rect.topLeft(),
+		this->applyGraphicsItemMargins(_rect.size().expandedTo(m_minSize).expandedTo(m_requestedSize).boundedTo(m_maxSize))
 	);
 }
 
@@ -260,17 +260,21 @@ QSizeF ot::GraphicsItem::applyGraphicsItemMargins(const QSizeF& _size) const {
 	return QSizeF(_size.width() + m_margins.left() + m_margins.right(), _size.height() + m_margins.top() + m_margins.bottom());
 }
 
+QSizeF ot::GraphicsItem::removeGraphicsItemMargins(const QSizeF& _size) const {
+	return QSizeF((_size.width() - m_margins.left()) - m_margins.right(), (_size.height() - m_margins.top()) - m_margins.bottom());
+}
+
 QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	auto qitm = this->getQGraphicsItem();
 	OTAssertNullptr(qitm);
 	QRectF r(qitm->boundingRect());
 
 	// Adjust size
-	QSizeF s(_innerSize);
-	s = s.expandedTo(m_minSize).expandedTo(m_requestedSize).boundedTo(m_maxSize).boundedTo(r.size());
+	QSizeF inner(_innerSize);
+	inner = inner.expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize).boundedTo(r.size());
 
 	// No further adjustments needed
-	if (s.toSize() == r.size()) return r;
+	if (inner.toSize() == r.size()) return r;
 
 	QPointF pt(r.topLeft());
 
@@ -278,32 +282,32 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	switch (m_alignment)
 	{
 	case ot::AlignCenter:
-		pt.setX(pt.x() + ((r.size().width() - s.width()) / 2.));
-		pt.setY(pt.y() + ((r.size().height() - s.height()) / 2.));
+		pt.setX(pt.x() + ((r.size().width() - inner.width()) / 2.));
+		pt.setY(pt.y() + ((r.size().height() - inner.height()) / 2.));
 		break;
 	case ot::AlignTop:
-		pt.setX(pt.x() + ((r.size().width() - s.width()) / 2.));
+		pt.setX(pt.x() + ((r.size().width() - inner.width()) / 2.));
 		break;
 	case ot::AlignTopRight:
-		pt.setX(pt.x() + (r.size().width() - s.width()));
+		pt.setX(pt.x() + (r.size().width() - inner.width()));
 		break;
 	case ot::AlignRight:
-		pt.setX(pt.x() + (r.size().width() - s.width()));
-		pt.setY(pt.y() + ((r.size().height() - s.height()) / 2.));
+		pt.setX(pt.x() + (r.size().width() - inner.width()));
+		pt.setY(pt.y() + ((r.size().height() - inner.height()) / 2.));
 		break;
 	case ot::AlignBottomRight:
-		pt.setX(pt.x() + (r.size().width() - s.width()));
-		pt.setY(pt.y() + (r.size().height() - s.height()));
+		pt.setX(pt.x() + (r.size().width() - inner.width()));
+		pt.setY(pt.y() + (r.size().height() - inner.height()));
 		break;
 	case ot::AlignBottom:
-		pt.setX(pt.x() + ((r.size().width() - s.width()) / 2.));
-		pt.setY(pt.y() + (r.size().height() - s.height()));
+		pt.setX(pt.x() + ((r.size().width() - inner.width()) / 2.));
+		pt.setY(pt.y() + (r.size().height() - inner.height()));
 		break;
 	case ot::AlignBottomLeft:
-		pt.setY(pt.y() + (r.size().height() - s.height()));
+		pt.setY(pt.y() + (r.size().height() - inner.height()));
 		break;
 	case ot::AlignLeft:
-		pt.setY(pt.y() + ((r.size().height() - s.height()) / 2.));
+		pt.setY(pt.y() + ((r.size().height() - inner.height()) / 2.));
 		break;
 	case ot::AlignTopLeft:
 		break;
@@ -312,5 +316,5 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 		break;
 	}
 
-	return QRectF(pt, s);
+	return QRectF(pt, inner);
 }

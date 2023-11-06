@@ -25,15 +25,15 @@
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8094" "127.0.0.1:8095" "unused"</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2023-11-03T14:31:20.9697575Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-06T15:16:53.4755583Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2023-11-03T14:31:20.7706183Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-06T15:16:53.3278526Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2023-11-03T14:31:20.5784938Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-06T15:16:53.2483956Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2023-11-03T14:31:21.1338357Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-06T15:16:53.5655557Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

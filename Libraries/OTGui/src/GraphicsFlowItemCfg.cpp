@@ -62,7 +62,7 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	itm->setName(m_name);
-	//itm->setMargins(ot::MarginsD(20., 0., 0., 0));
+	itm->setMargins(ot::MarginsD(10., 0., 0., 0));
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
@@ -211,7 +211,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setMaximumSize(ot::Size2DD(16., 16.));
 		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(0., 0., 0., 5.));
+		titLImg->setMargins(ot::MarginsD(10., 0., 0., 15.));
 		tLay->addChildItem(titLImg);
 	}
 	
@@ -227,7 +227,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		titRImg->setImagePath(m_rightTitleImagePath);
 		titRImg->setMaximumSize(ot::Size2DD(16., 16.));
 		titRImg->setAlignment(ot::AlignCenter);
-		titRImg->setMargins(ot::MarginsD(0., 5., 0., 0.));
+		titRImg->setMargins(ot::MarginsD(10., 15., 0., 0.));
 		tLay->addChildItem(titRImg);
 	}
 

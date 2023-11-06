@@ -12,8 +12,8 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-//static ot::SimpleFactoryRegistrar<ot::GraphicsPixmapItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
-//static ot::GlobalKeyMapRegistrar imageItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
+static ot::SimpleFactoryRegistrar<ot::GraphicsPixmapItem> pixmapItem(OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
+static ot::GlobalKeyMapRegistrar pixmapItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
 
 ot::GraphicsPixmapItem::GraphicsPixmapItem()
 {
@@ -100,7 +100,8 @@ void ot::GraphicsPixmapItem::callPaint(QPainter* _painter, const QStyleOptionGra
 
 void ot::GraphicsPixmapItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
-	_painter->drawPixmap(this->calculatePaintArea(m_pixmap.size()).toRect(), m_pixmap);
+	QRectF rect = this->calculatePaintArea(m_pixmap.size());
+	_painter->drawPixmap(rect.topLeft().x(), rect.topLeft().y(), rect.width(), rect.height(), m_pixmap);
 }
 
 void ot::GraphicsPixmapItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {

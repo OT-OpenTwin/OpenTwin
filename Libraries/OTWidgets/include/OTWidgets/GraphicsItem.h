@@ -131,6 +131,7 @@ namespace ot {
 		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
 		QSizeF applyGraphicsItemMargins(const QSizeF& _size) const;
+		QSizeF removeGraphicsItemMargins(const QSizeF& _size) const;
 
 		void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
