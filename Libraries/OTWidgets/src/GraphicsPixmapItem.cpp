@@ -12,8 +12,8 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsPixmapItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
-static ot::GlobalKeyMapRegistrar imageItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
+//static ot::SimpleFactoryRegistrar<ot::GraphicsPixmapItem> imageItem(OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
+//static ot::GlobalKeyMapRegistrar imageItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
 
 ot::GraphicsPixmapItem::GraphicsPixmapItem()
 {
