@@ -14,7 +14,7 @@
 #define OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem "OT_GIPixmap"
 
 namespace ot {
-	class GraphicsPixmapItem : public QGraphicsItem, public QGraphicsLayoutItem, public GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsPixmapItem : public QGraphicsItem, public QGraphicsLayoutItem, public GraphicsItem {
 	public:
 		GraphicsPixmapItem();
 		virtual ~GraphicsPixmapItem();

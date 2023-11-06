@@ -76,7 +76,6 @@ void ot::GraphicsPixmapItem::setGeometry(const QRectF& _rect) {
 
 QRectF ot::GraphicsPixmapItem::boundingRect(void) const {
 	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(m_pixmap.size())));
-	//return QGraphicsPixmapItem::boundingRect();
 }
 
 QVariant ot::GraphicsPixmapItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

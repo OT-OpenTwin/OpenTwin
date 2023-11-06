@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
@@ -52,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
+    <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />

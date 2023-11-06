@@ -91,6 +91,9 @@
     <ClCompile Include="src\GraphicsPixmapItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\CustomGraphicsItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -186,6 +189,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsPixmapItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
