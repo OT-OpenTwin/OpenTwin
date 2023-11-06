@@ -56,5 +56,4 @@ bld/
 
 __pycache__/
 
-# User project data
-*.vcxproj.user
+
