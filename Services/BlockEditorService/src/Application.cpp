@@ -67,6 +67,7 @@ namespace ottest {
 		flow.setTitleBackgroundColor(255, 0, 0);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		//flow->setBackgroundImagePath("Default/python");
+		flow.setLeftTitleCornerImagePath("Images/Test3");
 
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);

@@ -88,6 +88,9 @@
     <ClCompile Include="src\DockWatcherAction.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsPixmapItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -180,6 +183,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsPixmapItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

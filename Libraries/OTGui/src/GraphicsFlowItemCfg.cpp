@@ -200,9 +200,36 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
 	tit->setName(_name + "_tit");
 	tit->setText(_title);
-	tLay->addStrech(1);
+
+	// Title: Left Corner
+	if (m_leftTitleImagePath.empty()) {
+		tLay->addStrech(1);
+	}
+	else {
+		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
+		titLImg->setName(_name + "_titLImg");
+		titLImg->setImagePath(m_leftTitleImagePath);
+		titLImg->setMaximumSize(ot::Size2DD(16., 16.));
+		titLImg->setAlignment(ot::AlignCenter);
+		titLImg->setMargins(ot::MarginsD(0., 0., 0., 5.));
+		tLay->addChildItem(titLImg);
+	}
+	
 	tLay->addChildItem(tit);
-	tLay->addStrech(1);
+	
+	// Title: Right Corner
+	if (m_rightTitleImagePath.empty()) {
+		tLay->addStrech(1);
+	}
+	else {
+		ot::GraphicsImageItemCfg* titRImg = new ot::GraphicsImageItemCfg;
+		titRImg->setName(_name + "_titRImg");
+		titRImg->setImagePath(m_rightTitleImagePath);
+		titRImg->setMaximumSize(ot::Size2DD(16., 16.));
+		titRImg->setAlignment(ot::AlignCenter);
+		titRImg->setMargins(ot::MarginsD(0., 5., 0., 0.));
+		tLay->addChildItem(titRImg);
+	}
 
 	// Central grid
 	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_left.size(), m_right.size()), 5);

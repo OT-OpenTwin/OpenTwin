@@ -168,10 +168,16 @@ namespace ot {
 
 		void setBackgroundImagePath(const std::string& _path) { m_backgroundImagePath = _path; };
 
+		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
+
+		void setRightTitleCornerImagePath(const std::string& _path) { m_rightTitleImagePath = _path; };
+
 	private:
 		ot::Painter2D* m_backgroundPainter;
 		ot::Painter2D* m_titleBackgroundPainter;
 		
+		std::string m_leftTitleImagePath;
+		std::string m_rightTitleImagePath;
 		std::string m_backgroundImagePath;
 
 		GraphicsFlowConnectorCfg m_defaultConnectorStyle;
