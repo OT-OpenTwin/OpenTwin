@@ -473,6 +473,65 @@ std::list<std::string> ot::rJSON::getObjectList(OT_rJSON_val & _doc, const char 
 	return result;
 }
 
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isBool(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsBool();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isString(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsString();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isInteger(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsInt();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isUInt(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsUint();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isULongLong(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsUint64();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isFloat(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsFloat();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isDouble(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsDouble();
+}
+
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isArray(OT_rJSON_val& _doc, const char* _member)
+{
+	return _doc[_member].IsArray();
+}
+OT_CORE_API_EXPORTONLY bool ot::rJSON::isStringList(OT_rJSON_val& _doc, const char* _member)
+{
+	const bool typeCorrect = isArray(_doc, _member);
+	if (typeCorrect)
+	{
+		auto array = _doc[_member].GetArray();
+		if (array.Size() != 0)
+		{
+			return array[0].IsString();
+		}
+		else
+		{
+			return true;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
 // ##########################################################################################################
 
 // Value Setter

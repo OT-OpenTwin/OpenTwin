@@ -8,27 +8,45 @@ public:
 	bool interprete(std::shared_ptr<EntityFile> pythonScript);
 	const std::list<ot::Connector>& getAllConnectors() const { return _allConnectors; };
 	const std::list<EntityPropertiesBase*>& getAllProperties()const { return _allProperties; };
-
+	const std::string& getErrorReport() const { return _report; };
 private:
 	std::list<OT_rJSON_doc> _allConnectorsAsJSON;
 	std::list<OT_rJSON_doc> _allPropertiesAsJSON;
 
 	std::list<EntityPropertiesBase*> _allProperties;
 	std::list<ot::Connector> _allConnectors;
-
+	std::map<OT_rJSON_doc*, int> _jsonEntryToScriptLine;
 	std::string _report;
 
-	const std::vector<std::string> _entryTypeNamesProperty{"Property", "property", "PROPERTY"};
-	const std::vector<std::string> _entryTypeNamesConnector{"Port", "port", "PORT"};
+	const std::string _entryTypeNameProperty = "property";
+	const std::string _entryTypeNameConnector = "port";
 
-	const std::vector<std::string> _connectorDefType{ "Type","type", "TYPE" };
-	const std::vector<std::string> _connectorDefTypeIn{ "In", "in", "IN" };
-	const std::vector<std::string> _connectorDefTypeOut{ "Out", "out", "OUT" };
-	const std::vector<std::string> _connectorDefTypeInOptional{ "InOpt", "inopt", "INOPT","Inopt", "in_opt", "In_Opt","In_opt" };
-	const std::vector<std::string> _connectorDefName{ "Name", "name", "NAME" };
-	const std::vector<std::string> _connectorDefTitle{ "Title", "title", "TITLE" };
+	const std::string _connectorDefTypeIn = "in";
+	const std::string _connectorDefTypeOut = "out";
+	const std::string _connectorDefTypeInOptional = "inopt";
+	const std::string _connectorDefName = "name";
 
-	bool ExtractOTHeader(const std::string& scriptLine);
+	const std::string _defType = "type";
+	const std::string _defTitle = "label";
+
+	const std::string _propertyDefTypeSelection = "selection";
+	const std::string _propertyDefTypeString = "string";
+	const std::string _propertyDefTypeDouble = "double";
+	const std::string _propertyDefTypeInteger = "integer";
+	const std::string _propertyDefTypeBoolean = "boolean";
+
+	const std::string _propertyDefOptions = "options";
+	const std::string _propertyDefDefault = "default";
+
+	const std::string _propertyGroupName = "Script based";
+
+
+
+	const std::string extractType(const std::string& lineContent);
+	bool ExtractOTHeader(const std::string& scriptLine, const int scriptLineNumber);
 	bool CreateObjectsFromJSON();
-	ot::ConnectorType getConnectorType(OT_rJSON_doc& jsonEntry);
+	bool CreateConnectorsFromJSON();
+	bool CreatePropertiesFromJSON();
+	ot::ConnectorType getConnectorType(OT_rJSON_doc& jsonEntry, std::string& returnMessage);
+	EntityPropertiesBase* createPropertyEntity(OT_rJSON_doc& jsonEntry, std::string& returnMessage);
 };

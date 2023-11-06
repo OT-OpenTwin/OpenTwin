@@ -301,6 +301,17 @@ namespace ot {
 
 		// ##########################################################################################################
 		
+		OT_CORE_API_EXPORTONLY bool isBool(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isString(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isInteger(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isUInt(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isULongLong(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isFloat(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isDouble(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isArray(OT_rJSON_val& _doc, const char* _member);
+		OT_CORE_API_EXPORTONLY bool isStringList(OT_rJSON_val& _doc, const char* _member);
+		
+
 		// Value Setter
 
 		//! @brief Will add the provided member and value to the provided document

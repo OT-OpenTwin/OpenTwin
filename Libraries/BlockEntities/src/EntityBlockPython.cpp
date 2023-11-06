@@ -44,9 +44,14 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 
 bool EntityBlockPython::updateFromProperties()
 {
-	UpdateBlockAccordingToScriptHeader();
-	CreateBlockItem();
-	CreateConnections();
+	auto scriptSelectionProperty =	getProperties().getProperty(_propertyNameScripts);
+	if (scriptSelectionProperty->needsUpdate())
+	{
+		UpdateBlockAccordingToScriptHeader();
+		CreateBlockItem();
+		CreateConnections();
+	}
+	getProperties().forceResetUpdateForAllProperties();
 	return true;
 }
 
@@ -76,6 +81,14 @@ void EntityBlockPython::UpdateBlockAccordingToScriptHeader()
 			_connectorsByName[connector.getConnectorName()] = std::move(connector);
 		}
 
+		for (auto& property : allProperties)
+		{
+			getProperties().createProperty(property, property->getGroup());
+		}
+	}
+	else
+	{
+		const std::string& report = headerInterpreter.getErrorReport();
 	}
 }
 
