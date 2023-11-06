@@ -21,7 +21,7 @@
 namespace ot {
 
 	class GraphicsItem;
-	class GraphicsConnectionItem;
+	class GraphicsDirectConnectionItem;
 	class GraphicsScene;
 
 	//! @brief View widget used to display GraphicsItems
@@ -41,7 +41,7 @@ namespace ot {
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
 		GraphicsItem* getItem(const std::string& _itemUid);
-		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
+		GraphicsDirectConnectionItem* getConnection(const std::string& _connectionUid);
 		
 		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
 
@@ -97,6 +97,6 @@ namespace ot {
 		QPoint m_lastPanPos;
 
 		std::map<std::string, ot::GraphicsItem*> m_items;
-		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
+		std::map<std::string, ot::GraphicsDirectConnectionItem*> m_connections;
 	};
 }

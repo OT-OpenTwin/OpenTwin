@@ -64,7 +64,7 @@
     <ClCompile Include="src\GraphicsLineItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsConnectionItem.cpp">
+    <ClCompile Include="src\GraphicsDirectConnectionItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp">
@@ -92,6 +92,9 @@
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\CustomGraphicsItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -167,7 +170,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h">
+    <ClInclude Include="include\OTWidgets\GraphicsDirectConnectionItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItem.h">
@@ -192,6 +195,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

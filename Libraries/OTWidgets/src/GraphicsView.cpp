@@ -9,7 +9,7 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/GraphicsConnectionItem.h"
+#include "OTWidgets/GraphicsDirectConnectionItem.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -70,7 +70,7 @@ ot::GraphicsItem* ot::GraphicsView::getItem(const std::string&  _itemUid) {
 	}
 }
 
-ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _connectionUid) {
+ot::GraphicsDirectConnectionItem* ot::GraphicsView::getConnection(const std::string& _connectionUid) {
 	auto it = m_connections.find(_connectionUid);
 	if (it == m_connections.end()) {
 		OT_LOG_WAS("Connection with the UID \"" + _connectionUid + "\" does not exist");
@@ -112,7 +112,7 @@ void ot::GraphicsView::removeItem(const std::string& _itemUid) {
 }
 
 void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest) {
-	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
+	ot::GraphicsDirectConnectionItem* newConnection = new ot::GraphicsDirectConnectionItem;
 	QPen p;
 	p.setColor(QColor(255, 0, 0));
 	p.setWidth(1);
