@@ -47,7 +47,7 @@ bool EntityBlockPython::updateFromProperties()
 	auto scriptSelectionProperty =	getProperties().getProperty(_propertyNameScripts);
 	if (scriptSelectionProperty->needsUpdate())
 	{
-		UpdateBlockAccordingToScriptHeader();
+		updateBlockAccordingToScriptHeader();
 		CreateBlockItem();
 		CreateConnections();
 	}
@@ -55,9 +55,9 @@ bool EntityBlockPython::updateFromProperties()
 	return true;
 }
 
-void EntityBlockPython::UpdateBlockAccordingToScriptHeader()
+void EntityBlockPython::updateBlockAccordingToScriptHeader()
 {
-	ResetEntity();
+	resetBlockRelatedAttributes();
 
 	auto propertyBase =	getProperties().getProperty(_propertyNameScripts);
 	auto propertyEntityList = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
@@ -97,7 +97,7 @@ void EntityBlockPython::UpdateBlockAccordingToScriptHeader()
 	}
 }
 
-void EntityBlockPython::ResetEntity()
+void EntityBlockPython::resetBlockRelatedAttributes()
 {
 	_connectorsByName.clear();
 	_connections.clear();

@@ -168,7 +168,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockPython pythonBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	customizedBlockCollection->addItem(pythonBlock.CreateBlockCfg());
-	
+
 	EntityBlockDatabaseAccess dbAccessBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(dbAccessBlock.CreateBlockCfg());
 

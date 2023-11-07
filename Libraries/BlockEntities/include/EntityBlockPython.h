@@ -12,9 +12,10 @@ public:
 	std::string getSelectedScript();
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 	virtual bool updateFromProperties() override;
+
 private:
 	const std::string _propertyNameScripts = "Scripts";
 
-	void UpdateBlockAccordingToScriptHeader();
-	void ResetEntity();
+	void updateBlockAccordingToScriptHeader();
+	void resetBlockRelatedAttributes();
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "EntityBlock.h"
 
+
 class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 {
 public:
@@ -52,11 +53,7 @@ protected:
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-	bool SetVisibleParameter2(bool visible);
-	bool SetVisibleParameter3(bool visible);
-	void UpdateBlockConfig();
-	void UpdateConnections(std::list<std::string>& connectorsForRemoval);
-	void RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval);
+	const std::string _propertyNameProjectName = "Projectname";
 
 	const std::string _propertyNameDimension = "Outcome dimension";
 	const std::string _propertyValueDimension1 = "1D";
@@ -98,4 +95,10 @@ private:
 	ot::Connector _connectorParameter1;
 	ot::Connector _connectorParameter2;
 	ot::Connector _connectorParameter3;
+
+	bool SetVisibleParameter2(bool visible);
+	bool SetVisibleParameter3(bool visible);
+	void UpdateBlockConfig();
+	void UpdateConnections(std::list<std::string>& connectorsForRemoval);
+	void RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval);
 };

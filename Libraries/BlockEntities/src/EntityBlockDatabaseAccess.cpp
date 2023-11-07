@@ -1,6 +1,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "OpenTwinCommunication/ActionTypes.h"
 
+
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
@@ -86,7 +87,7 @@ void EntityBlockDatabaseAccess::createProperties()
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 {
-	auto propertyBase = getProperties().getProperty("Projectname");
+	auto propertyBase = getProperties().getProperty(_propertyNameProjectName);
 	auto selectedProjectName = dynamic_cast<EntityPropertiesProjectList*>(propertyBase);
 	assert(selectedProjectName != nullptr);
 
@@ -181,6 +182,7 @@ void EntityBlockDatabaseAccess::UpdateBlockConfig()
 		UpdateConnections(connectorsForRemoval);
 	}
 }
+
 
 void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connectorsForRemoval)
 {

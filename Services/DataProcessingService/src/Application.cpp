@@ -24,6 +24,7 @@
 
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
+#include "ClassFactoryBlock.h"
 
 Application * g_instance{ nullptr };
 
@@ -101,15 +102,14 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		assert(m_selectedEntities.size() == 1);
 		std::list<ot::EntityInformation> entityInfos;
 		m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-		ClassFactory classFactory;
+		ClassFactoryBlock classFactory;
 		auto entBase =	m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), classFactory);
-		//auto dbAccess =	std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
-
-		//if (dbAccess != nullptr)
-		//{
-		//	auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-		//	PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
-		//}
+		auto dbAccess =	std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
+		if (dbAccess != nullptr)
+		{
+			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+			PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 	{

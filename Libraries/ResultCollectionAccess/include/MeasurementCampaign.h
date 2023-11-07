@@ -22,13 +22,14 @@ public:
 	void setParameterOverview(std::map <std::string, MetadataParameter>&& parameterByName) { _parameterByName = parameterByName; };
 	void setQuantityOverview(std::map <std::string, MetadataQuantity>&& quantitiesByName) { _quantitiesByName = quantitiesByName; };
 
-
+	void reset();
 private:
 	std::list<SeriesMetadata> _seriesMetadata;
 	
 	std::map < std::string, MetadataQuantity > _quantitiesByName;
 	std::map < std::string, MetadataParameter > _parameterByName;
 	
+	//Kann komischerweise nicht gelöscht werden
 	const std::string measurementCampaignName;
 	
 	std::map <std::string, std::shared_ptr<MetadataEntry>> metaData;

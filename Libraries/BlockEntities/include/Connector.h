@@ -12,6 +12,10 @@ namespace ot
 	{
 	public:
 		Connector();
+		~Connector()
+		{
+
+		}
 		Connector(ConnectorType type, const std::string& connectorName, const std::string& connectorTitle);
 		bool operator==(const Connector& other) { return _connectorName == other._connectorName; }
 		
