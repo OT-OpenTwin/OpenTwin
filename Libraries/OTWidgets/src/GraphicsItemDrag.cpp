@@ -32,7 +32,7 @@ void ot::GraphicsItemDrag::slotQueue(void) {
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText("OT_BLOCK");
 		mimeData->setData(OT_GRAPHICSITEM_MIMETYPE_ItemName, QByteArray::fromStdString(m_owner->graphicsItemName()));
-
+		
 		// Create drag
 		drag.setMimeData(mimeData);
 

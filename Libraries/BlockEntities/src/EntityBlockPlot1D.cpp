@@ -81,6 +81,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	const ot::Color colourBackground(ot::Color::White);
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
+	//block->setLeftTitleCornerImagePath("Images/Python");
 
 	AddConnectors(block.get());
 

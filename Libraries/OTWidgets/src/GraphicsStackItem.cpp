@@ -13,7 +13,7 @@
 static ot::SimpleFactoryRegistrar<ot::GraphicsStackItem> stackItem(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::GlobalKeyMapRegistrar stackItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 
-ot::GraphicsStackItem::GraphicsStackItem() : m_isFirstPaint(true) {
+ot::GraphicsStackItem::GraphicsStackItem() : m_lastCalculatedSize(-1., -1.) {
 
 }
 
@@ -83,10 +83,7 @@ void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 }
 
 void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_isFirstPaint) {
-		this->adjustChildItems();
-		m_isFirstPaint = false;
-	}
+	this->adjustChildItems();
 	ot::GraphicsGroupItem::paint(_painter, _opt, _widget);
 }
 
@@ -119,10 +116,16 @@ void ot::GraphicsStackItem::adjustChildItems(void) {
 		return;
 	}
 
+	if (masterSize == m_lastCalculatedSize) return;
+
+	this->prepareGeometryChange();
+
+	m_lastCalculatedSize = masterSize;
+
 	for (GraphicsStackItemEntry itm : m_items) {
 		if (itm.isSlave) {
 			//OT_LOG_D("< Handling ItemResized: SlaveDetected { \"Root.UID\": \"" + itm.item->getRootItem()->graphicsItemUid() + "\", \"Item.Name\": \"" + itm.item->graphicsItemName() + "\" }");
-			itm.item->setGraphicsItemRequestedSize(masterSize);
+			itm.item->setGraphicsItemRequestedSize(m_lastCalculatedSize);
 		}
 	}
 }

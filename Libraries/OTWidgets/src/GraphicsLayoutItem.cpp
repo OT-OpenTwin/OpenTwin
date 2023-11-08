@@ -19,6 +19,12 @@ bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
+void ot::GraphicsLayoutItem::setGraphicsItemName(const std::string& _name) {
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setGraphicsItemName(_name);
+	ot::GraphicsItem::setGraphicsItemName(_name + "_AL");
+}
+
 void ot::GraphicsLayoutItem::removeAllConnections(void) {
 	ot::GraphicsItem::removeAllConnections();
 
@@ -89,8 +95,8 @@ ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName)
 void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
-	m_layoutWrap->setParentGraphicsItem(this);
 	m_layoutWrap->setLayout(_layout);
+
 	// Refresh the parent item
 	this->setParentGraphicsItem(nullptr);
 }

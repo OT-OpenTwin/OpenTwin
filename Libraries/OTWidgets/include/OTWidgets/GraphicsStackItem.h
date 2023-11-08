@@ -44,7 +44,7 @@ namespace ot {
 		void adjustChildItems(void);
 
 		std::list<GraphicsStackItemEntry> m_items;
-		bool m_isFirstPaint; //! @brief If true, the first paint event will resize calcule the child adjust
+		QSizeF m_lastCalculatedSize;
 
 		GraphicsStackItem(const GraphicsStackItem&) = delete;
 		GraphicsStackItem& operator = (const GraphicsStackItem&) = delete;

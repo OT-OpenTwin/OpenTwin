@@ -31,9 +31,10 @@
 Application * g_instance{ nullptr };
 
 #define EXAMPLE_NAME_Block1 "Alpha 1"
-#define EXAMPLE_NAME_Block2 "Beta 2"
+#define EXAMPLE_NAME_Block2 "Bravo 2"
 #define EXAMPLE_NAME_Block3 "Super mega ultra duper flex mex hex dex rex jax lax Gamma 3"
 #define EXAMPLE_NAME_Block4 "Delta 4"
+#define EXAMPLE_NAME_Block5 "Echo 5"
 
 namespace ottest {
 	static unsigned long long currentBlockUid = 0;
@@ -160,6 +161,25 @@ namespace ottest {
 		return root;
 	}
 
+	ot::GraphicsItemCfg* createTestItem2(const std::string& _name) {
+		ot::GraphicsVBoxLayoutItemCfg* root = new ot::GraphicsVBoxLayoutItemCfg;
+		root->setName(_name);
+		root->setTitle(_name);
+
+		ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
+		r1->setName(_name + "r1");
+		r1->setSize(ot::Size2DD(10., 10.));
+
+
+		ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
+		r2->setName(_name + "r2");
+		r2->setSize(ot::Size2DD(100., 10.));
+
+		root->addChildItem(r1);
+		root->addChildItem(r2);
+
+		return root;
+	}
 
 }
 
@@ -221,6 +241,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	else if (itemName == EXAMPLE_NAME_Block2) itm = ottest::createTestBlock2(EXAMPLE_NAME_Block2);
 	else if (itemName == EXAMPLE_NAME_Block3) itm = ottest::createTestBlock3(EXAMPLE_NAME_Block3);
 	else if (itemName == EXAMPLE_NAME_Block4) itm = ottest::createTestItem1(EXAMPLE_NAME_Block4);
+	else if (itemName == EXAMPLE_NAME_Block5) itm = ottest::createTestItem2(EXAMPLE_NAME_Block5);
 	else {
 		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
 		return OT_ACTION_RETURN_VALUE_FAILED;
@@ -347,6 +368,7 @@ std::string Application::createEmptyTestEditor(void) {
 		a->addChildCollection(a2);
 		a2->addItem(ottest::createTestBlock3(EXAMPLE_NAME_Block3));
 		a2->addItem(ottest::createTestItem1(EXAMPLE_NAME_Block4));
+		a2->addItem(ottest::createTestItem2(EXAMPLE_NAME_Block5));
 		pckg.addCollection(a);
 
 		OT_rJSON_createDOC(doc);

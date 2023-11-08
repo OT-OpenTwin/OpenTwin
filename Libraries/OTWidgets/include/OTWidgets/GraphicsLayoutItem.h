@@ -20,6 +20,8 @@ namespace ot {
 		
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
+		virtual void setGraphicsItemName(const std::string& _name) override;
+
 		virtual void removeAllConnections(void) override;
 
 		virtual void prepareGraphicsItemGeometryChange(void) override;

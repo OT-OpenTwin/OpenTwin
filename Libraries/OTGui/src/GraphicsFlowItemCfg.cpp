@@ -181,7 +181,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	// Title: Stack
 	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
 	tStack->setName(_name + "_tStack");
-	mLay->addChildItem(tStack);
+	mLay->addChildItem(tStack, 0);
 
 	// Title: Border
 	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
@@ -248,7 +248,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 
 	// Central stack
 	if (m_backgroundImagePath.empty()) {
-		mLay->addChildItem(cLay);
+		mLay->addChildItem(cLay, 1);
 	}
 	else {
 		ot::GraphicsStackItemCfg* cStack = new ot::GraphicsStackItemCfg;
@@ -257,13 +257,13 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
+		cImg->setMargins(ot::MarginsD(5., 5., 5., 5.));
 
 		cStack->addItemTop(cImg, false, true);
 		cStack->addItemTop(cLay, true, false);
 
-		mLay->addChildItem(cStack);
+		mLay->addChildItem(cStack, 1);
 	}
-	mLay->addStrech(1);
 
 	return root;
 }

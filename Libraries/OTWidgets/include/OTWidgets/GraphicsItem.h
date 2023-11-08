@@ -110,7 +110,7 @@ namespace ot {
 		void setGraphicsItemUid(const std::string& _uid) { m_uid = _uid; };
 		const std::string& graphicsItemUid(void) const { return m_uid; };
 
-		void setGraphicsItemName(const std::string& _name) { m_name = _name; };
+		virtual void setGraphicsItemName(const std::string& _name) { m_name = _name; };
 		const std::string& graphicsItemName(void) const { return m_name; };
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
