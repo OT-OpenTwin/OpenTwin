@@ -9,6 +9,7 @@
 #include <Python.h>
 #include "PythonObjectBuilder.h"
 #include "EntityBuffer.h"
+#include "PortDataBuffer.h"
 #include "EntityFile.h"
 #include "PythonModuleAPI.h"
 #include "PythonLoadedModules.h"
@@ -39,7 +40,7 @@ namespace PythonExtensions
         const int expectedNumberOfArguments = 1;
         if (numberOfArguments != expectedNumberOfArguments)
         {
-            throw std::exception("OT_ExecuteScript expects one argument");
+            throw std::exception("OT_GetScript expects one argument");
         }
         PythonObjectBuilder pyObBuilder;
         std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
@@ -103,7 +104,7 @@ namespace PythonExtensions
     {
         if (args != nullptr)
         {
-            throw std::exception("OT_SetPropertyValue expects zero arguments");
+            throw std::exception("OT_Flush expects zero arguments");
         }
 
         EntityBuffer::INSTANCE().SaveChangedEntities();
@@ -117,7 +118,7 @@ namespace PythonExtensions
         const int expectedNumberOfArguments = 1;
         if (numberOfArguments != expectedNumberOfArguments)
         {
-            throw std::exception("OT_SetPropertyValue expects one argument");
+            throw std::exception("OT_FlushEntity expects one argument");
         }
         EntityBuffer::INSTANCE().SaveChangedEntities();
         PythonObjectBuilder pyObBuilder;
@@ -130,7 +131,7 @@ namespace PythonExtensions
         const int expectedNumberOfArguments = 3;
         if (numberOfArguments != expectedNumberOfArguments)
         {
-            throw std::exception("OT_SetPropertyValue expects one argument");
+            throw std::exception("OT_GetTableCell expects three arguments");
         }
         PythonObjectBuilder pyObBuilder;
         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
@@ -140,7 +141,21 @@ namespace PythonExtensions
         PyObject* returnValue = EntityBuffer::INSTANCE().GetTableCellValue(absoluteEntityName, row, column);
         return returnValue;
     }
-        
+    
+    static PyObject* OT_GetPortData(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 1;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_GetPortData expects one argument");
+        }
+        PythonObjectBuilder pyObBuilder;
+        std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        PyObject* returnValue = PortDataBuffer::INSTANCE().getPortData(portName);
+        return returnValue;
+    }
+
     static PyMethodDef OTMethods[] = {
 
         {"GetPropertyValue",  OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
@@ -149,6 +164,7 @@ namespace PythonExtensions
         {"Flush",  OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
         {"FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
         {"GetPythonScript",  OT_GetScript, METH_VARARGS, "Executes another python script that is stored within OpenTwin."},
+        {"GetPortData",  OT_GetPortData, METH_VARARGS, "For Block Items. Gets datachunks from the ingoing ports."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 

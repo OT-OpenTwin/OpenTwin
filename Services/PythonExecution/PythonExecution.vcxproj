@@ -240,6 +240,7 @@
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\MinimalSubService.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\PortDataBuffer.cpp" />
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="include\EntityBuffer.h" />
     <ClInclude Include="include\MinimalSubService.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\PortDataBuffer.h" />
     <ClInclude Include="include\PropertyPythonObjectConverter.h" />
     <ClInclude Include="include\PythonAPI.h" />
     <ClInclude Include="include\PythonException.h" />

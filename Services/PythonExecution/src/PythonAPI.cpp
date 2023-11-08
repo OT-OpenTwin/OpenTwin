@@ -37,7 +37,7 @@ std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std:
 		CPythonObjectNew pythonParameterSet(nullptr);
 		if (parameterSetForScript.has_value())
 		{
-			pythonParameterSet.reset(CreateParameterSet(parameterSetForScript.value()));
+			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript.value()));
 		}
 		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 
@@ -98,50 +98,5 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 			_moduleEntrypointByScriptName[scriptName] = moduleAPI.GetModuleEntryPoint(moduleName.value());
 		}
 	}
-}
-
-CPythonObjectNew PythonAPI::CreateParameterSet(std::list<ot::Variable>& parameterSet)
-{
-	PythonObjectBuilder pObjectBuilder;
-	pObjectBuilder.StartTupleAssemply(static_cast<int>(parameterSet.size()));
-
-	for (ot::Variable& parameter : parameterSet)
-	{
-		if (parameter.isInt32())
-		{
-			auto value = pObjectBuilder.setInt32(parameter.getInt32());
-			pObjectBuilder << &value;
-		}
-		else if (parameter.isInt64())
-		{
-			auto value = pObjectBuilder.setInt32(static_cast<int32_t>(parameter.getInt64()));
-			pObjectBuilder << &value;
-		}
-		else if (parameter.isDouble())
-		{
-			auto value = pObjectBuilder.setDouble(parameter.getDouble());
-			pObjectBuilder << &value;
-		}
-		else if (parameter.isFloat())
-		{
-			auto value = pObjectBuilder.setDouble(static_cast<double>(parameter.getFloat()));
-			pObjectBuilder << &value;
-		}
-		else if (parameter.isConstCharPtr())
-		{
-			auto value = pObjectBuilder.setString(std::string(parameter.getConstCharPtr()));
-			pObjectBuilder << &value;
-		}
-		else if (parameter.isBool())
-		{
-			auto value = pObjectBuilder.setBool(parameter.getBool());
-			pObjectBuilder << &value;
-		}
-		else
-		{
-			throw std::exception("Type is not supported by the python service.");
-		}
-	}
-	return pObjectBuilder.getAssembledTuple();
 }
 

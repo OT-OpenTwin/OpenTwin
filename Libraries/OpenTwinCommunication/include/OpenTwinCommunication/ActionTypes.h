@@ -215,6 +215,9 @@
 #define OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS "Python.Execute.Results"
 #define OT_ACTION_CMD_PYTHON_Scripts "Python.Scripts"
 #define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
+#define OT_ACTION_CMD_PYTHON_Portdata "Python.Portdata"
+#define OT_ACTION_CMD_PYTHON_Portdata_Name "Python.Portdata.Name"
+#define OT_ACTION_CMD_PYTHON_Portdata_Data "Python.Portdata.Data"
 
 #define OT_ACTION_CMD_PYTHON_Request_Initialization "Python.Request.Initialize"
 #define OT_ACTION_CMD_PYTHON_Initialization "Python.Initialize"

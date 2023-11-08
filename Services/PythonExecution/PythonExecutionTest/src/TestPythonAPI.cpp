@@ -30,10 +30,10 @@ TEST_F(FixturePythonAPI, TestModuleEntryPoint_MultipleFunctionsInModule)
 TEST_F(FixturePythonAPI, CreateParameterSet_String)
 {
 	const std::string expectedValue = "First";
-	std::list<ot::variable_t> parameter;
-	parameter.emplace_back(ot::variable_t(expectedValue.c_str()));
-	parameter.emplace_back(ot::variable_t(2));
-	parameter.emplace_back(ot::variable_t(3.));
+	std::list<ot::Variable> parameter;
+	parameter.emplace_back(ot::Variable(expectedValue.c_str()));
+	parameter.emplace_back(ot::Variable(2));
+	parameter.emplace_back(ot::Variable(3.));
 
 	CPythonObjectNew pyParameter =CreateParameterSet(parameter); 
 	PythonObjectBuilder pyObBuilder;
@@ -45,10 +45,10 @@ TEST_F(FixturePythonAPI, CreateParameterSet_String)
 TEST_F(FixturePythonAPI, CreateParameterSet_Int)
 {
 	const int32_t expectedValue = 2;
-	std::list<ot::variable_t> parameter;
-	parameter.emplace_back(ot::variable_t("First"));
-	parameter.emplace_back(ot::variable_t(expectedValue));
-	parameter.emplace_back(ot::variable_t(3.));
+	std::list<ot::Variable> parameter;
+	parameter.emplace_back(ot::Variable("First"));
+	parameter.emplace_back(ot::Variable(expectedValue));
+	parameter.emplace_back(ot::Variable(3.));
 
 	CPythonObjectNew pyParameter = CreateParameterSet(parameter);
 	PythonObjectBuilder pyObBuilder;
@@ -60,10 +60,10 @@ TEST_F(FixturePythonAPI, CreateParameterSet_Int)
 TEST_F(FixturePythonAPI, CreateParameterSet_Double)
 {
 	const double expectedValue = 3.;
-	std::list<ot::variable_t> parameter;
-	parameter.emplace_back(ot::variable_t("First"));
-	parameter.emplace_back(ot::variable_t(2));
-	parameter.emplace_back(ot::variable_t(expectedValue));
+	std::list<ot::Variable> parameter;
+	parameter.emplace_back(ot::Variable("First"));
+	parameter.emplace_back(ot::Variable(2));
+	parameter.emplace_back(ot::Variable(expectedValue));
 
 	CPythonObjectNew pyParameter = CreateParameterSet(parameter);
 	PythonObjectBuilder pyObBuilder;

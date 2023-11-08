@@ -9,18 +9,18 @@
 #include <Python.h>
 #include "CPythonObjectNew.h"
 #include "CPythonObjectBorrowed.h"
+#include "OpenTwinCore/Variable.h"
+#include "OpenTwinCore/rJSON.h"
 
 #include <stdint.h>
 #include <string>
 #include <list>
 #include <map>
-#include "OpenTwinCore/Variable.h"
 #include <optional>
 
 class PythonObjectBuilder
 {
 public:
-
 	PythonObjectBuilder() : _assembly(nullptr) {};
 	~PythonObjectBuilder() { Py_XDECREF(_assembly); };
 	void StartTupleAssemply(int size);
@@ -54,8 +54,10 @@ public:
 	CPythonObjectNew setString(const std::string& value);
 	CPythonObjectNew setBool(const bool value);
 
+	CPythonObjectNew setVariableList(std::list<ot::Variable>& values);
+	CPythonObjectNew setVariableList(OT_rJSON_val& values);
+
 private:
-	
 	PyObject* _assembly = nullptr;
 	int _assemblySize = 0;
 	int _currentSize = 0;

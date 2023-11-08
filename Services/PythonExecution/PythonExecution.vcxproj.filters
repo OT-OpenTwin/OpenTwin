@@ -51,6 +51,9 @@
     <ClCompile Include="src\PythonWrapper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\PortDataBuffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\UiNotifier.h">
@@ -102,6 +105,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PortDataBuffer.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

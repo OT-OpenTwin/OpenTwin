@@ -10,7 +10,12 @@
 class FixturePythonAPI : public testing::Test
 {
 public:
-	CPythonObjectNew CreateParameterSet(std::list<ot::variable_t>& parameterSet) { return _api.CreateParameterSet(parameterSet); };
+	CPythonObjectNew CreateParameterSet(std::list<ot::Variable>& parameterSet) 
+	{ 
+		PythonObjectBuilder pyObBuilder;
+		return pyObBuilder.setVariableList(parameterSet); 
+	};
+	
 	std::string GetModuleEntryPoint() { 
 		PythonModuleAPI moduleAPI;
 		return moduleAPI.GetModuleEntryPoint(_moduleName); 

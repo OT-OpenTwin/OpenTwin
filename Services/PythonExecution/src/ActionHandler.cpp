@@ -1,5 +1,6 @@
 #pragma once
 #include "ActionHandler.h"
+#include "PortDataBuffer.h"
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinCore/Variable.h"
 #include "OpenTwinCore/VariableToJSONConverter.h"
@@ -74,6 +75,8 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 {
 	try
 	{
+		PortDataBuffer::INSTANCE().clearPortData();
+
 		//Extract script entity names from json doc
 		auto scriptArray = doc[OT_ACTION_CMD_PYTHON_Scripts].GetArray();
 		std::list<std::string> scripts;
@@ -105,6 +108,22 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 					scriptParameter.emplace_back(paramerter);
 				}
 				allParameter.emplace_back(scriptParameter);
+			}
+		}
+
+		//Extract port data if existing
+		if (doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata))
+		{
+			auto portDataMap = doc[OT_ACTION_CMD_PYTHON_Portdata].GetArray();
+
+			for (uint32_t i = 0; i < portDataMap.Size(); i++)
+			{
+				auto portEntry = portDataMap[i].GetObject();
+				const std::string portName =	portEntry[OT_ACTION_CMD_PYTHON_Portdata_Name].GetString();
+				auto portData =	&portEntry[OT_ACTION_CMD_PYTHON_Portdata_Data];
+				PythonObjectBuilder builder;
+				CPythonObjectNew pPortData = builder.setVariableList(*portData);
+				PortDataBuffer::INSTANCE().addPortData(portName,std::move(pPortData));
 			}
 		}
 

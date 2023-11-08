@@ -18,6 +18,4 @@ private:
 	std::map<std::string , std::string> _moduleEntrypointByScriptName;
 	PythonWrapper _wrapper;
 	void EnsureScriptsAreLoaded(std::list<std::string> scripts);
-	CPythonObjectNew CreateParameterSet(std::list<ot::Variable>& parameterSet);
-
 };

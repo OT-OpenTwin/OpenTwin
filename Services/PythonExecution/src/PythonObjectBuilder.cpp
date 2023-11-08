@@ -1,6 +1,7 @@
 #include "PythonObjectBuilder.h"
 #include "PythonException.h"
 
+
 void PythonObjectBuilder::StartTupleAssemply(int size)
 {
 	if (size != 0)
@@ -265,4 +266,98 @@ CPythonObjectNew PythonObjectBuilder::setBool(const bool value)
 {
 	CPythonObjectNew returnVal(PyBool_FromLong(value));
 	return returnVal;
+}
+
+CPythonObjectNew PythonObjectBuilder::setVariableList(std::list<ot::Variable>& values)
+{
+	uint64_t assemblySize =values.size();
+	PyObject* assembly = PyTuple_New(assemblySize);
+	uint64_t counter = 0;
+	for (ot::Variable& value : values)
+	{
+		CPythonObjectNew pValue(nullptr);
+		if (value.isInt32())
+		{
+			pValue.reset(setInt32(value.getInt32()));
+		}
+		else if (value.isInt64())
+		{
+			pValue.reset(setInt32(static_cast<int32_t>(value.getInt64())));
+		}
+		else if (value.isDouble())
+		{
+			pValue.reset(setDouble(value.getDouble()));
+		}
+		else if (value.isFloat())
+		{
+			pValue.reset(setDouble(static_cast<double>(value.getFloat())));
+		}
+		else if (value.isConstCharPtr())
+		{
+			pValue.reset(setString(std::string(value.getConstCharPtr())));
+		}
+		else if (value.isBool())
+		{
+			pValue.reset(setBool(value.getBool()));
+		}
+		else
+		{
+			throw std::exception("Type is not supported by the python service.");
+		}
+
+		int success = PyTuple_SetItem(assembly, counter, pValue);
+		assert(success == 0);
+		pValue.DropOwnership();
+		counter++;
+	}
+	
+	return CPythonObjectNew(assembly);
+}
+
+CPythonObjectNew PythonObjectBuilder::setVariableList(OT_rJSON_val& values)
+{
+	auto valueJSONArray = values.GetArray();
+	uint64_t assemblySize = valueJSONArray.Size();
+	PyObject* assembly = PyTuple_New(assemblySize);
+	uint64_t counter = 0;
+
+	for (auto& value : valueJSONArray)
+	{
+		CPythonObjectNew pValue(nullptr);
+		if (value.IsInt())
+		{
+			pValue.reset(setInt32(value.GetInt()));
+		}
+		else if (value.IsInt64())
+		{
+			pValue.reset(setInt32(static_cast<int32_t>(value.GetInt64())));
+		}
+		else if (value.IsDouble())
+		{
+			pValue.reset(setDouble(value.GetDouble()));
+		}
+		else if (value.IsFloat())
+		{
+			pValue.reset(setDouble(static_cast<double>(value.GetFloat())));
+		}
+		else if (value.IsString())
+		{
+			pValue.reset(setString(std::string(value.GetString())));
+		}
+		else if (value.IsBool())
+		{
+			pValue.reset(setBool(value.GetBool()));
+		}
+		else
+		{
+			throw std::exception("Type is not supported by the python service.");
+		}
+
+		int success = PyTuple_SetItem(assembly, counter, pValue);
+		assert(success == 0);
+		pValue.DropOwnership();
+		counter++;
+	}
+
+	return CPythonObjectNew(assembly);
 }
