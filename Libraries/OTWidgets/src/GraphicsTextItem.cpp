@@ -57,28 +57,12 @@ void ot::GraphicsTextItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	switch (_hint) {
-	case Qt::MinimumSize:
-	case Qt::PreferredSize:
-	case Qt::MaximumSize:
-	{
-		QFontMetrics m(this->font());
-		//return QSizeF(m.width(this->toPlainText()), m.height());
-		return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m.width(this->toPlainText()), m.height()));
-	}
-	default:
-		OT_LOG_EA("Unknown Qt::SizeHint");
-		break;
-	}
 	QFontMetrics m(this->font());
-
-	//return QSizeF(m.width(this->toPlainText()), m.height());
 	return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m.width(this->toPlainText()), m.height()));
 };
 
 QRectF ot::GraphicsTextItem::boundingRect(void) const {
 	return this->handleGetGraphicsItemBoundingRect(QGraphicsTextItem::boundingRect());
-	//return QGraphicsTextItem::boundingRect();
 }
 
 void ot::GraphicsTextItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

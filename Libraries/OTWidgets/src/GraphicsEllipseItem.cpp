@@ -54,28 +54,18 @@ void ot::GraphicsEllipseItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsEllipseItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	switch (_hint) {
-	case Qt::MinimumSize:
-	case Qt::PreferredSize:
-	case Qt::MaximumSize:
-		//return QSizeF(m_radiusX * 2., m_radiusY * 2.);
-		return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m_radiusX * 2., m_radiusY * 2.));
-	default:
-		OT_LOG_EA("Unknown Qt::SizeHint");
-		break;
-	}
-	return _constrains;
-};
+	return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m_radiusX * 2., m_radiusY * 2.));
+}
 
 QRectF ot::GraphicsEllipseItem::boundingRect(void) const {
-	//return QRectF(QPointF(0., 0.), this->geometry().size());
 	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(m_radiusX * 2., m_radiusY * 2.)));
 }
 
 void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	this->handleSetItemGeometry(_rect);
+	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 }
 
 QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -96,7 +86,8 @@ void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphi
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawEllipse(this->boundingRect().center(), m_radiusX, m_radiusY);
+	QRectF rect = this->calculatePaintArea(QSizeF(m_radiusX * 2., m_radiusY * 2.));
+	_painter->drawEllipse(rect.center(), rect.width() / 2., rect.height() / 2.);
 }
 
 void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {

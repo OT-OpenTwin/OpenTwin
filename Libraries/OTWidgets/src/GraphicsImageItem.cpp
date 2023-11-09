@@ -54,30 +54,19 @@ void ot::GraphicsImageItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsImageItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	switch (_hint) {
-	case Qt::MinimumSize:
-	case Qt::PreferredSize:
-	case Qt::MaximumSize:
-		return this->handleGetGraphicsItemSizeHint(_hint, this->pixmap().size());
-		//return QSizeF(this->pixmap().size());
-	default:
-		OT_LOG_EA("Unknown Qt::SizeHint");
-		break;
-	}
-
 	return this->handleGetGraphicsItemSizeHint(_hint, this->pixmap().size());
-	//return QSizeF(this->pixmap().size());
 };
 
 void ot::GraphicsImageItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+
+	this->handleSetItemGeometry(_rect);
 }
 
 QRectF ot::GraphicsImageItem::boundingRect(void) const {
 	return this->handleGetGraphicsItemBoundingRect(QGraphicsPixmapItem::boundingRect());
-	//return QGraphicsPixmapItem::boundingRect();
 }
 
 QVariant ot::GraphicsImageItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

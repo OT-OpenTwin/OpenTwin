@@ -27,24 +27,15 @@ void ot::GraphicsLineItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsLineItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	switch (_hint) {
-	case Qt::MinimumSize:
-	case Qt::PreferredSize:
-	case Qt::MaximumSize:
-		return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
-		//return this->boundingRect().size();
-	default:
-		OT_LOG_EA("Unknown Qt::SizeHint");
-		break;
-	}
 	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
-	//return _constrains;
 }
 
 void ot::GraphicsLineItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	this->setPos(_rect.topLeft());
 	QGraphicsLayoutItem::setGeometry(_rect);
+
+	this->handleSetItemGeometry(_rect);
 }
 
 QRectF ot::GraphicsLineItem::boundingRect(void) const {

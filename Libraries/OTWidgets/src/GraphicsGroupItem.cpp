@@ -34,7 +34,6 @@ void ot::GraphicsGroupItem::prepareGraphicsItemGeometryChange(void) {
 
 QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
-	//return this->boundingRect().size();
 }
 
 QRectF ot::GraphicsGroupItem::boundingRect(void) const {
