@@ -14,6 +14,7 @@
 
 // Qt header
 #include <QtGui/qpainter.h>
+#include <QtGui/qevent.h>
 
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
@@ -27,7 +28,7 @@ ot::GraphicsRectangularItem::GraphicsRectangularItem()
 }
 
 ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
-
+	
 }
 
 bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
@@ -63,30 +64,19 @@ QSizeF ot::GraphicsRectangularItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _
 };
 
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	//return QRectF(QPointF(0., 0.), this->geometry().size());
 	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), m_size));
 }
 
 void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-
 	this->handleSetItemGeometry(_rect);
+	QGraphicsLayoutItem::setGeometry(this->boundingRect());
 }
 
 QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	this->handleItemChange(_change, _value);
 	return _value;
-}
-
-void ot::GraphicsRectangularItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
-}
-
-void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -106,11 +96,19 @@ void ot::GraphicsRectangularItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _e
 	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
+void ot::GraphicsRectangularItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+}
+
+void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
+}
+
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	// Avoid resizing if the size did not change
 	if (m_size == _size) return;
-
 	m_size = _size;
-	this->setGeometry(QRectF(this->pos(), m_size));
+	this->setGeometry(QRectF(this->pos(), m_size).toRect());
 	this->raiseEvent(GraphicsItem::ItemResized);
 };

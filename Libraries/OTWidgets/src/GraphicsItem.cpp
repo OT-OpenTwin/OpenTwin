@@ -163,8 +163,7 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 	case Qt::NSizeHints:
 		break;
 	case Qt::MaximumSize:
-		adjustedSize = adjustedSize.expandedTo(m_requestedSize);
-		break;
+		return m_maxSize;
 	default:
 		OT_LOG_WA("Unknown Qt SizeHint");
 	}

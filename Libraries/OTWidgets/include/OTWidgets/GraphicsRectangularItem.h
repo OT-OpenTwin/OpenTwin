@@ -11,12 +11,14 @@
 // Qt header
 #include <QtGui/qpen.h>
 #include <QtGui/qbrush.h>
+#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qgraphicswidget.h>
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem "OT_GIRect"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public QGraphicsItem, public QGraphicsLayoutItem, public GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public QGraphicsWidget, public GraphicsItem {
 	public:
 		GraphicsRectangularItem();
 		virtual ~GraphicsRectangularItem();
@@ -27,7 +29,7 @@ namespace ot {
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem); };
 
 		virtual void prepareGraphicsItemGeometryChange(void) override;
-
+		
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 		virtual QRectF boundingRect(void) const override;
 		virtual void setGeometry(const QRectF& rect) override;
@@ -35,6 +37,7 @@ namespace ot {
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+		
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
