@@ -366,8 +366,8 @@ std::string Application::createEmptyTestEditor(void) {
 		a1->addItem(ottest::createTestBlock1(EXAMPLE_NAME_Block1));
 		a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
 		a->addChildCollection(a2);
-		a2->addItem(ottest::createTestBlock3(EXAMPLE_NAME_Block3));
-		a2->addItem(ottest::createTestItem1(EXAMPLE_NAME_Block4));
+		//a2->addItem(ottest::createTestBlock3(EXAMPLE_NAME_Block3));
+		//a2->addItem(ottest::createTestItem1(EXAMPLE_NAME_Block4));
 		a2->addItem(ottest::createTestItem2(EXAMPLE_NAME_Block5));
 		pckg.addCollection(a);
 

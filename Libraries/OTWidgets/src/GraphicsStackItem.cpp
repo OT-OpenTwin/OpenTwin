@@ -13,8 +13,10 @@
 static ot::SimpleFactoryRegistrar<ot::GraphicsStackItem> stackItem(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 static ot::GlobalKeyMapRegistrar stackItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
 
-ot::GraphicsStackItem::GraphicsStackItem() : m_lastCalculatedSize(-1., -1.) {
-
+ot::GraphicsStackItem::GraphicsStackItem() 
+	: ot::GraphicsGroupItem(true), m_lastCalculatedSize(-1., -1.) 
+{
+	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 }
 
 ot::GraphicsStackItem::~GraphicsStackItem() {

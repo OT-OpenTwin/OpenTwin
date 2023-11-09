@@ -45,7 +45,7 @@ namespace ot {
 			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
 		};
 
-		GraphicsItem();
+		GraphicsItem(bool _isLayoutOrStack);
 		virtual ~GraphicsItem();
 
 		// ###############################################################################################################################################
@@ -107,6 +107,8 @@ namespace ot {
 		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
 		bool hasHover(void) const { return m_hasHover; };		
 
+		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
+
 		void setGraphicsItemUid(const std::string& _uid) { m_uid = _uid; };
 		const std::string& graphicsItemUid(void) const { return m_uid; };
 
@@ -141,6 +143,7 @@ namespace ot {
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
 	private:
+		bool m_isLayoutOrStack;
 		bool m_hasHover;
 		std::string m_uid;
 		std::string m_name;
@@ -160,6 +163,7 @@ namespace ot {
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
 
+		GraphicsItem() = delete;
 		GraphicsItem(const GraphicsItem&) = delete;
 		GraphicsItem& operator = (const GraphicsItem&) = delete;
 	};

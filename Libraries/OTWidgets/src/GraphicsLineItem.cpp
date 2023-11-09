@@ -7,7 +7,8 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsLineItem.h"
 
-ot::GraphicsLineItem::GraphicsLineItem()
+ot::GraphicsLineItem::GraphicsLineItem() 
+	: ot::GraphicsItem(false)
 {
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }

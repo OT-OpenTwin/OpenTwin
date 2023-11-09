@@ -18,7 +18,9 @@ static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactor
 static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
 
 ot::GraphicsTextItem::GraphicsTextItem()
+	: ot::GraphicsItem(false)
 {
+	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }

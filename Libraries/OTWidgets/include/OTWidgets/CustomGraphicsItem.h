@@ -16,7 +16,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT CustomGraphicsItem : public QGraphicsItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
 	public:
-		CustomGraphicsItem();
+		CustomGraphicsItem(bool _isLayoutOrStack);
 		virtual ~CustomGraphicsItem();
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
@@ -45,6 +45,8 @@ namespace ot {
 
 	private:
 		QSizeF m_customItemSize;
+
+		CustomGraphicsItem() = delete;
 	};
 
 }

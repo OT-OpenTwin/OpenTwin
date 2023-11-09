@@ -6,8 +6,10 @@
 // OpenTwin header
 #include "OTWidgets/CustomGraphicsItem.h"
 
-ot::CustomGraphicsItem::CustomGraphicsItem() {
-
+ot::CustomGraphicsItem::CustomGraphicsItem(bool _isLayoutOrStack) 
+	: ot::GraphicsItem(_isLayoutOrStack)
+{
+	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 }
 
 ot::CustomGraphicsItem::~CustomGraphicsItem() {

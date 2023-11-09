@@ -18,7 +18,10 @@
 static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 
-ot::GraphicsRectangularItem::GraphicsRectangularItem() : m_size(10, 10), m_cornerRadius(0) {
+ot::GraphicsRectangularItem::GraphicsRectangularItem() 
+	: ot::GraphicsItem(false), m_size(10, 10), m_cornerRadius(0)
+{
+	this->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
@@ -56,18 +59,7 @@ void ot::GraphicsRectangularItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsRectangularItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	switch (_hint) {
-	case Qt::MinimumSize:
-	case Qt::PreferredSize:
-	case Qt::MaximumSize:
-		return this->handleGetGraphicsItemSizeHint(_hint, m_size);
-		//return m_size;
-	default:
-		OT_LOG_EA("Unknown Qt::SizeHint");
-		break;
-	}
 	return this->handleGetGraphicsItemSizeHint(_hint, m_size);
-	//return _constrains;
 };
 
 QRectF ot::GraphicsRectangularItem::boundingRect(void) const {

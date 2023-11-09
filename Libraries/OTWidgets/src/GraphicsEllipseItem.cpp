@@ -17,7 +17,10 @@
 static ot::SimpleFactoryRegistrar<ot::GraphicsEllipseItem> elliItem(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
 static ot::GlobalKeyMapRegistrar elliItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
 
-ot::GraphicsEllipseItem::GraphicsEllipseItem() : m_radiusX(5), m_radiusY(5) {
+ot::GraphicsEllipseItem::GraphicsEllipseItem()
+	: ot::GraphicsItem(false), m_radiusX(5), m_radiusY(5)
+{
+	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }

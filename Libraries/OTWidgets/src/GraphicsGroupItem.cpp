@@ -7,7 +7,10 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsGroupItem.h"
 
-ot::GraphicsGroupItem::GraphicsGroupItem() {
+ot::GraphicsGroupItem::GraphicsGroupItem(bool _isStackOrLayout)
+	: ot::GraphicsItem(_isStackOrLayout)
+{
+	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }

@@ -34,8 +34,8 @@
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItem::GraphicsItem() : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
-	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX)
+ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack) : m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), 
+	m_isLayoutOrStack(_isLayoutOrStack), m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX)
 {
 
 }
@@ -51,7 +51,7 @@ ot::GraphicsItem::~GraphicsItem() {
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) { m_flags |= GraphicsItem::ItemIsConnectable; }
 	m_uid = _cfg->uid();
-	m_name = _cfg->name();
+	this->setGraphicsItemName(_cfg->name());	
 	m_alignment = _cfg->alignment();
 	m_margins = _cfg->margins();
 	m_minSize = QSizeF(_cfg->minimumSize().width(), _cfg->minimumSize().height());
@@ -189,7 +189,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 
 void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 	if (m_parent) {
-		if (m_parent->simpleFactoryObjectKey() != OT_SimpleFactoryJsonKeyValue_GraphicsStackItem) {
+		if (m_parent->isLayoutOrStack()) {
 			this->setGraphicsItemRequestedSize(_geom.size());
 		}
 	}

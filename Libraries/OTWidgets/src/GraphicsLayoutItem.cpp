@@ -8,7 +8,9 @@
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
-ot::GraphicsLayoutItem::GraphicsLayoutItem() : m_layoutWrap(nullptr) {}
+ot::GraphicsLayoutItem::GraphicsLayoutItem()
+	: ot::GraphicsItem(true), m_layoutWrap(nullptr)
+{}
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 

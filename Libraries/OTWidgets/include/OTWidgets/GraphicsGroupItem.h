@@ -14,7 +14,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsGroupItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
 	public:
-		GraphicsGroupItem();
+		GraphicsGroupItem(bool _isStackOrLayout = false);
 		virtual ~GraphicsGroupItem();
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
