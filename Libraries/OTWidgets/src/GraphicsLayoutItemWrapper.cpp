@@ -58,3 +58,7 @@ void ot::GraphicsLayoutItemWrapper::removeAllConnections(void) {
 	OTAssertNullptr(m_owner);
 	m_owner->removeAllConnections();
 }
+
+QSizeF ot::GraphicsLayoutItemWrapper::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}

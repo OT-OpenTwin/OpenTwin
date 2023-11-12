@@ -61,23 +61,12 @@ void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::Graphics
 }
 
 void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_layoutWrap) {
-		m_layoutWrap->callPaint(_painter, _opt, _widget);
-	}
-	std::list<QGraphicsLayoutItem*> l;
-	this->getAllItems(l);
-	for (auto i : l) {
-		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem *>(i);
-		if (itm) {
-			itm->callPaint(_painter, _opt, _widget);
-		}
-		else {
-			OT_LOG_EA("Item cast failed");
-		}
-	}
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->callPaint(_painter, _opt, _widget);
 }
 
 QGraphicsLayoutItem* ot::GraphicsLayoutItem::getQGraphicsLayoutItem(void) { return m_layoutWrap->getQGraphicsLayoutItem(); };
+
 QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) { return m_layoutWrap->getQGraphicsItem(); };
 
 ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName) {

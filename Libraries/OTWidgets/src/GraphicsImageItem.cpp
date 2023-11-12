@@ -97,3 +97,7 @@ void ot::GraphicsImageItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsI
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
 }
+
+QSizeF ot::GraphicsImageItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}

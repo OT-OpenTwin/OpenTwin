@@ -56,3 +56,6 @@ void ot::GraphicsLineItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsIt
 	// Ignore
 }
 
+QSizeF ot::GraphicsLineItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}

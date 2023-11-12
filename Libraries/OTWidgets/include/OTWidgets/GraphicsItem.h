@@ -60,6 +60,8 @@ namespace ot {
 
 		virtual void prepareGraphicsItemGeometryChange(void) = 0;
 
+		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const = 0;
+
 		// ###############################################################################################################################################
 
 		// Virtual functions

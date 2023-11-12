@@ -88,3 +88,7 @@ ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) 
 	}
 	return nullptr;
 }
+
+QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}

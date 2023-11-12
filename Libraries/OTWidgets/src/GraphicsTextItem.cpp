@@ -57,8 +57,8 @@ void ot::GraphicsTextItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	QFontMetrics m(this->font());
-	return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m.width(this->toPlainText()), m.height()));
+	//QFontMetrics m(this->font());
+	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
 };
 
 QRectF ot::GraphicsTextItem::boundingRect(void) const {
@@ -98,4 +98,8 @@ void ot::GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	this->handleItemChange(_change, _value);
 	return QGraphicsTextItem::itemChange(_change, _value);
+}
+
+QSizeF ot::GraphicsTextItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
 }

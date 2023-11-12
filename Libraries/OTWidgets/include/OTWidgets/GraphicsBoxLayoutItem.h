@@ -22,6 +22,8 @@ namespace ot {
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
+		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
+
 	private:
 		GraphicsBoxLayoutItem() = delete;
 		GraphicsBoxLayoutItem(const GraphicsBoxLayoutItem&) = delete;

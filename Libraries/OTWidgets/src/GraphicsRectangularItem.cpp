@@ -111,4 +111,8 @@ void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	m_size = _size;
 	this->setGeometry(QRectF(this->pos(), m_size).toRect());
 	this->raiseEvent(GraphicsItem::ItemResized);
-};
+}
+
+QSizeF ot::GraphicsRectangularItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}

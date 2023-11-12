@@ -66,3 +66,7 @@ void ot::GraphicsGridLayoutItem::getAllItems(std::list<QGraphicsLayoutItem*>& _i
 		}
 	}
 }
+
+QSizeF ot::GraphicsGridLayoutItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}

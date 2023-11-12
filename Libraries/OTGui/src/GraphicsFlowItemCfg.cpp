@@ -103,6 +103,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
 	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(m_primaryColor));
 	itm->setSize(ot::Size2DD(10., 10.));
+	itm->setMaximumSize(ot::Size2DD(10., 10.));
+	itm->setMinimumSize(ot::Size2DD(10., 10.));
 	itm->setBorder(ot::Border(m_secondaryColor, 1));
 
 	return itm;
@@ -110,6 +112,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
 
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createCircleItem(void) {
 	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, new ot::FillPainter2D(m_primaryColor));
+	itm->setMaximumSize(ot::Size2DD(10., 10.));
+	itm->setMinimumSize(ot::Size2DD(10., 10.));
 	itm->setBorder(ot::Border(m_secondaryColor, 1));
 
 	return itm;
@@ -203,7 +207,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 
 	// Title: Left Corner
 	if (m_leftTitleImagePath.empty()) {
-		tLay->addStrech(1);
+		//tLay->addStrech(1);
 	}
 	else {
 		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
@@ -219,7 +223,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	
 	// Title: Right Corner
 	if (m_rightTitleImagePath.empty()) {
-		tLay->addStrech(1);
+		//tLay->addStrech(1);
 	}
 	else {
 		ot::GraphicsImageItemCfg* titRImg = new ot::GraphicsImageItemCfg;

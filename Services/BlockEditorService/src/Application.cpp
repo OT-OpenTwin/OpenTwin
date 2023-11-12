@@ -24,6 +24,7 @@
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
 
 #include "OTGui/LinearGradientPainter2D.h"
@@ -175,7 +176,23 @@ namespace ottest {
 		r2->setName(_name + "r2");
 		r2->setSize(ot::Size2DD(100., 10.));
 
+		ot::GraphicsGridLayoutItemCfg* h1 = new ot::GraphicsGridLayoutItemCfg(1, 2);
+		h1->setName(_name + "h1");
+		
+		ot::GraphicsEllipseItemCfg* e1 = new ot::GraphicsEllipseItemCfg;
+		e1->setName(_name + "e1");
+		e1->setRadiusX(5);
+		e1->setRadiusY(5);
+
+		ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
+		r3->setName(_name + "r3");
+		r3->setSize(ot::Size2DD(10., 10.));
+
+		h1->addChildItem(0, 0, e1);
+		h1->addChildItem(0, 1, r3);
+
 		root->addChildItem(r1);
+		root->addChildItem(h1);
 		root->addChildItem(r2);
 
 		return root;

@@ -33,6 +33,10 @@ void ot::CustomGraphicsItem::graphicsItemFlagsChanged(ot::GraphicsItem::Graphics
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
 }
 
+QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}
+
 QSizeF ot::CustomGraphicsItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->handleGetGraphicsItemSizeHint(_hint, this->getDefaultGraphicsItemSize());
 }

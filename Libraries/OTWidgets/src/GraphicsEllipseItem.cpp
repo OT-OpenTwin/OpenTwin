@@ -105,3 +105,7 @@ void ot::GraphicsEllipseItem::setRadius(int _x, int _y) {
 	m_radiusX = _x;
 	m_radiusY = _y;
 }
+
+QSizeF ot::GraphicsEllipseItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}
