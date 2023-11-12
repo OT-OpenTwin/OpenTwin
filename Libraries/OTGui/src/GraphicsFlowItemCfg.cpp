@@ -207,7 +207,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 
 	// Title: Left Corner
 	if (m_leftTitleImagePath.empty()) {
-		//tLay->addStrech(1);
+		tLay->addStrech(1);
 	}
 	else {
 		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
@@ -223,7 +223,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	
 	// Title: Right Corner
 	if (m_rightTitleImagePath.empty()) {
-		//tLay->addStrech(1);
+		tLay->addStrech(1);
 	}
 	else {
 		ot::GraphicsImageItemCfg* titRImg = new ot::GraphicsImageItemCfg;
