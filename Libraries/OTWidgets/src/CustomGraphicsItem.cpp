@@ -10,11 +10,17 @@ ot::CustomGraphicsItem::CustomGraphicsItem(bool _isLayoutOrStack)
 	: ot::GraphicsItem(_isLayoutOrStack)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
+	this->setGraphicsItem(this);
+	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
 ot::CustomGraphicsItem::~CustomGraphicsItem() {
 
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ot::GraphicsItem
 
 bool ot::CustomGraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
@@ -37,6 +43,10 @@ QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QS
 	return this->sizeHint(_hint, _constrains);
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// QGraphicsLayoutItem
+
 QSizeF ot::CustomGraphicsItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->handleGetGraphicsItemSizeHint(_hint, this->getDefaultGraphicsItemSize());
 }
@@ -48,6 +58,10 @@ void ot::CustomGraphicsItem::setGeometry(const QRectF& _rect) {
 
 	this->handleSetItemGeometry(_rect);
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// QGraphicsItem
 
 QRectF ot::CustomGraphicsItem::boundingRect(void) const {
 	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(this->getDefaultGraphicsItemSize())));

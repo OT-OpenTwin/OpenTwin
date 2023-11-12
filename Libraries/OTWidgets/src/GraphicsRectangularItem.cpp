@@ -20,16 +20,18 @@ static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_Simpl
 static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
 
 ot::GraphicsRectangularItem::GraphicsRectangularItem() 
-	: ot::GraphicsItem(false), m_size(10, 10), m_cornerRadius(0)
+	: ot::CustomGraphicsItem(false), m_size(10, 10), m_cornerRadius(0)
 {
-	this->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-	this->setGraphicsItem(this);
-	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+
 }
 
 ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
 	
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::GraphicsItems
 
 bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
@@ -55,55 +57,20 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsRectangularItem::prepareGraphicsItemGeometryChange(void) {
-	this->prepareGeometryChange();
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-QSizeF ot::GraphicsRectangularItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, m_size);
-};
+// Base class functions: ot::CustomGraphicsItem
 
-QRectF ot::GraphicsRectangularItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), m_size));
-}
-
-void ot::GraphicsRectangularItem::setGeometry(const QRectF& _rect) {
-	this->prepareGeometryChange();
-	this->setPos(_rect.topLeft());
-	this->handleSetItemGeometry(_rect);
-	QGraphicsLayoutItem::setGeometry(this->boundingRect());
-}
-
-QVariant ot::GraphicsRectangularItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	this->handleItemChange(_change, _value);
-	return _value;
-}
-
-void ot::GraphicsRectangularItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+void ot::GraphicsRectangularItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(this->calculatePaintArea(m_size), m_cornerRadius, m_cornerRadius);
+	_painter->drawRoundedRect(_rect, m_cornerRadius, m_cornerRadius);
 }
 
-void ot::GraphicsRectangularItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
-	QGraphicsItem::mousePressEvent(_event);
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::GraphicsRectangularItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
-	QGraphicsItem::mouseReleaseEvent(_event);
-}
-
-void ot::GraphicsRectangularItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
-}
-
-void ot::GraphicsRectangularItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
+// Setter/Getter
 
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	// Avoid resizing if the size did not change
@@ -111,8 +78,4 @@ void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	m_size = _size;
 	this->setGeometry(QRectF(this->pos(), m_size).toRect());
 	this->raiseEvent(GraphicsItem::ItemResized);
-}
-
-QSizeF ot::GraphicsRectangularItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->sizeHint(_hint, _constrains);
 }
