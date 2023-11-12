@@ -30,7 +30,6 @@
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsGroupItem.cpp" />
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp" />
-    <ClCompile Include="src\GraphicsImageItem.cpp" />
     <ClCompile Include="src\GraphicsItem.cpp" />
     <ClCompile Include="src\GraphicsItemDrag.cpp" />
     <ClCompile Include="src\GraphicsLayoutItem.cpp" />
@@ -64,7 +63,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsHBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsGroupItem.h" />
-    <ClInclude Include="include\OTWidgets\GraphicsImageItem.h" />
     <QtMoc Include="include\OTWidgets\GraphicsItemDrag.h" />
     <ClInclude Include="include\OTWidgets\GraphicsLayoutItem.h" />
     <QtMoc Include="include\OTWidgets\GraphicsPicker.h" />

@@ -58,9 +58,6 @@
     <ClCompile Include="src\GraphicsTextItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsImageItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsLineItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -162,9 +159,6 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsTextItem.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsImageItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
