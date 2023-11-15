@@ -145,6 +145,20 @@ namespace PythonExtensions
     static PyObject* OT_GetPortData(PyObject* self, PyObject* args)
     {
         auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 2;
+        if (numberOfArguments != expectedNumberOfArguments)
+        {
+            throw std::exception("OT_GetPortData expects two arguments");
+        }
+        PythonObjectBuilder pyObBuilder;
+        std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        PyObject* returnValue = PortDataBuffer::INSTANCE().getPortData(portName);
+        return returnValue;
+    }
+
+    static PyObject* OT_SetPortData(PyObject* self, PyObject* args)
+    {
+        auto numberOfArguments = PyTuple_Size(args);
         const int expectedNumberOfArguments = 1;
         if (numberOfArguments != expectedNumberOfArguments)
         {

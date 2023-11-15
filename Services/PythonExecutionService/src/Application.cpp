@@ -92,6 +92,16 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Scripts, scripts);
 						auto& parameter = _doc[OT_ACTION_CMD_PYTHON_Parameter];
 						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Parameter, parameter);
+
+						if (ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Portdata_Names) && _doc[OT_ACTION_CMD_PYTHON_Portdata_Names].IsArray())
+						{
+							assert(ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Portdata_Data));
+							auto& portData = _doc[OT_ACTION_CMD_PYTHON_Portdata_Data];
+							ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Portdata_Data, portData);
+							auto& portNames = _doc[OT_ACTION_CMD_PYTHON_Portdata_Names];
+							ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Portdata_Names, portNames);
+						}
+
 						return _subprocessHandler->SendExecutionOrder(subprocessDoc);					
 					}
 					else

@@ -208,23 +208,54 @@ std::list<bool> PythonObjectBuilder::getBoolList(const CPythonObject& pValue, co
 	return values;
 }
 
+std::list<ot::Variable> PythonObjectBuilder::getVariableList(CPythonObject& pValue)
+{
+	if (PyList_Check(pValue))
+	{
+		std::list<ot::Variable> variables{};
+		for (auto i = 0; i < PyList_Size(pValue); i++)
+		{
+			CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+
+			std::optional<ot::Variable> variable = getVariable(listItem);
+			if (variable.has_value())
+			{
+				variables.push_back(variable.value());
+			}
+		}
+		return variables;
+	}
+	else
+	{ 
+		std::optional<ot::Variable> variable = getVariable(pValue);
+		if (variable.has_value())
+		{
+			return { variable.value() };
+		}
+		else
+		{
+			return{};
+		}
+	}
+}
+
 std::optional<ot::Variable> PythonObjectBuilder::getVariable(CPythonObject& pValue)
 {
 	if (PyFloat_Check(pValue))
 	{
-		return ot::Variable(static_cast<double>(PyFloat_AsDouble(pValue)));
+		return { ot::Variable(static_cast<double>(PyFloat_AsDouble(pValue))) };
 	}
 	else if (PyBool_Check(pValue))
 	{
-		return ot::Variable(static_cast<bool>(PyLong_AsLong(pValue)));
+		return { ot::Variable(static_cast<bool>(PyLong_AsLong(pValue))) };
 	}
 	else if (PyLong_Check(pValue))
 	{
-		return ot::Variable(static_cast<int64_t>(PyLong_AsLongLong(pValue)));
+		return { ot::Variable(static_cast<int64_t>(PyLong_AsLongLong(pValue))) };
 	}
 	else if (PyUnicode_Check(pValue))
 	{
-		return ot::Variable(PyUnicode_AsUTF8(pValue));
+		return { ot::Variable(PyUnicode_AsUTF8(pValue)) };
 	}
 	else if (Py_None == pValue)
 	{
@@ -235,6 +266,7 @@ std::optional<ot::Variable> PythonObjectBuilder::getVariable(CPythonObject& pVal
 		throw std::exception("Not supported type by PythonObjectBuilder.");
 	}
 }
+
 
 CPythonObjectNew PythonObjectBuilder::setInt64(const int64_t value)
 {
@@ -314,9 +346,8 @@ CPythonObjectNew PythonObjectBuilder::setVariableList(std::list<ot::Variable>& v
 	return CPythonObjectNew(assembly);
 }
 
-CPythonObjectNew PythonObjectBuilder::setVariableList(OT_rJSON_val& values)
+CPythonObjectNew PythonObjectBuilder::setVariableList(rapidjson::GenericArray<false, rapidjson::Value>& valueJSONArray)
 {
-	auto valueJSONArray = values.GetArray();
 	uint64_t assemblySize = valueJSONArray.Size();
 	PyObject* assembly = PyTuple_New(assemblySize);
 	uint64_t counter = 0;

@@ -20,7 +20,7 @@ PythonAPI::PythonAPI()
 	_wrapper.InitializePythonInterpreter();
 }
 
-std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::optional<std::list<ot::Variable>>>& parameterSet)
+std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
 	EntityBuffer::INSTANCE().setModelComponent(Application::instance()->modelComponent());
@@ -33,19 +33,16 @@ std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std:
 		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
-		std::optional <std::list<ot::Variable>>& parameterSetForScript = *currentParameterSet;
+		std::list<ot::Variable>& parameterSetForScript = *currentParameterSet;
 		CPythonObjectNew pythonParameterSet(nullptr);
-		if (parameterSetForScript.has_value())
+		if (parameterSetForScript.size() != 0)
 		{
-			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript.value()));
+			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript));
 		}
 		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 
-		auto vReturnValue = pyObBuilder.getVariable(returnValue);
-		if (vReturnValue.has_value())
-		{
-			returnValues.emplace_front(vReturnValue.value());
-		}
+		auto vReturnValue = pyObBuilder.getVariableList(returnValue);
+		returnValues.splice(returnValues.begin(),vReturnValue);
 		currentParameterSet++;
 
 	}
@@ -77,26 +74,39 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 	}
 
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactory classFactory;
-
 	for (auto& entityInfo : entityInfos)
 	{
 		std::string scriptName = entityInfo.getName();
 		std::optional<std::string> moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName);
 		if (!moduleName.has_value())
 		{
-
-			auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-			std::unique_ptr<EntityFile> script(dynamic_cast<EntityFile*>(baseEntity));
-			auto plainData = script->getData()->getData();
-			std::string execution(plainData.begin(), plainData.end());
-
-			moduleName = PythonLoadedModules::INSTANCE()->AddModuleForEntity(baseEntity);
-			_wrapper.Execute(execution, moduleName.value());
-			PythonModuleAPI moduleAPI;
-
-			_moduleEntrypointByScriptName[scriptName] = moduleAPI.GetModuleEntryPoint(moduleName.value());
+			LoadScipt(entityInfo);
+		}
+		else
+		{
+			std::string shouldModuleName = PythonLoadedModules::INSTANCE()->GetModuleName(entityInfo);
+			if (moduleName.value() != shouldModuleName) // Script with same name but different ID or Version
+			{
+				PythonLoadedModules::INSTANCE()->RemoveModule(scriptName);
+				_moduleEntrypointByScriptName.erase(scriptName);
+				LoadScipt(entityInfo);
+			}
 		}
 	}
+}
+
+void PythonAPI::LoadScipt(ot::EntityInformation& entityInformation)
+{
+	auto modelComponent = Application::instance()->modelComponent();
+	ClassFactory classFactory;
+	auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), classFactory);
+	std::unique_ptr<EntityFile> script(dynamic_cast<EntityFile*>(baseEntity));
+	auto plainData = script->getData()->getData();
+	std::string execution(plainData.begin(), plainData.end());
+
+	std::string moduleName = PythonLoadedModules::INSTANCE()->AddModuleForEntity(baseEntity);
+	_wrapper.Execute(execution, moduleName);
+	PythonModuleAPI moduleAPI;
+	_moduleEntrypointByScriptName[script->getName()] = moduleAPI.GetModuleEntryPoint(moduleName);
 }
 

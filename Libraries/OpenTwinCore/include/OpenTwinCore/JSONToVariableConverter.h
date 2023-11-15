@@ -9,5 +9,6 @@ namespace ot
 	{
 	public:
 		Variable operator() (rapidjson::Value& value);
+		std::list<Variable> operator() (rapidjson::GenericArray<false,rapidjson::Value>& value);
 	};
 }

@@ -46,6 +46,7 @@ public:
 	std::list<std::string> getStringList(const CPythonObject& pValue, const std::string& varName);
 	std::list<bool> getBoolList(const CPythonObject& pValue, const std::string& varName);
 
+	std::list<ot::Variable> getVariableList(CPythonObject& pValue);
 	std::optional<ot::Variable> getVariable(CPythonObject& pValue);
 
 	CPythonObjectNew setInt32(const int32_t value);
@@ -55,7 +56,7 @@ public:
 	CPythonObjectNew setBool(const bool value);
 
 	CPythonObjectNew setVariableList(std::list<ot::Variable>& values);
-	CPythonObjectNew setVariableList(OT_rJSON_val& values);
+	CPythonObjectNew setVariableList(rapidjson::GenericArray<false,rapidjson::Value> & values);
 
 private:
 	PyObject* _assembly = nullptr;

@@ -1,6 +1,6 @@
 #include "openTwinCore/VariableToJSONConverter.h"
 
-rapidjson::Value ot::VariableToJSONConverter::operator()(Variable& value, OT_rJSON_doc& emebeddingDocument)
+OT_rJSON_val ot::VariableToJSONConverter::operator()(Variable& value, OT_rJSON_doc& emebeddingDocument)
 {
 
 	if (value.isInt32())
@@ -44,4 +44,14 @@ rapidjson::Value ot::VariableToJSONConverter::operator()(Variable& value, OT_rJS
 	{
 		throw std::exception("Not supported type for variable_t to rapidjson::Value conversion.");
 	}
+}
+
+OT_rJSON_val ot::VariableToJSONConverter::operator()(std::list<Variable>& variables, OT_rJSON_doc& emebeddingDocument)
+{
+	OT_rJSON_createValueArray(jVariables)
+		for (ot::Variable& variable : variables)
+		{
+			jVariables.PushBack(operator()(variable, emebeddingDocument), emebeddingDocument.GetAllocator());
+		}
+		return jVariables;
 }

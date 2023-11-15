@@ -32,16 +32,25 @@ public:
 	}
 	std::string AddModuleForEntity(EntityBase* baseEntity)
 	{
-		ot::UID uid = baseEntity->getEntityID();
-		ot::UID version = baseEntity->getEntityStorageVersion();
-		std::string moduleName = std::to_string(uid) + std::to_string(version);
-		/*std::string moduleName = baseEntity->getName();
-		*/
+		std::string moduleName = CreateModuleName(baseEntity->getEntityID(), baseEntity->getEntityStorageVersion());
 		_moduleNamesByScriptName[baseEntity->getName()] = moduleName;
 		return moduleName;
 	};
+	std::string GetModuleName(ot::EntityInformation& entityInfo)
+	{
+		return CreateModuleName(entityInfo.getID(), entityInfo.getVersion());
+	}
+	void RemoveModule(const std::string& scriptName)
+	{
+		_moduleNamesByScriptName.erase(scriptName);
+	}
 
 private:
+	std::string CreateModuleName(ot::UID entityID, ot::UID entityVersion)
+	{
+		return std::to_string(entityID) + std::to_string(entityVersion);
+	}
+	
 	PythonLoadedModules() {};
 	std::map<std::string, std::string> _moduleNamesByScriptName;
 

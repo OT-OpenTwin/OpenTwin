@@ -75,20 +75,16 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 {
 	try
 	{
+		std::string temp = ot::rJSON::toJSON(doc);
+
 		PortDataBuffer::INSTANCE().clearPortData();
 
 		//Extract script entity names from json doc
-		auto scriptArray = doc[OT_ACTION_CMD_PYTHON_Scripts].GetArray();
-		std::list<std::string> scripts;
-
-		for (auto& element : scriptArray)
-		{
-			scripts.emplace_back(element.GetString());
-		}
-
+		std::list<std::string> scripts = ot::rJSON::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
+		
 		//Extract parameter array from json doc
 		auto parameterArrayArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
-		std::list<std::optional<std::list<ot::Variable>>> allParameter;
+		std::list<std::list<ot::Variable>> allParameter;
 
 		ot::JSONToVariableConverter converterJ2V;
 		for (uint32_t i = 0; i < parameterArrayArray.Size(); i++)
@@ -101,46 +97,43 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 			{
 				auto parameterArray = parameterArrayArray[i].GetArray();
 				//Todo: support of lists/maps as parameter
-				std::list<ot::Variable> scriptParameter;
-				for (uint32_t i = 0; i < parameterArray.Size(); i++)
-				{
-					auto paramerter = converterJ2V(parameterArray[i]);
-					scriptParameter.emplace_back(paramerter);
-				}
+				
+				std::list<ot::Variable> scriptParameter = converterJ2V(parameterArray);
 				allParameter.emplace_back(scriptParameter);
 			}
 		}
 
 		//Extract port data if existing
-		if (doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata))
+		if (doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Names))
 		{
-			auto portDataMap = doc[OT_ACTION_CMD_PYTHON_Portdata].GetArray();
-
-			for (uint32_t i = 0; i < portDataMap.Size(); i++)
+			std::list<std::string> portDataNames = ot::rJSON::getStringList(doc,OT_ACTION_CMD_PYTHON_Portdata_Names);
+			auto portData = doc[OT_ACTION_CMD_PYTHON_Portdata_Data].GetArray();
+			auto portName = portDataNames.begin();
+			for (uint32_t i = 0; i < portData.Size(); i++)
 			{
-				auto portEntry = portDataMap[i].GetObject();
-				const std::string portName =	portEntry[OT_ACTION_CMD_PYTHON_Portdata_Name].GetString();
-				auto portData =	&portEntry[OT_ACTION_CMD_PYTHON_Portdata_Data];
+				auto portDataEntry = portData[i].GetArray();
 				PythonObjectBuilder builder;
-				CPythonObjectNew pPortData = builder.setVariableList(*portData);
-				PortDataBuffer::INSTANCE().addPortData(portName,std::move(pPortData));
+				CPythonObjectNew pPortData = builder.setVariableList(portDataEntry);
+				PortDataBuffer::INSTANCE().addPortData(*portName,std::move(pPortData));
+				portName++;
 			}
 		}
 
 		//Execute
 		std::list<ot::Variable> result = _pythonAPI.Execute(scripts, allParameter);
-
-		//Wrapp result in json string
-		OT_rJSON_createDOC(returnValues);
-		OT_rJSON_createValueArray(rJsonResult);
-		ot::VariableToJSONConverter converterV2J;
-
-		for (ot::Variable& var : result)
+		if (result.size() != 0)
 		{
-			rJsonResult.PushBack(converterV2J(var,returnValues), returnValues.GetAllocator());
+			ot::VariableToJSONConverter converterV2J;
+			OT_rJSON_createDOC(returnMessageContent);
+			OT_rJSON_val returnValueArray = converterV2J(result, returnMessageContent);
+			ot::rJSON::add(returnMessageContent, OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS, returnValueArray);
+			const std::string whatMessage = ot::rJSON::toJSON(returnMessageContent);
+			return ot::ReturnMessage(ot::ReturnMessage::Ok, whatMessage);
 		}
-
-		return ot::ReturnMessage(ot::ReturnMessage::Ok, ot::rJSON::toJSON(returnValues));
+		else
+		{
+			return ot::ReturnMessage(ot::ReturnMessage::Ok);
+		}
 	}
 	catch (std::exception& e)
 	{

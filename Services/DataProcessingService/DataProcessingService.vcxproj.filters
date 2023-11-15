@@ -9,12 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\Pipeline">
-      <UniqueIdentifier>{856d0176-b6a9-4c39-a83b-ac2af41600e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Pipeline">
-      <UniqueIdentifier>{6372d915-8143-4176-a56f-9e8f972a3d73}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\BlockHandling">
       <UniqueIdentifier>{031a1c64-1cf3-426f-b9f8-0022d3323f52}</UniqueIdentifier>
     </Filter>
@@ -48,23 +42,8 @@
     <ClCompile Include="src\ModelNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Pipeline.cpp">
-      <Filter>Source Files\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PipelineHandler.cpp">
-      <Filter>Source Files\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp">
       <Filter>Source Files\BlockHandling</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PipelineSink.cpp">
-      <Filter>Source Files\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PipelineSource.cpp">
-      <Filter>Source Files\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PipelineFilter.cpp">
-      <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="src\ResultCollectionHandler.cpp">
       <Filter>Source Files</Filter>
@@ -96,6 +75,12 @@
     <ClCompile Include="src\BlockHandler.cpp">
       <Filter>Source Files\BlockHandling</Filter>
     </ClCompile>
+    <ClCompile Include="src\PipelineHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockHandlerPython.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -106,24 +91,6 @@
     </ClInclude>
     <ClInclude Include="include\ModelNotifier.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PipelineHandler.h">
-      <Filter>Header Files\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Pipeline.h">
-      <Filter>Header Files\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PipelineFilter.h">
-      <Filter>Header Files\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PipelineSource.h">
-      <Filter>Header Files\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PipelineSink.h">
-      <Filter>Header Files\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PipelineItem.h">
-      <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandler.h">
       <Filter>Header Files\BlockFunctionality</Filter>
@@ -160,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="include\ValidityHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PipelineHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandlerPython.h">
+      <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

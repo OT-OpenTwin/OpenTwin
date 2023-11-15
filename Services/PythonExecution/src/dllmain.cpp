@@ -72,7 +72,7 @@ extern "C" {
 		catch (std::exception& e)
 		{
 			OT_LOG_E(e.what());
-			throw e;
+			return -1; //Correct error code?
 		}
 	};
 }
