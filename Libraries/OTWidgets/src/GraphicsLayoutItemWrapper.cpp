@@ -33,10 +33,6 @@ void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* 
 	QGraphicsWidget::mouseReleaseEvent(_event);
 }
 
-void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	QGraphicsWidget::paint(_painter, _opt, _widget);
-}
-
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	OTAssertNullptr(m_owner);
 	m_owner->handleItemChange(_change, _value);
@@ -45,6 +41,10 @@ QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemCh
 
 void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
+}
+
+void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 
 void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
@@ -61,4 +61,9 @@ void ot::GraphicsLayoutItemWrapper::removeAllConnections(void) {
 
 QSizeF ot::GraphicsLayoutItemWrapper::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->sizeHint(_hint, _constrains);
+}
+
+void ot::GraphicsLayoutItemWrapper::setGraphicsItemRequestedSize(const QSizeF& _size) {
+	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
+	this->setPreferredSize(_size);
 }

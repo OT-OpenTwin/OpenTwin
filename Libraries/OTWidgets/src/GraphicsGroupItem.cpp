@@ -43,8 +43,9 @@ QRectF ot::GraphicsGroupItem::boundingRect(void) const {
 
 void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+	this->handleSetItemGeometry(_rect);
+	QGraphicsLayoutItem::setGeometry(_rect);
 }
 
 QVariant ot::GraphicsGroupItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
