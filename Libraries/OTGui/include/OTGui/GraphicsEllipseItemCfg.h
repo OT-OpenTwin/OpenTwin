@@ -17,7 +17,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORTONLY GraphicsEllipseItemCfg : public ot::GraphicsItemCfg {
 	public:
-		GraphicsEllipseItemCfg(int _radiusX = 5, int _radiusY = 5, ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr);
+		GraphicsEllipseItemCfg(double _radiusX = 5., double _radiusY = 5., ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr);
 		virtual ~GraphicsEllipseItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -33,10 +33,10 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg); };
 
-		void setRadiusX(int _radius) { m_radiusX = _radius; };
-		int radiusX(void) const { return m_radiusX; };
-		void setRadiusY(int _radius) { m_radiusY = _radius; };
-		int radiusY(void) const { return m_radiusY; };
+		void setRadiusX(double _radius) { m_radiusX = _radius; };
+		double radiusX(void) const { return m_radiusX; };
+		void setRadiusY(double _radius) { m_radiusY = _radius; };
+		double radiusY(void) const { return m_radiusY; };
 
 		void setBorder(const ot::Border& _border) { m_border = _border; };
 		const ot::Border& border(void) const { return m_border; };
@@ -45,8 +45,8 @@ namespace ot {
 		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
 
 	private:
-		int m_radiusX;
-		int m_radiusY;
+		double m_radiusX;
+		double m_radiusY;
 		ot::Border m_border;
 		ot::Painter2D* m_backgroundPainter;
 

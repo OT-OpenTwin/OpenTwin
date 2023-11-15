@@ -43,15 +43,15 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
 
-		void setRadius(int _x, int _y);
-		int radiusX(void) const { return m_radiusX; };
-		int radiusY(void) const { return m_radiusY; };
+		void setRadius(double _x, double _y);
+		double radiusX(void) const { return m_radiusX; };
+		double radiusY(void) const { return m_radiusY; };
 
 	private:
 		QBrush m_brush;
 		QPen m_pen;
-		int m_radiusX;
-		int m_radiusY;
+		double m_radiusX;
+		double m_radiusY;
 	};
 
 }

@@ -16,7 +16,7 @@
 
 static ot::SimpleFactoryRegistrar<ot::GraphicsEllipseItemCfg> ellipseItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg);
 
-ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(int _radiusX, int _radiusY, ot::Painter2D* _backgroundPainter)
+ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(double _radiusX, double _radiusY, ot::Painter2D* _backgroundPainter)
 	: m_backgroundPainter(_backgroundPainter), m_radiusX(_radiusX), m_radiusY(_radiusY)
 {
 	if (m_backgroundPainter == nullptr) {
@@ -49,13 +49,13 @@ void ot::GraphicsEllipseItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJS
 void ot::GraphicsEllipseItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RadiusX, Int);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RadiusY, Int);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RadiusX, Double);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RadiusY, Double);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Border, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_BackgroundPainter, Object);
 
-	m_radiusX = _object[OT_JSON_MEMBER_RadiusX].GetInt();
-	m_radiusY = _object[OT_JSON_MEMBER_RadiusY].GetInt();
+	m_radiusX = _object[OT_JSON_MEMBER_RadiusX].GetDouble();
+	m_radiusY = _object[OT_JSON_MEMBER_RadiusY].GetDouble();
 
 	OT_rJSON_val backgroundPainterObj = _object[OT_JSON_MEMBER_BackgroundPainter].GetObject();
 	ot::Painter2D* p = ot::SimpleFactory::instance().createType<ot::Painter2D>(backgroundPainterObj);

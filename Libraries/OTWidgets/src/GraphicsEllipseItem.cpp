@@ -100,7 +100,7 @@ void ot::GraphicsEllipseItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event
 	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
-void ot::GraphicsEllipseItem::setRadius(int _x, int _y) {
+void ot::GraphicsEllipseItem::setRadius(double _x, double _y) {
 	this->prepareGeometryChange();
 	m_radiusX = _x;
 	m_radiusY = _y;
