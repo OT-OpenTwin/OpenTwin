@@ -13,6 +13,7 @@
 // Qt header
 #include <QtGui/qfont.h>
 #include <QtGui/qfontmetrics.h>
+#include <QtGui/qtextdocument.h>
 
 static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
 static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
@@ -57,9 +58,12 @@ void ot::GraphicsTextItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	//QFontMetrics m(this->font());
-	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
-};
+	
+	QFontMetrics m(this->font());
+	//return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m.width(this->toPlainText()), m.height()));
+	//return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
+	return this->handleGetGraphicsItemSizeHint(_hint, this->document()->size());
+}
 
 QRectF ot::GraphicsTextItem::boundingRect(void) const {
 	return this->handleGetGraphicsItemBoundingRect(QGraphicsTextItem::boundingRect());
@@ -74,6 +78,8 @@ void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
+
+	this->handleSetItemGeometry(_rect);
 }
 
 void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {

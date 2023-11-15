@@ -16,7 +16,7 @@ static ot::GlobalKeyMapRegistrar stackItemKey(OT_SimpleFactoryJsonKeyValue_Graph
 ot::GraphicsStackItem::GraphicsStackItem() 
 	: ot::GraphicsGroupItem(true), m_lastCalculatedSize(-1., -1.) 
 {
-	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
+	//this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 }
 
 ot::GraphicsStackItem::~GraphicsStackItem() {
@@ -80,7 +80,7 @@ void ot::GraphicsStackItem::removeAllConnections(void) {
 }
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	ot::GraphicsGroupItem::callPaint(_painter, _opt, _widget);
+	this->paint(_painter, _opt, _widget);
 	//for (auto itm : m_items) itm.item->callPaint(_painter, _opt, _widget);
 }
 
@@ -138,4 +138,11 @@ QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 		s = s.expandedTo(itm.item->graphicsItemSizeHint(_hint, _constrains));
 	}
 	return s;
+}
+
+void ot::GraphicsStackItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
+	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
+	for (auto itm : m_items) {
+		itm.item->setGraphicsItemRequestedSize(_size);
+	}
 }

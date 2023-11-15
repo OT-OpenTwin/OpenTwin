@@ -41,6 +41,8 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
+		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
+
 	private:
 		void memClear(void);
 		void adjustChildItems(void);

@@ -65,7 +65,9 @@ void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGra
 	m_layoutWrap->callPaint(_painter, _opt, _widget);
 }
 
-QGraphicsLayoutItem* ot::GraphicsLayoutItem::getQGraphicsLayoutItem(void) { return m_layoutWrap->getQGraphicsLayoutItem(); };
+QGraphicsLayoutItem* ot::GraphicsLayoutItem::getQGraphicsLayoutItem(void) { 
+	return m_layoutWrap->getQGraphicsLayoutItem(); 
+};
 
 QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) { return m_layoutWrap->getQGraphicsItem(); };
 
@@ -90,4 +92,10 @@ void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 
 	// Refresh the parent item
 	this->setParentGraphicsItem(nullptr);
+}
+
+void ot::GraphicsLayoutItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
+	OTAssertNullptr(m_layoutWrap);
+	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
+	m_layoutWrap->setGraphicsItemRequestedSize(_size);
 }

@@ -137,7 +137,7 @@ namespace ot {
 		QSizeF applyGraphicsItemMargins(const QSizeF& _size) const;
 		QSizeF removeGraphicsItemMargins(const QSizeF& _size) const;
 
-		void setGraphicsItemRequestedSize(const QSizeF& _size);
+		virtual void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
 
 		//! @brief Calculates the draw rect for the item
