@@ -174,7 +174,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	bor->setCornerRadius(5);
 	bor->setName(_name + "_bor");
-	bor->setSize(ot::Size2DD(200., 200.));
+	bor->setSize(ot::Size2DD(20., 100.));
 	root->addItemTop(bor, false, true);
 
 	// Layout
@@ -215,7 +215,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setMaximumSize(ot::Size2DD(16., 16.));
 		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(5., 0., 0., 15.));
+		titLImg->setMargins(ot::MarginsD(0., 0., 0., 15.));
 		tLay->addChildItem(titLImg);
 	}
 	

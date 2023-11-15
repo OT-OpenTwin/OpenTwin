@@ -81,7 +81,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	const ot::Color colourBackground(ot::Color::White);
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	//block->setBackgroundImagePath("Images/Graph");
+	block->setBackgroundImagePath("Images/Graph");
 
 	AddConnectors(block.get());
 
