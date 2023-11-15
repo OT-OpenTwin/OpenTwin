@@ -97,6 +97,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 	case ot::GraphicsFlowConnectorCfg::Circle: return this->createCircleItem();
 	case ot::GraphicsFlowConnectorCfg::TriangleLeft: return this->createLeftTriangleItem();
 	case ot::GraphicsFlowConnectorCfg::TriangleRight: return this->createRightTriangleItem();
+	case ot::GraphicsFlowConnectorCfg::TriangleUp: return this->createUpTriangleItem();
+	case ot::GraphicsFlowConnectorCfg::TriangleDown: return this->createDownTriangleItem();
 	default:
 		OT_LOG_EA("Unknown connector type");
 		throw std::exception("Unknown connector type");
@@ -134,6 +136,26 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createLeftTriangleItem(void) 
 
 ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createRightTriangleItem(void) {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Right);
+	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
+	itm->setMaximumSize(ot::Size2DD(10., 10.));
+	itm->setMinimumSize(ot::Size2DD(10., 10.));
+	itm->setOutline(ot::Border(m_secondaryColor, 1));
+
+	return itm;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createUpTriangleItem(void) {
+	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Up);
+	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
+	itm->setMaximumSize(ot::Size2DD(10., 10.));
+	itm->setMinimumSize(ot::Size2DD(10., 10.));
+	itm->setOutline(ot::Border(m_secondaryColor, 1));
+
+	return itm;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createDownTriangleItem(void) {
+	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Down);
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));

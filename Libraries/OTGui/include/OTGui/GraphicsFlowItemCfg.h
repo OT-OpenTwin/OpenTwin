@@ -22,6 +22,8 @@ namespace ot {
 			Square,
 			TriangleRight,
 			TriangleLeft,
+			TriangleUp,
+			TriangleDown,
 			Circle
 		};
 
@@ -59,6 +61,8 @@ namespace ot {
 		ot::GraphicsItemCfg* createCircleItem(void);
 		ot::GraphicsItemCfg* createLeftTriangleItem(void);
 		ot::GraphicsItemCfg* createRightTriangleItem(void);
+		ot::GraphicsItemCfg* createUpTriangleItem(void);
+		ot::GraphicsItemCfg* createDownTriangleItem(void);
 
 		std::string m_name;
 		std::string m_text;
