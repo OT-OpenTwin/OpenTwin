@@ -16,6 +16,8 @@
 #include "OpenTwinFoundation/UiComponent.h"
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinCommunication/Msg.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/LinearGradientPainter2D.h"
 
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
@@ -26,6 +28,8 @@
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsTextItemCfg.h"
+#include "OTGui/GraphicsStackItemCfg.h"
 
 #include "OTGui/LinearGradientPainter2D.h"
 
@@ -167,33 +171,47 @@ namespace ottest {
 		root->setName(_name);
 		root->setTitle(_name);
 
+		ot::GraphicsStackItemCfg* s1 = new ot::GraphicsStackItemCfg;
+		s1->setName(_name + "s1");
+
+		ot::GraphicsStackItemCfg* s2 = new ot::GraphicsStackItemCfg;
+		s2->setName(_name + "s2");
+
+		ot::GraphicsHBoxLayoutItemCfg* h1 = new ot::GraphicsHBoxLayoutItemCfg;
+		h1->setName(_name + "h1");
+
+		ot::GraphicsHBoxLayoutItemCfg* h2 = new ot::GraphicsHBoxLayoutItemCfg;
+		h2->setName(_name + "h2");
+
 		ot::GraphicsRectangularItemCfg* r1 = new ot::GraphicsRectangularItemCfg;
 		r1->setName(_name + "r1");
+		r1->setBackgroundPainer(new ot::FillPainter2D(ot::Color(255, 0, 0)));
 		r1->setSize(ot::Size2DD(10., 10.));
-
 
 		ot::GraphicsRectangularItemCfg* r2 = new ot::GraphicsRectangularItemCfg;
 		r2->setName(_name + "r2");
-		r2->setSize(ot::Size2DD(100., 10.));
-
-		ot::GraphicsGridLayoutItemCfg* h1 = new ot::GraphicsGridLayoutItemCfg(1, 2);
-		h1->setName(_name + "h1");
-		
-		ot::GraphicsEllipseItemCfg* e1 = new ot::GraphicsEllipseItemCfg;
-		e1->setName(_name + "e1");
-		e1->setRadiusX(5);
-		e1->setRadiusY(5);
+		r2->setBackgroundPainer(new ot::FillPainter2D(ot::Color(0, 255, 0)));
+		r2->setSize(ot::Size2DD(10., 10.));
 
 		ot::GraphicsRectangularItemCfg* r3 = new ot::GraphicsRectangularItemCfg;
 		r3->setName(_name + "r3");
-		r3->setSize(ot::Size2DD(10., 10.));
+		r3->setBackgroundPainer(new ot::FillPainter2D(ot::Color(0, 0, 255)));
+		r3->setSize(ot::Size2DD(100., 10.));
 
-		h1->addChildItem(0, 0, e1);
-		h1->addChildItem(0, 1, r3);
+		ot::GraphicsTextItemCfg* t1 = new ot::GraphicsTextItemCfg;
+		t1->setName(_name + "t1");
+		t1->setText("Hello my darkest of the Worlds");
 
-		root->addChildItem(r1);
-		root->addChildItem(h1);
-		root->addChildItem(r2);
+		root->addChildItem(s1);
+		root->addChildItem(s2);
+
+		s1->addItemTop(h1, true, false);
+		s2->addItemTop(h2, true, false);
+
+		h1->addChildItem(r1);
+		h1->addChildItem(r2);
+
+		h2->addChildItem(t1);
 
 		return root;
 	}
