@@ -41,6 +41,7 @@
     <ClCompile Include="src\GraphicsScene.cpp" />
     <ClCompile Include="src\GraphicsStackItem.cpp" />
     <ClCompile Include="src\GraphicsTextItem.cpp" />
+    <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsRectangularItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsStackItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsTextItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsTriangleItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsVBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.h" />
     <ClInclude Include="include\OTWidgets\LineEdit.h" />

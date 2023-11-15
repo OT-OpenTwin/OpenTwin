@@ -99,6 +99,9 @@
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h">
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsTriangleItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -171,6 +174,9 @@
       <Filter>Source Files\Painter</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsHBoxLayoutItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsTriangleItem.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

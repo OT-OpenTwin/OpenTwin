@@ -11,6 +11,7 @@
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsTextItemCfg.h"
+#include "OTGui/GraphicsTriangleItemCfg.h"
 
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsVBoxLayoutItemCfg.h"
@@ -94,6 +95,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
 	{
 	case ot::GraphicsFlowConnectorCfg::Square: return this->createSquareItem();
 	case ot::GraphicsFlowConnectorCfg::Circle: return this->createCircleItem();
+	case ot::GraphicsFlowConnectorCfg::TriangleLeft: return this->createLeftTriangleItem();
+	case ot::GraphicsFlowConnectorCfg::TriangleRight: return this->createRightTriangleItem();
 	default:
 		OT_LOG_EA("Unknown connector type");
 		throw std::exception("Unknown connector type");
@@ -115,6 +118,26 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createCircleItem(void) {
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
 	itm->setBorder(ot::Border(m_secondaryColor, 1));
+
+	return itm;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createLeftTriangleItem(void) {
+	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Left);
+	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
+	itm->setMaximumSize(ot::Size2DD(10., 10.));
+	itm->setMinimumSize(ot::Size2DD(10., 10.));
+	itm->setOutline(ot::Border(m_secondaryColor, 1));
+
+	return itm;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createRightTriangleItem(void) {
+	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Right);
+	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
+	itm->setMaximumSize(ot::Size2DD(10., 10.));
+	itm->setMinimumSize(ot::Size2DD(10., 10.));
+	itm->setOutline(ot::Border(m_secondaryColor, 1));
 
 	return itm;
 }

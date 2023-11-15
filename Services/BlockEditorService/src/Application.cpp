@@ -78,8 +78,8 @@ namespace ottest {
 		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
 		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
 		flow.addLeft("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::TriangleLeft, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::TriangleRight, ot::Color::Yellow);
 
 		return flow.createGraphicsItem(_name, _name);
 	}

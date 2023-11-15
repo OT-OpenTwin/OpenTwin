@@ -36,6 +36,7 @@
     <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsStackItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsTriangleItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsVBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
     <ClInclude Include="include\OTGui\LengthLimitation.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />
     <ClCompile Include="src\GraphicsStackItemCfg.cpp" />
     <ClCompile Include="src\GraphicsTextItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
     <ClCompile Include="src\LengthLimitation.cpp" />

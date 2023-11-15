@@ -20,8 +20,8 @@ namespace ot {
 	public:
 		enum ConnectorFigure {
 			Square,
-			//TriangleRight,
-			//TriangleLeft,
+			TriangleRight,
+			TriangleLeft,
 			Circle
 		};
 
@@ -57,6 +57,8 @@ namespace ot {
 		ot::GraphicsItemCfg* createConnectorItem(void);
 		ot::GraphicsItemCfg* createSquareItem(void);
 		ot::GraphicsItemCfg* createCircleItem(void);
+		ot::GraphicsItemCfg* createLeftTriangleItem(void);
+		ot::GraphicsItemCfg* createRightTriangleItem(void);
 
 		std::string m_name;
 		std::string m_text;

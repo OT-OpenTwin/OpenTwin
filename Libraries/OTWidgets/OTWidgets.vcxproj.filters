@@ -94,6 +94,9 @@
     <ClCompile Include="src\GraphicsConnectionItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsTriangleItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -192,6 +195,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsTriangleItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
