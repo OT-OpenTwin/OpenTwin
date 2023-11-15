@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/CustomGraphicsItem.h"
+#include "OpenTwinCore/OTClassHelper.h"
 
 // Qt header
 #include <QtGui/qpen.h>
@@ -17,6 +18,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public CustomGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsRectangularItem)
 	public:
 		GraphicsRectangularItem();
 		virtual ~GraphicsRectangularItem();
@@ -51,8 +53,13 @@ namespace ot {
 		const QSizeF& rectangleSize(void) const { return m_size; };
 
 		void setRectangleBrush(const QBrush& _brush) { m_brush = _brush; };
+		const QBrush& rectangleBrush(void) const { return m_brush; };
+
 		void setRectanglePen(const QPen& _pen) { m_pen = _pen; };
+		const QPen& rectanglePen(void) const { return m_pen; };
+
 		void setCornerRadius(int _r) { m_cornerRadius = _r; };
+		int cornerRadius(void) const { return m_cornerRadius; };
 
 	private:
 		QSizeF m_size;
