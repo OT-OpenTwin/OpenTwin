@@ -48,14 +48,13 @@ QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QS
 // QGraphicsLayoutItem
 
 QSizeF ot::CustomGraphicsItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, this->getDefaultGraphicsItemSize());
+	return this->handleGetGraphicsItemSizeHint(_hint, this->getPreferredGraphicsItemSize());
 }
 
 void ot::CustomGraphicsItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-
 	this->handleSetItemGeometry(_rect);
 }
 
@@ -64,12 +63,12 @@ void ot::CustomGraphicsItem::setGeometry(const QRectF& _rect) {
 // QGraphicsItem
 
 QRectF ot::CustomGraphicsItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(this->getDefaultGraphicsItemSize())));
+	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(this->getPreferredGraphicsItemSize())));
 }
 
 void ot::CustomGraphicsItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
-	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getDefaultGraphicsItemSize()));
+	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getPreferredGraphicsItemSize()));
 }
 
 QVariant ot::CustomGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

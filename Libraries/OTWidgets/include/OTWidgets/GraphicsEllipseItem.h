@@ -36,7 +36,7 @@ namespace ot {
 
 		// Base class functions: ot::CustomGraphicsItem
 
-		virtual QSizeF getDefaultGraphicsItemSize(void) const override;
+		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
 
 	protected:
 

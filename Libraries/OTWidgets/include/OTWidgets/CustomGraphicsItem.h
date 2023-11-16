@@ -23,7 +23,7 @@ namespace ot {
 
 		// Pure virtual functions
 
-		virtual QSizeF getDefaultGraphicsItemSize(void) const = 0;
+		virtual QSizeF getPreferredGraphicsItemSize(void) const = 0;
 
 	protected:
 

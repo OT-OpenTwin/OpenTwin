@@ -55,7 +55,7 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 // Base class functions: ot::CustomGraphicsItem
 
-QSizeF ot::GraphicsEllipseItem::getDefaultGraphicsItemSize(void) const {
+QSizeF ot::GraphicsEllipseItem::getPreferredGraphicsItemSize(void) const {
 	return QSizeF(m_radiusX * 2., m_radiusY * 2.);
 }
 

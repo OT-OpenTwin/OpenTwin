@@ -50,7 +50,7 @@ bool ot::GraphicsPixmapItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-QSizeF ot::GraphicsPixmapItem::getDefaultGraphicsItemSize(void) const {
+QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {
 	return m_pixmap.size();
 }
 
