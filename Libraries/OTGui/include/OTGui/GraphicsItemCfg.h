@@ -106,6 +106,9 @@ namespace ot {
 		void setUid(const std::string& _uid) { m_uid = _uid; };
 		const std::string& uid(void) const { return m_uid; };
 
+		void setSizePolicy(ot::SizePolicy _policy) { m_sizePolicy = _policy; };
+		ot::SizePolicy sizePolicy(void) const { return m_sizePolicy; };
+
 	private:
 		std::string m_name;
 		std::string m_tile;
@@ -118,6 +121,7 @@ namespace ot {
 		MarginsD m_margins;
 		GraphicsItemFlag m_flags;
 		ot::Alignment m_alignment;
+		ot::SizePolicy m_sizePolicy;
 	};
 
 }

@@ -71,7 +71,6 @@ std::string ot::toString(ot::FontFamily _fontFamily) {
 	case ot::TrebuchetMS: return "TrebuchetMS";
 	case ot::Verdana: return "Verdana";
 	default:
-		OT_LOG_EAS("Unknown font family provided: \"" + std::to_string((int)_fontFamily) + "\"");
 		OT_LOG_EA("Unknown font family provided");
 		throw std::exception("Unknown font family provided");
 	}
@@ -92,5 +91,29 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 	else {
 		OT_LOG_EAS("Unknown font family provided: \"" + _string + "\"");
 		throw std::exception("Unknown font family provided");
+	}
+}
+
+std::string ot::toString(SizePolicy _policy) {
+	switch (_policy)
+	{
+	case ot::Fixed: return "Fixed";
+	case ot::Shrink: return "Shrink";
+	case ot::Expand: return "Expand";
+	case ot::Dynamic: return "Dynamic";
+	default:
+		OT_LOG_EA("Unknown size policy");
+		throw std::exception("Unknown size policy");
+	}
+}
+
+ot::SizePolicy ot::stringToSizePolicy(const std::string& _string) {
+	if (_string == toString(ot::Fixed)) { return ot::Fixed; }
+	else if (_string == toString(ot::Shrink)) { return ot::Shrink; }
+	else if (_string == toString(ot::Expand)) { return ot::Expand; }
+	else if (_string == toString(ot::Dynamic)) { return ot::Dynamic; }
+	else {
+		OT_LOG_EAS("Unknown size policy \"" + _string + "\"");
+		throw std::exception("Unknown size policy");
 	}
 }

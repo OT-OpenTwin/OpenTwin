@@ -32,10 +32,14 @@
 #define OT_JSON_MEMBER_MaxSize "Size.Max"
 #define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_Alignment "Alignment"
+#define OT_JSON_MEMBER_SizePolicy "SizePolicy"
 
 #define OT_JSON_VALUE_Connectable "Connectable"
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX) {}
+ot::GraphicsItemCfg::GraphicsItemCfg()
+	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), 
+	m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Dynamic)
+{}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
@@ -64,6 +68,7 @@ void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val&
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Title, m_tile);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Alignment, ot::toString(m_alignment));
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_SizePolicy, ot::toString(m_sizePolicy));
 	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
 }
 
@@ -77,11 +82,13 @@ void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Alignment, String);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_SizePolicy, String);
 
 	m_uid = _object[OT_JSON_MEMBER_Uid].GetString();
 	m_name = _object[OT_JSON_MEMBER_Name].GetString();
 	m_tile = _object[OT_JSON_MEMBER_Title].GetString();
 	m_alignment = ot::stringToAlignment(_object[OT_JSON_MEMBER_Alignment].GetString());
+	m_sizePolicy = ot::stringToSizePolicy(_object[OT_JSON_MEMBER_SizePolicy].GetString());
 
 	OT_rJSON_val posObj = _object[OT_JSON_MEMBER_Position].GetObject();
 	OT_rJSON_val marginObj = _object[OT_JSON_MEMBER_Margin].GetObject();

@@ -150,6 +150,7 @@ namespace ot {
 		std::string m_uid;
 		std::string m_name;
 		ot::Alignment m_alignment;
+		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
 		GraphicsItemFlag m_flags;
 
