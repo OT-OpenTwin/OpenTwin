@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
 #include <QtGui/qpixmap.h>
@@ -14,39 +14,34 @@
 #define OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem "OT_GIPixmap"
 
 namespace ot {
-	class OT_WIDGETS_API_EXPORT GraphicsPixmapItem : public QGraphicsItem, public QGraphicsLayoutItem, public GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsPixmapItem : public CustomGraphicsItem {
 	public:
 		GraphicsPixmapItem();
 		virtual ~GraphicsPixmapItem();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions: ot::GraphicsItem
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem); };
 
-		virtual void prepareGraphicsItemGeometryChange(void) override;
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-		virtual void setGeometry(const QRectF& _rect) override;
+		// Base class functions: ot::CustomGraphicsItem
 
-		virtual QRectF boundingRect(void) const override;
+		virtual QSizeF getDefaultGraphicsItemSize(void) const override;
 
-		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+	protected:
 
-		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
-		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
+		//! @brief Paint the item inside the provided rect
+		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
 
-		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
-
-		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
-		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
-
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
-
-		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-
+		// Setter / Getter
 	private:
 		QPixmap m_pixmap;
 	};

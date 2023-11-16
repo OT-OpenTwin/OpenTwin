@@ -16,7 +16,7 @@ static ot::SimpleFactoryRegistrar<ot::GraphicsPixmapItem> pixmapItem(OT_SimpleFa
 static ot::GlobalKeyMapRegistrar pixmapItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
 
 ot::GraphicsPixmapItem::GraphicsPixmapItem()
-	: ot::GraphicsItem(false)
+	: ot::CustomGraphicsItem(false)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -50,56 +50,10 @@ bool ot::GraphicsPixmapItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsPixmapItem::prepareGraphicsItemGeometryChange(void) {
-	this->prepareGeometryChange();
+QSizeF ot::GraphicsPixmapItem::getDefaultGraphicsItemSize(void) const {
+	return m_pixmap.size();
 }
 
-QSizeF ot::GraphicsPixmapItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, m_pixmap.size());
-};
-
-void ot::GraphicsPixmapItem::setGeometry(const QRectF& _rect) {
-	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
-	this->setPos(_rect.topLeft());
-
-	this->handleSetItemGeometry(_rect);
-}
-
-QRectF ot::GraphicsPixmapItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(m_pixmap.size())));
-}
-
-QVariant ot::GraphicsPixmapItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	this->handleItemChange(_change, _value);
-	return QGraphicsItem::itemChange(_change, _value);
-}
-
-void ot::GraphicsPixmapItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
-	QGraphicsItem::mousePressEvent(_event);
-}
-
-void ot::GraphicsPixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
-	QGraphicsItem::mouseReleaseEvent(_event);
-}
-
-void ot::GraphicsPixmapItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsPixmapItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paintGeneralGraphics(_painter, _opt, _widget);
-	QRectF rect = this->calculatePaintArea(m_pixmap.size());
-	_painter->drawPixmap(rect.topLeft().x(), rect.topLeft().y(), rect.width(), rect.height(), m_pixmap);
-}
-
-void ot::GraphicsPixmapItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
-}
-
-QSizeF ot::GraphicsPixmapItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->sizeHint(_hint, _constrains);
+void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+	_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), m_pixmap);
 }
