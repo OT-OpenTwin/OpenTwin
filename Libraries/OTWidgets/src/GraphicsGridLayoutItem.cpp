@@ -56,6 +56,9 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
 	}
 
+	this->setMinimumSize(ot::OTQtConverter::toQt(_cfg->minimumSize()));
+	this->setMaximumSize(ot::OTQtConverter::toQt(_cfg->maximumSize()));
+
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 

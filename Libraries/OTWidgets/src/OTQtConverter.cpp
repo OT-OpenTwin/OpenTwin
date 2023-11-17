@@ -40,3 +40,15 @@ QPointF ot::OTQtConverter::toQt(const ot::Point2DF& _pt) {
 QPointF ot::OTQtConverter::toQt(const ot::Point2DD& _pt) {
 	return QPointF(_pt.x(), _pt.y());
 }
+
+QSize ot::OTQtConverter::toQt(const ot::Size2D& _s) {
+	return QSize(_s.width(), _s.height());
+}
+
+QSizeF ot::OTQtConverter::toQt(const ot::Size2DF& _s) {
+	return QSizeF(_s.width(), _s.height());
+}
+
+QSizeF ot::OTQtConverter::toQt(const ot::Size2DD& _s) {
+	return QSizeF(_s.width(), _s.height());
+}
