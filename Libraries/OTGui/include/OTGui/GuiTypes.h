@@ -44,8 +44,17 @@ namespace ot {
 
 	//! @brief Size policy for UI elements
 	enum SizePolicy {
-		Preferred, //! The item size is the ideal size, the item wont shrink by may expand
+		Preferred, //! The item size is the ideal size, the item wont shrink but may expand
 		Dynamic //! The item size will be ignored and the requested size will be used instead (only use for nested items)
+	};
+
+	//! @brief Describes in which direction a connetion from an item may face
+	enum ConnectionDirection {
+		ConnectAny, //! A connection from this item may go in any direction
+		ConnectLeft, //! Connection starts towards left
+		ConnectUp, //! Connection starts upwards
+		ConnectRight, //! Connection starts towards right
+		ConnectDown //! Connection starts downwards
 	};
 
 	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
@@ -59,4 +68,7 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(SizePolicy _policy);
 	OT_GUI_API_EXPORT SizePolicy stringToSizePolicy(const std::string& _string);
+
+	OT_GUI_API_EXPORT std::string toString(ConnectionDirection _direction);
+	OT_GUI_API_EXPORT ConnectionDirection stringToConnectionDirection(const std::string& _direction);
 }

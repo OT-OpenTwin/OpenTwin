@@ -9,12 +9,14 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Margins.h"
+//#include "OTGui/GraphicsItemCfg.h"
 #include "OpenTwinCore/SimpleFactory.h"
 #include "OpenTwinCore/Flags.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
+#include <QtCore/qpoint.h>
 
 // std header
 #include <list>
@@ -153,7 +155,7 @@ namespace ot {
 		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
 		GraphicsItemFlag m_flags;
-
+		
 		QPointF m_moveStartPt; //! @brief Item move origin
 		GraphicsItem* m_parent; //! @brief Parent graphics item
 		GraphicsItemDrag* m_drag; //! @brief Drag instance

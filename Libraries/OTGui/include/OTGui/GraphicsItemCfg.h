@@ -109,6 +109,9 @@ namespace ot {
 		void setSizePolicy(ot::SizePolicy _policy) { m_sizePolicy = _policy; };
 		ot::SizePolicy sizePolicy(void) const { return m_sizePolicy; };
 
+		void setConnectionDirection(ConnectionDirection _direction) { m_connectionDirection = _direction; };
+		ConnectionDirection connectionDirection(void) const { return m_connectionDirection; };
+
 	private:
 		std::string m_name;
 		std::string m_tile;
@@ -122,6 +125,7 @@ namespace ot {
 		GraphicsItemFlag m_flags;
 		ot::Alignment m_alignment;
 		ot::SizePolicy m_sizePolicy;
+		ConnectionDirection m_connectionDirection;
 	};
 
 }

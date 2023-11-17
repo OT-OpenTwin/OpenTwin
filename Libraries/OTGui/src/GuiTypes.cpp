@@ -113,3 +113,29 @@ ot::SizePolicy ot::stringToSizePolicy(const std::string& _string) {
 		throw std::exception("Unknown size policy");
 	}
 }
+
+std::string ot::toString(ot::ConnectionDirection _direction) {
+	switch (_direction)
+	{
+	case ot::ConnectAny: return "Any";
+	case ot::ConnectLeft: return "Left";
+	case ot::ConnectUp: return "Up";
+	case ot::ConnectRight: return "Right";
+	case ot::ConnectDown: return "Down";
+	default:
+		OT_LOG_EA("Unknown connection direction");
+		throw std::exception("Unknown connection direction");
+	}
+}
+
+ot::ConnectionDirection ot::stringToConnectionDirection(const std::string& _direction) {
+	if (_direction == toString(ot::ConnectAny)) return ot::ConnectAny;
+	else if (_direction == toString(ot::ConnectLeft)) return ot::ConnectLeft;
+	else if (_direction == toString(ot::ConnectUp)) return ot::ConnectUp;
+	else if (_direction == toString(ot::ConnectRight)) return ot::ConnectRight;
+	else if (_direction == toString(ot::ConnectDown)) return ot::ConnectDown;
+	else {
+		OT_LOG_EAS("Unknown connection direction \"" + _direction + "\"");
+		throw std::exception("Unknown connection direction");
+	}
+}
