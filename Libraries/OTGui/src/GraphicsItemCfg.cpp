@@ -38,7 +38,7 @@
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
 	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), 
-	m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Fixed)
+	m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Preferred)
 {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}

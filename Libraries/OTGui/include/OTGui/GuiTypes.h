@@ -44,10 +44,8 @@ namespace ot {
 
 	//! @brief Size policy for UI elements
 	enum SizePolicy {
-		Fixed,	//! The size of the item will remain and wont be adjusted
-		Shrink, //! The item size is the maximum size but the item may shrink
-		Expand, //! The item size is the minimum size but the item may expand
-		Dynamic //! The item size is the ideal size but the item may shrink and expand
+		Preferred, //! The item size is the ideal size, the item wont shrink by may expand
+		Dynamic //! The item size will be ignored and the requested size will be used instead (only use for nested items)
 	};
 
 	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
@@ -61,5 +59,4 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(SizePolicy _policy);
 	OT_GUI_API_EXPORT SizePolicy stringToSizePolicy(const std::string& _string);
-
 }

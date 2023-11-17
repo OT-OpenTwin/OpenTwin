@@ -97,9 +97,7 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 std::string ot::toString(SizePolicy _policy) {
 	switch (_policy)
 	{
-	case ot::Fixed: return "Fixed";
-	case ot::Shrink: return "Shrink";
-	case ot::Expand: return "Expand";
+	case ot::Preferred: return "Preferred";
 	case ot::Dynamic: return "Dynamic";
 	default:
 		OT_LOG_EA("Unknown size policy");
@@ -108,9 +106,7 @@ std::string ot::toString(SizePolicy _policy) {
 }
 
 ot::SizePolicy ot::stringToSizePolicy(const std::string& _string) {
-	if (_string == toString(ot::Fixed)) { return ot::Fixed; }
-	else if (_string == toString(ot::Shrink)) { return ot::Shrink; }
-	else if (_string == toString(ot::Expand)) { return ot::Expand; }
+	if (_string == toString(ot::Preferred)) { return ot::Preferred; }
 	else if (_string == toString(ot::Dynamic)) { return ot::Dynamic; }
 	else {
 		OT_LOG_EAS("Unknown size policy \"" + _string + "\"");

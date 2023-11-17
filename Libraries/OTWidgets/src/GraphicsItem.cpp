@@ -37,7 +37,7 @@
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
-	m_sizePolicy(ot::Fixed), m_requestedSize(-1., -1.)
+	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.)
 {
 
 }
@@ -289,14 +289,8 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 
 	switch (m_sizePolicy)
 	{
-	case ot::Fixed:
+	case ot::Preferred:
 		inner = _innerSize;
-		break;
-	case ot::Shrink:
-		inner = _innerSize;
-		break;
-	case ot::Expand:
-		inner = m_minSize;
 		break;
 	case ot::Dynamic:
 		inner = m_minSize;
