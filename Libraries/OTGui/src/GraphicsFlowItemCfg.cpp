@@ -219,12 +219,13 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	bor->setCornerRadius(5);
 	bor->setName(_name + "_bor");
-	bor->setSize(ot::Size2DD(20., 100.));
+	bor->setSizePolicy(ot::Dynamic);
 	root->addItemTop(bor, false, true);
 
 	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(_name + "_mLay");
+	mLay->setMinimumSize(ot::Size2DD(20., 50.));
 	root->addItemTop(mLay, true, false);
 
 	// Title: Stack
@@ -237,7 +238,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	tBor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	tBor->setName(_name + "_tBor");
 	tBor->setCornerRadius(5);
-	tBor->setSize(ot::Size2DD(200., 30.));
+	//tBor->setSize(ot::Size2DD(200., 30.));
+	tBor->setSizePolicy(ot::Dynamic);
 	tStack->addItemTop(tBor, false, true);
 
 	// Title: Layout
