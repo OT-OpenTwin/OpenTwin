@@ -48,7 +48,7 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
 	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

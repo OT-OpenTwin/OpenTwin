@@ -15,6 +15,7 @@
 // Qt header
 #include <QtCore/qpoint.h>
 #include <QtGui/qcolor.h>
+#include <QtWidgets/qsizepolicy.h>
 
 namespace ot {
 	namespace OTQtConverter {
@@ -27,7 +28,8 @@ namespace ot {
 		OT_WIDGETS_API_EXPORTONLY QPoint toQt(const ot::Point2D& _pt);
 		OT_WIDGETS_API_EXPORTONLY QPointF toQt(const ot::Point2DF& _pt);
 		OT_WIDGETS_API_EXPORTONLY QPointF toQt(const ot::Point2DD& _pt);
-
+		
+		OT_WIDGETS_API_EXPORTONLY QSizePolicy toQt(ot::SizePolicy _policy);
 	}
 }
 

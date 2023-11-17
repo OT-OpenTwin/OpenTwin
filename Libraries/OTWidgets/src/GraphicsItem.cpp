@@ -37,7 +37,7 @@
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
-	m_sizePolicy(ot::Dynamic)
+	m_sizePolicy(ot::Fixed), m_requestedSize(-1., -1.)
 {
 
 }
@@ -160,7 +160,8 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 
 	switch (_hint)
 	{
-	case Qt::MinimumSize: 
+	case Qt::MinimumSize:
+		return this->applyGraphicsItemMargins(m_minSize);
 	case Qt::PreferredSize:
 	case Qt::MinimumDescent:
 	case Qt::NSizeHints:
@@ -174,10 +175,19 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 }
 
 QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) const {
-	return QRectF(
-		_rect.topLeft(),
-		this->applyGraphicsItemMargins(_rect.size().expandedTo(m_minSize).expandedTo(m_requestedSize).boundedTo(m_maxSize))
-	);
+	if (m_sizePolicy == ot::Dynamic) {
+		return QRectF(
+			_rect.topLeft(),
+			this->applyGraphicsItemMargins(m_minSize.expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize))
+		);
+	}
+	else {
+		return QRectF(
+			_rect.topLeft(),
+			this->applyGraphicsItemMargins(_rect.size().expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize))
+		);
+	}
+	
 }
 
 void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -270,11 +280,32 @@ QSizeF ot::GraphicsItem::removeGraphicsItemMargins(const QSizeF& _size) const {
 QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	auto qitm = this->getQGraphicsItem();
 	OTAssertNullptr(qitm);
+	
+	// Get the bounding rect of the item
 	QRectF r(qitm->boundingRect());
 
 	// Adjust size
-	QSizeF inner(_innerSize);
-	inner = inner.expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize);// .boundedTo(r.size());
+	QSizeF inner;
+
+	switch (m_sizePolicy)
+	{
+	case ot::Fixed:
+		inner = _innerSize;
+		break;
+	case ot::Shrink:
+		inner = _innerSize;
+		break;
+	case ot::Expand:
+		inner = m_minSize;
+		break;
+	case ot::Dynamic:
+		inner = m_minSize;
+		break;
+	default:
+		break;
+	}
+
+	inner = inner.expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize);
 
 	// No further adjustments needed
 	if (inner.toSize() == r.size()) return r;

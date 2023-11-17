@@ -54,7 +54,7 @@ bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setTriangleSize(m_size);
 
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

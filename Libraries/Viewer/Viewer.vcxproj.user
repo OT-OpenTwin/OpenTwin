@@ -24,18 +24,18 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2023-11-15T15:54:51.1207256Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-16T11:58:25.9974648Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2023-11-15T15:54:51.0187264Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-16T11:58:25.7573711Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2023-11-15T15:54:51.2243892Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-16T11:58:26.1034300Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2023-11-15T15:54:51.3380646Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-16T11:58:26.2103529Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2023-11-15T15:54:50.6816510Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-16T11:58:25.6475692Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

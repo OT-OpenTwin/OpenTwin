@@ -307,6 +307,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
 		cImg->setMargins(ot::MarginsD(5., 5., 5., 5.));
+		cImg->setSizePolicy(ot::Dynamic);
 
 		cStack->addItemTop(cImg, false, true);
 		cStack->addItemTop(cLay, true, false);

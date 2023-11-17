@@ -135,7 +135,12 @@ void ot::GraphicsStackItem::adjustChildItems(void) {
 QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	QSizeF s;
 	for (auto itm : m_items) {
-		s = s.expandedTo(itm.item->graphicsItemSizeHint(_hint, _constrains));
+		if (itm.isMaster) {
+			s = s.expandedTo(itm.item->graphicsItemSizeHint(_hint, _constrains));
+		}
+		else {
+			s = s.expandedTo(itm.item->graphicsItemSizeHint(Qt::MinimumSize, _constrains));
+		}
 	}
 	return s;
 }

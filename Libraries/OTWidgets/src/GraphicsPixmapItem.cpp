@@ -47,7 +47,7 @@ bool ot::GraphicsPixmapItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		OT_LOG_EA("[FATAL] Unknown error");
 		return false;
 	}
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
 QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {

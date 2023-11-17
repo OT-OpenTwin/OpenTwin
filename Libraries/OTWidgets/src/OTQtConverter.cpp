@@ -40,3 +40,15 @@ QPointF ot::OTQtConverter::toQt(const ot::Point2DF& _pt) {
 QPointF ot::OTQtConverter::toQt(const ot::Point2DD& _pt) {
 	return QPointF(_pt.x(), _pt.y());
 }
+
+QSizePolicy ot::OTQtConverter::toQt(ot::SizePolicy _policy) {
+	switch (_policy)
+	{
+	case ot::Fixed: return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	case ot::Shrink: return QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	case ot::Expand: return QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	case ot::Dynamic: return QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	default:
+		break;
+	}
+}
