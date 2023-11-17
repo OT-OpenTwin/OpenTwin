@@ -11,81 +11,69 @@
 
 namespace ot {
 
-	template <class T> 
-	class __declspec(dllexport) Point2DTemplate : public ot::Serializable {
+	//! @brief 2D Point with integer values
+	class OT_CORE_API_EXPORT Point2D : public ot::Serializable {
 	public:
-		Point2DTemplate() : m_x((T)0), m_y((T)0) {};
+		Point2D() : m_x(0), m_y(0) {};
+		Point2D(int _x, int _y) : m_x(_x), m_y(_y) {};
+		Point2D(const Point2D& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
+		virtual ~Point2D() {};
 
-		//! @brief Constructor
-		//! @param _x The initial X value
-		//! @param _y The initial Y value
-		Point2DTemplate(T _x, T _y) : m_x(_x), m_y(_y) {};
+		Point2D& operator = (const Point2D& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
+		bool operator == (const Point2D& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
+		bool operator != (const Point2D& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
 
-		//! @brief Copy constructor
-		//! @param _other The other 2D point
-		Point2DTemplate(const Point2DTemplate<T>& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
 
-		virtual ~Point2DTemplate() {};
-
-		Point2DTemplate<T>& operator = (const Point2DTemplate<T>& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
-		bool operator == (const Point2DTemplate<T>& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
-		bool operator != (const Point2DTemplate<T>& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
 
 		//! @brief Returns the current X value
-		T x(void) const { return m_x; };
+		int x(void) const { return m_x; };
 
 		//! @brief Returns the current Y value
-		T y(void) const { return m_y; };
+		int y(void) const { return m_y; };
 
 		//! @brief Set the X value
 		//! @param _x The X value to set
-		void setX(T _x) { m_x = _x; };
+		void setX(int _x) { m_x = _x; };
 
 		//! @brief Set the Y value
 		//! @param _y The Y value to set
-		void setY(T _y) { m_y = _y; };
+		void setY(int _y) { m_y = _y; };
 
 		//! @brief Set the X and Y value
 		//! @param _x The X value to set
 		//! @param _y The y value to set
-		void set(T _x, T _y) { m_x = _x; m_y = _y; };
+		void set(int _x, int _y) { m_x = _x; m_y = _y; };
 
-	protected:
-		T		m_x;			//! The current X value
-		T		m_y;			//! The current Y value
-
+	private:
+		int	m_x; //! The current X value
+		int m_y; //! The current Y value
 	};
 
-	//! @brief 2D Point with integer values
-	class OT_CORE_API_EXPORT Point2D : public Point2DTemplate<int> {
-	public:
-		Point2D() : Point2DTemplate(0, 0) {};
-		Point2D(int _x, int _y) : Point2DTemplate(_x, _y) {};
-		Point2D(const Point2D& _other) : Point2DTemplate(_other) {};
-		virtual ~Point2D() {};
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-		Point2D& operator = (const Point2D& _other) = default;
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-		//! @brief Add the object contents to the provided JSON object
-		//! @param _document The JSON document (used to get the allocator)
-		//! @param _object The JSON object to add the contents to
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
-
-		//! @brief Will set the object contents from the provided JSON object
-		//! @param _object The JSON object containing the information
-		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
-		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
-	};
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	//! @brief 2D Point with float values
-	class OT_CORE_API_EXPORT Point2DF : public Point2DTemplate<float> {
+	class OT_CORE_API_EXPORT Point2DF : public ot::Serializable {
 	public:
-		Point2DF() : Point2DTemplate(0, 0) {};
-		Point2DF(float _x, float _y) : Point2DTemplate(_x, _y) {};
-		Point2DF(const Point2DF& _other) : Point2DTemplate(_other) {};
+		Point2DF() : m_x(0.f), m_y(0.f) {};
+		Point2DF(float _x, float _y) : m_x(_x), m_y(_y) {};
+		Point2DF(const Point2DF& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
 		virtual ~Point2DF() {};
 
-		Point2DF& operator = (const Point2DF& _other) = default;
+		Point2DF& operator = (const Point2DF& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
+		bool operator == (const Point2DF& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
+		bool operator != (const Point2DF& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -96,17 +84,48 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		//! @brief Returns the current X value
+		float x(void) const { return m_x; };
+
+		//! @brief Returns the current Y value
+		float y(void) const { return m_y; };
+
+		//! @brief Set the X value
+		//! @param _x The X value to set
+		void setX(float _x) { m_x = _x; };
+
+		//! @brief Set the Y value
+		//! @param _y The Y value to set
+		void setY(float _y) { m_y = _y; };
+
+		//! @brief Set the X and Y value
+		//! @param _x The X value to set
+		//! @param _y The y value to set
+		void set(float _x, float _y) { m_x = _x; m_y = _y; };
+
+	private:
+		float m_x; //! The current X value
+		float m_y; //! The current Y value
 	};
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	//! @brief 2D Point with double values
-	class OT_CORE_API_EXPORT Point2DD : public Point2DTemplate<double> {
+	class OT_CORE_API_EXPORT Point2DD : public ot::Serializable {
 	public:
-		Point2DD() : Point2DTemplate(0, 0) {};
-		Point2DD(double _x, double _y) : Point2DTemplate(_x, _y) {};
-		Point2DD(const Point2DD& _other) : Point2DTemplate(_other) {};
+		Point2DD() : m_x(0.), m_y(0.) {};
+		Point2DD(double _x, double _y) : m_x(_x), m_y(_y) {};
+		Point2DD(const Point2DD& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
 		virtual ~Point2DD() {};
 
-		Point2DD& operator = (const Point2DD& _other) = default;
+		Point2DD& operator = (const Point2DD& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
+		bool operator == (const Point2DD& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
+		bool operator != (const Point2DD& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -117,6 +136,29 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+
+		//! @brief Returns the current X value
+		double x(void) const { return m_x; };
+
+		//! @brief Returns the current Y value
+		double y(void) const { return m_y; };
+
+		//! @brief Set the X value
+		//! @param _x The X value to set
+		void setX(double _x) { m_x = _x; };
+
+		//! @brief Set the Y value
+		//! @param _y The Y value to set
+		void setY(double _y) { m_y = _y; };
+
+		//! @brief Set the X and Y value
+		//! @param _x The X value to set
+		//! @param _y The y value to set
+		void set(double _x, double _y) { m_x = _x; m_y = _y; };
+
+	private:
+		double m_x; //! The current X value
+		double m_y; //! The current Y value
 	};
 
 }
