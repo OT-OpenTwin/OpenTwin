@@ -11,6 +11,7 @@
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
 
+
 // Open twin header
 #include "OpenTwinCore/ReturnMessage.h"
 #include "OpenTwinFoundation/UiComponent.h"
@@ -20,25 +21,43 @@
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsStackItemCfg.h"
+#include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTGui/FillPainter2D.h"
+
+
+
 
 
 // Third Party Header
-#include "ngspice/sharedspice.h"
+#include <ngspice/sharedspice.h>
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <filesystem>
+#include <string.h>
 
 
 
 Application * g_instance{ nullptr };
 
-#define EXAMPLE_NAME_BLOCK1 "First"
-#define EXAMPLE_NAME_Block2 "Second"
+#define EXAMPLE_NAME_BLOCK1 "Resistor"
+#define EXAMPLE_NAME_Block2 "VoltageSource"
+#define EXAMPLE_NAME_Block3 "Diode"
 
 #undef GetObject
 
 namespace ottest
 {
-	static unsigned long long currentBlocikUid = 0;
+	static unsigned long long currentBlockUid = 0;
+
+	static unsigned long long currentResistorUid = 1;
+
+	static unsigned long long currentNodeNumber = 0;
+
+	static unsigned long long currentDiodeID = 1;
 
 	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
 		ot::GraphicsFlowConnectorCfg cfg;
@@ -48,31 +67,92 @@ namespace ottest
 		return cfg;
 	}
 
-	ot::GraphicsItemCfg* createTestBlock1(const std::string _name)
+	ot::GraphicsItemCfg* createResistor(const std::string _name)
+	{
+		//First I create a stack item;
+		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
+		myStack->setName("Resistor");
+		myStack->setTitle("Resistor");
+		
+
+		//Second I create an Image
+		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
+		image->setImagePath("CircuitElementImages/ResistorBG");
+		image->setSizePolicy(ot::SizePolicy::Dynamic);
+
+		myStack->addItemBottom(image, false, true);
+
+		//Then I create a layout
+		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
+		
+		myLayout->setMinimumSize(ot::Size2DD(400.0, 200.0));
+		myStack->addItemTop(myLayout, true, false);
+		
+
+		
+		
+
+		//Now i want connections on the item for this i need rectangle items
+		ot::GraphicsRectangularItemCfg* connection1 = new ot::GraphicsRectangularItemCfg();
+		connection1->setName("Input1");
+		connection1->setSize(ot::Size2DD(10.0, 10.0));
+		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection1->setBackgroundPainer(painter1);
+		connection1->setAlignment(ot::AlignCenter);
+		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
+
+		ot::GraphicsRectangularItemCfg* connection2 = new ot::GraphicsRectangularItemCfg();
+		connection2->setName("Output1");
+		connection2->setSize(ot::Size2DD(10.0, 10.0));
+		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection2->setBackgroundPainer(painter2);
+		connection2->setAlignment(ot::AlignCenter);
+		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
+
+		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		
+
+		//Here i add them to the Layout
+		myLayout->addChildItem(connection1);
+		myLayout->addStrech(1);
+		myLayout->addChildItem(connection2);
+		
+
+		
+		
+
+		return myStack;
+		
+	}
+
+	ot::GraphicsItemCfg* createVoltageSource(const std::string _name)
 	{
 		ot::GraphicsFlowItemCfg flow;
-		flow.setTitleBackgroundColor(0, 255, 0);
+		flow.setTitleBackgroundColor(0, 0, 255);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		
-		flow.setBackgroundColor(ot::Color(0, 255, 255));
+		
+		flow.setBackgroundColor(ot::Color(255, 255, 0));
 
-		flow.addLeft("Input1", "Input1", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Black);
-		flow.addRight("Output1", "Output1", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Black);
+		flow.addLeft("Input2", "Input2", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
+		flow.addRight("Output2", "Output2", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
 
 		return flow.createGraphicsItem(_name, _name);
 	}
 
-	ot::GraphicsItemCfg* createTestBlock2(const std::string _name)
+	ot::GraphicsItemCfg* createDiode(const std::string _name)
 	{
 		ot::GraphicsFlowItemCfg flow;
-		flow.setTitleBackgroundColor(0, 255, 0);
+		flow.setTitleBackgroundColor(255, 0, 0);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
-		
-		
-		flow.setBackgroundColor(ot::Color(0, 255, 255));
 
-		flow.addLeft("Input2", "Input2", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("Output2", "Output2", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
+		flow.setBackgroundColor(ot::Color(0, 0, 255));
+		
+		flow.addLeft("Input3", "Input3", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Cyan);
+		flow.addRight("Output3", "Output3", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Cyan);
 
 		return flow.createGraphicsItem(_name, _name);
 	}
@@ -133,17 +213,55 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
 
 	// Create item configuration for the item to add
 	ot::GraphicsItemCfg* itm = nullptr;
-	if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createTestBlock1(EXAMPLE_NAME_BLOCK1); }
-	else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createTestBlock2(EXAMPLE_NAME_Block2); }
+	if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createResistor(EXAMPLE_NAME_BLOCK1); }
+	else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createVoltageSource(EXAMPLE_NAME_Block2); }
+	else if (itemName == EXAMPLE_NAME_Block3) { itm = ottest::createDiode(EXAMPLE_NAME_Block3); }
 	else
 	{
 		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
-
+	
 	itm->setPosition(pos);
-	itm->setUid(std::to_string(++ottest::currentBlocikUid));
+	itm->setUid(std::to_string(++ottest::currentBlockUid));
 	pckg.addItem(itm);
+
+	
+
+	// Here i Create a buffer Object for generating netlist
+	
+	CircuitElement element;
+	element.setItemName(itemName);
+	element.setEditorName(editorName);
+	element.setUID(itm->uid());
+	if (element.getItemName() == "Resistor")
+	{
+		std::string temp = std::to_string(ottest::currentResistorUid++);
+		std::string resistor = "R";
+		element.setNetlistElementName(resistor + temp);
+	}
+	else if(element.getItemName() == "Diode")
+	{
+		std::string temp = std::to_string(ottest::currentDiodeID++);
+		std::string diode = "D";
+		element.setNetlistElementName(diode + temp);
+	}
+	else
+	{
+		element.setNetlistElementName("V1");
+	}
+	
+	auto it = mapOfCircuits.find(editorName);
+	if (it == mapOfCircuits.end())
+	{
+		Application::instance()->uiComponent()->displayMessage("No Circuit found");
+	}
+	else
+	{
+		it->second.addElement(element.getUID(), element);
+	}
+
+
 
 	OT_rJSON_createDOC(reqDoc);
 	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
@@ -181,6 +299,45 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(pckgObj);
 
+	
+	for (auto c : pckg.connections())
+	{
+		Connection connection(c);
+
+		connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
+
+		auto it = mapOfCircuits.find(pckg.name());
+		if(it == mapOfCircuits.end())
+		{
+			OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
+		}
+
+		else
+		{	
+			//Here I add the connection to the Origin Element
+			it->second.addConnection(connection.originUid(), connection);
+
+			
+
+
+			//Some Tests
+			//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
+			
+			//Here I add the connection to the Destination Element
+			it->second.addConnection(connection.destUid(), connection);
+
+			//test of print
+			
+			
+			
+		}
+	}
+	
+	
+	
+
+	
+
 	// Here we would check and store the connection information
 	OT_LOG_D("Handling new graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
@@ -208,6 +365,8 @@ std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _docum
 
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(pckgObj);
+
+
 
 	// Here we would check and remove the connection information
 	OT_LOG_D("Handling remove graphics item connection request ( editor = \"" + pckg.name() + "\" )");
@@ -238,10 +397,18 @@ std::string Application:: createNewCircuitEditor(void)
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
 		
 		a->addChildCollection(a1);
-		a1->addItem(ottest::createTestBlock1(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
-		a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
+		a1->addItem(ottest::createResistor(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
+		a1->addItem(ottest::createVoltageSource(EXAMPLE_NAME_Block2));
+		a1->addItem(ottest::createDiode(EXAMPLE_NAME_Block3));
 		
 		pckg.addCollection(a);
+		
+		Circuit circuit;
+		circuit.setEditorName(pckg.title());
+		circuit.setId(pckg.name());
+		mapOfCircuits.insert_or_assign(pckg.name(), circuit);
+
+
 
 		OT_rJSON_createDOC(doc);
 		OT_rJSON_createValueObject(pckgObj);
@@ -269,7 +436,7 @@ std::string Application:: createNewCircuitEditor(void)
 
  int Application::MySendCharFunction(char* output, int ident, void* userData)
 {
-	 OT_LOG_D(output);
+	 Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
 
 	return 0;
 }
@@ -309,8 +476,8 @@ std::string Application::ngSpice_Initialize()
 		std::list<std::string> enabled;
 		
 		std::list<std::string> disabled;
-		disabled.push_back("Circuit Simulator:Simulate:New Simulation");
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		/*disabled.push_back("Circuit Simulator:Simulate:New Simulation");
+		m_uiComponent->setControlsEnabledState(enabled, disabled);*/
 
 	}
 	else if (status == 1)
@@ -319,36 +486,11 @@ std::string Application::ngSpice_Initialize()
 	}
 
 
-	// Here i do 3 test Simulations
+	// Some simulation
 
-	//const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\TransientTest.cir";
+	generateNetlist();
 
-	//Transient Analysis
-
-	// The command always have to be char* so i make them as arrays and write a command into
-	/*char run[100] = "run";
-
-	sprintf_s(run, "source %s", netlistPath);
-	ngSpice_Command(run);
-
-	
-	char tran[100] = "tran 1ms 10ms";
-	ngSpice_Command(tran);*/
-	
-	//AC-Analysis
-
-	//char command[100];
-	//sprintf_s(command, "source %s", netlistPath);
-	//ngSpice_Command(command);
-
-	//sprintf_s(command, "ac dec 1 10k 10");
-	//ngSpice_Command(command);
-
-	////Plot
-	//char* currentPlot = ngSpice_CurPlot();
-	//std::cout << "Aktueller Plot: " << currentPlot << std::endl;
-
-	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\inv-example.cir";
+	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\output.cir";
 
 	char command[100];
 	sprintf_s(command, "source %s", netlistPath);
@@ -372,6 +514,120 @@ std::string Application::ngSpice_Initialize()
 	
 	
 }
+
+std::string Application::generateNetlist()
+{
+	//1Möglichkeit: Man könnte nach der Größe der NodenNumber sortieren das heißt dass alle knoten dann innerhalb eines NetlistString sortiert sind z.b statt
+	// 2 1 kommt dann immer 1 2 also -> knoten 1 < knoten 2 . Jedoch müsste man für die spoannungsquelle das umgedreht machen für positive ergebnisse
+
+	//2 Möglichkeit: Man sortiert die Liste der Connections für jedes Element aufsteigend der Nodenumbers nach mittels einer Funktion und dann bekommt man die 
+	//Connections schon sortiert aus der Liste 
+
+
+	// First I declare the path to the file
+	
+	std::ofstream outfile("C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/output.cir");
+	//Here i have two Vectors for incomging and putgoing Connections
+	
+
+	std::string Title = "*Test";
+	outfile << Title << std::endl;
+	
+
+	
+	
+	// Now I write the informations to the File
+	// Here i get the Circuit and the map of Elements
+	auto map = mapOfCircuits.find("Circuit")->second.getMapOfElements();
+	// Now i iterate through this Map of Elements and save the information
+	for (auto it : map)
+	{
+		
+		std::string NodeNumbersString = "";
+		std::string elementName_temp = it.second.getItemName();
+		std::string netlistElementName = it.second.getNetlistElementName();
+		std::string value;
+		std::string elmentUID = it.second.getUID();
+
+
+		//Here i get the Connection List
+		auto connectionList = it.second.getList();
+		
+		if(elementName_temp == "VoltageSource")
+		{
+			for (auto c = connectionList.rbegin(); c != connectionList.rend(); c++)
+			{
+				NodeNumbersString += c->getNodeNumber();
+				NodeNumbersString += " ";
+			}
+		}
+
+		else
+		{
+			for (auto c : connectionList)
+			{
+				NodeNumbersString += c.getNodeNumber();
+				NodeNumbersString += " ";
+
+			}
+
+		}
+
+		
+
+		
+		
+
+		//I set default values
+		if (elementName_temp == "VoltageSource")
+		{
+			value = "12V";
+
+
+		}
+		else if(elementName_temp == "Resistor")
+		{
+			value = "200";
+		}
+		else
+		{
+			value = "myDiode";
+			std::string diodeModel = ".model myDiode D (IS=1n RS=0.1 N=1)";
+			outfile << diodeModel << std::endl;
+		}
+
+		//Create the end string 
+		std::string NetlistLine = netlistElementName + " " + NodeNumbersString + value;
+
+		outfile << NetlistLine << std::endl;
+	}
+
+	
+
+	std::string Properties = ".dc V1 0V 12V 1V";
+	outfile << Properties << std::endl;
+
+	std::string control = ".Control";
+	outfile << control << std::endl;;
+
+	std::string run = "run";
+	outfile << run << std::endl;
+
+	std::string print = "print all";
+	outfile << print << std::endl;
+
+	std::string endc = ".endc";
+	outfile << endc << std::endl;;
+
+	std::string end = ".end";
+	outfile << end << std::endl;
+
+
+	std::string myString = "Succesfull";
+	return myString;
+}
+
+
 // ############################## ####################################################################################################################################################################################
 
 // Required functions

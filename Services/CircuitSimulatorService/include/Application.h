@@ -7,13 +7,17 @@
  */
 
 #pragma once
+//Service Header
+#include "Circuit.h"
 
 // Open twin header
 #include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
-#include "OpenTwinFoundation/ApplicationBase.h" // Base class
+#include "OpenTwinFoundation/ApplicationBase.h"	// Base class
+
 
 // C++ header
 #include <string>
+#include <map>
 
 // Forward declaration
 namespace ot {
@@ -52,6 +56,9 @@ public:
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
 	
 	std::string createNewCircuitEditor(void);
+	std::string generateNetlist();
+	std::map<std::string, Circuit> mapOfCircuits;
+	
 	
 	//NgSpice functions
 	std::string ngSpice_Initialize();
