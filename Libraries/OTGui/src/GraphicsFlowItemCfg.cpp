@@ -313,6 +313,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		cImg->setName(_name + "_cImg");
 		cImg->setMargins(ot::MarginsD(5., 5., 5., 5.));
 		cImg->setSizePolicy(ot::Dynamic);
+		cImg->setAlignment(ot::AlignCenter);
+		cImg->setMaintainAspectRatio(true);
 
 		cStack->addItemTop(cImg, false, true);
 		cStack->addItemTop(cLay, true, false);

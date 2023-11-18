@@ -166,6 +166,9 @@ namespace ot {
 		//! @brief Returns the alpha channel value (0 - 255)
 		inline int aInt(void) const;
 
+		//! @brief Returns true if the values of all channels are in the range of 0.0 - 1.0
+		bool isValid(void) const { return m_r >= 0.f && m_r <= 1.f && m_g >= 0.f && m_g <= 1.f && m_b >= 0.f && m_b <= 1.f && m_a >= 0.f && m_a <= 1.f; };
+
 	private:
 		float		m_r;
 		float		m_g;

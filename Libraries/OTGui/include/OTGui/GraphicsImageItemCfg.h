@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
+#include "OpenTwinCore/Color.h"
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
 
@@ -34,8 +35,16 @@ namespace ot {
 		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
 		const std::string& imagePath(void) const { return m_imageSubPath; };
 
+		void setMaintainAspectRatio(bool _active) { m_maintainAspectRatio = _active; };
+		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };
+
+		void setColorMask(const ot::Color& _color) { m_colorMask = _color; };
+		const ot::Color& colorMask(void) const { return m_colorMask; };
+
 	private:
 		std::string m_imageSubPath;
+		bool m_maintainAspectRatio;
+		ot::Color m_colorMask;
 
 		GraphicsImageItemCfg(GraphicsImageItemCfg&) = delete;
 		GraphicsImageItemCfg& operator = (GraphicsImageItemCfg&) = delete;
