@@ -2926,7 +2926,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 						ot::GraphicsItem* destConn = dest->findItem(connection.destConnectable());
 
 						if (srcConn && destConn) {
-							editor->addConnection(srcConn, destConn);
+							editor->addConnection(srcConn, destConn, connection);
 						}
 						else {
 							OT_LOG_EA("Invalid graphics item name");

@@ -58,12 +58,6 @@
     <ClCompile Include="src\GraphicsTextItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsLineItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsDirectConnectionItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -95,6 +89,9 @@
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsTriangleItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsLineItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,12 +161,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsTextItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsDirectConnectionItem.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
@@ -198,6 +189,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsTriangleItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

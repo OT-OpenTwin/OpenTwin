@@ -8,7 +8,9 @@
 #include "OpenTwinCore/rJSON.h"
 #include "OpenTwinCore/rJSONHelper.h"
 
+#define OT_JSON_Member_Color "Color"
 #define OT_JSON_Member_Style "Style"
+#define OT_JSON_Member_Width "Width"
 #define OT_JSON_Member_SourceUid "Source.UID"
 #define OT_JSON_Member_SourceName "Source.Name"
 #define OT_JSON_Member_DestinationUid "Destination.UID"
@@ -39,16 +41,18 @@ ot::GraphicsConnectionCfg::ConnectionStyle ot::GraphicsConnectionCfg::stringToSt
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
-	: m_style(DirectLine)
+	: m_style(DirectLine), m_width(1)
 {}
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const std::string& _originUid, const std::string& _originConnectableName, const std::string& _destinationUid, const std::string& _destinationName)
-	: m_style(DirectLine),
+	: m_style(DirectLine), m_width(1),
 	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName)
 {}
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const GraphicsConnectionCfg& _other) 
-	: m_style(_other.m_style), m_originUID(_other.m_originUID), m_originConnectable(_other.m_originConnectable), m_destUID(_other.m_destUID), m_destConnectable(_other.m_destConnectable)
+	: m_style(_other.m_style), m_width(_other.m_width), m_color(_other.m_color),
+	m_originUID(_other.m_originUID), m_originConnectable(_other.m_originConnectable), 
+	m_destUID(_other.m_destUID), m_destConnectable(_other.m_destConnectable)
 {
 
 }
@@ -65,6 +69,8 @@ ot::GraphicsConnectionCfg& ot::GraphicsConnectionCfg::operator = (const Graphics
 	m_destConnectable = _other.m_destConnectable;
 
 	m_style = _other.m_style;
+	m_width = _other.m_width;
+	m_color = _other.m_color;
 	return *this;
 }
 
@@ -74,6 +80,11 @@ void ot::GraphicsConnectionCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSO
 	ot::rJSON::add(_document, _object, OT_JSON_Member_DestinationUid, this->m_destUID);
 	ot::rJSON::add(_document, _object, OT_JSON_Member_DestinationName, this->m_destConnectable);
 	ot::rJSON::add(_document, _object, OT_JSON_Member_Style, this->styleToString(this->m_style));
+	ot::rJSON::add(_document, _object, OT_JSON_Member_Width, m_width);
+
+	OT_rJSON_createValueObject(colorObj);
+	m_color.addToJsonObject(_document, colorObj);
+	ot::rJSON::add(_document, _object, OT_JSON_Member_Color, colorObj);
 }
 
 void ot::GraphicsConnectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
@@ -82,12 +93,18 @@ void ot::GraphicsConnectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_Member_DestinationUid, String);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_DestinationName, String);
 	OT_rJSON_checkMember(_object, OT_JSON_Member_Style, String);
+	OT_rJSON_checkMember(_object, OT_JSON_Member_Width, Int);
+	OT_rJSON_checkMember(_object, OT_JSON_Member_Color, Object);
 
 	this->m_originUID = _object[OT_JSON_Member_SourceUid].GetString();
 	this->m_originConnectable = _object[OT_JSON_Member_SourceName].GetString();
 	this->m_destUID = _object[OT_JSON_Member_DestinationUid].GetString();
 	this->m_destConnectable = _object[OT_JSON_Member_DestinationName].GetString();
 	this->m_style = this->stringToStyle(_object[OT_JSON_Member_Style].GetString());
+	this->m_width = _object[OT_JSON_Member_Width].GetInt();
+
+	OT_rJSON_val colorObj = _object[OT_JSON_Member_Color].GetObject();
+	m_color.setFromJsonObject(colorObj);
 }
 
 ot::GraphicsConnectionCfg ot::GraphicsConnectionCfg::getReversedConnection(void) const {

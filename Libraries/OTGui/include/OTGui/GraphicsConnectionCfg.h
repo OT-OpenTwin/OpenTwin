@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/OTGuiAPIExport.h"
+#include "OpenTwinCore/Color.h"
 #include "OpenTwinCore/Serializable.h"
 
 // std header
@@ -60,12 +61,17 @@ namespace ot {
 		void setOriginConnectable(const std::string& _name) { m_originConnectable = _name; };
 		const std::string& originConnectable(void) const { return m_originConnectable; };
 
-		
 		void setDestUid(const std::string& _uid) { m_destUID = _uid; };
 		const std::string& destUid(void) const { return m_destUID; };
 
 		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
 		const std::string& destConnectable(void) const { return m_destConnectable; };
+
+		void setLineWidth(int _width) { m_width = _width; };
+		int lineWidth(void) const { return m_width; };
+
+		void setColor(const ot::Color& _color) { m_color = _color; };
+		const ot::Color& color(void) const { return m_color; };
 
 		void setStyle(ConnectionStyle _style) { m_style = _style; };
 		ConnectionStyle style(void) const { return m_style; };
@@ -77,7 +83,9 @@ namespace ot {
 		std::string m_destUID;
 		std::string m_destConnectable;
 
+		int m_width;
+		ot::Color m_color;
+
 		ConnectionStyle m_style;
 	};
-
 }

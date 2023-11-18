@@ -74,13 +74,16 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg
 
 	if (_isLeft) {
 		itm->setAlignment(ot::AlignLeft);
+		itm->setConnectionDirection(ot::ConnectLeft);
 		itmTxt->setAlignment(ot::AlignLeft);
 
 		_gridLayout->addChildItem(_row, ot::intern::flcLeftConnector, itm);
 		_gridLayout->addChildItem(_row, ot::intern::flcLeftTitle, itmTxt);
+		
 	}
 	else {
 		itm->setAlignment(ot::AlignRight);
+		itm->setConnectionDirection(ot::ConnectRight);
 		itmTxt->setAlignment(ot::AlignRight);
 
 		_gridLayout->addChildItem(_row, ot::intern::flcRightConnector, itm);

@@ -37,7 +37,7 @@
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
-	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.)
+	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny)
 {
 
 }
@@ -60,6 +60,7 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_minSize = QSizeF(_cfg->minimumSize().width(), _cfg->minimumSize().height());
 	m_maxSize = QSizeF(_cfg->maximumSize().width(), _cfg->maximumSize().height());
 	m_moveStartPt = QPointF(_cfg->position().x(), _cfg->position().y());
+	m_connectionDirection = _cfg->connectionDirection();
 	return true;
 }
 

@@ -131,6 +131,9 @@ namespace ot {
 		void setGraphicsItemAlignment(ot::Alignment _align) { m_alignment = _align; };
 		ot::Alignment graphicsItemAlignment(void) const { return m_alignment; };
 
+		void setConnectionDirection(ot::ConnectionDirection _direction) { m_connectionDirection = _direction; };
+		ot::ConnectionDirection connectionDirection(void) const { return m_connectionDirection; };
+
 		void addGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 		void removeGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 
@@ -155,7 +158,8 @@ namespace ot {
 		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
 		GraphicsItemFlag m_flags;
-		
+		ot::ConnectionDirection m_connectionDirection;
+
 		QPointF m_moveStartPt; //! @brief Item move origin
 		GraphicsItem* m_parent; //! @brief Parent graphics item
 		GraphicsItemDrag* m_drag; //! @brief Drag instance

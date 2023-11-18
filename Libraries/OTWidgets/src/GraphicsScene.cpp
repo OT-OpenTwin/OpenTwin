@@ -43,11 +43,12 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	for (auto itm : lst) {
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
-		OTAssertNullptr(actualItm);
-		if (actualItm->graphicsItemFlags() & ot::GraphicsItem::ItemIsConnectable) {
-			this->startConnection(actualItm);
-			QGraphicsScene::mouseDoubleClickEvent(_event);
-			return;
+		if (actualItm) {
+			if (actualItm->graphicsItemFlags() & ot::GraphicsItem::ItemIsConnectable) {
+				this->startConnection(actualItm);
+				QGraphicsScene::mouseDoubleClickEvent(_event);
+				return;
+			}
 		}
 	}
 
@@ -97,7 +98,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 void ot::GraphicsScene::stopConnection(void) {
 	// Stop connection
 	if (m_lineItem) {
-		removeItem(m_lineItem);
+		this->removeItem(m_lineItem);
 		delete m_lineItem;
 		m_lineItem = nullptr;
 		m_connectionOrigin = nullptr;
