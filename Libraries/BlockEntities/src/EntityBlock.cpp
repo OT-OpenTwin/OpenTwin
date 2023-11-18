@@ -186,6 +186,8 @@ void EntityBlock::CreateConnections()
 	// Store connection information
 	for (auto& connection : _connections)
 	{
+		connection.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
+
 		connectionPckg.addConnection(connection);
 	}
 
