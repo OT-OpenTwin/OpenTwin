@@ -267,6 +267,7 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 	block->setLeftTitleCornerImagePath("Images/Database.png");
+	block->setBackgroundImagePath("Images/Database.svg");
 
 	AddConnectors(block.get());
 

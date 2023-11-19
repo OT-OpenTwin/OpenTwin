@@ -33,6 +33,7 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
 	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 	block->setLeftTitleCornerImagePath("Images/Python.png");
+	block->setBackgroundImagePath("Images/Script.svg");
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
