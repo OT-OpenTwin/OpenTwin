@@ -19,6 +19,7 @@
 // Qt header
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qlabel.h>
 
 // std header
 #include <string>
@@ -80,11 +81,13 @@ void ot::GraphicsPicker::add(const std::list<ot::GraphicsCollectionCfg*>& _topLe
 }
 
 void ot::GraphicsPicker::clear(void) {
-	for (auto v : m_views) {
-		m_viewLayout->removeWidget(v);
-		delete v;
+	for (auto v : m_previews) {
+		m_viewLayout->removeWidget(v.layoutWidget);
+		delete v.label;
+		delete v.view;
+		delete v.layout;
 	}
-	m_views.clear();
+	m_previews.clear();
 
 	for (auto d : m_previewData) {
 		for (auto e : *d.second) delete e;
@@ -99,11 +102,13 @@ void ot::GraphicsPicker::clear(void) {
 // Private: Slots
 
 void ot::GraphicsPicker::slotSelectionChanged(void) {
-	for (auto v : m_views) {
-		m_viewLayout->removeWidget(v);
-		delete v;
+	for (auto v : m_previews) {
+		m_viewLayout->removeWidget(v.layoutWidget);
+		delete v.label;
+		delete v.view;
+		delete v.layout;
 	}
-	m_views.clear();
+	m_previews.clear();
 
 	std::list<GraphicsView *> previews;
 
@@ -114,20 +119,33 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 				// Construct block
 				ot::GraphicsItem* newItem = ot::GraphicsFactory::itemFromConfig(bCfg);
 				
-				if (newItem) {					
-					GraphicsView* newView = new GraphicsView;
-					newView->setMaximumSize(m_previewSize);
-					newView->setMinimumSize(m_previewSize);
-					newView->setDragMode(QGraphicsView::NoDrag);
-					
-					newView->getGraphicsScene()->setBackgroundBrush(QBrush());
-					newView->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
+				if (newItem) {
 					newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemPreviewContext);
+					
+					PreviewBox box;
 
-					newView->viewAll();
+					box.view = new GraphicsView;
+					box.view->setMaximumSize(m_previewSize);
+					box.view->setMinimumSize(m_previewSize);
+					box.view->setDragMode(QGraphicsView::NoDrag);
+					
+					box.view->getGraphicsScene()->setBackgroundBrush(QBrush());
+					box.view->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
 
-					m_viewLayout->addWidget(newView);
-					m_views.push_back(newView);
+					box.view->viewAll();
+
+					box.label = new QLabel(QString::fromStdString(bCfg->title()));
+					box.label->setAlignment(Qt::AlignCenter);
+
+					box.layoutWidget = new QWidget;
+
+					box.layout = new QVBoxLayout(box.layoutWidget);
+					box.layout->addWidget(box.view, 0, Qt::AlignCenter);
+					box.layout->addWidget(box.label, 1, Qt::AlignTop);
+
+					m_viewLayout->addWidget(box.layoutWidget);
+
+					m_previews.push_back(box);
 				}
 				else {
 					OT_LOG_E("Failed to create preview item from factory");

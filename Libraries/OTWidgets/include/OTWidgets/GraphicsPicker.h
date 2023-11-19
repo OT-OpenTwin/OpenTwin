@@ -16,9 +16,12 @@
 // std header
 #include <list>
 
-class QTreeWidgetItem;
+class QLabel;
+class QWidget;
 class QSplitter;
 class QGridLayout;
+class QVBoxLayout;
+class QTreeWidgetItem;
 
 namespace ot {
 
@@ -60,13 +63,20 @@ namespace ot {
 
 		void storePreviewData(QTreeWidgetItem* _item, GraphicsItemCfg* _config);
 
+		struct PreviewBox {
+			QWidget* layoutWidget;
+			QVBoxLayout* layout;
+			GraphicsView* view;
+			QLabel* label;
+		};
+
 		bool                  m_repaintPreviewRequired;
 
 		QSize                 m_previewSize;
 		QSplitter* m_splitter;
 		TreeWidgetFilter* m_navigation;
 
-		std::list<GraphicsView *> m_views;
+		std::list<PreviewBox> m_previews;
 		QWidget* m_viewLayoutW;
 		QGridLayout* m_viewLayout;
 
