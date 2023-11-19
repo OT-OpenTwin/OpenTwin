@@ -30,20 +30,20 @@ namespace ot {
 		void addSearchPath(const QString& _path);
 		const QStringList& searchPaths(void) const { return m_searchPaths; };
 
-		//! @brief Create and return the icon (*.png, *.jpg)
+		//! @brief Create and return the icon
 		QIcon& getIcon(const QString& _subPath);
 
-		//! @brief Create and return the pixmap (*.png, *.jpg)
+		//! @brief Create and return the pixmap
 		QPixmap& getPixmap(const QString& _subPath);
 
-		//! @brief Create and return the movie (*.gif)
+		//! @brief Create and return the movie
 		QMovie& getMovie(const QString& _subPath);
 
 	private:
 		template <class T>
-		T& get(const QString& _subPath, const QStringList& _extensions, std::map<QString, T*>& _dataMap);
+		T& get(const QString& _subPath, std::map<QString, T*>& _dataMap);
 
-		QString findFullPath(const QString& _subPath, const QStringList& _extensions);
+		QString findFullPath(const QString& _subPath);
 
 		IconManager();
 		virtual ~IconManager();
@@ -59,7 +59,7 @@ namespace ot {
 }
 
 template <class T>
-T& ot::IconManager::get(const QString& _subPath, const QStringList& _extensions, std::map<QString, T*>& _dataMap) {
+T& ot::IconManager::get(const QString& _subPath, std::map<QString, T*>& _dataMap) {
 	this->m_mutex.lock();
 
 	// Find existing
@@ -70,7 +70,7 @@ T& ot::IconManager::get(const QString& _subPath, const QStringList& _extensions,
 	}
 
 	// Find new
-	QString path = this->findFullPath(_subPath, _extensions);
+	QString path = this->findFullPath(_subPath);
 	if (path.isEmpty()) {
 		this->m_mutex.unlock();
 		OT_LOG_EAS("Icon \"" + _subPath.toStdString() + "\" not found");
