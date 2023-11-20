@@ -15,14 +15,14 @@
 #include <chrono>
 #include <thread>
 
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/IpConverter.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCommunication/ServiceLogNotifier.h"
+#include "OTCore/Logger.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 #include "base64.h"
 #include "zlib.h"

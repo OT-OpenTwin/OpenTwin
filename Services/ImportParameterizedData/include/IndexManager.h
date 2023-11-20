@@ -14,7 +14,7 @@
 #include "MetadataAssemblyRangeData.h"
 #include "MetadataQuantity.h"
 #include "Documentation.h"
-#include "openTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 #include <set>
 #include <map>

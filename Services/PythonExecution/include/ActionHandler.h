@@ -2,10 +2,10 @@
 #include <mutex>
 #include <map>
 #include <functional>
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCommunication/ActionTypes.h"
 #include "PythonAPI.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/ReturnMessage.h"
 
 class ActionHandler
 {

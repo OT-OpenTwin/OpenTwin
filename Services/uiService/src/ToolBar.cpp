@@ -4,8 +4,8 @@
 #include "UserSettings.h"
 
 // openTwin header
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCore/Flags.h"
+#include "OTCommunication/UiTypes.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>

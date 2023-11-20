@@ -6,8 +6,8 @@
 #include <Windows.h>
 #include "MinimalSubService.h"
 #include "ActionHandler.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/ServiceLogNotifier.h"
+#include "OTCore/rJSON.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -72,7 +72,7 @@ extern "C" {
 		catch (std::exception& e)
 		{
 			OT_LOG_E(e.what());
-			throw e;
+			return 1;
 		}
 	};
 }

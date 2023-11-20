@@ -1,6 +1,6 @@
 #include "OTGui/Margins.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCore/OTAssert.h"
 
 void ot::Margins::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const {
 	ot::rJSON::add(_document, _jsonObject, "Top", m_top);
@@ -17,7 +17,7 @@ void ot::Margins::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	OT_rJSON_checkMember(_jsonObject, "Left", Int);
 	OT_rJSON_checkMember(_jsonObject, "Type", String);
 	if (_jsonObject["Type"].GetString() != std::string("int")) {
-		otAssert(0, "Invalid type");
+		OTAssert(0, "Invalid type");
 		throw std::exception("Invalid Margins type provided");
 	}
 	m_top = _jsonObject["Top"].GetInt();
@@ -41,7 +41,7 @@ void ot::MarginsF::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	OT_rJSON_checkMember(_jsonObject, "Left", Float);
 	OT_rJSON_checkMember(_jsonObject, "Type", String);
 	if (_jsonObject["Type"].GetString() != std::string("float")) {
-		otAssert(0, "Invalid type");
+		OTAssert(0, "Invalid type");
 		throw std::exception("Invalid Margins type provided");
 	}
 	m_top = _jsonObject["Top"].GetFloat();
@@ -65,7 +65,7 @@ void ot::MarginsD::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	OT_rJSON_checkMember(_jsonObject, "Left", Double);
 	OT_rJSON_checkMember(_jsonObject, "Type", String);
 	if (_jsonObject["Type"].GetString() != std::string("double")) {
-		otAssert(0, "Invalid type");
+		OTAssert(0, "Invalid type");
 		throw std::exception("Invalid Margins type provided");
 	}
 	m_top = _jsonObject["Top"].GetDouble();

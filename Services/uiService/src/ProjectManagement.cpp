@@ -26,10 +26,10 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/rJSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
 
 ProjectManagement::ProjectManagement() :
 	isConnected(false),

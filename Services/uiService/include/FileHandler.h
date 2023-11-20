@@ -10,9 +10,9 @@
 #include <string>
 #include <list>
 #include <memory>
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 #include "EntityFile.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/rJSON.h"
 
 class FileHandler
 {

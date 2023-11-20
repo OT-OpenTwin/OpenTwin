@@ -2,7 +2,7 @@
 
 #include "EntityGeometry.h"
 
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <rbeCore/RubberbandConfiguration.h>
 #include <rbeCore/jsonMember.h>

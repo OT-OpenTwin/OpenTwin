@@ -1,10 +1,10 @@
 #include "SubprocessDebugConfigurator.h"
-#include "openTwinSystem/OperatingSystem.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTSystem/OperatingSystem.h"
+#include "OTCore/rJSON.h"
 #include <assert.h>
 #include <fstream>
 #include "DataBase.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 void SubprocessDebugConfigurator::CreateConfiguration(const std::string& urlThisService, const std::string& urlSubProcess, const std::string& urlModelService, const std::string& urlDataBase, const int serviceID, const std::string& sessionID)
 {

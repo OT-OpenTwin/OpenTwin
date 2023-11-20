@@ -10,7 +10,7 @@
 #include "AppBase.h"
 
 // OT header
-#include "OpenTwinCore/ServiceBase.h"
+#include "OTCore/ServiceBase.h"
 
 // AK header
 #include <akAPI/uiAPI.h>

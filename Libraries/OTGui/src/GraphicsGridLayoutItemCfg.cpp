@@ -128,7 +128,7 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 						itm->setFromJsonObject(itemObj);
 					}
 					else {
-						otAssert(0, "Factory failed");
+						OT_LOG_EA("Factory failed");
 					}
 					m_items[r][c] = itm;
 				}

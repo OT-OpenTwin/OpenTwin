@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OpenTwinCore/rJSONHelper.h"
+#include "OTCore/rJSONHelper.h"
 
 ot::GraphicsLayoutItemCfg::~GraphicsLayoutItemCfg() {
 	

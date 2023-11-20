@@ -12,11 +12,11 @@
 #include <Windows.h>
 #include <string>
 
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/IpConverter.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/Logger.h"
+#include "OTCore/rJSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/Msg.h"
 
 // SessionService header
 

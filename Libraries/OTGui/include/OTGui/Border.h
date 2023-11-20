@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Serializable.h"
-#include "OpenTwinCore/Color.h"
+#include "OTCore/Serializable.h"
+#include "OTCore/Color.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {

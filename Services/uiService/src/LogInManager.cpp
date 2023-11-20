@@ -3,9 +3,9 @@
 #include "ExternalServicesComponent.h"
 #include "UserManagement.h"
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include <akAPI/uiAPI.h>
 #include <akDialogs/aLogInDialog.h>

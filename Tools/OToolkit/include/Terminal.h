@@ -9,7 +9,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OT header
-#include "OpenTwinCommunication/CommunicationTypes.h"
+#include "OTCommunication/CommunicationTypes.h"
 
 // Qt header
 #include <QtCore/qobject.h>

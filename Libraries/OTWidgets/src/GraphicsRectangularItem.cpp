@@ -5,8 +5,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTWidgets/GraphicsRectangularItem.h"
 #include "OTWidgets/Painter2DFactory.h"

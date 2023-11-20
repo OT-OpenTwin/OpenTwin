@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenTwinFoundation/ContextMenu.h"
+#include "OTServiceFoundation/ContextMenu.h"
 
 #include <akCore/akCore.h>
 #include <akCore/aNotifier.h>

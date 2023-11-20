@@ -5,7 +5,7 @@
 #include <list>
 #include <memory>
 
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 #include "MetadataEntry.h"
 
 struct __declspec(dllexport) MetadataQuantity

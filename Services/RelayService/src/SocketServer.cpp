@@ -5,10 +5,10 @@
 #include <Logger.h>
 
 // OpenTwin header
-#include "OpenTwinCore/rJSON.h"				// rapidjson wrapper
-#include "OpenTwinCore/Logger.h"		// Logger
-#include "OpenTwinCommunication/ActionTypes.h"		// action member and types definition
-#include "OpenTwinCommunication/Msg.h"				// message sending
+#include "OTCore/rJSON.h"				// rapidjson wrapper
+#include "OTCore/Logger.h"		// Logger
+#include "OTCommunication/ActionTypes.h"		// action member and types definition
+#include "OTCommunication/Msg.h"				// message sending
 
 #include <QtWebSockets/qwebsocketserver.h>
 #include <QtWebSockets/qwebsocket.h>

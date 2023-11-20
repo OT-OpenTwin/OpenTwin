@@ -24,10 +24,10 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 std::string UserManagement::userSettingsCollection;
 

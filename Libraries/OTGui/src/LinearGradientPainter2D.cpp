@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/rJSONHelper.h"
+#include "OTCore/rJSONHelper.h"
 #include "OTGui/LinearGradientPainter2D.h"
 
 #define OT_JSON_MEMBER_Pos "Pos"
@@ -70,7 +70,7 @@ ot::LinearGradientPainter2D::~LinearGradientPainter2D() {}
 
 void ot::LinearGradientPainter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	ot::Painter2D::addToJsonObject(_document, _object);
-	otAssert(!m_stops.empty(), "Exporting empty linear gradient painter 2D");
+	OTAssert(!m_stops.empty(), "Exporting empty linear gradient painter 2D");
 	OT_rJSON_createValueArray(stepArr);
 	for (auto s : m_stops) {
 		OT_rJSON_createValueObject(stepObj);

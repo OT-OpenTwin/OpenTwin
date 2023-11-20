@@ -5,9 +5,9 @@
 
 // OpenTwin header
 #include "OTGui/Painter2D.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
 
 void ot::Painter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());

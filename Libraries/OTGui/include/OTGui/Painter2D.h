@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTGui/OTGuiAPIExport.h"
-#include "OpenTwinCore/Serializable.h"
-#include "OpenTwinCore/SimpleFactory.h"
+#include "OTCore/Serializable.h"
+#include "OTCore/SimpleFactory.h"
 
 namespace ot {
 

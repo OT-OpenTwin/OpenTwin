@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 // Qt header
 #include <qstring.h>

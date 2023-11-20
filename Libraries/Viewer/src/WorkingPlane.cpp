@@ -4,7 +4,7 @@
 #include "ViewerSettings.h"
 
 // Open twin header
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 // Osg header
 #include <osg/Array>
@@ -127,7 +127,7 @@ bool WorkingPlane::calculateSize(bool _calculateGridStepWidth, bool& _gridResolu
 		}
 	}
 	if (w == 0.f || h == 0.f) {
-		otAssert(0, "Invalid working plane size");
+		OTAssert(0, "Invalid working plane size");
 		return false;
 	}
 	if (w == m_width && h == m_height) { 
@@ -168,7 +168,7 @@ void WorkingPlane::rebuildNode(void) {
 	if (!m_isVisible) { return; }
 
 	if (m_height <= 0.f || m_width <= 0.f) {
-		otAssert(0, "Invalid size @WorkingPlane");
+		OTAssert(0, "Invalid size @WorkingPlane");
 		return;
 	}
 
@@ -179,7 +179,7 @@ void WorkingPlane::rebuildNode(void) {
 	if (settings->workingPlaneGridResolution <= 0.f) { gridVisible = false; }
 	bool planeVisible = settings->workingPlaneStyle != settings->workingPlaneStyle_Grid;
 
-	if (!gridVisible && !planeVisible) { otAssert(0, "Invalid working plane style selected"); return; }
+	if (!gridVisible && !planeVisible) { OTAssert(0, "Invalid working plane style selected"); return; }
 
 	// Load settings
 	float width, height;

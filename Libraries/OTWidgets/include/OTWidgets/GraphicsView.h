@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsview.h>

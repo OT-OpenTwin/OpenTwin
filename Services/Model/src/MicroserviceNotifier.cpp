@@ -11,12 +11,12 @@
 #include <fstream>
 #include <cstdio>
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCommunication/actionTypes.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCommunication/ActionTypes.h"
 
-#include "OpenTwinCommunication/IpConverter.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/UiTypes.h"
 
 extern ot::serviceID_t globalServiceID;
 

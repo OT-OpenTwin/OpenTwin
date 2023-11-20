@@ -21,10 +21,10 @@
 #include <QtWidgets/qmessagebox.h>
 
 // Open Twin header
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCommunication/actionTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTCommunication/actionTypes.h"
 
 #define DLLMAIN_LOG(___msg) OTOOLKIT_LOG("main", ___msg)
 #define DLLMAIN_LOGW(___msg) OTOOLKIT_LOGW("main", ___msg)
@@ -88,13 +88,13 @@ void mainApplicationThread()
 		exit(application.exec());
 	}
 	catch (const std::exception& _e) {
-		otAssert(0, "Exception caught");
+		OTAssert(0, "Exception caught");
 		QMessageBox msg(QMessageBox::Critical, "Fatal Error", _e.what(), QMessageBox::Ok);
 		msg.exec();
 		exit(2);
 	}
 	catch (...) {
-		otAssert(0, "Unknown error");
+		OTAssert(0, "Unknown error");
 		QMessageBox msg(QMessageBox::Critical, "Fatal Error", "Unknown error occured", QMessageBox::Ok);
 		msg.exec();
 		exit(1);
@@ -114,13 +114,13 @@ extern "C"
 			return 0;
 		}
 		catch (const std::exception& _e) {
-			otAssert(0, "Exception caught");
+			OTAssert(0, "Exception caught");
 			QMessageBox msg(QMessageBox::Critical, "Fatal Error", _e.what(), QMessageBox::Ok);
 			msg.exec();
 			return 2;
 		}
 		catch (...) {
-			otAssert(0, "Unknown error");
+			OTAssert(0, "Unknown error");
 			QMessageBox msg(QMessageBox::Critical, "Fatal Error", "Unknown error occured", QMessageBox::Ok);
 			msg.exec();
 			return 1;
@@ -154,13 +154,13 @@ extern "C"
 			}
 		}
 		catch (const std::exception & _e) {
-			otAssert(0, "Exception caught");
+			OTAssert(0, "Exception caught");
 			QMessageBox msg(QMessageBox::Critical, "Fatal Error", _e.what(), QMessageBox::Ok);
 			msg.exec();
 			
 		}
 		catch (...) {
-			otAssert(0, "Unknown error");
+			OTAssert(0, "Unknown error");
 			QMessageBox msg(QMessageBox::Critical, "Fatal Error", "Unknown error occured", QMessageBox::Ok);
 			msg.exec();
 		}

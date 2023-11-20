@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/IconManager.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 // Qt header
 #include <QtCore/qfile.h>

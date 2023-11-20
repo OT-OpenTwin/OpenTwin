@@ -3,8 +3,8 @@
 #include <string>
 #include <mutex>
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/CommunicationTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCommunication/CommunicationTypes.h"
 
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/types.hpp>

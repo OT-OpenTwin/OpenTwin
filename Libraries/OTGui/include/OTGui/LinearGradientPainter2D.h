@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinCore/Point2D.h"
+#include "OTCore/Color.h"
+#include "OTCore/Point2D.h"
 #include "OTGui/Painter2D.h"
 
 #define OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg "OT_P2DCGrad"

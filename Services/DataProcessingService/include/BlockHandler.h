@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
+#include "OTCore/Variable.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "GraphNode.h"
 
 

@@ -4,12 +4,12 @@
 #include "Application.h"
 
 // Open Twin core types header
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinSystem/Application.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/otAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCore/rJSON.h"
+#include "OTSystem/Application.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // Standard headers
 #include <iostream>

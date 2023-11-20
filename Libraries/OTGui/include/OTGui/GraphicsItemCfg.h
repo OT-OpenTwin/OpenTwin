@@ -7,10 +7,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Size2D.h"
-#include "OpenTwinCore/Point2D.h"
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCore/Serializable.h"
+#include "OTCore/Size2D.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/Border.h"
 #include "OTGui/Margins.h"

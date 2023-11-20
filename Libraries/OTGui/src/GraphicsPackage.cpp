@@ -5,8 +5,8 @@
 
 
 // OpenTwin header
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/SimpleFactory.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCore/SimpleFactory.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"

@@ -5,8 +5,7 @@
 
 // OpenTwin header
 #include "OTGui/Border.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/rJSONHelper.h"
 
 ot::Border::Border() : m_color(0, 0, 0), m_top(0), m_left(0), m_right(0), m_bottom(0) {}
 

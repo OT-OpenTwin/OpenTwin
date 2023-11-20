@@ -1,6 +1,6 @@
 #include "MinimalSubService.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
 #include <thread>
 
 int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)

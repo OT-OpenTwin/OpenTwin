@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 EntityFile::EntityFile(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner) :
 	EntityBase(ID,parent,obs,ms,factory,owner)

@@ -9,9 +9,9 @@
 #pragma once
 
 // Open twin header
-#include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
-#include "OpenTwinFoundation/ApplicationBase.h" // Base class
-#include "OpenTwinFoundation/MenuButtonDescription.h"
+#include "OTCore/rJSON.h"					// OpenTwin rapidjson wrapper
+#include "OTServiceFoundation/ApplicationBase.h" // Base class
+#include "OTServiceFoundation/MenuButtonDescription.h"
 // C++ header
 #include <string>
 

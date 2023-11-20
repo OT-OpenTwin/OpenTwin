@@ -9,8 +9,8 @@
 #include "StatusManager.h"
 
 // OT header
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/OTAssert.h"
 
 // Qt header
 #include <QtCore/qjsondocument.h>
@@ -109,7 +109,7 @@ TerminalCollectionItem * TerminalCollectionItem::createFromJsonObject(Terminal *
 	}
 	else {
 		TERMINAL_LOGE("Unknown terminal collection item type");
-		otAssert(0, "Unknown item type");
+		OTAssert(0, "Unknown item type");
 	}
 	return newItm;
 }
@@ -185,7 +185,7 @@ void TerminalCollectionFilter::addToJsonObject(QJsonObject& _object) const {
 		}
 		else {
 			TERMINAL_LOGE("Invalid treewidget item, cast to terminal collectio item failed");
-			otAssert(0, "Invalid item");
+			OTAssert(0, "Invalid item");
 		}
 	}
 	_object[OT_JSON_COLLECTION_Childs] = childArr;
@@ -555,10 +555,10 @@ void Terminal::setEndpointFromMessageType(ot::MessageType _type) {
 	case ot::EXECUTE_ONE_WAY_TLS: m_endpoint->setCurrentText(TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS); break;
 	case ot::SECURE_MESSAGE_TYPES:
 	case ot::ALL_MESSAGE_TYPES:
-		otAssert(0, "Invalid message type");
+		OTAssert(0, "Invalid message type");
 		break;
 	default:
-		otAssert(0, "Unknown message type");
+		OTAssert(0, "Unknown message type");
 		break;
 	}
 }
@@ -569,7 +569,7 @@ ot::MessageType Terminal::endpointToMessageType(void) const {
 	else if (txt == TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS) return ot::EXECUTE_ONE_WAY_TLS;
 	else if (txt == TERMINAL_TXT_ENDPOINT_QUEUE) return ot::QUEUE;
 	else {
-		otAssert(0, "Unknown endpoint");
+		OTAssert(0, "Unknown endpoint");
 		return ot::EXECUTE;
 	}
 }
@@ -691,12 +691,12 @@ void Terminal::slotShowNavigationContextMenu(const QPoint& _pt) {
 			handleContextRequest(_pt, request);
 		}
 		else {
-			otAssert(0, "Cast failed");
+			OTAssert(0, "Cast failed");
 			OTOOLKIT_LOGE("Terminal", "Navigation item cast failed");
 		}
 	}
 	else {
-		otAssert(0, "Unknown root item");
+		OTAssert(0, "Unknown root item");
 		OTOOLKIT_LOGE("Terminal", "Unknown navigation root item");
 	}
 }
@@ -1107,7 +1107,7 @@ void Terminal::removeRequest(TerminalRequest * _request) {
 		m_exportLock = false;
 	}
 	else {
-		otAssert(0, "No parent item");
+		OTAssert(0, "No parent item");
 		TERMINAL_LOGE("Parent item not found");
 	}
 

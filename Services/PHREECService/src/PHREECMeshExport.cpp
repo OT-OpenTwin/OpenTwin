@@ -15,8 +15,8 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "OpenTwinFoundation/EntityInformation.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/EntityInformation.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include <fstream>
 #include <iomanip>

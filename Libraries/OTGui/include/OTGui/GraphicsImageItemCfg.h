@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/Color.h"
+#include "OTCore/Color.h"
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
 

@@ -6,7 +6,7 @@
  * \date   June 2023
  *********************************************************************/
 #pragma once
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 class ProgressUpdater
 {

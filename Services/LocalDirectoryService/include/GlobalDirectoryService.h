@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/rJSON.h"
 
 #include <string>
 

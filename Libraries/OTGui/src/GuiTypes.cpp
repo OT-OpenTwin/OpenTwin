@@ -1,6 +1,6 @@
 #include "OTGui/GuiTypes.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
 
 std::string ot::toString(ot::Alignment _alignment) {
 	switch (_alignment)

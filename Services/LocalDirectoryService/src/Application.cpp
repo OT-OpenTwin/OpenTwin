@@ -12,13 +12,13 @@
 #include "ExitCodes.h"
 
 // Open twin header
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinSystem/PortManager.h"
-#include "openTwinSystem/OperatingSystem.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinFoundation/TypeConverter.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/Msg.h"
+#include "OTSystem/PortManager.h"
+#include "OTSystem/OperatingSystem.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/TypeConverter.h"
 
 #include <thread>
 #include <iostream>

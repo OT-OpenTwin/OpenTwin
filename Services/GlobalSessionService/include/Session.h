@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 #include <string>
 
 class Session {

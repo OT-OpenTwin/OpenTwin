@@ -14,8 +14,8 @@ class PrimitivePyramid;
 class PrimitiveSphere;
 class PrimitiveTorus;
 
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 class PrimitiveManager
 {

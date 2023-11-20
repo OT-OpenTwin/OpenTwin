@@ -1,8 +1,8 @@
 #pragma once
 #include "EntityBase.h"
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/Point2D.h"
-#include "OpenTwinCore/BasicServiceInformation.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/BasicServiceInformation.h"
 #include "EntityCoordinates2D.h"
 
 #include "Connector.h"

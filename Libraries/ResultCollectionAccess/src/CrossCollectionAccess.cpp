@@ -1,11 +1,11 @@
 #pragma once
 #include "CrossCollectionAccess.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 #include "DataBase.h"
-#include "OpenTwinCore/FolderNames.h"
+#include "OTCore/FolderNames.h"
 #include "ClassFactory.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/ReturnMessage.h"
 
 
 CrossCollectionAccess::CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL)

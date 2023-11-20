@@ -1,9 +1,9 @@
 #include "ResultCollectionHandler.h"
 #include "Application.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/rJSON.h"
 #include "DataBase.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
 
 ResultCollectionHandler::ResultCollectionHandler()
 {

@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTGui/Font.h"
-#include "OpenTwinCore/rJSONHelper.h"
+#include "OTCore/rJSONHelper.h"
 
 ot::Font::Font() : m_sizePx(12), m_isBold(false), m_isItalic(false) {}
 

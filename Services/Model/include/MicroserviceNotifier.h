@@ -8,8 +8,8 @@
 #include "Types.h"
 #include "Geometry.h"
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCommunication/UiTypes.h"
 
 class MicroserviceNotifier
 {

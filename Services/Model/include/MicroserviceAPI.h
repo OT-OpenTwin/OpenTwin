@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 
 #include "rapidjson/document.h"
 

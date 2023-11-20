@@ -9,7 +9,7 @@ namespace ot
 	}
 }
 
-#include <OpenTwinCore/CoreTypes.h>
+#include "OTCore/CoreTypes.h"
 #include "Types.h"
 
 #include <map>

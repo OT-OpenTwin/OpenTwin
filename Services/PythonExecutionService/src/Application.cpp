@@ -12,18 +12,18 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 #include <vector>
 #include <string>
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/TypeNames.h"
+#include "OTCore/Variable.h"
+#include "OTCore/TypeNames.h"
 #include "TemplateDefaultManager.h"
 #include "SubprocessDebugConfigurator.h"
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 #include "DataBase.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/ReturnMessage.h"
 
 Application * g_instance{ nullptr };
 

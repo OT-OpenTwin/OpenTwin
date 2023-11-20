@@ -13,13 +13,13 @@
 
 
 // Open twin header
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCore/OwnerServiceGlobal.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
 
 #include "ClassFactory.h"

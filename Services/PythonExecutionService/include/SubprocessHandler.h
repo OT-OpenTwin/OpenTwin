@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include "openTwinSystem/SystemTypes.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTSystem/SystemTypes.h"
+#include "OTCore/rJSON.h"
 
 #include <condition_variable>
 #include <atomic>

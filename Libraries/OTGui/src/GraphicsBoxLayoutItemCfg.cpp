@@ -96,12 +96,12 @@ void ot::GraphicsBoxLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item) {
 }
 
 void ot::GraphicsBoxLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item, int _stretch) {
-	otAssert(_stretch >= 0, "Stretch should be greater or equal to 0");
+	OTAssert(_stretch >= 0, "Stretch should be greater or equal to 0");
 	m_items.push_back(itemStrechPair_t(_item, _stretch));
 }
 
 void ot::GraphicsBoxLayoutItemCfg::addStrech(int _stretch) {
-	otAssert(_stretch > 0, "Stretch should be greater than 0");
+	OTAssert(_stretch > 0, "Stretch should be greater than 0");
 	m_items.push_back(itemStrechPair_t(nullptr, _stretch));
 }
 

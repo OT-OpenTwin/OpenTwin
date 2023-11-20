@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItemCfg "OT_GICTria"
 

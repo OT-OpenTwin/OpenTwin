@@ -9,10 +9,10 @@
 #pragma once
 
 // Open twin header
-#include "OpenTwinFoundation/ApplicationBase.h"		// Base class
-#include "OpenTwinCore/rJSON.h"					// open twins rapid json layer
-#include "OpenTwinFoundation/EntityInformation.h"
-#include "OpenTwinFoundation/MenuButtonDescription.h"
+#include "OTServiceFoundation/ApplicationBase.h"		// Base class
+#include "OTCore/rJSON.h"					// open twins rapid json layer
+#include "OTServiceFoundation/EntityInformation.h"
+#include "OTServiceFoundation/MenuButtonDescription.h"
 
 // C++ header
 #include <string>

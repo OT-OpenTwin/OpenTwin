@@ -7,7 +7,7 @@ class DataSourceManagerItem;
 
 #include "Types.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 class DataSourceManager
 {

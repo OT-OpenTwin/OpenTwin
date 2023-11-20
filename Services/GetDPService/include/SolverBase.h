@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OpenTwinCore/TypeNames.h"
-#include "OpenTwinFoundation/EntityInformation.h"
+#include "OTCore/TypeNames.h"
+#include "OTServiceFoundation/EntityInformation.h"
 
 #include <fstream>
 #include <map>

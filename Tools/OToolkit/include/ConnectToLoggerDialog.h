@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 #include <QtCore/qlist.h>
 #include <QtWidgets/qdialog.h>

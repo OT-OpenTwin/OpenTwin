@@ -4,8 +4,8 @@
 #include <list>
 #include <map>
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinFoundation/EntityInformation.h"
+#include "OTCore/CoreTypes.h"
+#include "OTServiceFoundation/EntityInformation.h"
 
 #include "EntityProperties.h"
 

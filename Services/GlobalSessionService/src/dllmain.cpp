@@ -18,11 +18,11 @@
 #include "GlobalSessionService.h"
 
 // OpenTwin header
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/ServiceLogNotifier.h"
-#include "OpenTwinFoundation/Dispatcher.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
+#include "OTServiceFoundation/Dispatcher.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -49,7 +49,7 @@ extern "C"
 	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownIP, const char * _databaseIP, const char * _authURL)
 	{
 		if (GlobalSessionService::hasInstance()) {
-			otAssert(0, "Global session service was already initialized");
+			OTAssert(0, "Global session service was already initialized");
 			return -1;
 		}
 
@@ -99,7 +99,7 @@ extern "C"
 
 		// Check if the global session service was initialized
 		if (!GlobalSessionService::hasInstance()) {
-			otAssert(0, "Global session service not initialized");
+			OTAssert(0, "Global session service not initialized");
 			returnValue = new char[1]{ 0 };
 			return returnValue;
 		}

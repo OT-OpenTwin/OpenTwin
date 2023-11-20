@@ -14,7 +14,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 #include <optional>
 
 class PythonObjectBuilder

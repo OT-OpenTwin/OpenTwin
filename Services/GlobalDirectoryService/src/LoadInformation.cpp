@@ -2,9 +2,9 @@
 #include "LoadInformation.h"
 
 // OpenTwin header
-#include <OpenTwinCore/Logger.h>
-#include <OpenTwinCommunication/ActionTypes.h>
-#include <OpenTwinFoundation/TypeConverter.h>
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/TypeConverter.h"
 
 LoadInformation::LoadInformation() 
 	: m_currentPhysicalMemoryLoad(100.), m_currentVirtualMemoryLoad(100.),

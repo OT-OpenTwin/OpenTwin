@@ -1,7 +1,7 @@
 #include "MeasurementCampaignHandler.h"
 #include "Application.h"
 #include "ClassFactory.h"
-#include "OpenTwinCore/FolderNames.h"
+#include "OTCore/FolderNames.h"
 #include "DataBase.h"
 
 void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName)

@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <gmsh_cwrap.h>
 

@@ -11,10 +11,10 @@
 
 #include <akGui/aColorStyle.h>
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/rJSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
 
 #include <qlayout.h>
 #include <qtablewidget.h>

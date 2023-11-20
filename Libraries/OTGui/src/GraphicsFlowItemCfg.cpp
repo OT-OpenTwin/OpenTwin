@@ -176,7 +176,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createDownTriangleItem(void) 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::string& _name, const std::string& _title) const {
 	OTAssertNullptr(m_backgroundPainter);
 	OTAssertNullptr(m_titleBackgroundPainter);
-	otAssert(!_name.empty(), "No name provided");
+	OTAssert(!_name.empty(), "No name provided");
 
 	// --- Create a copy of local data ------------------------------------------------
 

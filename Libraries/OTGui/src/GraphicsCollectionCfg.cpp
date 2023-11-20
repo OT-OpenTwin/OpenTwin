@@ -1,9 +1,9 @@
 // OpenTwin header
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTCore/Logger.h"
 
 #define OT_JSON_Member_Name "Name"
 #define OT_JSON_Member_Title "Title"

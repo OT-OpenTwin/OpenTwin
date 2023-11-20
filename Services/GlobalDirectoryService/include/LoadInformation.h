@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenTwinCore/rJSON.h>
+#include "OTCore/rJSON.h"
 
 class LoadInformation {
 public:

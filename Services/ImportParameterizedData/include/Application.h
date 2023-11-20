@@ -9,9 +9,9 @@
 #pragma once
 
 // Open twin header
-#include <OpenTwinCore/rJSON.h>					// open twins rapid json layer
-#include <OpenTwinFoundation/ApplicationBase.h>		// Base class
-#include <OpenTwinFoundation/MenuButtonDescription.h>
+#include "OTCore/rJSON.h"					// open twins rapid json layer
+#include "OTServiceFoundation/ApplicationBase.h"		// Base class
+#include "OTServiceFoundation/MenuButtonDescription.h"
 
 // C++ header
 #include <string>
@@ -20,7 +20,7 @@
 #include "DataCategorizationHandler.h"
 #include "DataCollectionCreationHandler.h"
 
-#include "OpenTwinCore/FolderNames.h"
+#include "OTCore/FolderNames.h"
 
 // Forward declaration
 namespace ot {

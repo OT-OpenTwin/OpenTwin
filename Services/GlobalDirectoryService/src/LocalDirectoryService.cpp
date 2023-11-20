@@ -11,9 +11,9 @@
 #include "Application.h"
 
 // OpenTwin header
-#include <OpenTwinCore/Logger.h>
-#include <OpenTwinCommunication/ActionTypes.h>
-#include <OpenTwinCommunication/Msg.h>
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // C++ header
 #include <iostream>

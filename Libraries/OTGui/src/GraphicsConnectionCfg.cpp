@@ -5,8 +5,8 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/rJSONHelper.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/rJSONHelper.h"
 
 #define OT_JSON_Member_Color "Color"
 #define OT_JSON_Member_Style "Style"

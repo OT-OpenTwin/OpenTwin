@@ -1,6 +1,6 @@
 #include "openTwin/AbstractPluginCore.h"
 #include "openTwin/AbstractUIWidgetInterface.h"
-#include "OpenTwinCore/ServiceBase.h"
+#include "OTCore/ServiceBase.h"
 
 ot::AbstractPluginCore::AbstractPluginCore() 
 	: m_uiInterface(nullptr)

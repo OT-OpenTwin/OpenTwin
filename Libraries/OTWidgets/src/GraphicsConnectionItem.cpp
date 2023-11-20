@@ -9,7 +9,7 @@
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/OTQtConverter.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -135,8 +135,8 @@ ot::GraphicsConnectionCfg ot::GraphicsConnectionItem::getConnectionInformation(v
 void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
 	OTAssertNullptr(_origin);
 	OTAssertNullptr(_dest);
-	otAssert(m_origin == nullptr, "Origin already set");
-	otAssert(m_dest == nullptr, "Destination already set");
+	OTAssert(m_origin == nullptr, "Origin already set");
+	OTAssert(m_dest == nullptr, "Destination already set");
 	m_origin = _origin;
 	m_dest = _dest;
 	m_origin->storeConnection(this);

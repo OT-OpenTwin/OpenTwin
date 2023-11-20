@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Types.h"
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 void TreeIcon::addToJsonDoc(rapidjson::Document *doc)
 {

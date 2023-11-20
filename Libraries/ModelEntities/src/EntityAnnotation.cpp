@@ -6,7 +6,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include <OTCommunication/ActionTypes.h>
 #include <bsoncxx/builder/basic/array.hpp>
 
 EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :

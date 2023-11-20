@@ -12,10 +12,10 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTCommunication/Msg.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 

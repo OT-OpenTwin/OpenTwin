@@ -9,8 +9,8 @@
 #include <qicon.h>
 
 // open twin header
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCore/Flags.h"
+#include "OTCommunication/UiTypes.h"
 
 class AppBase;
 class LockManager;

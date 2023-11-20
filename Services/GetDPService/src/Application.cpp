@@ -12,10 +12,10 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/rJSON.h"				// json convenience functions
-#include "OpenTwinCommunication/actionTypes.h"		// action member and types definition
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTCore/rJSON.h"				// json convenience functions
+#include "OTCommunication/actionTypes.h"		// action member and types definition
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 // Application specific includes
 #include "GetDPLauncher.h"

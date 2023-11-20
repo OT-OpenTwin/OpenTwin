@@ -12,8 +12,8 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 Application * g_instance{ nullptr };
 

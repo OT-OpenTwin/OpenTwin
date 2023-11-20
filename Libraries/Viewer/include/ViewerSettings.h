@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenTwinCore/Color.h"
+#include "OTCore/Color.h"
 
 #include <string>
 

@@ -7,8 +7,8 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/Painter2D.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/rJSONHelper.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/rJSONHelper.h"
 
 // <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
 //  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                          ^O^^^^^^// '## w ##' //^^3

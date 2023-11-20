@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
 
 #include <mutex>
 #include <string>

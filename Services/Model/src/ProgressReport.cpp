@@ -2,12 +2,12 @@
 
 #include "ProgressReport.h"
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Flags.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/UiTypes.h"
 
 extern std::string globalUIserviceURL;
 extern std::string globalServiceURL;

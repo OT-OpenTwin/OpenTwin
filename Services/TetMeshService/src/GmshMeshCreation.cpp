@@ -58,9 +58,9 @@
 #include <chrono>
 #include <thread>	
 
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTCommunication/Msg.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 GmshMeshCreation::GmshMeshCreation(Application *app) : 
 	application(app),

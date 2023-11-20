@@ -8,7 +8,7 @@
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/KeyMap.h"
+#include "OTCore/KeyMap.h"
 
 ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration) {
 	OTAssertNullptr(_configuration);

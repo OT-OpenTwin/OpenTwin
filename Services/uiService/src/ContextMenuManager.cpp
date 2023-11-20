@@ -4,8 +4,8 @@
 #include "ExternalServicesComponent.h"
 #include "UserSettings.h"
 
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/OTAssert.h"
 
 #include <akAPI/uiAPI.h>
 #include <akGui/aToolButtonCustomContextMenu.h>
@@ -68,13 +68,13 @@ ContextMenuItem::~ContextMenuItem() {
 ContextMenuEntry * ContextMenuItem::addEntry(ContextMenuEntry * _entry) {
 	for (auto itm : m_items) {
 		if (itm->name() == _entry->name()) {
-			otAssert(0, "Item with the same name already exists");
+			OTAssert(0, "Item with the same name already exists");
 			AppBase::instance()->appendInfoMessage("[WARNING] Failed to add context menu entry: Entry with the same name already exists");
 			return nullptr;
 		}
 	}
 	aToolButtonCustomContextMenu * obj = uiAPI::object::get<aToolButtonCustomContextMenu>(m_uid);
-	if (obj == nullptr) { otAssert(0, "Menu cast failed"); return nullptr; }
+	if (obj == nullptr) { OTAssert(0, "Menu cast failed"); return nullptr; }
 	aContextMenuItem * itm;
 	contextMenuRole role = cmrNone;
 	
@@ -96,13 +96,13 @@ ContextMenuEntry * ContextMenuItem::addEntry(ContextMenuEntry * _entry) {
 ContextMenuEntry * ContextMenuItem::addEntry(ot::ContextMenuItem * _item) {
 	for (auto itm : m_items) {
 		if (itm->name() == _item->name()) {
-			otAssert(0, "Item with the same name already exists");
+			OTAssert(0, "Item with the same name already exists");
 			AppBase::instance()->appendInfoMessage("[WARNING] Failed to add context menu entry: Entry with the same name already exists");
 			return nullptr;
 		}
 	}
 	aToolButtonCustomContextMenu * obj = uiAPI::object::get<aToolButtonCustomContextMenu>(m_uid);
-	if (obj == nullptr) { otAssert(0, "Menu cast failed"); return nullptr; }
+	if (obj == nullptr) { OTAssert(0, "Menu cast failed"); return nullptr; }
 	aContextMenuItem * itm;
 	std::string roleId;
 std::string roleText;
@@ -139,7 +139,7 @@ return newEntry;
 ContextMenuEntry * ContextMenuItem::addEntry(const std::string& _name, const std::string& _text, const std::string& _role, const std::string& _icon) {
 	for (auto itm : m_items) {
 		if (itm->name() == _name) {
-			otAssert(0, "Item with the same name already exists");
+			OTAssert(0, "Item with the same name already exists");
 			AppBase::instance()->appendInfoMessage("[WARNING] Failed to add context menu entry: Entry with the same name already exists");
 			return nullptr;
 		}
@@ -166,7 +166,7 @@ ContextMenuEntry * ContextMenuItem::addEntry(const std::string& _name, const std
 
 void ContextMenuItem::addSeperator(void) {
 	aToolButtonCustomContextMenu * obj = uiAPI::object::get<aToolButtonCustomContextMenu>(m_uid);
-	if (obj == nullptr) { otAssert(0, "Menu cast failed"); return; }
+	if (obj == nullptr) { OTAssert(0, "Menu cast failed"); return; }
 	obj->addMenuSeperator();
 }
 
@@ -174,7 +174,7 @@ const ContextMenuEntry * ContextMenuItem::findItemById(ak::ID _id) {
 	for (auto itm : m_items) {
 		if (itm->id() == _id) { return itm; }
 	}
-	otAssert(0, "Item not found");
+	OTAssert(0, "Item not found");
 	return nullptr;
 }
 
@@ -236,7 +236,7 @@ void ContextMenuManager::notify(UID _sender, eventType _event, int _info1, int _
 				}
 			}
 			else {
-				otAssert(0, "Failed to find context menu entry by id");
+				OTAssert(0, "Failed to find context menu entry by id");
 				printIError("Failed to find context menu entry by id");
 			}
 		}
@@ -277,7 +277,7 @@ void ContextMenuManager::notify(UID _sender, eventType _event, int _info1, int _
 				}
 			}
 			else {
-				otAssert(0, "Failed to find context menu entry by id");
+				OTAssert(0, "Failed to find context menu entry by id");
 				printIError("Failed to find context menu entry by id");
 			}
 		}
@@ -288,7 +288,7 @@ ContextMenuItem * ContextMenuManager::createItem(ot::ServiceBase * _creator, ak:
 	std::list<ContextMenuItem *> * entries = getOrCreateDataList(_creator);
 	for (auto itm : *entries) {
 		if (itm->name() == _menu.name()) {
-			otAssert(0, "An item with the given name was already created");
+			OTAssert(0, "An item with the given name was already created");
 			return nullptr;
 		}
 	}
@@ -304,7 +304,7 @@ ContextMenuItem * ContextMenuManager::createItem(ot::ServiceBase * _creator, ak:
 				newItem->addEntry(actualItem);
 			}
 			else {
-				otAssert(0, "Context menu item cast failed");
+				OTAssert(0, "Context menu item cast failed");
 				printSError(_creator, "Context menu item cast failed");
 			}
 		}
@@ -312,12 +312,12 @@ ContextMenuItem * ContextMenuManager::createItem(ot::ServiceBase * _creator, ak:
 			ot::ContextMenuSeperator * actualItem = dynamic_cast<ot::ContextMenuSeperator *>(itm);
 			if (actualItem) { newItem->addSeperator(); }
 			else {
-				otAssert(0, "Context menu seperator cast failed");
+				OTAssert(0, "Context menu seperator cast failed");
 				printSError(_creator, "Context menu seperator cast failed");
 			}
 		}
 		else {
-			otAssert(0, "Unknown context menu item type");
+			OTAssert(0, "Unknown context menu item type");
 			printSError(_creator, "Unknown context menu item type");
 		}
 	}
@@ -329,7 +329,7 @@ ContextMenuItem * ContextMenuManager::createItem(ot::ServiceBase * _creator, ak:
 	std::list<ContextMenuItem *> * entries = getOrCreateDataList(_creator);
 	for (auto itm : *entries) {
 		if (itm->name() == _name) {
-			otAssert(0, "An item with the given name was already created");
+			OTAssert(0, "An item with the given name was already created");
 			return nullptr;
 		}
 	}
@@ -388,7 +388,7 @@ bool ContextMenuManager::hasDataListEntry(ot::ServiceBase * _service) {
 ContextMenuItem * ContextMenuManager::findItemByUid(ak::UID _uid) {
 	auto entry = m_uiToDataMap.find(_uid);
 	if (entry == m_uiToDataMap.end()) {
-		otAssert(0, "No entry found");
+		OTAssert(0, "No entry found");
 		return nullptr;
 	}
 	return entry->second;

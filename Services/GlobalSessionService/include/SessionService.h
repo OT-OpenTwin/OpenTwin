@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/rJSON.h"
 #include <string>
 #include <list>
 

@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/CustomGraphicsItem.h"
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 
 // Qt header
 #include <QtGui/qpen.h>

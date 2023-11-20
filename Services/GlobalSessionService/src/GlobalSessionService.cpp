@@ -3,9 +3,9 @@
 #include "SessionService.h"
 #include "Session.h"
 
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/Msg.h"
 
 #include <iostream>
 #include <thread>
@@ -40,7 +40,7 @@ bool GlobalSessionService::addSessionService(SessionService& _service) {
 	for (auto it : m_sessionServiceIdMap) {
 		if (it.second->url() == _service.url()) {
 			OT_LOG_W("Session with the url (" + _service.url() + ") is already registered");
-			otAssert(0, "Session url already registered");
+			OTAssert(0, "Session url already registered");
 			_service.setID(it.second->id());
 			// UNLOCK
 			m_mapMutex.unlock();
@@ -106,7 +106,7 @@ std::string GlobalSessionService::handleCreateSession(OT_rJSON_doc& _doc) {
 			m_mapMutex.unlock();
 
 			OT_LOG_W("Session opened by other user");
-			otAssert(0, "Session open by other user");
+			OTAssert(0, "Session open by other user");
 			return OT_ACTION_RETURN_INDICATOR_Error "Session open by other user";
 		}
 		else {
@@ -128,7 +128,7 @@ std::string GlobalSessionService::handleCreateSession(OT_rJSON_doc& _doc) {
 			m_mapMutex.unlock();
 
 			OT_LOG_E("No session service connected");
-			otAssert(0, "No session service connected");
+			OTAssert(0, "No session service connected");
 			return OT_ACTION_RETURN_INDICATOR_Error "No session service connected";
 		}
 	}

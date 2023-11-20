@@ -59,7 +59,7 @@ REM 3) IP address of this session service
 REM 4) IP address if MongoDB data base
 REM 5) Port number of the authorisation service
 
-START "SESSION SERVICE" %pause_prefix%open_twin.exe SessionService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LSS_PORT%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "%OPEN_TWIN_AUTH_PORT%"%pause_suffix%
+START "LOCAL SESSION SERVICE" %pause_prefix%open_twin.exe LocalSessionService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LSS_PORT%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "%OPEN_TWIN_AUTH_PORT%"%pause_suffix%
 
 REM ===========================================================================
 REM Launch the global directory service 

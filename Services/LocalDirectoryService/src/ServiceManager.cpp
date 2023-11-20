@@ -4,12 +4,12 @@
 #include "Configuration.h"
 
 // OpenTwin header
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinSystem/PortManager.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTSystem/PortManager.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // C++ header
 #include <iostream>
@@ -452,7 +452,7 @@ void ServiceManager::workerServiceStarter(void) {
 
 			// Check if max restarts is reached
 			if (info.startAttempt > info.service.getMaxStartupRestarts()) {
-				otAssert(0, "Maximum number of start attempts reached");
+				OTAssert(0, "Maximum number of start attempts reached");
 				OT_LOG_E("Maximum number of start attempts (" + std::to_string(info.service.getMaxStartupRestarts()) + 
 					") reached for service (name = \"" + info.service.getName() + "\"; type = \"" + info.service.getType() + "\")");
 				

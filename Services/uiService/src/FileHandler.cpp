@@ -2,9 +2,9 @@
 #include <fstream>
 #include <exception>
 #include "EntityFileCSV.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/TextEncoding.h"
-#include "OpenTwinCore/EncodingGuesser.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCore/TextEncoding.h"
+#include "OTCore/EncodingGuesser.h"
 
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)

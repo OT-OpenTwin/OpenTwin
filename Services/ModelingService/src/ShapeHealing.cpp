@@ -5,9 +5,8 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/uiComponent.h>
-//#include "openTwin/msg.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <map>
 

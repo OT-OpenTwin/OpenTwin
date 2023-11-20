@@ -1,6 +1,6 @@
 #pragma once
 #include "EntityFile.h"
-#include "OpenTwinCore/TextEncoding.h"
+#include "OTCore/TextEncoding.h"
 
 class __declspec(dllexport) EntityFileText : public EntityFile
 {

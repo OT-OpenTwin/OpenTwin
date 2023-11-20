@@ -2,7 +2,7 @@
 
 #if OT_UISERVICE_DEV_LOGGER_ACTIVE==1
 
-#include <OpenTwinCommunication/ServiceLogNotifier.h>
+#include <OTCommunication/ServiceLogNotifier.h>
 
 #include <QtWidgets/qmainwindow.h>
 

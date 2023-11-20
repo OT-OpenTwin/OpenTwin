@@ -8,8 +8,8 @@ namespace ot
 #include <list>
 #include <string>
 
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 class EntityBrep;
 class EntityGeometry;

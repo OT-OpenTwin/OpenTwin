@@ -6,7 +6,7 @@
 #include "EntityBase.h"
 #include "EntityMeshTet.h"
 
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 
 void ObjectManager::storeMeshElementsForEntity(EntityBase *entity, gmsh::vectorpair &meshElements)

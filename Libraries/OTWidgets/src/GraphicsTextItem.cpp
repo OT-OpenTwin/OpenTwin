@@ -5,7 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
+#include "OTCore/KeyMap.h"
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OTWidgets/GraphicsTextItem.h"
 #include "OTWidgets/OTQtConverter.h"

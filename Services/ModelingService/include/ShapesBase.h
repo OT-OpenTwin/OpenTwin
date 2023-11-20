@@ -6,8 +6,8 @@
 #include <vector>
 #include <list>
 
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 class EntityGeometry;
 class EntityCache;

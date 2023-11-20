@@ -2,8 +2,8 @@
 #pragma warning(disable : 4251)
 
 //#include <OpenTwinCommunication/actionTypes.h>
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/CoreTypes.h"
 
 class __declspec(dllexport) TreeIcon
 {

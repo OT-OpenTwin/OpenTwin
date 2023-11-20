@@ -1,12 +1,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCore/OTClassHelper.h"
-#include "OpenTwinCommunication/actionTypes.h"
-#include "OpenTwinFoundation/OTObject.h"
-#include "OpenTwinFoundation/IDManager.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/Flags.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/OTObject.h"
+#include "OTServiceFoundation/IDManager.h"
 
 // C++ header
 #include <string>

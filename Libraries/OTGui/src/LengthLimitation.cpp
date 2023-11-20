@@ -1,6 +1,6 @@
 #include "OTGui/LengthLimitation.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCore/OTAssert.h"
 
 void ot::LengthLimitation::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const {
 	ot::rJSON::add(_document, _jsonObject, "Min", m_min);
@@ -17,7 +17,7 @@ void ot::LengthLimitation::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	OT_rJSON_checkMember(_jsonObject, "MaxIsSet", Bool);
 	OT_rJSON_checkMember(_jsonObject, "Type", String);
 	if (_jsonObject["Type"].GetString() != std::string("int")) {
-		otAssert(0, "Invalid type");
+		OTAssert(0, "Invalid type");
 		throw std::exception("Invalid LengthLimitation type provided");
 	}
 	m_min = _jsonObject["Min"].GetInt();
@@ -43,7 +43,7 @@ void ot::LengthLimitationF::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	OT_rJSON_checkMember(_jsonObject, "MaxIsSet", Bool);
 	OT_rJSON_checkMember(_jsonObject, "Type", String);
 	if (_jsonObject["Type"].GetString() != std::string("float")) {
-		otAssert(0, "Invalid type");
+		OTAssert(0, "Invalid type");
 		throw std::exception("Invalid LengthLimitation type provided");
 	}
 	m_min = _jsonObject["Min"].GetFloat();
@@ -69,7 +69,7 @@ void ot::LengthLimitationD::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 	OT_rJSON_checkMember(_jsonObject, "MaxIsSet", Bool);
 	OT_rJSON_checkMember(_jsonObject, "Type", String);
 	if (_jsonObject["Type"].GetString() != std::string("double")) {
-		otAssert(0, "Invalid type");
+		OTAssert(0, "Invalid type");
 		throw std::exception("Invalid LengthLimitation type provided");
 	}
 	m_min = _jsonObject["Min"].GetDouble();

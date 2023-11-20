@@ -6,10 +6,10 @@
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
-#include <OpenTwinFoundation/EntityInformation.h>
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/EntityInformation.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <string>
 #include <list>

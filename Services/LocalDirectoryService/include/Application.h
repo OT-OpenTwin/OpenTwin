@@ -12,10 +12,10 @@
 #include "ServiceManager.h"
 
 // Open twin header
-#include "OpenTwinCore/ServiceBase.h"		// Base class
-#include "OpenTwinCore/rJSON.h"				// open twins rapid json layer
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinFoundation/OTObject.h"	// Base class
+#include "OTCore/ServiceBase.h"		// Base class
+#include "OTCore/rJSON.h"				// open twins rapid json layer
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/OTObject.h"	// Base class
 
 // C++ header
 #include <string>

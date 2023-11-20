@@ -12,7 +12,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/rJSON.h"
 
 TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBase *> objects)
 {

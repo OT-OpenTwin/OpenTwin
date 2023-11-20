@@ -36,12 +36,12 @@
 #include <Geometry.h>
 
 // Rapid JSON
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/OwnerService.h"
-#include "OpenTwinCore/BasicServiceInformation.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Flags.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/OwnerService.h"
+#include "OTCore/BasicServiceInformation.h"
+#include "OTCommunication/UiTypes.h"
 
 class WebsocketClient;
 class ControlsManager;

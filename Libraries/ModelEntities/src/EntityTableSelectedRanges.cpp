@@ -1,8 +1,8 @@
 #include "EntityTableSelectedRanges.h"
 #include <bsoncxx/builder/basic/array.hpp>
 
-#include <OpenTwinCore/TypeNames.h>
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCore/TypeNames.h"
+#include "OTCommunication/ActionTypes.h"
 
 EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityBase(ID,parent,obs,ms,factory,owner)

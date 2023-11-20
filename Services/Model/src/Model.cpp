@@ -30,9 +30,9 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCommunication/UiTypes.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include "TopExp_Explorer.hxx"
 #include "TopoDS.hxx"

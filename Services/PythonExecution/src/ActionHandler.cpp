@@ -1,9 +1,9 @@
 #pragma once
 #include "ActionHandler.h"
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/VariableToJSONConverter.h"
-#include "OpenTwinCore/JSONToVariableConverter.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCore/Variable.h"
+#include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/JSONToVariableConverter.h"
 
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)

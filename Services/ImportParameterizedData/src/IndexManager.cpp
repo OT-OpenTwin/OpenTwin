@@ -9,7 +9,7 @@
  * \date   June 2023
  *********************************************************************/
 #include "IndexManager.h"
-#include "OpenTwinCore/TypeNames.h"
+#include "OTCore/TypeNames.h"
 
 
 IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField)

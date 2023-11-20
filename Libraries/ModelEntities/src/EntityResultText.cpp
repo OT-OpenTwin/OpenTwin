@@ -1,7 +1,7 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 #include "EntityResultText.h"
 #include "EntityResultTextData.h"
 #include "DataBase.h"

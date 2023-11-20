@@ -5,7 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
+#include "OTCore/KeyMap.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 #include "OTWidgets/Painter2DFactory.h"

@@ -48,15 +48,15 @@
 #include <qfiledialog.h>		// Open/Save file dialog
 
 // Open twin header
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Point2D.h"
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
-#include "OpenTwinFoundation/SettingsData.h"
-#include "OpenTwinFoundation/OTObject.h"
+#include "OTCore/Logger.h"
+#include "OTCore/Flags.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/UiTypes.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTServiceFoundation/OTObject.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsView.h"
@@ -171,7 +171,7 @@ AppBase::~AppBase() {
 
 int AppBase::run() {
 	try {
-		otAssert(!m_isInitialized, "Application was already initialized");
+		OTAssert(!m_isInitialized, "Application was already initialized");
 		m_isInitialized = true;
 
 		QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
@@ -221,7 +221,7 @@ int AppBase::run() {
 
 		// Check if at least one icon directory was found
 		if (iconPathCounter == 0) {
-			otAssert(0, "No icon path was found!");
+			OTAssert(0, "No icon path was found!");
 			OT_LOG_E("No icon path found");
 			showErrorPrompt("No icon path was found. Try to reinstall the application", "Error");
 			return 3;
@@ -392,7 +392,7 @@ void AppBase::setCurrentProjectIsModified(
 
 aWindow * AppBase::mainWindow(void) {
 	if (m_mainWindow == invalidUID) {
-		otAssert(0, "Window not created"); return nullptr;
+		OTAssert(0, "Window not created"); return nullptr;
 	}
 	return uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 }
@@ -1163,13 +1163,13 @@ void AppBase::viewerSettingsChanged(ot::AbstractSettingsItem * _item) {
 		m_viewerComponent->settingsItemChanged(_item);
 	}
 	else {
-		otAssert(0, "No viewer component found");
+		OTAssert(0, "No viewer component found");
 	}
 }
 
 void AppBase::settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem * _item) {
-	if (_item->parentGroup() == nullptr) { otAssert(0, "Item is not attached to a group"); return; }
-	if (_owner == nullptr) { otAssert(0, "No settings owner provided"); return; }
+	if (_item->parentGroup() == nullptr) { OTAssert(0, "Item is not attached to a group"); return; }
+	if (_owner == nullptr) { OTAssert(0, "No settings owner provided"); return; }
 	ot::SettingsData * data = new ot::SettingsData("DataChangedEvent", "1.0");
 	ot::SettingsGroup * group = new ot::SettingsGroup(_item->parentGroup()->name(), _item->parentGroup()->title());
 	ot::SettingsGroup * groupOrigin = _item->parentGroup();
@@ -1190,11 +1190,11 @@ void AppBase::settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem
 	std::string response;
 	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, _owner->serviceURL(), doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		otAssert(0, "Error from service");
+		OTAssert(0, "Error from service");
 		appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		otAssert(0, "Warning from service");
+		OTAssert(0, "Warning from service");
 		appendInfoMessage(QString("[WARNING] Sending message resulted in error: ") + response.c_str() + "\n");
 	}
 }

@@ -11,7 +11,7 @@
 
 #pragma once
 //OT Header
-#include "OpenTwinCore/Point2D.h"
+#include "OTCore/Point2D.h"
 
 //C++ Header
 #include <string>

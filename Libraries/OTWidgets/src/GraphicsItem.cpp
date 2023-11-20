@@ -15,8 +15,8 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/KeyMap.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 
 #include <QtCore/qmimedata.h>
 #include <QtCore/qmath.h>

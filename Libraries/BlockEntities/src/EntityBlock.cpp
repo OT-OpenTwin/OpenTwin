@@ -1,5 +1,5 @@
 #include "EntityBlock.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsPackage.h"
 #include "BlockConnectionBSON.h"
 #include "EntityBlock.h"

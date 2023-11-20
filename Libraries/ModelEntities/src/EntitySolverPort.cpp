@@ -1,6 +1,6 @@
 #include "../include/EntitySolverPort.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 EntitySolverPort::EntitySolverPort(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	: EntityContainer(ID,parent,obs,ms,factory,owner){}

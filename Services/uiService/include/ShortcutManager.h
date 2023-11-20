@@ -1,7 +1,7 @@
 #pragma once
 
 // openTwin header
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCommunication/UiTypes.h"
 
 // uiCore header
 #include <akCore/aObject.h>

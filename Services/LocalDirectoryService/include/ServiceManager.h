@@ -9,8 +9,8 @@
 #include <list>
 #include <mutex>
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinSystem/Network.h"
+#include "OTCore/rJSON.h"
+#include "OTSystem/Network.h"
 
 class Service;
 namespace std { class thread; }

@@ -12,7 +12,7 @@
 #include "ClassFactoryModel.h"
 #include "EntityFaceAnnotation.h"
 
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCommunication/UiTypes.h"
 
 class EntityMesh;
 class EntityMeshTet;

@@ -9,8 +9,8 @@
 #pragma once
 
 // Open twin header
-#include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
-#include "OpenTwinFoundation/ApplicationBase.h" // Base class
+#include "OTCore/rJSON.h"					// OpenTwin rapidjson wrapper
+#include "OTServiceFoundation/ApplicationBase.h" // Base class
 
 #include "SubprocessHandler.h"
 

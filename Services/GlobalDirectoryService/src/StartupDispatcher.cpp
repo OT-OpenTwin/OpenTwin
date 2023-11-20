@@ -2,8 +2,8 @@
 #include "Application.h"
 #include "LocalDirectoryService.h"
 
-#include <OpenTwinCore/Logger.h>
-#include <OpenTwinCommunication/Msg.h>
+#include "OTCore/Logger.h"
+#include "OTCommunication/Msg.h"
 
 #include <thread>
 #include <iostream>

@@ -18,9 +18,9 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCommunication/actionTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCommunication/actionTypes.h"
 
 // Qt header
 #include <QtCore/qdatetime.h>
@@ -73,7 +73,7 @@ void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogTy
 			this->slotLogError(_sender, _message);
 			break;
 		default:
-			otAssert(0, "Unknown log type");
+			OTAssert(0, "Unknown log type");
 			this->slotLogError("OToolkit", "Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }");
 			break;
 		}
@@ -92,7 +92,7 @@ void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogTy
 			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
 			break;
 		default:
-			otAssert(0, "Unknown log type");
+			OTAssert(0, "Unknown log type");
 			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, QString("Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }")));
 			break;
 		}

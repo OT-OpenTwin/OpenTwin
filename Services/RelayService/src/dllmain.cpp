@@ -19,10 +19,10 @@
 #include <QtWebSockets/QtWebSockets>
 
 // Open Twin header
-#include "OpenTwinCore/rJSON.h"					// rapidjson wrapper
-#include "OpenTwinCore/Logger.h"				// Logger
-#include "OpenTwinCore/ServiceBase.h"			// Logger initialization
-#include "OpenTwinCommunication/ActionTypes.h"	// action member and types definition
+#include "OTCore/rJSON.h"					// rapidjson wrapper
+#include "OTCore/Logger.h"				// Logger
+#include "OTCore/ServiceBase.h"			// Logger initialization
+#include "OTCommunication/ActionTypes.h"	// action member and types definition
 
 #include "SocketServer.h"
 

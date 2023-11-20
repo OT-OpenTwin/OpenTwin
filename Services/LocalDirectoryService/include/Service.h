@@ -8,9 +8,9 @@
 #include <map>
 #include <thread>
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinSystem/Application.h"
-#include "OpenTwinSystem/Network.h"
+#include "OTCore/rJSON.h"
+#include "OTSystem/Application.h"
+#include "OTSystem/Network.h"
 
 class ServiceManager;
 

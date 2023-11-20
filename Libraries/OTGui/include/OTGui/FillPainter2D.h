@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Color.h"
+#include "OTCore/Color.h"
 #include "OTGui/Painter2D.h"
 
 #define OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg "OT_P2DCFill"

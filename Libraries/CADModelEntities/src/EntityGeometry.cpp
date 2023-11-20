@@ -4,7 +4,7 @@
 #include "EntityGeometry.h"
 #include "DataBase.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include "GeometryOperations.h"
 

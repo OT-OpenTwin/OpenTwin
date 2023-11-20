@@ -4,8 +4,8 @@
 #include "ServiceInformation.h"
 
 // OpenTwin header
-#include "OpenTwinCore/OTClassHelper.h"
-#include "OpenTwinCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTCore/Serializable.h"
 
 // C++ header
 #include <string>

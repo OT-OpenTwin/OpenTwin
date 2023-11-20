@@ -7,9 +7,9 @@
 #define OT_OTQTCONVERTER_H
 
 // OpenTwin header
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinCore/Point2D.h"
-#include "OpenTwinCore/Size2D.h"
+#include "OTCore/Color.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/Size2D.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

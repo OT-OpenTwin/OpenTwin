@@ -3,14 +3,14 @@
 
 #include <iostream>
 
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinFoundation/UserCredentials.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/rJSON.h"
+#include "OTServiceFoundation/UserCredentials.h"
+#include "OTCore/Logger.h"
 //#include "OpenTwinCore/TypeConversion.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/ReturnMessage.h"
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 
@@ -231,15 +231,15 @@ std::string ServiceBase::dispatchAction(const char * _json, ot::MessageType _mes
 	// Parse the json string and check its main syntax
 	OT_rJSON_parseDOC(actionDoc, _json);
 	if (!actionDoc.IsObject()) {
-		otAssert(0, "Received message is not an JSON object");
+		OTAssert(0, "Received message is not an JSON object");
 		return OT_ACTION_RETURN_INDICATOR_Error "Received message is not an JSON object";
 	}
 	if (!actionDoc.HasMember(OT_ACTION_MEMBER)) {
-		otAssert(0, "Received JSON Object does not contain the action member");
+		OTAssert(0, "Received JSON Object does not contain the action member");
 		return OT_ACTION_RETURN_INDICATOR_Error "Received JSON Object does not contain the action member";
 	}
 	if (!actionDoc[OT_ACTION_MEMBER].IsString()) {
-		otAssert(0, "Received JSON Object's action member is not a string");
+		OTAssert(0, "Received JSON Object's action member is not a string");
 		return OT_ACTION_RETURN_INDICATOR_Error "Received JSON Object's action member is not a string";
 	}
 	std::string action = actionDoc[OT_ACTION_MEMBER].GetString();

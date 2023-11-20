@@ -26,7 +26,7 @@ ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 void ot::GraphicsStackItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	ot::GraphicsItemCfg::addToJsonObject(_document, _object);
 
-	otAssert(m_items.size() > 1, "Please add at least two items to the stack");
+	OTAssert(m_items.size() > 1, "Please add at least two items to the stack");
 #ifdef _DEBUG
 	{
 		bool checkOK = false;
@@ -36,7 +36,7 @@ void ot::GraphicsStackItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON
 				break;
 			}
 		}
-		otAssert(checkOK, "No master item was set. The size adjustment between the items won't be executed");
+		OTAssert(checkOK, "No master item was set. The size adjustment between the items won't be executed");
 	}
 #endif // _DEBUG
 

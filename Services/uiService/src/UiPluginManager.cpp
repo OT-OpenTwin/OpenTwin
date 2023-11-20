@@ -2,7 +2,7 @@
 #include "UiPluginComponent.h"
 #include "AppBase.h"
 
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 #include <akAPI/uiAPI.h>
 #include <akCore/aAssert.h>
@@ -153,12 +153,12 @@ unsigned long long UiPluginManager::loadPlugin(const QString& _pluginName, const
 void UiPluginManager::unloadPlugin(unsigned long long _pluginUID) {
 	auto it = m_plugins.find(_pluginUID);
 	if (it == m_plugins.end()) {
-		otAssert(0, "Unknown plugin UID");
+		OTAssert(0, "Unknown plugin UID");
 		return;
 	}
 	it->second->detachFunction();
 	if (!FreeLibrary(it->second->libraryInstance())) {
-		otAssert(0, "Failed to unload library");
+		OTAssert(0, "Failed to unload library");
 		logInfo("\n[ERROR] [PluginManager]: Failed to unload plugin \"" + it->second->name() + "\"");
 		return;
 	}
@@ -175,7 +175,7 @@ void UiPluginManager::unloadPlugin(const QString& _pluginName, ot::ServiceBase *
 			if (p.second->name() == _pluginName && p.second->owner() == _owner) {
 				p.second->detachFunction();
 				if (!FreeLibrary(p.second->libraryInstance())) {
-					otAssert(0, "Failed to unload library");
+					OTAssert(0, "Failed to unload library");
 					logInfo("\n[ERROR] [PluginManager]: Failed to unload plugin \"" + _pluginName + "\"");
 					return;
 				}
@@ -197,7 +197,7 @@ void UiPluginManager::unloadPlugins(ot::ServiceBase * _owner) {
 			if (p.second->owner() == _owner) {
 				p.second->detachFunction();
 				if (!FreeLibrary(p.second->libraryInstance())) {
-					otAssert(0, "Failed to unload library");
+					OTAssert(0, "Failed to unload library");
 					logInfo("\n[ERROR] [PluginManager]: Failed to unload plugin \"" + p.second->name() + "\"");
 					return;
 				}

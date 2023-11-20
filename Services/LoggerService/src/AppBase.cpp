@@ -1,8 +1,8 @@
 #include "AppBase.h"
 
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/rJSONHelper.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 #include <thread>
 

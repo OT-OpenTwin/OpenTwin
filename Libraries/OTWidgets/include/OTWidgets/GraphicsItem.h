@@ -10,8 +10,8 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Margins.h"
 //#include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCore/Flags.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTCore/Flags.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>

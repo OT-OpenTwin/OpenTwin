@@ -14,7 +14,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 // Qt header
 #include <QtWidgets/qsplitter.h>
@@ -160,7 +160,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 // Private: Helper
 
 void ot::GraphicsPicker::addCollection(ot::GraphicsCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem) {
-	otAssert(_category, "nullptr provided");
+	OTAssert(_category, "nullptr provided");
 
 	QTreeWidgetItem* categoryItem = nullptr;
 	if (_parentNavigationItem) {
@@ -209,8 +209,8 @@ void ot::GraphicsPicker::addCollections(const std::list<ot::GraphicsCollectionCf
 }
 
 void ot::GraphicsPicker::addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _parentNavigationItem) {
-	otAssert(_item, "nullptr provided");
-	otAssert(_parentNavigationItem, "nullptr provided");
+	OTAssert(_item, "nullptr provided");
+	OTAssert(_parentNavigationItem, "nullptr provided");
 
 	QTreeWidgetItem* treeItem = nullptr;
 	for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
@@ -298,7 +298,7 @@ ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(const QString& _title, QW
 ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(GraphicsPicker* _customPickerWidget, const QString& _title, QWidget* _parentWidget)
 	: QDockWidget(_title, _parentWidget), m_widget(_customPickerWidget)
 {
-	otAssert(m_widget, "No block picker widget provided");
+	OTAssert(m_widget, "No block picker widget provided");
 	setWidget(m_widget->widget());
 }
 

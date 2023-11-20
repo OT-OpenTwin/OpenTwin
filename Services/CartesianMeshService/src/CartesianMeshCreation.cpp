@@ -29,9 +29,9 @@
 #include <thread>	
 #include <limits>
 
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTCommunication/Msg.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #undef max
 #undef min

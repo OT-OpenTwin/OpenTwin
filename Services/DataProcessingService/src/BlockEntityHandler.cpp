@@ -1,6 +1,6 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 #include "ExternalDependencies.h"
 
 #include "Application.h"

@@ -8,8 +8,8 @@
 #include "ConnectToLoggerDialog.h"
 
 // OT header
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // Qt header
 #include <QtCore/qtimer.h>

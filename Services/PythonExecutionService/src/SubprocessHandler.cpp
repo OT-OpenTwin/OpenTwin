@@ -1,12 +1,12 @@
 #include "SubprocessHandler.h"
 
-#include "openTwinSystem/Application.h"
-#include "openTwinSystem/OperatingSystem.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCore/TypeNames.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTSystem/Application.h"
+#include "OTSystem/OperatingSystem.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCore/TypeNames.h"
+#include "OTCore/Logger.h"
 
 #include <assert.h>
 

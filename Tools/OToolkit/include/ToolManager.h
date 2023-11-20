@@ -9,7 +9,7 @@
 #include "ToolRuntimeHandler.h"
 
 // OpenTwin header
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 
 // Qt header
 #include <QtCore/qstring.h>

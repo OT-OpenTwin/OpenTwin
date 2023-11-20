@@ -34,11 +34,11 @@
 #include "zlib.h"
 
 // Open twin header
-#include <OpenTwinCore/otAssert.h>
-#include <OpenTwinCommunication/actionTypes.h>
-#include <OpenTwinFoundation/SettingsData.h>
-#include <OpenTwinFoundation/UiComponent.h>
-#include <OpenTwinFoundation/ModelComponent.h>
+#include "OTCore/OTAssert.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_ModelingService
@@ -328,9 +328,9 @@ void Application::settingsSynchronized(ot::SettingsData * _dataset) {
 	ot::SettingsItemSelection * geomNamingMode = dynamic_cast<ot::SettingsItemSelection *>(_dataset->findItemByLogicalName("Modeling:Geom:NamingMode"));
 	ot::SettingsItemString * geomCustomName = dynamic_cast<ot::SettingsItemString *>(_dataset->findItemByLogicalName("Modeling:Geom:CustomName"));
 	
-	if (geomColor) { settings->geometryDefaultColor = geomColor->value(); } else { otAssert(0, "Item not found"); }
-	if (geomNamingMode) { settings->geometryNamingMode = geomNamingMode->selectedValue(); } else { otAssert(0, "Item not found"); }
-	if (geomCustomName) { settings->geometryDefaultName = geomCustomName->value(); } else { otAssert(0, "Item not found"); }
+	if (geomColor) { settings->geometryDefaultColor = geomColor->value(); } else { OTAssert(0, "Item not found"); }
+	if (geomNamingMode) { settings->geometryNamingMode = geomNamingMode->selectedValue(); } else { OTAssert(0, "Item not found"); }
+	if (geomCustomName) { settings->geometryDefaultName = geomCustomName->value(); } else { OTAssert(0, "Item not found"); }
 	if (geomNamingMode && geomCustomName) { geomCustomName->setVisible(geomNamingMode->selectedValue() == settings->geometryNamingModeCustom); }
 }
 
@@ -339,14 +339,14 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	if (name == "Modeling:Geom:Color") {
 		ot::SettingsItemColor * geomColor = dynamic_cast<ot::SettingsItemColor *>(_item);
 		if (geomColor == nullptr) {
-			otAssert(0, "Cast failed"); return false;
+			OTAssert(0, "Cast failed"); return false;
 		}
 		ApplicationSettings::instance()->geometryDefaultColor = geomColor->value();
 	}
 	else if (name == "Modeling:Geom:NamingMode") {
 		ot::SettingsItemSelection * geomNamingMode = dynamic_cast<ot::SettingsItemSelection *>(_item);
 		if (geomNamingMode == nullptr) {
-			otAssert(0, "Cast failed"); return false;
+			OTAssert(0, "Cast failed"); return false;
 		}
 		ApplicationSettings::instance()->geometryNamingMode = geomNamingMode->selectedValue();
 		return true;
@@ -354,12 +354,12 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 	else if (name == "Modeling:Geom:CustomName") {
 		ot::SettingsItemString * geomCustomName = dynamic_cast<ot::SettingsItemString *>(_item);
 		if (geomCustomName == nullptr) {
-			otAssert(0, "Cast failed"); return false;
+			OTAssert(0, "Cast failed"); return false;
 		}
 		ApplicationSettings::instance()->geometryDefaultName = geomCustomName->value();
 	}
 	else {
-		otAssert(0, "Unknown item name");
+		OTAssert(0, "Unknown item name");
 	}
 	return false;
 }

@@ -12,10 +12,10 @@
 #include "ServiceStartupInformation.h"
 
 // Open twin header
-#include <OpenTwinCore/Logger.h>
-#include <OpenTwinCommunication/Msg.h>
-#include <OpenTwinFoundation/UiComponent.h>
-#include <OpenTwinFoundation/ModelComponent.h>
+#include "OTCore/Logger.h"
+#include "OTCommunication/Msg.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 // C++ header
 #include <iostream>

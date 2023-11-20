@@ -10,9 +10,9 @@
 #include "ExternalServicesComponent.h"
 
 // OT header
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/ServiceLogNotifier.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
+#include "OTCore/Logger.h"
 
 // C++ header
 #include <exception>

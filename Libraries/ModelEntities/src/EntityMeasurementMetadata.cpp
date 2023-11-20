@@ -1,6 +1,6 @@
 #include "EntityMeasurementMetadata.h"
 
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 
 EntityMeasurementMetadata::EntityMeasurementMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	: EntityWithDynamicFields(ID,parent,mdl,ms,factory,owner)

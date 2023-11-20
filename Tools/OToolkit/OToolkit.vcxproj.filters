@@ -87,6 +87,9 @@
     <ClCompile Include="src\TabManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\FAR.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -97,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="include\ToolRuntimeHandler.h">
       <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FAR.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

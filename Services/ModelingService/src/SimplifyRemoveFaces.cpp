@@ -7,9 +7,9 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"

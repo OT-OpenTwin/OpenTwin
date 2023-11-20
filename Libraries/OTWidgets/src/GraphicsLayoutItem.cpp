@@ -86,7 +86,7 @@ ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName)
 }
 
 void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
-	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
+	OTAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 	m_layoutWrap->setLayout(_layout);
 

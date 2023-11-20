@@ -3,9 +3,9 @@
 #include "AppBase.h"
 #include "ExternalServicesComponent.h"
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCommunication/ActionTypes.h"
 
 UiPluginComponent::UiPluginComponent(ExternalUiPlugin * _plugin) : m_plugin(_plugin) {}
 

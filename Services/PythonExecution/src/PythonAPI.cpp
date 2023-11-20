@@ -8,7 +8,7 @@
  *********************************************************************/
 #include "PythonAPI.h"
 #include "Application.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 #include "ClassFactory.h"
 
 #include "PythonLoadedModules.h"

@@ -17,8 +17,8 @@
 #include "ContextMenuManager.h"
 
 
-#include "OpenTwinFoundation/SettingsData.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTCore/OTAssert.h"
 
 // C++ header
 #include <exception>

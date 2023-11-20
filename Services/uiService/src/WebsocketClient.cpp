@@ -7,8 +7,8 @@
 #include <thread>
 
 // OpenTwin header
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCore/rJSON.h"
 
 // SSL
 #include <QtCore/QFile>

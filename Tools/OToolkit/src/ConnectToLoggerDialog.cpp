@@ -6,8 +6,8 @@
 #include "ConnectToLoggerDialog.h"
 #include "AppBase.h"
 
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCommunication/ActionTypes.h"		// action member and types definition
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"		// action member and types definition
 
 #include <QtCore/qsettings.h>
 #include <QtWidgets/qlayout.h>

@@ -46,7 +46,7 @@ REM OpenTwin services root paths
 SET OT_AUTHORISATION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\AuthorisationService
 SET OT_MODEL_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\Model
 SET OT_GLOBAL_SESSION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\GlobalSessionService
-SET OT_LOCAL_SESSION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\SessionService
+SET OT_LOCAL_SESSION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\LocalSessionService
 SET OT_GLOBAL_DIRECTORY_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService
 SET OT_LOCAL_DIRECTORY_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\LocalDirectoryService
 SET OT_RELAY_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\RelayService
@@ -74,15 +74,14 @@ SET OT_DATASTORAGE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\DataStorage
 SET OT_MODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\ModelEntities
 SET OT_BLOCKENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\BlockEntities
 
-SET OT_COMMUNICATION_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication
-SET OT_CORE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore
-SET OT_FOUNDATION_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation
-SET OT_SYSTEM_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem
+SET OT_COMMUNICATION_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTCommunication
+SET OT_CORE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTCore
+SET OT_FOUNDATION_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTServiceFoundation
+SET OT_SYSTEM_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTSystem
 SET OT_GUI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTGui
 SET OT_WIDGETS_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTWidgets
 
 SET OT_QWTWRAPPER_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper
-SET OT_SCI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTsci
 SET OT_RUBBERBANDAPI_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineCore
 SET OT_RUBBERBAND_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineOsgWrapper
 SET OT_UICORE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\uiCore
@@ -125,8 +124,8 @@ SET OT_DEFAULT_SERVICE_LIBPATHR=%OT_CORE_ROOT%\%OT_LIBR%;%OT_SYSTEM_ROOT%\%OT_LI
 
 REM SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
 REM SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;libCurl.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib
-SET OT_DEFAULT_SERVICE_LIBD=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;UIPluginAPI.lib;%CURL_LIBD%;%MONGO_C_LIBD%;%MONGO_CXX_LIBD%
-SET OT_DEFAULT_SERVICE_LIBR=OpenTwinCore.lib;OpenTwinSystem.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;UIPluginAPI.lib;%CURL_LIBR%;%MONGO_C_LIBR%;%MONGO_CXX_LIBR%
+SET OT_DEFAULT_SERVICE_LIBD=OTCore.lib;OTSystem.lib;OTCommunication.lib;OTServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;UIPluginAPI.lib;%CURL_LIBD%;%MONGO_C_LIBD%;%MONGO_CXX_LIBD%
+SET OT_DEFAULT_SERVICE_LIBR=OTCore.lib;OTSystem.lib;OTCommunication.lib;OTServiceFoundation.lib;ModelEntities.lib;DataStorage.lib;UIPluginAPI.lib;%CURL_LIBR%;%MONGO_C_LIBR%;%MONGO_CXX_LIBR%
 
 REM SET OT_DEFAULT_SERVICE_DLLD=%OT_CORE_ROOT%\x64\Debug;%OT_SYSTEM_ROOT%\x64\Debug;%OT_COMMUNICATION_ROOT%\x64\Debug;%OT_FOUNDATION_ROOT%\x64\Debug;%OT_MODELENTITIES_ROOT%\x64\Debug;%OT_DATASTORAGE_ROOT%\x64\Debug;%OT_UIPLUGINAPI_ROOT%\x64\Debug;%CURL_DLLD%;%MONGO_C_ROOT%\Debug\bin;%MONGO_CXX_ROOT%\Debug\bin
 REM SET OT_DEFAULT_SERVICE_DLLR=%OT_CORE_ROOT%\x64\Release;%OT_SYSTEM_ROOT%\x64\Release;%OT_COMMUNICATION_ROOT%\x64\Release;%OT_FOUNDATION_ROOT%\x64\Release;%OT_MODELENTITIES_ROOT%\x64\Release;%OT_DATASTORAGE_ROOT%\x64\Release;%OT_UIPLUGINAPI_ROOT%\x64\Release;%CURL_DLL%;%MONGO_C_ROOT%\Release\bin;%MONGO_CXX_ROOT%\Release\bin

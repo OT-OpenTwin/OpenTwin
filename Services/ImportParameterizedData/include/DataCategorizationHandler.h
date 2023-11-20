@@ -14,14 +14,14 @@
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityParameterizedDataTable.h"
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinFoundation/TableRange.h"
-#include "OpenTwinFoundation/EntityInformation.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/Color.h"
+#include "OTServiceFoundation/TableRange.h"
+#include "OTServiceFoundation/EntityInformation.h"
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinFoundation/PythonServiceInterface.h"
+#include "OTCore/Variable.h"
+#include "OTServiceFoundation/PythonServiceInterface.h"
 
 #include <optional>
 #include <map>

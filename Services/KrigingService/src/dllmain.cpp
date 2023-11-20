@@ -6,8 +6,8 @@
 #include <Windows.h>
 
 // OpenTwin header
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinFoundation/ExternalServicesComponent.h"
+#include "OTCore/Logger.h"
+#include "OTServiceFoundation/ExternalServicesComponent.h"
 
 // Service header
 #include "Application.h"

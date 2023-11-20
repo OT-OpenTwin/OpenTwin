@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Flags.h"
+#include "OTCore/Flags.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt widget

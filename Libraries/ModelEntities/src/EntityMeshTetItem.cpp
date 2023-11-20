@@ -9,7 +9,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs,  ms,  factory, owner),

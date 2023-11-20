@@ -12,7 +12,7 @@
 #include "ModelState.h"
 #include "Types.h"
 
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/rJSON.h"
 
 class EntityBase;
 class ClassFactoryHandler;

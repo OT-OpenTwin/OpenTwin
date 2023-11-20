@@ -3,12 +3,12 @@
 #include "ExitCodes.h"
 
 // OpenTwin header
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCommunication/actionTypes.h"
-#include "OpenTwinSystem/Application.h"
-#include "OpenTwinSystem/OperatingSystem.h"
+#include "OTCore/rJSON.h"
+#include "OTCore/Logger.h"
+#include "OTCore/otAssert.h"
+#include "OTCommunication/actionTypes.h"
+#include "OTSystem/Application.h"
+#include "OTSystem/OperatingSystem.h"
 
 // C++ header
 #include <iostream>
@@ -93,7 +93,7 @@ void Configuration::setFromJsonObject(OT_rJSON_val& _object) {
 			if (serviceObj.HasMember(LDS_CFG_ServiceType)) {
 				std::string type = ot::rJSON::getString(serviceObj, LDS_CFG_ServiceType);
 				if (type.empty()) {
-					otAssert(0, "Service type is empty");
+					OTAssert(0, "Service type is empty");
 					OT_LOG_E("Service type is empty");
 					return;
 				}
@@ -119,7 +119,7 @@ void Configuration::setFromJsonObject(OT_rJSON_val& _object) {
 			}
 		}
 		else {
-			otAssert(0, "Supported service entry is neither a string nor an object");
+			OTAssert(0, "Supported service entry is neither a string nor an object");
 			OT_LOG_E("Supported service entry is neither a string nor an object");
 			return;
 		}
@@ -127,7 +127,7 @@ void Configuration::setFromJsonObject(OT_rJSON_val& _object) {
 		// Check for duplicates
 		for (auto check : m_SupportedServices) {
 			if (check.getName() == newEntry.getName()) {
-				otAssert(0, "Supported service duplicate");
+				OTAssert(0, "Supported service duplicate");
 				OT_LOG_E("A service with the name \"" + check.getName() + "\" was already provided");
 				return;
 			}

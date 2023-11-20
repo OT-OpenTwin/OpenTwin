@@ -8,7 +8,7 @@
 #include "EntityBase.h"
 #include "GeometryOperations.h"
 
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #define _USE_MATH_DEFINES
 

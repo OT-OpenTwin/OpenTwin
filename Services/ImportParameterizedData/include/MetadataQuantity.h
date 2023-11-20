@@ -1,5 +1,5 @@
 #pragma once
-#include "OpenTwinCore/TypeNames.h"
+#include "OTCore/TypeNames.h"
 
 struct MetadataQuantity
 {

@@ -12,7 +12,7 @@
 //Service Header
 #include "Circuit.h"
 #include "Application.h" 
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 //C++ Header
 #include <string>

@@ -19,7 +19,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 #define TOOLMANAGER_LOG(___msg) OTOOLKIT_LOG("ToolManager", ___msg)
 #define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)

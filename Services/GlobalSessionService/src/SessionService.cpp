@@ -1,9 +1,9 @@
 #include "SessionService.h"
 #include "Session.h"
 
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTCommunication/ActionTypes.h"
 
 SessionService::SessionService() : m_id(ot::invalidServiceID) {
 
@@ -60,22 +60,22 @@ bool SessionService::setFromDocument(OT_rJSON_doc& _document) {
 	// Check document types
 	if (!_document.IsObject()) {
 		OT_LOG_E("Provided document is not an object");
-		otAssert(0, "Provided document is not an object");
+		OTAssert(0, "Provided document is not an object");
 		return false;
 	}
 	if (!_document.HasMember(OT_ACTION_PARAM_SERVICE_URL)) {
 		OT_LOG_E("Action member missing: " OT_ACTION_PARAM_SERVICE_URL);
-		otAssert(0, "Action member missing: " OT_ACTION_PARAM_SERVICE_URL);
+		OTAssert(0, "Action member missing: " OT_ACTION_PARAM_SERVICE_URL);
 		return false;
 	}
 	if (!_document.HasMember(OT_ACTION_PARAM_SESSION_LIST)) {
 		OT_LOG_E("Action member missing: " OT_ACTION_PARAM_SESSION_LIST);
-		otAssert(0, "Action member missing: " OT_ACTION_PARAM_SESSION_LIST);
+		OTAssert(0, "Action member missing: " OT_ACTION_PARAM_SESSION_LIST);
 		return false;
 	}
 	if (!_document[OT_ACTION_PARAM_SESSION_LIST].IsArray()) {
 		OT_LOG_E("Action member wrong data type: " OT_ACTION_PARAM_SERVICE_URL);
-		otAssert(0, "Action member wrong data type: " OT_ACTION_PARAM_SERVICE_URL);
+		OTAssert(0, "Action member wrong data type: " OT_ACTION_PARAM_SERVICE_URL);
 		return false;
 	}
 

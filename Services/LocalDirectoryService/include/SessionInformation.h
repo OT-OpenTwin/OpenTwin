@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Serializable.h"
+#include "OTCore/Serializable.h"
 
 #include <string>
 
