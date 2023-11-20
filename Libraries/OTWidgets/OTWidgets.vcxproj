@@ -47,6 +47,7 @@
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\OTQtConverter.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
+    <ClCompile Include="src\StyleValues.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="include\OTWidgets\Painter2DFactory.h" />
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h" />
     <QtMoc Include="include\OTWidgets\TabWidget.h" />
+    <ClInclude Include="include\OTWidgets\StyleValues.h" />
     <ClInclude Include="include\OTWidgets\TreeWidget.h" />
     <ClInclude Include="include\OTWidgets\WidgetTypes.h" />
     <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h" />
