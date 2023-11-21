@@ -11,6 +11,7 @@
 #define OT_JSON_MEMBER_Color "Color"
 #define OT_JSON_MEMBER_Start "Start"
 #define OT_JSON_MEMBER_Stops "Stops"
+#define OT_JSON_MEMBER_Spread "Spread"
 #define OT_JSON_MEMBER_FinalStop "FinalStop"
 
 static ot::SimpleFactoryRegistrar<ot::LinearGradientPainter2D> linGradCfg(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg);
@@ -62,9 +63,13 @@ void ot::LinearGradientPainter2DStop::setFromJsonObject(OT_rJSON_val& _object) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::LinearGradientPainter2D::LinearGradientPainter2D() : m_start(0., 0.), m_finalStop(1., 1.) {}
+ot::LinearGradientPainter2D::LinearGradientPainter2D()
+	: m_start(0., 0.), m_finalStop(1., 1.), m_spread(PadSpread) 
+{}
 
-ot::LinearGradientPainter2D::LinearGradientPainter2D(const std::vector<LinearGradientPainter2DStop>& _stops) : m_stops(_stops) {}
+ot::LinearGradientPainter2D::LinearGradientPainter2D(const std::vector<LinearGradientPainter2DStop>& _stops)
+	: m_start(0., 0.), m_finalStop(1., 1.), m_spread(PadSpread), m_stops(_stops) 
+{}
 
 ot::LinearGradientPainter2D::~LinearGradientPainter2D() {}
 
@@ -86,6 +91,8 @@ void ot::LinearGradientPainter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJ
 	OT_rJSON_createValueObject(finalStopObj);
 	m_finalStop.addToJsonObject(_document, finalStopObj);
 	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_FinalStop, finalStopObj);
+
+	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Spread, ot::toString(m_spread));
 }
 
 void ot::LinearGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
@@ -93,6 +100,7 @@ void ot::LinearGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Stops, Array);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Start, Object);
 	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_FinalStop, Object);
+	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Spread, String);
 
 	OT_rJSON_val stepArr = _object[OT_JSON_MEMBER_Stops].GetArray();
 	m_stops.clear();
@@ -109,6 +117,8 @@ void ot::LinearGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
 
 	OT_rJSON_val finalStopObj = _object[OT_JSON_MEMBER_FinalStop].GetObject();
 	m_finalStop.setFromJsonObject(finalStopObj);
+
+	m_spread = ot::stringToGradientSpread(_object[OT_JSON_MEMBER_Spread].GetString());
 }
 
 void ot::LinearGradientPainter2D::addStop(const LinearGradientPainter2DStop& _stop) {

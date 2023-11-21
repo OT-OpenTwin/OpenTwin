@@ -17,6 +17,7 @@
 #include <QtCore/qpoint.h>
 #include <QtCore/qsize.h>
 #include <QtGui/qcolor.h>
+#include <QtGui/qbrush.h>
 
 namespace ot {
 	namespace OTQtConverter {
@@ -33,6 +34,8 @@ namespace ot {
 		OT_WIDGETS_API_EXPORTONLY QSize toQt(const ot::Size2D& _s);
 		OT_WIDGETS_API_EXPORTONLY QSizeF toQt(const ot::Size2DF& _s);
 		OT_WIDGETS_API_EXPORTONLY QSizeF toQt(const ot::Size2DD& _s);
+
+		OT_WIDGETS_API_EXPORTONLY QGradient::Spread toQt(ot::GradientSpread _spread);
 	}
 }
 

@@ -139,3 +139,25 @@ ot::ConnectionDirection ot::stringToConnectionDirection(const std::string& _dire
 		throw std::exception("Unknown connection direction");
 	}
 }
+
+std::string ot::toString(GradientSpread _spread) {
+	switch (_spread)
+	{
+	case ot::PadSpread: return "Pad";
+	case ot::RepeatSpread: return "Repeat";
+	case ot::ReflectSpread: return "Reflect";
+	default:
+		OT_LOG_EA("Unknown gradient spread");
+		throw std::exception("Unknown gradient spread");
+	}
+}
+
+ot::GradientSpread ot::stringToGradientSpread(const std::string& _spread) {
+	if (_spread == toString(PadSpread)) return PadSpread;
+	else if (_spread == toString(RepeatSpread)) return RepeatSpread;
+	else if (_spread == toString(ReflectSpread)) return ReflectSpread;
+	else {
+		OT_LOG_EAS("Unknown gradient spread \"" + _spread + "\"");
+		throw std::exception("Unknown gradient spread");
+	}
+}

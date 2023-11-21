@@ -26,9 +26,8 @@ QBrush ot::Painter2DFactory::brushFromPainter2D(ot::Painter2D* _painter) {
 			stops.append(QGradientStop(s.pos(), ot::OTQtConverter::toQt(s.color())));
 		}
 
-		QLinearGradient grad;
-		grad.setStart(ot::OTQtConverter::toQt(painter->start()));
-
+		QLinearGradient grad(ot::OTQtConverter::toQt(painter->start()), ot::OTQtConverter::toQt(painter->finalStop()));
+		grad.setSpread(ot::OTQtConverter::toQt(painter->spread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 		

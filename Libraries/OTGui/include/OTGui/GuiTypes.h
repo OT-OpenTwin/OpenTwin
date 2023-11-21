@@ -57,6 +57,13 @@ namespace ot {
 		ConnectDown //! Connection starts downwards
 	};
 
+	//! @brief Describes how the painter will behave when painting outsite the gradient area
+	enum GradientSpread {
+		PadSpread, //! Pad the outside area with the color at the closest stop point
+		RepeatSpread, //! Repeat the gradient
+		ReflectSpread //! Reflect the gradient
+	};
+
 	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
 	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
 
@@ -71,4 +78,7 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(ConnectionDirection _direction);
 	OT_GUI_API_EXPORT ConnectionDirection stringToConnectionDirection(const std::string& _direction);
+
+	OT_GUI_API_EXPORT std::string toString(GradientSpread _spread);
+	OT_GUI_API_EXPORT GradientSpread stringToGradientSpread(const std::string& _spread);
 }

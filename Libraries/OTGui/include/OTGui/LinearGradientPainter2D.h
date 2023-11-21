@@ -9,6 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Point2D.h"
 #include "OTGui/Painter2D.h"
+#include "OTGui/GuiTypes.h"
 
 #define OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg "OT_P2DCGrad"
 
@@ -84,10 +85,14 @@ namespace ot {
 		void setFinalStop(const ot::Point2DD& _finalStop) { m_finalStop = _finalStop; };
 		const ot::Point2DD& finalStop(void) const { return m_finalStop; };
 
+		void setSpread(GradientSpread _spread) { m_spread = _spread; };
+		GradientSpread spread(void) const { return m_spread; };
+
 	private:
 		std::vector<LinearGradientPainter2DStop> m_stops;
 		ot::Point2DD m_start;
 		ot::Point2DD m_finalStop;
+		GradientSpread m_spread;
 
 		LinearGradientPainter2D(const LinearGradientPainter2D&) = delete;
 		LinearGradientPainter2D& operator = (const LinearGradientPainter2D&) = delete;
