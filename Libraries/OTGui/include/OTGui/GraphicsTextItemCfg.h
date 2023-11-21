@@ -13,6 +13,8 @@
 
 namespace ot {
 
+	class Painter2D;
+
 	class OT_GUI_API_EXPORTONLY GraphicsTextItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
@@ -37,13 +39,14 @@ namespace ot {
 		void setTextFont(const ot::Font& _font) { m_textFont = _font; };
 		const ot::Font& textFont(void) const { return m_textFont; };
 
-		void setTextColor(const ot::Color& _color) { m_textColor = _color; };
-		const ot::Color& textColor(void) const { return m_textColor; };
+		void setTextColor(const ot::Color& _color);
+		void setTextPainter(ot::Painter2D* _painter);
+		Painter2D* textPainter(void) const { return m_textPainter; };
 
 	private:
 		std::string m_text;
 		ot::Font    m_textFont;
-		ot::Color   m_textColor;
+		Painter2D* m_textPainter;
 
 		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
 		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;

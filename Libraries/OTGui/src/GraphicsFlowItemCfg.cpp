@@ -176,6 +176,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createDownTriangleItem(void) 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::string& _name, const std::string& _title) const {
 	OTAssertNullptr(m_backgroundPainter);
 	OTAssertNullptr(m_titleBackgroundPainter);
+	OTAssertNullptr(m_titleForegroundPainter);
 	OTAssert(!_name.empty(), "No name provided");
 
 	// --- Create a copy of local data ------------------------------------------------
@@ -183,6 +184,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	// Create a copy of the painter
 	ot::Painter2D* painterBack = nullptr;
 	ot::Painter2D* painterTitleBack = nullptr;
+	ot::Painter2D* painterTitleFront = nullptr;
 
 	try {
 		OT_rJSON_createDOC(backDoc);
@@ -194,6 +196,14 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc);
 		painterTitleBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc);
 		painterTitleBack->setFromJsonObject(titleBackDoc);
+
+		OT_rJSON_createDOC(titleFrontDoc);
+		m_titleForegroundPainter->addToJsonObject(titleFrontDoc, titleFrontDoc);
+		painterTitleFront = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleFrontDoc);
+		painterTitleFront->setFromJsonObject(titleFrontDoc);
+
+		
+
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
@@ -205,10 +215,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		OT_LOG_EA("[FATAL] Unknown error");
 		if (painterBack) delete painterBack;
 		if (painterTitleBack) delete painterTitleBack;
+		if (painterTitleFront) delete painterTitleFront;
 		return nullptr;
 	}
 	OTAssertNullptr(painterBack);
 	OTAssertNullptr(painterTitleBack);
+	OTAssertNullptr(painterTitleFront);
 
 	// --- Create items ------------------------------------------------
 
@@ -254,6 +266,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
 	tit->setName(_name + "_tit");
 	tit->setText(_title);
+	tit->setTextPainter(painterTitleFront);
+	tit->setMargins(ot::MarginsD(2., 2., 2., 2.));
 
 	// Title: Left Corner
 	if (m_leftTitleImagePath.empty()) {
@@ -325,11 +339,14 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	return root;
 }
 
-ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() : m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr) {
+ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() : m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr) {
 	this->setBackgroundColor(ot::Color(50, 50, 50));
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
+	this->setDefaultTitleForegroundGradient();
 
-
+	m_defaultConnectorStyle.setTextColor(ot::Color(ot::Color::White));
+	m_defaultConnectorStyle.setPrimaryColor(ot::Color(ot::Color::White));
+	m_defaultConnectorStyle.setSecondaryColor(ot::Color(ot::Color::Black));
 }
 
 ot::GraphicsFlowItemCfg::~GraphicsFlowItemCfg() {}
@@ -418,15 +435,44 @@ void ot::GraphicsFlowItemCfg::setTitleBackgroundPainter(ot::Painter2D* _painter)
 
 void ot::GraphicsFlowItemCfg::setTitleBackgroundGradientColor(const ot::Color& _color) {
 	ot::LinearGradientPainter2D* painter = new ot::LinearGradientPainter2D;
-	painter->setStart(ot::Point2DD(0., 0.5));
-	painter->setFinalStop(ot::Point2DD(1., 0.5));
+	painter->setStart(ot::Point2DD(0., 1.));
+	painter->setFinalStop(ot::Point2DD(1., 0.));
 
-	painter->addStop(ot::LinearGradientPainter2DStop(0, _color));
-	painter->addStop(ot::LinearGradientPainter2DStop(1, ot::Color(ot::Color::Silver)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0., _color));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.80, ot::Color(50, 50, 50)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.85, ot::Color(30, 30, 30)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.90, ot::Color(230, 230, 230)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.95, ot::Color(50, 50, 50)));
+	painter->addStop(ot::LinearGradientPainter2DStop(1., ot::Color(0, 0, 0)));
 
 	this->setTitleBackgroundPainter(painter);
 }
 
 void ot::GraphicsFlowItemCfg::setTitleBackgroundColor(const ot::Color& _color) {
 	this->setTitleBackgroundPainter(new ot::FillPainter2D(_color));
+}
+
+void ot::GraphicsFlowItemCfg::setTitleForegroundPainter(ot::Painter2D* _painter) {
+	if (m_titleForegroundPainter == _painter) return;
+	if (m_titleForegroundPainter) delete m_titleForegroundPainter;
+	m_titleForegroundPainter = _painter;
+}
+
+void ot::GraphicsFlowItemCfg::setTitleForegroundColor(const ot::Color& _color) {
+	this->setTitleForegroundPainter(new ot::FillPainter2D(_color));
+}
+
+void ot::GraphicsFlowItemCfg::setDefaultTitleForegroundGradient(void) {
+	ot::LinearGradientPainter2D* painter = new ot::LinearGradientPainter2D;
+	painter->setStart(ot::Point2DD(0., 0.5));
+	painter->setFinalStop(ot::Point2DD(1., 0.5));
+
+	painter->addStop(ot::LinearGradientPainter2DStop(0., ot::Color(0, 0, 0)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.75, ot::Color(205, 205, 205)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.8, ot::Color(225, 225, 225)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.85, ot::Color(25, 25, 25)));
+	painter->addStop(ot::LinearGradientPainter2DStop(0.9, ot::Color(205, 205, 205)));
+	painter->addStop(ot::LinearGradientPainter2DStop(1., ot::Color(255, 255, 255)));
+
+	this->setTitleForegroundPainter(painter);
 }

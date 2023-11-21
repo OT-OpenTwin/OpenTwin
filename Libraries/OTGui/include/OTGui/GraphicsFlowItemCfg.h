@@ -150,7 +150,7 @@ namespace ot {
 		//! Will create a FillPainter2D and replace the current background painter
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(ot::Color(_r, _g, _b, _a)); };
 
-		//! @brief Replace the current background painter
+		//! @brief Replace the current title background painter
 		//! The item takes ownership
 		void setTitleBackgroundPainter(ot::Painter2D* _painter);
 
@@ -165,6 +165,19 @@ namespace ot {
 		//! @brief Sets the title background color
 		//! Will create a FillPainter2D and replace the current title background painter
 		inline void setTitleBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setTitleBackgroundColor(ot::Color(_r, _g, _b, _a)); };
+
+		//! @brief Replace the current title foreground painter
+		//! The item takes ownership
+		void setTitleForegroundPainter(ot::Painter2D* _painter);
+
+		//! @brief Sets the title foreground painter
+		//! Create a FillPainter2D and replace the current title foreground painter
+		void setTitleForegroundColor(const ot::Color& _color);
+
+		//! @brief Sets the title foreground painter
+		//! Create a LinearGradientPainter2D and replace the current title foreground painter
+		//! @param _color The primary text color, other colors are calculated by 255-color
+		void setDefaultTitleForegroundGradient(void);
 
 		//! @brief Sets the default connector style
 		//! The new default style will only affect items added after settings the style.
@@ -181,7 +194,8 @@ namespace ot {
 	private:
 		ot::Painter2D* m_backgroundPainter;
 		ot::Painter2D* m_titleBackgroundPainter;
-		
+		ot::Painter2D* m_titleForegroundPainter;
+
 		std::string m_leftTitleImagePath;
 		std::string m_rightTitleImagePath;
 		std::string m_backgroundImagePath;
