@@ -21,6 +21,7 @@
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
+#include "OTGui/RadialGradientPainter2D.h"
 
 namespace ot {
 	namespace intern {
@@ -434,9 +435,9 @@ void ot::GraphicsFlowItemCfg::setTitleBackgroundPainter(ot::Painter2D* _painter)
 }
 
 void ot::GraphicsFlowItemCfg::setTitleBackgroundGradientColor(const ot::Color& _color) {
-	ot::LinearGradientPainter2D* painter = new ot::LinearGradientPainter2D;
-	painter->setStart(ot::Point2DD(0., 2.));
-	painter->setFinalStop(ot::Point2DD(1., 0.));
+	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
+	painter->setCenterPoint(ot::Point2DD(0., 2.));
+	painter->setCenterRadius(2.5);
 	painter->setSpread(ot::ReflectSpread);
 
 	painter->addStop(0.00, _color);
