@@ -94,7 +94,7 @@
     <ClCompile Include="src\GraphicsLineItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\StyleValues.cpp">
+    <ClCompile Include="src\StyleValue.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,7 +197,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\StyleValues.h">
+    <ClInclude Include="include\OTWidgets\StyleValue.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>

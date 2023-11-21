@@ -1,14 +1,14 @@
-//! @file StyleValues.h
+//! @file StyleValue.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date November 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#pragma once
+#include "OTWidgets/StyleValue.h"
 
-namespace ot {
+ot::StyleValue::StyleValue() {
 
-	class StyleValues {
+}
 
-	};
+ot::StyleValue::~StyleValue() {
 
 }
