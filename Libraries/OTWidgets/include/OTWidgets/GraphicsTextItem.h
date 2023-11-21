@@ -10,7 +10,7 @@
 
 // Qt header
 #include <QtGui/qfont.h>
-#include <QtGui/qbrush.h>
+#include <QtGui/qpen.h>
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
 
@@ -48,7 +48,7 @@ namespace ot {
 	private:
 		QString m_text;
 		QFont m_font;
-		QBrush m_brush;
+		QPen m_pen;
 	};
 
 }

@@ -43,7 +43,7 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_font.setItalic(cfg->textFont().isItalic());
 	m_font.setBold(cfg->textFont().isBold());
 
-	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->textPainter());
+	m_pen.setBrush(ot::Painter2DFactory::brushFromPainter2D(cfg->textPainter()));
 
 	m_text = QString::fromStdString(cfg->text());
 
@@ -61,6 +61,6 @@ QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	_painter->setFont(m_font);
-	_painter->setBrush(m_brush);
+	_painter->setPen(m_pen);
 	_painter->drawText(_rect, Qt::AlignCenter, m_text);
 }
