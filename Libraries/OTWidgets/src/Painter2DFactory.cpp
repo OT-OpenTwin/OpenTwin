@@ -7,6 +7,7 @@
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
+#include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/OTQtConverter.h"
 
@@ -31,6 +32,26 @@ QBrush ot::Painter2DFactory::brushFromPainter2D(ot::Painter2D* _painter) {
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 		
+		return grad;
+	}
+	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_RadialGradientPainter2DCfg) {
+		ot::RadialGradientPainter2D* painter = dynamic_cast<ot::RadialGradientPainter2D*>(_painter);
+		OTAssertNullptr(painter);
+
+		QGradientStops stops;
+		for (auto s : painter->stops()) {
+			stops.append(QGradientStop(s.pos(), ot::OTQtConverter::toQt(s.color())));
+		}
+
+		QRadialGradient grad(ot::OTQtConverter::toQt(painter->centerPoint()), painter->centerRadius());
+		if (painter->isFocalPointSet()) {
+			grad.setFocalPoint(ot::OTQtConverter::toQt(painter->focalPoint()));
+			grad.setFocalRadius(painter->focalRadius());
+		}
+		grad.setSpread(ot::OTQtConverter::toQt(painter->spread()));
+		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+		grad.setStops(stops);
+
 		return grad;
 	}
 	else {

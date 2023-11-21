@@ -435,15 +435,15 @@ void ot::GraphicsFlowItemCfg::setTitleBackgroundPainter(ot::Painter2D* _painter)
 
 void ot::GraphicsFlowItemCfg::setTitleBackgroundGradientColor(const ot::Color& _color) {
 	ot::LinearGradientPainter2D* painter = new ot::LinearGradientPainter2D;
-	painter->setStart(ot::Point2DD(0., 1.));
+	painter->setStart(ot::Point2DD(0., 2.));
 	painter->setFinalStop(ot::Point2DD(1., 0.));
+	painter->setSpread(ot::ReflectSpread);
 
-	painter->addStop(ot::LinearGradientPainter2DStop(0., _color));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.80, ot::Color(50, 50, 50)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.85, ot::Color(30, 30, 30)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.90, ot::Color(230, 230, 230)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.95, ot::Color(50, 50, 50)));
-	painter->addStop(ot::LinearGradientPainter2DStop(1., ot::Color(0, 0, 0)));
+	painter->addStop(0.00, _color);
+	painter->addStop(0.70, ot::Color(50, 50, 50));
+	painter->addStop(0.75, ot::Color(30, 30, 30));
+	painter->addStop(0.80, ot::Color(230, 230, 230));
+	painter->addStop(0.85, ot::Color(50, 50, 50));
 
 	this->setTitleBackgroundPainter(painter);
 }
@@ -467,12 +467,12 @@ void ot::GraphicsFlowItemCfg::setDefaultTitleForegroundGradient(void) {
 	painter->setStart(ot::Point2DD(0., 0.5));
 	painter->setFinalStop(ot::Point2DD(1., 0.5));
 
-	painter->addStop(ot::LinearGradientPainter2DStop(0., ot::Color(0, 0, 0)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.75, ot::Color(205, 205, 205)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.8, ot::Color(225, 225, 225)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.85, ot::Color(25, 25, 25)));
-	painter->addStop(ot::LinearGradientPainter2DStop(0.9, ot::Color(205, 205, 205)));
-	painter->addStop(ot::LinearGradientPainter2DStop(1., ot::Color(255, 255, 255)));
+	painter->addStop(0., ot::Color(0, 0, 0));
+	painter->addStop(0.75, ot::Color(205, 205, 205));
+	painter->addStop(0.8, ot::Color(225, 225, 225));
+	painter->addStop(0.85, ot::Color(25, 25, 25));
+	painter->addStop(0.9, ot::Color(205, 205, 205));
+	painter->addStop(1., ot::Color(255, 255, 255));
 
 	this->setTitleForegroundPainter(painter);
 }
