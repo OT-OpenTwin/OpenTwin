@@ -264,8 +264,8 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 
 	const ot::Color colourTitle(ot::Color::Lime);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
-	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
+	block->setTitleBackgroundGradientColor(colourTitle);
+	//block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 	block->setLeftTitleCornerImagePath("Images/Database.png");
 	block->setBackgroundImagePath("Images/Database.svg");
 
@@ -374,7 +374,6 @@ const std::string& EntityBlockDatabaseAccess::getParameter2QueryComparator()
 	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	return selectProp->getValue();
 }
-
 
 const std::string& EntityBlockDatabaseAccess::getParameter3QueryValue()
 {

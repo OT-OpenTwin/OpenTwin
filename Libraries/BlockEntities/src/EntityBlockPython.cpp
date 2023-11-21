@@ -30,8 +30,8 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 
 	const ot::Color colourTitle(ot::Color::Cyan);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
-	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
+	block->setTitleBackgroundGradientColor(colourTitle);
+	//block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
 	block->setLeftTitleCornerImagePath("Images/Python.png");
 	block->setBackgroundImagePath("Images/Script.svg");
 
