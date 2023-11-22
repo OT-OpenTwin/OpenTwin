@@ -33,6 +33,7 @@ namespace ot {
 		virtual ~GraphicsView();
 
 		void resetView(void);
+		void fitInCurrentView(void);
 		void viewAll(void);
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };

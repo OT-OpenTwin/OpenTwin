@@ -37,12 +37,21 @@ void ot::GraphicsView::resetView(void) {
 	QGraphicsScene* s = scene();
 	if (s == nullptr) return;
 	QRectF boundingRect = s->itemsBoundingRect();
-	setSceneRect(QRectF());
+	this->setSceneRect(QRectF());
 	int w = boundingRect.width();
 	int h = boundingRect.height();
 	QRectF viewRect = boundingRect.marginsAdded(QMarginsF(w, h, w, h));
-	fitInView(viewRect, Qt::AspectRatioMode::KeepAspectRatio);
-	centerOn(viewRect.center());
+	this->fitInView(viewRect, Qt::AspectRatioMode::KeepAspectRatio);
+	this->centerOn(viewRect.center());
+}
+
+void ot::GraphicsView::fitInCurrentView(void) {
+	QGraphicsScene* s = scene();
+	if (s == nullptr) return;
+	QRectF boundingRect = s->itemsBoundingRect();
+	this->setSceneRect(boundingRect);
+	this->fitInView(boundingRect, Qt::AspectRatioMode::KeepAspectRatio);
+	this->centerOn(boundingRect.center());
 }
 
 void ot::GraphicsView::viewAll(void) {

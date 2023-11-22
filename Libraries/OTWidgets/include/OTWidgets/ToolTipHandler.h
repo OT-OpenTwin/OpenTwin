@@ -18,6 +18,7 @@
 namespace ot {
 
 	class ToolTipHandler : public QObject {
+		Q_OBJECT
 		OT_DECL_NOCOPY(ToolTipHandler)
 	public:
 		static void showToolTip(const QPoint& _pos, const QString& _text, int _timeout = 0);

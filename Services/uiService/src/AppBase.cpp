@@ -1557,6 +1557,14 @@ void AppBase::applyColorStyle(
 	if (m_uiPluginManager) {
 		m_uiPluginManager->forwardColorStyle(_colorStyle);
 	}
+
+	QString graphicsPickerSheet = _colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QDockWidget {", "}");
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafForegroundColorHeader | cafBackgroundColorHeader | cafBorderColorHeader, "QDockWidget::title{border-width: 1px;", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QSplitter {", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QTreeWidget {", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QLineEdit {", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafForegroundColorControls, "QLabel {", "}"));
+	m_graphicsPickerDock->setStyleSheet(graphicsPickerSheet);
 }
 
 void AppBase::registerSession(

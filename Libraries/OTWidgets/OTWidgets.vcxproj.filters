@@ -209,9 +209,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\ToolTipHandler.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -233,6 +230,9 @@
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ToolTipHandler.h">
       <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>

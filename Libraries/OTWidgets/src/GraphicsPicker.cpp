@@ -128,11 +128,13 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 					box.view->setMaximumSize(m_previewSize);
 					box.view->setMinimumSize(m_previewSize);
 					box.view->setDragMode(QGraphicsView::NoDrag);
-					
-					box.view->getGraphicsScene()->setBackgroundBrush(QBrush());
-					box.view->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
+					box.view->setMouseWheelEnabled(false);
+					box.view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+					box.view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-					box.view->viewAll();
+					box.view->getGraphicsScene()->setBackgroundBrush(QBrush());
+					newItem->getQGraphicsItem()->setPos(QPointF(0., 0.));
+					box.view->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
 
 					box.label = new QLabel(QString::fromStdString(bCfg->title()));
 					box.label->setAlignment(Qt::AlignCenter);
@@ -146,6 +148,8 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 					m_viewLayout->addWidget(box.layoutWidget);
 
 					m_previews.push_back(box);
+
+					box.view->resetView();
 				}
 				else {
 					OT_LOG_E("Failed to create preview item from factory");
