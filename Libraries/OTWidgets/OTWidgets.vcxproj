@@ -24,6 +24,7 @@
     <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
+    <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
     <ClCompile Include="src\GraphicsFactory.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h" />

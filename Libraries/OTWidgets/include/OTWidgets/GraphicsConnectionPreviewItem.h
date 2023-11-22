@@ -1,4 +1,4 @@
-//! @file GraphicsConnectionItem.h
+//! @file GraphicsConnectionPreviewItem.h
 //! @author Alexander Kuester (alexk95)
 //! @date November 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -7,23 +7,24 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
-#include <QtCore/qrect.h>
 #include <QtGui/qpen.h>
+#include <QtCore/qrect.h>
 
 namespace ot {
-	
+
 	class GraphicsItem;
 
-	class GraphicsConnectionItem : public QGraphicsItem {
-		OT_DECL_NOCOPY(GraphicsConnectionItem)
+	class GraphicsConnectionPreviewItem : public QGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsConnectionPreviewItem)
 	public:
-		GraphicsConnectionItem();
-		virtual ~GraphicsConnectionItem();
+		GraphicsConnectionPreviewItem();
+		virtual ~GraphicsConnectionPreviewItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -31,34 +32,35 @@ namespace ot {
 
 		virtual QRectF boundingRect(void) const override;
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
-		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
-		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
-		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		//! @brief Will set the connection properties as provided in the configuration
-		//! The origin and destination item won't be set!
-		bool setupFromConfig(const ot::GraphicsConnectionCfg& _cfg);
+		void setPen(const QPen& _pen);
+		const QPen& pen(void) const { return m_pen; };
 
-		//! @brief Creates a configuration object containing the items origin and destination information
-		GraphicsConnectionCfg getConnectionInformation(void) const;
+		void setConnectionStyle(ot::GraphicsConnectionCfg::ConnectionStyle _style);
+		ot::GraphicsConnectionCfg::ConnectionStyle connectionStyle(void) const { return m_style; };
 
-		void updateConnection(void);
+		void setOriginPos(const QPointF& _origin);
+		QPointF originPos(void) const { return m_origin; };
 
-		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
-		void disconnectItems(void);
+		void setOriginDir(ot::ConnectionDirection _direction);
+		ot::ConnectionDirection originDir(void) const { return m_originDir; };
 
-		GraphicsItem* originItem(void) const { return m_origin; };
-		GraphicsItem* destItem(void) const { return m_dest; };
+		void setDestPos(const QPointF& _dest);
+		QPointF destPos(void) const { return m_dest; };
+
+		void setDestDir(ot::ConnectionDirection _direction);
+		ot::ConnectionDirection destDir(void) const { return m_originDir; };
 
 	private:
-		void calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const;
-		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
+		void calculateSmoothLinePoints(QPointF& _control1, QPointF& _control2) const;
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
 
-		GraphicsItem* m_origin;
-		GraphicsItem* m_dest;
+		QPointF m_origin;
+		ot::ConnectionDirection m_originDir;
+		QPointF m_dest;
+		ot::ConnectionDirection m_destDir;
 
 		QRectF m_lastRect;
 

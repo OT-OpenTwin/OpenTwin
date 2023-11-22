@@ -140,6 +140,20 @@ ot::ConnectionDirection ot::stringToConnectionDirection(const std::string& _dire
 	}
 }
 
+ot::ConnectionDirection ot::inversedConnectionDirection(ConnectionDirection _direction) {
+	switch (_direction)
+	{
+	case ot::ConnectAny: return ot::ConnectAny;
+	case ot::ConnectLeft: return ot::ConnectRight;
+	case ot::ConnectUp: return ot::ConnectDown;
+	case ot::ConnectRight: return ot::ConnectLeft;
+	case ot::ConnectDown: return ot::ConnectUp;
+	default:
+		OT_LOG_EA("Unknown connection direction");
+		return ot::ConnectAny;
+	}
+}
+
 std::string ot::toString(GradientSpread _spread) {
 	switch (_spread)
 	{
