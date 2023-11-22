@@ -27,10 +27,6 @@ bool ot::Color::operator != (const Color & _other) const {
 }
 
 void ot::Color::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-    OTAssert(m_r >= 0. && m_r <= 1., "Invalid value for R");
-    OTAssert(m_g >= 0. && m_g <= 1., "Invalid value for G");
-    OTAssert(m_b >= 0. && m_b <= 1., "Invalid value for B");
-    OTAssert(m_a >= 0. && m_a <= 1., "Invalid value for A");
 	ot::rJSON::add(_document, _object, "R", m_r);
 	ot::rJSON::add(_document, _object, "G", m_g);
 	ot::rJSON::add(_document, _object, "B", m_b);
