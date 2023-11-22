@@ -120,7 +120,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 				ot::GraphicsItem* newItem = ot::GraphicsFactory::itemFromConfig(bCfg);
 				
 				if (newItem) {
-					newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemPreviewContext);
+					newItem->setGraphicsItemContext(ot::GraphicsItem::ItemPreviewContext);
 					
 					PreviewBox box;
 

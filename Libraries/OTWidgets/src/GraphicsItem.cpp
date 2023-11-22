@@ -82,7 +82,7 @@ QRectF ot::GraphicsItem::calculateInnerRect(const QRectF& _outerRect, const QSiz
 // Constructor / Destructor
 
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
-	: m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
+	: m_flags(GraphicsItemCfg::NoFlags), m_context(NoContext), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
 	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny)
 {
@@ -98,7 +98,6 @@ ot::GraphicsItem::~GraphicsItem() {
 // Virtual functions
 
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	if (_cfg->graphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) { m_flags |= GraphicsItem::ItemIsConnectable; }
 	m_uid = _cfg->uid();
 	this->setGraphicsItemName(_cfg->name());	
 	m_alignment = _cfg->alignment();
@@ -108,6 +107,7 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_maxSize = QSizeF(_cfg->maximumSize().width(), _cfg->maximumSize().height());
 	m_moveStartPt = QPointF(_cfg->position().x(), _cfg->position().y());
 	m_connectionDirection = _cfg->connectionDirection();
+	this->setGraphicsItemFlags(_cfg->graphicsItemFlags());
 	return true;
 }
 
@@ -156,7 +156,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else if (m_flags & ot::GraphicsItem::ItemPreviewContext) {
+	else if (m_context == ItemPreviewContext) {
 		if (_event->button() == Qt::LeftButton) {
 			if (m_drag == nullptr) {
 				m_drag = new GraphicsItemDrag(this);
@@ -164,12 +164,12 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 			m_drag->queue(_event->widget());
 		}
 	}
-	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
-		if (m_flags & ot::GraphicsItem::ItemIsConnectable) {
-			OTAssertNullptr(m_scene); // Ensure the finalizeItem() method calls setGraphicsScene()
+	else if (m_context == ItemNetworkContext) {
+		if (m_flags & GraphicsItemCfg::ItemIsConnectable) {
+			OTAssertNullptr(m_scene);
 			m_scene->startConnection(this);
 		}
-		else {
+		else if (m_flags & GraphicsItemCfg::ItemIsMoveable) {
 			auto qitm = this->getQGraphicsItem();
 			OTAssertNullptr(qitm);
 			m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
@@ -181,10 +181,8 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else if (m_flags & ot::GraphicsItem::ItemNetworkContext) {
-		if (m_flags & ot::GraphicsItem::ItemIsConnectable) {
-		}
-		else {
+	else if (m_context == ItemNetworkContext) {
+		if (m_flags & GraphicsItemCfg::ItemIsMoveable) {
 			auto qitm = this->getQGraphicsItem();
 			OTAssertNullptr(qitm);
 			// Check if the item has moved after the user released the mouse
@@ -197,8 +195,8 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_hasHover && (m_flags & GraphicsItem::ItemIsConnectable)) {
-		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), Qt::GlobalColor::green);
+	if (m_hasHover && (m_flags & GraphicsItemCfg::ItemIsConnectable)) {
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(0, 0, 0, 128));
 	}
 }
 
@@ -259,7 +257,7 @@ void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 
 // Getter / Setter
 
-void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlag _flags) {
 	m_flags = _flags;
 	this->graphicsItemFlagsChanged(m_flags);
 }

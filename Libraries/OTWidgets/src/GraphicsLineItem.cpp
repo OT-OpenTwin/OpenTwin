@@ -52,7 +52,7 @@ void ot::GraphicsLineItem::callPaint(QPainter* _painter, const QStyleOptionGraph
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsLineItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsLineItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
 	// Ignore
 }
 

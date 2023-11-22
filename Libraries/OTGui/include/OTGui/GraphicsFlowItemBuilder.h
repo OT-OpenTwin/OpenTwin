@@ -55,7 +55,7 @@ namespace ot {
 		void setFigure(GraphicsFlowItemConnector::ConnectorFigure _figure) { m_figure = _figure; };
 		GraphicsFlowItemConnector::ConnectorFigure figure(void) const { return m_figure; };
 
-		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft, bool _isLast);
+		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft);
 
 	private:
 		ot::GraphicsItemCfg* createConnectorItem(void);

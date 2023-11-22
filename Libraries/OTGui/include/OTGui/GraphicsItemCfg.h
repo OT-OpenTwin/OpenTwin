@@ -26,8 +26,10 @@ namespace ot {
 	class OT_GUI_API_EXPORTONLY GraphicsItemCfg : public ot::Serializable, public ot::SimpleFactoryObject {
 	public:
 		enum GraphicsItemFlag {
-			NoFlags           = 0x00, //! @brief No item flags
-			ItemIsConnectable = 0x01  //! @brief Item can be used as source or destination of a conncetion
+			NoFlags             = 0x00, //! @brief No item flags
+			ItemIsMoveable      = 0x01, //! @brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item
+			ItemIsConnectable   = 0x02, //! @brief Item can be used as source or destination of a conncetion
+			ItemForwardsTooltip = 0x04  //! @brief If the user hovers over this item and no tooltip is set, the tooltip request will be forwarded to the parent item. If this flag is not set this item also wont forward tooltip requests from child items
 		};
 
 		GraphicsItemCfg();
@@ -58,6 +60,14 @@ namespace ot {
 		//! @brief Item title
 		//! The item title will be displayed to the user when needed.
 		const std::string& title(void) const { return m_tile; };
+
+		//! @brief Set ToolTip
+		//! ToolTips are displayed when the user hovers over an item.
+		//! If the root item in a graphics item hierarchy has a tool tip set, child items may be enabled to forward the tooltip request (See GraphicsItemFlags)
+		void setToolTip(const std::string& _toolTip) { m_tooltip = _toolTip; };
+
+		//! @brief ToolTip that will be displayed to the user when he hovers over the item
+		const std::string& toolTip(void) const { return m_tooltip; };
 
 		//! @brief Set item position
 		//! If the item is the root item, the position is the scene position.
@@ -116,6 +126,7 @@ namespace ot {
 		std::string m_name;
 		std::string m_tile;
 		std::string m_uid;
+		std::string m_tooltip;
 		Point2DD m_pos;
 
 		Size2DD m_minSize;

@@ -89,7 +89,7 @@ void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphics
 	ot::GraphicsGroupItem::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsStackItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
 	ot::GraphicsGroupItem::graphicsItemFlagsChanged(_flags);
 }
 

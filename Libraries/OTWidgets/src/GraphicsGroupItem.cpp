@@ -72,9 +72,9 @@ void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphics
 	QGraphicsItemGroup::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsGroupItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+void ot::GraphicsGroupItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
 
 ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) {

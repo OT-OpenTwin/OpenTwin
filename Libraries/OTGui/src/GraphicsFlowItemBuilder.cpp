@@ -59,7 +59,7 @@ ot::GraphicsFlowItemConnector& ot::GraphicsFlowItemConnector::operator = (const 
 	return *this;
 }
 
-void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft, bool _isLast) {
+void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
@@ -72,14 +72,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	itmTxt->setText(m_text);
 	itmTxt->setTextColor(m_textColor);
 	itmTxt->setTextFont(m_font);
-
-	// Set margins
-	if (_isLast) {
-		itmTxt->setMargins(ot::MarginsD(2., 2., 40., 2.));
-	}
-	else {
-		itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
-	}
+	//itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
 
 	// Place into layout
 	if (_isLeft) {
@@ -237,6 +230,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 	ot::GraphicsStackItemCfg* root = new ot::GraphicsStackItemCfg;
 	root->setName(_name);
 	root->setTitle(_title);
+	root->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);
@@ -316,12 +310,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 
 	int ix = 0;
 	for (auto c : m_left) {
-		c.addToGrid(ix, cLay, true, false);
+		c.addToGrid(ix, cLay, true);
 		ix++;
 	}
 	ix = 0;
 	for (auto c : m_right) {
-		c.addToGrid(ix, cLay, false, false);
+		c.addToGrid(ix, cLay, false);
 		ix++;
 	}
 

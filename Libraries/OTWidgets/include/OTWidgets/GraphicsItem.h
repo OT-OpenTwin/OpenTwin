@@ -9,7 +9,7 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Margins.h"
-//#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/SimpleFactory.h"
 #include "OTCore/Flags.h"
 
@@ -39,12 +39,10 @@ namespace ot {
 			ItemResized
 		};
 
-		enum GraphicsItemFlag {
-			NoFlags = 0x00, //! @brief No graphics item flags
-			ItemIsConnectable = 0x01, //! @brief Item can be used as source or destination of a conncetion
-			ItemIsMoveable = 0x02, //! @brief The item can be moved by a user
-			ItemPreviewContext = 0x10, //! @brief Item is placed in a preview (preview box)
-			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
+		enum GraphicsItemContext {
+			NoContext, //! @brief Item is not placed anywhere
+			ItemPreviewContext, //! @brief Item is placed in a preview
+			ItemNetworkContext  //! @brief Item is placed in a network
 		};
 
 		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
@@ -75,7 +73,7 @@ namespace ot {
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItemCfg::GraphicsItemFlag _flags) {};
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
@@ -104,8 +102,11 @@ namespace ot {
 
 		// Getter / Setter
 
-		void setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags);
-		ot::GraphicsItem::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlag _flags);
+		ot::GraphicsItemCfg::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+
+		void setGraphicsItemContext(GraphicsItem::GraphicsItemContext _context) { m_context = _context; };
+		GraphicsItem::GraphicsItemContext graphicsItemContext(void) const { return m_context; };
 
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void);
@@ -159,7 +160,8 @@ namespace ot {
 		ot::Alignment m_alignment;
 		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
-		GraphicsItemFlag m_flags;
+		GraphicsItemCfg::GraphicsItemFlag m_flags;
+		GraphicsItemContext m_context;
 		ot::ConnectionDirection m_connectionDirection;
 
 		QPointF m_moveStartPt; //! @brief Item move origin
@@ -180,5 +182,3 @@ namespace ot {
 	};
 
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemFlag);

@@ -44,7 +44,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	for (auto itm : lst) {
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
 		if (actualItm) {
-			if (actualItm->graphicsItemFlags() & ot::GraphicsItem::ItemIsConnectable) {
+			if (actualItm->graphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
 				this->startConnection(actualItm);
 				QGraphicsScene::mouseDoubleClickEvent(_event);
 				return;

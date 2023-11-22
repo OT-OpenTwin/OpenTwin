@@ -44,7 +44,7 @@ namespace ot {
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) override;
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 

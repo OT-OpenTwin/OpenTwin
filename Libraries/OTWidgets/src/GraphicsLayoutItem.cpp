@@ -55,7 +55,7 @@ void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
 	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
-void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemFlags(_flags);
 }
