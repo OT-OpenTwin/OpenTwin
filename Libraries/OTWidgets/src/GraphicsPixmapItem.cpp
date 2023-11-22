@@ -60,7 +60,7 @@ QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	if (m_maintainAspectRatio) {
 		QPixmap scaled = m_pixmap.scaled(_rect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		QRectF br = this->boundingRect();
+		QRectF adjustedRect = this->calculateInnerRect(_rect, scaled.size(), this->graphicsItemAlignment());
 
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {
@@ -68,11 +68,11 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 			mask.fill(ot::OTQtConverter::toQt(m_colorMask));
 			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
 
-			_painter->drawPixmap(QPointF(br.center().x() - (scaled.width() / 2.), br.center().y() - (scaled.height() / 2.)), scaled);
-			_painter->drawPixmap(QPointF(br.center().x() - (scaled.width() / 2.), br.center().y() - (scaled.height() / 2.)), mask);
+			_painter->drawPixmap(adjustedRect.topLeft(), scaled);
+			_painter->drawPixmap(adjustedRect.topLeft(), mask);
 		}
 		else {
-			_painter->drawPixmap(QPointF(br.center().x() - (scaled.width() / 2.), br.center().y() - (scaled.height() / 2.)), scaled);
+			_painter->drawPixmap(adjustedRect.topLeft(), scaled);
 		}
 	}
 	else {

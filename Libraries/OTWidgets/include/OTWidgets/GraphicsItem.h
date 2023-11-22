@@ -47,6 +47,8 @@ namespace ot {
 			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
 		};
 
+		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
+
 		GraphicsItem(bool _isLayoutOrStack);
 		virtual ~GraphicsItem();
 

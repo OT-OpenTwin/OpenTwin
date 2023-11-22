@@ -30,9 +30,56 @@
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// ###########################################################################################################################################################################################################################################################################################################################
+// Static functions
+
+QRectF ot::GraphicsItem::calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment) {
+	// Get the top left point of the outer rectangle
+	QPointF pt(_outerRect.topLeft());
+
+	// Align inner rectangle
+	switch (_alignment)
+	{
+	case ot::AlignCenter:
+		pt.setX(pt.x() + ((_outerRect.width() - _innerSize.width()) / 2.));
+		pt.setY(pt.y() + ((_outerRect.height() - _innerSize.height()) / 2.));
+		break;
+	case ot::AlignTop:
+		pt.setX(pt.x() + ((_outerRect.width() - _innerSize.width()) / 2.));
+		break;
+	case ot::AlignTopRight:
+		pt.setX(pt.x() + (_outerRect.width() - _innerSize.width()));
+		break;
+	case ot::AlignRight:
+		pt.setX(pt.x() + (_outerRect.width() - _innerSize.width()));
+		pt.setY(pt.y() + ((_outerRect.height() - _innerSize.height()) / 2.));
+		break;
+	case ot::AlignBottomRight:
+		pt.setX(pt.x() + (_outerRect.width() - _innerSize.width()));
+		pt.setY(pt.y() + (_outerRect.height() - _innerSize.height()));
+		break;
+	case ot::AlignBottom:
+		pt.setX(pt.x() + ((_outerRect.width() - _innerSize.width()) / 2.));
+		pt.setY(pt.y() + (_outerRect.height() - _innerSize.height()));
+		break;
+	case ot::AlignBottomLeft:
+		pt.setY(pt.y() + (_outerRect.height() - _innerSize.height()));
+		break;
+	case ot::AlignLeft:
+		pt.setY(pt.y() + ((_outerRect.height() - _innerSize.height()) / 2.));
+		break;
+	case ot::AlignTopLeft:
+		break;
+	default:
+		OT_LOG_EA("Unknown Alignment");
+		break;
+	}
+
+	return QRectF(pt, _innerSize);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructor / Destructor
 
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItem::NoFlags), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
@@ -300,50 +347,15 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 		break;
 	}
 
+	// Calculate the size of the inner rectangle
 	inner = inner.expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize);
 
-	// No further adjustments needed
-	if (inner.toSize() == r.size()) return r;
-
-	QPointF pt(r.topLeft());
-
-	// Align inner size
-	switch (m_alignment)
-	{
-	case ot::AlignCenter:
-		pt.setX(pt.x() + ((r.size().width() - inner.width()) / 2.));
-		pt.setY(pt.y() + ((r.size().height() - inner.height()) / 2.));
-		break;
-	case ot::AlignTop:
-		pt.setX(pt.x() + ((r.size().width() - inner.width()) / 2.));
-		break;
-	case ot::AlignTopRight:
-		pt.setX(pt.x() + (r.size().width() - inner.width()));
-		break;
-	case ot::AlignRight:
-		pt.setX(pt.x() + (r.size().width() - inner.width()));
-		pt.setY(pt.y() + ((r.size().height() - inner.height()) / 2.));
-		break;
-	case ot::AlignBottomRight:
-		pt.setX(pt.x() + (r.size().width() - inner.width()));
-		pt.setY(pt.y() + (r.size().height() - inner.height()));
-		break;
-	case ot::AlignBottom:
-		pt.setX(pt.x() + ((r.size().width() - inner.width()) / 2.));
-		pt.setY(pt.y() + (r.size().height() - inner.height()));
-		break;
-	case ot::AlignBottomLeft:
-		pt.setY(pt.y() + (r.size().height() - inner.height()));
-		break;
-	case ot::AlignLeft:
-		pt.setY(pt.y() + ((r.size().height() - inner.height()) / 2.));
-		break;
-	case ot::AlignTopLeft:
-		break;
-	default:
-		OT_LOG_EA("Unknown Alignment");
-		break;
+	if (inner.toSize() == r.size()) {
+		// No further adjustments needed
+		return r;
 	}
-
-	return QRectF(pt, inner);
+	else {
+		// Calculate the inner rectangle
+		return this->calculateInnerRect(r, inner, m_alignment);
+	}
 }
