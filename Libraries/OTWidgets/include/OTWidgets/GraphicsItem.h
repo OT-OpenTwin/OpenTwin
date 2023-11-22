@@ -85,6 +85,9 @@ namespace ot {
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
+		void handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event);
+		void handleToolTip(QGraphicsSceneHoverEvent* _event);
+		void handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event);
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		//! @brief Will expand the size according to the margins
@@ -157,6 +160,7 @@ namespace ot {
 		bool m_hasHover;
 		std::string m_uid;
 		std::string m_name;
+		std::string m_toolTip;
 		ot::Alignment m_alignment;
 		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;

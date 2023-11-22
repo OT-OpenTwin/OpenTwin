@@ -63,6 +63,14 @@ void ot::GraphicsGroupItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) 
 	QGraphicsItem::mouseReleaseEvent(_event);
 }
 
+void ot::GraphicsGroupItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleHoverEnterEvent(_event);
+}
+
+void ot::GraphicsGroupItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleHoverLeaveEvent(_event);
+}
+
 void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
 }

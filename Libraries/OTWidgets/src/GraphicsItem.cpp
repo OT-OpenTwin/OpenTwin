@@ -5,28 +5,30 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/GraphicsStackItem.h"
-#include "OTWidgets/GraphicsItemDrag.h"
-#include "OTWidgets/GraphicsConnectionItem.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsView.h"
-#include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/Painter2DFactory.h"
-#include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
+#include "OTGui/GraphicsItemCfg.h"
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/Painter2DFactory.h"
+#include "OTWidgets/GraphicsItemDrag.h"
+#include "OTWidgets/GraphicsStackItem.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
 
-#include <QtCore/qmimedata.h>
+// Qt header
 #include <QtCore/qmath.h>
+#include <QtCore/qmimedata.h>
 #include <QtGui/qdrag.h>
 #include <QtGui/qfont.h>
 #include <QtGui/qpainter.h>
-#include <QtWidgets/qgraphicsscene.h>
-#include <QtWidgets/qstyleoption.h>
-#include <QtWidgets/qgraphicssceneevent.h>
 #include <QtWidgets/qwidget.h>
+#include <QtWidgets/qtooltip.h>
+#include <QtWidgets/qstyleoption.h>
+#include <QtWidgets/qgraphicsscene.h>
+#include <QtWidgets/qgraphicssceneevent.h>
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -99,7 +101,7 @@ ot::GraphicsItem::~GraphicsItem() {
 
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_uid = _cfg->uid();
-	this->setGraphicsItemName(_cfg->name());	
+	m_toolTip = _cfg->toolTip();	
 	m_alignment = _cfg->alignment();
 	m_sizePolicy = _cfg->sizePolicy();
 	m_margins = _cfg->margins();
@@ -107,7 +109,10 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_maxSize = QSizeF(_cfg->maximumSize().width(), _cfg->maximumSize().height());
 	m_moveStartPt = QPointF(_cfg->position().x(), _cfg->position().y());
 	m_connectionDirection = _cfg->connectionDirection();
+
+	this->setGraphicsItemName(_cfg->name());
 	this->setGraphicsItemFlags(_cfg->graphicsItemFlags());
+
 	return true;
 }
 
@@ -192,6 +197,28 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 			}
 		}
 	}
+}
+
+void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleToolTip(_event);
+}
+
+void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
+	// Check if the item is in a network
+	if (this->getRootItem()->graphicsItemContext() != ItemNetworkContext) return;
+
+	if (!m_toolTip.empty())
+	{
+		QString Tt = QString::fromStdString(m_toolTip);
+		QToolTip::showText(_event->screenPos(), Tt, this->getRootItem()->graphicsScene()->getGraphicsView());
+	}
+	else if ((m_flags & GraphicsItemCfg::ItemForwardsTooltip) && m_parent) {
+		m_parent->handleToolTip(_event);
+	}
+}
+
+void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	QToolTip::hideText();
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

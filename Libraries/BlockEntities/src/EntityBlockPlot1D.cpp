@@ -76,16 +76,15 @@ void EntityBlockPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view& do
 ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 {
 	ot::GraphicsFlowItemBuilder block;
+	block.setName(this->getClassName());
+	block.setTitle(this->CreateBlockHeadline());
 
 	const ot::Color colourTitle(ot::Color::Yellow);
-	const ot::Color colourBackground(ot::Color::White);
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setBackgroundImagePath("Images/Graph.svg");
-
+	//block.setToolTip("Plots the X and Y values in a 1D plot");
 	AddConnectors(block);
 
-	const std::string blockName = getClassName();
-	const std::string blockTitel = CreateBlockHeadline();
-	auto graphicsItemConfig = block.createGraphicsItem(blockName, blockTitel);
+	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
 }

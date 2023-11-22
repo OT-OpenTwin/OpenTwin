@@ -33,6 +33,16 @@ void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* 
 	QGraphicsWidget::mouseReleaseEvent(_event);
 }
 
+void ot::GraphicsLayoutItemWrapper::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	OTAssertNullptr(m_owner);
+	m_owner->handleHoverEnterEvent(_event);
+}
+
+void ot::GraphicsLayoutItemWrapper::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	OTAssertNullptr(m_owner);
+	m_owner->handleHoverLeaveEvent(_event);
+}
+
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	OTAssertNullptr(m_owner);
 	m_owner->handleItemChange(_change, _value);

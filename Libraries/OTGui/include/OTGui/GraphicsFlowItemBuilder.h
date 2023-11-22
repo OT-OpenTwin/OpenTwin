@@ -40,6 +40,9 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& text(void) const { return m_text; };
 
+		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+		const std::string& toolTip(void) const { return m_toolTip; };
+
 		void setFont(const ot::Font& _font) { m_font = _font; };
 		const ot::Font& font(void) const { return m_font; };
 
@@ -68,6 +71,7 @@ namespace ot {
 
 		std::string m_name;
 		std::string m_text;
+		std::string m_toolTip;
 		ConnectorFigure m_figure;
 		ot::Color m_textColor;
 		ot::Font m_font;
@@ -84,12 +88,31 @@ namespace ot {
 	class OT_GUI_API_EXPORTONLY GraphicsFlowItemBuilder {
 		OT_DECL_NOCOPY(GraphicsFlowItemBuilder)
 	public:
-		//! @brief Creates a GraphicsItem configuration in the OpenTwin flow block style
-		//! The callee takes ownership of the item
-		ot::GraphicsItemCfg* createGraphicsItem(const std::string& _name, const std::string& _title) const;
+		//! @brief Creates a GraphicsItemCfg in the "OpenTwin flow block" style that takes the current configuration into account.
+		//! The callee takes ownership of the item.
+		ot::GraphicsItemCfg* createGraphicsItem(void) const;
 
 		GraphicsFlowItemBuilder();
 		virtual ~GraphicsFlowItemBuilder();
+
+		//! @brief Sets the name for the root item
+		//! The item name will be used as a prefix for the created child items (layouts and stacks)
+		void setName(const std::string& _name) { m_name = _name; };
+
+		//! @brief Item name
+		const std::string& name(void) const { return m_name; };
+
+		//! @brief Sets the title that will be displayed to the user
+		void setTitle(const std::string& _title) { m_title = _title; };
+
+		//! @brief Item title
+		const std::string& title(void) const { return m_title; };
+
+		//! @brief Set the item tool tip
+		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+
+		//! @brief Set the item tool tip
+		const std::string& toolTip(void) const { return m_toolTip; };
 
 		//! @brief Add a connector on the left side of the FlowItem
 		//! The default connector style will be applied
@@ -197,6 +220,10 @@ namespace ot {
 		void setRightTitleCornerImagePath(const std::string& _path) { m_rightTitleImagePath = _path; };
 
 	private:
+		std::string m_name;
+		std::string m_title;
+		std::string m_toolTip;
+
 		ot::Painter2D* m_backgroundPainter;
 		ot::Painter2D* m_titleBackgroundPainter;
 		ot::Painter2D* m_titleForegroundPainter;

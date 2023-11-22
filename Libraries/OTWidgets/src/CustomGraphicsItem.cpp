@@ -85,3 +85,11 @@ void ot::CustomGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	GraphicsItem::handleMouseReleaseEvent(_event);
 	QGraphicsItem::mouseReleaseEvent(_event);
 }
+
+void ot::CustomGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleHoverEnterEvent(_event);
+}
+
+void ot::CustomGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleHoverLeaveEvent(_event);
+}

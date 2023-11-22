@@ -50,6 +50,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	itm->setName(m_name);
 	itm->setMargins(ot::MarginsD(0., 0., 0., 0));
+	itm->setToolTip(m_toolTip);
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
@@ -57,6 +58,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	itmTxt->setText(m_text);
 	itmTxt->setTextColor(m_textColor);
 	itmTxt->setTextFont(m_font);
+	itmTxt->setToolTip(m_toolTip);
 	//itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
 
 	// Place into layout
@@ -160,11 +162,11 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createDownTriangleItem(void)
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::string& _name, const std::string& _title) const {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	OTAssertNullptr(m_backgroundPainter);
 	OTAssertNullptr(m_titleBackgroundPainter);
 	OTAssertNullptr(m_titleForegroundPainter);
-	OTAssert(!_name.empty(), "No name provided");
+	OTAssert(!m_name.empty(), "No name provided");
 
 	// --- Create a copy of local data ------------------------------------------------
 
@@ -213,50 +215,57 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 
 	// Root
 	ot::GraphicsStackItemCfg* root = new ot::GraphicsStackItemCfg;
-	root->setName(_name);
-	root->setTitle(_title);
+	root->setName(m_name);
+	root->setTitle(m_title);
+	root->setToolTip(m_toolTip);
 	root->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);
 	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
 	bor->setCornerRadius(5);
-	bor->setName(_name + "_bor");
+	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(ot::Dynamic);
+	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	root->addItemTop(bor, false, true);
 
 	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
-	mLay->setName(_name + "_mLay");
+	mLay->setName(m_name + "_mLay");
 	mLay->setMinimumSize(ot::Size2DD(50., 80.));
+	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	root->addItemTop(mLay, true, false);
 
 	// Title: Stack
 	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
-	tStack->setName(_name + "_tStack");
+	tStack->setName(m_name + "_tStack");
+	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	mLay->addChildItem(tStack, 0);
 
 	// Title: Border
 	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
 	tBor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
-	tBor->setName(_name + "_tBor");
+	tBor->setName(m_name + "_tBor");
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));
 	tBor->setSizePolicy(ot::Dynamic);
+	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	tStack->addItemTop(tBor, false, true);
 
 	// Title: Layout
 	ot::GraphicsHBoxLayoutItemCfg* tLay = new ot::GraphicsHBoxLayoutItemCfg;
-	tLay->setName(_name + "_tLay");
+	tLay->setName(m_name + "_tLay");
+	tLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	tStack->addItemTop(tLay, true, false);
 
 	// Title: Title
 	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
-	tit->setName(_name + "_tit");
-	tit->setText(_title);
+	tit->setName(m_name + "_tit");
+	tit->setText(m_title);
 	tit->setTextPainter(painterTitleFront);
 	tit->setMargins(ot::MarginsD(2., 2., 2., 2.));
 	tit->setMinimumSize(ot::Size2DD(10., 22.));
+	tit->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	// Title: Left Corner
 	if (m_leftTitleImagePath.empty()) {
@@ -264,11 +273,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 	}
 	else {
 		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
-		titLImg->setName(_name + "_titLImg");
+		titLImg->setName(m_name + "_titLImg");
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titLImg->setAlignment(ot::AlignCenter);
 		titLImg->setMargins(ot::MarginsD(2., 0., 2., 15.));
+		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
 	}
 	
@@ -280,24 +290,27 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 	}
 	else {
 		ot::GraphicsImageItemCfg* titRImg = new ot::GraphicsImageItemCfg;
-		titRImg->setName(_name + "_titRImg");
+		titRImg->setName(m_name + "_titRImg");
 		titRImg->setImagePath(m_rightTitleImagePath);
 		titRImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titRImg->setAlignment(ot::AlignCenter);
 		titRImg->setMargins(ot::MarginsD(2., 15., 2., 0.));
+		titRImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titRImg);
 	}
 
 	// Central layout
 	ot::GraphicsHBoxLayoutItemCfg* cLay = new ot::GraphicsHBoxLayoutItemCfg;
-	cLay->setName(_name + "_cLay");
+	cLay->setName(m_name + "_cLay");
+	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	mLay->addChildItem(cLay, 1);
 
 	// Left connector layout
 	ot::GraphicsGridLayoutItemCfg* lcLay = new ot::GraphicsGridLayoutItemCfg((int)m_left.size() + 1, 2);
-	lcLay->setName(_name + "_lcLay");
+	lcLay->setName(m_name + "_lcLay");
 	lcLay->setRowStretch((int)m_left.size(), 1);
 	lcLay->setColumnStretch(1, 1);
+	lcLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	int ix = 0;
 	for (auto c : m_left) {
@@ -307,9 +320,10 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 
 	// Right connector layout
 	ot::GraphicsGridLayoutItemCfg* rcLay = new ot::GraphicsGridLayoutItemCfg((int)m_right.size() + 1, 2);
-	rcLay->setName(_name + "_rcLay");
+	rcLay->setName(m_name + "_rcLay");
 	rcLay->setRowStretch((int)m_right.size(), 1);
 	rcLay->setColumnStretch(0, 1);
+	rcLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	ix = 0;
 	for (auto c : m_right) {
@@ -328,11 +342,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 		// Setup central layout (central image)
 		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
 		cImg->setImagePath(m_backgroundImagePath);
-		cImg->setName(_name + "_cImg");
+		cImg->setName(m_name + "_cImg");
 		cImg->setMargins(m_backgroundImageMargins);
 		cImg->setSizePolicy(ot::Dynamic);
 		cImg->setAlignment(m_backgroundImageAlignment);
 		cImg->setMaintainAspectRatio(true);
+		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 		if (!m_left.empty() && m_right.empty()) {
 			// Only left connectors
