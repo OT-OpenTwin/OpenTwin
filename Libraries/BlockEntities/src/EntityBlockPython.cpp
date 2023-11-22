@@ -26,20 +26,19 @@ std::string EntityBlockPython::getSelectedScript()
 
 ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 {
-	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
+	ot::GraphicsFlowItemBuilder block;
 
 	const ot::Color colourTitle(ot::Color::Cyan);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundGradientColor(colourTitle);
-	//block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	block->setLeftTitleCornerImagePath("Images/Python.png");
-	block->setBackgroundImagePath("Images/Script.svg");
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setLeftTitleCornerImagePath("Images/Python.png");
+	block.setBackgroundImagePath("Images/Script.svg");
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
-	AddConnectors(block.get());
+	AddConnectors(block);
 	
-	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	auto graphicsItemConfig = block.createGraphicsItem(blockName, blockTitel);
 	return graphicsItemConfig;
 }
 

@@ -1,11 +1,11 @@
-//! @file GraphicsFlowConnectorCfg.cpp
+//! @file GraphicsFlowItemBuilder.cpp
 //! 
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
@@ -38,15 +38,15 @@ namespace ot {
 	}
 }
 
-ot::GraphicsFlowConnectorCfg::GraphicsFlowConnectorCfg() : m_figure(ot::GraphicsFlowConnectorCfg::Square) {}
+ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector() : m_figure(ot::GraphicsFlowItemConnector::Square) {}
 
-ot::GraphicsFlowConnectorCfg::GraphicsFlowConnectorCfg(const GraphicsFlowConnectorCfg& _other) {
+ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector(const GraphicsFlowItemConnector& _other) {
 	*this = _other;
 }
 
-ot::GraphicsFlowConnectorCfg::~GraphicsFlowConnectorCfg() {}
+ot::GraphicsFlowItemConnector::~GraphicsFlowItemConnector() {}
 
-ot::GraphicsFlowConnectorCfg& ot::GraphicsFlowConnectorCfg::operator = (const GraphicsFlowConnectorCfg& _other) {
+ot::GraphicsFlowItemConnector& ot::GraphicsFlowItemConnector::operator = (const GraphicsFlowItemConnector& _other) {
 	if (this != &_other) {
 		m_name = _other.m_name;
 		m_text = _other.m_text;
@@ -59,7 +59,7 @@ ot::GraphicsFlowConnectorCfg& ot::GraphicsFlowConnectorCfg::operator = (const Gr
 	return *this;
 }
 
-void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) {
+void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft, bool _isLast) {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
@@ -73,6 +73,15 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg
 	itmTxt->setTextColor(m_textColor);
 	itmTxt->setTextFont(m_font);
 
+	// Set margins
+	if (_isLast) {
+		itmTxt->setMargins(ot::MarginsD(2., 2., 20., 2.));
+	}
+	else {
+		itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
+	}
+
+	// Place into layout
 	if (_isLeft) {
 		itm->setAlignment(ot::AlignLeft);
 		itm->setConnectionDirection(ot::ConnectLeft);
@@ -90,26 +99,25 @@ void ot::GraphicsFlowConnectorCfg::addToGrid(int _row, GraphicsGridLayoutItemCfg
 		_gridLayout->addChildItem(_row, ot::intern::flcRightConnector, itm);
 		_gridLayout->addChildItem(_row, ot::intern::flcRightTitle, itmTxt);
 	}
-
 	
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createConnectorItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem(void) {
 	switch (m_figure)
 	{
-	case ot::GraphicsFlowConnectorCfg::Square: return this->createSquareItem();
-	case ot::GraphicsFlowConnectorCfg::Circle: return this->createCircleItem();
-	case ot::GraphicsFlowConnectorCfg::TriangleLeft: return this->createLeftTriangleItem();
-	case ot::GraphicsFlowConnectorCfg::TriangleRight: return this->createRightTriangleItem();
-	case ot::GraphicsFlowConnectorCfg::TriangleUp: return this->createUpTriangleItem();
-	case ot::GraphicsFlowConnectorCfg::TriangleDown: return this->createDownTriangleItem();
+	case ot::GraphicsFlowItemConnector::Square: return this->createSquareItem();
+	case ot::GraphicsFlowItemConnector::Circle: return this->createCircleItem();
+	case ot::GraphicsFlowItemConnector::TriangleLeft: return this->createLeftTriangleItem();
+	case ot::GraphicsFlowItemConnector::TriangleRight: return this->createRightTriangleItem();
+	case ot::GraphicsFlowItemConnector::TriangleUp: return this->createUpTriangleItem();
+	case ot::GraphicsFlowItemConnector::TriangleDown: return this->createDownTriangleItem();
 	default:
 		OT_LOG_EA("Unknown connector type");
 		throw std::exception("Unknown connector type");
 	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem(void) {
 	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(m_primaryColor));
 	itm->setSize(ot::Size2DD(10., 10.));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
@@ -119,7 +127,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createSquareItem(void) {
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createCircleItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
 	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
@@ -128,7 +136,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createCircleItem(void) {
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createLeftTriangleItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createLeftTriangleItem(void) {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Left);
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
@@ -138,7 +146,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createLeftTriangleItem(void) 
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createRightTriangleItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createRightTriangleItem(void) {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Right);
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
@@ -148,7 +156,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createRightTriangleItem(void)
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createUpTriangleItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createUpTriangleItem(void) {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Up);
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
@@ -158,7 +166,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createUpTriangleItem(void) {
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createDownTriangleItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createDownTriangleItem(void) {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Down);
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
@@ -174,7 +182,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowConnectorCfg::createDownTriangleItem(void) 
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::string& _name, const std::string& _title) const {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::string& _name, const std::string& _title) const {
 	OTAssertNullptr(m_backgroundPainter);
 	OTAssertNullptr(m_titleBackgroundPainter);
 	OTAssertNullptr(m_titleForegroundPainter);
@@ -241,7 +249,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(_name + "_mLay");
-	mLay->setMinimumSize(ot::Size2DD(20., 50.));
+	mLay->setMinimumSize(ot::Size2DD(50., 80.));
 	root->addItemTop(mLay, true, false);
 
 	// Title: Stack
@@ -269,6 +277,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	tit->setText(_title);
 	tit->setTextPainter(painterTitleFront);
 	tit->setMargins(ot::MarginsD(2., 2., 2., 2.));
+	tit->setMinimumSize(ot::Size2DD(10., 22.));
 
 	// Title: Left Corner
 	if (m_leftTitleImagePath.empty()) {
@@ -278,9 +287,9 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
 		titLImg->setName(_name + "_titLImg");
 		titLImg->setImagePath(m_leftTitleImagePath);
-		titLImg->setMaximumSize(ot::Size2DD(16., 16.));
+		titLImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(0., 0., 0., 15.));
+		titLImg->setMargins(ot::MarginsD(2., 0., 2., 15.));
 		tLay->addChildItem(titLImg);
 	}
 	
@@ -294,9 +303,9 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		ot::GraphicsImageItemCfg* titRImg = new ot::GraphicsImageItemCfg;
 		titRImg->setName(_name + "_titRImg");
 		titRImg->setImagePath(m_rightTitleImagePath);
-		titRImg->setMaximumSize(ot::Size2DD(16., 16.));
+		titRImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titRImg->setAlignment(ot::AlignCenter);
-		titRImg->setMargins(ot::MarginsD(5., 15., 0., 0.));
+		titRImg->setMargins(ot::MarginsD(2., 15., 2., 0.));
 		tLay->addChildItem(titRImg);
 	}
 
@@ -304,13 +313,17 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_left.size(), m_right.size()), 5);
 	cLay->setName(_name + "_cLay");
 
+	size_t lastRow = std::max(m_left.size(), m_right.size());
+
 	int ix = 0;
 	for (auto c : m_left) {
-		c.addToGrid(ix++, cLay, true);
+		c.addToGrid(ix, cLay, true, ix == (lastRow - 1));
+		ix++;
 	}
 	ix = 0;
 	for (auto c : m_right) {
-		c.addToGrid(ix++, cLay, false);
+		c.addToGrid(ix, cLay, false, ix == (lastRow - 1));
+		ix++;
 	}
 
 	cLay->setColumnStretch(2, 1);
@@ -326,9 +339,9 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
-		cImg->setMargins(ot::MarginsD(5., 5., 5., 5.));
+		cImg->setMargins(m_backgroundImageMargins);
 		cImg->setSizePolicy(ot::Dynamic);
-		cImg->setAlignment(ot::AlignCenter);
+		cImg->setAlignment(m_backgroundImageAlignment);
 		cImg->setMaintainAspectRatio(true);
 
 		cStack->addItemTop(cImg, false, true);
@@ -340,7 +353,10 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemCfg::createGraphicsItem(const std::stri
 	return root;
 }
 
-ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() : m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr) {
+ot::GraphicsFlowItemBuilder::GraphicsFlowItemBuilder()
+	: m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
+	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(2., 2., 5., 2.)
+{
 	this->setBackgroundColor(ot::Color(50, 50, 50));
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 	this->setDefaultTitleForegroundGradient();
@@ -350,10 +366,10 @@ ot::GraphicsFlowItemCfg::GraphicsFlowItemCfg() : m_backgroundPainter(nullptr), m
 	m_defaultConnectorStyle.setSecondaryColor(ot::Color(ot::Color::Black));
 }
 
-ot::GraphicsFlowItemCfg::~GraphicsFlowItemCfg() {}
+ot::GraphicsFlowItemBuilder::~GraphicsFlowItemBuilder() {}
 
-void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure) {
+	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
@@ -361,8 +377,8 @@ void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::strin
 	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
+	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
@@ -371,8 +387,8 @@ void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::strin
 	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, const ot::Color& _color) {
+	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
@@ -381,12 +397,12 @@ void ot::GraphicsFlowItemCfg::addLeft(const std::string& _name, const std::strin
 	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addLeft(const GraphicsFlowConnectorCfg& _input) {
+void ot::GraphicsFlowItemBuilder::addLeft(const GraphicsFlowItemConnector& _input) {
 	m_left.push_back(_input);
 }
 
-void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure) {
+	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
@@ -394,8 +410,8 @@ void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::stri
 	this->addRight(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
+	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
@@ -404,8 +420,8 @@ void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::stri
 	this->addRight(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::string& _title, GraphicsFlowConnectorCfg::ConnectorFigure _figure, const ot::Color& _color) {
-	GraphicsFlowConnectorCfg cfg = m_defaultConnectorStyle;
+void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, const ot::Color& _color) {
+	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
@@ -414,66 +430,66 @@ void ot::GraphicsFlowItemCfg::addRight(const std::string& _name, const std::stri
 	this->addRight(cfg);
 }
 
-void ot::GraphicsFlowItemCfg::addRight(const GraphicsFlowConnectorCfg& _output) {
+void ot::GraphicsFlowItemBuilder::addRight(const GraphicsFlowItemConnector& _output) {
 	m_right.push_back(_output);
 }
 
-void ot::GraphicsFlowItemCfg::setBackgroundPainter(ot::Painter2D* _painter) {
+void ot::GraphicsFlowItemBuilder::setBackgroundPainter(ot::Painter2D* _painter) {
 	if (m_backgroundPainter == _painter) return;
 	if (m_backgroundPainter) delete m_backgroundPainter;
 	m_backgroundPainter = _painter;
 }
 
-void ot::GraphicsFlowItemCfg::setBackgroundColor(const ot::Color& _color) {
+void ot::GraphicsFlowItemBuilder::setBackgroundColor(const ot::Color& _color) {
 	this->setBackgroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsFlowItemCfg::setTitleBackgroundPainter(ot::Painter2D* _painter) {
+void ot::GraphicsFlowItemBuilder::setTitleBackgroundPainter(ot::Painter2D* _painter) {
 	if (m_titleBackgroundPainter == _painter) return;
 	if (m_titleBackgroundPainter) delete m_titleBackgroundPainter;
 	m_titleBackgroundPainter = _painter;
 }
 
-void ot::GraphicsFlowItemCfg::setTitleBackgroundGradientColor(const ot::Color& _color) {
+void ot::GraphicsFlowItemBuilder::setTitleBackgroundGradientColor(const ot::Color& _color) {
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
 	painter->setSpread(ot::ReflectSpread);
 
 	painter->addStop(0.00, _color);
-	painter->addStop(0.70, ot::Color(50, 50, 50));
-	painter->addStop(0.75, ot::Color(30, 30, 30));
-	painter->addStop(0.80, ot::Color(230, 230, 230));
-	painter->addStop(0.85, ot::Color(50, 50, 50));
+	painter->addStop(0.75, ot::Color(50, 50, 50));
+	painter->addStop(0.80, ot::Color(30, 30, 30));
+	painter->addStop(0.85, ot::Color(230, 230, 230));
+	painter->addStop(0.90, ot::Color(50, 50, 50));
 
 	this->setTitleBackgroundPainter(painter);
 }
 
-void ot::GraphicsFlowItemCfg::setTitleBackgroundColor(const ot::Color& _color) {
+void ot::GraphicsFlowItemBuilder::setTitleBackgroundColor(const ot::Color& _color) {
 	this->setTitleBackgroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsFlowItemCfg::setTitleForegroundPainter(ot::Painter2D* _painter) {
+void ot::GraphicsFlowItemBuilder::setTitleForegroundPainter(ot::Painter2D* _painter) {
 	if (m_titleForegroundPainter == _painter) return;
 	if (m_titleForegroundPainter) delete m_titleForegroundPainter;
 	m_titleForegroundPainter = _painter;
 }
 
-void ot::GraphicsFlowItemCfg::setTitleForegroundColor(const ot::Color& _color) {
+void ot::GraphicsFlowItemBuilder::setTitleForegroundColor(const ot::Color& _color) {
 	this->setTitleForegroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsFlowItemCfg::setDefaultTitleForegroundGradient(void) {
-	ot::LinearGradientPainter2D* painter = new ot::LinearGradientPainter2D;
-	painter->setStart(ot::Point2DD(0., 0.5));
-	painter->setFinalStop(ot::Point2DD(1., 0.5));
+void ot::GraphicsFlowItemBuilder::setDefaultTitleForegroundGradient(void) {
+	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
+	painter->setCenterPoint(ot::Point2DD(0., 2.));
+	painter->setCenterRadius(2.5);
+	painter->setSpread(ot::ReflectSpread);
 
-	painter->addStop(0., ot::Color(0, 0, 0));
-	painter->addStop(0.75, ot::Color(205, 205, 205));
-	painter->addStop(0.8, ot::Color(225, 225, 225));
+	painter->addStop(0.00, ot::Color(255, 255, 255));
+	painter->addStop(0.75, ot::Color(255, 255, 255));
+	painter->addStop(0.80, ot::Color(230, 230, 230));
 	painter->addStop(0.85, ot::Color(25, 25, 25));
-	painter->addStop(0.9, ot::Color(205, 205, 205));
-	painter->addStop(1., ot::Color(255, 255, 255));
+	painter->addStop(0.90, ot::Color(255, 255, 255));
 
 	this->setTitleForegroundPainter(painter);
 }

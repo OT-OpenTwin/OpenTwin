@@ -27,7 +27,7 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 
@@ -44,8 +44,8 @@ Application * g_instance{ nullptr };
 namespace ottest {
 	static unsigned long long currentBlockUid = 0;
 
-	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
-		ot::GraphicsFlowConnectorCfg cfg;
+	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
+		ot::GraphicsFlowItemConnector cfg;
 
 		cfg.setTextColor(ot::Color(0, 0, 0));
 
@@ -53,46 +53,46 @@ namespace ottest {
 	}
 
 	ot::GraphicsItemCfg* createTestBlock1(const std::string& _name) {
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
 		flow.setTitleBackgroundColor(0, 255, 0);
 		flow.setBackgroundImagePath("Images/Test2");
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		flow.setBackgroundColor(ot::Color(255, 255, 255));
 		//flow->setBackgroundImagePath("Default/python");
 
-		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowItemConnector::Square, ot::Color::Orange);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowItemConnector::Square, ot::Color::Yellow);
 
 		return flow.createGraphicsItem(_name, _name);
 	}
 
 	ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
 		flow.setTitleBackgroundColor(255, 0, 0);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		//flow->setBackgroundImagePath("Default/python");
 		flow.setLeftTitleCornerImagePath("Images/Test3");
 
-		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-		flow.addLeft("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::TriangleLeft, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::TriangleRight, ot::Color::Yellow);
+		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowItemConnector::Square, ot::Color::Orange);
+		flow.addLeft("SomeIn3", "Perform shutdown", ot::GraphicsFlowItemConnector::Circle, ot::Color::IndianRed);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowItemConnector::TriangleLeft, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowItemConnector::TriangleRight, ot::Color::Yellow);
 
 		return flow.createGraphicsItem(_name, _name);
 	}
 
 	ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
 		
 		flow.setTitleBackgroundGradientColor(ot::Color(ot::Color::Orange));
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		
-		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowItemConnector::Square, ot::Color::Yellow);
 
 		return flow.createGraphicsItem(_name, _name);
 	}

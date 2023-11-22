@@ -128,7 +128,7 @@ std::string EntityBlock::CreateBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_first_of("/") + 1, getName().size());
 	const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
-	return blockTitel;
+	return nameWithoutRootDirectory;
 }
 
 void EntityBlock::CreateNavigationTreeEntry()
@@ -202,30 +202,26 @@ void EntityBlock::CreateConnections()
 	getObserver()->sendMessageToViewer(connectionReqDoc);
 }
 
-void EntityBlock::AddConnectors(ot::GraphicsFlowItemCfg* flowBlockConfig)
+void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {
-	if (flowBlockConfig != nullptr)
+	for (auto connectorByName : _connectorsByName)
 	{
-		for (auto connectorByName : _connectorsByName)
+		const ot::Connector& connector = connectorByName.second;
+		ot::ConnectorType connectorType = connector.getConnectorType();
+		if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS(""); };
+		const std::string connectorName = connector.getConnectorName();
+		const std::string connectorTitle = connector.getConnectorTitle();
+		if (connectorType == ot::ConnectorType::In)
 		{
-			const ot::Connector& connector = connectorByName.second;
-			ot::ConnectorType connectorType = connector.getConnectorType();
-			if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS(""); };
-			const std::string connectorName = connector.getConnectorName();
-			const std::string connectorTitle = connector.getConnectorTitle();
-			if (connectorType == ot::ConnectorType::In)
-			{
-				flowBlockConfig->addLeft(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Black);
-			}
-			else if (connectorType == ot::ConnectorType::InOptional)
-			{
-				flowBlockConfig->addLeft(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
-			}
-			else if (connectorType == ot::ConnectorType::Out)
-			{
-				flowBlockConfig->addRight(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Square, ot::Color::Black);
-			}
+			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
+		}
+		else if (connectorType == ot::ConnectorType::InOptional)
+		{
+			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
+		}
+		else if (connectorType == ot::ConnectorType::Out)
+		{
+			flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Square);
 		}
 	}
-
 }

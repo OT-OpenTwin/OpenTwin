@@ -75,18 +75,17 @@ void EntityBlockPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view& do
 
 ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 {
-	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
+	ot::GraphicsFlowItemBuilder block;
 
 	const ot::Color colourTitle(ot::Color::Yellow);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundGradientColor(colourTitle);
-	//block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	block->setBackgroundImagePath("Images/Graph.svg");
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setBackgroundImagePath("Images/Graph.svg");
 
-	AddConnectors(block.get());
+	AddConnectors(block);
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
-	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	auto graphicsItemConfig = block.createGraphicsItem(blockName, blockTitel);
 	return graphicsItemConfig;
 }

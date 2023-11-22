@@ -20,7 +20,7 @@
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
@@ -59,8 +59,8 @@ namespace ottest
 
 	static unsigned long long currentDiodeID = 1;
 
-	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
-		ot::GraphicsFlowConnectorCfg cfg;
+	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
+		ot::GraphicsFlowItemConnector cfg;
 
 		cfg.setTextColor(ot::Color(0, 0, 0));
 
@@ -130,29 +130,29 @@ namespace ottest
 
 	ot::GraphicsItemCfg* createVoltageSource(const std::string _name)
 	{
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
 		flow.setTitleBackgroundColor(0, 0, 255);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		
 		
 		flow.setBackgroundColor(ot::Color(255, 255, 0));
 
-		flow.addLeft("Input2", "Input2", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("Output2", "Output2", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
+		flow.addLeft("Input2", "Input2", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("Output2", "Output2", ot::GraphicsFlowItemConnector::Circle, ot::Color::Blue);
 
 		return flow.createGraphicsItem(_name, _name);
 	}
 
 	ot::GraphicsItemCfg* createDiode(const std::string _name)
 	{
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
 		flow.setTitleBackgroundColor(255, 0, 0);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 
 		flow.setBackgroundColor(ot::Color(0, 0, 255));
 		
-		flow.addLeft("Input3", "Input3", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Cyan);
-		flow.addRight("Output3", "Output3", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Cyan);
+		flow.addLeft("Input3", "Input3", ot::GraphicsFlowItemConnector::Square, ot::Color::Cyan);
+		flow.addRight("Output3", "Output3", ot::GraphicsFlowItemConnector::Circle, ot::Color::Cyan);
 
 		return flow.createGraphicsItem(_name, _name);
 	}

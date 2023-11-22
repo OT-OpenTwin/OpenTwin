@@ -32,7 +32,7 @@
     <ClInclude Include="include\OTGui\GraphicsHBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsPackage.h" />
-    <ClInclude Include="include\OTGui\GraphicsFlowItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsFlowItemBuilder.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
@@ -63,7 +63,7 @@
     <ClCompile Include="src\GraphicsHBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPackage.cpp" />
-    <ClCompile Include="src\GraphicsFlowItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsFlowItemBuilder.cpp" />
     <ClCompile Include="src\GraphicsItemCfg.cpp" />
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />

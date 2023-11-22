@@ -260,20 +260,19 @@ void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<o
 
 ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 {
-	std::unique_ptr<ot::GraphicsFlowItemCfg> block( new ot::GraphicsFlowItemCfg());
+	ot::GraphicsFlowItemBuilder block;
 
 	const ot::Color colourTitle(ot::Color::Lime);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundGradientColor(colourTitle);
-	//block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	block->setLeftTitleCornerImagePath("Images/Database.png");
-	block->setBackgroundImagePath("Images/Database.svg");
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setLeftTitleCornerImagePath("Images/Database.png");
+	block.setBackgroundImagePath("Images/Database.svg");
 
-	AddConnectors(block.get());
+	AddConnectors(block);
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
-	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	auto graphicsItemConfig = block.createGraphicsItem(blockName, blockTitel);
 	return graphicsItemConfig;
 }
 

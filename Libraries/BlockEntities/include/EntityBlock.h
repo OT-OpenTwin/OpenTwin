@@ -9,8 +9,7 @@
 
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 class __declspec(dllexport) EntityBlock : public EntityBase
@@ -62,5 +61,5 @@ protected:
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();
 	void CreateConnections();
-	void AddConnectors(ot::GraphicsFlowItemCfg* flowBlockConfig);
+	void AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 };
