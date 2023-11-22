@@ -23,21 +23,6 @@
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/RadialGradientPainter2D.h"
 
-namespace ot {
-	namespace intern {
-
-		// Column description
-		enum FlowLayoutColumns {
-			flcLeftConnector,
-			flcLeftTitle,
-			flcSpacer,
-			flcRightTitle,
-			flcRightConnector,
-			flcCount // Number of columns (keep this at the end of the enum)
-		};
-	}
-}
-
 ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector() : m_figure(ot::GraphicsFlowItemConnector::Square) {}
 
 ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector(const GraphicsFlowItemConnector& _other) {
@@ -80,8 +65,8 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 		itm->setConnectionDirection(ot::ConnectLeft);
 		itmTxt->setAlignment(ot::AlignLeft);
 
-		_gridLayout->addChildItem(_row, ot::intern::flcLeftConnector, itm);
-		_gridLayout->addChildItem(_row, ot::intern::flcLeftTitle, itmTxt);
+		_gridLayout->addChildItem(_row, 0, itm);
+		_gridLayout->addChildItem(_row, 1, itmTxt);
 		
 	}
 	else {
@@ -89,8 +74,8 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 		itm->setConnectionDirection(ot::ConnectRight);
 		itmTxt->setAlignment(ot::AlignRight);
 
-		_gridLayout->addChildItem(_row, ot::intern::flcRightConnector, itm);
-		_gridLayout->addChildItem(_row, ot::intern::flcRightTitle, itmTxt);
+		_gridLayout->addChildItem(_row, 1, itm);
+		_gridLayout->addChildItem(_row, 0, itmTxt);
 	}
 	
 }
@@ -303,39 +288,44 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 		tLay->addChildItem(titRImg);
 	}
 
-	// Central grid
-	size_t lastRow = std::max(m_left.size(), m_right.size());
-	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)lastRow + 1, 5);
+	// Central layout
+	ot::GraphicsHBoxLayoutItemCfg* cLay = new ot::GraphicsHBoxLayoutItemCfg;
 	cLay->setName(_name + "_cLay");
+	mLay->addChildItem(cLay, 1);
+
+	// Left connector layout
+	ot::GraphicsGridLayoutItemCfg* lcLay = new ot::GraphicsGridLayoutItemCfg((int)m_left.size() + 1, 2);
+	lcLay->setName(_name + "_lcLay");
+	lcLay->setRowStretch((int)m_left.size(), 1);
+	lcLay->setColumnStretch(1, 1);
 
 	int ix = 0;
 	for (auto c : m_left) {
-		c.addToGrid(ix, cLay, true);
+		c.addToGrid(ix, lcLay, true);
 		ix++;
 	}
+
+	// Right connector layout
+	ot::GraphicsGridLayoutItemCfg* rcLay = new ot::GraphicsGridLayoutItemCfg((int)m_right.size() + 1, 2);
+	rcLay->setName(_name + "_rcLay");
+	rcLay->setRowStretch((int)m_right.size(), 1);
+	rcLay->setColumnStretch(0, 1);
+
 	ix = 0;
 	for (auto c : m_right) {
-		c.addToGrid(ix, cLay, false);
+		c.addToGrid(ix, rcLay, false);
 		ix++;
 	}
 
-	// Add stretch item at the bottom of the grid
-	ot::GraphicsTextItemCfg* stretcher = new ot::GraphicsTextItemCfg(" ");
-	stretcher->setName(_name + "_cStr");
-	stretcher->setTextFont(ot::Font(ot::Consolas, 25));
+	// Setup central layout (left connector layout)
+	cLay->addChildItem(lcLay);
 
-	cLay->addChildItem((int)lastRow, 2, stretcher);
-	cLay->setColumnStretch(2, 1);
-	cLay->setRowStretch((int)lastRow, 1);
-
-	// Central stack
 	if (m_backgroundImagePath.empty()) {
-		mLay->addChildItem(cLay, 1);
+		// Setup central layout (stretch)
+		cLay->addStrech(1);
 	}
 	else {
-		ot::GraphicsStackItemCfg* cStack = new ot::GraphicsStackItemCfg;
-		cStack->setName(_name + "_cStack");
-
+		// Setup central layout (central image)
 		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(_name + "_cImg");
@@ -344,11 +334,24 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 		cImg->setAlignment(m_backgroundImageAlignment);
 		cImg->setMaintainAspectRatio(true);
 
-		cStack->addItemTop(cImg, false, true);
-		cStack->addItemTop(cLay, true, false);
+		if (!m_left.empty() && m_right.empty()) {
+			// Only left connectors
+			cImg->setAlignment(ot::AlignLeft);
+		}
+		else if (m_left.empty() && !m_right.empty()) {
+			// Only right connectors
+			cImg->setAlignment(ot::AlignRight);
+		}
+		else {
+			// No or connectors on both sides
+			cImg->setAlignment(ot::AlignCenter);
+		}
 
-		mLay->addChildItem(cStack, 1);
+		cLay->addChildItem(cImg, 1);
 	}
+
+	// Setup central layout (right connector layout)
+	cLay->addChildItem(rcLay);
 
 	return root;
 }
