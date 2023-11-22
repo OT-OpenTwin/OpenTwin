@@ -75,7 +75,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 
 	// Set margins
 	if (_isLast) {
-		itmTxt->setMargins(ot::MarginsD(2., 2., 20., 2.));
+		itmTxt->setMargins(ot::MarginsD(2., 2., 40., 2.));
 	}
 	else {
 		itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
@@ -310,23 +310,29 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem(const std::
 	}
 
 	// Central grid
-	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)std::max<size_t>(m_left.size(), m_right.size()), 5);
-	cLay->setName(_name + "_cLay");
-
 	size_t lastRow = std::max(m_left.size(), m_right.size());
+	ot::GraphicsGridLayoutItemCfg* cLay = new ot::GraphicsGridLayoutItemCfg((int)lastRow + 1, 5);
+	cLay->setName(_name + "_cLay");
 
 	int ix = 0;
 	for (auto c : m_left) {
-		c.addToGrid(ix, cLay, true, ix == (lastRow - 1));
+		c.addToGrid(ix, cLay, true, false);
 		ix++;
 	}
 	ix = 0;
 	for (auto c : m_right) {
-		c.addToGrid(ix, cLay, false, ix == (lastRow - 1));
+		c.addToGrid(ix, cLay, false, false);
 		ix++;
 	}
 
+	// Add stretch item at the bottom of the grid
+	ot::GraphicsTextItemCfg* stretcher = new ot::GraphicsTextItemCfg(" ");
+	stretcher->setName(_name + "_cStr");
+	stretcher->setTextFont(ot::Font(ot::Consolas, 25));
+
+	cLay->addChildItem((int)lastRow, 2, stretcher);
 	cLay->setColumnStretch(2, 1);
+	cLay->setRowStretch((int)lastRow, 1);
 
 	// Central stack
 	if (m_backgroundImagePath.empty()) {
