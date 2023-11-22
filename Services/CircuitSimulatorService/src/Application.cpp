@@ -131,6 +131,8 @@ namespace ottest
 	ot::GraphicsItemCfg* createVoltageSource(const std::string _name)
 	{
 		ot::GraphicsFlowItemBuilder flow;
+		flow.setName(_name);
+		flow.setTitle(_name);
 		flow.setTitleBackgroundColor(0, 0, 255);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		
@@ -140,12 +142,14 @@ namespace ottest
 		flow.addLeft("Input2", "Input2", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
 		flow.addRight("Output2", "Output2", ot::GraphicsFlowItemConnector::Circle, ot::Color::Blue);
 
-		return flow.createGraphicsItem(_name, _name);
+		return flow.createGraphicsItem();
 	}
 
 	ot::GraphicsItemCfg* createDiode(const std::string _name)
 	{
 		ot::GraphicsFlowItemBuilder flow;
+		flow.setName(_name);
+		flow.setTitle(_name);
 		flow.setTitleBackgroundColor(255, 0, 0);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 
@@ -154,7 +158,7 @@ namespace ottest
 		flow.addLeft("Input3", "Input3", ot::GraphicsFlowItemConnector::Square, ot::Color::Cyan);
 		flow.addRight("Output3", "Output3", ot::GraphicsFlowItemConnector::Circle, ot::Color::Cyan);
 
-		return flow.createGraphicsItem(_name, _name);
+		return flow.createGraphicsItem();
 	}
 }
 
