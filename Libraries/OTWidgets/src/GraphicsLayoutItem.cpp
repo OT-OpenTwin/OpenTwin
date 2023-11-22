@@ -17,7 +17,8 @@ ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 }
 
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	//if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setAcceptHoverEvents(true);
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 

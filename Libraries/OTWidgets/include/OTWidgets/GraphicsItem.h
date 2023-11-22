@@ -20,6 +20,7 @@
 
 // std header
 #include <list>
+#include <string>
 
 #define OT_GRAPHICSITEM_MIMETYPE_ItemName "GraphicsItem.Name"
 
@@ -154,6 +155,8 @@ namespace ot {
 		//! @brief Calculates the draw rect for the item
 		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
+
+		virtual bool graphicsItemRequiresHover(void) const { return !m_toolTip.empty(); };
 
 	private:
 		bool m_isLayoutOrStack;

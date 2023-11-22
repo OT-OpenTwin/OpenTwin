@@ -11,6 +11,7 @@ ot::CustomGraphicsItem::CustomGraphicsItem(bool _isLayoutOrStack)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
+	this->setAcceptHoverEvents(true);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
@@ -73,16 +74,16 @@ void ot::CustomGraphicsItem::paint(QPainter* _painter, const QStyleOptionGraphic
 
 QVariant ot::CustomGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	this->handleItemChange(_change, _value);
-	return _value;
+	return QGraphicsItem::itemChange(_change, _value);
 }
 
 void ot::CustomGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
+	this->handleMousePressEvent(_event);
 	QGraphicsItem::mousePressEvent(_event);
 }
 
 void ot::CustomGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
+	this->handleMouseReleaseEvent(_event);
 	QGraphicsItem::mouseReleaseEvent(_event);
 }
 

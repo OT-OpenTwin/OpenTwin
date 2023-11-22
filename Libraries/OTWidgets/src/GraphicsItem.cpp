@@ -12,6 +12,7 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/ToolTipHandler.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/GraphicsItemDrag.h"
@@ -209,8 +210,7 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 
 	if (!m_toolTip.empty())
 	{
-		QString Tt = QString::fromStdString(m_toolTip);
-		QToolTip::showText(_event->screenPos(), Tt, this->getRootItem()->graphicsScene()->getGraphicsView());
+		ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(m_toolTip), 1500);
 	}
 	else if ((m_flags & GraphicsItemCfg::ItemForwardsTooltip) && m_parent) {
 		m_parent->handleToolTip(_event);
@@ -218,7 +218,7 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
-	QToolTip::hideText();
+	ToolTipHandler::hideToolTip();
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
