@@ -41,11 +41,11 @@ ot::GraphicsConnectionCfg::ConnectionStyle ot::GraphicsConnectionCfg::stringToSt
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
-	: m_style(DirectLine), m_width(1)
+	: m_style(DirectLine), m_width(2)
 {}
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const std::string& _originUid, const std::string& _originConnectableName, const std::string& _destinationUid, const std::string& _destinationName)
-	: m_style(DirectLine), m_width(1),
+	: m_style(DirectLine), m_width(2),
 	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName)
 {}
 
