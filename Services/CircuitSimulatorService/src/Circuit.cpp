@@ -33,32 +33,7 @@ std::string Circuit::getEditorName()
 	return this->editorName;
 }
 
- void Circuit::addConnection(const std::string& key,const Connection& obj)
-{
-	if (mapOfElements.find(key) != mapOfElements.end())
-	{
-		mapOfElements[key].addConnection(obj);
-		 
-	}
-	else
-	{
-		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
-		
-	}
 
-}
-
- //void Circuit::sort(const std::string& key)
- //{
-	// if (mapOfElements.find(key) != mapOfElements.end())
-	// {
-	//	 mapOfElements[key].sortListOfConnections(mapOfElements[key].getList());
-	// }
-	// else
-	// {
-	//	 Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
-	// }
- //}
 
 std::string Circuit::getId()
 {
@@ -85,3 +60,17 @@ void Circuit::setId(std::string id)
 	this->id = id;
 }
 
+void Circuit::addConnection(const std::string& key, const Connection& obj)
+{
+	if (mapOfElements.find(key) != mapOfElements.end())
+	{
+		mapOfElements[key].addConnection(obj);
+
+	}
+	else
+	{
+		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
+
+	}
+
+}

@@ -40,8 +40,7 @@ public:
 
 	//Additional Functions
 	void addConnection(const Connection& obj);
-	bool compareOfNodeNumbers( Connection& objA,  Connection& objB);
-	void sortListOfConnections(std::list<Connection>& listOfConnections);
+	
 	
 	
 

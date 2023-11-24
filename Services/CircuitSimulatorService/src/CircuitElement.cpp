@@ -51,19 +51,4 @@ void CircuitElement::setNetlistElementName(std::string name) { this->netlistElem
 
 void CircuitElement::addConnection(const Connection &obj) { listOfConnections.push_back(obj);}
 
-//bool CircuitElement::compareOfNodeNumbers( Connection& objA,  Connection& objB) 
-//{
-//	if (std::stoi(objA.getNodeNumber()) < std::stoi(objB.getNodeNumber()))
-//	{
-//		return true;
-//	}
-//	else
-//	{
-//		return false;
-//	}
-//}
 
-//void CircuitElement::sortListOfConnections(std::list<Connection>& listOfConnections)
-//{
-//	std::sort(listOfConnections.begin(), listOfConnections.end(), compareOfNodeNumbers );
-//}

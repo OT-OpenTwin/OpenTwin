@@ -16,14 +16,15 @@ public:
 
 	
 	std::string getEditorName();
-	void addConnection(const std::string& key,const Connection& obj);
-	/*void sort(const std::string& key)*/;
 	std::string getId();
 	std::map<std::string, CircuitElement> getMapOfElements();
 	void addElement(std::string key, const CircuitElement& obj);
 	void setEditorName(std::string name);
 	void setId(const std::string id);
 	
+	//additionalFunctions
+	void addConnection(const std::string& key, const Connection& obj);
+	std::vector<Connection> getParallelConnections(std::map <std::string, CircuitElement>);
 		
 private:
 
