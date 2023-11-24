@@ -889,13 +889,17 @@ void LogVisualizationItemViewDialog::slotDisplayMessageText(int _state) {
 }
 
 QString LogVisualizationItemViewDialog::findJsonSyntax(const QString& _inputString) {
-	QRegularExpression regex("(.*?)(\\s*([\\{\\[])(?:[^{}\\[\\]]|(?3))*\\3\\s*)(.*$)");
+	//QRegularExpression regex("(.*?)(\\s*([\\{\\[])(?:[^{}\\[\\]]|(?3))*\\3\\s*)(.*$)");
+	QRegularExpression regex("(.*?)(\\s*\\{.*\\}\\s*)(.*$)");
 	QRegularExpressionMatch match = regex.match(_inputString);
 
 	if (match.hasMatch()) {
-		return (match.captured(1) + "\n\n" + 
-			QJsonDocument::fromJson(QByteArray::fromStdString(match.captured(2).toStdString())).toJson(QJsonDocument::Indented) +
-			"\n\n" + match.captured(4));
+		QString pre = match.captured(1);
+		QString doc = match.captured(2);
+		QString suf = match.captured(3);
+		return (pre + "\n\n" + 
+			QJsonDocument::fromJson(QByteArray::fromStdString(doc.toStdString())).toJson(QJsonDocument::Indented) +
+			"\n\n" + suf);
 	}
 	else {
 		return _inputString; // Return an empty string if no match is found

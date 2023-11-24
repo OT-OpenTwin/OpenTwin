@@ -184,7 +184,7 @@ void AppBase::slotProcessMessage(const QString& _json) {
 				msg.setFromJsonObject(logObj);
 				msg.setCurrentTimeAsGlobalSystemTime();
 
-				m_logger->appendLogMessage(msg);
+				if (m_logger) m_logger->appendLogMessage(msg);
 			}
 		}
 		else {
@@ -334,7 +334,7 @@ void AppBase::slotRecenter(void) {
 	this->resize(800, 600);
 }
 
-AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
+AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m_logger(nullptr) {
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
 
