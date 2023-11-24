@@ -24,10 +24,10 @@ public:
 	virtual QString toolName(void) const override;
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
-	virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) override;
+	virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) override;
 
 	//! @brief Stop all the logic of this tool
-	virtual bool prepareToolShutdown(void) override;
+	virtual bool prepareToolShutdown(QSettings& _settings) override;
 
 private:
 	QSplitter* m_centralSplitter;

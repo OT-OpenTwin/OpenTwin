@@ -98,7 +98,7 @@ QString LogVisualization::toolName(void) const {
 	return QString("Log Visualization");
 }
 
-QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
@@ -207,9 +207,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	splitter->setStretchFactor(1, 1);
 
 	// Restore settings
-	QSettings s("OpenTwin", "OToolkit");
-
-	QString tableColumnWidths = s.value("LogVisualization.Table.ColumnWidth", "").toString();
+	QString tableColumnWidths = _settings.value("LogVisualization.Table.ColumnWidth", "").toString();
 	QStringList tableColumnWidthsList = tableColumnWidths.split(";", QString::SkipEmptyParts);
 	if (tableColumnWidthsList.count() == m_table->columnCount()) {
 		int column = 0;
@@ -218,16 +216,16 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 		}
 	}
 
-	m_autoScrollToBottom->setChecked(s.value("LogVisualization.AutoScrollToBottom", true).toBool());
+	m_autoScrollToBottom->setChecked(_settings.value("LogVisualization.AutoScrollToBottom", true).toBool());
 
-	m_msgTypeFilterDetailed->setChecked(s.value("LogVisualization.FilterActive.Detailed", true).toBool());
-	m_msgTypeFilterInfo->setChecked(s.value("LogVisualization.FilterActive.Info", true).toBool());
-	m_msgTypeFilterWarning->setChecked(s.value("LogVisualization.FilterActive.Warning", true).toBool());
-	m_msgTypeFilterError->setChecked(s.value("LogVisualization.FilterActive.Error", true).toBool());
-	m_msgTypeFilterMsgIn->setChecked(s.value("LogVisualization.FilterActive.Message.In", false).toBool());
-	m_msgTypeFilterMsgOut->setChecked(s.value("LogVisualization.FilterActive.Message.Out", false).toBool());
+	m_msgTypeFilterDetailed->setChecked(_settings.value("LogVisualization.FilterActive.Detailed", true).toBool());
+	m_msgTypeFilterInfo->setChecked(_settings.value("LogVisualization.FilterActive.Info", true).toBool());
+	m_msgTypeFilterWarning->setChecked(_settings.value("LogVisualization.FilterActive.Warning", true).toBool());
+	m_msgTypeFilterError->setChecked(_settings.value("LogVisualization.FilterActive.Error", true).toBool());
+	m_msgTypeFilterMsgIn->setChecked(_settings.value("LogVisualization.FilterActive.Message.In", false).toBool());
+	m_msgTypeFilterMsgOut->setChecked(_settings.value("LogVisualization.FilterActive.Message.Out", false).toBool());
 
-	QByteArray serviceFilter = s.value("LogVisualization.ServiceFilter.List", QByteArray()).toByteArray();
+	QByteArray serviceFilter = _settings.value("LogVisualization.ServiceFilter.List", QByteArray()).toByteArray();
 	if (!serviceFilter.isEmpty()) {
 		QJsonDocument serviceFilterDoc = QJsonDocument::fromJson(serviceFilter);
 		if (serviceFilterDoc.isArray()) {
@@ -285,7 +283,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	// Create menu bar
 	m_connectButton = _rootMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
 	m_autoConnect = _rootMenu->addAction("Auto-Connect");
-	bool needAutoConnect = s.value("LogVisualization.AutoConnect", false).toBool();
+	bool needAutoConnect = _settings.value("LogVisualization.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
 
 	_rootMenu->addSeparator();
@@ -317,7 +315,33 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 //	return ret;
 //}
 
-bool LogVisualization::prepareToolShutdown(void) {
+bool LogVisualization::prepareToolShutdown(QSettings& _settings) {
+	_settings.setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
+
+	_settings.setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
+
+	QJsonArray serviceFilterArr;
+	for (int i = 0; i < m_serviceFilter->count(); i++) {
+		QJsonObject serviceObj;
+		serviceObj["Name"] = m_serviceFilter->item(i)->text();
+		serviceObj["Active"] = (m_serviceFilter->item(i)->checkState() == Qt::Checked);
+		serviceFilterArr.push_back(serviceObj);
+	}
+	QJsonDocument serviceFilterDoc(serviceFilterArr);
+	_settings.setValue("LogVisualization.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
+
+	QString tableColumnWidths;
+	for (int i = 0; i < m_table->columnCount(); i++) {
+		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
+	}
+	_settings.setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
+
+
 	if (this->disconnectFromLogger()) {
 		return true;
 	}
@@ -851,52 +875,29 @@ void LogVisualizationItemViewDialog::slotRecenter(void) {
 }
 
 void LogVisualizationItemViewDialog::slotDisplayMessageText(int _state) {
+	QString str = QString::fromStdString(m_msg.text());
 	if (m_findMessageSyntax->isChecked()) {
-		std::string res;
-		std::string str = m_msg.text();
-
 		// JSON check
 		str = this->findJsonSyntax(str);
 
-		// Check if the buffer string contains information
-		if (!str.empty()) {
-			res.append(str);
-		}
-
 		// Display result string
-		m_message->setPlainText(QString::fromStdString(res));
+		m_message->setPlainText(str);
 	}
 	else {
-		m_message->setPlainText(QString::fromStdString(m_msg.text()));
+		m_message->setPlainText(str);
 	}
 }
 
-std::string LogVisualizationItemViewDialog::findJsonSyntax(std::string _str) {
-	std::string ret;
+QString LogVisualizationItemViewDialog::findJsonSyntax(const QString& _inputString) {
+	QRegularExpression regex("(.*?)(\\s*([\\{\\[])(?:[^{}\\[\\]]|(?3))*\\3\\s*)(.*$)");
+	QRegularExpressionMatch match = regex.match(_inputString);
 
-	size_t ixBegin = _str.find('{');
-	while (ixBegin != std::string::npos) {
-		size_t ixEnd = _str.find('}', ixBegin);
-		if (ixEnd != std::string::npos) {
-			ret.append(_str.substr(0, ixBegin));
-			std::string json = _str.substr(ixBegin, (ixEnd - ixBegin) + 1);
-			QJsonParseError err;
-			QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(json), &err);
-			if (err.error == QJsonParseError::NoError) {
-				json = '\n' + doc.toJson(QJsonDocument::Indented).toStdString() + '\n';
-			}
-			ret.append(json);
-			_str = _str.substr(ixEnd + 1);
-			ixBegin = _str.find('{');
-		}
-		else {
-			ixBegin = std::string::npos;
-		}
+	if (match.hasMatch()) {
+		return (match.captured(1) + "\n\n" + 
+			QJsonDocument::fromJson(QByteArray::fromStdString(match.captured(2).toStdString())).toJson(QJsonDocument::Indented) +
+			"\n\n" + match.captured(4));
 	}
-
-	// Check if the buffer string contains information
-	if (!_str.empty()) {
-		ret.append(_str);
+	else {
+		return _inputString; // Return an empty string if no match is found
 	}
-	return ret;
 }

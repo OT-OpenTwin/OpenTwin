@@ -55,6 +55,10 @@ public:
 
 	void clear(void);
 
+	void stopAll(void);
+
+	void stopTool(const QString& _toolName);
+
 	TabManager* tabManager(void) { return m_tabManager; };
 	DockManager* dockManager(void) { return m_dockManager; };
 	MenuManager* menuManager(void) { return m_menuManager; };

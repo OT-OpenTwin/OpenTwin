@@ -25,13 +25,13 @@ QString FAR::toolName(void) const {
 	return "FAR";
 }
 
-QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
 	m_centralSplitter = new QSplitter;
 
 
 	return m_centralSplitter;
 }
 
-bool FAR::prepareToolShutdown(void) {
+bool FAR::prepareToolShutdown(QSettings& _settings) {
 	return true;
 }

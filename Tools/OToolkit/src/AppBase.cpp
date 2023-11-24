@@ -148,6 +148,7 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	settings->setValue("WindowState", saveState());
 
 	// Clear tools
+	m_toolManager->stopAll();
 	m_toolManager->clear();
 
 	// Qt

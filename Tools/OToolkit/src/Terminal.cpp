@@ -377,9 +377,6 @@ Terminal::Terminal() : m_exportLock(false) {
 }
 
 Terminal::~Terminal() {
-	QSettings s("OpenTwin", "OToolkit");
-	s.setValue("Terminal.Receiver", m_receiverUrl->text());
-	s.setValue("Terminal.Message", m_messageEdit->toPlainText());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -390,7 +387,7 @@ QString Terminal::toolName(void) const {
 	return "OTerminal";
 }
 
-QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
@@ -508,9 +505,8 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
 
 	// Restore settings
-	QSettings s("OpenTwin", "OToolkit");
-	m_receiverUrl->setText(s.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
-	m_messageEdit->setPlainText(s.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
+	m_receiverUrl->setText(_settings.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
+	m_messageEdit->setPlainText(_settings.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
 
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
@@ -537,7 +533,9 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	return m_splitter;
 }
 
-bool Terminal::prepareToolShutdown(void) {
+bool Terminal::prepareToolShutdown(QSettings& _settings) {
+	_settings.setValue("Terminal.Receiver", m_receiverUrl->text());
+	_settings.setValue("Terminal.Message", m_messageEdit->toPlainText());
 	return true;
 }
 

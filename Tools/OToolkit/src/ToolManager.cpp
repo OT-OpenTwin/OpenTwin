@@ -103,6 +103,26 @@ void ToolManager::clear(void) {
 	m_tools.clear();
 }
 
+void ToolManager::stopAll(void) {
+	std::map<QString, ToolRuntimeHandler*> bak = m_tools;
+	for (auto it : bak) {
+		this->removeTool(it.first);
+	}
+}
+
+void ToolManager::stopTool(const QString& _toolName) {
+	auto it = m_tools.find(_toolName);
+	if (it == m_tools.end()) {
+		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + _toolName + "\" }");
+		return;
+	}
+	QSettings settings("OpenTwin", "OToolkit");
+
+	it->second->setStopped();
+	it->second->tool()->prepareToolShutdown(settings);
+	this->fwdRemoveTool(_toolName);
+}
+
 void ToolManager::runToolTriggered(void) {
 	ToolMenuManager* tmm = dynamic_cast<ToolMenuManager*>(sender());
 	if (tmm == nullptr) {
@@ -128,7 +148,8 @@ void ToolManager::runToolTriggered(void) {
 	}
 	else {
 		std::list<QWidget*> status;
-		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status));
+		QSettings settings("OpenTwin", "OToolkit");
+		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status, settings));
 		m_statusManager->addTool(it->first, status);
 	}
 }
