@@ -117,6 +117,7 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 		}
 		for (rapidjson::SizeType c = 0; c < columnArr.Size(); c++) {
 			if (columnArr[c].IsNull()) {
+				m_items[r][c] = nullptr;
 				continue;
 			}
 			else if (columnArr[c].IsObject()) {
@@ -152,6 +153,7 @@ void ot::GraphicsGridLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item) {
 		for (size_t c = 0; c < m_items[r].size(); c++) {
 			if (m_items[r][c] == nullptr) {
 				m_items[r][c] = _item;
+				return;
 			}
 		}
 	}
@@ -194,19 +196,9 @@ void ot::GraphicsGridLayoutItemCfg::clearAndResize(void) {
 	m_items.clear();
 	m_items.resize(m_rows);
 	for (size_t r = 0; r < m_items.size(); r++) {
-		m_items[r].resize(m_columns);
-		for (size_t c = 0; c < m_columns; c++) {
-			m_items[r][c] = nullptr;
-		}
+		m_items[r].resize(m_columns, nullptr);
 	}
-
-	m_rowStretch.resize(m_rows);
-	m_columnStretch.resize(m_columns);
-	for (int r = 0; r < m_rows; r++) {
-		m_rowStretch[r] = 0;
-	}
-	for (int c = 0; c < m_columns; c++) {
-		m_columnStretch[c] = 0;
-	}
+	m_rowStretch.resize(m_rows, 0);
+	m_columnStretch.resize(m_columns, 0);
 }
 

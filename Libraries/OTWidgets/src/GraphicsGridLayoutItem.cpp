@@ -50,10 +50,10 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	// Setup stretches
 	for (size_t r = 0; r < cfg->rowStretch().size(); r++) {
-		this->setRowStretchFactor(r, cfg->rowStretch()[r]);
+		if (cfg->rowStretch()[r] > 0) this->setRowStretchFactor(r, cfg->rowStretch()[r]);
 	}
 	for (size_t c = 0; c < cfg->columnStretch().size(); c++) {
-		this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
+		if (cfg->columnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
 	}
 
 	this->setMinimumSize(ot::OTQtConverter::toQt(_cfg->minimumSize()));

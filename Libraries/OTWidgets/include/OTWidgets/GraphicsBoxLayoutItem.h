@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 
 // Qt header
@@ -14,6 +15,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsBoxLayoutItem : public QGraphicsLinearLayout, public ot::GraphicsLayoutItem {
+		OT_DECL_NOCOPY(GraphicsBoxLayoutItem)
 	public:
 		GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsBoxLayoutItem() {};
@@ -26,8 +28,6 @@ namespace ot {
 
 	private:
 		GraphicsBoxLayoutItem() = delete;
-		GraphicsBoxLayoutItem(const GraphicsBoxLayoutItem&) = delete;
-		GraphicsBoxLayoutItem& operator = (const GraphicsBoxLayoutItem&) = delete;
 	};
 
 }
