@@ -16,10 +16,19 @@ public:
 
 	Connection(const GraphicsConnectionCfg& obj);
 
-	//Setter
-	void setNodeNumber(std::string);
-	//Getter
-	std::string getNodeNumber();
+	
+
+
+	void setNodeNumber(std::string num)
+	{
+		this->nodeNumber = num;
+	}
+
+	std::string getNodeNumber()
+	{
+		return this->nodeNumber;
+	}
+
 private:
 	
 	std::string nodeNumber;

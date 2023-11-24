@@ -27,7 +27,7 @@
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
-
+#include "OTGui/GraphicsEllipseItemCfg.h"
 
 
 
@@ -285,6 +285,15 @@ namespace ottest
 
 		return myStack;
 
+	}
+
+	ot::GraphicsItemCfg* createConnector()
+	{
+		ot::GraphicsEllipseItemCfg* connector = new ot::GraphicsEllipseItemCfg();
+		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
+		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+
+		connector->setName("Connector");
 	}
 }
 

@@ -18,12 +18,3 @@ Connection::Connection(const GraphicsConnectionCfg& obj) :GraphicsConnectionCfg(
 
 }
 
-void Connection::setNodeNumber(std::string num)
-{
-	this->nodeNumber = num;
-}
-
-std::string Connection::getNodeNumber()
-{
-	return this->nodeNumber;
-}
