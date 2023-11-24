@@ -47,6 +47,7 @@
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
+    <ClInclude Include="include\OTGui\StyleValue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
@@ -77,6 +78,7 @@
     <ClCompile Include="src\Margins.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
+    <ClCompile Include="src\StyleValue.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
