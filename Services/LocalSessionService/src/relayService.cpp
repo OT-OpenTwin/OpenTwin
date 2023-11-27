@@ -8,7 +8,6 @@
 
 #include "RelayService.h"			// Corrsponding header
 
-#include "OTCore/rJSON.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -31,13 +30,13 @@ RelayService::RelayService(
 RelayService::~RelayService() { delete m_connectedService; }
 
 std::string RelayService::toJSON(void) const {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, m_name);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, m_type);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, m_url);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_WebsocketURL, m_websocketIP);
-	ot::rJSON::add(doc, "ConnectedService", m_connectedService->toJSON());
-	return ot::rJSON::toJSON(doc);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(m_name, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(m_type, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(m_websocketIP, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ConnectedService", ot::JsonString(m_connectedService->toJSON(), doc.GetAllocator()), doc.GetAllocator());
+	return doc.toJson();
 }
 
 std::list<unsigned long long> RelayService::portNumbers(void) const {

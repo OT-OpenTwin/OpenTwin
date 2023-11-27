@@ -21,7 +21,7 @@
     <ClCompile Include="src\GlobalSessionService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SessionService.cpp">
+    <ClCompile Include="src\LocalSessionService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Session.cpp">
@@ -32,7 +32,7 @@
     <ClInclude Include="include\GlobalSessionService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SessionService.h">
+    <ClInclude Include="include\LocalSessionService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Session.h">

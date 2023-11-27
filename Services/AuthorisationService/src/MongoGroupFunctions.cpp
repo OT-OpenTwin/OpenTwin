@@ -3,6 +3,7 @@
 #include "MongoRoleFunctions.h"
 #include "MongoConstants.h"
 #include "MongoUserFunctions.h"
+#include "OTCore/JSON.h"
 
 #include <sstream>
 
@@ -433,12 +434,12 @@ namespace MongoGroupFunctions
 
 	std::string groupToJson(Group& gr)
 	{
-		OT_rJSON_createDOC(json);
-		ot::rJSON::add(json, "groupName", gr.name);
-		ot::rJSON::add(json, "ownerUsername", gr.ownerUsername);
-		ot::rJSON::add(json, "users", gr.userNames);
-
-		return ot::rJSON::toJSON(json);
+		ot::JsonDocument json;
+		json.AddMember("groupName", ot::JsonString(gr.name, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("ownerUsername", ot::JsonString(gr.ownerUsername, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("users", ot::JsonArray(gr.userNames, json.GetAllocator()), json.GetAllocator());
+		
+		return json.toJson();
 	}
 
 
@@ -451,8 +452,9 @@ namespace MongoGroupFunctions
 			jsonGroups.push_back(groupToJson(group));
 		}
 
-		OT_rJSON_createDOC(json);
-		ot::rJSON::add(json, "groups", jsonGroups);
-		return ot::rJSON::toJSON(json);
+		ot::JsonDocument json;
+		json.AddMember("groups", ot::JsonArray(jsonGroups, json.GetAllocator()), json.GetAllocator());
+		
+		return json.toJson();
 	}
 }

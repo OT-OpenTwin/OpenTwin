@@ -11,7 +11,7 @@
 // SessionService header
 #include <globalDatatypes.h>
 
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 
 // C++ header
@@ -105,7 +105,7 @@ public:
 	//! @brief Will return a JSON string representing this service
 	virtual std::string toJSON(void) const;
 
-	void writeDataToValue(OT_rJSON_doc & _doc, OT_rJSON_val & _value);
+	void writeDataToValue(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 protected:
 

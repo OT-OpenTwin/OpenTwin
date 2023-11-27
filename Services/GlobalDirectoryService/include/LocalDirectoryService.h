@@ -14,8 +14,8 @@
 #include "SessionInformation.h"
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/rJSON.h"
 
 // C++ header
 #include <string>
@@ -29,7 +29,7 @@ public:
 	const LoadInformation& loadInformation(void) const { return m_loadInformation; }
 	LoadInformation::load_t load(void) const;
 
-	bool updateSystemUsageValues(OT_rJSON_doc& _jsonDocument);
+	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);
 
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
 	bool supportsService(const std::string& _serviceName);

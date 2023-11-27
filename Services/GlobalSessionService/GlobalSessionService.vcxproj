@@ -176,12 +176,12 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\GlobalSessionService.cpp" />
     <ClCompile Include="src\Session.cpp" />
-    <ClCompile Include="src\SessionService.cpp" />
+    <ClCompile Include="src\LocalSessionService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\GlobalSessionService.h" />
     <ClInclude Include="include\Session.h" />
-    <ClInclude Include="include\SessionService.h" />
+    <ClInclude Include="include\LocalSessionService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

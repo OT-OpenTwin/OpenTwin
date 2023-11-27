@@ -48,7 +48,7 @@ LoadInformation::load_t LoadInformation::load(void) const {
 	return l;
 }
 
-bool LoadInformation::updateSystemUsageValues(OT_rJSON_doc& _jsonDocument) {
+bool LoadInformation::updateSystemUsageValues(ot::JsonDocument& _jsonDocument) {
 	if (!_jsonDocument.HasMember(OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory)) { OT_LOG_W("JSON member missing: " OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory); return false; }
 	if (!_jsonDocument.HasMember(OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory)) { OT_LOG_W("JSON member missing: " OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory); return false; }
 	if (!_jsonDocument.HasMember(OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory)) { OT_LOG_W("JSON member missing: " OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory); return false; }

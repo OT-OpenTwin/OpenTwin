@@ -3,7 +3,6 @@
 #include <string>
 #include <mutex>
 
-#include "OTCore/rJSON.h"
 #include "OTCommunication/CommunicationTypes.h"
 
 #include <bsoncxx/json.hpp>
@@ -45,53 +44,53 @@ public:
 
 private:
 	
-	std::string dispatchAction(const std::string& _action, OT_rJSON_doc& _actionDocument, ot::MessageType _messageType);
+	std::string dispatchAction(const std::string& _action, const ot::JsonDocument& _actionDocument, ot::MessageType _messageType);
 
 	// No authentication needed
 
-	std::string handleAdminLogIn(OT_rJSON_doc& _actionDocument);
-	std::string handleLogIn(OT_rJSON_doc& _actionDocument);
-	std::string handleRegister(OT_rJSON_doc& _actionDocument);
+	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
+	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
+	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
 
 	// authentication needed: user functions
 
-	std::string handleGetUserData(OT_rJSON_doc& _actionDocument);
-	std::string handleGetAllUsers(OT_rJSON_doc& _actionDocument);
-	std::string handleGetAllUsersCount(OT_rJSON_doc& _actionDocument);
-	std::string handleChangeUserNameByUser(OT_rJSON_doc& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword);
-	std::string handleChangeUserPasswordByUser(OT_rJSON_doc& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword);
-	std::string handleDeleteUser(OT_rJSON_doc& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
-	std::string handleChangeUserNameByAdmin(OT_rJSON_doc& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
-	std::string handleChangeUserPasswordByAdmin(OT_rJSON_doc& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
+	std::string handleGetUserData(const ot::ConstJsonObject& _actionDocument);
+	std::string handleGetAllUsers(const ot::ConstJsonObject& _actionDocument);
+	std::string handleGetAllUsersCount(const ot::ConstJsonObject& _actionDocument);
+	std::string handleChangeUserNameByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword);
+	std::string handleChangeUserPasswordByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword);
+	std::string handleDeleteUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
+	std::string handleChangeUserNameByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
+	std::string handleChangeUserPasswordByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 
 	// authentication needed: group functions
 
-	std::string handleCreateGroup(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetGroupData(OT_rJSON_doc& _actionDocument);
-	std::string handleGetAllUserGroups(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetAllGroups(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetAllGroupsCount(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleChangeGroupName(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleChangeGroupOwner(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleAddUserToGroup(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleRemoveUserFromGroup(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleRemoveGroup(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
+	std::string handleCreateGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetGroupData(const ot::ConstJsonObject& _actionDocument);
+	std::string handleGetAllUserGroups(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetAllGroups(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetAllGroupsCount(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleChangeGroupName(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleChangeGroupOwner(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleAddUserToGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleRemoveUserFromGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleRemoveGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
 	// authentication needed: project functions
 
-	std::string handleCreateProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetProjectData(OT_rJSON_doc& _actionDocument);
-	std::string handleGetAllProjectOwners(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetAllUserProjects(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetAllProjects(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetAllProjectsCount(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleGetAllGroupProjects(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleChangeProjectName(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleChangeProjectOwner(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleAddGroupToProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleRemoveGroupFromProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleRemoveProject(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
-	std::string handleCheckIfCollectionExists(OT_rJSON_doc& _actionDocument, User& _loggedInUser);
+	std::string handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetProjectData(const ot::ConstJsonObject& _actionDocument);
+	std::string handleGetAllProjectOwners(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetAllUserProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetAllProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetAllProjectsCount(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetAllGroupProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleChangeProjectName(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleChangeProjectOwner(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleAddGroupToProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleRemoveGroupFromProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleRemoveProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleCheckIfCollectionExists(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
 
 	std::string serviceURL;

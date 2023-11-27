@@ -42,12 +42,12 @@ bool SessionInformation::operator >= (const SessionInformation& _other) const {
 	return m_id >= _other.m_id;
 }
 
-void SessionInformation::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, "ID", m_id);
-	ot::rJSON::add(_document, _object, "LSS.URL", m_sessionServiceUrl);
+void SessionInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("ID", ot::JsonString(m_id, _allocator), _allocator);
+	_object.AddMember("LSS.URL", ot::JsonString(m_sessionServiceUrl, _allocator), _allocator);
 }
 
-void SessionInformation::setFromJsonObject(OT_rJSON_val& _object) {
-	m_id = ot::rJSON::getString(_object, "ID");
-	m_sessionServiceUrl = ot::rJSON::getString(_object, "LSS.URL");
+void SessionInformation::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	m_id = ot::json::getString(_object, "ID");
+	m_sessionServiceUrl = ot::json::getString(_object, "LSS.URL");
 }

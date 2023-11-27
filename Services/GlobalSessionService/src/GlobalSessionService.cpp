@@ -1,12 +1,19 @@
-// Global session service header
+//! @file GlobalSessionService.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date March 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// GSS header
 #include "GlobalSessionService.h"
-#include "SessionService.h"
+#include "LocalSessionService.h"
 #include "Session.h"
 
+// OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 
+// std header
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -32,7 +39,7 @@ void GlobalSessionService::deleteInstance(void) {
 
 // Service handling
 
-bool GlobalSessionService::addSessionService(SessionService& _service) {
+bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
 	// LOCK
 	m_mapMutex.lock();
 
@@ -41,7 +48,7 @@ bool GlobalSessionService::addSessionService(SessionService& _service) {
 		if (it.second->url() == _service.url()) {
 			OT_LOG_W("Session with the url (" + _service.url() + ") is already registered");
 			OTAssert(0, "Session url already registered");
-			_service.setID(it.second->id());
+			_service.setId(it.second->id());
 			// UNLOCK
 			m_mapMutex.unlock();
 			return true;
@@ -49,23 +56,23 @@ bool GlobalSessionService::addSessionService(SessionService& _service) {
 	}
 
 	// Create copy and assign uid
-	SessionService * newEntry = new SessionService(_service);
+	LocalSessionService* newEntry = new LocalSessionService(_service);
 	ot::serviceID_t newID = m_sessionServiceIdManager.grabNextID();
-	_service.setID(newID);
-	newEntry->setID(newID);
+	_service.setId(newID);
+	newEntry->setId(newID);
 
 	OT_LOG_D("New session service registered @ " + newEntry->url() + " with id=" + std::to_string(newEntry->id()));
 
 	// Register already opened sessions
 	for (auto session : newEntry->sessions()) {
-		m_sessionToServiceMap.insert_or_assign(session->ID(), newEntry);
-		OT_LOG_D("Session service contains already running session with id=" + session->ID());
+		m_sessionToServiceMap.insert_or_assign(session->id(), newEntry);
+		OT_LOG_D("Session service contains already running session with id=" + session->id());
 	}
 	m_sessionServiceIdMap.insert_or_assign(newID, newEntry);
 
 	// Check if the health check is aready running, otherwise start it
-	if (!m_HealthCheckRunning) {
-		m_HealthCheckRunning = true;
+	if (!m_healthCheckRunning) {
+		m_healthCheckRunning = true;
 		std::thread worker(&GlobalSessionService::healthCheck, this);
 		worker.detach();
 	}
@@ -80,20 +87,20 @@ bool GlobalSessionService::addSessionService(SessionService& _service) {
 
 // Handler
 
-std::string GlobalSessionService::handleGetDBUrl(OT_rJSON_doc& _doc) {
-	return DatabaseURL();
+std::string GlobalSessionService::handleGetDBUrl(ot::JsonDocument& _doc) {
+	return m_databaseUrl;
 }
 
-std::string GlobalSessionService::handleGetDBandAuthURL(OT_rJSON_doc& _doc) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_DBURL, DatabaseURL());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_AUTHURL, AuthorizationServiceURL());
-	return ot::rJSON::toJSON(doc);
+std::string GlobalSessionService::handleGetDBandAuthURL(ot::JsonDocument& _doc) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, m_healthCheckRunning, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
+	return doc.toJson();
 }
 
-std::string GlobalSessionService::handleCreateSession(OT_rJSON_doc& _doc) {
-	std::string sessionID = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
-	std::string userName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_USER_NAME);
+std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
+	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
+	std::string userName = ot::json::getString(_doc, OT_ACTION_PARAM_USER_NAME);
 
 	m_mapMutex.lock();
 
@@ -102,7 +109,7 @@ std::string GlobalSessionService::handleCreateSession(OT_rJSON_doc& _doc) {
 	if (it != m_sessionToServiceMap.end()) {
 
 		// Check if the username differs
-		if (it->second->getSessionById(sessionID)->UserName() != userName) {
+		if (it->second->getSessionById(sessionID)->userName() != userName) {
 			m_mapMutex.unlock();
 
 			OT_LOG_W("Session opened by other user");
@@ -116,7 +123,7 @@ std::string GlobalSessionService::handleCreateSession(OT_rJSON_doc& _doc) {
 		}
 	}
 	else {
-		SessionService * ss = leastLoadedSessionService();
+		LocalSessionService* ss = leastLoadedSessionService();
 		if (ss) {
 			m_mapMutex.unlock();
 
@@ -134,31 +141,33 @@ std::string GlobalSessionService::handleCreateSession(OT_rJSON_doc& _doc) {
 	}
 }
 
-std::string GlobalSessionService::handleRegisterSessionService(OT_rJSON_doc& _doc) {
-	SessionService nService;
+std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument& _doc) {
+	LocalSessionService nService;
 	// Gather information from document
-	if (!nService.setFromDocument(_doc)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to load session service data"; }
+	nService.setFromJsonObject(_doc.GetConstObject());
 
 	// Add to GSS
 	if (!addSessionService(nService)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to attach service information"; }
 
-	OT_rJSON_createDOC(reply);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_SERVICE_ID, nService.id());
-	ot::rJSON::add(reply, OT_ACTION_PARAM_DATABASE_URL, m_DatabaseURL);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_SERVICE_AUTHURL, m_AuthorizationServiceURL);
-	if (!m_GlobalDirectoryServiceURL.empty()) ot::rJSON::add(reply, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, m_GlobalDirectoryServiceURL);
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_ID, nService.id(), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
+	if (!m_globalDirectoryUrl.empty()) {
+		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
+	}
 
-	return ot::rJSON::toJSON(reply);
+	return reply.toJson();
 }
 
-std::string GlobalSessionService::handleShutdownSession(OT_rJSON_doc& _doc) {
-	std::string sessionID = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
+std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) {
+	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
 
 	m_mapMutex.lock();
 
 	auto it = m_sessionToServiceMap.find(sessionID);
 	if (it != m_sessionToServiceMap.end()) {
-		SessionService * ss = it->second;
+		LocalSessionService* ss = it->second;
 		ss->removeSession(ss->getSessionById(sessionID));
 		m_sessionToServiceMap.erase(sessionID);
 	}
@@ -170,8 +179,8 @@ std::string GlobalSessionService::handleShutdownSession(OT_rJSON_doc& _doc) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string GlobalSessionService::handleCheckProjectOpen(OT_rJSON_doc& _doc) {
-	std::string projectName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc) {
+	std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 
 	m_mapMutex.lock();
 
@@ -183,19 +192,19 @@ std::string GlobalSessionService::handleCheckProjectOpen(OT_rJSON_doc& _doc) {
 	}
 	else {
 		m_mapMutex.unlock();
-		return it->second->getSessionById(projectName)->UserName();
+		return it->second->getSessionById(projectName)->userName();
 	}
 }
 
-std::string GlobalSessionService::handleForceHealthcheck(OT_rJSON_doc& _doc) {
-	if (m_HealthCheckRunning) {
+std::string GlobalSessionService::handleForceHealthcheck(ot::JsonDocument& _doc) {
+	if (m_healthCheckRunning) {
 		m_forceHealthCheck = true;
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
 	else return OT_ACTION_RETURN_VALUE_FAILED;
 }
 
-std::string GlobalSessionService::handleNewGlobalDirectoryService(OT_rJSON_doc& _doc) {
+std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocument& _doc) {
 	// Check document
 	if (!_doc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
 		OT_LOG_E("Missing \"" OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL "\" member");
@@ -207,23 +216,23 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(OT_rJSON_doc& 
 	}
 
 	// Set new GDS url
-	if (!m_GlobalDirectoryServiceURL.empty()) {
-		OT_LOG_D("Removing old Global Directory Service (url = " + m_GlobalDirectoryServiceURL + ")");
+	if (!m_globalDirectoryUrl.empty()) {
+		OT_LOG_D("Removing old Global Directory Service (url = " + m_globalDirectoryUrl + ")");
 	}
-	m_GlobalDirectoryServiceURL = _doc[OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL].GetString();
+	m_globalDirectoryUrl = _doc[OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL].GetString();
 
-	OT_LOG_D("Set new Global Directory Service (url = " + m_GlobalDirectoryServiceURL + ")");
+	OT_LOG_D("Set new Global Directory Service (url = " + m_globalDirectoryUrl + ")");
 
 	// Create notification document for the local session services
-	OT_rJSON_createDOC(lssDoc);
-	ot::rJSON::add(lssDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService);
-	ot::rJSON::add(lssDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, m_GlobalDirectoryServiceURL);
+	ot::JsonDocument lssDoc;
+	lssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	lssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
 
 	// Notify connected Local Session Services
 	m_mapMutex.lock();
 	std::string response;
 	for (auto ss : m_sessionServiceIdMap) {
-		if (!ot::msg::send("", ss.second->url(), ot::EXECUTE, ot::rJSON::toJSON(lssDoc), response)) {
+		if (!ot::msg::send("", ss.second->url(), ot::EXECUTE, lssDoc.toJson(), response)) {
 			assert(0);
 			OT_LOG_E("Failed to send message to Local Session Service (url = " + ss.second->url() + ")");
 			m_mapMutex.unlock();
@@ -247,19 +256,19 @@ void GlobalSessionService::healthCheck() {
 	const static int limit{ 60 }; // 1 min
 	int counter{ 0 };
 
-	OT_rJSON_createDOC(pingDoc);
-	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	std::string pingMessage = ot::rJSON::toJSON(pingDoc);
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string pingMessage = pingDoc.toJson();
 
-	while (m_HealthCheckRunning) {
+	while (m_healthCheckRunning) {
 		counter = 0;
-		while (counter++ < limit && m_HealthCheckRunning && !m_forceHealthCheck)
+		while (counter++ < limit && m_healthCheckRunning && !m_forceHealthCheck)
 		{
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(1s);
 		}
 		m_forceHealthCheck = false;
-		if (m_HealthCheckRunning) {
+		if (m_healthCheckRunning) {
 			m_mapMutex.lock();
 			bool running{ true };
 			// Use running in case of a disconnected service
@@ -272,7 +281,7 @@ void GlobalSessionService::healthCheck() {
 					try {
 						std::string response;
 						// Try to ping
-						if (!ot::msg::send(m_URL, it.second->url(), ot::EXECUTE, pingMessage, response)) {
+						if (!ot::msg::send(m_url, it.second->url(), ot::EXECUTE, pingMessage, response)) {
 							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second->url() + ")");
 							removeSessionService(it.second);
 							running = true;
@@ -305,7 +314,7 @@ void GlobalSessionService::healthCheck() {
 	}
 }
 
-void GlobalSessionService::removeSessionService(SessionService * _service) {
+void GlobalSessionService::removeSessionService(LocalSessionService * _service) {
 	if (_service) {
 		// Service UID map
 		m_sessionServiceIdMap.erase(_service->id());
@@ -326,8 +335,8 @@ void GlobalSessionService::removeSessionService(SessionService * _service) {
 	}
 }
 
-SessionService * GlobalSessionService::leastLoadedSessionService(void) {
-	SessionService * leastLoadedSessionService{ nullptr };
+LocalSessionService * GlobalSessionService::leastLoadedSessionService(void) {
+	LocalSessionService * leastLoadedSessionService{ nullptr };
 	size_t minLoad{ UINT64_MAX };
 	for (auto it : m_sessionServiceIdMap) {
 		if (it.second->sessionCount() < minLoad) {
@@ -340,7 +349,7 @@ SessionService * GlobalSessionService::leastLoadedSessionService(void) {
 
 GlobalSessionService::GlobalSessionService()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
-	m_HealthCheckRunning(false), m_forceHealthCheck(false)
+	m_healthCheckRunning(false), m_forceHealthCheck(false)
 {
 
 }

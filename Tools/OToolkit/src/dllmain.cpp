@@ -21,7 +21,7 @@
 #include <QtWidgets/qmessagebox.h>
 
 // Open Twin header
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
 #include "OTCommunication/actionTypes.h"
@@ -137,9 +137,10 @@ extern "C"
 
 		try {
 			// Check if the received message was a ping message
-			OT_rJSON_parseDOC(inboundAction, json);
+			ot::JsonDocument inboundAction;
+			inboundAction.fromJson(json);
 			if (inboundAction.IsObject()) {
-				std::string action = ot::rJSON::getString(inboundAction, OT_ACTION_MEMBER);
+				std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
 				if (action == OT_ACTION_CMD_Ping) {
 					char * r = new char[strlen(OT_ACTION_CMD_Ping) + 1];
 					strcpy(r, OT_ACTION_CMD_Ping);

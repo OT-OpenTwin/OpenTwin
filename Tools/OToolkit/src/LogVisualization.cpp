@@ -370,7 +370,8 @@ void LogVisualization::slotImport(void) {
 		return;
 	}
 
-	OT_rJSON_parseDOC(doc, f.readAll().toStdString().c_str());
+	ot::JsonDocument doc;
+	doc.fromJson(f.readAll().toStdString());
 	f.close();
 
 	if (!doc.IsArray()) {
@@ -381,10 +382,8 @@ void LogVisualization::slotImport(void) {
 
 	for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
 		try {
-			if (!doc[i].IsObject()) {
-				throw std::exception("Array entry is not an object");
-			}
-			OT_rJSON_val obj = doc[i].GetObject();
+			ot::ConstJsonObject obj = ot::json::getObject(doc, i);
+			
 			ot::LogMessage m;
 			m.setFromJsonObject(obj);
 			msg.push_back(m);
@@ -425,16 +424,15 @@ void LogVisualization::slotExport(void) {
 		return;
 	}
 
-	OT_rJSON_doc doc;
-	doc.SetArray();
-
+	ot::JsonDocument doc(rapidjson::kArrayType);
+	
 	for (auto m : m_messages) {
-		OT_rJSON_createValueObject(msgObj);
-		m.addToJsonObject(doc, msgObj);
+		ot::JsonObject msgObj;
+		m.addToJsonObject(msgObj, doc.GetAllocator());
 		doc.PushBack(msgObj, doc.GetAllocator());
 	}
 
-	f.write(QByteArray::fromStdString(ot::rJSON::toJSON(doc)));
+	f.write(QByteArray::fromStdString(doc.toJson()));
 	f.close();
 
 	settings->setValue("LogVisualization.LastExportedFile", fn);
@@ -699,11 +697,11 @@ bool LogVisualization::disconnectFromLogger(void) {
 	if (m_loggerUrl.empty()) return true;
 
 	std::string response;
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_RemoveService);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, AppBase::instance()->url().toStdString());
-
-	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RemoveService, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->url().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	
+	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, doc.toJson(), response)) {
 		LOGVIS_LOGE("Failed to send remove service request to logger service.");
 		return false;
 	}

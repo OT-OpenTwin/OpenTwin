@@ -1,7 +1,6 @@
 #include "GlobalDirectoryService.h"
 #include "Application.h"
 
-#include "OTCore/rJSON.h"
 #include "OTCore/Logger.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCommunication/Msg.h"
@@ -43,15 +42,15 @@ void GlobalDirectoryService::connect(const std::string& _url) {
 
 void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	
-	OT_rJSON_createDOC(registerDoc);
-	ot::rJSON::add(registerDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewLocalDirecotoryService);
-	ot::rJSON::add(registerDoc, OT_ACTION_PARAM_SERVICE_URL, LDS_APP->serviceURL());
-	ot::rJSON::add(registerDoc, OT_ACTION_PARAM_SUPPORTED_SERVICES, LDS_APP->supportedServices());
+	ot::JsonDocument registerDoc;
+	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLocalDirecotoryService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(LDS_APP->serviceURL(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(LDS_APP->supportedServices(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 	addSystemValues(registerDoc);
 
 	// Send request and check if the request was successful
 	std::string response;
-	if (!ot::msg::send(LDS_APP->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(registerDoc), response)) {
+	if (!ot::msg::send(LDS_APP->serviceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response)) {
 		OT_LOG_E("Failed to send register request to global directory service");
 		return;
 	}
@@ -66,7 +65,8 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	}
 
 	// Check response
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 	if (!responseDoc.IsObject()) { OT_LOG_E("Register at GDS, invalid response"); return; }
 	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_ID)) { OT_LOG_E("Register at GDS, invalid response: Missing member"); return; }
 	if (!responseDoc[OT_ACTION_PARAM_SERVICE_ID].IsUint()) { OT_LOG_E("Register at GDS, invalid response: Invalid member type"); return; }
@@ -82,13 +82,14 @@ void GlobalDirectoryService::healthCheck(void) {
 	OT_LOG_I("Starting Global Directory Service health check");
 	while (!m_isShuttingDown) {
 
-		OT_rJSON_createDOC(systemStatusDoc);
-		ot::rJSON::add(systemStatusDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UpdateSystemLoad);
-		ot::rJSON::add(systemStatusDoc, OT_ACTION_PARAM_SERVICE_ID, LDS_APP->serviceID());
+		ot::JsonDocument systemStatusDoc;
+		systemStatusDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateSystemLoad, systemStatusDoc.GetAllocator()), systemStatusDoc.GetAllocator());
+		systemStatusDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, LDS_APP->serviceID(), systemStatusDoc.GetAllocator());
+		
 		addSystemValues(systemStatusDoc);
 
 		std::string response;
-		if (!ot::msg::send(LDS_APP->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(systemStatusDoc), response)) {
+		if (!ot::msg::send(LDS_APP->serviceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response)) {
 			OT_LOG_E("Failed to send updated system load to global directory service");
 			LDS_APP->globalDirectoryServiceCrashed();
 			return;
@@ -108,9 +109,9 @@ void GlobalDirectoryService::healthCheck(void) {
 	}
 }
 
-void GlobalDirectoryService::addSystemValues(OT_rJSON_doc& _jsonDocument) {
-	ot::rJSON::add(_jsonDocument, OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory, std::to_string(ot::os::getAvailablePhysicalMemory()));
-	ot::rJSON::add(_jsonDocument, OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory, std::to_string(ot::os::getAvailableVirtualMemory()));
-	ot::rJSON::add(_jsonDocument, OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory, std::to_string(ot::os::getTotalPhysicalMemory()));
-	ot::rJSON::add(_jsonDocument, OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory, std::to_string(ot::os::getTotalVirtualMemory()));
+void GlobalDirectoryService::addSystemValues(ot::JsonDocument& _jsonDocument) {
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory, ot::JsonString(std::to_string(ot::os::getAvailablePhysicalMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory, ot::JsonString(std::to_string(ot::os::getAvailableVirtualMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory, ot::JsonString(std::to_string(ot::os::getTotalPhysicalMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory, ot::JsonString(std::to_string(ot::os::getTotalVirtualMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
 }

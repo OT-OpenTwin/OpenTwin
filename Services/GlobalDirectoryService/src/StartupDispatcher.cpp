@@ -112,12 +112,12 @@ void StartupDispatcher::serviceStartRequestFailed(const ServiceStartupInformatio
 	}
 
 	// Notify session service about the failed startup
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceStartupFailed);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, _serviceInfo.serviceInformation().name());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, _serviceInfo.serviceInformation().type());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _serviceInfo.sessionInformation().id());
-
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceStartupFailed, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.serviceInformation().name(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.serviceInformation().type(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
+	
 	// Fire message
-	ot::msg::sendAsync(Application::instance()->serviceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(doc));
+	ot::msg::sendAsync(Application::instance()->serviceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, doc.toJson());
 }

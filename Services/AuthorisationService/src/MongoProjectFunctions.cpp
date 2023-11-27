@@ -3,8 +3,7 @@
 #include "MongoRoleFunctions.h"
 #include "MongoConstants.h"
 #include "MongoUserFunctions.h"
-
-
+#include "OTCore/JSON.h"
 
 /*
 * The following functionalities have to be implemented
@@ -671,21 +670,21 @@ namespace MongoProjectFunctions
 
 	std::string projectToJson(Project& project)
 	{
-		OT_rJSON_createDOC(json);
-		ot::rJSON::add(json, "id", project._id.to_string());
-		ot::rJSON::add(json, "name", project.name);
-		ot::rJSON::add(json, "collectionName", project.collectionName);
-		ot::rJSON::add(json, "creatingUser", project.creatingUser.username);
-
-		std::list<std::string> groups{};
+		ot::JsonDocument json;
+		json.AddMember("id", ot::JsonString(project._id.to_string(), json.GetAllocator()), json.GetAllocator());
+		json.AddMember("name", ot::JsonString(project.name, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("collectionName", ot::JsonString(project.collectionName, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
+		
+		std::list<std::string> groups;
 
 		for (auto group : project.groups)
 		{
 			groups.push_back(group.name);
 		}
-		ot::rJSON::add(json, "groups", groups);
+		json.AddMember("groups", ot::JsonArray(groups, json.GetAllocator()), json.GetAllocator());
 
-		return ot::rJSON::toJSON(json);
+		return json.toJson();
 	}
 
 	std::string projectsToJson(std::vector<Project>& projects)
@@ -698,8 +697,8 @@ namespace MongoProjectFunctions
 		}
 
 		
-		OT_rJSON_createDOC(json);
-		ot::rJSON::add(json, "projects", jsonProjects);
-		return ot::rJSON::toJSON(json);
+		ot::JsonDocument json;
+		json.AddMember("projects", ot::JsonArray(jsonProjects, json.GetAllocator()), json.GetAllocator());
+		return json.toJson();
 	}
 }

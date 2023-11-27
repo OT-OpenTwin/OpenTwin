@@ -9,7 +9,7 @@
 #include <list>
 #include <mutex>
 
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTSystem/Network.h"
 
 class Service;
@@ -23,7 +23,7 @@ public:
 	//! @brief Add the object contents to the provided JSON object
 	//! @param _document The JSON document (used to get the allocator)
 	//! @param _object The JSON object to add the contents to
-	void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object);
+	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator);
 
 	// ##################################################################################################################################
 

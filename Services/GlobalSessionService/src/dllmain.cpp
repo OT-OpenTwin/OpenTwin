@@ -1,10 +1,7 @@
-/*
- * dllmain.cpp
- *
- *  Created on: November 26, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date March 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // C++ header
 #include <Windows.h>
@@ -70,9 +67,9 @@ extern "C"
 
 		// Create session service and add data to session service
 		GlobalSessionService * sessionService = GlobalSessionService::instance();
-		sessionService->setDatabaseURL(_databaseIP);
-		sessionService->setURL(_ownIP);
-		sessionService->setAuthorizationServiceURL(_authURL);
+		sessionService->setDatabaseUrl(_databaseIP);
+		sessionService->setUrl(_ownIP);
+		sessionService->setAuthorizationUrl(_authURL);
 
 		OT_LOG_I("Service initialized");
 
@@ -104,7 +101,7 @@ extern "C"
 			return returnValue;
 		}
 
-		std::string serviceURL = GlobalSessionService::instance()->URL();
+		std::string serviceURL = GlobalSessionService::instance()->url();
 
 		char * retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());

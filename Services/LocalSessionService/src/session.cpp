@@ -14,13 +14,12 @@
 #include <Exception.h>		// Error handling
 
 #include "OTCore/Logger.h"
-#include "OTCore/rJSON.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
-#define OT_BROADCASTMESSAGE_CREATE(___doc) OT_rJSON_createDOC(___doc); ot::rJSON::add(___doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Message);
-#define OT_BROADCASTMESSAGE_ADDSENDERDATA(___doc, ___sender) ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_ID, ___sender->id()); ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_URL, ___sender->url()); ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_NAME, ___sender->name()); ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_TYPE, ___sender->type());
-#define OT_BROADCASTACTION_ADDSENDERDATA(___doc, ___sender) ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_ID, ___sender->id()); ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_URL, ___sender->url()); ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_NAME, ___sender->name()); ot::rJSON::add(___doc, OT_ACTION_PARAM_SERVICE_TYPE, ___sender->type());
+#define OT_BROADCASTMESSAGE_CREATE(___doc) ot::JsonDocument ___doc; ___doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Message, ___doc.GetAllocator()), ___doc.GetAllocator());
+#define OT_BROADCASTMESSAGE_ADDSENDERDATA(___doc, ___sender) ___doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ___sender->id(), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(___sender->url(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(___sender->name(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(___sender->type(), ___doc.GetAllocator()), ___doc.GetAllocator());
+#define OT_BROADCASTACTION_ADDSENDERDATA(___doc, ___sender) ___doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ___sender->id(), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(___sender->url(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(___sender->name(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(___sender->type(), ___doc.GetAllocator()), ___doc.GetAllocator());
 
 Session::Session(
 	const std::string &						_ID,
@@ -174,28 +173,28 @@ std::string Session::getServiceListJSON(void) {
 }
 
 std::string Session::infoToJSON(void) const {
-	OT_rJSON_createDOC(infoDoc);
-	ot::rJSON::add(infoDoc, OT_ACTION_PARAM_SESSION_ID, m_id);
-	ot::rJSON::add(infoDoc, OT_ACTION_PARAM_SESSION_TYPE, m_type);
-	return ot::rJSON::toJSON(infoDoc);
+	ot::JsonDocument infoDoc;
+	infoDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_id, infoDoc.GetAllocator()), infoDoc.GetAllocator());
+	infoDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(m_type, infoDoc.GetAllocator()), infoDoc.GetAllocator());
+	return infoDoc.toJson();
 }
 
-void Session::addServiceListToDocument(OT_rJSON_doc & _doc) {
-	OT_rJSON_createValueArray(serviceList);
+void Session::addServiceListToDocument(ot::JsonDocument& _doc) {
+	ot::JsonArray serviceList;
 	for (auto s : m_serviceMap)
 	{
 		if (s.second->isVisible()) {
-			OT_rJSON_val serviceInfo;
-			s.second->writeDataToValue(_doc, serviceInfo);
-			serviceList.PushBack(serviceInfo, _doc.GetAllocator());
+			ot::JsonObject serviceObj;
+			s.second->writeDataToValue(serviceObj, _doc.GetAllocator());
+			serviceList.PushBack(serviceObj, _doc.GetAllocator());
 		}
 	}
-	ot::rJSON::add(_doc, OT_ACTION_PARAM_SESSION_SERVICES, serviceList);
+	_doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, serviceList, _doc.GetAllocator());
 }
 
 void Session::broadcastMessage(Service * _sender, const std::string& _message, bool _async) {
 	OT_BROADCASTMESSAGE_CREATE(theMessageDoc);
-	ot::rJSON::add(theMessageDoc, OT_ACTION_PARAM_MESSAGE, _message);
+	theMessageDoc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(_message, theMessageDoc.GetAllocator()), theMessageDoc.GetAllocator());
 
 	if (_sender != nullptr)
 	{
@@ -206,8 +205,8 @@ void Session::broadcastMessage(Service * _sender, const std::string& _message, b
 }
 
 void Session::broadcastAction(Service * _sender, const std::string& _command, bool _async) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, _command);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_command, doc.GetAllocator()), doc.GetAllocator());
 	if (_sender != nullptr)
 	{
 		OT_BROADCASTACTION_ADDSENDERDATA(doc, _sender);
@@ -215,8 +214,8 @@ void Session::broadcastAction(Service * _sender, const std::string& _command, bo
 	broadcast(_sender, doc, false, _async);
 }
 
-void Session::broadcast(Service * _sender, OT_rJSON_doc& _message, bool _shutdown, bool _async) {
-	std::string msg{ OT_rJSON_toJSON(_message) };
+void Session::broadcast(Service * _sender, const ot::JsonDocument& _message, bool _shutdown, bool _async) {
+	std::string msg = _message.toJson();
 	OT_LOG_D("Sending broadcast message in session (id = \"" + m_id + "\"): " + msg);
 	
 	std::string response;
@@ -242,9 +241,10 @@ void Session::broadcast(Service * _sender, OT_rJSON_doc& _message, bool _shutdow
 void Session::shutdown(Service * _sender) {
 	broadcastAction(_sender, OT_ACTION_CMD_ServicePreShutdown);
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShutdown);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_EXISTS, false);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdown, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_EXISTS, false, doc.GetAllocator());
+	
 	broadcast(_sender, doc, true);
 
 	auto itm = m_serviceMap.begin();
@@ -266,9 +266,9 @@ void Session::serviceFailure(Service * _failedService) {
 		SessionService::instance()->serviceClosing(_failedService, false, false);
 	}
 
-	OT_rJSON_createDOC(shutdownDoc);
-	ot::rJSON::add(shutdownDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceEmergencyShutdown);
-	std::string msg = ot::rJSON::toJSON(shutdownDoc);
+	ot::JsonDocument shutdownDoc;
+	shutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, shutdownDoc.GetAllocator()), shutdownDoc.GetAllocator());
+	std::string msg = shutdownDoc.toJson();
 	std::string response;
 	size_t oldCt;
 	while (m_serviceMap.size() > 0) {

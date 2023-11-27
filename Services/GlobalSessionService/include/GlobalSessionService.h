@@ -1,3 +1,8 @@
+//! @file GlobalSessionService.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
@@ -14,7 +19,7 @@
 #include <map>
 #include <mutex>
 
-class SessionService;
+class LocalSessionService;
 
 class GlobalSessionService : public ot::OTObject, public ot::ServiceBase {
 public:
@@ -25,16 +30,17 @@ public:
 	// ###################################################################################################
 
 	// Properties
-	OT_PROPERTY(std::string, URL);
-	OT_PROPERTY(std::string, DatabaseURL);
-	OT_PROPERTY(std::string, AuthorizationServiceURL);
-	OT_PROPERTY(std::string, GlobalDirectoryServiceURL);
+	OT_PROPERTY_REF(std::string, url, setUrl, url)
+	OT_PROPERTY_REF(std::string, databaseUrl, setDatabaseUrl, databaseUrl)
+	OT_PROPERTY_REF(std::string, authorizationUrl, setAuthorizationUrl, authorizationUrl)
+	OT_PROPERTY_REF(std::string, globalDirectoryUrl, setGlobalDirectoryUrl, globalDirectoryUrl)
+	OT_PROPERTY_V(bool, healthCheckRunning, setHealthCheckIsRunning, isHealthCheckRunning, private)
 
 	// ###################################################################################################
 
 	// Service handling
 
-	bool addSessionService(SessionService& _service);
+	bool addSessionService(LocalSessionService& _service);
 
 private:
 
@@ -59,21 +65,18 @@ private:
 	void healthCheck(void);
 
 	//! @brief Will remove the service from the service map aswell as all sessions in this service
-	void removeSessionService(SessionService * _service);
+	void removeSessionService(LocalSessionService* _service);
 
-	SessionService * leastLoadedSessionService(void);
+	LocalSessionService* leastLoadedSessionService(void);
 
 	GlobalSessionService();
 	virtual ~GlobalSessionService();
 
 	// ###################################################################################################
 
-	// Private properties
-	OT_PROPERTY_IS(HealthCheckRunning);
-
 	std::mutex									m_mapMutex;
-	std::map<std::string, SessionService *>		m_sessionToServiceMap;
-	std::map<ot::serviceID_t, SessionService *>	m_sessionServiceIdMap;
+	std::map<std::string, LocalSessionService*>		m_sessionToServiceMap;
+	std::map<ot::serviceID_t, LocalSessionService*>	m_sessionServiceIdMap;
 	ot::IDManager<ot::serviceID_t>				m_sessionServiceIdManager;
 	bool										m_forceHealthCheck;
 

@@ -115,9 +115,9 @@ void ConnectToLoggerDialog::worker(QString _url) {
 	DIA_LOG("Connection worker started (url = \"" + _url + "\")...");
 
 	std::string response;
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, doc.GetAllocator()), doc.GetAllocator());
+	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, doc.toJson(), response)) {
 		DIA_LOGE("Failed to send ping message to Logger Service at \"" + _url + "\"");
 		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotPingFail, Qt::QueuedConnection);
 		return;
@@ -132,17 +132,18 @@ void ConnectToLoggerDialog::worker(QString _url) {
 
 	response.clear();
 
-	OT_rJSON_createDOC(registerDoc);
-	ot::rJSON::add(registerDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewService);
-	ot::rJSON::add(registerDoc, OT_ACTION_PARAM_SERVICE_URL, AppBase::instance()->url().toStdString());
-
-	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, ot::rJSON::toJSON(registerDoc), response)) {
+	ot::JsonDocument registerDoc;
+	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->url().toStdString(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	
+	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, registerDoc.toJson(), response)) {
 		DIA_LOGE("Failed to send registration request to Logger Service at \"" + _url + "\"");
 		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotRegisterFail, Qt::QueuedConnection);
 		return;
 	}
 	
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 	if (!responseDoc.IsArray()) {
 		DIA_LOGE("Invalid registration response from Logger Service at \"" + _url + "\"");
 		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotRegisterFail, Qt::QueuedConnection);
@@ -153,7 +154,7 @@ void ConnectToLoggerDialog::worker(QString _url) {
 
 	for (rapidjson::SizeType i = 0; i < responseDoc.Size(); i++) {
 		if (responseDoc[i].IsObject()) {
-			OT_rJSON_val msgObj = responseDoc[i].GetObject();
+			ot::ConstJsonObject msgObj = responseDoc.constRef()[i].GetObject();
 			ot::LogMessage msg;
 			try {
 				msg.setFromJsonObject(msgObj);

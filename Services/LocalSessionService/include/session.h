@@ -12,11 +12,12 @@
 #include <string>
 #include <map>
 #include <list>
+#include <vector>
 #include <mutex>
 
 // SessionService header
 #include <globalDatatypes.h>
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTSystem/PortManager.h"
 #include "OTServiceFoundation/UserCredentials.h"
@@ -115,7 +116,7 @@ public:
 	std::string infoToJSON(void) const;
 
 	//! @brief Will add all services to the provided document
-	void addServiceListToDocument(OT_rJSON_doc & _doc);
+	void addServiceListToDocument(ot::JsonDocument& _doc);
 
 	//! @brief Will send a broadcast message to all services of this session
 	//! @param _sender The sender of this message
@@ -135,7 +136,7 @@ public:
 	//! @param _async If true the massage(s) will be send from a worker thread
 	void broadcast(
 		Service *					_sender,
-		OT_rJSON_doc &				_message,
+		const ot::JsonDocument&		_message,
 		bool						_shutdown,
 		bool                        _async = false
 	);

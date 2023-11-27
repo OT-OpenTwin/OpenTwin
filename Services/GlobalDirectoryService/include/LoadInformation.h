@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 
 class LoadInformation {
 public:
@@ -15,7 +15,7 @@ public:
 	LoadInformation& operator = (const LoadInformation& _other);
 
 	load_t load(void) const;
-	bool updateSystemUsageValues(OT_rJSON_doc& _jsonDocument);
+	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);
 
 private:
 	load_t calculateLoad(memory_t _total, memory_t _avail);

@@ -32,7 +32,7 @@ LoadInformation::load_t LocalDirectoryService::load(void) const {
 	return m_loadInformation.load();
 }
 
-bool LocalDirectoryService::updateSystemUsageValues(OT_rJSON_doc& _jsonDocument)
+bool LocalDirectoryService::updateSystemUsageValues(ot::JsonDocument& _jsonDocument)
 {
 	return m_loadInformation.updateSystemUsageValues(_jsonDocument);
 }
@@ -45,15 +45,15 @@ bool LocalDirectoryService::supportsService(const std::string& _serviceName) {
 }
 
 bool LocalDirectoryService::requestToRunService(const ServiceStartupInformation& _serviceInfo) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_StartNewService);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, _serviceInfo.serviceInformation().name());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, _serviceInfo.serviceInformation().type());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL, _serviceInfo.sessionInformation().sessionServiceURL());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _serviceInfo.sessionInformation().id());
-
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.serviceInformation().name(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.serviceInformation().type(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_serviceInfo.sessionInformation().sessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
+	
 	std::string response;
-	if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) return false;
+	if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) return false;
 	bool success = (response == OT_ACTION_RETURN_VALUE_OK);
 	if (success) {
 		m_services.push_back(std::pair<SessionInformation, ServiceInformation>(
@@ -63,17 +63,18 @@ bool LocalDirectoryService::requestToRunService(const ServiceStartupInformation&
 }
 
 bool LocalDirectoryService::requestToRunRelayService(const ServiceStartupInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_StartNewRelayService);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL, _serviceInfo.sessionInformation().sessionServiceURL());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _serviceInfo.sessionInformation().id());
-
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_serviceInfo.sessionInformation().sessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
+	
 	std::string response;
-	if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) return false;
+	if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) return false;
 	OT_ACTION_IF_RESPONSE_ERROR(response) return false;
 	OT_ACTION_IF_RESPONSE_WARNING(response) return false;
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_URL)) return false;
 	if (!responseDoc.HasMember(OT_ACTION_PARAM_WebsocketURL)) return false;
@@ -101,16 +102,16 @@ void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 				if (!notified) {
 					notified = true;
 					// Create document
-					OT_rJSON_createDOC(doc);
-					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ShutdownSessionCompleted);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _session.id());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL, _session.sessionServiceURL());
+					ot::JsonDocument doc;
+					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.id(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_session.sessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 					OT_LOG_D("xxxxx..... DEBUG: 1.start");
 
 					// Send message and check response
 					std::string response;
-					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
 						OT_LOG_E("Failed to send session closed notification to LDS at " + m_serviceURL);
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -143,19 +144,19 @@ void LocalDirectoryService::serviceClosed(const SessionInformation& _session, co
 				if (!notified) {
 					notified = true;
 					// Create document
-					OT_rJSON_createDOC(doc);
-					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceDisconnected);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _session.id());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL, _session.sessionServiceURL());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, _service.name());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, _service.type());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, _serviceURL);
+					ot::JsonDocument doc;
+					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceDisconnected, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.id(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_session.sessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_service.name(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_service.type(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, doc.GetAllocator()), doc.GetAllocator());
 
 					OT_LOG_D("xxxxx..... DEBUG: 2.start");
 
 					// Send message and check response
 					std::string response;
-					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
 						OT_LOG_E("Failed to send service closed notification to LDS at " + m_serviceURL);
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {

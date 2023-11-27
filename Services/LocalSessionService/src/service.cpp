@@ -41,12 +41,9 @@ void Service::setHidden(void) {
 }
 
 std::string Service::toJSON(void) const {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_ID, m_id);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, m_name);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, m_type);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, m_url);
-	return ot::rJSON::toJSON(doc);
+	ot::JsonDocument doc;
+	this->writeDataToValue(doc, doc.GetAllocator());
+	return doc.toJson();
 }
 
 std::list<unsigned long long> Service::portNumbers(void) const {
@@ -65,10 +62,9 @@ std::list<unsigned long long> Service::portNumbers(void) const {
 	return ports;
 }
 
-void Service::writeDataToValue(OT_rJSON_doc & _doc, OT_rJSON_val & _value) {
-	_value.SetObject();
-	ot::rJSON::add(_doc, _value, OT_ACTION_PARAM_SERVICE_ID, m_id);
-	ot::rJSON::add(_doc, _value, OT_ACTION_PARAM_SERVICE_NAME, m_name);
-	ot::rJSON::add(_doc, _value, OT_ACTION_PARAM_SERVICE_TYPE, m_type);
-	ot::rJSON::add(_doc, _value, OT_ACTION_PARAM_SERVICE_URL, m_url);
+void Service::writeDataToValue(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(m_name, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(m_type, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, _allocator), _allocator);
 }

@@ -13,7 +13,6 @@
 
 // Open twin header
 #include "OTCore/ServiceBase.h"		// Base class
-#include "OTCore/rJSON.h"				// open twins rapid json layer
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/OTObject.h"	// Base class
 

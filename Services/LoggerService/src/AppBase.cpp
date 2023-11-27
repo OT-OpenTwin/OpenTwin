@@ -1,6 +1,5 @@
 #include "AppBase.h"
 
-#include "OTCore/rJSONHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
@@ -17,7 +16,7 @@ AppBase& AppBase::instance(void) {
 	return g_instance;
 }
 
-std::string AppBase::dispatchAction(const std::string& _action, OT_rJSON_doc& _jsonDocument) {
+std::string AppBase::dispatchAction(const std::string& _action, ot::JsonDocument& _jsonDocument) {
 	if (_action == OT_ACTION_CMD_Log) return handleLog(_jsonDocument);
 	else if (_action == OT_ACTION_CMD_Ping) return OT_ACTION_CMD_Ping;
 	else if (_action == OT_ACTION_CMD_RegisterNewService) return handleRegister(_jsonDocument);
@@ -30,18 +29,14 @@ std::string AppBase::dispatchAction(const std::string& _action, OT_rJSON_doc& _j
 }
 
 std::string AppBase::handleGetDebugInfo(void) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, "MessageCount", m_count);
+	ot::JsonDocument doc;
+	doc.AddMember("MessageCount", m_count, doc.GetAllocator());
 
-	OT_rJSON_createValueArray(receiverArr);
 	m_receiverMutex.lock();
-	for (auto r : m_receiver) {
-		receiverArr.PushBack(rapidjson::Value(r.c_str(), doc.GetAllocator()), doc.GetAllocator());
-	}
+	doc.AddMember("Receivers", ot::JsonArray(m_receiver, doc.GetAllocator()), doc.GetAllocator());
 	m_receiverMutex.unlock();
-	ot::rJSON::add(doc, "Receivers", receiverArr);
 
-	return ot::rJSON::toJSON(doc);
+	return doc.toJson();
 }
 
 std::string AppBase::handleClear(void) {
@@ -52,12 +47,11 @@ std::string AppBase::handleClear(void) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string AppBase::handleLog(OT_rJSON_doc& _jsonDocument) {
-	OT_rJSON_checkMember(_jsonDocument, OT_ACTION_PARAM_LOG, Object);
-	OT_rJSON_val logObject = _jsonDocument[OT_ACTION_PARAM_LOG].GetObject();
+std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
+	ot::ConstJsonObject obj = ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_LOG);
 
 	ot::LogMessage msg;
-	msg.setFromJsonObject(logObject);
+	msg.setFromJsonObject(obj);
 
 	msg.setCurrentTimeAsGlobalSystemTime();
 
@@ -75,8 +69,8 @@ std::string AppBase::handleLog(OT_rJSON_doc& _jsonDocument) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string AppBase::handleRegister(OT_rJSON_doc& _jsonDocument) {
-	std::string receiverUrl = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
+std::string AppBase::handleRegister(ot::JsonDocument& _jsonDocument) {
+	std::string receiverUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 
 	m_receiverMutex.lock();
 	m_receiver.push_back(receiverUrl);
@@ -86,18 +80,17 @@ std::string AppBase::handleRegister(OT_rJSON_doc& _jsonDocument) {
 
 	m_receiverMutex.unlock();
 
-	OT_rJSON_doc doc;
-	doc.SetArray();
+	ot::JsonDocument doc(rapidjson::kArrayType);
 	for (auto msg : m_messages) {
-		OT_rJSON_createValueObject(msgObj);
-		msg.addToJsonObject(doc, msgObj);
+		ot::JsonObject msgObj;
+		msg.addToJsonObject(msgObj, doc.GetAllocator());
 		doc.PushBack(msgObj, doc.GetAllocator());
 	}
-	return ot::rJSON::toJSON(doc);
+	return doc.toJson();
 }
 
-std::string AppBase::handleDeregister(OT_rJSON_doc& _jsonDocument) {
-	std::string receiverUrl = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
+std::string AppBase::handleDeregister(ot::JsonDocument& _jsonDocument) {
+	std::string receiverUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 	std::string ret = OT_ACTION_RETURN_VALUE_FAILED;
 	m_receiverMutex.lock();
 	auto it = std::find(m_receiver.begin(), m_receiver.end(), receiverUrl);
@@ -113,14 +106,14 @@ std::string AppBase::handleDeregister(OT_rJSON_doc& _jsonDocument) {
 }
 
 void AppBase::notifyListeners(const ot::LogMessage& _message) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Log);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Log, doc.GetAllocator()), doc.GetAllocator());
 
-	OT_rJSON_createValueObject(logObj);
-	_message.addToJsonObject(doc, logObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_LOG, logObj);
-
-	std::string msg = ot::rJSON::toJSON(doc);
+	ot::JsonObject logObj;
+	_message.addToJsonObject(logObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LOG, logObj, doc.GetAllocator());
+	
+	std::string msg = doc.toJson();
 
 	m_receiverMutex.lock();
 	std::list<std::string> receiverList = m_receiver;

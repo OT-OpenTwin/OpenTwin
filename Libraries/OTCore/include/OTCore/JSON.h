@@ -62,8 +62,8 @@ namespace ot {
 		OT_DECL_NOCOPY(JsonString)
 			JsonString() = delete;
 	public:
-		JsonString(const std::string& _str, JsonAllocator& _allocator) : JsonValue(_str.c_str(), _allocator) {};
 		JsonString(const char* _cstr, JsonAllocator& _allocator) : JsonValue(_cstr, _allocator) {};
+		JsonString(const std::string& _str, JsonAllocator& _allocator) : JsonValue(_str.c_str(), _allocator) {};
 		virtual ~JsonString() {};
 	};
 
@@ -250,7 +250,13 @@ namespace ot {
 	class JsonDocument : public rapidjson::Document {
 		OT_DECL_NOCOPY(JsonDocument)
 	public:
+		//! @brief Constructor
+		//! Set the document as object
 		JsonDocument() : rapidjson::Document(rapidjson::kObjectType) {};
+
+		//! @brief Constructor
+		//! @param _type The type for the json document
+		JsonDocument(rapidjson::Type _type) : rapidjson::Document(_type) {};
 		virtual ~JsonDocument() {};
 
 		bool fromJson(const std::string& _json) { return this->fromJson(_json.c_str()); };
@@ -265,7 +271,7 @@ namespace ot {
 			return this->GetObject();
 		}
 
-		std::string toJson(void) {
+		std::string toJson(void) const {
 			// Create String buffer
 			rapidjson::StringBuffer buffer;
 			buffer.Clear();

@@ -68,7 +68,7 @@ LocalDirectoryService * Application::leastLoadedDirectoryService(const ServiceSt
 	return leastLoaded;
 }
 
-std::string Application::handleLocalDirectoryServiceConnected(OT_rJSON_doc& _jsonDocument) {
+std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SUPPORTED_SERVICES, Array);
 
@@ -112,16 +112,16 @@ std::string Application::handleLocalDirectoryServiceConnected(OT_rJSON_doc& _jso
 	m_localDirectoryServices.push_back(newLds);
 
 	// Create response
-	OT_rJSON_createDOC(responseDoc);
-	ot::rJSON::add(responseDoc, OT_ACTION_PARAM_SERVICE_ID, newLds->serviceID());
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds->serviceID(), responseDoc.GetAllocator());
 
 	// ##### MUTEX #####
 	m_mutex.unlock();
 
-	return ot::rJSON::toJSON(responseDoc);
+	return responseDoc.toJson();
 }
 
-std::string Application::handleStartService(OT_rJSON_doc& _jsonDocument) {
+std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_ID, String);
@@ -139,7 +139,7 @@ std::string Application::handleStartService(OT_rJSON_doc& _jsonDocument) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleStartServices(OT_rJSON_doc& _jsonDocument) {
+std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICES, Array);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_ID, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL, String);
@@ -181,7 +181,7 @@ std::string Application::handleStartServices(OT_rJSON_doc& _jsonDocument) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleStartRelayService(OT_rJSON_doc& _jsonDocument) {
+std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_ID, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL, String);
 
@@ -208,19 +208,19 @@ std::string Application::handleStartRelayService(OT_rJSON_doc& _jsonDocument) {
 
 	OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 
-	OT_rJSON_createDOC(responseDoc);
-	ot::rJSON::add(responseDoc, OT_ACTION_PARAM_SERVICE_URL, relayServiceURL);
-	ot::rJSON::add(responseDoc, OT_ACTION_PARAM_WebsocketURL, websocketUrl);
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-	return ot::rJSON::toJSON(responseDoc);
+	return responseDoc.toJson();
 }
 
-std::string Application::handleServiceStopped(OT_rJSON_doc& _jsonDocument) {
-	std::string sessionID = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	std::string lssURL = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-	std::string name = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string type = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
-	std::string url = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
+std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
+	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
+	std::string lssURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+	std::string name = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string type = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
+	std::string url = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 
 	SessionInformation sessionInfo(sessionID, lssURL);
 	ServiceInformation serviceInfo(name, type);
@@ -233,9 +233,9 @@ std::string Application::handleServiceStopped(OT_rJSON_doc& _jsonDocument) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleSessionClosed(OT_rJSON_doc& _jsonDocument) {
-	std::string sessionID = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	std::string lssURL = ot::rJSON::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
+	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
+	std::string lssURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	
 	SessionInformation sessionInfo(sessionID, lssURL);
 	
@@ -247,7 +247,7 @@ std::string Application::handleSessionClosed(OT_rJSON_doc& _jsonDocument) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleUpdateSystemLoad(OT_rJSON_doc& _jsonDocument) {
+std::string Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID, Uint);
 
 	ot::serviceID_t id = _jsonDocument[OT_ACTION_PARAM_SERVICE_ID].GetUint();
@@ -285,16 +285,16 @@ int Application::initialize(const char * _siteID, const char * _ownURL, const ch
 	m_globalSessionServiceURL = _globalSessionServiceURL;
 
 	// Register at global session service
-	OT_rJSON_createDOC(gssDoc);
-	ot::rJSON::add(gssDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService);
-	ot::rJSON::add(gssDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, m_serviceURL);
+	ot::JsonDocument gssDoc;
+	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_serviceURL, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
 	OT_LOG_I("Sending registration document to the Global Session Service");
 
 	// Send message
 	std::string gssURL(_globalSessionServiceURL);
 	std::string gssResponse;
-	if (!ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, ot::rJSON::toJSON(gssDoc), gssResponse)) {
+	if (!ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse)) {
 		OT_LOG_E("Failed to send message to Global Session Service (url = " + gssURL + ")");
 		return 1;
 	}

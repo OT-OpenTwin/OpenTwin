@@ -98,26 +98,29 @@ extern "C"
 #ifdef OT_USE_GSS
 
 			// Register at GSS
-			OT_rJSON_createDOC(gssDoc);
-			ot::rJSON::add(gssDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewSessionService);
-			ot::rJSON::add(gssDoc, OT_ACTION_PARAM_SERVICE_URL, ownUrl);
-			OT_rJSON_createValueArray(sessionListArray);
-			ot::rJSON::add(gssDoc, OT_ACTION_PARAM_SESSION_LIST, sessionListArray);
+			ot::JsonDocument gssDoc;
+			gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+			gssDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(ownUrl, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+			
+			ot::JsonArray sessionArr;
+			gssDoc.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionArr, gssDoc.GetAllocator());
 
 			// Send request to GSS
 			std::string gssResponse;
-			if (!ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, ot::rJSON::toJSON(gssDoc), gssResponse)) {
+			if (!ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse)) {
 				OT_LOG_E("Failed to send request to GlobalSessionService");
 				return 20;
 			}
 
-			OT_rJSON_parseDOC(gssResponseDoc, gssResponse.c_str());
-			ot::serviceID_t ssID = ot::rJSON::getUInt(gssResponseDoc, OT_ACTION_PARAM_SERVICE_ID);
-			std::string databaseURL = ot::rJSON::getString(gssResponseDoc, OT_ACTION_PARAM_DATABASE_URL);
-			std::string authURL = ot::rJSON::getString(gssResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL);
+			ot::JsonDocument gssResponseDoc;
+			gssResponseDoc.fromJson(gssResponse);
+
+			ot::serviceID_t ssID = ot::json::getUInt(gssResponseDoc, OT_ACTION_PARAM_SERVICE_ID);
+			std::string databaseURL = ot::json::getString(gssResponseDoc, OT_ACTION_PARAM_DATABASE_URL);
+			std::string authURL = ot::json::getString(gssResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL);
 			std::string gdsURL;
 			if (gssResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
-				gdsURL = ot::rJSON::getString(gssResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL);
+				gdsURL = ot::json::getString(gssResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL);
 			}
 
 			// Create session service and add data to session service

@@ -15,7 +15,6 @@
 #include <bsoncxx/builder/stream/helpers.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
-#include "OTCore/rJSON.h"								// rapidjson wrapper
 
 #include "User.h"
 #include "Project.h"

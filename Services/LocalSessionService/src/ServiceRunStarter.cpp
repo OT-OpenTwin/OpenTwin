@@ -3,7 +3,6 @@
 #include "Session.h"
 #include "SessionService.h"
 
-#include "OTCore/rJSON.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -85,12 +84,12 @@ void ServiceRunStarter::worker(void) {
 			m_queue.pop_front();
 			
 			// Create run document
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Run);
-			ot::rJSON::add(doc, OT_PARAM_AUTH_USERNAME, info.credentialsUserName);
-			ot::rJSON::add(doc, OT_PARAM_AUTH_PASSWORD, info.credentialsUserPassword);
-			ot::rJSON::add(doc, OT_PARAM_SETTINGS_USERCOLLECTION, info.userCollection);
-
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Run, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(info.credentialsUserName, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(info.credentialsUserPassword, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(info.userCollection, doc.GetAllocator()), doc.GetAllocator());
+			
 			// Get session
 			Session * session = SessionService::instance()->getSession(info.sessionId, false);
 			if (session == nullptr) {
@@ -113,7 +112,7 @@ void ServiceRunStarter::worker(void) {
 				"\"; id = \"" + std::to_string(info.serviceId) + "\")");
 
 			std::string response;
-			std::string messageOut = ot::rJSON::toJSON(doc);
+			std::string messageOut = doc.toJson();
 			if (!ot::msg::send("", info.serviceUrl, ot::EXECUTE, messageOut, response, 3000)) {
 				assert(0);
 				OT_LOG_E("Failed to send run command to service (name = \"" + info.serviceName + "\"; type = \"" + info.serviceType +

@@ -18,8 +18,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/rJSON.h"
-#include "OTCore/rJSONHelper.h"
+#include "OTCore/JSON.h"
 #include "OTCommunication/actionTypes.h"
 
 // Qt header
@@ -171,14 +170,14 @@ void AppBase::setUrl(const QString& _url) {
 void AppBase::slotProcessMessage(const QString& _json) {
 	try {
 		std::string msgStd = _json.toStdString();
-		OT_rJSON_parseDOC(inboundAction, msgStd.c_str());
+		ot::JsonDocument inboundAction;
+		inboundAction.fromJson(msgStd);
 		if (inboundAction.IsObject()) {
 
-			std::string action = ot::rJSON::getString(inboundAction, OT_ACTION_MEMBER);
+			std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
 
 			if (action == OT_ACTION_CMD_Log) {
-				OT_rJSON_checkMember(inboundAction, OT_ACTION_PARAM_LOG, Object);
-				OT_rJSON_val logObj = inboundAction[OT_ACTION_PARAM_LOG].GetObject();
+				ot::ConstJsonObject logObj = ot::json::getObject(inboundAction, OT_ACTION_PARAM_LOG);
 
 				ot::LogMessage msg;
 				msg.setFromJsonObject(logObj);
