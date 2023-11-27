@@ -31,7 +31,7 @@ for (rapidjson::SizeType i = 0; i < lclit->value.Size(); i++) { \
 } \
 return ___list
 
-#define OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction) if (!_value[_ix].IsBool()) { OT_LOG_EAS("Array entry \"" + std::to_string(_ix) + "\" is not a " #___entryType); ___errorAction; }
+#define OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction) if (!_value[_ix].Is##___entryType()) { OT_LOG_EAS("Array entry \"" + std::to_string(_ix) + "\" is not a " #___entryType); ___errorAction; }
 
 #define OT_JSON_getFromArray(___array, ___ix, ___entryType, ___errorAction) \
 OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction); \
