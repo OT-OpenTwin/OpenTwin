@@ -12,8 +12,6 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "OTCore/rJSON.h"
-
 TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBase *> objects)
 {
 	assert(!objects.empty());
@@ -153,18 +151,18 @@ void TransformManipulator::performOperation(void)
 	viewer3D->getModel()->lockSelectionAndModification(false);
 
 	// Now we just need to send the property grid settings
-	OT_rJSON_createDOC(doc);
+	ot::JsonDocument doc;
+	doc.AddMember("Translate X", lastPropertyOffset.x(), doc.GetAllocator());
+	doc.AddMember("Translate Y", lastPropertyOffset.y(), doc.GetAllocator());
+	doc.AddMember("Translate Z", lastPropertyOffset.z(), doc.GetAllocator());
 
-	ot::rJSON::add(doc, "Translate X", lastPropertyOffset.x());
-	ot::rJSON::add(doc, "Translate Y", lastPropertyOffset.y());
-	ot::rJSON::add(doc, "Translate Z", lastPropertyOffset.z());
+	doc.AddMember("Axis X", lastPropertyAxis.x(), doc.GetAllocator());
+	doc.AddMember("Axis Y", lastPropertyAxis.y(), doc.GetAllocator());
+	doc.AddMember("Axis Z", lastPropertyAxis.z(), doc.GetAllocator());
 
-	ot::rJSON::add(doc, "Axis X", lastPropertyAxis.x());
-	ot::rJSON::add(doc, "Axis Y", lastPropertyAxis.y());
-	ot::rJSON::add(doc, "Axis Z", lastPropertyAxis.z());
-	ot::rJSON::add(doc, "Angle", lastPropertyAngle);
-
-	std::string selectionInfo = OT_rJSON_toJSON(doc);
+	doc.AddMember("Angle", lastPropertyAngle, doc.GetAllocator());
+	
+	std::string selectionInfo = doc.toJson();
 
 	// Send the selection message to the model
 	getNotifier()->entitiesSelected(messageReplyTo, messageSelectionAction, selectionInfo, messageOptionNames, messageOptionValues);
