@@ -65,6 +65,11 @@ std::string ot::ReturnMessage::toJson(ot::ReturnMessage::ReturnMessageStatus _st
 	return msg.toJson();
 }
 
+std::string ot::ReturnMessage::toJson(ReturnMessageStatus _status, const ot::JsonDocument& _document) {
+	ReturnMessage msg(_status, _document.toJson());
+	return msg.toJson();
+}
+
 ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const std::string& _what) : m_status(_status), m_what(_what) {}
 
 ot::ReturnMessage::ReturnMessage(const ReturnMessage& _other) : m_status(_other.m_status), m_what(_other.m_what) {}

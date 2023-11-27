@@ -31,6 +31,11 @@ namespace ot
 		//! @param _what The message contents
 		static std::string toJson(ReturnMessageStatus _status, const std::string& _what = std::string());
 
+		//! @brief Create a json string that can be used to create a ReturnMessage instance
+		//! @param _status Message status
+		//! @param _document JSON document that will be set as message
+		static std::string toJson(ReturnMessageStatus _status, const ot::JsonDocument& _document);
+
 		//! @brief Constructor
 		//! @param _status The status
 		//! @param _what The message contents
