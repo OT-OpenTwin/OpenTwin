@@ -348,18 +348,18 @@ void EntityMeshTetItem::addVisualizationItem(bool isHidden)
 	treeIcons.visibleIcon = "MeshItemVisible";
 	treeIcons.hiddenIcon = "MeshItemHidden";
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, getCurrentEntityVersion(getEntityID()));
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_TETEDGES_ID, meshDataTetEdgesStorageId);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_TETEDGES_Version, getCurrentEntityVersion(meshDataTetEdgesStorageId));
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getCurrentEntityVersion(this->getEntityID()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_TETEDGES_ID, meshDataTetEdgesStorageId, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_TETEDGES_Version, this->getCurrentEntityVersion(meshDataTetEdgesStorageId), doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(&doc);
+	treeIcons.addToJsonDoc(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(getEntityID(), getCurrentEntityVersion(getEntityID())));
@@ -399,20 +399,20 @@ bool EntityMeshTetItem::updateFromProperties(void)
 	{
 		if (color->needsUpdate())
 		{
-			double colorRGB[3] = { 0.0, 0.0, 0.0 };
-
-			colorRGB[0] = color->getColorR();
-			colorRGB[1] = color->getColorG();
-			colorRGB[2] = color->getColorB();
+			std::list<double> colorRGB;
+			colorRGB.push_back(color->getColorR());
+			colorRGB.push_back(color->getColorG());
+			colorRGB.push_back(color->getColorB());
 
 			setColor(color->getColorR(), color->getColorG(), color->getColorB());
 
 			assert(getObserver() != nullptr);
 
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateMeshColor);
-			ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-			ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, colorRGB, 3);
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_UpdateMeshColor, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
+
 			getObserver()->sendMessageToViewer(doc);
 
 			// We have processed the color change -> reset the needs update flag for this property

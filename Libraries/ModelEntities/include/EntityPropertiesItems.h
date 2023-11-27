@@ -8,8 +8,6 @@ class EntityProperties;
 class EntityBase;
 class EntityContainer;
 
-#include "rapidjson/document.h"
-
 #include "Types.h"
 
 class __declspec(dllexport) EntityPropertiesBase
@@ -43,8 +41,8 @@ public:
 	virtual bool isCompatible(EntityPropertiesBase *other) { return true; };
 	virtual bool hasSameValue(EntityPropertiesBase *other) = 0;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) = 0;
-	virtual void readFromJsonObject(const rapidjson::Value &object) = 0;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) = 0;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) = 0;
 
 	void setReadOnly(bool flag) { readOnly = flag; };
 	bool getReadOnly(void) { return readOnly; };
@@ -63,7 +61,7 @@ public:
 	EntityPropertiesBase& operator=(const EntityPropertiesBase &other);
 
 protected:
-	void addToJsonDocument(rapidjson::Value &container, rapidjson::Document::AllocatorType &allocator, const std::string &type);
+	void addToJsonDocument(ot::JsonValue& container, ot::JsonAllocator& allocator, const std::string &type);
 
 private:
 	void setMultipleValues(void) { multipleValues = true; }
@@ -100,8 +98,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -132,8 +130,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -164,8 +162,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -196,8 +194,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -233,8 +231,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -276,8 +274,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -305,8 +303,8 @@ public:
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
-	virtual void addToJsonDocument(rapidjson::Document &jsonDoc, EntityBase *root) override;
-	virtual void readFromJsonObject(const rapidjson::Value &object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase *root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -348,8 +346,8 @@ public:
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
 
 	virtual bool hasSameValue(EntityPropertiesBase* other) override { return true; };
-	virtual void addToJsonDocument(rapidjson::Document& jsonDoc, EntityBase* root) override;
-	virtual void readFromJsonObject(const rapidjson::Value& object) override;
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	void setValue(std::string& value) { _value = value; }
 	std::string getValue() const {return _value;}

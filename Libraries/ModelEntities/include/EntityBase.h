@@ -12,8 +12,6 @@
 #include "ModelState.h"
 #include "Types.h"
 
-#include "OTCore/rJSON.h"
-
 class EntityBase;
 class ClassFactoryHandler;
 
@@ -26,8 +24,8 @@ public:
 	virtual void entityRemoved(EntityBase *entity) {};
 	virtual void entityModified(EntityBase *entity) {};
 
-	virtual void sendMessageToViewer(rapidjson::Document &doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds;  sendMessageToViewer(doc, prefetchIds); };
-	virtual void sendMessageToViewer(rapidjson::Document &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
+	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds;  sendMessageToViewer(doc, prefetchIds); };
+	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
 
 };
 

@@ -205,16 +205,16 @@ void EntityAnnotation::addVisualizationItem(bool isHidden)
 
 	ot::UID storageVersion = getCurrentEntityVersion(annotationDataStorageId);
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) annotationDataStorageId);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) annotationDataStorageId, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, isHidden, doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(&doc);
+	treeIcons.addToJsonDoc(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(annotationDataStorageId, storageVersion));

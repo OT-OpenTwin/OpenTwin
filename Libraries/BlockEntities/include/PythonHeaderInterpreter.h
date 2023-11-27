@@ -1,17 +1,20 @@
 #pragma once
+#include "OTCore/JSON.h"
 #include "EntityFile.h"
 #include "Connector.h"
 #include <vector>
 class PythonHeaderInterpreter
 {
 public:
+	virtual ~PythonHeaderInterpreter();
+
 	bool interprete(std::shared_ptr<EntityFile> pythonScript);
 	const std::list<ot::Connector>& getAllConnectors() const { return _allConnectors; };
 	const std::list<EntityPropertiesBase*>& getAllProperties()const { return _allProperties; };
 
 private:
-	std::list<OT_rJSON_doc> _allConnectorsAsJSON;
-	std::list<OT_rJSON_doc> _allPropertiesAsJSON;
+	std::list<ot::JsonDocument *> _allConnectorsAsJSON;
+	std::list<ot::JsonDocument*> _allPropertiesAsJSON;
 
 	std::list<EntityPropertiesBase*> _allProperties;
 	std::list<ot::Connector> _allConnectors;
@@ -30,5 +33,5 @@ private:
 
 	bool ExtractOTHeader(const std::string& scriptLine);
 	bool CreateObjectsFromJSON();
-	ot::ConnectorType getConnectorType(OT_rJSON_doc& jsonEntry);
+	ot::ConnectorType getConnectorType(const ot::ConstJsonObject& jsonEntry);
 };

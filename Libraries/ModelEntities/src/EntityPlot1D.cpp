@@ -93,12 +93,12 @@ void EntityPlot1D::addVisualizationItem(bool isHidden)
 	treeIcons.visibleIcon = "Plot1DVisible";
 	treeIcons.hiddenIcon = "Plot1DHidden";
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::list<unsigned long long> versions;
 	for (auto curve : curves)
@@ -106,13 +106,12 @@ void EntityPlot1D::addVisualizationItem(bool isHidden)
 		versions.push_back(getCurrentEntityVersion(curve));
 	}
 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_CurveIDs, curves);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_CurveVersions, versions);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_CurveNames, getCurveNames());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveIDs, ot::JsonArray(curves, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveVersions, ot::JsonArray(versions, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, ot::JsonArray(this->getCurveNames(), doc.GetAllocator()), doc.GetAllocator());
 
-	addPropertiesToDocument(doc);
-
-	treeIcons.addToJsonDoc(&doc);
+	this->addPropertiesToDocument(doc);
+	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -150,9 +149,10 @@ bool EntityPlot1D::updateFromProperties(void)
 	setModified();
 
 	// Send a notification message to the observer, that the result1d properties have changed
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, getEntityID());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
+
 	addPropertiesToDocument(doc);
 
 	getObserver()->sendMessageToViewer(doc);
@@ -195,27 +195,27 @@ std::string EntityPlot1D::getPlotQuantity(void) {
 	}
 }
 
-void EntityPlot1D::addPropertiesToDocument(rapidjson::Document &doc)
+void EntityPlot1D::addPropertiesToDocument(ot::JsonDocument& doc)
 {
 	int gridColorR = 0, gridColorG = 0, gridColorB = 0;
 	getGridColor(gridColorR, gridColorG, gridColorB);
 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Title, getTitle());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_PlotType, getPlotType());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity, getPlotQuantity());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Legend, getLegend());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Grid, getGrid());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_LogscaleX, getLogscaleX());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_LogscaleY, getLogscaleY());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_AutoscaleX, getAutoscaleX());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_AutoscaleY, getAutoscaleY());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Xmin, getXmin());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Xmax, getXmax());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Ymin, getYmin());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_Ymax, getYmax());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_GridColorR, gridColorR);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_GridColorG, gridColorG);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW1D_GridColorB, gridColorB);
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Title, ot::JsonString(getTitle(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_PlotType, ot::JsonString(getPlotType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_PlotQuantity, ot::JsonString(getPlotQuantity(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Legend, getLegend(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Grid, getGrid(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_LogscaleX, getLogscaleX(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_LogscaleY, getLogscaleY(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_AutoscaleX, getAutoscaleX(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_AutoscaleY, getAutoscaleY(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Xmin, getXmin(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Xmax, getXmax(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Ymin, getYmin(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Ymax, getYmax(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorR, gridColorR, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorG, gridColorG, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorB, gridColorB, doc.GetAllocator());
 }
 
 void EntityPlot1D::setStringPlotProperty(const std::string &name, const std::string &value)

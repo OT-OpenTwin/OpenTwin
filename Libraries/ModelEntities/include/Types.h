@@ -1,8 +1,7 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-//#include <OpenTwinCommunication/actionTypes.h>
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 
 class __declspec(dllexport) TreeIcon
@@ -16,5 +15,5 @@ public:
 	std::string visibleIcon;
 	std::string hiddenIcon;
 
-	void addToJsonDoc(rapidjson::Document *doc);
+	void addToJsonDoc(ot::JsonDocument& doc);
 };

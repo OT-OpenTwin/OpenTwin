@@ -120,23 +120,23 @@ bool EntityGeometry::updateFromProperties(void)
 
 	if (color->needsUpdate() || typeNeedsUpdate)
 	{
-		double surfaceColorRGB[3] = { 0.8, 0.8, 0.8 };
-		double edgeColorRGB[3]    = { 0.8, 0.8, 0.8 };
-
-		surfaceColorRGB[0] = edgeColorRGB[0] = color->getColorR();
-		surfaceColorRGB[1] = edgeColorRGB[1] = color->getColorG();
-		surfaceColorRGB[2] = edgeColorRGB[2] = color->getColorB();
+		std::vector<double> surfaceColorRGB;
+		surfaceColorRGB.push_back(color->getColorR());
+		surfaceColorRGB.push_back(color->getColorG());
+		surfaceColorRGB.push_back(color->getColorB());
+		
+		std::vector<double> edgeColorRGB = surfaceColorRGB;
 
 		assert(getObserver() != nullptr);
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, surfaceColorRGB, 3);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, edgeColorRGB, 3);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType, materialType);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_TextureType, textureType);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_TextureReflective, isTextureReflective(textureType));
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, ot::JsonArray(surfaceColorRGB, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, ot::JsonArray(edgeColorRGB, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString(textureType, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, this->isTextureReflective(textureType), doc.GetAllocator());
 
 		getObserver()->sendMessageToViewer(doc);
 
@@ -411,13 +411,18 @@ void EntityGeometry::addVisualizationNodes(void)
 	EntityPropertiesColor *colorProp = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
 	assert(colorProp != nullptr);
 
-	double colorRGB[3] = { 0.8, 0.8, 0.8 };
-
-	if (colorProp != nullptr)
+	std::vector<double> colorRGB(3);
+	
+	if (colorProp)
 	{
-		colorRGB[0] = colorProp->getColorR();
-		colorRGB[1] = colorProp->getColorG();
-		colorRGB[2] = colorProp->getColorB();
+		colorRGB.push_back(colorProp->getColorR());
+		colorRGB.push_back(colorProp->getColorG());
+		colorRGB.push_back(colorProp->getColorB());
+	}
+	else {
+		colorRGB.push_back(0.8);
+		colorRGB.push_back(0.8);
+		colorRGB.push_back(0.8);
 	}
 
 	std::string materialType = "Rough";
@@ -443,29 +448,29 @@ void EntityGeometry::addVisualizationNodes(void)
 	std::vector<double> transformation;
 	getTransformation(transformation);
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, colorRGB, 3);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, colorRGB, 3);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType, materialType);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_TextureType, textureType);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_TextureReflective, isTextureReflective(textureType));
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, true);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, (double) 1.0);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, getInitiallyHidden());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) facetsStorageID);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_SelectChildren, getSelectChildren());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, getManageParentVisibility());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, getManageChildVisibility());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, getShowWhenSelected());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Transformation, transformation);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString(textureType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, this->isTextureReflective(textureType), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, true, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, 1., doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) facetsStorageID, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SelectChildren, this->getSelectChildren(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, this->getManageParentVisibility(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, this->getManageChildVisibility(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, this->getShowWhenSelected(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Transformation, ot::JsonArray(transformation, doc.GetAllocator()), doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(&doc);
+	treeIcons.addToJsonDoc(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(facetsStorageID, storageVersion));

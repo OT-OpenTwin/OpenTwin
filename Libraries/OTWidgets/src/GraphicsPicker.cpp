@@ -229,15 +229,14 @@ void ot::GraphicsPicker::addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _p
 		treeItem = new QTreeWidgetItem;
 		treeItem->setText(intern::ntTitle, QString::fromStdString(_item->title()));
 
-		OT_rJSON_createDOC(doc);
-		OT_rJSON_createValueObject(obj);
-		_item->addToJsonObject(doc, obj);
+		JsonDocument doc;
+		_item->addToJsonObject(doc, doc.GetAllocator());
 
 		ot::GraphicsItemCfg* config = nullptr;
 		try {
-			config = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(obj);
+			config = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(doc.GetConstObject());
 			if (config) {
-				config->setFromJsonObject(obj);
+				config->setFromJsonObject(doc.GetConstObject());
 				_parentNavigationItem->addChild(treeItem);
 				treeItem->setHidden(true);
 				this->storePreviewData(_parentNavigationItem, config);

@@ -4,9 +4,10 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
 
 ot::GraphicsLayoutItem::GraphicsLayoutItem()
 	: ot::GraphicsItem(true), m_layoutWrap(nullptr)

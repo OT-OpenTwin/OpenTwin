@@ -6,10 +6,10 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/OTQtConverter.h"
-#include "OTCore/OTAssert.h"
 
 // Qt header
 #include <QtGui/qpainter.h>

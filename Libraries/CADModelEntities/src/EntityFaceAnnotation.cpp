@@ -136,10 +136,14 @@ void EntityFaceAnnotation::EnsureFacetsAreLoaded(void)
 
 void EntityFaceAnnotation::updateVisualization(bool isHidden)
 {
-	EntityPropertiesColor *color = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
+	EntityPropertiesColor* color = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
 	assert(color != nullptr);
 
-	double colorRGB[3] = { color->getColorR(), color->getColorG(), color->getColorB() };
+	std::vector<double> colorRGB(3);
+	colorRGB.push_back(color->getColorR());
+	colorRGB.push_back(color->getColorG());
+	colorRGB.push_back(color->getColorB());
+
 	std::string errors;
 
 	// Note: this call will modify a potentially existing node rather than creating a new one
@@ -152,28 +156,29 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 
 	std::string materialType = "Rough";
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, colorRGB, 3);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, colorRGB, 3);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType, materialType);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_TextureType, "None");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_TextureReflective, false);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, false);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, (double) 0.5);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) facetsStorageID);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_SelectChildren, getSelectChildren());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, getManageParentVisibility());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, getManageChildVisibility());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, false);
+	ot::JsonDocument doc;
 
-	treeIcons.addToJsonDoc(&doc);	
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString("None", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, false, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, false, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, 0.5, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) facetsStorageID, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SelectChildren, this->getSelectChildren(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, this->getManageParentVisibility(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, this->getManageChildVisibility(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, false, doc.GetAllocator());
+	
+	treeIcons.addToJsonDoc(doc);	
 	
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(facetsStorageID, storageVersion));

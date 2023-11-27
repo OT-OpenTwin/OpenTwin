@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 #include "OTWidgets/Painter2DFactory.h"

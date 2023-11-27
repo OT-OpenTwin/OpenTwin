@@ -15,9 +15,6 @@
 #include <bsoncxx/types/value.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
 
 using bsoncxx::types::value;
 using bsoncxx::builder::basic::kvp;

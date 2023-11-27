@@ -3,6 +3,19 @@
 #include <sstream>
 #include <algorithm>
 
+PythonHeaderInterpreter::~PythonHeaderInterpreter() {
+	for (auto doc : _allConnectorsAsJSON) {
+		delete doc;
+	}
+	_allConnectorsAsJSON.clear();
+
+	for (auto doc : _allPropertiesAsJSON) {
+		delete doc;
+	}
+	_allPropertiesAsJSON.clear();
+
+}
+
 bool PythonHeaderInterpreter::interprete(std::shared_ptr<EntityFile> pythonScript)
 {
 	_allConnectors.clear();
@@ -58,7 +71,9 @@ bool PythonHeaderInterpreter::ExtractOTHeader(const std::string& scriptLine)
 	if(std::find(_entryTypeNamesProperty.begin(), _entryTypeNamesProperty.end(), entryType) != _entryTypeNamesProperty.end())
 	{
 		std::string entryDefinition = scriptLine.substr(endOfEntryType + 1, scriptLine.size());
-		_allPropertiesAsJSON.push_back(ot::rJSON::fromJSON(entryDefinition));
+		ot::JsonDocument* doc = new ot::JsonDocument;
+		doc->fromJson(entryDefinition);
+		_allPropertiesAsJSON.push_back(doc);
 		return true;
 	}
 	else if (std::find(_entryTypeNamesConnector.begin(), _entryTypeNamesConnector.end(), entryType) != _entryTypeNamesConnector.end())
@@ -66,7 +81,9 @@ bool PythonHeaderInterpreter::ExtractOTHeader(const std::string& scriptLine)
 		const size_t startJSON = scriptLine.find_first_of("{");
 		const size_t endOfJSON = scriptLine.find_last_of("}");
 		std::string entryDefinition = scriptLine.substr(startJSON, endOfJSON-startJSON+1);
-		_allConnectorsAsJSON.push_back(ot::rJSON::fromJSON(entryDefinition));
+		ot::JsonDocument* doc = new ot::JsonDocument;
+		doc->fromJson(entryDefinition);
+		_allConnectorsAsJSON.push_back(doc);
 		return true;
 	}
 	else
@@ -80,22 +97,22 @@ bool PythonHeaderInterpreter::CreateObjectsFromJSON()
 	bool allObjectsCreated = true;
 	for (auto& connectorJSON : _allConnectorsAsJSON)
 	{
-		ot::ConnectorType connectorType = getConnectorType(connectorJSON);
+		ot::ConnectorType connectorType = getConnectorType(connectorJSON->GetConstObject());
 		std::string name(""), title("");
 		for (const std::string& nameVariant : _connectorDefName)
 		{
-			if (connectorJSON.HasMember(nameVariant.c_str()))
+			if (connectorJSON->HasMember(nameVariant.c_str()))
 			{
-				name = ot::rJSON::getString(connectorJSON, nameVariant.c_str());
+				name = ot::json::getString(*connectorJSON, nameVariant.c_str());
 				break;
 			}
 		}
 
 		for (const std::string& titleVariant : _connectorDefTitle)
 		{
-			if (connectorJSON.HasMember(titleVariant.c_str()))
+			if (connectorJSON->HasMember(titleVariant.c_str()))
 			{
-				title = ot::rJSON::getString(connectorJSON, titleVariant.c_str());
+				title = ot::json::getString(*connectorJSON, titleVariant.c_str());
 				break;
 			}
 		}
@@ -118,14 +135,14 @@ bool PythonHeaderInterpreter::CreateObjectsFromJSON()
 	return allObjectsCreated;
 }
 
-ot::ConnectorType PythonHeaderInterpreter::getConnectorType(OT_rJSON_doc& jsonEntry)
+ot::ConnectorType PythonHeaderInterpreter::getConnectorType(const ot::ConstJsonObject& jsonEntry)
 {
 	std::string typeString("");
 	for (const std::string& typeVariant : _connectorDefType)
 	{
 		if (jsonEntry.HasMember(typeVariant.c_str()))
 		{
-			typeString = ot::rJSON::getString(jsonEntry, typeVariant.c_str());
+			typeString = ot::json::getString(jsonEntry, typeVariant.c_str());
 		}
 	}
 	if (typeString == "")

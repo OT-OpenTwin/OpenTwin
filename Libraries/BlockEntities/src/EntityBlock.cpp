@@ -1,6 +1,7 @@
 #include "EntityBlock.h"
-#include "OTCommunication/ActionTypes.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
+#include "OTCommunication/ActionTypes.h"
 #include "BlockConnectionBSON.h"
 #include "EntityBlock.h"
 
@@ -142,13 +143,13 @@ void EntityBlock::CreateNavigationTreeEntry()
 		treeIcons.visibleIcon = _navigationTreeIconName;
 		treeIcons.hiddenIcon = _navigationTreeIconNameHidden;
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(&doc);
+		treeIcons.addToJsonDoc(doc);
 		getObserver()->sendMessageToViewer(doc);
 	}
 }
@@ -169,13 +170,14 @@ void EntityBlock::CreateBlockItem()
 	ot::GraphicsScenePackage pckg(_graphicsScenePackage);
 	pckg.addItem(blockCfg);
 
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-	_info.addToJsonObject(reqDoc, reqDoc);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	OT_rJSON_createValueObject(pckgDoc);
-	pckg.addToJsonObject(reqDoc, pckgDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(reqDoc);
 }
@@ -192,15 +194,15 @@ void EntityBlock::CreateConnections()
 		connectionPckg.addConnection(connection);
 	}
 
-	// Request UI to add connections
-	OT_rJSON_createDOC(connectionReqDoc);
-	ot::rJSON::add(connectionReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
-	_info.addToJsonObject(connectionReqDoc, connectionReqDoc);
-	OT_rJSON_createValueObject(reqConnectionPckgObj);
-	connectionPckg.addToJsonObject(connectionReqDoc, reqConnectionPckgObj);
-	ot::rJSON::add(connectionReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqConnectionPckgObj);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
-	getObserver()->sendMessageToViewer(connectionReqDoc);
+	ot::JsonObject pckgObj;
+	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+	getObserver()->sendMessageToViewer(reqDoc);
 }
 
 void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)

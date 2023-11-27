@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"

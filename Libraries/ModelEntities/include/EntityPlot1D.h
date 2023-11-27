@@ -91,7 +91,7 @@ private:
 	std::string getSelectionPlotProperty(const std::string &name);
 	bool getBoolPlotProperty(const std::string &name);
 	double getDoublePlotProperty(const std::string &name);
-	void addPropertiesToDocument(rapidjson::Document &doc);
+	void addPropertiesToDocument(ot::JsonDocument &doc);
 
 	std::list<ot::UID> curves;
 	std::map<ot::UID, std::string> curveNames;

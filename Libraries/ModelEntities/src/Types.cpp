@@ -3,11 +3,11 @@
 #include "Types.h"
 #include "OTCommunication/ActionTypes.h"
 
-void TreeIcon::addToJsonDoc(rapidjson::Document *doc)
+void TreeIcon::addToJsonDoc(ot::JsonDocument& doc)
 {
-	ot::rJSON::add(*doc, OT_ACTION_PARAM_UI_TREE_IconSize, size);
-	ot::rJSON::add(*doc, OT_ACTION_PARAM_UI_TREE_IconItemVisible, visibleIcon);
-	ot::rJSON::add(*doc, OT_ACTION_PARAM_UI_TREE_IconItemHidden, hiddenIcon);
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconSize, size, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemVisible, ot::JsonString(visibleIcon, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemHidden, ot::JsonString(hiddenIcon, doc.GetAllocator()), doc.GetAllocator());
 }
 
 

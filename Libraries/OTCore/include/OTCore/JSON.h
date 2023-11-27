@@ -183,6 +183,42 @@ namespace ot {
 			}
 		}
 
+		//! @brief Create float array
+		explicit JsonArray(const std::list<float>& _lst, JsonAllocator& _allocator)
+			: rapidjson::Value(rapidjson::kArrayType)
+		{
+			for (auto itm : _lst) {
+				this->PushBack(itm, _allocator);
+			}
+		}
+
+		//! @brief Create float array
+		explicit JsonArray(const std::vector<float>& _vec, JsonAllocator& _allocator)
+			: rapidjson::Value(rapidjson::kArrayType)
+		{
+			for (auto itm : _vec) {
+				this->PushBack(itm, _allocator);
+			}
+		}
+
+		//! @brief Create double array
+		explicit JsonArray(const std::list<double>& _lst, JsonAllocator& _allocator)
+			: rapidjson::Value(rapidjson::kArrayType)
+		{
+			for (auto itm : _lst) {
+				this->PushBack(itm, _allocator);
+			}
+		}
+
+		//! @brief Create double array
+		explicit JsonArray(const std::vector<double>& _vec, JsonAllocator& _allocator)
+			: rapidjson::Value(rapidjson::kArrayType)
+		{
+			for (auto itm : _vec) {
+				this->PushBack(itm, _allocator);
+			}
+		}
+
 		//! @brief Create string array
 		explicit JsonArray(const std::list<std::string>& _lst, JsonAllocator& _allocator)
 			: rapidjson::Value(rapidjson::kArrayType)
@@ -224,6 +260,10 @@ namespace ot {
 		}
 
 		const JsonDocument& constRef(void) const { return *this; };
+
+		ConstJsonObject GetConstObject() const {
+			return this->GetObject();
+		}
 
 		std::string toJson(void) {
 			// Create String buffer
