@@ -3,7 +3,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/UserCredentials.h"
 
@@ -24,11 +24,11 @@ namespace ot {
 
 		virtual ~SettingsData();
 
-		static SettingsData * parseFromJsonDocument(rapidjson::Document& _document);
+		static SettingsData * parseFromJsonDocument(const JsonDocument& _document);
 
-		static SettingsData * parseFromJsonObject(rapidjson::Value& _object);
+		static SettingsData * parseFromJsonObject(const ConstJsonObject& _object);
 
-		static SettingsGroup * parseGroupFromJsonObject(rapidjson::Value& _object);
+		static SettingsGroup * parseGroupFromJsonObject(const ConstJsonObject& _object);
 
 		// ##############################################################
 
@@ -44,7 +44,7 @@ namespace ot {
 
 		std::string toJson(void) const;
 
-		void addToJsonDocument(rapidjson::Document& _document) const;
+		void addToJsonDocument(JsonDocument& _document) const;
 
 		std::list<AbstractSettingsItem *> items(void);
 
@@ -111,7 +111,7 @@ namespace ot {
 
 		inline bool isAttached(void) const { return m_isAttached; }
 
-		void addToJsonArray(rapidjson::Document& _document, rapidjson::Value& _array) const;
+		void addToJsonArray(JsonValue& _array, JsonAllocator& _allocator) const;
 
 		std::string logicalName(const std::string& _delimiter = std::string(":"));
 
@@ -198,13 +198,13 @@ namespace ot {
 
 		std::list<std::string> parentGroupsList(void) const;
 
-		void addToJsonArray(rapidjson::Document& _document, rapidjson::Value& _array) const;
+		void addToJsonArray(JsonValue& _array, JsonAllocator& _allocator) const;
 
 		std::string logicalName(const std::string& _delimiter = std::string(":"));
 
 	protected:
 
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const = 0;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const = 0;
 
 		SettingsGroup *	m_parent;
 		itemType		m_type;
@@ -249,7 +249,7 @@ namespace ot {
 		inline std::string value(void) const;
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		SettingsItemInfoText() = delete;
@@ -282,7 +282,7 @@ namespace ot {
 		inline bool value(void) const { return m_value; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		bool			m_value;
@@ -321,7 +321,7 @@ namespace ot {
 		inline const std::string& inputHint(void) const { return m_inputHint; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::string			m_value;
@@ -369,7 +369,7 @@ namespace ot {
 		inline int maxValue(void) const { return m_maxValue; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 
@@ -423,7 +423,7 @@ namespace ot {
 		inline int decimalPlaces(void) const { return m_decimals; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 
@@ -473,7 +473,7 @@ namespace ot {
 		inline const std::string& selectedValue(void) const { return m_selectedValue; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::list<std::string>	m_possibleSelection;
@@ -522,7 +522,7 @@ namespace ot {
 		inline const std::string& inputHint(void) const { return m_inputHint; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::list<std::string>	m_possibleSelection;
@@ -572,7 +572,7 @@ namespace ot {
 		inline const std::list<std::string>& selectedValues(void) const { return m_selectedValues; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::list<std::string>	m_possibleSelection;
@@ -613,7 +613,7 @@ namespace ot {
 		inline const ot::Color& value(void) const { return m_color; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		ot::Color		m_color;
@@ -653,7 +653,7 @@ namespace ot {
 		inline const std::string& inputHint(void) const { return m_inputHint; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::string			m_directory;
@@ -698,7 +698,7 @@ namespace ot {
 		inline const std::string& inputHint(void) const { return m_inputHint; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::string			m_file;
@@ -744,7 +744,7 @@ namespace ot {
 		inline const std::string& inputHint(void) const { return m_inputHint; }
 
 	protected:
-		virtual void addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const override;
+		virtual void addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 	private:
 		std::string			m_file;
@@ -764,42 +764,42 @@ namespace ot {
 
 	class OT_SERVICEFOUNDATION_API_EXPORT SettingsItemFactory {
 	public:
-		static AbstractSettingsItem * createItem(rapidjson::Value& _jsonObject);
+		static AbstractSettingsItem * createItem(const ConstJsonObject& _jsonObject);
 
 		static SettingsItemInfoText * createInfoTextItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible = true);
 
 		static SettingsItemBoolean * createBooleanItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _value);
-		static SettingsItemBoolean * createBooleanItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemBoolean * createBooleanItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemString * createStringItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::string& _value, const std::string& _inputHint = std::string());
-		static SettingsItemString * createStringItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemString * createStringItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemInteger * createIntegerItem(const std::string& _name, const std::string& _title, const std::string& _description, int _value, int _minValue, int _maxValue);
-		static SettingsItemInteger * createIntegerItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemInteger * createIntegerItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemDouble * createDoubleItem(const std::string& _name, const std::string& _title, const std::string& _description, double _value, double _minValue, double _maxValue, int _decimals);
-		static SettingsItemDouble * createDoubleItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemDouble * createDoubleItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemSelection * createSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::list<std::string>& _possibleSelection = std::list<std::string>(), const std::string& _selectedValue = std::string());
-		static SettingsItemSelection * createSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemSelection * createSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemEditableSelection * createEditableSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::list<std::string>& _possibleSelection = std::list<std::string>(), const std::string& _selectedValue = std::string(), const std::string& _inputHint = std::string());
-		static SettingsItemEditableSelection * createEditableSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemEditableSelection * createEditableSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemListSelection * createListSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::list<std::string>& _possibleSelection = std::list<std::string>(), const std::list<std::string>& _selectedValues = std::list<std::string>());
-		static SettingsItemListSelection * createListSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemListSelection * createListSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemColor * createColorItem(const std::string& _name, const std::string& _title, const std::string& _description, const ot::Color& _color);
-		static SettingsItemColor * createColorItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemColor * createColorItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemDirectorySelect * createDirectorySelectItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::string& _directory, const std::string& _inputHint = std::string());
-		static SettingsItemDirectorySelect * createDirectorySelectItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemDirectorySelect * createDirectorySelectItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemFileSelectOpen * createFileSelectOpenItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::string& _file, const std::string& _inputHint = std::string());
-		static SettingsItemFileSelectOpen * createFileSelectOpenItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemFileSelectOpen * createFileSelectOpenItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 		static SettingsItemFileSelectSave * createFileSelectSaveItem(const std::string& _name, const std::string& _title, const std::string& _description, const std::string& _file, const std::string& _inputHint = std::string());
-		static SettingsItemFileSelectSave * createFileSelectSaveItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject);
+		static SettingsItemFileSelectSave * createFileSelectSaveItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject);
 
 	private:
 		SettingsItemFactory() = delete;

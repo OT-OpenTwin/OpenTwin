@@ -1,6 +1,5 @@
 #pragma once
-#include "OTCore/rJSONHelper.h"
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "Variable.h"
 
 namespace ot
@@ -8,6 +7,6 @@ namespace ot
 	class __declspec(dllexport)  JSONToVariableConverter
 	{
 	public:
-		Variable operator() (rapidjson::Value& value);
+		Variable operator() (JsonValue& value);
 	};
 }

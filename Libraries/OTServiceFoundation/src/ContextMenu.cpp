@@ -43,14 +43,14 @@ ot::ContextMenuItemRole::itemRole ot::ContextMenuItemRole::stringToRole(const st
 	else { OTAssert(0, "Invalid role"); return NoRole; }
 }
 
-void ot::ContextMenuItemRole::addToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const {
-	ot::rJSON::add(_doc, _object, "Role", roleToString(m_role));
-	ot::rJSON::add(_doc, _object, "RoleText", m_roleText);
+void ot::ContextMenuItemRole::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("Role", JsonString(roleToString(m_role), _allocator), _allocator);
+	_object.AddMember("RoleText", JsonString(m_roleText, _allocator), _allocator);
 }
 
-void ot::ContextMenuItemRole::setFromJsonObject(OT_rJSON_val & _object) {
-	m_role = stringToRole(ot::rJSON::getString(_object, "Role"));
-	m_roleText = ot::rJSON::getString(_object, "RoleText");
+void ot::ContextMenuItemRole::setFromJsonObject(const ConstJsonObject& _object) {
+	m_role = stringToRole(json::getString(_object, "Role"));
+	m_roleText = json::getString(_object, "RoleText");
 }
 
 // #########################################################################################################################################
@@ -99,12 +99,12 @@ ot::AbstractContextMenuItem::itemType ot::AbstractContextMenuItem::stringToType(
 	}
 }
 
-void ot::AbstractContextMenuItem::addToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const {
-	ot::rJSON::add(_doc, _object, "Type", typeToString(m_type));
-	addInternalToJsonObject(_doc, _object);
+void ot::AbstractContextMenuItem::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("Type", JsonString(typeToString(m_type), _allocator), _allocator);
+	this->addInternalToJsonObject(_object, _allocator);
 }
 
-ot::AbstractContextMenuItem * ot::AbstractContextMenuItem::buildItemFromJsonObject(OT_rJSON_val & _object) {
+ot::AbstractContextMenuItem * ot::AbstractContextMenuItem::buildItemFromJsonObject(const ConstJsonObject& _object) {
 	if (!_object.HasMember("Type")) {
 		OTAssert(0, "Type is missing");
 		return nullptr;
@@ -136,8 +136,8 @@ ot::AbstractContextMenuItem * ot::AbstractContextMenuItem::buildItemFromJsonObje
 	}
 }
 
-void ot::AbstractContextMenuItem::setFromJsonObject(OT_rJSON_val & _object) {
-	m_type = stringToType(ot::rJSON::getString(_object, "Type"));
+void ot::AbstractContextMenuItem::setFromJsonObject(const ConstJsonObject& _object) {
+	m_type = stringToType(json::getString(_object, "Type"));
 	setInternalFromJsonObject(_object);
 }
 
@@ -164,9 +164,9 @@ ot::AbstractContextMenuItem * ot::ContextMenuSeperator::createCopy(void) const {
 	return new ContextMenuSeperator;
 }
 
-void ot::ContextMenuSeperator::addInternalToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const {}
+void ot::ContextMenuSeperator::addInternalToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {}
 
-void ot::ContextMenuSeperator::setInternalFromJsonObject(OT_rJSON_val & _object) {}
+void ot::ContextMenuSeperator::setInternalFromJsonObject(const ConstJsonObject& _object) {}
 
 // #########################################################################################################################################
 
@@ -244,18 +244,19 @@ ot::ContextMenuItem& ot::ContextMenuItem::operator + (itemCheckedState _checkedS
 
 // Protected functions
 
-void ot::ContextMenuItem::addInternalToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const {
-	ot::rJSON::add(_doc, _object, "Name", m_name);
-	ot::rJSON::add(_doc, _object, "Text", m_text);
-	ot::rJSON::add(_doc, _object, "Icon", m_icon);
-	OT_rJSON_createValueObject(roleObj);
-	m_role.addToJsonObject(_doc, roleObj);
-	ot::rJSON::add(_doc, _object, "Role", roleObj);
-	ot::rJSON::add(_doc, _object, "Flags", convert::toString(m_flags));
-	ot::rJSON::add(_doc, _object, "CheckedState", convert::toString(m_checkState.data()));
+void ot::ContextMenuItem::addInternalToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
+	_object.AddMember("Icon", JsonString(m_icon, _allocator), _allocator);
+	_object.AddMember("Flags", JsonArray(convert::toString(m_flags), _allocator), _allocator);
+	_object.AddMember("CheckedState", JsonString(convert::toString(m_checkState.data()), _allocator), _allocator);
+	
+	JsonObject roleObj;
+	m_role.addToJsonObject(roleObj, _allocator);
+	_object.AddMember("Role", roleObj, _allocator);
 }
 
-void ot::ContextMenuItem::setInternalFromJsonObject(OT_rJSON_val & _object) {
+void ot::ContextMenuItem::setInternalFromJsonObject(const ConstJsonObject& _object) {
 	// Check object
 	if (!_object.HasMember("Name")) { OTAssert(0, "Member Name is missing"); return; }
 	if (!_object["Name"].IsString()) { OTAssert(0, "Member Name is not a string"); return; }
@@ -271,12 +272,12 @@ void ot::ContextMenuItem::setInternalFromJsonObject(OT_rJSON_val & _object) {
 	if (!_object["CheckedState"].IsString()) { OTAssert(0, "Member Role is not a object"); return; }
 
 	// Store data
-	m_name = _object["Name"].GetString();
-	m_text = _object["Text"].GetString();
-	m_icon = _object["Icon"].GetString();
-	m_role.setFromJsonObject(_object);
-	m_checkState = convert::toItemCheckedState(ot::rJSON::getString(_object, "CheckedState"));
-	m_flags = convert::toItemFlags(ot::rJSON::getStringList(_object, "Flags"));
+	m_name = json::getString(_object, "Name");
+	m_text = json::getString(_object, "Text");
+	m_icon = json::getString(_object, "Icon");
+	m_role.setFromJsonObject(json::getObject(_object, "Role"));
+	m_checkState = convert::toItemCheckedState(json::getString(_object, "CheckedState"));
+	m_flags = convert::toItemFlags(json::getStringList(_object, "Flags"));
 }
 
 // #########################################################################################################################################
@@ -313,33 +314,31 @@ ot::ContextMenu::~ContextMenu() {}
 
 bool ot::ContextMenu::hasItems(void) const { return !m_items.empty(); }
 
-void ot::ContextMenu::addToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const {
-	ot::rJSON::add(_doc, _object, "Name", m_name);
-	OT_rJSON_createValueArray(itemData);
+void ot::ContextMenu::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
+	JsonArray itemArr;
 	for (auto itm : m_items) {
-		OT_rJSON_createValueObject(itemObj);
-		itm->addToJsonObject(_doc, itemObj);
-		itemData.PushBack(itemObj, _doc.GetAllocator());
+		JsonObject itemObj;
+		itm->addToJsonObject(itemObj, _allocator);
+		itemArr.PushBack(itemObj, _allocator);
 	}
-	ot::rJSON::add(_doc, _object, "Items", itemData);
+	_object.AddMember("Items", itemArr, _allocator);
 }
 
 // #######################################################################################################
 
 // Setter
 
-void ot::ContextMenu::setFromJsonObject(OT_rJSON_val & _object) {
+void ot::ContextMenu::setFromJsonObject(const ConstJsonObject& _object) {
 	if (!_object.HasMember("Name")) { OTAssert(0, "Member Name is missing"); return; }
 	if (!_object["Name"].IsString()) { OTAssert(0, "Member Name is not a string"); return; }
 	if (!_object.HasMember("Items")) { OTAssert(0, "Member Items is missing"); return; }
 	if (!_object["Items"].IsArray()) { OTAssert(0, "Member Items is not a array"); return; }
 	
-	m_name = _object["Name"].GetString();
-	OT_rJSON_val itemData = _object["Items"].GetArray();
-	for (rapidjson::SizeType i{ 0 }; i < itemData.Size(); i++) {
-		if (!itemData[i].IsObject()) { OTAssert(0, "Item entry is not a object"); return; }
-		OT_rJSON_val itemEntry = itemData[i].GetObject();
-		AbstractContextMenuItem * itm = AbstractContextMenuItem::buildItemFromJsonObject(itemEntry);
+	m_name = json::getString(_object, "Name");
+	std::list<ConstJsonObject> itemsArr = json::getObjectList(_object, "Items");
+	for (auto itemObj : itemsArr) {
+		AbstractContextMenuItem * itm = AbstractContextMenuItem::buildItemFromJsonObject(itemObj);
 		if (itm) { m_items.push_back(itm); }
 	}
 }

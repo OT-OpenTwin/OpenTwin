@@ -5,8 +5,8 @@
 
 
 // OpenTwin header
-#include "OTCore/rJSONHelper.h"
 #include "OTCore/SimpleFactory.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
@@ -29,28 +29,24 @@ void ot::GraphicsCollectionPackage::addCollection(GraphicsCollectionCfg* _collec
 	m_collections.push_back(_collection);
 }
 
-void ot::GraphicsCollectionPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	OT_rJSON_createValueArray(collectionArr);
+void ot::GraphicsCollectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	JsonArray collectionArr;
 	for (auto c : m_collections) {
-		OT_rJSON_createValueObject(collectionObj);
-		c->addToJsonObject(_document, collectionObj);
-		collectionArr.PushBack(collectionObj, _document.GetAllocator());
+		JsonObject collectionObj;
+		c->addToJsonObject(collectionObj, _allocator);
+		collectionArr.PushBack(collectionObj, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Collections, collectionArr);
+	_object.AddMember(OT_JSON_Member_Collections, collectionArr, _allocator);
 }
 
-void ot::GraphicsCollectionPackage::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsCollectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
 	this->memFree();
 
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Collections, Array);
-
-	OT_rJSON_val collectionArr = _object[OT_JSON_Member_Collections].GetArray();
-	for (rapidjson::SizeType i = 0; i < collectionArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(collectionArr, i, Object);
-		OT_rJSON_val collectionObj = collectionArr[i].GetObject();
+	std::list<ConstJsonObject> collectionArr = json::getObjectList(_object, OT_JSON_Member_Collections);
+	for (auto c : collectionArr) {
 		GraphicsCollectionCfg* newCollection = new GraphicsCollectionCfg;
 		try {
-			newCollection->setFromJsonObject(collectionObj);
+			newCollection->setFromJsonObject(c);
 			m_collections.push_back(newCollection);
 		}
 		catch (const std::exception& _e) {
@@ -79,18 +75,16 @@ ot::GraphicsNewEditorPackage::~GraphicsNewEditorPackage() {
 	
 }
 
-void ot::GraphicsNewEditorPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::GraphicsCollectionPackage::addToJsonObject(_document, _object);
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Name, m_name);
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Title, m_title);
+void ot::GraphicsNewEditorPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	ot::GraphicsCollectionPackage::addToJsonObject(_object, _allocator);
+
+	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
 }
 
-void ot::GraphicsNewEditorPackage::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsNewEditorPackage::setFromJsonObject(const ConstJsonObject& _object) {
 	ot::GraphicsCollectionPackage::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Title, String);
-	m_name = ot::rJSON::getString(_object, OT_JSON_Member_Name);
-	m_title = ot::rJSON::getString(_object, OT_JSON_Member_Title);
+	m_name = json::getString(_object, OT_JSON_Member_Name);
+	m_title = json::getString(_object, OT_JSON_Member_Title);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -107,35 +101,30 @@ ot::GraphicsScenePackage::~GraphicsScenePackage() {
 	this->memFree();
 }
 
-void ot::GraphicsScenePackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Name, m_name);
+void ot::GraphicsScenePackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
 
-	OT_rJSON_createValueArray(itemsArr);
+	JsonArray itemsArr;
 	for (auto itm : m_items) {
-		OT_rJSON_createValueObject(itemObj);
-		itm->addToJsonObject(_document, itemObj);
-		itemsArr.PushBack(itemObj, _document.GetAllocator());
+		JsonObject itemObj;
+		itm->addToJsonObject(itemObj, _allocator);
+		itemsArr.PushBack(itemObj, _allocator);
 	}
 
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Items, itemsArr);
+	_object.AddMember(OT_JSON_Member_Items, itemsArr, _allocator);
 }
 
-void ot::GraphicsScenePackage::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Items, Array);
+void ot::GraphicsScenePackage::setFromJsonObject(const ConstJsonObject& _object) {
+	m_name = json::getString(_object, OT_JSON_Member_Name);
 
 	this->memFree();
 
-	m_name = ot::rJSON::getString(_object, OT_JSON_Member_Name);
-	
-	OT_rJSON_val itemsArr = _object[OT_JSON_Member_Items].GetArray();
-	for (rapidjson::SizeType i = 0; i < itemsArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(itemsArr, i, Object);
-		OT_rJSON_val itemObj = itemsArr[i].GetObject();
-		ot::GraphicsItemCfg* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(itemObj);
+	std::list<ConstJsonObject> itemsArr = json::getObjectList(_object, OT_JSON_Member_Items);
+	for (auto itmObj : itemsArr) {
+		ot::GraphicsItemCfg* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(itmObj);
 		OTAssertNullptr(itm);
 		if (itm) {
-			itm->setFromJsonObject(itemObj);
+			itm->setFromJsonObject(itmObj);
 			if (itm) m_items.push_back(itm);
 		}
 	}
@@ -165,32 +154,26 @@ ot::GraphicsConnectionPackage::~GraphicsConnectionPackage() {
 
 }
 
-void ot::GraphicsConnectionPackage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	OT_rJSON_createValueArray(cArr);
+void ot::GraphicsConnectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	JsonArray cArr;
 	for (auto c : m_connections) {
-		OT_rJSON_createValueObject(cObj);
-		c.addToJsonObject(_document, cObj);
-		cArr.PushBack(cObj, _document.GetAllocator());
+		JsonObject cObj;
+		c.addToJsonObject(cObj, _allocator);
+		cArr.PushBack(cObj, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Connections, cArr);
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Name, m_name);
+	_object.AddMember(OT_JSON_Member_Connections, cArr, _allocator);
+	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
 }
 
-void ot::GraphicsConnectionPackage::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsConnectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_connections.clear();
 
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Connections, Array);
-	
-	m_name = _object[OT_JSON_Member_Name].GetString();
+	m_name = json::getString(_object, OT_JSON_Member_Name);
 
-	OT_rJSON_val cArr = _object[OT_JSON_Member_Connections].GetArray();
-	for (rapidjson::SizeType i = 0; i < cArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(cArr, i, Object);
-		OT_rJSON_val cObj = cArr[i].GetObject();
-
+	std::list<ConstJsonObject> cArr = json::getObjectList(_object, OT_JSON_Member_Connections);
+	for (auto c : cArr) {
 		GraphicsConnectionCfg newConnection;
-		newConnection.setFromJsonObject(cObj);
+		newConnection.setFromJsonObject(c);
 
 		m_connections.push_back(newConnection);
 	}

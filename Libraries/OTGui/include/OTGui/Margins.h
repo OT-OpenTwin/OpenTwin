@@ -8,107 +8,95 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
 
-	template <class T>
-	class __declspec(dllexport)	MarginsTemplate : public ot::Serializable {
-	public:
-		MarginsTemplate() {};
-		MarginsTemplate(T _top, T _right, T _bottom, T _left) : m_top(_top), m_right(_right), m_bottom(_bottom), m_left(_left) {};
-		MarginsTemplate(const MarginsTemplate<T>& _other) : m_top(_other.m_top), m_right(_other.m_right), m_bottom(_other.m_bottom), m_left(_other.m_left) {};
-		virtual ~MarginsTemplate() {};
-
-		MarginsTemplate<T>& operator = (const MarginsTemplate<T>& _other);
-		bool operator == (const MarginsTemplate<T>& _other);
-		bool operator != (const MarginsTemplate<T>& _other);
-
-		void set(T _top, T _right, T _bottom, T _left);
-		
-		void setTop(T _top) { m_top = _top; };
-		T top(void) const { return m_top; };
-
-		void setRight(T _right) { m_right = _right; };
-		T right(void) const { return m_right; };
-
-		void setBottom(T _bottom) { m_bottom = _bottom; };
-		T bottom(void) const { return m_bottom; };
-
-		void setLeft(T _left) { m_left = _left; };
-		T left(void) const { return m_left; };
-
-	protected:
-		T m_top;
-		T m_right;
-		T m_bottom;
-		T m_left;
-	};
-
 	// #########################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT Margins : public MarginsTemplate<int> {
+	class OT_GUI_API_EXPORT Margins : ot::Serializable {
+
+		OT_PROPERTY(int, left, setLeft, left)
+		OT_PROPERTY(int, top, setTop, top)
+		OT_PROPERTY(int, right, setRight, right)
+		OT_PROPERTY(int, bottom, setBottom, bottom)
+
 	public:
-		Margins() : MarginsTemplate<int>(0, 0, 0, 0) {};
-		Margins(int _top, int _right, int _bottom, int _left) : MarginsTemplate<int>(_top, _right, _bottom, _left) {};
-		Margins(const Margins& _other) : MarginsTemplate<int>(_other.m_top, _other.m_right, _other.m_bottom, _other.m_left) {};
+		Margins() : m_left(0), m_top(0), m_right(0), m_bottom(0) {};
+		Margins(int _left, int _top, int _right, int _bottom) : m_left(_left), m_top(_top), m_right(_right), m_bottom(_bottom) {};
+		Margins(const Margins& _other) : m_left(_other.m_left), m_top(_other.m_top), m_right(_other.m_right), m_bottom(_other.m_bottom) {};
 		virtual ~Margins() {};
 		
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const override;
-		virtual void setFromJsonObject(OT_rJSON_val& _jsonObject) override;
+		Margins& operator = (const Margins& _other);
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+
+		
 	};
 
 	// #########################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT MarginsF : public MarginsTemplate<float> {
+	class OT_GUI_API_EXPORT MarginsF : ot::Serializable {
+
+		OT_PROPERTY(float, left, setLeft, left)
+		OT_PROPERTY(float, top, setTop, top)
+		OT_PROPERTY(float, right, setRight, right)
+		OT_PROPERTY(float, bottom, setBottom, bottom)
+
 	public:
-		MarginsF() : MarginsTemplate<float>(0.f, 0.f, 0.f, 0.f) {};
-		MarginsF(float _top, float _right, float _bottom, float _left) : MarginsTemplate<float>(_top, _right, _bottom, _left) {};
-		MarginsF(const MarginsF& _other) : MarginsTemplate<float>(_other.m_top, _other.m_right, _other.m_bottom, _other.m_left) {};
+		MarginsF() : m_left(0.f), m_top(0.f), m_right(0.f), m_bottom(0.f) {};
+		MarginsF(float _left, float _top, float _right, float _bottom) : m_left(_left), m_top(_top), m_right(_right), m_bottom(_bottom) {};
+		MarginsF(const MarginsF& _other) : m_left(_other.m_left), m_top(_other.m_top), m_right(_other.m_right), m_bottom(_other.m_bottom) {};
 		virtual ~MarginsF() {};
 
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const override;
-		virtual void setFromJsonObject(OT_rJSON_val& _jsonObject) override;
+		MarginsF& operator = (const MarginsF& _other);
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 	};
 
 	// #########################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT MarginsD : public MarginsTemplate<double> {
+	class OT_GUI_API_EXPORT MarginsD : ot::Serializable {
+
+		OT_PROPERTY(double, left, setLeft, left)
+		OT_PROPERTY(double, top, setTop, top)
+		OT_PROPERTY(double, right, setRight, right)
+		OT_PROPERTY(double, bottom, setBottom, bottom)
+
 	public:
-		MarginsD() : MarginsTemplate<double>(0., 0., 0., 0.) {};
-		MarginsD(double _top, double _right, double _bottom, double _left) : MarginsTemplate<double>(_top, _right, _bottom, _left) {};
-		MarginsD(const MarginsD& _other) : MarginsTemplate<double>(_other.m_top, _other.m_right, _other.m_bottom, _other.m_left) {};
+		MarginsD() : m_left(0.), m_top(0.), m_right(0.), m_bottom(0.) {};
+		MarginsD(double _left, double _top, double _right, double _bottom) : m_left(_left), m_top(_top), m_right(_right), m_bottom(_bottom) {};
+		MarginsD(const MarginsD& _other) : m_left(_other.m_left), m_top(_other.m_top), m_right(_other.m_right), m_bottom(_other.m_bottom) {};
 		virtual ~MarginsD() {};
 
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const override;
-		virtual void setFromJsonObject(OT_rJSON_val& _jsonObject) override;
+		MarginsD& operator = (const MarginsD& _other);
+
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _document The JSON document (used to get the allocator)
+		//! @param _object The JSON object to add the contents to
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 	};
 
-}
-
-template <class T>
-ot::MarginsTemplate<T>& ot::MarginsTemplate<T>::operator = (const MarginsTemplate<T>& _other) {
-	m_top = _other.m_top;
-	m_right = _other.m_right;
-	m_bottom = _other.m_bottom;
-	m_left = _other.m_left;
-	return *this;
-}
-
-template <class T>
-bool ot::MarginsTemplate<T>::operator == (const MarginsTemplate<T>& _other) {
-	return m_top == _other.m_top && m_right == _other.m_right && m_bottom == _other.m_bottom && m_left == _other.m_left;
-}
-
-template <class T>
-bool ot::MarginsTemplate<T>::operator != (const MarginsTemplate<T>& _other) {
-	return m_top != _other.m_top || m_right != _other.m_right || m_bottom != _other.m_bottom || m_left != _other.m_left;
-}
-
-template <class T>
-void ot::MarginsTemplate<T>::set(T _top, T _right, T _bottom, T _left) {
-	m_top = _top;
-	m_right = _right;
-	m_bottom = _bottom;
-	m_left = _left;
 }

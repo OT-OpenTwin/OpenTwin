@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/rJSONHelper.h"
 #include "OTGui/StyleValue.h"
 
 #define OT_JSON_MEMBER_Key "Key"
@@ -26,22 +25,18 @@ ot::StyleValue& ot::StyleValue::operator = (const StyleValue& _other) {
 	return *this;
 }
 
-void ot::StyleValue::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Key, m_key);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Qss, m_qss);
-	OT_rJSON_createValueObject(colorObj);
-	m_color.addToJsonObject(_document, colorObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Color, colorObj);
+void ot::StyleValue::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_MEMBER_Key, JsonString(m_key, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Qss, JsonString(m_qss, _allocator), _allocator);
+
+	JsonObject colorObj;
+	m_color.addToJsonObject(colorObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Color, colorObj, _allocator);
 }
 
-void ot::StyleValue::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Key, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Qss, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Color, Object);
-
-	m_key = _object[OT_JSON_MEMBER_Key].GetString();
-	m_qss = _object[OT_JSON_MEMBER_Qss].GetString();
+void ot::StyleValue::setFromJsonObject(const ConstJsonObject& _object) {
+	m_key = json::getString(_object, OT_JSON_MEMBER_Key);
+	m_qss = json::getString(_object, OT_JSON_MEMBER_Qss);
 	
-	OT_rJSON_val colorObj = _object[OT_JSON_MEMBER_Color].GetObject();
-	m_color.setFromJsonObject(colorObj);
+	m_color.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Color));
 }

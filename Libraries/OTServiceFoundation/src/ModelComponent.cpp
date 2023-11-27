@@ -59,14 +59,14 @@ std::list<std::string> ot::components::ModelComponent::getListOfFolderItems(cons
 {
 	std::list<std::string> folderItems;
 
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetListOfFolderItems);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Folder, _folder);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Recursive, recursive);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetListOfFolderItems, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Folder, JsonString(_folder, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Recursive, recursive, requestDoc.GetAllocator());	
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get list of folder items: Failed to send HTTP request" << std::endl;
 		return folderItems;
 	}
@@ -80,24 +80,21 @@ std::list<std::string> ot::components::ModelComponent::getListOfFolderItems(cons
 	}
 
 	// Process the result
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	// Check if the received document contains the required information
-	OT_rJSON_ifNoMember(responseDoc, OT_ACTION_PARAM_BASETYPE_List) {
-		std::cout << "ERROR: The member \"list\" is missing";
+	if (!responseDoc.HasMember(OT_ACTION_PARAM_BASETYPE_List)) {
+		OT_LOG_EA("ERROR: The member \"list\" is missing");
 		return folderItems;
 	}
 
 	// Get information and iterate trough entries
-	rapidjson::Value items = responseDoc[OT_ACTION_PARAM_BASETYPE_List].GetArray();
-	int numberOfentrys = items.Size();
-
-	for (long i = 0; i < numberOfentrys; i++)
+	std::list<std::string> items = json::getStringList(responseDoc, OT_ACTION_PARAM_BASETYPE_List);
+	
+	for (auto i : items)
 	{
-		std::string name = items[i].GetString();
-
-		folderItems.push_back(name);
+		folderItems.push_back(i);
 	}
 
 	return folderItems;
@@ -107,15 +104,15 @@ std::list<ot::UID> ot::components::ModelComponent::getIDsOfFolderItemsOfType(con
 {
 	std::list<ot::UID> folderItemIDs;
 
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Folder, _folder);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Type, _entityClassName);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Recursive, recursive);
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Folder, JsonString(_folder, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Type, JsonString(_entityClassName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Recursive, recursive, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get list of folder items: Failed to send HTTP request" << std::endl;
 		return folderItemIDs;
 	}
@@ -129,10 +126,9 @@ std::list<ot::UID> ot::components::ModelComponent::getIDsOfFolderItemsOfType(con
 	}
 
 	// Process the result
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
-
-	folderItemIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_BASETYPE_List);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+	folderItemIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_BASETYPE_List);
 
 	return folderItemIDs;
 }
@@ -140,12 +136,12 @@ std::list<ot::UID> ot::components::ModelComponent::getIDsOfFolderItemsOfType(con
 std::string ot::components::ModelComponent::getCurrentModelVersion(void)
 {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetCurrentVersion);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetCurrentVersion, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return "";
 	}
@@ -160,10 +156,10 @@ std::string ot::components::ModelComponent::getCurrentModelVersion(void)
 
 	// Process the result from the model service
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
-	std::string modelVersion = ot::rJSON::getString(responseDoc, OT_ACTION_PARAM_BASETYPE_Props);
+	std::string modelVersion = ot::json::getString(responseDoc, OT_ACTION_PARAM_BASETYPE_Props);
 
 	return modelVersion;
 }
@@ -194,13 +190,13 @@ EntityBase * ot::components::ModelComponent::readEntityFromEntityIDandVersion(UI
 
 ot::UID ot::components::ModelComponent::getCurrentVisualizationModelID(void) {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetCurrentVisModelID);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
-		std::cout << "ERROR: Failed to get visualization model id: Failed to send HTTP request" << std::endl;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_EA("Failed to get visualization model id: Failed to send HTTP request");
 		return 0;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -214,10 +210,10 @@ ot::UID ot::components::ModelComponent::getCurrentVisualizationModelID(void) {
 
 	// Process the result from the model service
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
-	UID visModelID = ot::rJSON::getULongLong(responseDoc, OT_ACTION_PARAM_BASETYPE_UID);
+	UID visModelID = ot::json::getUInt64(responseDoc, OT_ACTION_PARAM_BASETYPE_UID);
 
 	return visModelID;
 }
@@ -250,19 +246,19 @@ void ot::components::ModelComponent::addEntitiesToModel(std::list<UID> & _topolo
 														std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList,
 														const std::string & _changeComment)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_AddEntities);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, _topologyEntityIDList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, _topologyEntityVersionList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList, _topologyEntityForceVisible);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityIDList, _dataEntityIDList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityVersionList, _dataEntityVersionList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityParentList, _dataEntityParentList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Description, _changeComment);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(_topologyEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, JsonArray(_topologyEntityVersionList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList, JsonArray(_topologyEntityForceVisible, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityIDList, JsonArray(_dataEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityVersionList, JsonArray(_dataEntityVersionList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityParentList, JsonArray(_dataEntityParentList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(_changeComment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to add entities to model: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -278,28 +274,28 @@ void ot::components::ModelComponent::addEntitiesToModel(std::list<UID> & _topolo
 
 void ot::components::ModelComponent::addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_AddEntities);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, _topologyEntityIDList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, _topologyEntityVersionList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList, _topologyEntityForceVisible);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityIDList, _dataEntityIDList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityVersionList, _dataEntityVersionList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityParentList, _dataEntityParentList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Description, _changeComment);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(_topologyEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, JsonArray(_topologyEntityVersionList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList, JsonArray(_topologyEntityForceVisible, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityIDList, JsonArray(_dataEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityVersionList, JsonArray(_dataEntityVersionList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityParentList, JsonArray(_dataEntityParentList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(_changeComment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
-		std::cout << "ERROR: Failed to add entities to model: Failed to send HTTP request" << std::endl;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_EA("Failed to add entities to model: Failed to send HTTP request");
 		return;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		std::cout << "ERROR: Failed to add entities to model: " << response << std::endl;
+		OT_LOG_EAS("Failed to add entities to model: " + response);
 		return;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		std::cout << "ERROR: Failed to add entities to model: " << response << std::endl;
+		OT_LOG_EAS("Failed to add entities to model:" + response);
 		return;
 	}
 }
@@ -308,20 +304,20 @@ void ot::components::ModelComponent::addGeometryOperation(UID _newEntityID, UID 
 														  std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList, std::list<std::string> & _childrenList, 
 														  const std::string & _changeComment)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_AddGeometryOperation);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID, _newEntityID);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion, _newEntityVersion);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityName, _newEntityName);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityIDList, _dataEntityIDList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityVersionList, _dataEntityVersionList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataEntityParentList, _dataEntityParentList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityChildrenList, _childrenList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Description, _changeComment);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddGeometryOperation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _newEntityID, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _newEntityVersion, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, JsonString(_newEntityName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityIDList, JsonArray(_dataEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityVersionList, JsonArray(_dataEntityVersionList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityParentList, JsonArray(_dataEntityParentList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityChildrenList, JsonArray(_childrenList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(_changeComment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to add entities to model: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -337,23 +333,23 @@ void ot::components::ModelComponent::addGeometryOperation(UID _newEntityID, UID 
 
 void ot::components::ModelComponent::deleteEntitiesFromModel(std::list<std::string> & _entityNameList, bool _saveModel)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_DeleteEntity);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityNameList, _entityNameList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_SaveModel, _saveModel);
-
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_DeleteEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityNameList, JsonArray(_entityNameList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_SaveModel, _saveModel, requestDoc.GetAllocator());
+	
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
-		std::cout << "ERROR: Failed to delete entities from model: Failed to send HTTP request" << std::endl;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_EA("Failed to delete entities from model : Failed to send HTTP request");
 		return;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		std::cout << "ERROR: Failed to delete entities from model: " << response << std::endl;
+		OT_LOG_EAS("Failed to delete entities from model: " + response);
 		return;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		std::cout << "ERROR: Failed to delete entities from model: " << response << std::endl;
+		OT_LOG_EAS("Failed to delete entities from model: " + response);
 		return;
 	}
 }
@@ -361,18 +357,18 @@ void ot::components::ModelComponent::deleteEntitiesFromModel(std::list<std::stri
 void ot::components::ModelComponent::getEntityInformation(const std::list<UID> & _entities, std::list<EntityInformation> & _entityInfo)
 {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetEntityInformationFromID);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityIDList, _entities);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityInformationFromID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(_entities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
-		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_EA("Failed to get new entity id's: Failed to send HTTP request");
 		return;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		std::cout << "ERROR: Failed to get new entity id's: " << response << std::endl;
+		OT_LOG_EAS("Failed to get new entity id's: " + response);
 		return;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
@@ -383,18 +379,18 @@ void ot::components::ModelComponent::getEntityInformation(const std::list<UID> &
 	// Process the result from the model service
 	_entityInfo.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<UID> entityVersions;
 	std::list<std::string> entityNames;
 	std::list<std::string> entityTypes;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-	entityNames = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
-	entityTypes = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityVersions = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	entityNames = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
+	entityTypes = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
 
 	std::vector<UID> entityIDVec(entityIDs.begin(), entityIDs.end());
 	std::vector<UID> entityVersionVec(entityVersions.begin(), entityVersions.end());
@@ -428,40 +424,40 @@ void ot::components::ModelComponent::getEntityInformation(const std::string & _e
 void ot::components::ModelComponent::getEntityInformation(const std::list<std::string> & _entities, std::list<EntityInformation> & _entityInfo)
 {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetEntityInformationFromName);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityNameList, _entities);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityInformationFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityNameList, JsonArray(_entities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
-		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_EA("Failed to get new entity id's: Failed to send HTTP request");
 		return;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		std::cout << "ERROR: Failed to get new entity id's: " << response << std::endl;
+		OT_LOG_EAS("Failed to get new entity id's: " + response);
 		return;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		std::cout << "ERROR: Failed to get new entity id's: " << response << std::endl;
+		OT_LOG_EAS("Failed to get new entity id's: " + response);
 		return;
 	}
 
 	// Process the result from the model service
 	_entityInfo.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<UID> entityVersions;
 	std::list<std::string> entityNames;
 	std::list<std::string> entityTypes;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-	entityNames = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
-	entityTypes = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityVersions = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	entityNames = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
+	entityTypes = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
 
 	std::vector<UID> entityIDVec(entityIDs.begin(), entityIDs.end());
 	std::vector<UID> entityVersionVec(entityVersions.begin(), entityVersions.end());
@@ -483,13 +479,13 @@ void ot::components::ModelComponent::getEntityInformation(const std::list<std::s
 void ot::components::ModelComponent::getSelectedEntityInformation(std::list<EntityInformation> & _entityInfo, const std::string &typeFilter)
 {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetSelectedEntityInformation);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_SETTINGS_Type, typeFilter);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -505,18 +501,18 @@ void ot::components::ModelComponent::getSelectedEntityInformation(std::list<Enti
 	// Process the result from the model service
 	_entityInfo.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<UID> entityVersions;
 	std::list<std::string> entityNames;
 	std::list<std::string> entityTypes;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-	entityNames = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
-	entityTypes = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityVersions = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	entityNames = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
+	entityTypes = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
 
 	std::vector<UID> entityIDVec(entityIDs.begin(), entityIDs.end());
 	std::vector<UID> entityVersionVec(entityVersions.begin(), entityVersions.end());
@@ -537,13 +533,13 @@ void ot::components::ModelComponent::getSelectedEntityInformation(std::list<Enti
 
 void ot::components::ModelComponent::getEntityChildInformation(const std::string & _entity, std::list<EntityInformation> & _entityInfo) {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Name, _entity);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, JsonString(_entity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -559,18 +555,18 @@ void ot::components::ModelComponent::getEntityChildInformation(const std::string
 	// Process the result from the model service
 	_entityInfo.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<UID> entityVersions;
 	std::list<std::string> entityNames;
 	std::list<std::string> entityTypes;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-	entityNames = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
-	entityTypes = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityVersions = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	entityNames = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
+	entityTypes = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
 
 	std::vector<UID> entityIDVec(entityIDs.begin(), entityIDs.end());
 	std::vector<UID> entityVersionVec(entityVersions.begin(), entityVersions.end());
@@ -591,13 +587,13 @@ void ot::components::ModelComponent::getEntityChildInformation(const std::string
 
 void ot::components::ModelComponent::getEntityChildInformation(UID _entity, std::list<EntityInformation> & _entityInfo) {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_ID, _entity);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, _entity, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -613,18 +609,18 @@ void ot::components::ModelComponent::getEntityChildInformation(UID _entity, std:
 	// Process the result from the model service
 	_entityInfo.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<UID> entityVersions;
 	std::list<std::string> entityNames;
 	std::list<std::string> entityTypes;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-	entityNames = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
-	entityTypes = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityVersions = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	entityNames = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityNameList);
+	entityTypes = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_EntityTypeList);
 
 	std::vector<UID> entityIDVec(entityIDs.begin(), entityIDs.end());
 	std::vector<UID> entityVersionVec(entityVersions.begin(), entityVersions.end());
@@ -645,14 +641,14 @@ void ot::components::ModelComponent::getEntityChildInformation(UID _entity, std:
 
 void ot::components::ModelComponent::addPropertiesToEntities(std::list<UID>& _entityList, const std::string& _propertiesJson)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_AddPropertiesToEntities);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityIDList, _entityList);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_JSON, _propertiesJson);
-
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddPropertiesToEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(_entityList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_JSON, JsonString(_propertiesJson, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -665,15 +661,15 @@ void ot::components::ModelComponent::addPropertiesToEntities(std::list<UID>& _en
 
 void ot::components::ModelComponent::getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties) {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetEntityProperties);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID, _entity);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Recursive, _recursive);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Filter, _propertyGroupFilter);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityProperties, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _entity, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Recursive, _recursive, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Filter, JsonString(_propertyGroupFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get entity properties: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -689,14 +685,14 @@ void ot::components::ModelComponent::getEntityProperties(UID _entity, bool _recu
 	// Process the result from the model service
 	_entityProperties.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<std::string> entityProperties;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityProperties = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityProperties = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
 
 	auto prop = entityProperties.begin();
 	for (auto id : entityIDs)
@@ -712,15 +708,15 @@ void ot::components::ModelComponent::getEntityProperties(UID _entity, bool _recu
 
 void ot::components::ModelComponent::getEntityProperties(const std::string &entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties) {
 	// Prepare the request
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityName, entityName);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Recursive, _recursive);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_Filter, _propertyGroupFilter);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, JsonString(entityName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Recursive, _recursive, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Filter, JsonString(_propertyGroupFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get entity properties: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -736,14 +732,14 @@ void ot::components::ModelComponent::getEntityProperties(const std::string &enti
 	// Process the result from the model service
 	_entityProperties.clear();
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
 	std::list<std::string> entityProperties;
 
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityProperties = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityProperties = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
 
 	auto prop = entityProperties.begin();
 	for (auto id : entityIDs)
@@ -759,11 +755,11 @@ void ot::components::ModelComponent::getEntityProperties(const std::string &enti
 
 void ot::components::ModelComponent::updatePropertyGrid()
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertyGrid);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdatePropertyGrid, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get entity properties: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -779,14 +775,15 @@ void ot::components::ModelComponent::updatePropertyGrid()
 
 void ot::components::ModelComponent::updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateTopologyEntity);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, topologyEntityIDs);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, topologyEntityVersions);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_ITM_Description, comment);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdateTopologyEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(topologyEntityIDs, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, JsonArray(topologyEntityVersions, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(comment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to add entities to model: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -922,13 +919,13 @@ DataStorageAPI::UniqueUIDGenerator* ot::components::ModelComponent::getUniqueUID
 
 void ot::components::ModelComponent::importTableFile(const std::string &itemName)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ImportTableFile);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_NAME, itemName);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ImportTableFile, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_NAME, JsonString(itemName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -944,13 +941,13 @@ void ot::components::ModelComponent::importTableFile(const std::string &itemName
 
 void ot::components::ModelComponent::enableMessageQueueing(bool flag)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_QueueMessages);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_QUEUE_FLAG, flag);
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_QueueMessages, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_QUEUE_FLAG, flag, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -967,13 +964,13 @@ void ot::components::ModelComponent::enableMessageQueueing(bool flag)
 
 void ot::components::ModelComponent::modelChangeOperationCompleted(const std::string &description)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_Description, description);
-
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_Description, JsonString(description, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -988,7 +985,7 @@ void ot::components::ModelComponent::modelChangeOperationCompleted(const std::st
 
 }
 
-std::string  ot::components::ModelComponent::sendMessage(bool _queue, OT_rJSON_doc & _doc)
+std::string  ot::components::ModelComponent::sendMessage(bool _queue, JsonDocument & _doc)
 {
 	return m_application->sendMessage(_queue, "Model", _doc);
 }

@@ -5,6 +5,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
+
 #include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
@@ -176,23 +178,20 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	ot::Painter2D* painterTitleFront = nullptr;
 
 	try {
-		OT_rJSON_createDOC(backDoc);
-		m_backgroundPainter->addToJsonObject(backDoc, backDoc);
-		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(backDoc);
-		painterBack->setFromJsonObject(backDoc);
+		JsonDocument backDoc;
+		m_backgroundPainter->addToJsonObject(backDoc, backDoc.GetAllocator());
+		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(backDoc.constRef().GetObject());
+		painterBack->setFromJsonObject(backDoc.constRef().GetObject());
 
-		OT_rJSON_createDOC(titleBackDoc);
-		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc);
-		painterTitleBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc);
-		painterTitleBack->setFromJsonObject(titleBackDoc);
+		JsonDocument titleBackDoc;
+		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc.GetAllocator());
+		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc.constRef().GetObject());
+		painterBack->setFromJsonObject(titleBackDoc.constRef().GetObject());
 
-		OT_rJSON_createDOC(titleFrontDoc);
-		m_titleForegroundPainter->addToJsonObject(titleFrontDoc, titleFrontDoc);
-		painterTitleFront = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleFrontDoc);
-		painterTitleFront->setFromJsonObject(titleFrontDoc);
-
-		
-
+		JsonDocument titleFrontDoc;
+		m_titleForegroundPainter->addToJsonObject(titleFrontDoc, titleFrontDoc.GetAllocator());
+		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleFrontDoc.constRef().GetObject());
+		painterBack->setFromJsonObject(titleFrontDoc.constRef().GetObject());
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
@@ -277,7 +276,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(2., 0., 2., 15.));
+		titLImg->setMargins(ot::MarginsD(15., 2., 0., 2.));
 		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
 	}
@@ -294,7 +293,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titRImg->setImagePath(m_rightTitleImagePath);
 		titRImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titRImg->setAlignment(ot::AlignCenter);
-		titRImg->setMargins(ot::MarginsD(2., 15., 2., 0.));
+		titRImg->setMargins(ot::MarginsD(0., 2., 15., 2.));
 		titRImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titRImg);
 	}
@@ -373,7 +372,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 ot::GraphicsFlowItemBuilder::GraphicsFlowItemBuilder()
 	: m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
-	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(2., 2., 5., 2.)
+	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(5., 2., 2., 2.)
 {
 	this->setBackgroundColor(ot::Color(50, 50, 50));
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));

@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/CoreAPIExport.h"
-#include "OTCore/rJSON.h"
 #include "OTCore/Logger.h"
 
 // std header

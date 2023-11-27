@@ -19,9 +19,6 @@
     <ClCompile Include="src\Queue.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\rJSON.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\ServiceBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -68,6 +65,9 @@
       <Filter>src\Owner</Filter>
     </ClCompile>
     <ClCompile Include="src\BasicServiceInformation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSON.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -156,12 +156,6 @@
     <ClInclude Include="include\OTCore\ReturnMessage.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\rJSON.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\rJSONHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\Serializable.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -184,6 +178,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\TypeNames.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSON.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
@@ -29,41 +30,34 @@ ot::GraphicsEllipseItemCfg::~GraphicsEllipseItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
-void ot::GraphicsEllipseItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+void ot::GraphicsEllipseItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	OTAssertNullptr(m_backgroundPainter);
+	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	GraphicsItemCfg::addToJsonObject(_document, _object);
+	_object.AddMember(OT_JSON_MEMBER_RadiusX, m_radiusX, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_RadiusY, m_radiusY, _allocator);
 
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_RadiusX, m_radiusX);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_RadiusY, m_radiusY);
+	JsonObject backgroundPainterObj;
+	m_backgroundPainter->addToJsonObject(backgroundPainterObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj, _allocator);
 
-	OT_rJSON_createValueObject(backgroundPainterObj);
-	m_backgroundPainter->addToJsonObject(_document, backgroundPainterObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
-
-	OT_rJSON_createValueObject(borderObj);
-	m_border.addToJsonObject(_document, borderObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Border, borderObj);
+	JsonObject borderObj;
+	m_border.addToJsonObject(borderObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Border, borderObj, _allocator);
 }
 
-void ot::GraphicsEllipseItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsEllipseItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RadiusX, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RadiusY, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Border, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_BackgroundPainter, Object);
+	m_radiusX = json::getDouble(_object, OT_JSON_MEMBER_RadiusX);
+	m_radiusY = json::getDouble(_object, OT_JSON_MEMBER_RadiusY);
 
-	m_radiusX = _object[OT_JSON_MEMBER_RadiusX].GetDouble();
-	m_radiusY = _object[OT_JSON_MEMBER_RadiusY].GetDouble();
-
-	OT_rJSON_val backgroundPainterObj = _object[OT_JSON_MEMBER_BackgroundPainter].GetObject();
+	m_border.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Border));
+	
+	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
 	ot::Painter2D* p = ot::SimpleFactory::instance().createType<ot::Painter2D>(backgroundPainterObj);
 	p->setFromJsonObject(backgroundPainterObj);
 	this->setBackgroundPainer(p);
-
-	OT_rJSON_val borderObj = _object[OT_JSON_MEMBER_Border].GetObject();
-	m_border.setFromJsonObject(borderObj);
 }
 
 void ot::GraphicsEllipseItemCfg::setBackgroundPainer(ot::Painter2D* _painter) {

@@ -8,9 +8,9 @@ namespace ot
 	{
 	public:
 		OwnerService(ot::serviceID_t id = ot::invalidServiceID) : ot::Owner<ot::serviceID_t>(id) {};
-		bool getIdFromJson(OT_rJSON_val& _object, ot::serviceID_t& _id);
-		ot::OwnerService ownerFromJson(OT_rJSON_val& _object);
-		void addToJsonObject(OT_rJSON_doc& _doc, OT_rJSON_val& _object);
+		bool getIdFromJson(JsonValue& _object, ot::serviceID_t& _id);
+		ot::OwnerService ownerFromJson(JsonValue& _object);
+		void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator);
 
 	private:
 		const std::string m_jsonMemberName = "goid_";

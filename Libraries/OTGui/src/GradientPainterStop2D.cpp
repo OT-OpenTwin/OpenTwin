@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/rJSONHelper.h"
 #include "OTGui/GradientPainterStop2D.h"
 
 #define OT_JSON_MEMBER_Pos "Pos"
@@ -36,17 +35,15 @@ bool ot::GradientPainterStop2D::operator != (const GradientPainterStop2D& _other
 	return m_pos == _other.m_pos || m_color != _other.m_color;
 }
 
-void ot::GradientPainterStop2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Pos, m_pos);
-	OT_rJSON_createValueObject(colorObj);
-	m_color.addToJsonObject(_document, colorObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Color, colorObj);
+void ot::GradientPainterStop2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_MEMBER_Pos, m_pos, _allocator);
+
+	JsonObject colorObj;
+	m_color.addToJsonObject(colorObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Color, colorObj, _allocator);
 }
 
-void ot::GradientPainterStop2D::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Pos, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Color, Object);
-	m_pos = _object[OT_JSON_MEMBER_Pos].GetDouble();
-	OT_rJSON_val colorObj = _object[OT_JSON_MEMBER_Color].GetObject();
-	m_color.setFromJsonObject(colorObj);
+void ot::GradientPainterStop2D::setFromJsonObject(const ConstJsonObject& _object) {
+	m_pos = json::getDouble(_object, OT_JSON_MEMBER_Pos);
+	m_color.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Color));
 }

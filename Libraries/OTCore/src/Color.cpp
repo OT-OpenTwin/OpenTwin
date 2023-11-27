@@ -26,18 +26,18 @@ bool ot::Color::operator != (const Color & _other) const {
 	return m_r != _other.m_r || m_g != _other.m_g || m_b != _other.m_b || m_a != _other.m_a;
 }
 
-void ot::Color::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, "R", m_r);
-	ot::rJSON::add(_document, _object, "G", m_g);
-	ot::rJSON::add(_document, _object, "B", m_b);
-	ot::rJSON::add(_document, _object, "A", m_a);
+void ot::Color::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+    _object.AddMember("r", m_r, _allocator);
+    _object.AddMember("g", m_g, _allocator);
+    _object.AddMember("b", m_b, _allocator);
+    _object.AddMember("a", m_a, _allocator);
 }
 
-void ot::Color::setFromJsonObject(OT_rJSON_val& _object) {
-	m_r = ot::rJSON::getFloat(_object, "R");
-	m_g = ot::rJSON::getFloat(_object, "G");
-	m_b = ot::rJSON::getFloat(_object, "B");
-	m_a = ot::rJSON::getFloat(_object, "A");
+void ot::Color::setFromJsonObject(const ConstJsonObject& _object) {
+    m_r = json::getFloat(_object, "r");
+    m_g = json::getFloat(_object, "g");
+    m_b = json::getFloat(_object, "b");
+    m_a = json::getFloat(_object, "a");
 }
 
 void ot::Color::set(ot::Color::DefaultColor _color) {

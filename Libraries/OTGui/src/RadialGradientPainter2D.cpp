@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/rJSONHelper.h"
 #include "OTGui/RadialGradientPainter2D.h"
 
 #define OT_JSON_MEMBER_CenterPoint "Center.Point"
@@ -21,37 +20,27 @@ ot::RadialGradientPainter2D::RadialGradientPainter2D()
 
 ot::RadialGradientPainter2D::~RadialGradientPainter2D() {}
 
-void ot::RadialGradientPainter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::GradientPainter2D::addToJsonObject(_document, _object);
+void ot::RadialGradientPainter2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	ot::GradientPainter2D::addToJsonObject(_object, _allocator);
 
-	OT_rJSON_createValueObject(centerObj);
-	m_center.addToJsonObject(_document, centerObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CenterPoint, centerObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CenterRadius, m_centerRadius);
-
-	OT_rJSON_createValueObject(focalObj);
-	m_center.addToJsonObject(_document, focalObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_FocalPoint, focalObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_FocalRadius, m_centerRadius);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_FocalIsSet, m_focalSet);
+	JsonObject focalObj;
+	JsonObject centerObj;
+	m_focal.addToJsonObject(focalObj, _allocator);
+	m_center.addToJsonObject(centerObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_FocalPoint, focalObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_FocalIsSet, m_focalSet, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_CenterPoint, centerObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_FocalRadius, m_focalRadius, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_CenterRadius, m_centerRadius, _allocator);
 }
 
-void ot::RadialGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::RadialGradientPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	ot::GradientPainter2D::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_CenterPoint, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_CenterRadius, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_FocalPoint, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_FocalRadius, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_FocalIsSet, Bool);
-
-	m_centerRadius = _object[OT_JSON_MEMBER_CenterRadius].GetDouble();
-	OT_rJSON_val centerObj = _object[OT_JSON_MEMBER_CenterPoint].GetObject();
-	m_center.setFromJsonObject(centerObj);
-
-	m_focalSet = _object[OT_JSON_MEMBER_FocalIsSet].GetBool();
-	m_focalRadius = _object[OT_JSON_MEMBER_FocalRadius].GetDouble();
-	OT_rJSON_val finalStopObj = _object[OT_JSON_MEMBER_FocalPoint].GetObject();
-	m_focal.setFromJsonObject(finalStopObj);
+	m_center.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_CenterPoint));
+	m_focal.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_FocalPoint));
+	m_centerRadius = json::getDouble(_object, OT_JSON_MEMBER_CenterRadius);
+	m_focalSet = json::getBool(_object, OT_JSON_MEMBER_FocalIsSet);
+	m_focalRadius = json::getDouble(_object, OT_JSON_MEMBER_FocalRadius);
 }
 
 void ot::RadialGradientPainter2D::setFocalPoint(const ot::Point2DD& _focal) {

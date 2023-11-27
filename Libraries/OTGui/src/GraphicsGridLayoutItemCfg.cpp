@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 
 #define OT_JSON_MEMBER_Rows "Rows"
@@ -29,88 +30,58 @@ ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
 	m_items.clear();
 }
 
-void ot::GraphicsGridLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::GraphicsLayoutItemCfg::addToJsonObject(_document, _object);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Rows, m_rows);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Columns, m_columns);
+void ot::GraphicsGridLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	ot::GraphicsLayoutItemCfg::addToJsonObject(_object, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Rows, m_rows, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Columns, m_columns, _allocator);
 
-	OT_rJSON_createValueArray(rowStretchArr);
-	for (auto r : m_rowStretch) {
-		rowStretchArr.PushBack(r, _document.GetAllocator());
-	}
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_RowStretch, rowStretchArr);
+	JsonArray rowStretchArr(m_rowStretch, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_RowStretch, rowStretchArr, _allocator);
 
-	OT_rJSON_createValueArray(columnStretchArr);
-	for (auto c : m_columnStretch) {
-		columnStretchArr.PushBack(c, _document.GetAllocator());
-	}
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_ColumnStretch, columnStretchArr);
+	JsonArray columnStretchArr(m_columnStretch, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ColumnStretch, columnStretchArr, _allocator);
 
-	OT_rJSON_createValueArray(itemArr);
+	JsonArray itemArr;
 	for (auto r : m_items) {
-		OT_rJSON_createValueArray(columnArr);
+		JsonArray columnArr;
 		for (auto c : r) {
 			if (c) {
-				OT_rJSON_createValueObject(itemObj);
-				c->addToJsonObject(_document, itemObj);
-				columnArr.PushBack(itemObj, _document.GetAllocator());
+				JsonObject itemObj;
+				c->addToJsonObject(itemObj, _allocator);
+				columnArr.PushBack(itemObj, _allocator);
 			}
 			else {
-				OT_rJSON_createValueNull(itemObj);
-				columnArr.PushBack(itemObj, _document.GetAllocator());
+				JsonNullValue itemObj;
+				columnArr.PushBack(itemObj, _allocator);
 			}
 		}
-		itemArr.PushBack(columnArr, _document.GetAllocator());
+		itemArr.PushBack(columnArr, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Items, itemArr);
+	_object.AddMember(OT_JSON_MEMBER_Items, itemArr, _allocator);
 }
 
-void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	ot::GraphicsLayoutItemCfg::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Rows, Int);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Columns, Int);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_RowStretch, Array);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_ColumnStretch, Array);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Items, Array);
-
-	m_rows = _object[OT_JSON_MEMBER_Rows].GetInt();
-	m_columns = _object[OT_JSON_MEMBER_Columns].GetInt();
+	
+	m_rows = json::getInt(_object, OT_JSON_MEMBER_Rows);
+	m_columns = json::getInt(_object, OT_JSON_MEMBER_Columns);
 
 	// Clear and resize the arrays
 	this->clearAndResize();
 
-	OT_rJSON_val rowStretchArr = _object[OT_JSON_MEMBER_RowStretch].GetArray();
-	OT_rJSON_val columnStretchArr = _object[OT_JSON_MEMBER_ColumnStretch].GetArray();
-	OT_rJSON_val itemsArr = _object[OT_JSON_MEMBER_Items].GetArray();
+	m_rowStretch = json::getIntVector(_object, OT_JSON_MEMBER_RowStretch);
+	m_columnStretch = json::getIntVector(_object, OT_JSON_MEMBER_ColumnStretch);
+	ConstJsonArray itemsArr = _object[OT_JSON_MEMBER_Items].GetArray();
 
 	// Ensure correct array sizes
-	if (rowStretchArr.Size() != m_rows) {
-		OT_LOG_EA("Row stretch array size mismatch");
-		return;
-	}
-	if (columnStretchArr.Size() != m_columns) {
-		OT_LOG_EA("Column stretch array size mismatch");
-		return;
-	}
 	if (itemsArr.Size() != m_rows) {
 		OT_LOG_EA("Item array size mismatch");
 		return;
 	}
 
-	// Stretch factors
-	for (rapidjson::SizeType i = 0; i < rowStretchArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(rowStretchArr, i, Int);
-		m_rowStretch[i] = rowStretchArr[i].GetInt();
-	}
-	for (rapidjson::SizeType i = 0; i < columnStretchArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(columnStretchArr, i, Int);
-		m_columnStretch[i] = columnStretchArr[i].GetInt();
-	}
-
 	// Items
 	for (rapidjson::SizeType r = 0; r < itemsArr.Size(); r++) {
-		OT_rJSON_checkArrayEntryType(itemsArr, r, Array);
-		OT_rJSON_val columnArr = itemsArr[r].GetArray();
+		ConstJsonArray columnArr = json::getArray(itemsArr, r);
 		if (columnArr.Size() != m_columns) {
 			OT_LOG_EA("Item column array size mismatch");
 			return;
@@ -123,7 +94,7 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 			else if (columnArr[c].IsObject()) {
 				GraphicsItemCfg* itm = nullptr;
 				try {
-					OT_rJSON_val itemObj = columnArr[c].GetObject();
+					ConstJsonObject itemObj = json::getObject(columnArr, c);
 					itm = ot::SimpleFactory::instance().createType<GraphicsItemCfg>(itemObj);
 					if (itm) {
 						itm->setFromJsonObject(itemObj);

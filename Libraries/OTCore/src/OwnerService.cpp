@@ -1,7 +1,7 @@
 #include "OTCore/OwnerService.h"
 
 
-bool ot::OwnerService::getIdFromJson(OT_rJSON_val& _object, ot::serviceID_t& _id) {
+bool ot::OwnerService::getIdFromJson(JsonValue& _object, ot::serviceID_t& _id) {
 	if (!_object.HasMember(m_jsonMemberName.c_str())) {
 		OT_LOG_EA("JSON object member for owner Id is missing ");
 		return false;
@@ -16,7 +16,7 @@ bool ot::OwnerService::getIdFromJson(OT_rJSON_val& _object, ot::serviceID_t& _id
 	return true;
 }
 
-ot::OwnerService ot::OwnerService::ownerFromJson(OT_rJSON_val& _object) {
+ot::OwnerService ot::OwnerService::ownerFromJson(JsonValue& _object) {
 	if (!_object.HasMember(m_jsonMemberName.c_str())) {
 		OT_LOG_EA("JSON object member for owner Id is missing ");
 		return false;
@@ -29,7 +29,7 @@ ot::OwnerService ot::OwnerService::ownerFromJson(OT_rJSON_val& _object) {
 	return ot::OwnerService((ot::serviceID_t)_object[m_jsonMemberName.c_str()].GetUint());
 }
 
-void ot::OwnerService::addToJsonObject(OT_rJSON_doc& _doc, OT_rJSON_val& _object) {
-	ot::rJSON::add(_doc, _object, m_jsonMemberName.c_str(), getId());
+void ot::OwnerService::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) {
+	_object.AddMember(JsonValue(m_jsonMemberName.c_str(), _allocator), JsonValue(this->getId()), _allocator);
 }
 

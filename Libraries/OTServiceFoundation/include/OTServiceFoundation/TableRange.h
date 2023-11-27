@@ -26,8 +26,9 @@ namespace ot
 			bool operator!=(const TableRange& other);
 
 			// Inherited via Serializable
-			virtual void addToJsonObject(OT_rJSON_doc & _document, OT_rJSON_val & _object) const override;
-			virtual void setFromJsonObject(OT_rJSON_val & _object) override;
+
+			virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+			virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 			int GetTopRow() const { return _topRow; }
 			int GetBottomRow() const { return _bottomRow; }

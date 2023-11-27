@@ -9,12 +9,14 @@
 // OpenTwin header
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
-#include "OTCore/SimpleFactory.h"
+#include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTGui/Font.h"
 #include "OTGui/Border.h"
 #include "OTGui/Margins.h"
-#include "OTGui/Font.h"
+#include "OTGui/GuiTypes.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <string>
@@ -38,12 +40,12 @@ namespace ot {
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
 		//! @param _object The JSON object to add the contents to
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 		//! @brief Will set the object contents from the provided JSON object
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
-		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Set item name
 		//! The item name must be unique for one item picker.
@@ -98,7 +100,7 @@ namespace ot {
 		//! @param _right Right margin
 		//! @param _bottom Bottom margin
 		//! @param _left Left margin
-		void setMargins(double _top, double _right, double _bottom, double _left) { this->setMargins(ot::MarginsD(_top, _right, _bottom, _left)); };
+		void setMargins(double _left, double _top, double _right, double _bottom) { this->setMargins(ot::MarginsD(_left, _top, _right, _bottom)); };
 
 		//! @brief Set item margins
 		//! @param _margins Margins to set

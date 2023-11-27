@@ -1,6 +1,6 @@
 #include "OTCore/JSONToVariableConverter.h"
 
-ot::Variable ot::JSONToVariableConverter::operator()(rapidjson::Value& value)
+ot::Variable ot::JSONToVariableConverter::operator()(JsonValue& value)
 {
 	if (value.IsString())
 	{

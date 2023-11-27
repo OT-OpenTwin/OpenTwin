@@ -8,8 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreAPIExport.h"
-#include "OTCore/rJSON.h"
-#include "OTCore/rJSONHelper.h"
+#include "OTCore/JSON.h"
 
 // std header
 #include <string>
@@ -80,7 +79,7 @@ namespace ot {
 		//! @brief Create an object according to the key in the provided json object and ensure its type
 		//! If the created object can not be dynamically casted to the specified type the created object will be destroyed and nullptr will be returned
 		//! @param _key The key to the object
-		template<class T> T* createType(OT_rJSON_val& _jsonObject);
+		template<class T> T* createType(const ConstJsonObject& _jsonObject);
 
 	private:
 		std::map<std::string, std::function<SimpleFactoryObject* (void)>> m_data;
@@ -117,7 +116,6 @@ T* ot::SimpleFactory::createType(const std::string& _key) {
 }
 
 template <class T>
-T* ot::SimpleFactory::createType(OT_rJSON_val& _jsonObject) {
-	OT_rJSON_checkMember(_jsonObject, OT_SimpleFactoryJsonKey, String);
-	return ot::SimpleFactory::createType<T>(_jsonObject[OT_SimpleFactoryJsonKey].GetString());
+T* ot::SimpleFactory::createType(const ConstJsonObject& _jsonObject) {
+	return ot::SimpleFactory::createType<T>(json::getString(_jsonObject, OT_SimpleFactoryJsonKey));
 }

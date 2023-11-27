@@ -19,27 +19,21 @@ ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
 
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
-void ot::GraphicsImageItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	GraphicsItemCfg::addToJsonObject(_document, _object);
+void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_ImagePath, m_imageSubPath);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_MaintainAspectRatio, m_maintainAspectRatio);
+	_object.AddMember(OT_JSON_MEMBER_ImagePath, JsonString(m_imageSubPath, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ImagePath, m_maintainAspectRatio, _allocator);
 
-	OT_rJSON_createValueObject(maskObj);
-	m_colorMask.addToJsonObject(_document, maskObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_ColorMask, maskObj);
+	JsonObject maskObj;
+	m_colorMask.addToJsonObject(maskObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ColorMask, maskObj, _allocator);
 }
 
-void ot::GraphicsImageItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsImageItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 	
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_ImagePath, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_ColorMask, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_MaintainAspectRatio, Bool);
-
-	m_imageSubPath = _object[OT_JSON_MEMBER_ImagePath].GetString();
-	m_maintainAspectRatio = _object[OT_JSON_MEMBER_MaintainAspectRatio].GetBool();
-
-	OT_rJSON_val maskObj = _object[OT_JSON_MEMBER_ColorMask].GetObject();
-	m_colorMask.setFromJsonObject(maskObj);
+	m_imageSubPath = json::getString(_object, OT_JSON_MEMBER_ImagePath);
+	m_maintainAspectRatio = json::getBool(_object, OT_JSON_MEMBER_MaintainAspectRatio);
+	m_colorMask.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_ColorMask));
 }

@@ -9,7 +9,6 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
-#include "OTCore/rJSON.h"
 
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
@@ -186,11 +185,11 @@ void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 
 	if (destination->second.doc != nullptr)
 	{
-		rapidjson::Document * queuedDoc = destination->second.doc;
+		JsonDocument* queuedDoc = destination->second.doc;
 
 		std::string response;
 		if (queuedDoc->IsObject()) {
-			sendHttpRequest(QUEUE, destination->second.service->serviceURL(), *queuedDoc, response);
+			ot::msg::send(this->serviceURL(), destination->second.service->serviceURL(), ot::QUEUE, queuedDoc->toJson(), response);
 
 			delete queuedDoc;
 			destination->second.doc = nullptr;
@@ -201,13 +200,13 @@ void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 	}
 }
 
-std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, OT_rJSON_doc & _doc)
+std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 	return sendMessage(_queue, _serviceName, _doc, prefetchIds);
 }
 
-std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, OT_rJSON_doc & _doc, std::list<std::pair<UID, UID>> & _prefetchIds)
+std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds)
 {
 	auto destination = m_serviceNameMap.find(_serviceName);
 	if (destination == m_serviceNameMap.end()) {
@@ -217,23 +216,21 @@ std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _s
 
 	if (destination->second.enabledCounter > 0 && _queue)
 	{
-		rapidjson::Document *queuedDoc = nullptr;
+		JsonDocument *queuedDoc = nullptr;
 		
 		if (destination->second.doc == nullptr)
 		{
-			queuedDoc = new rapidjson::Document;
-			queuedDoc->SetObject();
+			queuedDoc = new JsonDocument;
 
-			ot::rJSON::add(*queuedDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Compound);
+			JsonArray docs;
+			JsonArray prefetchedIDs;
+			JsonArray prefetchedVersions;
 
-			OT_rJSON_createValueArray(docs);
-			OT_rJSON_createValueArray(prefetchedIDs);
-			OT_rJSON_createValueArray(prefetchedVersions);
-
-			ot::rJSON::add(*queuedDoc, OT_ACTION_PARAM_PROJECT_NAME, m_projectName);
-			ot::rJSON::add(*queuedDoc, OT_ACTION_PARAM_PREFETCH_Documents, docs);
-			ot::rJSON::add(*queuedDoc, OT_ACTION_PARAM_PREFETCH_ID, prefetchedIDs);
-			ot::rJSON::add(*queuedDoc, OT_ACTION_PARAM_PREFETCH_Version, prefetchedVersions);
+			queuedDoc->AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Compound, queuedDoc->GetAllocator());
+			queuedDoc->AddMember(OT_ACTION_PARAM_PROJECT_NAME, JsonString(m_projectName, queuedDoc->GetAllocator()), queuedDoc->GetAllocator());
+			queuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_Documents, docs, queuedDoc->GetAllocator());
+			queuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_ID, prefetchedIDs, queuedDoc->GetAllocator());
+			queuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_Version, prefetchedVersions, queuedDoc->GetAllocator());
 
 			destination->second.doc = queuedDoc;
 		}
@@ -242,7 +239,7 @@ std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _s
 			queuedDoc = destination->second.doc;
 		}
 
-		rapidjson::Document::AllocatorType& allocator = queuedDoc->GetAllocator();
+		JsonAllocator& allocator = queuedDoc->GetAllocator();
 
 		rapidjson::Value v(_doc, allocator);
 		(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_Documents].PushBack(v, allocator);
@@ -263,19 +260,19 @@ std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _s
 }
 
 std::string ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _message) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_SendBroadcastMessage);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_ID, m_serviceID);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, m_sessionID);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESSAGE, _message);
+	JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_SendBroadcastMessage, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_serviceID, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_sessionID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	sendHttpRequest(_queue ? QUEUE : EXECUTE, m_sessionService.service->serviceURL(), doc, response);
 	return response;
 }
 
-std::string ot::ApplicationBase::broadcastMessage(bool _queue, OT_rJSON_doc& _doc) {
-	return broadcastMessage(_queue, rJSON::toJSON(_doc));
+std::string ot::ApplicationBase::broadcastMessage(bool _queue, JsonDocument& _doc) {
+	return broadcastMessage(_queue, _doc.toJson());
 }
 
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)
@@ -292,11 +289,11 @@ void ot::ApplicationBase::removeModalCommand(ot::ModalCommandBase *command)
 	m_modalCommands.erase(std::find(m_modalCommands.begin(), m_modalCommands.end(), command));
 }
 
-std::string ot::ApplicationBase::processActionWithModalCommands(const std::string & _action, OT_rJSON_doc & _doc)
+std::string ot::ApplicationBase::processActionWithModalCommands(const std::string & _action, JsonDocument & _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
-		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		std::string action = json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 
 		// Now process actions for all modal commands
 		std::list<ModalCommandBase *> currentModalCommands = m_modalCommands; // We need to work on a copy, since the command might be erased from the list
@@ -312,7 +309,7 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 	}	
 	else if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
 	{
-		m_selectedEntities = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+		m_selectedEntities = json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
 
 		for (auto command : m_modalCommands)
 		{
@@ -336,9 +333,9 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 
 // Protected functions
 
-bool ot::ApplicationBase::sendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response)
+bool ot::ApplicationBase::sendHttpRequest(ot::MessageType _operation, const std::string& _url, JsonDocument& _doc, std::string& _response)
 {
-	return sendHttpRequest(_operation, _url, ot::rJSON::toJSON(_doc), _response);
+	return sendHttpRequest(_operation, _url, _doc.toJson(), _response);
 }
 
 bool ot::ApplicationBase::sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response)
@@ -357,9 +354,9 @@ bool ot::ApplicationBase::EnsureDataBaseConnection(void)
 
 // Private functions
 
-std::string ot::ApplicationBase::handleKeySequenceActivated(OT_rJSON_doc& _document) {
+std::string ot::ApplicationBase::handleKeySequenceActivated(JsonDocument& _document) {
 	if (m_uiNotifier) {
-		std::string keySequence = ot::rJSON::getString(_document, OT_ACTION_PARAM_UI_KeySequence);
+		std::string keySequence = json::getString(_document, OT_ACTION_PARAM_UI_KeySequence);
 		m_uiNotifier->shortcutActivated(keySequence);
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
@@ -369,7 +366,7 @@ std::string ot::ApplicationBase::handleKeySequenceActivated(OT_rJSON_doc& _docum
 	}
 }
 
-std::string ot::ApplicationBase::handleSettingsItemChanged(OT_rJSON_doc& _document) {
+std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _document) {
 	ot::SettingsData * data = ot::SettingsData::parseFromJsonDocument(_document);
 	if (data) {
 		std::list<ot::AbstractSettingsItem *> items = data->items();
@@ -409,10 +406,10 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(OT_rJSON_doc& _docume
 	}
 }
 
-std::string ot::ApplicationBase::handleContextMenuItemClicked(OT_rJSON_doc& _document) {
+std::string ot::ApplicationBase::handleContextMenuItemClicked(JsonDocument& _document) {
 	if (m_uiNotifier) {
-		std::string menuName = rJSON::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName);
-		std::string itemName = rJSON::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName);
+		std::string menuName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName);
+		std::string itemName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName);
 		m_uiNotifier->contextMenuItemClicked(menuName, itemName);
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
@@ -422,11 +419,11 @@ std::string ot::ApplicationBase::handleContextMenuItemClicked(OT_rJSON_doc& _doc
 	}
 }
 
-std::string ot::ApplicationBase::handleContextMenuItemCheckedChanged(OT_rJSON_doc& _document) {
+std::string ot::ApplicationBase::handleContextMenuItemCheckedChanged(JsonDocument& _document) {
 	if (m_uiNotifier) {
-		std::string menuName = rJSON::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName);
-		std::string itemName = rJSON::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName);
-		bool isChecked = rJSON::getBool(_document, OT_ACTION_PARAM_UI_CONTROL_CheckedState);
+		std::string menuName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName);
+		std::string itemName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName);
+		bool isChecked = json::getBool(_document, OT_ACTION_PARAM_UI_CONTROL_CheckedState);
 		m_uiNotifier->contextMenuItemCheckedChanged(menuName, itemName, isChecked);
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
@@ -516,7 +513,7 @@ void ot::ApplicationBase::__shuttingDown(bool _requestedAsCommand) {
 	else shuttingDown();
 }
 
-std::string ot::ApplicationBase::__processMessage(const std::string & _message, OT_rJSON_doc & _doc, serviceID_t _senderID) {
+std::string ot::ApplicationBase::__processMessage(const std::string & _message, JsonDocument & _doc, serviceID_t _senderID) {
 #ifdef _DEBUG
 	auto sender{ getConnectedServiceByID(_senderID) };
 	assert(sender != nullptr); // Sender was not registered

@@ -5,58 +5,36 @@
 
 // OpenTwin header
 #include "OTCore/Size2D.h"
-#include "OTCore/rJSON.h"
-#include "OTCore/rJSONHelper.h"
 
-#define OT_JSON_MEMBER_Type "t"
 #define OT_JSON_MEMBER_Width "w"
 #define OT_JSON_MEMBER_Height "h"
 
-#define OT_JSON_VALUE_IntType "i"
-#define OT_JSON_VALUE_DoubleType "d"
-#define OT_JSON_VALUE_FloatType "f"
-
-void ot::Size2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Type, OT_JSON_VALUE_IntType);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Width, m_w);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Height, m_h);
+void ot::Size2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_MEMBER_Width, m_w, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Height, m_h, _allocator);
 }
 
-void ot::Size2D::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Type, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Width, Int);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Height, Int);
-	OTAssert(_object[OT_JSON_MEMBER_Type] == OT_JSON_VALUE_IntType, "Invalid Size2D type");
-	m_w = _object[OT_JSON_MEMBER_Width].GetInt();
-	m_h = _object[OT_JSON_MEMBER_Height].GetInt();
+void ot::Size2D::setFromJsonObject(const ConstJsonObject& _object) {
+	m_w = json::getInt(_object, OT_JSON_MEMBER_Width);
+	m_h = json::getInt(_object, OT_JSON_MEMBER_Height);
 }
 
-void ot::Size2DF::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Type, OT_JSON_VALUE_FloatType);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Width, m_w);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Height, m_h);
+void ot::Size2DF::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_MEMBER_Width, m_w, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Height, m_h, _allocator);
 }
 
-void ot::Size2DF::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Type, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Width, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Height, Double);
-	OTAssert(_object[OT_JSON_MEMBER_Type] == OT_JSON_VALUE_FloatType, "Invalid Size2D type");
-	m_w = _object[OT_JSON_MEMBER_Width].GetFloat();
-	m_h = _object[OT_JSON_MEMBER_Height].GetFloat();
+void ot::Size2DF::setFromJsonObject(const ConstJsonObject& _object) {
+	m_w = json::getFloat(_object, OT_JSON_MEMBER_Width);
+	m_h = json::getFloat(_object, OT_JSON_MEMBER_Height);
 }
 
-void ot::Size2DD::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Type, OT_JSON_VALUE_DoubleType);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Width, m_w);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Height, m_h);
+void ot::Size2DD::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_MEMBER_Width, m_w, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Height, m_h, _allocator);
 }
 
-void ot::Size2DD::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Type, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Width, Double);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Height, Double);
-	OTAssert(_object[OT_JSON_MEMBER_Type] == OT_JSON_VALUE_DoubleType, "Invalid Size2D type");
-	m_w = _object[OT_JSON_MEMBER_Width].GetDouble();
-	m_h = _object[OT_JSON_MEMBER_Height].GetDouble();
+void ot::Size2DD::setFromJsonObject(const ConstJsonObject& _object) {
+	m_w = json::getDouble(_object, OT_JSON_MEMBER_Width);
+	m_h = json::getDouble(_object, OT_JSON_MEMBER_Height);
 }

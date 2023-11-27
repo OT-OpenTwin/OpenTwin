@@ -24,119 +24,46 @@ ot::SettingsData::~SettingsData() {
 	}
 }
 
-ot::SettingsData * ot::SettingsData::parseFromJsonDocument(rapidjson::Document& _document) {
+ot::SettingsData * ot::SettingsData::parseFromJsonDocument(const JsonDocument& _document) {
 	if (!_document.IsObject()) {
 		OTAssert(0, "Document is not an object");
 		return nullptr;
 	}
-	return parseFromJsonObject(_document);
+	return parseFromJsonObject(_document.GetObject());
 }
 
-ot::SettingsData * ot::SettingsData::parseFromJsonObject(rapidjson::Value& _object) {
-	// Check member
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_DataName)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_DataName "\" is missing");
-		return nullptr;
-	}
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_Version)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Version "\" is missing");
-		return nullptr;
-	}
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_Groups)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Groups "\" is missing");
-		return nullptr;
-	}
-
-	// Check types
-	if (!_object[OT_ACTION_PARAM_SETTINGS_DataName].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_DataName "\" is not a string");
-		return nullptr;
-	}
-	if (!_object[OT_ACTION_PARAM_SETTINGS_Version].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Version "\" is not a string");
-		return nullptr;
-	}
-	if (!_object[OT_ACTION_PARAM_SETTINGS_Groups].IsArray()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Groups "\" is not a array");
-		return nullptr;
-	}
-
-	std::string name = _object[OT_ACTION_PARAM_SETTINGS_DataName].GetString();
-	std::string version = _object[OT_ACTION_PARAM_SETTINGS_Version].GetString();
-	rapidjson::Value groupsData = _object[OT_ACTION_PARAM_SETTINGS_Groups].GetArray();
+ot::SettingsData * ot::SettingsData::parseFromJsonObject(const ConstJsonObject& _object) {
+	std::string name = json::getString(_object, OT_ACTION_PARAM_SETTINGS_DataName);
+	std::string version = json::getString(_object, OT_ACTION_PARAM_SETTINGS_Version);
+	std::list<ConstJsonObject> groupsData = json::getObjectList(_object, OT_ACTION_PARAM_SETTINGS_Groups);
 
 	SettingsData * newData = new SettingsData(name, version);
 
-	for (rapidjson::SizeType i{ 0 }; i < groupsData.Size(); i++) {
-		if (groupsData[i].IsObject()) {
-			rapidjson::Value groupEntry = groupsData[i].GetObject();
-			SettingsGroup * newGroup = parseGroupFromJsonObject(groupEntry);
-			if (newGroup) {
-				newData->addGroup(newGroup);
-			}
-		}
-		else {
-			OTAssert(0, "An entry in the groups data is not an object");
+	for (auto gd : groupsData) {
+		SettingsGroup * newGroup = parseGroupFromJsonObject(gd);
+		if (newGroup) {
+			newData->addGroup(newGroup);
 		}
 	}
 
 	return newData;
 }
 
-ot::SettingsGroup * ot::SettingsData::parseGroupFromJsonObject(rapidjson::Value& _object) {
-	if (!_object.IsObject()) {
-		OTAssert(0, "Group is not an object");
-		return nullptr;
-	}
-	// Check member
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_Name)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Name "\" is missing");
-		return nullptr;
-	}
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_Title)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Title "\" is missing");
-		return nullptr;
-	}
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_Groups)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Groups "\" is missing");
-		return nullptr;
-	}
-	if (!_object.HasMember(OT_ACTION_PARAM_SETTINGS_Items)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Items "\" is missing");
-		return nullptr;
-	}
-
-	// Check types
-	if (!_object[OT_ACTION_PARAM_SETTINGS_Name].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Name "\" is not a string");
-		return nullptr;
-	}
-	if (!_object[OT_ACTION_PARAM_SETTINGS_Title].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Title "\" is not a string");
-		return nullptr;
-	}
-	if (!_object[OT_ACTION_PARAM_SETTINGS_Groups].IsArray()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Groups "\" is not a array");
-		return nullptr;
-	}
-	if (!_object[OT_ACTION_PARAM_SETTINGS_Items].IsArray()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Items "\" is not a array");
-		return nullptr;
-	}
-
+ot::SettingsGroup * ot::SettingsData::parseGroupFromJsonObject(const ConstJsonObject& _object) {
 	SettingsGroup * newGroup = new SettingsGroup(
-		_object[OT_ACTION_PARAM_SETTINGS_Name].GetString(),
-		_object[OT_ACTION_PARAM_SETTINGS_Title].GetString()
+		json::getString(_object, OT_ACTION_PARAM_SETTINGS_Name),
+		json::getString(_object, OT_ACTION_PARAM_SETTINGS_Title)
 	);
-	rapidjson::Value groupData = _object[OT_ACTION_PARAM_SETTINGS_Groups].GetArray();
-	rapidjson::Value itemData = _object[OT_ACTION_PARAM_SETTINGS_Items].GetArray();
 
-	for (rapidjson::SizeType i{ 0 }; i < groupData.Size(); i++) {
-		SettingsGroup * itm = parseGroupFromJsonObject(groupData[i]);
+	ConstJsonObjectList groupData = json::getObjectList(_object, OT_ACTION_PARAM_SETTINGS_Groups);
+	ConstJsonObjectList itemData = json::getObjectList(_object, OT_ACTION_PARAM_SETTINGS_Items);
+
+	for (auto gd : groupData) {
+		SettingsGroup * itm = parseGroupFromJsonObject(gd);
 		if (itm) { newGroup->addSubgroup(itm); }
 	}
-	for (rapidjson::SizeType i{ 0 }; i < itemData.Size(); i++) {
-		AbstractSettingsItem * itm = SettingsItemFactory::createItem(itemData[i]);
+	for (auto id : itemData) {
+		AbstractSettingsItem * itm = SettingsItemFactory::createItem(id);
 		if (itm) { newGroup->addItem(itm); }
 	}
 
@@ -159,20 +86,20 @@ void ot::SettingsData::splitString(std::list<std::string>& _list, const std::str
 }
 
 std::string ot::SettingsData::toJson(void) const {
-	OT_rJSON_createDOC(doc);
-	addToJsonDocument(doc);
-	return ot::rJSON::toJSON(doc);
+	JsonDocument doc;
+	this->addToJsonDocument(doc);
+	return doc.toJson();
 }
 
-void ot::SettingsData::addToJsonDocument(rapidjson::Document& _document) const {
-	ot::rJSON::add(_document, OT_ACTION_PARAM_SETTINGS_DataName, m_settingsDataName);
-	ot::rJSON::add(_document, OT_ACTION_PARAM_SETTINGS_Version, m_settingsVersion);
+void ot::SettingsData::addToJsonDocument(JsonDocument& _document) const {
+	_document.AddMember(OT_ACTION_PARAM_SETTINGS_DataName, JsonString(m_settingsDataName, _document.GetAllocator()), _document.GetAllocator());
+	_document.AddMember(OT_ACTION_PARAM_SETTINGS_Version, JsonString(m_settingsVersion, _document.GetAllocator()), _document.GetAllocator());
 
-	OT_rJSON_createValueArray(groupsData);
+	JsonArray groupsData;
 	for (auto group : m_groups) {
-		group->addToJsonArray(_document, groupsData);
+		group->addToJsonArray(groupsData, _document.GetAllocator());
 	}
-	ot::rJSON::add(_document, OT_ACTION_PARAM_SETTINGS_Groups, groupsData);
+	_document.AddMember(OT_ACTION_PARAM_SETTINGS_Groups, groupsData, _document.GetAllocator());
 }
 
 void findChilds(std::list<ot::AbstractSettingsItem *> & _list, ot::SettingsGroup * _group) {
@@ -363,7 +290,8 @@ bool ot::SettingsData::refreshValuesFromDatabase(const std::string& _databaseURL
 		}
 
 		// Create new settings from json string
-		OT_rJSON_parseDOC(importedSettings, settingString.c_str());
+		JsonDocument importedSettings;
+		importedSettings.fromJson(settingString);
 		SettingsData * restoredSettings = SettingsData::parseFromJsonDocument(importedSettings);
 
 		// Get all current items
@@ -447,24 +375,24 @@ void ot::SettingsGroup::addItem(AbstractSettingsItem * _item) {
 
 // Getter 
 
-void ot::SettingsGroup::addToJsonArray(rapidjson::Document& _document, rapidjson::Value& _array) const {
-	OT_rJSON_createValueObject(obj);
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Name, m_name);
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Title, m_title);
-
-	OT_rJSON_createValueArray(subgroupsData);
+void ot::SettingsGroup::addToJsonArray(JsonValue& _array, JsonAllocator& _allocator) const {
+	JsonObject obj;
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Name, JsonString(m_name, _allocator), _allocator);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Title, JsonString(m_title, _allocator), _allocator);
+	
+	JsonArray subgroupsData;
 	for (auto subgroup : m_subgroups) {
-		subgroup->addToJsonArray(_document, subgroupsData);
+		subgroup->addToJsonArray(subgroupsData, _allocator);
 	}
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Groups, subgroupsData);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Groups, subgroupsData, _allocator);
 
-	OT_rJSON_createValueArray(itemsData);
+	JsonArray itemsData;
 	for (auto item : m_items) {
-		item->addToJsonArray(_document, itemsData);
+		item->addToJsonArray(itemsData, _allocator);
 	}
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Items, itemsData);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Items, itemsData, _allocator);
 
-	_array.PushBack(obj, _document.GetAllocator());
+	_array.PushBack(obj, _allocator);
 }
 
 std::string ot::SettingsGroup::logicalName(const std::string& _delimiter) {
@@ -571,15 +499,15 @@ std::string ot::AbstractSettingsItem::logicalName(const std::string& _delimiter)
 
 // Protected function
 
-void ot::AbstractSettingsItem::addToJsonArray(rapidjson::Document& _document, rapidjson::Value& _array) const {
-	OT_rJSON_createValueObject(obj);
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Type, typeToString());
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Name, m_name);
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Title, m_title);
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_IsVisible, m_isVisible);
-	ot::rJSON::add(_document, obj, OT_ACTION_PARAM_SETTINGS_Description, m_description);
-	addItemDataToJsonObject(_document, obj);
-	_array.PushBack(obj, _document.GetAllocator());
+void ot::AbstractSettingsItem::addToJsonArray(JsonValue& _array, JsonAllocator& _allocator) const {
+	JsonObject obj;
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeToString(), _allocator), _allocator);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Name, JsonString(m_name, _allocator), _allocator);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Title, JsonString(m_title, _allocator), _allocator);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_IsVisible, m_isVisible, _allocator);
+	obj.AddMember(OT_ACTION_PARAM_SETTINGS_Description, JsonString(m_description, _allocator), _allocator);
+	this->addItemDataToJsonObject(obj, _allocator);
+	_array.PushBack(obj, _allocator);
 }
 
 // ############################################################################################
@@ -607,7 +535,7 @@ void ot::SettingsItemInfoText::setText(const std::string& _text) { m_title = _te
 
 std::string ot::SettingsItemInfoText::value(void) const { return m_title; }
 
-void ot::SettingsItemInfoText::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {}
+void ot::SettingsItemInfoText::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {}
 
 // ############################################################################################
 
@@ -640,8 +568,8 @@ void ot::SettingsItemBoolean::copyValuesFromOtherItem(AbstractSettingsItem * _ot
 
 // Getter
 
-void ot::SettingsItemBoolean::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_value);
+void ot::SettingsItemBoolean::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, m_value, _allocator);
 }
 
 // ############################################################################################
@@ -676,9 +604,9 @@ void ot::SettingsItemString::copyValuesFromOtherItem(AbstractSettingsItem * _oth
 
 // Getter
 
-void ot::SettingsItemString::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_value);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_InputHint, m_inputHint);
+void ot::SettingsItemString::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonString(m_value, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_InputHint, JsonString(m_inputHint, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -741,10 +669,10 @@ void ot::SettingsItemInteger::setMaxLimits(void) {
 
 // Protected functions
 
-void ot::SettingsItemInteger::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_value);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueMin, m_minValue);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueMax, m_maxValue);
+void ot::SettingsItemInteger::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, m_value, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueMin, m_minValue, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueMax, m_maxValue, _allocator);
 }
 
 // ##############################################################
@@ -827,11 +755,11 @@ void ot::SettingsItemDouble::setMaxLimits(void) {
 
 // Protected functions
 
-void ot::SettingsItemDouble::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_value);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueMin, m_minValue);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueMax, m_maxValue);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Decimals, m_decimals);
+void ot::SettingsItemDouble::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, m_value, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueMin, m_minValue, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueMax, m_maxValue, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Decimals, m_decimals, _allocator);
 }
 
 // ##############################################################
@@ -903,9 +831,9 @@ void ot::SettingsItemSelection::setSelectedValue(const std::string& _selectedVal
 
 // Getter
 
-void ot::SettingsItemSelection::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_PossibleValue, m_possibleSelection);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_selectedValue);
+void ot::SettingsItemSelection::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonString(m_selectedValue, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_PossibleValue, JsonArray(m_possibleSelection, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -960,10 +888,10 @@ void ot::SettingsItemEditableSelection::setSelectedValue(const std::string& _sel
 
 // Getter
 
-void ot::SettingsItemEditableSelection::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_PossibleValue, m_possibleSelection);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_selectedValue);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_InputHint, m_inputHint);
+void ot::SettingsItemEditableSelection::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonString(m_selectedValue, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_PossibleValue, JsonArray(m_possibleSelection, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_InputHint, JsonString(m_inputHint, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -1024,9 +952,9 @@ void ot::SettingsItemListSelection::setSelectedValues(const std::list<std::strin
 
 // Getter
 
-void ot::SettingsItemListSelection::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_PossibleValue, m_possibleSelection);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_selectedValues);
+void ot::SettingsItemListSelection::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonArray(m_selectedValues, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_PossibleValue, JsonArray(m_possibleSelection, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -1063,11 +991,11 @@ void ot::SettingsItemColor::setValue(float _r, float _g, float _b, float _a) { m
 
 // Getter
 
-void ot::SettingsItemColor::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueA, m_color.aInt());
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueR, m_color.rInt());
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueG, m_color.gInt());
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_ValueB, m_color.bInt());
+void ot::SettingsItemColor::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueA, m_color.aInt(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueR, m_color.rInt(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueG, m_color.gInt(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueB, m_color.bInt(), _allocator);
 }
 
 // ############################################################################################
@@ -1101,9 +1029,9 @@ void ot::SettingsItemDirectorySelect::copyValuesFromOtherItem(AbstractSettingsIt
 
 // Getter
 
-void ot::SettingsItemDirectorySelect::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_directory);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_InputHint, m_inputHint);
+void ot::SettingsItemDirectorySelect::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonString(m_directory, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_InputHint, JsonString(m_inputHint, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -1138,10 +1066,10 @@ void ot::SettingsItemFileSelectOpen::copyValuesFromOtherItem(AbstractSettingsIte
 
 // Protected functions
 
-void ot::SettingsItemFileSelectOpen::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_file);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Filter, m_filter);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_InputHint, m_inputHint);
+void ot::SettingsItemFileSelectOpen::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonString(m_file, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Filter, JsonString(m_filter, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_InputHint, JsonString(m_inputHint, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -1176,10 +1104,10 @@ void ot::SettingsItemFileSelectSave::copyValuesFromOtherItem(AbstractSettingsIte
 
 // Protected functions
 
-void ot::SettingsItemFileSelectSave::addItemDataToJsonObject(rapidjson::Document& _document, rapidjson::Value& _object) const {
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Value, m_file);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_Filter, m_filter);
-	ot::rJSON::add(_document, _object, OT_ACTION_PARAM_SETTINGS_InputHint, m_inputHint);
+void ot::SettingsItemFileSelectSave::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Value, JsonString(m_file, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_Filter, JsonString(m_filter, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_InputHint, JsonString(m_inputHint, _allocator), _allocator);
 }
 
 // ############################################################################################
@@ -1188,56 +1116,16 @@ void ot::SettingsItemFileSelectSave::addItemDataToJsonObject(rapidjson::Document
 
 // ############################################################################################
 
-ot::AbstractSettingsItem * ot::SettingsItemFactory::createItem(rapidjson::Value& _jsonObject) {
-	// Check for missing members
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Type)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Type "\" is missing");
-		return nullptr;
-	}
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Name)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Name "\" is missing");
-		return nullptr;
-	}
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Title)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Title "\" is missing");
-		return nullptr;
-	}
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_IsVisible)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_IsVisible "\" is missing");
-		return nullptr;
-	}
-
-	// Check member types
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_Type].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Type "\" is not a string");
-		return nullptr;
-	}
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_Name].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Name "\" is not a string");
-		return nullptr;
-	}
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_Title].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Title "\" is not a string");
-		return nullptr;
-	}
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_IsVisible].IsBool()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_IsVisible "\" is not a bool");
-		return nullptr;
-	}
-
+ot::AbstractSettingsItem * ot::SettingsItemFactory::createItem(const ConstJsonObject& _jsonObject) {
 	// Get type and name
-	std::string itmName = _jsonObject[OT_ACTION_PARAM_SETTINGS_Name].GetString();
-	std::string itmTitle = _jsonObject[OT_ACTION_PARAM_SETTINGS_Title].GetString();
-	std::string itmType = _jsonObject[OT_ACTION_PARAM_SETTINGS_Type].GetString();
+	std::string itmName = json::getString(_jsonObject, OT_ACTION_PARAM_SETTINGS_Name);
+	std::string itmTitle = json::getString(_jsonObject, OT_ACTION_PARAM_SETTINGS_Title);
+	std::string itmType = json::getString(_jsonObject, OT_ACTION_PARAM_SETTINGS_Type);
 	std::string itmDescription;
-	bool isVisible = _jsonObject[OT_ACTION_PARAM_SETTINGS_IsVisible].GetBool();
+	bool isVisible = json::getBool(_jsonObject, OT_ACTION_PARAM_SETTINGS_IsVisible);
 	
 	if (_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Description)) {
-		if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_Description].IsString()) {
-			OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Description "\" is not a string");
-			return nullptr;
-		}
-		itmDescription = _jsonObject[OT_ACTION_PARAM_SETTINGS_Description].GetString();
+		itmDescription = json::getString(_jsonObject, OT_ACTION_PARAM_SETTINGS_Description);
 	}
 
 	if (itmType == AbstractSettingsItem::typeToString(AbstractSettingsItem::InfoText)) {
@@ -1293,14 +1181,8 @@ ot::SettingsItemBoolean * ot::SettingsItemFactory::createBooleanItem(const std::
 	return new SettingsItemBoolean(_name, _title, _value, _description);
 }
 
-ot::SettingsItemBoolean * ot::SettingsItemFactory::createBooleanItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
-	}
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_Value].IsBool()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is not a boolean"); return nullptr;
-	}
-	bool itmValue = _jsonObject[OT_ACTION_PARAM_SETTINGS_Value].GetBool();
+ot::SettingsItemBoolean * ot::SettingsItemFactory::createBooleanItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
+	bool itmValue = json::getBool(_jsonObject, OT_ACTION_PARAM_SETTINGS_Value);
 	SettingsItemBoolean * newItem = createBooleanItem(_name, _title, _description, itmValue);
 	newItem->setVisible(_isVisible);
 	return newItem;
@@ -1310,21 +1192,9 @@ ot::SettingsItemString * ot::SettingsItemFactory::createStringItem(const std::st
 	return new SettingsItemString(_name, _title, _value, _inputHint, _description);
 }
 
-ot::SettingsItemString * ot::SettingsItemFactory::createStringItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
-	}
-	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_InputHint)) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_InputHint "\" is missing"); return nullptr;
-	}
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_Value].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is not a string"); return nullptr;
-	}
-	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_InputHint].IsString()) {
-		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_InputHint "\" is not a string"); return nullptr;
-	}
-	std::string itmValue = _jsonObject[OT_ACTION_PARAM_SETTINGS_Value].GetString();
-	std::string inputHint = _jsonObject[OT_ACTION_PARAM_SETTINGS_InputHint].GetString();
+ot::SettingsItemString * ot::SettingsItemFactory::createStringItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
+	std::string itmValue = json::getString(_jsonObject, OT_ACTION_PARAM_SETTINGS_Value);
+	std::string inputHint = json::getString(_jsonObject, OT_ACTION_PARAM_SETTINGS_InputHint);
 	SettingsItemString * newItem = createStringItem(_name, _title, _description, itmValue, inputHint);
 	newItem->setVisible(_isVisible);
 	return newItem;
@@ -1334,7 +1204,7 @@ ot::SettingsItemInteger * ot::SettingsItemFactory::createIntegerItem(const std::
 	return new SettingsItemInteger(_name, _title, _value, _minValue, _maxValue, _description);
 }
 
-ot::SettingsItemInteger * ot::SettingsItemFactory::createIntegerItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemInteger * ot::SettingsItemFactory::createIntegerItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1365,7 +1235,7 @@ ot::SettingsItemDouble * ot::SettingsItemFactory::createDoubleItem(const std::st
 	return new SettingsItemDouble(_name, _title, _value, _minValue, _maxValue, _decimals, _description);
 }
 
-ot::SettingsItemDouble * ot::SettingsItemFactory::createDoubleItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemDouble * ot::SettingsItemFactory::createDoubleItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1403,7 +1273,7 @@ ot::SettingsItemSelection * ot::SettingsItemFactory::createSelectionItem(const s
 	return new SettingsItemSelection(_name, _title, _possibleSelection, _selectedValue, _description);
 }
 
-ot::SettingsItemSelection * ot::SettingsItemFactory::createSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemSelection * ot::SettingsItemFactory::createSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1417,7 +1287,7 @@ ot::SettingsItemSelection * ot::SettingsItemFactory::createSelectionItem(const s
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_PossibleValue "\" is not a string"); return nullptr;
 	}
 	std::string itmValue = _jsonObject[OT_ACTION_PARAM_SETTINGS_Value].GetString();
-	std::list<std::string> possibleSelection = ot::rJSON::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_PossibleValue);
+	std::list<std::string> possibleSelection = ot::json::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_PossibleValue);
 	SettingsItemSelection * newItem = createSelectionItem(_name, _title, _description, possibleSelection, itmValue);
 	newItem->setVisible(_isVisible);
 	return newItem;
@@ -1427,7 +1297,7 @@ ot::SettingsItemEditableSelection * ot::SettingsItemFactory::createEditableSelec
 	return new SettingsItemEditableSelection(_name, _title, _possibleSelection, _selectedValue, _inputHint, _description);
 }
 
-ot::SettingsItemEditableSelection * ot::SettingsItemFactory::createEditableSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemEditableSelection * ot::SettingsItemFactory::createEditableSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1448,7 +1318,7 @@ ot::SettingsItemEditableSelection * ot::SettingsItemFactory::createEditableSelec
 	}
 	std::string itmValue = _jsonObject[OT_ACTION_PARAM_SETTINGS_Value].GetString();
 	std::string inputHint = _jsonObject[OT_ACTION_PARAM_SETTINGS_InputHint].GetString();
-	std::list<std::string> possibleSelection = ot::rJSON::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_PossibleValue);
+	std::list<std::string> possibleSelection = ot::json::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_PossibleValue);
 	SettingsItemEditableSelection * newItem = createEditableSelectionItem(_name, _title, _description, possibleSelection, itmValue, inputHint);
 	newItem->setVisible(_isVisible);
 	return newItem;
@@ -1458,7 +1328,7 @@ ot::SettingsItemListSelection * ot::SettingsItemFactory::createListSelectionItem
 	return new SettingsItemListSelection(_name, _title, _possibleSelection, _selectedValues, _description);
 }
 
-ot::SettingsItemListSelection * ot::SettingsItemFactory::createListSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemListSelection * ot::SettingsItemFactory::createListSelectionItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1471,8 +1341,8 @@ ot::SettingsItemListSelection * ot::SettingsItemFactory::createListSelectionItem
 	if (!_jsonObject[OT_ACTION_PARAM_SETTINGS_PossibleValue].IsArray()) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_PossibleValue "\" is not a string"); return nullptr;
 	}
-	std::list<std::string> itmValue = ot::rJSON::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_Value);
-	std::list<std::string> possibleSelection = ot::rJSON::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_PossibleValue);
+	std::list<std::string> itmValue = ot::json::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_Value);
+	std::list<std::string> possibleSelection = ot::json::getStringList(_jsonObject, OT_ACTION_PARAM_SETTINGS_PossibleValue);
 	SettingsItemListSelection * newItem = createListSelectionItem(_name, _title, _description, possibleSelection, itmValue);
 	newItem->setVisible(_isVisible);
 	return newItem;
@@ -1482,7 +1352,7 @@ ot::SettingsItemColor * ot::SettingsItemFactory::createColorItem(const std::stri
 	return new SettingsItemColor(_name, _title, _color, _description);
 }
 
-ot::SettingsItemColor * ot::SettingsItemFactory::createColorItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemColor * ot::SettingsItemFactory::createColorItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_ValueA)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_ValueA "\" is missing"); return nullptr;
 	}
@@ -1518,7 +1388,7 @@ ot::SettingsItemDirectorySelect * ot::SettingsItemFactory::createDirectorySelect
 	return new SettingsItemDirectorySelect(_name, _title, _directory, _inputHint, _description);
 }
 
-ot::SettingsItemDirectorySelect * ot::SettingsItemFactory::createDirectorySelectItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemDirectorySelect * ot::SettingsItemFactory::createDirectorySelectItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1542,7 +1412,7 @@ ot::SettingsItemFileSelectOpen * ot::SettingsItemFactory::createFileSelectOpenIt
 	return new SettingsItemFileSelectOpen(_name, _title, _file, _inputHint, _description);
 }
 
-ot::SettingsItemFileSelectOpen * ot::SettingsItemFactory::createFileSelectOpenItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemFileSelectOpen * ot::SettingsItemFactory::createFileSelectOpenItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}
@@ -1566,7 +1436,7 @@ ot::SettingsItemFileSelectSave * ot::SettingsItemFactory::createFileSelectSaveIt
 	return new SettingsItemFileSelectSave(_name, _title, _file, _inputHint, _description);
 }
 
-ot::SettingsItemFileSelectSave * ot::SettingsItemFactory::createFileSelectSaveItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, rapidjson::Value& _jsonObject) {
+ot::SettingsItemFileSelectSave * ot::SettingsItemFactory::createFileSelectSaveItem(const std::string& _name, const std::string& _title, const std::string& _description, bool _isVisible, const ConstJsonObject& _jsonObject) {
 	if (!_jsonObject.HasMember(OT_ACTION_PARAM_SETTINGS_Value)) {
 		OTAssert(0, "Settings item member \"" OT_ACTION_PARAM_SETTINGS_Value "\" is missing"); return nullptr;
 	}

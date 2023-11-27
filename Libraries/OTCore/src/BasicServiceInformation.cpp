@@ -32,12 +32,12 @@ bool ot::BasicServiceInformation::operator < (const BasicServiceInformation& _ot
 	return m_name < _other.m_name && m_type < _other.m_type;
 }
 
-void ot::BasicServiceInformation::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, "BSI.ServiceName", m_name);
-	ot::rJSON::add(_document, _object, "BSI.ServiceType", m_type);
+void ot::BasicServiceInformation::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("BSI.ServiceName", JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("BSI.ServiceType", JsonString(m_type, _allocator), _allocator);
 }
 
-void ot::BasicServiceInformation::setFromJsonObject(OT_rJSON_val& _object) {
-	m_name = ot::rJSON::getString(_object, "BSI.ServiceName");
-	m_type = ot::rJSON::getString(_object, "BSI.ServiceType");
+void ot::BasicServiceInformation::setFromJsonObject(const ConstJsonObject& _object) {
+	m_name = json::getString(_object, "BSI.ServiceName");
+	m_type = json::getString(_object, "BSI.ServiceType");
 }

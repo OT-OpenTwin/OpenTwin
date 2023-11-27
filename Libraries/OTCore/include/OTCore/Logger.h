@@ -165,16 +165,15 @@ namespace ot {
 		//! @brief Set the current system time as message received by logger service timestamp
 		void setCurrentTimeAsGlobalSystemTime(void);
 
-
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
 		//! @param _object The JSON object to add the contents to
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 		//! @brief Will set the object contents from the provided JSON object
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
-		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 	private:
 		friend OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);

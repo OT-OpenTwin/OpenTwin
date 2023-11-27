@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/otAssert.h"
-#include "OTCore/rJSON.h"	            						// rapidjson wrapper
+#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OwnerServiceGlobal.h"
 
@@ -45,9 +45,9 @@ namespace ot {
 			OT_LOG_D("Starting Local Session Service health check (URL = \"" + _sessionServiceURL + "\")");
 
 			// Create ping request
-			OT_rJSON_createDOC(pingDoc);
-			ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-			std::string ping = ot::rJSON::toJSON(pingDoc);
+			JsonDocument pingDoc;
+			pingDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Ping, pingDoc.GetAllocator());
+			std::string ping = pingDoc.toJson();
 
 			bool alive = true;
 			while (alive) {
@@ -165,13 +165,13 @@ std::string ot::intern::ExternalServicesComponent::init(
 	
 	// Get the database information
 	{
-		OT_rJSON_createDOC(request);
-
+		JsonDocument request;
+		
 		// todo: maybe merge get database url and register new service into one call? (nothin else is happening before anyway
-		ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_GetDatabaseUrl);
+		request.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_GetDatabaseUrl, request.GetAllocator());
 
 		std::string response;
-		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(request), response)) {
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, request.toJson(), response)) {
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send get database URL message";
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -190,20 +190,20 @@ std::string ot::intern::ExternalServicesComponent::init(
 
 	// Register this service as a service in the session service
 	{
-		OT_rJSON_createDOC(newServiceCommandDoc);
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewService);
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SESSION_ID, m_application->sessionID());
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SERVICE_NAME, m_application->serviceName());
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(m_application->serviceURL()));
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SERVICE_TYPE, m_application->serviceType());
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_START_RELAY, m_application->startAsRelayService());
+		JsonDocument newServiceCommandDoc;
+		newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_RegisterNewService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->sessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->serviceName(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PORT, JsonString(ot::IpConverter::portFromIp(m_application->serviceURL()), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->serviceType(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_START_RELAY, m_application->startAsRelayService(), newServiceCommandDoc.GetAllocator());
 
 #ifdef _DEBUG
 		auto handle = GetCurrentProcess();
 		if (handle != nullptr) {
 			unsigned long handleID = GetProcessId(handle);
 			assert(handleID != 0); // Failed to get process handle ID
-			ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_PROCESS_ID, std::to_string(handleID));
+			newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		}
 		else {
 			assert(0); // Failed to get current process handle
@@ -211,7 +211,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 #endif // _DEBUG
 
 		std::string response;
-		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(newServiceCommandDoc), response)) {
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), response)) {
 			OT_LOG_E("Failed to send http request to LSS at \"" + m_application->sessionServiceURL() + "\"");
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send register command to LSS";
 		}
@@ -224,15 +224,16 @@ std::string ot::intern::ExternalServicesComponent::init(
 			return response;
 		}
 
-		OT_rJSON_parseDOC(reply, response.c_str());
-		OT_rJSON_docCheck(reply);
-		m_application->setServiceID(ot::rJSON::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
+		JsonDocument reply;
+		reply.fromJson(response);
+
+		m_application->setServiceID(json::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
 		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 
 		if (m_application->startAsRelayService()) {
-			m_application->setWebSocketURL(ot::rJSON::getString(reply, OT_ACTION_PARAM_WebsocketURL));
+			m_application->setWebSocketURL(ot::json::getString(reply, OT_ACTION_PARAM_WebsocketURL));
 
 			OT_LOG_D("Websocket URL set to: \"" + m_application->webSocketURL() + "\"");
 		}
@@ -265,13 +266,13 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 
 	// Get the database information
 	{
-		OT_rJSON_createDOC(request);
+		JsonDocument request;
 
 		// todo: maybe merge get database url and register new service into one call? (nothin else is happening before anyway
-		ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_GetDatabaseUrl);
+		request.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_GetDatabaseUrl, request.GetAllocator());
 
 		std::string response;
-		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(request), response)) {
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, request.toJson(), response)) {
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send get database URL message";
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -290,20 +291,20 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 
 	// Register this service as a service in the session service
 	{
-		OT_rJSON_createDOC(newServiceCommandDoc);
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewService);
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SESSION_ID, m_application->sessionID());
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SERVICE_NAME, m_application->serviceName());
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(m_application->serviceURL()));
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_SERVICE_TYPE, m_application->serviceType());
-		ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_START_RELAY, m_application->startAsRelayService());
+		JsonDocument newServiceCommandDoc;
+		newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_RegisterNewService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->sessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->serviceName(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PORT, JsonString(ot::IpConverter::portFromIp(m_application->serviceURL()), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->serviceType(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_START_RELAY, m_application->startAsRelayService(), newServiceCommandDoc.GetAllocator());
 
 
 		auto handle = GetCurrentProcess();
 		if (handle != nullptr) {
 			unsigned long handleID = GetProcessId(handle);
 			assert(handleID != 0); // Failed to get process handle ID
-			ot::rJSON::add(newServiceCommandDoc, OT_ACTION_PARAM_PROCESS_ID, std::to_string(handleID));
+			newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		}
 		else {
 			assert(0); // Failed to get current process handle
@@ -311,7 +312,7 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 
 
 		std::string response;
-		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(newServiceCommandDoc), response)) {
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), response)) {
 			OT_LOG_E("Failed to send http request to LSS at \"" + m_application->sessionServiceURL() + "\"");
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send register command to LSS";
 		}
@@ -324,15 +325,15 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 			return response;
 		}
 
-		OT_rJSON_parseDOC(reply, response.c_str());
-		OT_rJSON_docCheck(reply);
-		m_application->setServiceID(ot::rJSON::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
+		JsonDocument reply;
+		reply.fromJson(response);
+		m_application->setServiceID(ot::json::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
 		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 
 		if (m_application->startAsRelayService()) {
-			m_application->setWebSocketURL(ot::rJSON::getString(reply, OT_ACTION_PARAM_WebsocketURL));
+			m_application->setWebSocketURL(ot::json::getString(reply, OT_ACTION_PARAM_WebsocketURL));
 
 			OT_LOG_D("Websocket URL set to: \"" + m_application->webSocketURL() + "\"");
 		}
@@ -362,11 +363,11 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 		return std::string();
 	}
 	try {
-		// Use a mutex to ensure the requests will be handled one by one
-		OT_rJSON_parseDOC(actionDoc, _json.c_str());
+		JsonDocument actionDoc;
+		actionDoc.fromJson(_json);
 
 		// Get the requested action (if the member is missing a exception will be thrown)
-		std::string action = ot::rJSON::getString(actionDoc, OT_ACTION_MEMBER);
+		std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
 		
 		bool hasHandler{ false };
 		std::string result = ot::Dispatcher::instance()->dispatch(action, actionDoc, hasHandler, _messageType);
@@ -400,15 +401,15 @@ void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand) {
 	// Notify the session service about the service shutting down
 	if (!_requestedAsCommand) {
 		// Create a document to notify the session service about the fact that this service is closing
-		OT_rJSON_createDOC(commandDoc);
-		ot::rJSON::add(commandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceClosing);
-		ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID());
-		ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SESSION_ID, m_application->sessionID());
+		JsonDocument commandDoc;
+		commandDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceClosing, commandDoc.GetAllocator());
+		commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), commandDoc.GetAllocator());
+		commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->sessionID(), commandDoc.GetAllocator()), commandDoc.GetAllocator());
 		std::string response;
 
 		OT_LOG_D("Sending shutdown notification to LSS");
 
-		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(commandDoc), response)) {
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, commandDoc.toJson(), response)) {
 			assert(0); // Failed to send http request
 		}
 	}
@@ -421,45 +422,45 @@ void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand) {
 
 // Private functions
 
-std::string ot::intern::ExternalServicesComponent::handleInitialize(OT_rJSON_doc& _document) {
-	std::string serviceName = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string serviceType = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
-	std::string sessionServiceURL = ot::rJSON::getString(_document, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-	std::string sessionID = ot::rJSON::getString(_document, OT_ACTION_PARAM_SESSION_ID);
+std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
+	std::string serviceName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string serviceType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+	std::string sessionServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+	std::string sessionID = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_ID);
 
 	return this->init(sessionServiceURL, sessionID);
 }
 
-std::string ot::intern::ExternalServicesComponent::handleServiceConnected(OT_rJSON_doc& _document) {
-	serviceID_t senderID = ot::rJSON::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string senderURL = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
-	std::string senderName = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string senderType = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+std::string ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {
+	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
 
 	m_application->__serviceConnected(senderName, senderType, senderURL, senderID);
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleServiceDisconnected(OT_rJSON_doc& _document) {
-	serviceID_t senderID = ot::rJSON::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string senderURL = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
-	std::string senderName = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string senderType = ot::rJSON::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+std::string ot::intern::ExternalServicesComponent::handleServiceDisconnected(JsonDocument& _document) {
+	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
 
 	m_application->__serviceDisconnected(senderName, senderType, senderURL, senderID);
 	
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleShutdownRequestByService(OT_rJSON_doc& _document) {
+std::string ot::intern::ExternalServicesComponent::handleShutdownRequestByService(JsonDocument& _document) {
 	shutdown(false);
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleMessage(OT_rJSON_doc& _document) {
-	std::string message = ot::rJSON::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	serviceID_t senderID = ot::rJSON::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+std::string ot::intern::ExternalServicesComponent::handleMessage(JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
 #ifdef _DEBUG
 	std::string msg("Message from \"");
@@ -472,27 +473,27 @@ std::string ot::intern::ExternalServicesComponent::handleMessage(OT_rJSON_doc& _
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleServiceShutdown(OT_rJSON_doc& _document) {
+std::string ot::intern::ExternalServicesComponent::handleServiceShutdown(JsonDocument& _document) {
 	shutdown(true);
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleRun(OT_rJSON_doc& _document) {
-	std::string credentialsUsername = ot::rJSON::getString(_document, OT_PARAM_AUTH_USERNAME);
-	std::string credentialsPassword = ot::rJSON::getString(_document, OT_PARAM_AUTH_PASSWORD);
-	m_application->m_DBuserCollection = ot::rJSON::getString(_document, OT_PARAM_SETTINGS_USERCOLLECTION);
+std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document) {
+	std::string credentialsUsername = ot::json::getString(_document, OT_PARAM_AUTH_USERNAME);
+	std::string credentialsPassword = ot::json::getString(_document, OT_PARAM_AUTH_PASSWORD);
+	m_application->m_DBuserCollection = ot::json::getString(_document, OT_PARAM_SETTINGS_USERCOLLECTION);
 
 	DataBase::GetDataBase()->setUserCredentials(credentialsUsername, credentialsPassword);
 
 	// Change the service to visible
 	{
-		OT_rJSON_createDOC(visibilityCommand);
-		ot::rJSON::add(visibilityCommand, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShow);
-		ot::rJSON::add(visibilityCommand, OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID());
-		ot::rJSON::add(visibilityCommand, OT_ACTION_PARAM_SESSION_ID, m_application->sessionID());
+		JsonDocument visibilityCommand;
+		visibilityCommand.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShow, visibilityCommand.GetAllocator());
+		visibilityCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), visibilityCommand.GetAllocator());
+		visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->sessionID(), visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
 
 		std::string response;
-		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(visibilityCommand), response)) {
+		if (!ot::msg::send(m_application->serviceURL(), m_application->sessionServiceURL(), ot::EXECUTE, visibilityCommand.toJson(), response)) {
 			std::cout << OT_ACTION_RETURN_INDICATOR_Error "Failed to send http request" << std::endl;
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send http request";
 		}
@@ -505,8 +506,8 @@ std::string ot::intern::ExternalServicesComponent::handleRun(OT_rJSON_doc& _docu
 			return OT_ACTION_RETURN_INDICATOR_Error "From uiService: " + response;
 		}
 
-		OT_rJSON_parseDOC(responseDoc, response.c_str());
-		OT_rJSON_docCheck(responseDoc);
+		JsonDocument responseDoc;
+		responseDoc.fromJson(response);
 
 		{
 			SettingsData * serviceSettings = m_application->createSettings();
@@ -523,14 +524,12 @@ std::string ot::intern::ExternalServicesComponent::handleRun(OT_rJSON_doc& _docu
 			}
 		}
 
-		auto serviceList = ot::rJSON::getObjectList(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES);
+		auto serviceList = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES);
 		for (auto serviceJSON : serviceList) {
-			OT_rJSON_parseDOC(serviceDoc, serviceJSON.c_str());
-			OT_rJSON_docCheck(serviceDoc);
-			std::string senderURL = ot::rJSON::getString(serviceDoc, OT_ACTION_PARAM_SERVICE_URL);
-			std::string senderName = ot::rJSON::getString(serviceDoc, OT_ACTION_PARAM_SERVICE_NAME);
-			std::string senderType = ot::rJSON::getString(serviceDoc, OT_ACTION_PARAM_SERVICE_TYPE);
-			serviceID_t senderID = ot::rJSON::getUInt(serviceDoc, OT_ACTION_PARAM_SERVICE_ID);
+			std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
+			std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
+			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
+			serviceID_t senderID = ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID);
 			if (senderID != m_application->serviceID()) {
 				m_application->__serviceConnected(senderName, senderType, senderURL, senderID);
 			}
@@ -543,21 +542,21 @@ std::string ot::intern::ExternalServicesComponent::handleRun(OT_rJSON_doc& _docu
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handlePreShutdown(OT_rJSON_doc& _document) {
+std::string ot::intern::ExternalServicesComponent::handlePreShutdown(JsonDocument& _document) {
 	m_application->preShutdown();
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleEmergencyShutdown(OT_rJSON_doc& _document) {
+std::string ot::intern::ExternalServicesComponent::handleEmergencyShutdown(JsonDocument& _document) {
 	std::thread t(ot::intern::exitWorker, -100);
 	t.detach();
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleUIPluginConnected(OT_rJSON_doc& _document) {
+std::string ot::intern::ExternalServicesComponent::handleUIPluginConnected(JsonDocument& _document) {
 	components::UiComponent * ui = m_application->uiComponent();
-	unsigned long long pluginUID = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
-	std::string pluginName = ot::rJSON::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
+	unsigned long long pluginUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
+	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
 	if (ui == nullptr) {
 		return OT_ACTION_RETURN_INDICATOR_Error "UI is not connected";
 	}
@@ -686,15 +685,15 @@ int ot::foundation::init(
 			return -21;
 		}
 		// Parse doc
-		OT_rJSON_parseDOC(params, info.c_str());
-		assert(params.IsObject());
+		JsonDocument params;
+		params.fromJson(info);
 
 		OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
 
-		std::string actualServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-		std::string actualSessionServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-		std::string actualLocalDirectoryServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-		std::string actualSessionID = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_ID);
+		std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+		std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+		std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
+		std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
 		// Initialize the service with the parameters from the file
 
 		int startupResult = intern::ExternalServicesComponent::instance()->startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
@@ -763,15 +762,15 @@ int ot::foundation::initDebugExplicit(
 			return -21;
 		}
 		// Parse doc
-		OT_rJSON_parseDOC(params, info.c_str());
-		assert(params.IsObject());
+		JsonDocument params;
+		params.fromJson(info);
 
 		OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
 
-		std::string actualServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-		std::string actualSessionServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-		std::string actualLocalDirectoryServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-		std::string actualSessionID = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_ID);
+		std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+		std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+		std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
+		std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
 		// Initialize the service with the parameters from the file
 
 		int startupResult = intern::ExternalServicesComponent::instance()->startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);

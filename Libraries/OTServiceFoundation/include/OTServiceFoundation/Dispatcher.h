@@ -2,7 +2,7 @@
 
 // OpenTwin header
 #include "OTServiceFoundation/FoundationAPIExport.h"
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCommunication/CommunicationTypes.h"
 
 // std header
@@ -42,7 +42,7 @@ namespace ot {
 		//! Uses a mutex to ensure that only one request is handled at a time
 		//! @param _action The action to dispatch
 		//! @param _document The document containing the action parameter
-		std::string dispatch(const std::string& _action, OT_rJSON_doc& _document, ot::MessageType _messageType);
+		std::string dispatch(const std::string& _action, JsonDocument& _document, ot::MessageType _messageType);
 
 		//! @brief Will forward the action to all registered handlers
 		//! Will return the result of the last handler
@@ -50,7 +50,7 @@ namespace ot {
 		//! @param _action The action to dispatch
 		//! @param _document The document containing the action parameter
 		//! @param _handlerFound Will be set to true if at least one handler was found to dispatch this action to
-		std::string dispatch(const std::string& _action, OT_rJSON_doc& _document, bool& _handlerFound, ot::MessageType _messageType);
+		std::string dispatch(const std::string& _action, JsonDocument& _document, bool& _handlerFound, ot::MessageType _messageType);
 
 	private:
 

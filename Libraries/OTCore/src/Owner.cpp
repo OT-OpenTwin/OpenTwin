@@ -6,5 +6,4 @@
 // OpenTwin header
 #include "OTCore/Owner.h"
 #include "OTCore/Logger.h"
-#include "OTCore/rJSONHelper.h"
 

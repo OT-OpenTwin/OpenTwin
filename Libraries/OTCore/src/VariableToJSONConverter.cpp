@@ -1,6 +1,6 @@
 #include "OTCore/VariableToJSONConverter.h"
 
-rapidjson::Value ot::VariableToJSONConverter::operator()(Variable& value, OT_rJSON_doc& emebeddingDocument)
+rapidjson::Value ot::VariableToJSONConverter::operator()(Variable& value, JsonAllocator& jsonAllocator)
 {
 
 	if (value.isInt32())
@@ -37,7 +37,7 @@ rapidjson::Value ot::VariableToJSONConverter::operator()(Variable& value, OT_rJS
 	{
 		rapidjson::Value rJValue;
 		const char* temp = value.getConstCharPtr();
-		rJValue.SetString(temp, emebeddingDocument.GetAllocator());
+		rJValue.SetString(temp, jsonAllocator);
 		return rJValue;
 	}
 	else

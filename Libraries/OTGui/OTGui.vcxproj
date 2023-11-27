@@ -41,7 +41,6 @@
     <ClInclude Include="include\OTGui\GraphicsTriangleItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsVBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
-    <ClInclude Include="include\OTGui\LengthLimitation.h" />
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
@@ -73,7 +72,6 @@
     <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
-    <ClCompile Include="src\LengthLimitation.cpp" />
     <ClCompile Include="src\LinearGradientPainter2D.cpp" />
     <ClCompile Include="src\Margins.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />

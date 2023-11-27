@@ -28,6 +28,6 @@ namespace ot
 		const std::string _pythonExecutionServiceURL;
 		std::list<std::tuple<std::string, scriptParameter>> _scriptNamesWithParameter;
 
-		OT_rJSON_doc AssembleMessage();
+		std::string AssembleMessage();
 	};
 }

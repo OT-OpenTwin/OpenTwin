@@ -25,6 +25,7 @@
     <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
     <ClCompile Include="src\EncodingGuesser.cpp" />
+    <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\OwnerServiceGlobal.cpp" />
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
     <ClCompile Include="src\KeyMap.cpp" />
@@ -32,7 +33,6 @@
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Queue.cpp" />
     <ClCompile Include="src\ReturnMessage.cpp" />
-    <ClCompile Include="src\rJSON.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\OwnerService.cpp" />
@@ -54,12 +54,14 @@
     <ClInclude Include="include\OTCore\Flags.h" />
     <ClInclude Include="include\OTCore\FlagsHelper.h" />
     <ClInclude Include="include\OTCore\FolderNames.h" />
+    <ClInclude Include="include\OTCore\JSON.h" />
     <ClInclude Include="include\OTCore\JSONToVariableConverter.h" />
     <ClInclude Include="include\OTCore\KeyMap.h" />
     <ClInclude Include="include\OTCore\Logger.h" />
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OTAssert.h" />
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
+    <ClInclude Include="include\OTCore\OTObject.h" />
     <ClInclude Include="include\OTCore\Owner.h" />
     <ClInclude Include="include\OTCore\OwnerManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OwnerService.h" />
@@ -69,8 +71,6 @@
     <ClInclude Include="include\OTCore\Point3D.h" />
     <ClInclude Include="include\OTCore\Queue.h" />
     <ClInclude Include="include\OTCore\ReturnMessage.h" />
-    <ClInclude Include="include\OTCore\rJSON.h" />
-    <ClInclude Include="include\OTCore\rJSONHelper.h" />
     <ClInclude Include="include\OTCore\Serializable.h" />
     <ClInclude Include="include\OTCore\ServiceBase.h" />
     <ClInclude Include="include\OTCore\SimpleFactory.h" />

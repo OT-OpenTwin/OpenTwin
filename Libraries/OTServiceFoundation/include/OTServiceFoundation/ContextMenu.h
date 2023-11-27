@@ -2,8 +2,8 @@
 #pragma warning(disable : 4251)
 
 // Foundation header
-#include "OTCore/rJSON.h"
 #include "OTCore/Flags.h"
+#include "OTCore/Serializable.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/FoundationTypes.h"
 
@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class OT_SERVICEFOUNDATION_API_EXPORT ContextMenuItemRole {
+	class OT_SERVICEFOUNDATION_API_EXPORT ContextMenuItemRole : public Serializable {
 	public:
 		enum itemRole {
 			NoRole,
@@ -35,9 +35,15 @@ namespace ot {
 		static std::string roleToString(itemRole _role);
 		static itemRole stringToRole(const std::string& _role);
 		
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _object Json object reference
+		//! @param _allocator Allocator
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
-		void addToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const;
-		void setFromJsonObject(OT_rJSON_val & _object);
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 	private:
 		itemRole		m_role;
@@ -50,7 +56,7 @@ namespace ot {
 
 	// #########################################################################################################################################
 
-	class OT_SERVICEFOUNDATION_API_EXPORT AbstractContextMenuItem {
+	class OT_SERVICEFOUNDATION_API_EXPORT AbstractContextMenuItem : public Serializable {
 	public:
 		enum itemType {
 			Seperator,
@@ -62,6 +68,16 @@ namespace ot {
 		AbstractContextMenuItem& operator = (const AbstractContextMenuItem& _other);
 		virtual ~AbstractContextMenuItem();
 
+		//! @brief Add the object contents to the provided JSON object
+		//! @param _object Json object reference
+		//! @param _allocator Allocator
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+
+		//! @brief Will set the object contents from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+
 		// Getter
 
 		itemType type(void) const { return m_type; }
@@ -70,20 +86,13 @@ namespace ot {
 		static std::string typeToString(itemType _type);
 		static itemType stringToType(const std::string& _type);
 
-		void addToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const;
-		static AbstractContextMenuItem * buildItemFromJsonObject(OT_rJSON_val & _object);
+		static AbstractContextMenuItem * buildItemFromJsonObject(const ConstJsonObject& _object);
 
 		virtual AbstractContextMenuItem * createCopy(void) const = 0;
 
-		// Setter
-
-		void setFromJsonObject(OT_rJSON_val & _object);
-
-	
-
 	protected:
-		virtual void addInternalToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const = 0;
-		virtual void setInternalFromJsonObject(OT_rJSON_val & _object) = 0;
+		virtual void addInternalToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const = 0;
+		virtual void setInternalFromJsonObject(const ConstJsonObject& _object) = 0;
 		itemType		m_type;
 
 	private:
@@ -103,11 +112,11 @@ namespace ot {
 		ContextMenuSeperator& operator = (const ContextMenuSeperator& _other);
 		virtual ~ContextMenuSeperator();
 
-		virtual AbstractContextMenuItem * createCopy(void) const override;
+		AbstractContextMenuItem* createCopy(void) const override;
 
 	protected:
-		virtual void addInternalToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const override;
-		virtual void setInternalFromJsonObject(OT_rJSON_val & _object) override;
+		virtual void addInternalToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setInternalFromJsonObject(const ConstJsonObject& _object) override;
 	};
 
 	// #########################################################################################################################################
@@ -153,8 +162,8 @@ namespace ot {
 		ContextMenuItem& operator + (itemCheckedState _checkedState);
 
 	protected:
-		virtual void addInternalToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const override;
-		virtual void setInternalFromJsonObject(OT_rJSON_val & _object) override;
+		virtual void addInternalToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setInternalFromJsonObject(const ConstJsonObject& _object) override;
 
 	private:
 		std::string						m_name;
@@ -189,13 +198,13 @@ namespace ot {
 
 		const std::list<AbstractContextMenuItem *>& items(void) const { return m_items; }
 
-		void addToJsonObject(OT_rJSON_doc & _doc, OT_rJSON_val & _object) const;
+		void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const;
 
 		// #######################################################################################################
 
 		// Setter
 		
-		void setFromJsonObject(OT_rJSON_val & _object);
+		void setFromJsonObject(const ConstJsonObject& _object);
 
 		ContextMenu& addItem(const ContextMenuSeperator& _item);
 

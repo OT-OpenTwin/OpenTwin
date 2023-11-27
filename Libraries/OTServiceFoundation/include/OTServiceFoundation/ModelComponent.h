@@ -10,7 +10,7 @@
 
  // OpenTwin header
 #include "OTCore/ServiceBase.h"			// Base class
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/EntityInformation.h"
 
@@ -102,7 +102,7 @@ namespace ot {
 			void enableMessageQueueing(bool flag);
 			void modelChangeOperationCompleted(const std::string &description);
 
-			std::string sendMessage(bool _queue, OT_rJSON_doc& _doc);
+			std::string sendMessage(bool _queue, JsonDocument& _doc);
 
 			void clearNewEntityList(void);
 			void addNewTopologyEntity(UID entityID, UID entityVersion, bool forceVisible);

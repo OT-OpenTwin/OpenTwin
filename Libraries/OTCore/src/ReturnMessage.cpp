@@ -2,6 +2,14 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logger.h"
 
+namespace ot {
+	namespace intern {
+		void setReturnMessageFromJson(ReturnMessage& _msg, const JsonDocument& _doc) {
+			_msg.setFromJsonObject(_doc.GetObject());
+		}
+	}
+}
+
 std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageStatus _status) {
 	switch (_status)
 	{
@@ -26,11 +34,15 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 	ReturnMessage msg(ot::ReturnMessage::Ok);
 	if (_json.empty()) { return msg; }
 
-	OT_rJSON_parseDOC(doc, _json.c_str());
+	JsonDocument doc;
+	if (!doc.fromJson(_json)) {
+		msg = "Failed to deserialize return message \"" + _json + "\": Document is not an object";
+		return msg;
+	}
 
 	if (doc.IsObject()) {
 		try {
-			msg.setFromJsonObject(doc);
+			intern::setReturnMessageFromJson(msg, doc);
 		}
 		catch (const std::exception& _e) {
 			msg = ot::ReturnMessage::Failed;
@@ -96,14 +108,14 @@ bool ot::ReturnMessage::operator != (const ReturnMessage& _other) const {
 	return this->m_status != _other.m_status || this->m_what != _other.m_what;
 }
 
-void ot::ReturnMessage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, "Status", statusToString(m_status));
-	ot::rJSON::add(_document, _object, "What", m_what);
+void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("Status", JsonString(this->statusToString(m_status), _allocator), _allocator);
+	_object.AddMember("What", JsonString(m_what, _allocator), _allocator);
 }
 
-void ot::ReturnMessage::setFromJsonObject(OT_rJSON_val& _object) {
-	m_what = ot::rJSON::getString(_object, "What");
-	m_status = stringToStatus(ot::rJSON::getString(_object, "Status"));
+void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
+	m_what = json::getString(_object, "What");
+	m_status = stringToStatus(json::getString(_object, "Status"));
 }
 
 std::string ot::ReturnMessage::getStatusString(void) const {
@@ -111,7 +123,7 @@ std::string ot::ReturnMessage::getStatusString(void) const {
 }
 
 std::string ot::ReturnMessage::toJson(void) const {
-	OT_rJSON_createDOC(doc);
-	this->addToJsonObject(doc, doc);
-	return ot::rJSON::toJSON(doc);
+	JsonDocument doc;
+	this->addToJsonObject(doc, doc.GetAllocator());
+	return doc.toJson();
 }

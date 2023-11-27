@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/rJSONHelper.h"
 #include "OTGui/LinearGradientPainter2D.h"
 
 #define OT_JSON_MEMBER_Start "Start"
@@ -22,26 +21,20 @@ ot::LinearGradientPainter2D::LinearGradientPainter2D(const std::vector<GradientP
 
 ot::LinearGradientPainter2D::~LinearGradientPainter2D() {}
 
-void ot::LinearGradientPainter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::GradientPainter2D::addToJsonObject(_document, _object);
+void ot::LinearGradientPainter2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	ot::GradientPainter2D::addToJsonObject(_object, _allocator);
 
-	OT_rJSON_createValueObject(startObj);
-	m_start.addToJsonObject(_document, startObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Start, startObj);
+	JsonObject startObj;
+	m_start.addToJsonObject(startObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Start, startObj, _allocator);
 
-	OT_rJSON_createValueObject(finalStopObj);
-	m_finalStop.addToJsonObject(_document, finalStopObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_FinalStop, finalStopObj);
+	JsonObject finalStopObj;
+	m_finalStop.addToJsonObject(finalStopObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_FinalStop, finalStopObj, _allocator);
 }
 
-void ot::LinearGradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::LinearGradientPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	ot::GradientPainter2D::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Start, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_FinalStop, Object);
-
-	OT_rJSON_val startObj = _object[OT_JSON_MEMBER_Start].GetObject();
-	m_start.setFromJsonObject(startObj);
-
-	OT_rJSON_val finalStopObj = _object[OT_JSON_MEMBER_FinalStop].GetObject();
-	m_finalStop.setFromJsonObject(finalStopObj);
+	m_start.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Start));
+	m_finalStop.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_FinalStop));
 }

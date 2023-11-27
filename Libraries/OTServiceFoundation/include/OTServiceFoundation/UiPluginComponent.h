@@ -1,7 +1,7 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
 #include <string>
@@ -29,7 +29,7 @@ namespace ot {
 			//! @brief Will send a queued message to the plugin
 			//! @param _action The action identicator
 			//! @param _message The action message as a json object
-			void sendQueuedMessage(const std::string& _action, OT_rJSON_doc& _object);
+			void sendQueuedMessage(const std::string& _action, JsonDocument& _object);
 
 			// ##################################################################################################
 

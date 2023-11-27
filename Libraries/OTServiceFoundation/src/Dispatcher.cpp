@@ -83,22 +83,16 @@ const char * ot::Dispatcher::dispatchWrapper(const char * _json, const char * _s
 
 std::string ot::Dispatcher::dispatch(const std::string& _json, ot::MessageType _messageType) {
 	// Parse the json string and check its main syntax
-	OT_rJSON_parseDOC(doc, _json.c_str());
-	if (!doc.IsObject()) {
-		OTAssert(0, "Received message is not a JSON object");
-		return OT_ACTION_RETURN_INDICATOR_Error "Received message is not a JSON object";
-	}
-	if (!doc.HasMember(OT_ACTION_MEMBER)) {
-		OTAssert(0, "Received JSON Object does not contain the member \"" OT_ACTION_MEMBER "\"");
-		return OT_ACTION_RETURN_INDICATOR_Error "Received JSON Object does not contain the member \"" OT_ACTION_MEMBER "\"";
-	}
-	if (!doc[OT_ACTION_MEMBER].IsString()) {
-		OTAssert(0, "JSON Object member \"" OT_ACTION_MEMBER "\" is not a string");
-		return OT_ACTION_RETURN_INDICATOR_Error "JSON Object member \"" OT_ACTION_MEMBER "\" is not a string";
-	}
+	JsonDocument doc;
+	doc.fromJson(_json);
 
 	// Get the action and dispatch it
-	std::string action = doc[OT_ACTION_MEMBER].GetString();
+	std::string action = json::getString(doc, OT_ACTION_MEMBER);
+
+	if (!action.empty()) {
+		return OT_ACTION_RETURN_INDICATOR_Error "Action syntax error";
+	}
+
 	bool handlerFound = false;
 	std::string result = dispatch(action, doc, handlerFound, _messageType);
 	
@@ -111,12 +105,12 @@ std::string ot::Dispatcher::dispatch(const std::string& _json, ot::MessageType _
 	return result;
 }
 
-std::string ot::Dispatcher::dispatch(const std::string& _action, OT_rJSON_doc& _document, ot::MessageType _messageType) {
+std::string ot::Dispatcher::dispatch(const std::string& _action, JsonDocument& _document, ot::MessageType _messageType) {
 	bool tmp = false;
 	return dispatch(_action, _document, tmp, _messageType);
 }
 
-std::string ot::Dispatcher::dispatch(const std::string& _action, OT_rJSON_doc& _document, bool& _handlerFound, ot::MessageType _messageType) {
+std::string ot::Dispatcher::dispatch(const std::string& _action, JsonDocument& _document, bool& _handlerFound, ot::MessageType _messageType) {
 	// Check for default actions
 	if (_action == OT_ACTION_CMD_Ping) { 
 		_handlerFound = true;

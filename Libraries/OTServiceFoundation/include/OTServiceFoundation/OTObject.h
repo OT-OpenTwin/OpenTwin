@@ -2,7 +2,7 @@
 
 // OpenTwin header
 #include "OTCore/Flags.h"	// Flags
-#include "OTCore/rJSON.h" // rJSON doc/val
+#include "OTCore/JSON.h" // rJSON doc/val
 #include "OTCommunication/CommunicationTypes.h" // MessageType type
 #include "OTServiceFoundation/FoundationAPIExport.h" // API export
 
@@ -29,7 +29,7 @@ namespace ot {
 
 		// todo: add endpoint (execute, queue ...) to dispatch and ensure the handler does allow the enpoint
 		// if the user adds a handler then he needs to specify which endpoints are allowed
-		virtual std::string forwardDispatch(OT_rJSON_doc& _document) = 0;
+		virtual std::string forwardDispatch(JsonDocument& _document) = 0;
 
 		const std::string& actionName(void) const { return m_actionName; }
 
@@ -40,7 +40,7 @@ namespace ot {
 
 	template <class T> class __declspec(dllexport) OTHandleConnector : public AbstractDispatchItem {
 	public:
-		typedef std::string(T::*ConnectorMessageRef)(OT_rJSON_doc&);
+		typedef std::string(T::*ConnectorMessageRef)(JsonDocument&);
 
 		OTHandleConnector();
 		OTHandleConnector(const std::string& _actionName, const ot::Flags<ot::MessageType>& _messageFlags, OTObject * _obj, ConnectorMessageRef _func);
@@ -50,7 +50,7 @@ namespace ot {
 		OTObject * object(void) { return m_obj; }
 		ConnectorMessageRef dispatchReference(void) { return m_func; }
 
-		virtual std::string forwardDispatch(OT_rJSON_doc& _doc) override;
+		virtual std::string forwardDispatch(JsonDocument& _doc) override;
 
 	private:
 		OTObject *					m_obj;
@@ -78,7 +78,7 @@ ot::OTHandleConnector<T>& ot::OTHandleConnector<T>::operator = (const OTHandleCo
 }
 
 template <class T>
-std::string ot::OTHandleConnector<T>::forwardDispatch(OT_rJSON_doc& _doc) {
+std::string ot::OTHandleConnector<T>::forwardDispatch(JsonDocument& _doc) {
 	if (m_func) return std::invoke(m_func, dynamic_cast<T *>(m_obj), _doc);
 	else return std::string();
 }
@@ -87,8 +87,8 @@ std::string ot::OTHandleConnector<T>::forwardDispatch(OT_rJSON_doc& _doc) {
 
 //! @brief Creates a function that will be registered in the dispatch system
 //! The generated function will look like this
-//!		std::string <functionName>(OT_rJSON_doc& _document);
+//!		std::string <functionName>(JsonDocument& _document);
 //! @param ___functionName The name of the new function
 //! @param ___className The name of the class where the function is created at
 //! @param ___actionName The action that should be registered in the dispatch system
-#define OT_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags) std::string ___functionName(OT_rJSON_doc& _document); OT_ADD_HANDLE(___functionName, ___className, ___actionName, ___messageTypeFlags)
+#define OT_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags) std::string ___functionName(ot::JsonDocument& _document); OT_ADD_HANDLE(___functionName, ___className, ___actionName, ___messageTypeFlags);

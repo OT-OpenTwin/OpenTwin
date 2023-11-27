@@ -1,11 +1,10 @@
-//! @file Border.h
+//! @file Font.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
 #include "OTGui/Font.h"
-#include "OTCore/rJSONHelper.h"
 
 ot::Font::Font() : m_sizePx(12), m_isBold(false), m_isItalic(false) {}
 
@@ -35,23 +34,18 @@ bool ot::Font::operator != (const Font& _other) const {
 	return !(*this == _other);
 }
 
-void ot::Font::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, "Family", m_family);
-	ot::rJSON::add(_document, _object, "SizePx", m_sizePx);
-	ot::rJSON::add(_document, _object, "Bold", m_isBold);
-	ot::rJSON::add(_document, _object, "Italic", m_isItalic);
+void ot::Font::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("Family", JsonString(m_family, _allocator), _allocator);
+	_object.AddMember("SizePx", m_sizePx, _allocator);
+	_object.AddMember("Bold", m_isBold, _allocator);
+	_object.AddMember("Italic", m_isItalic, _allocator);
 }
 
-void ot::Font::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, "Family", String);
-	OT_rJSON_checkMember(_object, "SizePx", Int);
-	OT_rJSON_checkMember(_object, "Bold", Bool);
-	OT_rJSON_checkMember(_object, "Italic", Bool);
-
-	m_family = _object["Family"].GetString();
-	m_sizePx = _object["SizePx"].GetInt();
-	m_isBold = _object["Bold"].GetBool();
-	m_isItalic = _object["Italic"].GetBool();
+void ot::Font::setFromJsonObject(const ConstJsonObject& _object) {
+	m_family = json::getString(_object, "Family");
+	m_sizePx = json::getInt(_object, "SizePx");
+	m_isBold = json::getBool(_object, "Bold");
+	m_isItalic = json::getBool(_object, "Italic");
 }
 
 void ot::Font::setFamily(FontFamily _fontFamily) {

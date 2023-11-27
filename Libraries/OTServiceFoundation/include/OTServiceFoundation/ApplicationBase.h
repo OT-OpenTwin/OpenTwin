@@ -11,7 +11,7 @@
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"	// Base class
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
@@ -55,13 +55,13 @@ namespace ot {
 		//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
 		//! @param _action The action that should be processed
 		//! @param _doc The document containing all the information
-		virtual std::string processAction(const std::string & _action, OT_rJSON_doc & _doc) = 0;
+		virtual std::string processAction(const std::string & _action, JsonDocument& _doc) = 0;
 		
 		//! @brief Will be called whenever a message should be processed. Core messages will be processed in the base and will not be forwarded to this function (see documentation)
 		//! @param _sender The service that this message was sent from
 		//! @param _message The message that should be processed
 		//! @param _doc The document containing all the information
-		virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc) = 0;
+		virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, JsonDocument& _doc) = 0;
 
 		//! @brief Will be called when a UI connected to the session and is ready to work
 		virtual void uiConnected(components::UiComponent * _ui) = 0;
@@ -221,7 +221,7 @@ namespace ot {
 
 		void addModalCommand(ModalCommandBase *command);
 		void removeModalCommand(ModalCommandBase *command);
-		std::string processActionWithModalCommands(const std::string & _action, OT_rJSON_doc & _doc);
+		std::string processActionWithModalCommands(const std::string & _action, JsonDocument& _doc);
 
 		// ##########################################################################################################################################
 
@@ -241,14 +241,14 @@ namespace ot {
 		//! @param _queue If true, the message will be queued
 		//! @param _serviceName The name of the service
 		//! @param _doc The document containing the message
-		std::string sendMessage(bool _queue, const std::string & _serviceName, OT_rJSON_doc & _doc);
+		std::string sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc);
 
 		//! @brief Will send the message to the service with the specified name
 		//! @param _queue If true, the message will be queued
 		//! @param _serviceName The name of the service
 		//! @param _doc The document containing the message
 		//! @param _prefetchIds A list containing the prefetched IDs
-		std::string sendMessage(bool _queue, const std::string & _serviceName, OT_rJSON_doc & _doc, std::list<std::pair<UID, UID>> & _prefetchIds);
+		std::string sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds);
 
 		//! @brief Will send the message to all other services in this session
 		//! @param _queue If true, the message will be queued
@@ -258,13 +258,13 @@ namespace ot {
 		//! @brief Will send the message to all other services in this session
 		//! @param _queue If true, the message will be queued
 		//! @param _doc The JSON Document to send
-		std::string broadcastMessage(bool _queue, OT_rJSON_doc& _doc);
+		std::string broadcastMessage(bool _queue, JsonDocument& _doc);
 
 		void prefetchDocumentsFromStorage(const std::list<UID> &entities);
 		void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation> &entityInfo);
 		UID getPrefetchedEntityVersion(UID entityID);
 
-		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, OT_rJSON_doc& _doc, std::string& _response);
+		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, JsonDocument& _doc, std::string& _response);
 		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response);
 		// ##########################################################################################################################################
 	protected:
@@ -280,7 +280,7 @@ namespace ot {
 		struct structServiceInformation {
 			ServiceBase *	service;
 			int				enabledCounter;
-			OT_rJSON_doc *	doc;
+			JsonDocument*	doc;
 		};
 
 		std::map<std::string, structServiceInformation>	m_serviceNameMap;
@@ -316,13 +316,13 @@ namespace ot {
 	private:
 		friend intern::ExternalServicesComponent;
 
-		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleContextMenuItemClicked, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemClicked, ot::SECURE_MESSAGE_TYPES);
-		OT_HANDLER(handleContextMenuItemCheckedChanged, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, ot::SECURE_MESSAGE_TYPES);
+		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleContextMenuItemClicked, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemClicked, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleContextMenuItemCheckedChanged, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, ot::SECURE_MESSAGE_TYPES)
 		
 		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
-		std::string __processMessage(const std::string & _message, OT_rJSON_doc &doc, serviceID_t _senderID);
+		std::string __processMessage(const std::string & _message, JsonDocument&doc, serviceID_t _senderID);
 		void __shuttingDown(bool _requestedAsCommand);
 		void __addUiPlugin(components::UiPluginComponent * _component);
 

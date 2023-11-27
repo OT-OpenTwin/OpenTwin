@@ -14,19 +14,20 @@ ot::components::UiPluginComponent::~UiPluginComponent() {}
 // ##################################################################################################
 
 void ot::components::UiPluginComponent::sendQueuedMessage(const std::string& _action, const std::string& _message) {
-	OT_rJSON_createDOC(cmdDoc);
-	ot::rJSON::add(cmdDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_PluginMessage);
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER, _action);
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_SERVICE_ID, m_uiComponent->serviceID());
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_SERVICE_URL, m_uiComponent->serviceURL());
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_SERVICE_NAME, m_uiComponent->serviceName());
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_SERVICE_TYPE, m_uiComponent->serviceType());
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_UI_PLUGIN_UID, m_pluginUID);
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_UI_PLUGIN_NAME, m_pluginName);
-	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_MESSAGE, _message);
+	JsonDocument cmdDoc;
+	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_PluginMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER, JsonString(_action, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_uiComponent->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_uiComponent->serviceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_uiComponent->serviceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_uiComponent->serviceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, m_pluginUID, cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, JsonString(m_pluginName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+
 	m_application->sendMessage(true, m_uiComponent->serviceName(), cmdDoc);
 }
 
-void ot::components::UiPluginComponent::sendQueuedMessage(const std::string& _action, OT_rJSON_doc& _jsonDocument) {
-	sendQueuedMessage(_action, rJSON::toJSON(_jsonDocument));
+void ot::components::UiPluginComponent::sendQueuedMessage(const std::string& _action, JsonDocument& _jsonDocument) {
+	sendQueuedMessage(_action, _jsonDocument.toJson());
 }

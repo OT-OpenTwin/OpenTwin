@@ -32,18 +32,18 @@ bool ot::TableRange::operator!=(const TableRange & other)
 	return !(_topRow == other._topRow && _bottomRow == other._bottomRow && _leftColumn == other._leftColumn && _rightColumn == other._rightColumn);
 }
 
-void ot::TableRange::addToJsonObject(OT_rJSON_doc & _document, OT_rJSON_val & _object) const
+void ot::TableRange::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
 {
-	ot::rJSON::add(_document, _object, "tR", _topRow);
-	ot::rJSON::add(_document, _object, "bR", _bottomRow);
-	ot::rJSON::add(_document, _object, "lC", _leftColumn);
-	ot::rJSON::add(_document, _object, "rC", _rightColumn);
+	_object.AddMember("lC", _leftColumn, _allocator);
+	_object.AddMember("tR", _topRow, _allocator);
+	_object.AddMember("rC", _rightColumn, _allocator);
+	_object.AddMember("bR", _bottomRow, _allocator);
 }
 
-void ot::TableRange::setFromJsonObject(OT_rJSON_val & _object)
+void ot::TableRange::setFromJsonObject(const ConstJsonObject& _object)
 {
-	_topRow = ot::rJSON::getInt(_object, "tR");
-	_bottomRow = ot::rJSON::getInt(_object, "bR");
-	_leftColumn = ot::rJSON::getInt(_object, "lC");
-	_rightColumn = ot::rJSON::getInt(_object, "rC");
+	_topRow = ot::json::getInt(_object, "tR");
+	_bottomRow = ot::json::getInt(_object, "bR");
+	_leftColumn = ot::json::getInt(_object, "lC");
+	_rightColumn = ot::json::getInt(_object, "rC");
 }

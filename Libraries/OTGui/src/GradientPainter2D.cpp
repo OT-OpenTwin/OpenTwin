@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/rJSONHelper.h"
+#include "OTCore/OTAssert.h"
 #include "OTGui/GradientPainter2D.h"
 
 #define OT_JSON_MEMBER_Stops "Stops"
@@ -20,35 +20,31 @@ ot::GradientPainter2D::GradientPainter2D(const std::vector<GradientPainterStop2D
 
 ot::GradientPainter2D::~GradientPainter2D() {}
 
-void ot::GradientPainter2D::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::Painter2D::addToJsonObject(_document, _object);
+void ot::GradientPainter2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	ot::Painter2D::addToJsonObject(_object, _allocator);
 	OTAssert(!m_stops.empty(), "Exporting empty linear gradient painter 2D");
-	OT_rJSON_createValueArray(stepArr);
+	JsonArray stepArr;
 	for (auto s : m_stops) {
-		OT_rJSON_createValueObject(stepObj);
-		s.addToJsonObject(_document, stepObj);
-		stepArr.PushBack(stepObj, _document.GetAllocator());
+		JsonObject stepObj;
+		s.addToJsonObject(stepObj, _allocator);
+		stepArr.PushBack(stepObj, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Stops, stepArr);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Spread, ot::toString(m_spread));
+	_object.AddMember(OT_JSON_MEMBER_Stops, stepArr, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Spread, JsonString(toString(m_spread), _allocator), _allocator);
 }
 
-void ot::GradientPainter2D::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GradientPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	ot::Painter2D::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Stops, Array);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Spread, String);
-
-	OT_rJSON_val stepArr = _object[OT_JSON_MEMBER_Stops].GetArray();
+	
+	std::list<ConstJsonObject> stepArr = json::getObjectList(_object, OT_JSON_MEMBER_Stops);
 	m_stops.clear();
-	for (rapidjson::SizeType i = 0; i < stepArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(stepArr, i, Object);
-		OT_rJSON_val stepObj = stepArr[i].GetObject();
+	for (auto stepObj : stepArr) {
 		GradientPainterStop2D newStep;
 		newStep.setFromJsonObject(stepObj);
 		m_stops.push_back(newStep);
 	}
 
-	m_spread = ot::stringToGradientSpread(_object[OT_JSON_MEMBER_Spread].GetString());
+	m_spread = ot::stringToGradientSpread(json::getString(_object, OT_JSON_MEMBER_Spread));
 }
 
 void ot::GradientPainter2D::addStop(const GradientPainterStop2D& _stop) {

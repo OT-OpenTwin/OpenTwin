@@ -12,7 +12,6 @@
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/rJSONHelper.h"
 
 // Std header
 #include <exception>
@@ -73,43 +72,42 @@ void ot::LogMessage::setCurrentTimeAsGlobalSystemTime(void) {
 	m_globalSystemTime = buffer;
 }
 
-void ot::LogMessage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const {
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_Service, m_serviceName);
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_Function, m_functionName);
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_Message, m_text);
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_Time_Local, m_localSystemTime);
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_Time_Global, m_globalSystemTime);
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_DataVersion, "1.0");
+void ot::LogMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_ACTION_PARAM_LOG_Service, JsonString(m_serviceName, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Function, JsonString(m_functionName, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Message, JsonString(m_text, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Local, JsonString(m_localSystemTime, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Global, JsonString(m_globalSystemTime, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_DataVersion, JsonString("1.0", _allocator), _allocator);
 
-	OT_rJSON_createValueArray(flagArr);
-	if (m_flags & INFORMATION_LOG) flagArr.PushBack(rapidjson::Value("Information", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & DETAILED_LOG) flagArr.PushBack(rapidjson::Value("Detailed", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & WARNING_LOG) flagArr.PushBack(rapidjson::Value("Warning", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & ERROR_LOG) flagArr.PushBack(rapidjson::Value("Error", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & INBOUND_MESSAGE_LOG) flagArr.PushBack(rapidjson::Value("InboundMessage", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & QUEUED_INBOUND_MESSAGE_LOG) flagArr.PushBack(rapidjson::Value("QueuedMessage", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & ONEWAY_TLS_INBOUND_MESSAGE_LOG) flagArr.PushBack(rapidjson::Value("OneWayTLSMessage", _document.GetAllocator()), _document.GetAllocator());
-	if (m_flags & OUTGOING_MESSAGE_LOG) flagArr.PushBack(rapidjson::Value("OutgoingMessage", _document.GetAllocator()), _document.GetAllocator());
-	ot::rJSON::add(_document, _jsonObject, OT_ACTION_PARAM_LOG_Flags, flagArr);
+	JsonArray flagArr;
+	if (m_flags & INFORMATION_LOG) flagArr.PushBack(JsonString("Information", _allocator), _allocator);
+	if (m_flags & DETAILED_LOG) flagArr.PushBack(JsonString("Detailed", _allocator), _allocator);
+	if (m_flags & WARNING_LOG) flagArr.PushBack(JsonString("Warning", _allocator), _allocator);
+	if (m_flags & ERROR_LOG) flagArr.PushBack(JsonString("Error", _allocator), _allocator);
+	if (m_flags & INBOUND_MESSAGE_LOG) flagArr.PushBack(JsonString("InboundMessage", _allocator), _allocator);
+	if (m_flags & QUEUED_INBOUND_MESSAGE_LOG) flagArr.PushBack(JsonString("QueuedMessage", _allocator), _allocator);
+	if (m_flags & ONEWAY_TLS_INBOUND_MESSAGE_LOG) flagArr.PushBack(JsonString("OneWayTLSMessage", _allocator), _allocator);
+	if (m_flags & OUTGOING_MESSAGE_LOG) flagArr.PushBack(JsonString("OutgoingMessage", _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Flags, flagArr, _allocator);
 }
 
-void ot::LogMessage::setFromJsonObject(OT_rJSON_val& _jsonObject) {
+void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	// Check version
-	std::string versionString = ot::rJSON::getString(_jsonObject, OT_ACTION_PARAM_LOG_DataVersion);
+	
+	std::string versionString = json::getString(_object, OT_ACTION_PARAM_LOG_DataVersion);
 	if (versionString != "1.0") throw std::exception("Invalid log version");
 
 	// Get values
-	m_serviceName = rJSON::getString(_jsonObject, OT_ACTION_PARAM_LOG_Service);
-	m_functionName = rJSON::getString(_jsonObject, OT_ACTION_PARAM_LOG_Function);
-	m_text = rJSON::getString(_jsonObject, OT_ACTION_PARAM_LOG_Message);
-	m_localSystemTime = rJSON::getString(_jsonObject, OT_ACTION_PARAM_LOG_Time_Local);
-	m_globalSystemTime = rJSON::getString(_jsonObject, OT_ACTION_PARAM_LOG_Time_Global);
+	m_serviceName = json::getString(_object, OT_ACTION_PARAM_LOG_Service);
+	m_functionName = json::getString(_object, OT_ACTION_PARAM_LOG_Function);
+	m_text = json::getString(_object, OT_ACTION_PARAM_LOG_Message);
+	m_localSystemTime = json::getString(_object, OT_ACTION_PARAM_LOG_Time_Local);
+	m_globalSystemTime = json::getString(_object, OT_ACTION_PARAM_LOG_Time_Global);
 
-	OT_rJSON_checkMember(_jsonObject, OT_ACTION_PARAM_LOG_Flags, Array);
-	auto flagsArr = _jsonObject[OT_ACTION_PARAM_LOG_Flags].GetArray();
+	ConstJsonArray flagsArr = json::getArray(_object, OT_ACTION_PARAM_LOG_Flags);
 	for (rapidjson::SizeType i = 0; i < flagsArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(flagsArr, i, String);
-		std::string f = flagsArr[i].GetString();
+		std::string f = json::getString(flagsArr, i);
 		if (f == "Information") m_flags |= INFORMATION_LOG;
 		else if (f == "Detailed") m_flags |= DETAILED_LOG;
 		else if (f == "Warning") m_flags |= WARNING_LOG;
@@ -119,8 +117,7 @@ void ot::LogMessage::setFromJsonObject(OT_rJSON_val& _jsonObject) {
 		else if (f == "OneWayTLSMessage") m_flags |= ONEWAY_TLS_INBOUND_MESSAGE_LOG;
 		else if (f == "OutgoingMessage") m_flags |= OUTGOING_MESSAGE_LOG;
 		else {
-			assert(0);
-			throw std::exception("Invalid log flag string");
+			OT_LOG_EAS("Unknown log flag \"" + f + "\"");
 		}
 	}
 }
@@ -191,7 +188,7 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 		try {
 			r->log(msg);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception&) {
 			OTAssert(0, "Error occured while dispatching log message");
 		}
 		catch (...) {

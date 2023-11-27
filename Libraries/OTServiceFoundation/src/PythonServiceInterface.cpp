@@ -21,48 +21,42 @@ ot::ReturnMessage ot::PythonServiceInterface::SendExecutionOrder()
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "PythonServiceInterface got nothing to execute.");
 	}
 
-	OT_rJSON_doc jsonMessage = AssembleMessage();
-
 	std::string response;
-	std::string message = ot::rJSON::toJSON(jsonMessage);
-	ot::msg::send("", _pythonExecutionServiceURL, ot::MessageType::EXECUTE, message, response);
+	ot::msg::send("", _pythonExecutionServiceURL, ot::MessageType::EXECUTE, this->AssembleMessage(), response);
 	return ot::ReturnMessage::fromJson(response);
 }
 
-OT_rJSON_doc ot::PythonServiceInterface::AssembleMessage()
+std::string ot::PythonServiceInterface::AssembleMessage()
 {
-	OT_rJSON_createDOC(doc);
-	OT_rJSON_createValueArray(allparameter);
-	OT_rJSON_createValueArray(scripts);
+	JsonDocument doc;
+	JsonArray allparameter;
+	JsonArray scripts;
 	ot::VariableToJSONConverter converter;
 
 	for (auto& scriptWithParameter : _scriptNamesWithParameter)
 	{
-		OT_rJSON_val scripName;
-		scripName.SetString(std::get<0>(scriptWithParameter).c_str(), doc.GetAllocator());
-		scripts.PushBack(scripName,doc.GetAllocator());
+		scripts.PushBack(JsonString(std::get<0>(scriptWithParameter).c_str(), doc.GetAllocator()), doc.GetAllocator());
 		
 		scriptParameter& currentParameterSet = std::get<1>(scriptWithParameter);
 		if (currentParameterSet.has_value())
 		{
-			OT_rJSON_createValueArray(parameter);
+			JsonArray parameter;
 			for (auto& singleParameter : currentParameterSet.value())
 			{
-				parameter.PushBack(converter(singleParameter,doc),doc.GetAllocator());
+				parameter.PushBack(converter(singleParameter, doc.GetAllocator()), doc.GetAllocator());
 			}
 			allparameter.PushBack(parameter, doc.GetAllocator());
 		}
 		else
 		{
-			OT_rJSON_val nullValue;
-			allparameter.PushBack(nullValue, doc.GetAllocator());
+			allparameter.PushBack(JsonNullValue(), doc.GetAllocator());
 		}
 	}
-	ot::rJSON::add(doc, OT_ACTION_CMD_PYTHON_Parameter, allparameter);
-	ot::rJSON::add(doc, OT_ACTION_CMD_PYTHON_Scripts, scripts);
+
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE, doc.GetAllocator()), doc.GetAllocator());
 	
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE);
-	
-	return doc;
+	return doc.toJson();
 }

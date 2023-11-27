@@ -4,7 +4,6 @@
 #include "OTCore/Logger.h"
 #include "OTCore/otAssert.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/rJSONHelper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
@@ -36,10 +35,10 @@ void ot::ServiceLogNotifier::setLoggingServiceURL(const std::string& _url) {
 		m_loggingServiceURL = "";
 	}
 	else {
-		OT_rJSON_createDOC(pingDoc);
-		ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
+		JsonDocument pingDoc;
+		pingDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Ping, pingDoc.GetAllocator());
 		std::string response;
-		if (ot::msg::send("", _url, ot::EXECUTE, ot::rJSON::toJSON(pingDoc), response, 3000, false, false)) {
+		if (ot::msg::send("", _url, ot::EXECUTE, pingDoc.toJson(), response, 3000, false, false)) {
 			if (response == OT_ACTION_CMD_Ping) {
 				m_loggingServiceURL = _url;
 			}
@@ -57,15 +56,15 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 	if (m_loggingServiceURL.empty()) return;
 
 	std::string response;
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Log);
-	OT_rJSON_createValueObject(logObj);
-	_message.addToJsonObject(doc, logObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_LOG, logObj);
+	JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Log, doc.GetAllocator());
+	JsonObject logObj;
+	_message.addToJsonObject(logObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LOG, logObj, doc.GetAllocator());
 
 	try {
 		// Write log message to logger service
-		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response, 3000, false, false)) {
+		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE, doc.toJson(), response, 3000, false, false)) {
 			assert(0);
 		}
 	}
