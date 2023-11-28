@@ -31,10 +31,10 @@ void UpdateManager::checkParentUpdates(std::list<ot::UID> modifiedEntities)
 {
 	while (!modifiedEntities.empty())
 	{
-		OT_rJSON_createDOC(parentCheckDoc);
-		ot::rJSON::add(parentCheckDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_CheckParentUpdates);
-		ot::rJSON::add(parentCheckDoc, OT_ACTION_PARAM_MODEL_EntityIDList, modifiedEntities);
-
+		ot::JsonDocument parentCheckDoc;
+		parentCheckDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_CheckParentUpdates, parentCheckDoc.GetAllocator()), parentCheckDoc.GetAllocator());
+		parentCheckDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(modifiedEntities, parentCheckDoc.GetAllocator()), parentCheckDoc.GetAllocator());
+		
 		std::string response = modelComponent->sendMessage(false, parentCheckDoc);
 
 		modifiedEntities.clear();
@@ -47,14 +47,14 @@ void UpdateManager::checkParentUpdates(std::list<ot::UID> modifiedEntities)
 
 			if (doc.IsObject())
 			{
-				std::string action = ot::rJSON::getString(doc, OT_ACTION_MEMBER);
+				std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
 				assert(action == OT_ACTION_CMD_MODEL_ParentNeedsUpdate);
 
 				// Now we process the response and update the parents
-				std::list<ot::UID> entityIDs = ot::rJSON::getULongLongList(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-				std::list<ot::UID> entityVersions = ot::rJSON::getULongLongList(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-				std::list<ot::UID> entityInfoIdList = ot::rJSON::getULongLongList(doc, OT_ACTION_PARAM_MODEL_EntityInfoID);
-				std::list<ot::UID> entityInfoVersionList = ot::rJSON::getULongLongList(doc, OT_ACTION_PARAM_MODEL_EntityInfoVersion);
+				std::list<ot::UID> entityIDs = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				std::list<ot::UID> entityVersions = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+				std::list<ot::UID> entityInfoIdList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityInfoID);
+				std::list<ot::UID> entityInfoVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityInfoVersion);
 
 				// This update of the parent entities may again result in parents which need to be updated
 				modifiedEntities = updateParents(entityIDs, entityVersions, entityInfoIdList, entityInfoVersionList);
@@ -168,14 +168,14 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 
 		geomEntity->releaseFacets();
 
-		OT_rJSON_createDOC(requestDoc);
-		ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateGeometryEntity);
-		ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID, geomEntity->getEntityID());
-		ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID_Brep, brepID);
-		ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID_Facets, facetsID);
-		ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion);
-		ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion);
-		ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_OverrideGeometry, false);
+		ot::JsonDocument requestDoc;
+		requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, geomEntity->getEntityID(), requestDoc.GetAllocator());
+		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, brepID, requestDoc.GetAllocator());
+		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, facetsID, requestDoc.GetAllocator());
+		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, requestDoc.GetAllocator());
+		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, requestDoc.GetAllocator());
+		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, requestDoc.GetAllocator());
 
 		modelComponent->sendMessage(false, requestDoc);
 
@@ -417,14 +417,14 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 
 				geomEntity->releaseFacets();
 
-				OT_rJSON_createDOC(requestDoc);
-				ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateGeometryEntity);
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID, geomEntity->getEntityID());
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID_Brep, brepID);
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID_Facets, facetsID);
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion);
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion);
-				ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_OverrideGeometry, true);	// Here we can replace the geometry entity, since it was 
+				ot::JsonDocument requestDoc;
+				requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, geomEntity->getEntityID(), requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, brepID, requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, facetsID, requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, true, requestDoc.GetAllocator());	// Here we can replace the geometry entity, since it was 
 																							// already written during this operation as a result to the 
 																							// parameter change. This means that we must not cache this geometry entity.
 				modelComponent->sendMessage(false, requestDoc);
@@ -503,14 +503,14 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 
 	geomEntity->releaseFacets();
 
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateGeometryEntity);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID, geomEntity->getEntityID());
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID_Brep, brepID);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID_Facets, facetsID);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_OverrideGeometry, true);   // Here we can replace the geometry entity, since it was 
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, geomEntity->getEntityID(), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, brepID, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, facetsID, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, true, requestDoc.GetAllocator());   // Here we can replace the geometry entity, since it was 
 																				// already written during this operation as a result to the 
 																				// parameter change
 	modelComponent->sendMessage(false, requestDoc);

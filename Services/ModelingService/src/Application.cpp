@@ -107,13 +107,14 @@ void Application::run(void)
 	}
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	entityCache.setModelComponent(m_modelComponent);
 
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
-		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+
 		if      (action == "Modeling:Create:Cuboid")            { getPrimitiveManager()->getCuboid()->sendRubberbandData(); }
 		else if (action == "Modeling:Create:Cylinder")          { getPrimitiveManager()->getCylinder()->sendRubberbandData(); }
 		else if (action == "Modeling:Create:Sphere")            { getPrimitiveManager()->getSphere()->sendRubberbandData(); }
@@ -131,18 +132,18 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData) 
 	{
-		std::string note              = ot::rJSON::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
-		std::string json              = ot::rJSON::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_PointDocument);
-		std::vector<double> transform = ot::rJSON::getDoubleVector(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Transform);
+		std::string note              = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
+		std::string json              = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_PointDocument);
+		std::vector<double> transform = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Transform);
 
 		getPrimitiveManager()->createFromRubberbandJson(note, json, transform);
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 	{
-		std::list<ot::UID> entityIDs      = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-		std::list<ot::UID> entityVersions = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		std::list<ot::UID> brepVersions   = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
-		bool itemsVisible			  = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
+		std::list<ot::UID> entityIDs      = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+		std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+		std::list<ot::UID> brepVersions   = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
+		bool itemsVisible			  = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
 
 		std::list<ot::UID> modifiedEntities = getUpdateManager()->updateEntities(entityIDs, entityVersions, brepVersions, itemsVisible);
 
@@ -152,10 +153,10 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_EntitiesSelected)
 	{
-		std::string selectionAction         = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_SelectionAction);
-		std::string selectionInfo           = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_SelectionInfo);
-		std::list<std::string> optionNames  = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
-		std::list<std::string> optionValues = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
+		std::string selectionAction         = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_SelectionAction);
+		std::string selectionInfo           = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_SelectionInfo);
+		std::list<std::string> optionNames  = ot::json::getStringList(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
+		std::list<std::string> optionValues = ot::json::getStringList(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
 		
 		// Build a map from the option name and values lists
 		std::map<std::string, std::string> options;
@@ -185,19 +186,19 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 	{
-		std::string function = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-		std::string mode = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Mode);
-		std::string originalName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+		std::string function = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+		std::string mode = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mode);
+		std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
 		if (mode == OT_ACTION_VALUE_FILE_Mode_Name)
 		{
-			std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Name);
+			std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Name);
 			executeFunction(function, fileName, false, originalName);
 		}
 		else if (mode == OT_ACTION_VALUE_FILE_Mode_Content)
 		{
-			std::string content        = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-			ot::UID uncompressedDataLength = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+			std::string content        = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+			ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 
 			// Create a tmp file from uncompressing the data
 			std::string tmpFileName = CreateTmpFileFromCompressedData(content, uncompressedDataLength);
@@ -212,7 +213,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
@@ -454,13 +455,13 @@ STEPReader *Application::getSTEPReader(void)
 void Application::importSTEP(void)
 {
 	// Get a file name for the STEP file from the UI
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import STEP File");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "STEP files (*.stp;*.step)");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importSTEPFile");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, true);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import STEP File", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("STEP files (*.stp;*.step)", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importSTEPFile", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }
