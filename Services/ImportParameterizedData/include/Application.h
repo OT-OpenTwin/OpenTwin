@@ -9,7 +9,6 @@
 #pragma once
 
 // Open twin header
-#include "OTCore/rJSON.h"					// open twins rapid json layer
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTServiceFoundation/MenuButtonDescription.h"
 
@@ -45,13 +44,13 @@ public:
 	//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
 	//! @param _action The action that should be processed
 	//! @param _doc The document containing all the information
-	virtual std::string processAction(const std::string & _action, OT_rJSON_doc & _doc) override;
+	virtual std::string processAction(const std::string & _action, ot::JsonDocument& _doc) override;
 
 	//! @brief Will be called whenever a message should be processed. Core messages will be processed in the base and will not be forwarded to this function (see documentation)
 	//! @param _sender The service that this message was sent from
 	//! @param _message The message that should be processed
 	//! @param _doc The document containing all the information
-	virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc) override;
+	virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc) override;
 
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
@@ -163,7 +162,7 @@ private:
 	DataCollectionCreationHandler* _collectionCreationHandler = nullptr;
 
 	void HandleSelectionChanged();
-	void ProcessActionDetached(const std::string& _action, OT_rJSON_doc _doc);
+	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
 	void RequestSelectedRanges();
 	void SetControlstateTableFunctions(bool visible);
 

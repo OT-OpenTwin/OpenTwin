@@ -41,18 +41,21 @@ std::list<ot::EntityInformation> MeasurementCampaignHandler::getMSMDEntityInform
 {
 	EntityMeasurementMetadata temp(0, nullptr, nullptr, nullptr, nullptr, "");
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, projectName);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_COLLECTION_NAME, collectionName);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_Folder, ot::FolderNames::DatasetFolder);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_Type, temp.getClassName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_Recursive, true);
+	ot::JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(ot::FolderNames::DatasetFolder, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString(temp.getClassName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Recursive, true, doc.GetAllocator());
 
 	std::string response = Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	ot::UIDList entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	ot::UIDList entityVersions = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+	ot::UIDList entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	ot::UIDList entityVersions = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityVersionList);
 
 	auto version = entityVersions.begin();
 	std::list<ot::EntityInformation> entityInfos;

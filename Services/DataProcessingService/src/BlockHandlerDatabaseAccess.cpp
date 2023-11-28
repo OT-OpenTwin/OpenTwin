@@ -21,10 +21,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		const std::string dbURL = "Projects";
 		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
 		
-		OT_rJSON_createDOC(query);
-		OT_rJSON_createDOC(projection);
-		
-		ot::rJSON::add(projection, "_id", 0);
+		ot::JsonDocument query;
+		ot::JsonDocument projection;
+				
+		projection.AddMember("_id", 0, projection.GetAllocator());
 	
 		const std::string sessionServiceURL = Application::instance()->sessionServiceURL();
 		
@@ -42,7 +42,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 			if (parameter.second.parameterName == selectedParameter1Name)
 			{
 				const std::string selectedParameter1Abbreviation = parameter.second.parameterAbbreviation;
-				ot::rJSON::add(projection, selectedParameter1Abbreviation, 1);
+				projection.AddMember(ot::JsonString(selectedParameter1Abbreviation, projection.GetAllocator()), ot::JsonValue(1), projection.GetAllocator());
 
 				const std::string selectedParam1Value =	blockEntity->getParameter1QueryValue();
 				const std::string parameterTypeName = parameter.second.typeName;
@@ -96,27 +96,27 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 					{
 						if (parameterValue.isBool())
 						{
-							ot::rJSON::add(query, selectedParameter1Abbreviation, parameterValue.getBool());
+							query.AddMember(ot::JsonString(selectedParameter1Abbreviation, query.GetAllocator()), ot::JsonValue(parameterValue.getBool()), query.GetAllocator());
 						}
 						else if (parameterValue.isConstCharPtr())
 						{
-							ot::rJSON::add(query, selectedParameter1Abbreviation, parameterValue.getConstCharPtr());
+							query.AddMember(ot::JsonString(selectedParameter1Abbreviation, query.GetAllocator()), ot::JsonString(parameterValue.getConstCharPtr(), query.GetAllocator()), query.GetAllocator());
 						}
 						else if (parameterValue.isDouble())
 						{
-							ot::rJSON::add(query, selectedParameter1Abbreviation, parameterValue.getDouble());
+							query.AddMember(ot::JsonString(selectedParameter1Abbreviation, query.GetAllocator()), ot::JsonValue(parameterValue.getDouble()), query.GetAllocator());
 						}
 						else if (parameterValue.isFloat())
 						{
-							ot::rJSON::add(query, selectedParameter1Abbreviation, parameterValue.getFloat());
+							query.AddMember(ot::JsonString(selectedParameter1Abbreviation, query.GetAllocator()), ot::JsonValue(parameterValue.getFloat()), query.GetAllocator());
 						}
 						else if (parameterValue.isInt32())
 						{
-							ot::rJSON::add(query, selectedParameter1Abbreviation, parameterValue.getInt32());
+							query.AddMember(ot::JsonString(selectedParameter1Abbreviation, query.GetAllocator()), ot::JsonValue(parameterValue.getInt32()), query.GetAllocator());
 						}
 						else if (parameterValue.isInt64())
 						{
-							ot::rJSON::add(query, selectedParameter1Abbreviation, parameterValue.getInt64());
+							query.AddMember(ot::JsonString(selectedParameter1Abbreviation, query.GetAllocator()), ot::JsonValue(parameterValue.getInt64()), query.GetAllocator());
 						}
 						else
 						{
@@ -136,10 +136,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 			if (quantity.second.quantityName== selectedQuantityName)
 			{
 				const std::string documentFieldName = MetadataQuantity::getFieldName();
-				ot::rJSON::add(projection, documentFieldName, 1);
+				projection.AddMember(ot::JsonString(documentFieldName, projection.GetAllocator()), ot::JsonValue(1), projection.GetAllocator());
 				
 				const int32_t seklectedQuantityIndex = quantity.second.quantityIndex;
-				ot::rJSON::add(query, documentFieldName, seklectedQuantityIndex);
+				query.AddMember(ot::JsonString(documentFieldName, query.GetAllocator()), ot::JsonValue(seklectedQuantityIndex), query.GetAllocator());
 				break;
 			}
 		}

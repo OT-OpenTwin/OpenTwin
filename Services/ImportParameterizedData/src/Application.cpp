@@ -12,7 +12,6 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OTCore/rJSON.h"				// json convenience functions
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -67,7 +66,7 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 	//_parametrizedDataHandler->Init();
 }
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc));
 	handler.detach();
@@ -75,7 +74,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
@@ -233,7 +232,7 @@ void Application::modelSelectionChanged(void)
 
 // ##################################################################################################################################
 
-void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc _doc)
+void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
 {
 	std::mutex onlyOneActionPerTime;
 	std::lock_guard<std::mutex> lock (onlyOneActionPerTime);
@@ -243,34 +242,34 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			_parametrizedDataHandler->CheckEssentials();
-			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == _buttonImportCSV.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_Action_CMD_UI_StoreFileInDataBase);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.csv;*.txt)");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_NAME, _dataSourcesFolder);
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_Action_CMD_UI_StoreFileInDataBase, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import File", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("CSV files (*.csv;*.txt)", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_dataSourcesFolder, doc.GetAllocator()), doc.GetAllocator());
 				std::list<std::string> takenNames =	m_modelComponent->getListOfFolderItems(_dataSourcesFolder);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES, takenNames);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "addFilesToModel");
+				doc.AddMember(OT_ACTION_PARAM_FILE_TAKEN_NAMES, ot::JsonArray(takenNames, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER, ot::JsonString(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonImportPythonScript.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_Action_CMD_UI_StoreFileInDataBase);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import File");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, "CSV files (*.py)");
-				ot::rJSON::add(doc, OT_ACTION_PARAM_NAME, _scriptsFolder);
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_Action_CMD_UI_StoreFileInDataBase, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import File", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("CSV files (*.py)", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_scriptsFolder, doc.GetAllocator()), doc.GetAllocator());
 				std::list<std::string> takenNames = m_modelComponent->getListOfFolderItems(_scriptsFolder);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES, takenNames);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "addFilesToModel");
+				doc.AddMember(OT_ACTION_PARAM_FILE_TAKEN_NAMES, ot::JsonArray(takenNames, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER, ot::JsonString(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
 			}
@@ -322,72 +321,72 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			}
 			else if (action == _buttonTableAddColumnLeft.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
+				ot::JsonDocument doc;
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, true);
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, true, doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonTableAddColumnRight.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
+				ot::JsonDocument doc;
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, false);
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, false, doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonTableDeleteColumn.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
+				ot::JsonDocument doc;
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn, doc.GetAllocator()), doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonTableAddRowAbove.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
+				ot::JsonDocument doc;
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, true);
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, true, doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonTableAddRowBelow.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
+				ot::JsonDocument doc;
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_BASETYPE_Bool, false);
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, false, doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonTableDeleteRow.GetFullDescription())
 			{
-				OT_rJSON_createDOC(doc);
+				ot::JsonDocument doc;
 				if (_visualizationModel == -1)
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow);
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow, doc.GetAllocator()), doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
 			else
@@ -397,28 +396,27 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 		{
-			std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+			std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 			if (subsequentFunction == "addFilesToModel")
 			{
-				std::list<std::string> fileNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+				std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 				
-				ot::UIDList topoIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
-				ot::UIDList topoVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
-				ot::UIDList dataIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
-				ot::UIDList dataVers = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
+				ot::UIDList topoIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
+				ot::UIDList topoVers = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
+				ot::UIDList dataIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
+				ot::UIDList dataVers = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
 				_dataSourceHandler->AddNewFilesToModel(topoIDs, topoVers, dataIDs, dataVers, fileNames);
 				m_modelComponent->updatePropertyGrid();
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
-				auto listOfSerializedRanges = ot::rJSON::getObjectList(_doc, "Ranges");
+				auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
 				std::vector<ot::TableRange> ranges;
 				ranges.reserve(listOfSerializedRanges.size());
 				for (auto range : listOfSerializedRanges)
 				{
-					OT_rJSON_parseDOC(serializedRange, range.c_str());
 					ot::TableRange tableRange;
-					tableRange.setFromJsonObject(serializedRange);
+					tableRange.setFromJsonObject(range);
 					ranges.push_back(tableRange);
 				}
 
@@ -428,7 +426,7 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 			}
 			else if (subsequentFunction == "ColourRanges")
 			{
-				std::string tableName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
+				std::string tableName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
 				_parametrizedDataHandler->SetColourOfRanges(tableName);
 			}
 			else
@@ -446,13 +444,13 @@ void Application::ProcessActionDetached(const std::string& _action, OT_rJSON_doc
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getVersion());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getVersion(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
 			}
@@ -501,13 +499,13 @@ void Application::HandleSelectionChanged()
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _visualizationModel);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "ColourRanges");
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
 			}
@@ -533,13 +531,13 @@ void Application::HandleSelectionChanged()
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
 				auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel));
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second));
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first));
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "");
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, "", doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
 			}
@@ -596,17 +594,17 @@ void Application::HandleSelectionChanged()
 
 void Application::RequestSelectedRanges()
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, m_modelComponent->getCurrentVisualizationModelID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, m_modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "CreateSelectedRangeEntity");
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
 
-	OT_rJSON_createValueObject(obj);
-	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(doc, obj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_COLOUR_BACKGROUND, obj);
+	ot::JsonObject obj;
+	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(obj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
 
 
 	uiComponent()->sendMessage(true, doc);

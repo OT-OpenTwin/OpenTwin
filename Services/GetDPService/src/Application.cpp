@@ -12,7 +12,6 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OTCore/rJSON.h"				// json convenience functions
 #include "OTCommunication/actionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -60,12 +59,12 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	return OT_ACTION_RETURN_UnknownAction;
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
@@ -136,8 +135,8 @@ bool Application::startAsRelayService(void) const
 
 // ##################################################################################################################################
 
-std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
-	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "GetDP:Solver:Create Solver")	          addSolver();
 	else if (action == "GetDP:Solver:Run Solver")		  runSolver();
 	else if (action == "Model:Sources:Add Terminal")	  addTerminal();
@@ -146,8 +145,8 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 	return std::string();
 }
 
-std::string Application::handleModelSelectionChanged(OT_rJSON_doc& _document) {
-	selectedEntities = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
+	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
 	modelSelectionChangedNotification();
 	return std::string();
 }

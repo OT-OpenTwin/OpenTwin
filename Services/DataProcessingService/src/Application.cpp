@@ -79,11 +79,11 @@ void Application::run(void)
 #include "CrossCollectionAccess.h"
 #include "MeasurementCampaignFactory.h"
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
-		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
@@ -113,12 +113,11 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 	{
-		std::string itemName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-		std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);	
+		std::string itemName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+		std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 		
-		OT_rJSON_val posObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
 		ot::Point2DD position;
-		position.setFromJsonObject(posObj);
+		position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 		
 		//Needs to be set once but modelConnect event cannot be used currently, since the modelstate in that point in time is a dummy.
 		ExternalDependencies dependencies;
@@ -134,28 +133,23 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 	{
-				
-		OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-		OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-		
 		ot::GraphicsConnectionPackage pckg;
-		pckg.setFromJsonObject(pckgObj);
+		pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 		_blockEntityHandler.AddBlockConnection(pckg.connections());
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved)
 	{
-		const std::string blockID = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
-		auto positionObject = ot::rJSON::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition);
+		const std::string blockID = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 		ot::Point2DD position;
-		position.setFromJsonObject(positionObject);
+		position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 		_blockEntityHandler.UpdateBlockPosition(blockID,position);
 	}
 
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

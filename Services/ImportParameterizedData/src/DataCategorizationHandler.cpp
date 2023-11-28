@@ -831,21 +831,20 @@ inline void DataCategorizationHandler::CheckEssentials()
 
 void DataCategorizationHandler::RequestRangesSelection(std::vector<ot::TableRange>& ranges)
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, Application::instance()->serviceURL());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	OT_rJSON_createValueArray(vectOfRanges);
-
+	ot::JsonArray vectOfRanges;
 	for (auto range : ranges)
 	{
-		OT_rJSON_createValueObject(temp);
-		range.addToJsonObject(doc, temp);
+		ot::JsonObject temp;
+		range.addToJsonObject(temp, doc.GetAllocator());
 		vectOfRanges.PushBack(temp, doc.GetAllocator());
 	}
-	ot::rJSON::add(doc, "Ranges", vectOfRanges);
+	doc.AddMember("Ranges", vectOfRanges, doc.GetAllocator());
 
 	_uiComponent->sendMessage(true, doc);
 }
@@ -872,15 +871,15 @@ void DataCategorizationHandler::RequestColouringRanges(std::string colour)
 
 void DataCategorizationHandler::RequestColouringRanges(ot::Color colour)
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, Application::instance()->serviceURL());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	OT_rJSON_createValueObject(obj);
-	colour.addToJsonObject(doc, obj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_COLOUR_BACKGROUND, obj);
+	ot::JsonObject obj;
+	colour.addToJsonObject(obj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
 
 	_uiComponent->sendMessage(true, doc);
 }

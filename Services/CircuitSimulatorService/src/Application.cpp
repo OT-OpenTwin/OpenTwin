@@ -11,7 +11,6 @@
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
 
-
 // Open twin header
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -29,9 +28,6 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 
-
-
-
 // Third Party Header
 #include <ngspice/sharedspice.h>
 #include <iostream>
@@ -39,8 +35,6 @@
 #include <fstream>
 #include <filesystem>
 #include <string.h>
-
-
 
 Application * g_instance{ nullptr };
 
@@ -292,23 +286,8 @@ namespace ottest
 
 	ot::GraphicsItemCfg* createConnector(const std::string _name)
 	{
-		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-		myStack->setName("Connector");
-		myStack->setTitle("Connector");
-		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
-
-		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-		image->setImagePath("CircuitElementImages/Connector.png");
-		image->setSizePolicy(ot::SizePolicy::Dynamic);
-		image->setMaintainAspectRatio(true);
-
-		myStack->addItemBottom(image, false, true);
-
-		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
-		myStack->addItemTop(myLayout, true, false);
-
 		ot::GraphicsEllipseItemCfg* connector = new ot::GraphicsEllipseItemCfg();
+		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 		connector->setName("Connector");
@@ -317,7 +296,7 @@ namespace ottest
 
 		myLayout->addChildItem(connector);
 		myLayout->addStrech(1);
-
+		
 		return connector;
 	}
 }
@@ -347,9 +326,9 @@ Application::~Application()
 // ##################################################################################################################################################################################################################
 
 // Custom functions
-std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) 
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
-	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
 	//else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
 	else {
@@ -359,15 +338,14 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document)
 	return std::string();
 }
 
-std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
+std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 {
 	//Here we get the Item Information
-	std::string itemName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	OT_rJSON_val posObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
 	ot::Point2DD pos;
-	pos.setFromJsonObject(posObj);
+	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 
 	//check and store information
 	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
@@ -445,29 +423,27 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
 		it->second.addElement(element.getUID(), element);
 	}
 
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-
-	OT_rJSON_createValueObject(pckgObj);
-	pckg.addToJsonObject(reqDoc, pckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+	
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, ot::rJSON::toJSON(pckgObj));
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 
-std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document)
+std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 {	
 	std::list<std::string> items;
 
 	// Add Item UIDs to the list above (Items to be removed)
-	std::string itemUID = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+	std::string itemUID = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 	items.push_back(itemUID);
 
 
@@ -475,13 +451,10 @@ std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document)
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document)
+std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document)
 {
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-
 	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(pckgObj);
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 	
 	for (auto c : pckg.connections())
@@ -542,46 +515,38 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	OT_LOG_D("Handling new graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to add connections
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	// Add received package to reuest (all connections are allowed)
-	OT_rJSON_createValueObject(reqPckgObj);
-	pckg.addToJsonObject(reqDoc, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _document)
+std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document)
 {
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(pckgObj);
-
-
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 	// Here we would check and remove the connection information
 	OT_LOG_D("Handling remove graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to remove connections
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection);
-	
-	// Add received package to reuest (all connections are allowed)
-    OT_rJSON_createValueObject(reqPckgObj);
-	pckg.addToJsonObject(reqDoc, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, editorName);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(editorName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -610,18 +575,17 @@ std::string Application:: createNewCircuitEditor(void)
 		circuit.setId(pckg.name());
 		mapOfCircuits.insert_or_assign(pckg.name(), circuit);
 
+		ot::JsonDocument reqDoc;
+		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
+		ot::JsonObject pckgObj;
+		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-		OT_rJSON_createDOC(doc);
-		OT_rJSON_createValueObject(pckgObj);
-		pckg.addToJsonObject(doc, pckgObj);
-
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-		this->getBasicServiceInformation().addToJsonObject(doc, doc);
+		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 		std::string response;
-		std::string req = ot::rJSON::toJSON(doc);
+		std::string req = reqDoc.toJson();
 
 		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
 
@@ -858,12 +822,12 @@ void Application::run(void)
 	}
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

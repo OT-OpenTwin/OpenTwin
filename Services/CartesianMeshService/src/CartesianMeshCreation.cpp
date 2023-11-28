@@ -585,18 +585,14 @@ void CartesianMeshCreation::reportTime(const std::string &message, std::time_t &
 
 std::list<ot::UID> CartesianMeshCreation::getAllGeometryEntitiesForMeshing(void)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	std::string response = application->modelComponent()->sendMessage(false, requestDoc);
+	std::string response = application->modelComponent()->sendMessage(false, reqDoc);
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
-
-	std::list<ot::UID> entityIDs;
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-
-	return entityIDs;
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+	return ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
 }
 
 EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty)
