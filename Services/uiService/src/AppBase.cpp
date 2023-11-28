@@ -1182,8 +1182,8 @@ void AppBase::settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem
 	}
 	data->addGroup(group);
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_SettingsItemChanged);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SettingsItemChanged, doc.GetAllocator()), doc.GetAllocator());
 	data->addToJsonDocument(doc);
 	delete data;
 
@@ -2179,19 +2179,19 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 		return;
 	}
 	
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _name.toStdString());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, ot::JsonString(_name.toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	
 	ot::Point2DD itmPos(_pos.x(), _pos.y());
-	OT_rJSON_createValueObject(itemPosObj);
-	itmPos.addToJsonObject(doc, itemPosObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
+	ot::JsonObject itemPosObj;
+	itmPos.addToJsonObject(itemPosObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
 
 	try {
 		
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2220,18 +2220,18 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 		return;
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, _uid);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, ot::JsonString(_uid, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::Point2DD itmPos(_newPos.x(), _newPos.y());
-	OT_rJSON_createValueObject(itemPosObj);
-	itmPos.addToJsonObject(doc, itemPosObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
+	ot::JsonObject itemPosObj;
+	itmPos.addToJsonObject(itemPosObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
 
 	try {
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2260,15 +2260,15 @@ void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const
 		return;
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::GraphicsConnectionPackage pckg(view->graphicsViewName());
 	pckg.addConnection(_fromUid, _fromConnector, _toUid, _toConnector);
 
-	OT_rJSON_createValueObject(pckgObj);
-	pckg.addToJsonObject(doc, pckgObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 	
 	try {
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
@@ -2299,8 +2299,8 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		return;
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, doc.GetAllocator()), doc.GetAllocator());
 
 	std::list<std::string> sel;
 	for (auto s : scene->selectedItems()) {
@@ -2308,12 +2308,12 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		OTAssertNullptr(itm);
 		sel.push_back(itm->graphicsItemUid());
 	}
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, sel);
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
 		ot::GraphicsView* view = scene->getGraphicsView();
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_EA("Failed to send http request");

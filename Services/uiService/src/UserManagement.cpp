@@ -24,7 +24,7 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -69,11 +69,11 @@ bool UserManagement::checkConnectionAuthorizationService(void)
 	assert(!authServerURL.empty());
 
 	// Here send a ping to the authorization service to check whether the server is up and running
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_PING);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PING, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -118,13 +118,13 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	// Here we register a new user by sending a message to the authorization service
 
 	// Now we try to register the new user
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_REGISTER);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_USERNAME, userName);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PASSWORD, password);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REGISTER, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -149,14 +149,14 @@ bool UserManagement::deleteUser(const std::string &userName)
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_DELETE_USER);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_USERNAME, userName);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_DELETE_USER, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -184,14 +184,14 @@ bool UserManagement::changePassword(const std::string &oldPassword, const std::s
 	}	
 
 	// Now we try to change the password
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CHANGE_USER_PASSWORD);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PASSWORD, newPassword);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_USER_PASSWORD, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(newPassword, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -210,14 +210,14 @@ bool UserManagement::checkUserName(const std::string &userName)
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_USER_DATA);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_USERNAME, userName);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -232,14 +232,14 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 
 	// Here we check whether a user exists by getting its data from the authorization service
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_LOGIN);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_USERNAME, userName);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PASSWORD, password);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_ENCRYPTED_PASSWORD, isEncryptedPassword);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, isEncryptedPassword, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -247,11 +247,12 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	// Now we check the response document
 	if (hasSuccessful(response))
 	{
-		OT_rJSON_parseDOC(responseDoc, response.c_str());
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
 
 		// Login attempt successful -> get encrypted and unencrypted passwords
-		validPassword          = ot::rJSON::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
-		validEncryptedPassword = ot::rJSON::getString(responseDoc, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
+		validPassword          = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
+		validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
 
 		return true; // Successful
 	}
@@ -261,11 +262,12 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 
 bool UserManagement::hasError(const std::string &response)
 {
-	OT_rJSON_parseDOC(doc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	try
 	{
-		int error = ot::rJSON::getInt(doc, OT_ACTION_AUTH_ERROR);
+		int error = ot::json::getInt(responseDoc, OT_ACTION_AUTH_ERROR);
 		return (error == 1);
 	}
 	catch (std::exception)
@@ -276,11 +278,12 @@ bool UserManagement::hasError(const std::string &response)
 
 bool UserManagement::hasSuccessful(const std::string &response)
 {
-	OT_rJSON_parseDOC(doc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	try
 	{
-		bool success = ot::rJSON::getBool(doc, OT_ACTION_AUTH_SUCCESS);
+		bool success = ot::json::getBool(responseDoc, OT_ACTION_AUTH_SUCCESS);
 		return success;
 	}
 	catch (std::exception)
@@ -434,25 +437,26 @@ std::string UserManagement::getUserSettingsCollection(void)
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_USER_DATA);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::string collectionName;
 
 	try
 	{
-		collectionName = ot::rJSON::getString(responseDoc, OT_ACTION_SETTINGS_COLLECTION_NAME);
+		collectionName = ot::json::getString(responseDoc, OT_ACTION_SETTINGS_COLLECTION_NAME);
 	}
 	catch (std::exception)
 	{
@@ -513,8 +517,9 @@ void UserManagement::getListOfRecentProjects(std::list<std::string> &recentProje
 
 	try
 	{
-		OT_rJSON_parseDOC(doc, recentProjects.c_str());
-		recentProjectList = ot::rJSON::getStringList(doc, "Names");
+		ot::JsonDocument doc;
+		doc.fromJson(recentProjects);
+		recentProjectList = ot::json::getStringList(doc, "Names");
 	}
 	catch (std::exception)
 	{
@@ -523,10 +528,10 @@ void UserManagement::getListOfRecentProjects(std::list<std::string> &recentProje
 
 bool UserManagement::storeListOfRecentProjects(std::list<std::string> &recentProjectList)
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, "Names", recentProjectList);
+	ot::JsonDocument doc;
+	doc.AddMember("Names", ot::JsonArray(recentProjectList, doc.GetAllocator()), doc.GetAllocator());
 
-	storeSetting("RecentProjects", ot::rJSON::toJSON(doc));
+	storeSetting("RecentProjects", doc.toJson());
 
 	return true;
 }

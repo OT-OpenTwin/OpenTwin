@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 
 // SSL
 #include <QtCore/QFile>
@@ -114,11 +114,10 @@ void WebsocketClient::socketDisconnected()
 	if (!sessionIsClosing)
 	{
 		// This is an unexpected disconnect of the relay service -> we need to close the session
-
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceEmergencyShutdown);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
 		currentlyProcessingQueuedMessage = true;
-		queueAction(ot::rJSON::toJSON(doc).c_str(), "");
+		queueAction(doc.toJson().c_str(), "");
 	}
 }
 

@@ -11,7 +11,7 @@
 
 #include <akGui/aColorStyle.h>
 
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCore/ReturnMessage.h"
@@ -320,26 +320,26 @@ void ManageAccess::slotGroupCheckBoxChanged(bool state, int row)
 	std::string groupName = m_groupsList->item(row, 1)->text().toStdString();
 
 	AppBase * app{ AppBase::instance() };
-	OT_rJSON_createDOC(doc);
-
+	
+	ot::JsonDocument doc;
 	if (state)
 	{
 		// We need to add this user to the group
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_ADD_GROUP_TO_PROJECT);
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_ADD_GROUP_TO_PROJECT, doc.GetAllocator()), doc.GetAllocator());
 	}
 	else
 	{
 		// We need to remove the user from the group
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_REMOVE_GROUP_FROM_PROJECT);
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_GROUP_FROM_PROJECT, doc.GetAllocator()), doc.GetAllocator());
 	}
 
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_GROUP_NAME, groupName);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, m_projectName);
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		assert(0);
 		return;
@@ -350,11 +350,11 @@ void ManageAccess::slotGroupCheckBoxChanged(bool state, int row)
 
 bool ManageAccess::hasSuccessful(const std::string &response)
 {
-	OT_rJSON_parseDOC(doc, response.c_str());
-
+	ot::JsonDocument doc;
+	doc.fromJson(response);
 	try
 	{
-		bool success = ot::rJSON::getBool(doc, OT_ACTION_AUTH_SUCCESS);
+		bool success = ot::json::getBool(doc, OT_ACTION_AUTH_SUCCESS);
 		return success;
 	}
 	catch (std::exception)
@@ -381,14 +381,14 @@ void ManageAccess::fillGroupsList(void)
 	// Add new content to list
 	assert(!m_authServerURL.empty());
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_PROJECT_DATA);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, m_projectName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		assert(0);
 		return;
@@ -398,7 +398,9 @@ void ManageAccess::fillGroupsList(void)
 	{
 		return;
 	}
-	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(responseMessage.getWhat());
 
 	// Reset in group flag for all members
 	for (auto user : m_groupList)
@@ -485,19 +487,20 @@ void ManageAccess::readGroupsList(void)
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_ALL_USER_GROUPS);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_GROUPS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		assert(0);
 		return;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::string filterText = tolower(m_filterGroups->text().toStdString());
 
@@ -512,7 +515,8 @@ void ManageAccess::readGroupsList(void)
 		const rapidjson::Value& group = *itr;
 		std::string groupData = group.GetString();
 
-		OT_rJSON_parseDOC(groupDoc, groupData.c_str());
+		ot::JsonDocument groupDoc;
+		groupDoc.fromJson(groupData);
 
 		std::string groupName = groupDoc[OT_PARAM_AUTH_GROUP].GetString();
 		std::string groupOwner = groupDoc[OT_PARAM_AUTH_GROUPOWNER].GetString();

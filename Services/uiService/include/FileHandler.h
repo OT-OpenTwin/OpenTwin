@@ -12,7 +12,6 @@
 #include <memory>
 #include "OTCore/CoreTypes.h"
 #include "EntityFile.h"
-#include "OTCore/rJSON.h"
 
 class FileHandler
 {
@@ -23,7 +22,7 @@ public:
 	FileHandler& operator=(const FileHandler& other) = delete;
 	FileHandler& operator=(const FileHandler&& other) = delete;
 
-	rapidjson::Document StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions);
+	ot::JsonDocument StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions);
 	
 	/// <summary>
 	/// Extracts the file name from the absolute path and trims the file type as well.
@@ -57,5 +56,5 @@ private:
 	std::string CreateNewUniqueTopologyName(const std::string& fileName);
 	std::shared_ptr<EntityFile> CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner);
 
-	rapidjson::Document	CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers);
+	ot::JsonDocument	CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers);
 };

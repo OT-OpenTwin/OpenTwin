@@ -126,7 +126,7 @@ void UserSettings::clear(void) {
 	m_uiToOwnerMap.clear();
 }
 
-void UserSettings::addFromService(ot::ServiceBase * _sender, rapidjson::Document& _document) {
+void UserSettings::addFromService(ot::ServiceBase * _sender, ot::JsonDocument& _document) {
 	QString lastSelection;
 	if (m_dialog) {
 		lastSelection = m_dialog->lastSelectedGroupName();
@@ -138,10 +138,12 @@ void UserSettings::addFromService(ot::ServiceBase * _sender, rapidjson::Document
 		m_serviceToSettingsMap.erase(_sender);
 	}
 	ot::SettingsData * serviceSettings = ot::SettingsData::parseFromJsonDocument(_document);
-	if (serviceSettings) { m_serviceToSettingsMap.insert_or_assign(_sender, serviceSettings); }
-	if (m_dialog) {
-		for (auto g : serviceSettings->groups()) { m_dialog->addGroup(parseFromSettingsGroup(_sender, g)); }
-		m_dialog->selectGroupByLogicalName(lastSelection);
+	if (serviceSettings) {
+		m_serviceToSettingsMap.insert_or_assign(_sender, serviceSettings);
+		if (m_dialog) {
+			for (auto g : serviceSettings->groups()) { m_dialog->addGroup(parseFromSettingsGroup(_sender, g)); }
+			m_dialog->selectGroupByLogicalName(lastSelection);
+		}
 	}
 }
 

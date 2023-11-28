@@ -36,7 +36,7 @@
 #include <Geometry.h>
 
 // Rapid JSON
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
@@ -213,7 +213,7 @@ public:
 
 	void entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues);
 	
-	std::string dispatchAction(rapidjson::Document & _doc, const char * _senderIP);
+	std::string dispatchAction(ot::JsonDocument & _doc, const char * _senderIP);
 	
 	void prefetchDataThread(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
 
@@ -225,9 +225,9 @@ public:
 
 	// Messaging
 
-	bool sendHttpRequest(RequestType operation, const std::string &url, rapidjson::Document &doc, std::string &response);
-	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, rapidjson::Document &doc, std::string &response);
-	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, rapidjson::Document &doc, std::string &response);
+	bool sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response);
+	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument &doc, std::string &response);
+	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response);
 	bool sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender);
@@ -293,28 +293,26 @@ private:
 
 	// JSON helper functions
 
-	std::string getStringFromDocument(rapidjson::Document &doc, const char *attribute);
-	rapidjson::Document BuildJsonDocFromAction(const std::string &action);
-	rapidjson::Document BuildJsonDocFromString(std::string json);
-	void AddUIDListToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::list<ModelUIDtype> &list);
-	void AddStringListToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::list<std::string> &list);
-	void AddUIDVectorToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::vector<ModelUIDtype> &vector);
+	std::string getStringFromDocument(ot::JsonDocument &doc, const char *attribute);
+	void AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<ModelUIDtype> &list);
+	void AddStringListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<std::string> &list);
+	void AddUIDVectorToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::vector<ModelUIDtype> &vector);
 
 	std::string getReturnJSONFromVector(std::vector<ModelUIDtype> idList);
 	std::string getReturnJSONFromString(std::string fileName);
 
-	std::list<ModelUIDtype> getListFromDocument(rapidjson::Document &doc, const std::string &itemName);
-	std::list<std::string> getStringListFromDocument(rapidjson::Document &doc, const std::string &itemName);
-	double *getDoubleFromDocument(rapidjson::Document &doc, const std::string &itemName);
-	std::vector<ModelUIDtype> getVectorFromDocument(rapidjson::Document &doc, const std::string &itemName);
-	std::vector<double> getVectorDoubleFromDocument(rapidjson::Document &doc, const std::string &itemName);
-	std::vector<int> getVectorIntFromDocument(rapidjson::Document &doc, const std::string &itemName);
-	std::vector<std::array<double, 3>> getVectorDoubleArrayFromDocument(rapidjson::Document &doc, const std::string &name);
-	TreeIcon getTreeIconsFromDocument(rapidjson::Document &doc);
+	std::list<ModelUIDtype> getListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
+	std::list<std::string> getStringListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
+	double *getDoubleFromDocument(ot::JsonDocument &doc, const std::string &itemName);
+	std::vector<ModelUIDtype> getVectorFromDocument(ot::JsonDocument &doc, const std::string &itemName);
+	std::vector<double> getVectorDoubleFromDocument(ot::JsonDocument &doc, const std::string &itemName);
+	std::vector<int> getVectorIntFromDocument(ot::JsonDocument &doc, const std::string &itemName);
+	std::vector<std::array<double, 3>> getVectorDoubleArrayFromDocument(ot::JsonDocument &doc, const std::string &name);
+	TreeIcon getTreeIconsFromDocument(ot::JsonDocument &doc);
 
-	void getVectorNodeFromDocument(rapidjson::Document &doc, const std::string &name, std::vector<Geometry::Node> &result);
-	void getListTriangleFromDocument(rapidjson::Document &doc, const std::string &name, std::list<Geometry::Triangle> &result);
-	void getListEdgeFromDocument(rapidjson::Document &doc, const std::string &name, std::list<Geometry::Edge> &result);
+	void getVectorNodeFromDocument(ot::JsonDocument &doc, const std::string &name, std::vector<Geometry::Node> &result);
+	void getListTriangleFromDocument(ot::JsonDocument &doc, const std::string &name, std::list<Geometry::Triangle> &result);
+	void getListEdgeFromDocument(ot::JsonDocument &doc, const std::string &name, std::list<Geometry::Edge> &result);
 
 	// ###################################################################################################
 
