@@ -40,6 +40,11 @@ namespace ot
 		//! @param _status The status
 		//! @param _what The message contents
 		ReturnMessage(ReturnMessageStatus _status = ReturnMessageStatus::Ok, const std::string& _what = std::string());
+
+		//! @brief Constructor
+		//! @param _status The status
+		//! @param _document The document that will be serialized and set as what()
+		ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocument& _document);
 		ReturnMessage(const ReturnMessage& _other);
 		~ReturnMessage() {};
 		ReturnMessage& operator = (const ReturnMessage& _other);

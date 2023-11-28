@@ -72,6 +72,10 @@ std::string ot::ReturnMessage::toJson(ReturnMessageStatus _status, const ot::Jso
 
 ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const std::string& _what) : m_status(_status), m_what(_what) {}
 
+ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocument& _document) : m_status(_status) {
+	m_what = _document.toJson();
+}
+
 ot::ReturnMessage::ReturnMessage(const ReturnMessage& _other) : m_status(_other.m_status), m_what(_other.m_what) {}
 
 ot::ReturnMessage& ot::ReturnMessage::operator = (const ReturnMessage& _other) {
