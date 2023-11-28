@@ -26,8 +26,8 @@ OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction); \
 OT_JSON_createMemberIterator(___object, ___memberName, lclit); \
 OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, ___errorAction); \
 for (rapidjson::SizeType i = 0; i < lclit->value.Size(); i++) { \
-	if (!lclit[i].value.Is##___entryType()) { OT_LOG_EAS("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryType); ___errorAction; } \
-	___list.push_back(lclit[i].value.Get##___entryType()); \
+	if (!lclit->value[i].Is##___entryType()) { OT_LOG_EAS("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryType); ___errorAction; } \
+	___list.push_back(lclit->value[i].Get##___entryType()); \
 } \
 return ___list
 

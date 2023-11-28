@@ -89,7 +89,7 @@ std::string ot::Dispatcher::dispatch(const std::string& _json, ot::MessageType _
 	// Get the action and dispatch it
 	std::string action = json::getString(doc, OT_ACTION_MEMBER);
 
-	if (!action.empty()) {
+	if (action.empty()) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Action syntax error";
 	}
 

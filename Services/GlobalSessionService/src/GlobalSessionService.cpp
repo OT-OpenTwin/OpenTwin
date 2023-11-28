@@ -93,7 +93,7 @@ std::string GlobalSessionService::handleGetDBUrl(ot::JsonDocument& _doc) {
 
 std::string GlobalSessionService::handleGetDBandAuthURL(ot::JsonDocument& _doc) {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, m_healthCheckRunning, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
 	return doc.toJson();
 }
