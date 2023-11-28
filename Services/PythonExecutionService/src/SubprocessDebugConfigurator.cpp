@@ -1,6 +1,5 @@
 #include "SubprocessDebugConfigurator.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/rJSON.h"
 #include <assert.h>
 #include <fstream>
 #include "DataBase.h"
@@ -17,18 +16,17 @@ void SubprocessDebugConfigurator::CreateConfiguration(const std::string& urlThis
 	{
 		std::string userName = DataBase::GetDataBase()->getUserName();
 		std::string pwd = DataBase::GetDataBase()->getUserPassword(); 
-		OT_rJSON_createDOC(config);
-		OT_rJSON_createValueObject(value);
-		ot::rJSON::add(config, "Service.URL", urlSubProcess);
-		ot::rJSON::add(config, "MasterService.URL", urlThisService);
-		ot::rJSON::add(config, "ModelService.URL", urlModelService);
-		ot::rJSON::add(config, "Service.ID", serviceID);
-		ot::rJSON::add(config, "Session.ID", sessionID);
-		ot::rJSON::add(config, "DataBase.URL", urlDataBase);
-		ot::rJSON::add(config, "DataBase.Username", userName);
-		ot::rJSON::add(config, "DataBase.PWD", pwd);
+		ot::JsonDocument config;
+		config.AddMember("Service.URL", ot::JsonString(urlSubProcess, config.GetAllocator()), config.GetAllocator());
+		config.AddMember("MasterService.URL", ot::JsonString(urlThisService, config.GetAllocator()), config.GetAllocator());
+		config.AddMember("ModelService.URL", ot::JsonString(urlModelService, config.GetAllocator()), config.GetAllocator());
+		config.AddMember("Service.ID", serviceID, config.GetAllocator());
+		config.AddMember("Session.ID", ot::JsonString(sessionID, config.GetAllocator()), config.GetAllocator());
+		config.AddMember("DataBase.URL", ot::JsonString(urlDataBase, config.GetAllocator()), config.GetAllocator());
+		config.AddMember("DataBase.Username", ot::JsonString(userName, config.GetAllocator()), config.GetAllocator());
+		config.AddMember("DataBase.PWD", ot::JsonString(pwd, config.GetAllocator()), config.GetAllocator());
 
-		fileWriter << ot::rJSON::toJSON(config);
+		fileWriter << config.toJson();
 
 		fileWriter.flush();
 		fileWriter.close();

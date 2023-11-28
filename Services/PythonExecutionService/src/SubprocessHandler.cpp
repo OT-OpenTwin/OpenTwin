@@ -25,9 +25,9 @@ SubprocessHandler::SubprocessHandler(const std::string& urlThisService)
 	_launcherPath = baseDirectory + "\\open_twin.exe";
 	_subprocessPath = baseDirectory + "\\PythonExecution.dll";
 	
-	OT_rJSON_createDOC(pingDoc);
-	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	_pingCommand = ot::rJSON::toJSON(pingDoc);
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	_pingCommand = pingDoc.toJson();
 }
 
 SubprocessHandler::~SubprocessHandler()
@@ -35,15 +35,15 @@ SubprocessHandler::~SubprocessHandler()
 	Close();
 }
 
-std::string SubprocessHandler::SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter)
+std::string SubprocessHandler::SendExecutionOrder(ot::JsonDocument& scriptsAndParameter)
 {
 	if (/*CheckAlive(_subprocess) && */PingSubprocess())
 	{
-		ot::rJSON::add(scriptsAndParameter, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_EXECUTE);
-		ot::rJSON::add(scriptsAndParameter, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
+		scriptsAndParameter.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE, scriptsAndParameter.GetAllocator()), scriptsAndParameter.GetAllocator());
+		scriptsAndParameter.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(_urlThisProcess, scriptsAndParameter.GetAllocator()), scriptsAndParameter.GetAllocator());
 		
 		std::string response;
-		std::string messageBody =  ot::rJSON::toJSON(scriptsAndParameter);
+		std::string messageBody = scriptsAndParameter.toJson();
 		if (!ot::msg::send("", _urlSubprocess, ot::EXECUTE, messageBody, response, 0))
 		{
 			OT_LOG_D("Failed to execute python script");
@@ -170,11 +170,11 @@ bool SubprocessHandler::PingSubprocess()
 
 bool SubprocessHandler::CloseProcess(const std::string& url)
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShutdown);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, _urlThisProcess);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdown, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(_urlThisProcess, doc.GetAllocator()), doc.GetAllocator());
 	std::string response;
-	ot::msg::send("", url, ot::EXECUTE, ot::rJSON::toJSON(doc), response, 0);
+	ot::msg::send("", url, ot::EXECUTE, doc.toJson(), response, 0);
 	
 	CloseHandle(_subprocess);
 	_subprocess = OT_INVALID_PROCESS_HANDLE;

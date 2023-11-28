@@ -71,7 +71,7 @@ void Application::run(void)
 }
 
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	try
 	{
@@ -79,19 +79,18 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			
-			std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == OT_ACTION_CMD_PYTHON_EXECUTE)
 			{
-				if (ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Scripts) && ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Parameter))
+				if (_doc.HasMember(OT_ACTION_CMD_PYTHON_Scripts) && _doc.HasMember(OT_ACTION_CMD_PYTHON_Parameter))
 				{
 					if (_doc[OT_ACTION_CMD_PYTHON_Scripts].IsArray() && _doc[OT_ACTION_CMD_PYTHON_Parameter].IsArray())
 					{
-
-						OT_rJSON_createDOC(subprocessDoc);
+						ot::JsonDocument subprocessDoc;
 						auto& scripts = _doc[OT_ACTION_CMD_PYTHON_Scripts];
-						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Scripts, scripts);
+						subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, subprocessDoc.GetAllocator());
 						auto& parameter = _doc[OT_ACTION_CMD_PYTHON_Parameter];
-						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Parameter, parameter);
+						subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, parameter, subprocessDoc.GetAllocator());
 						return _subprocessHandler->SendExecutionOrder(subprocessDoc);					
 					}
 					else
@@ -110,17 +109,16 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 				std::string userName = DataBase::GetDataBase()->getUserName();
 				std::string pwd = DataBase::GetDataBase()->getUserPassword();
 
-
-				OT_rJSON_createDOC(message);
-				ot::rJSON::add(message, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-				ot::rJSON::add(message, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_Initialization);
-				ot::rJSON::add(message, "ModelService.URL", urlModelservice);
-				ot::rJSON::add(message, "Service.ID", m_serviceID);
-				ot::rJSON::add(message, "Session.ID", m_sessionID);
-				ot::rJSON::add(message, "DataBase.PWD", pwd);
-				ot::rJSON::add(message, "DataBase.Username", userName);
-				ot::rJSON::add(message, "DataBase.URL", m_databaseURL);
-				returnMessage = ot::rJSON::toJSON(message);
+				ot::JsonDocument message;
+				message.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, message.GetAllocator()), message.GetAllocator());
+				message.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_Initialization, message.GetAllocator()), message.GetAllocator());
+				message.AddMember("ModelService.URL", ot::JsonString(urlModelservice, message.GetAllocator()), message.GetAllocator());
+				message.AddMember("Service.ID", m_serviceID, message.GetAllocator());
+				message.AddMember("Session.ID", ot::JsonString(m_sessionID, message.GetAllocator()), message.GetAllocator());
+				message.AddMember("DataBase.PWD", ot::JsonString(pwd, message.GetAllocator()), message.GetAllocator());
+				message.AddMember("DataBase.Username", ot::JsonString(userName, message.GetAllocator()), message.GetAllocator());
+				message.AddMember("DataBase.URL", ot::JsonString(m_databaseURL, message.GetAllocator()), message.GetAllocator());
+				returnMessage = message.toJson();
 			}
 		}
 		return returnMessage;
@@ -133,7 +131,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

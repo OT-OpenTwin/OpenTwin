@@ -6,7 +6,6 @@
 #include <Windows.h>
 #include "MinimalSubService.h"
 #include "ActionHandler.h"
-#include "OTCore/rJSON.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,

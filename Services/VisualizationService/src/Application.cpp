@@ -13,7 +13,6 @@
 #include "DataSourceManager.h"
 
 // Open twin header
-#include "OTCore/rJSON.h"				// json convenience functions
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
@@ -63,19 +62,19 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
-		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 	
 		assert(0); // Unhandled button action
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 	{
-		std::list<ot::UID> entityIDs      = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-		std::list<ot::UID> entityVersions = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		bool itemsVisible			      = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
+		std::list<ot::UID> entityIDs      = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+		std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+		bool itemsVisible			      = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
 
 		updateEntities(entityIDs, entityVersions, itemsVisible);
 	}
@@ -85,7 +84,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	return "";
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
@@ -247,12 +246,12 @@ std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_
 
 void Application::sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateVisualizationEntity);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityID, visEntity->getEntityID());
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityVersion, visEntity->getEntityStorageVersion());
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion);
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, visEntity->getEntityID(), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, visEntity->getEntityStorageVersion(), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion, requestDoc.GetAllocator());
 
 	sendMessage(false, "Model", requestDoc);
 }

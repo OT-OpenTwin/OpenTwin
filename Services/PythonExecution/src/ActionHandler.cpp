@@ -19,10 +19,11 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
 	std::string returnMessage;
-	OT_rJSON_doc doc = ot::rJSON::fromJSON(json);
-	if (ot::rJSON::memberExists(doc, OT_ACTION_PARAM_SENDER_URL))
+	ot::JsonDocument doc;
+	doc.fromJson(json);
+	if (doc.HasMember(OT_ACTION_PARAM_SENDER_URL))
 	{
-		std::string senderURL = ot::rJSON::getString(doc, OT_ACTION_PARAM_SENDER_URL);
+		std::string senderURL = ot::json::getString(doc, OT_ACTION_PARAM_SENDER_URL);
 		
 		if (senderURL != _urlMasterService)
 		{
@@ -31,7 +32,7 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		}
 		else
 		{
-			std::string action = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
+			std::string action = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (_handlingFunctions.find(action) != _handlingFunctions.end())
 			{
 				auto& checkParameter = _checkParameterFunctions[action];
@@ -65,12 +66,12 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
     return returnValue;
 }
 
-ot::ReturnMessage ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::ShutdownProcess(ot::JsonDocument& doc)
 {
 	exit(1);
 }
 
-ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 {
 	try
 	{
@@ -112,16 +113,16 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 		std::list<ot::Variable> result = _pythonAPI.Execute(scripts, allParameter);
 
 		//Wrapp result in json string
-		OT_rJSON_createDOC(returnValues);
-		OT_rJSON_createValueArray(rJsonResult);
+		ot::JsonDocument returnValues;
+		ot::JsonArray rJsonResult;
 		ot::VariableToJSONConverter converterV2J;
 
 		for (ot::Variable& var : result)
 		{
-			rJsonResult.PushBack(converterV2J(var,returnValues), returnValues.GetAllocator());
+			rJsonResult.PushBack(converterV2J(var, returnValues.GetAllocator()), returnValues.GetAllocator());
 		}
 
-		return ot::ReturnMessage(ot::ReturnMessage::Ok, ot::rJSON::toJSON(returnValues));
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, returnValues);
 	}
 	catch (std::exception& e)
 	{
@@ -130,9 +131,9 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 
 }
 
-ot::ReturnMessage ActionHandler::CheckParameterExecute(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::CheckParameterExecute(ot::JsonDocument& doc)
 {
-	if (!ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Scripts) || !ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Parameter))
+	if (!doc.HasMember(OT_ACTION_CMD_PYTHON_Scripts) || !doc.HasMember(OT_ACTION_CMD_PYTHON_Parameter))
 	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Either the scripts or parameter are not contained in the message");
 	}

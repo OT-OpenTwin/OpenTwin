@@ -29,6 +29,7 @@ void PluginCore::deleteInstance(void) {
 
 bool PluginCore::initialize(void) {
 	// Display info message
+
 	m_uiInterface->appenInfoMessage("[PluginCore] Initializing UI plugin");
 
 	// Create a text edit widget

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "OTSystem/SystemTypes.h"
-#include "OTCore/rJSON.h"
+#include "OTCore/JSON.h"
 
 #include <condition_variable>
 #include <atomic>
@@ -24,7 +24,7 @@ public:
 	static int getStartPort() { return _startPort; }
 	void setSubprocessURL(const std::string& urlSubprocess) { _urlSubprocess = urlSubprocess; };
 	
-	std::string SendExecutionOrder(OT_rJSON_doc& scriptsAndParameter);
+	std::string SendExecutionOrder(ot::JsonDocument& scriptsAndParameter);
 	void Create(const std::string& urlThisProcess);
 	bool Close();
 

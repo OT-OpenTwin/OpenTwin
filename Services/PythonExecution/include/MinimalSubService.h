@@ -4,7 +4,6 @@
 #include "DataBase.h"
 #include <fstream>
 #include <sstream>
-#include "OTCore/rJSON.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include <list>

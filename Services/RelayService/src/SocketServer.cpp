@@ -2,10 +2,8 @@
 
 #include "SocketServer.h"
 
-#include <Logger.h>
-
 // OpenTwin header
-#include "OTCore/rJSON.h"				// rapidjson wrapper
+#include "OTCore/JSON.h"				// rapidjson wrapper
 #include "OTCore/Logger.h"		// Logger
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
@@ -249,10 +247,10 @@ bool SocketServer::sendHttpRequest(const std::string &operation, const std::stri
 QString SocketServer::performAction(const char *json, const char *senderIP)
 {
 	try {
-		OT_rJSON_parseDOC(doc, json);
-		OT_rJSON_docCheck(doc);
+		ot::JsonDocument doc;
+		doc.fromJson(json);
 
-		std::string action = ot::rJSON::getString(doc, "action");
+		std::string action = ot::json::getString(doc, "action");
 
 		OT_LOG("Received HTTP execute message: " + action, ot::INBOUND_MESSAGE_LOG);
 
@@ -281,10 +279,10 @@ QString SocketServer::performAction(const char *json, const char *senderIP)
 void SocketServer::queueAction(const char *json, const char *senderIP)
 {
 	try {
-		OT_rJSON_parseDOC(doc, json);
-		OT_rJSON_docCheck(doc);	
+		ot::JsonDocument doc;
+		doc.fromJson(json);
 
-		std::string action = ot::rJSON::getString(doc, "action");
+		std::string action = ot::json::getString(doc, "action");
 
 		OT_LOG_I("Received HTTP queue message: " + action);
 
