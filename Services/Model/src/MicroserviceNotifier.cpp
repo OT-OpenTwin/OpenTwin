@@ -22,8 +22,8 @@ extern ot::serviceID_t globalServiceID;
 
 void MicroserviceNotifier::requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, int siteID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_RequestFileForReading);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_FILE_LoadContent, false);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_RequestFileForReading);
+	inDoc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, false, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, rapidjson::Value(dialogTitle.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, rapidjson::Value(fileMask.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -35,7 +35,7 @@ void MicroserviceNotifier::requestFileForReading(const std::string &dialogTitle,
 
 void MicroserviceNotifier::fillPropertyGrid(const std::string &settings)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_FillPropertyGrid);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_FillPropertyGrid);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON, rapidjson::Value(settings.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -44,9 +44,9 @@ void MicroserviceNotifier::fillPropertyGrid(const std::string &settings)
 
 void MicroserviceNotifier::addMenuPage(const std::string &pageName)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuPage);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuPage);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -54,10 +54,10 @@ void MicroserviceNotifier::addMenuPage(const std::string &pageName)
 
 void MicroserviceNotifier::addMenuGroup(const std::string &pageName, const std::string &groupName)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuGroup);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuGroup);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, rapidjson::Value(groupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -65,11 +65,11 @@ void MicroserviceNotifier::addMenuGroup(const std::string &pageName, const std::
 
 void MicroserviceNotifier::addMenuSubGroup(const std::string &pageName, const std::string &groupName, const std::string &subGroupName)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuSubgroup);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuSubgroup);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, rapidjson::Value(groupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, rapidjson::Value(subGroupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -81,19 +81,20 @@ void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const 
 }
 
 void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence) {
-	OT_rJSON_createDOC(inDoc);
-	ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_AddMenuButton);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_PageName, pageName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_GroupName, groupName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName, subgroupName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, buttonName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectText, text);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_IconName, iconName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_IconFolder, iconFolder);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_ElementLockTypes, ot::ui::toList(flags));
+	ot::JsonDocument inDoc;
+
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_AddMenuButton, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, ot::JsonString(pageName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, ot::JsonString(groupName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, ot::JsonString(subgroupName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(buttonName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(text, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconName, ot::JsonString(iconName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, ot::JsonString(iconFolder, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::ui::toList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 	if (!keySequence.empty()) {
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_KeySequence, keySequence);
+		inDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, ot::JsonString(keySequence, inDoc.GetAllocator()), inDoc.GetAllocator());
 	}
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -102,15 +103,15 @@ void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const 
 
 void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::Flags<ot::ui::lockType> &flags)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuCheckbox);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuCheckbox);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, rapidjson::Value(groupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, rapidjson::Value(subGroupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(boxName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(boxText.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, checked, inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_ElementLockTypes, ot::ui::toList(flags));
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::ui::toList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -118,25 +119,25 @@ void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const st
 
 void MicroserviceNotifier::addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::Flags<ot::ui::lockType> &flags)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuLineEdit);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuLineEdit);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, rapidjson::Value(groupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, rapidjson::Value(subGroupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(editName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(editText.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, rapidjson::Value(editLabel.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_ElementLockTypes, ot::ui::toList(flags));
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::ui::toList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addShortcut(const std::string &keySequence) {
-	OT_rJSON_createDOC(inDoc);
-	ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_AddShortcut);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_KeySequence, keySequence);
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_AddShortcut, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, ot::JsonString(keySequence, inDoc.GetAllocator()), inDoc.GetAllocator());
 	
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -144,12 +145,12 @@ void MicroserviceNotifier::addShortcut(const std::string &keySequence) {
 
 void MicroserviceNotifier::setMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, bool checked)
 {
-	OT_rJSON_createDOC(inDoc);
-	ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_SetCheckboxValues);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SetCheckboxValues, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, pageName + ":" + groupName + ":" + subGroupName + ":" + boxName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_CheckedState, checked);
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(pageName + ":" + groupName + ":" + subGroupName + ":" + boxName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, checked, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -157,13 +158,13 @@ void MicroserviceNotifier::setMenuCheckBox(const std::string &pageName, const st
 
 void MicroserviceNotifier::setMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, bool error)
 {
-	OT_rJSON_createDOC(inDoc);
-	ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_SetLineEditValues);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SetLineEditValues, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, pageName + ":" + groupName + ":" + subGroupName + ":" + editName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectText, editText);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_CONTROL_ErrorState, error);
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(pageName + ":" + groupName + ":" + subGroupName + ":" + editName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ErrorState, error, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -171,9 +172,9 @@ void MicroserviceNotifier::setMenuLineEdit(const std::string &pageName, const st
 
 void MicroserviceNotifier::activateMenuTab(const std::string &pageName)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_SwitchMenuTab);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_SwitchMenuTab);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -181,9 +182,9 @@ void MicroserviceNotifier::activateMenuTab(const std::string &pageName)
 
 void MicroserviceNotifier::removeUIElements(const std::string &type, std::list<std::string> &itemList)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_RemoveElements);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_RemoveElements);
 	//inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectType, rapidjson::Value(type.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectNames, itemList);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -192,10 +193,10 @@ void MicroserviceNotifier::removeUIElements(const std::string &type, std::list<s
 
 void MicroserviceNotifier::enableDisableControls(std::list<std::string> &enabled, std::list<std::string> &disabled)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_EnableDisableControls);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_EnableDisableControls);
 	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_UI_EnabledControlsList, enabled);
 	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_UI_DisabledControlsList, disabled);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -203,10 +204,10 @@ void MicroserviceNotifier::enableDisableControls(std::list<std::string> &enabled
 
 void MicroserviceNotifier::setToolTip(const std::string &item, const std::string &text)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_OBJ_SetToolTip);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_OBJ_SetToolTip);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(item.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(text.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
@@ -214,7 +215,7 @@ void MicroserviceNotifier::setToolTip(const std::string &item, const std::string
 
 void MicroserviceNotifier::displayMessage(const std::string &message)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_DisplayMessage);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_DisplayMessage);
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -223,7 +224,7 @@ void MicroserviceNotifier::displayMessage(const std::string &message)
 
 void MicroserviceNotifier::reportError(const std::string &message)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportError);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportError);
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -232,7 +233,7 @@ void MicroserviceNotifier::reportError(const std::string &message)
 
 void MicroserviceNotifier::reportWarning(const std::string &message)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportWarning);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportWarning);
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -241,7 +242,7 @@ void MicroserviceNotifier::reportWarning(const std::string &message)
 
 void MicroserviceNotifier::reportInformation(const std::string &message)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportInformation);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportInformation);
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -250,7 +251,7 @@ void MicroserviceNotifier::reportInformation(const std::string &message)
 
 void MicroserviceNotifier::promptChoice(const std::string &message, const std::string &icon, const std::string &options, const std::string &promptResponse, const std::string &parameter1)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_PromptInformation);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_PromptInformation);
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_ICON, rapidjson::Value(("Dialog"+icon).c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_OPTIONS, rapidjson::Value(options.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -264,7 +265,7 @@ void MicroserviceNotifier::promptChoice(const std::string &message, const std::s
 
 void MicroserviceNotifier::resetAllViews(ot::UID visualizationModelID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_Reset);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_Reset);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -273,7 +274,7 @@ void MicroserviceNotifier::resetAllViews(ot::UID visualizationModelID)
 
 void MicroserviceNotifier::clearSelection(ot::UID visualizationModelID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_ClearSelection);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_ClearSelection);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -282,7 +283,7 @@ void MicroserviceNotifier::clearSelection(ot::UID visualizationModelID)
 
 void MicroserviceNotifier::refreshSelection(ot::UID visualizationModelID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_RefreshSelection);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_RefreshSelection);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -291,7 +292,7 @@ void MicroserviceNotifier::refreshSelection(ot::UID visualizationModelID)
 
 void MicroserviceNotifier::selectObject(ot::UID visualizationModelID, ot::UID entityID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_SelectObject);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_SelectObject);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(entityID), inDoc.GetAllocator());
 
@@ -301,7 +302,7 @@ void MicroserviceNotifier::selectObject(ot::UID visualizationModelID, ot::UID en
 
 void MicroserviceNotifier::refreshAllViews(ot::UID visualizationModelID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_Refresh);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_Refresh);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -312,7 +313,7 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetData(ot::UID visModelID,
 															 double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
 															 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, rapidjson::Value(treeName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, surfaceColorRGB, 3);
@@ -339,31 +340,30 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetData(ot::UID visModelID,
 void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
 																 double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
 {
-	OT_rJSON_createDOC(inDoc);
-	ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ID, visModelID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_TREE_Name, treeName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_UI_TREE_Name, treeName);
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, visModelID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(treeName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, surfaceColorRGB, 3);
 	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, edgeColorRGB, 3);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_MaterialType, materialType);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_TextureType, textureType);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_TextureReflective, textureReflective);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_EntityID, modelEntityID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, backFaceCulling);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, offsetFactor);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, isEditable);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_PROJECT_NAME, projectName);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID, entityID);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_Version, entityVersion);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_SelectChildren, selectChildren);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, manageParentVisibility);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, manageChildVisibility);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, showWhenSelected);
-	ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ITM_Transformation, transformation);
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString(textureType, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, textureReflective, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, modelEntityID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, backFaceCulling, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, offsetFactor, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, isEditable, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, entityID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, entityVersion, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SelectChildren, selectChildren, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, manageParentVisibility, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, manageChildVisibility, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, showWhenSelected, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Transformation, ot::JsonArray(transformation, inDoc.GetAllocator()), inDoc.GetAllocator());
 
-	//rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase);
+	//ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase);
 	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
 	//inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, rapidjson::Value(treeName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
@@ -383,7 +383,7 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visMode
 
 void MicroserviceNotifier::addVisualizationContainerNode(ot::UID visModelID, const std::string &treeName, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isEditable)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddContainerNode);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddContainerNode);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, rapidjson::Value(treeName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
@@ -403,7 +403,7 @@ void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, co
 														  const std::vector<std::array<double, 3>> &triangle_p3,
 														  const std::vector<std::array<double, 3>> &triangle_rgb)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(name.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_UID, rapidjson::Value(uid), inDoc.GetAllocator());
@@ -423,7 +423,7 @@ void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, co
 
 void MicroserviceNotifier::updateObjectColor(ot::UID visModelID, ot::UID modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
 	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, surfaceColorRGB, 3);
@@ -438,7 +438,7 @@ void MicroserviceNotifier::updateObjectColor(ot::UID visModelID, ot::UID modelEn
 
 void MicroserviceNotifier::updateObjectFacetsFromDataBase(ot::UID visModelID, ot::UID modelEntityID, ot::UID entityID, ot::UID entityVersion)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_UpdateFacetsFromDataBase);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_UpdateFacetsFromDataBase);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, rapidjson::Value((long long)entityID), inDoc.GetAllocator());
@@ -451,7 +451,7 @@ void MicroserviceNotifier::updateObjectFacetsFromDataBase(ot::UID visModelID, ot
 
 void MicroserviceNotifier::removeShapesFromVisualization(ot::UID visualizationModelID, std::list<ot::UID> entityID)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID, entityID);
 
@@ -461,7 +461,7 @@ void MicroserviceNotifier::removeShapesFromVisualization(ot::UID visualizationMo
 
 void MicroserviceNotifier::setTreeStateRecording(ot::UID visualizationModelID, bool flag)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_State, rapidjson::Value(flag), inDoc.GetAllocator());
 
@@ -473,7 +473,7 @@ void MicroserviceNotifier::enterEntitySelectionMode(ot::UID visualizationModelID
 													const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage,
 													const std::map<std::string, std::string> &options)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SelectionType, rapidjson::Value(selectionType.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_REPLYTO, globalServiceID, inDoc.GetAllocator());
@@ -498,7 +498,7 @@ void MicroserviceNotifier::enterEntitySelectionMode(ot::UID visualizationModelID
 
 void MicroserviceNotifier::setShapeVisibility(ot::UID visualizationModelID, std::list<ot::UID> &visibleEntityIDs, std::list<ot::UID> &hiddenEntityIDs)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_SetShapeVisibility);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_SetShapeVisibility);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID_Visible, visibleEntityIDs);
 	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden, hiddenEntityIDs);
@@ -509,7 +509,7 @@ void MicroserviceNotifier::setShapeVisibility(ot::UID visualizationModelID, std:
 
 void MicroserviceNotifier::hideEntities(ot::UID visualizationModelID, std::list<ot::UID> &hiddenEntityIDs)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_HideEntities);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_HideEntities);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden, hiddenEntityIDs);
 
@@ -519,7 +519,7 @@ void MicroserviceNotifier::hideEntities(ot::UID visualizationModelID, std::list<
 
 void MicroserviceNotifier::isModified(ot::UID visualizationModelID, bool modifiedState)
 {
-	rapidjson::Document inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_SetModifiedState);
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_SetModifiedState);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ModifiedState, rapidjson::Value(modifiedState), inDoc.GetAllocator());
 
@@ -532,7 +532,7 @@ void MicroserviceNotifier::enableQueuingHttpRequests(bool flag)
 	MicroserviceAPI::enableQueuingHttpRequests(flag);
 }
 
-void MicroserviceNotifier::queuedHttpRequestToUI(rapidjson::Document &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
+void MicroserviceNotifier::queuedHttpRequestToUI(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
 {
 	MicroserviceAPI::queuedHttpRequestToUI(doc, prefetchIds);
 }
@@ -542,12 +542,12 @@ bool MicroserviceNotifier::isUIAvailable(void)
 	return (!MicroserviceAPI::getUIURL().empty());
 }
 
-std::string MicroserviceNotifier::sendMessageToService(bool queue, const std::string &owner, rapidjson::Document &doc)
+std::string MicroserviceNotifier::sendMessageToService(bool queue, const std::string &owner, ot::JsonDocument &doc)
 {
 	return MicroserviceAPI::sendMessageToService(queue ? MicroserviceAPI::QUEUE : MicroserviceAPI::EXECUTE, owner, doc);
 }
 
-std::string MicroserviceNotifier::dispatchAction(rapidjson::Document &doc)
+std::string MicroserviceNotifier::dispatchAction(ot::JsonDocument &doc)
 {
 	std::string senderIP;
 

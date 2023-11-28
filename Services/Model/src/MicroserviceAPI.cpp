@@ -16,7 +16,6 @@
 #include <thread>
 
 #include "OTCore/Logger.h"
-#include "OTCore/rJSON.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/ActionTypes.h"
@@ -40,7 +39,7 @@ bool globalServiceURLsRetrieved = false;
 std::map<std::string, std::string> globalServiceURLs;
 
 bool globalUIMessageQueuingEnabled = false;
-rapidjson::Document *globalQueuedDoc = nullptr;
+ot::JsonDocument *globalQueuedDoc = nullptr;
 
 MicroserviceNotifier *globalNotifier = nullptr;
 
@@ -50,9 +49,9 @@ Model *globalModel = nullptr;
 
 void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	// Create ping request
-	OT_rJSON_createDOC(pingDoc);
-	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	std::string ping = ot::rJSON::toJSON(pingDoc);
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string ping = pingDoc.toJson();
 
 	bool alive = true;
 	while (alive) {
@@ -124,7 +123,7 @@ void MicroserviceAPI::flushQueuedHttpRequests(void)
 	if (globalQueuedDoc != nullptr)
 	{
 #ifdef _DEBUG
-		//std::cout << "<< Flush: " << ot::rJSON::toJSON(*globalQueuedDoc) << std::endl;
+		//std::cout << "<< Flush: " << ot::json::toJSON(*globalQueuedDoc) << std::endl;
 #endif // _DEBUG
 
 		std::string response;
@@ -138,7 +137,7 @@ void MicroserviceAPI::flushQueuedHttpRequests(void)
 	lock = false;
 }
 
-void MicroserviceAPI::queuedHttpRequestToUI(rapidjson::Document &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
+void MicroserviceAPI::queuedHttpRequestToUI(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
 {
 	using namespace std::chrono_literals;
 	static bool lock = false;
@@ -149,14 +148,13 @@ void MicroserviceAPI::queuedHttpRequestToUI(rapidjson::Document &doc, std::list<
 	{
 		if (globalQueuedDoc == nullptr)
 		{
-			globalQueuedDoc = new rapidjson::Document;
-			*globalQueuedDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_Compound);
+			globalQueuedDoc = new ot::JsonDocument(MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_Compound));
 
 			rapidjson::Value docs(rapidjson::kArrayType);
 			rapidjson::Value prefID(rapidjson::kArrayType);
 			rapidjson::Value prefVersion(rapidjson::kArrayType);
 
-			rapidjson::Document::AllocatorType& allocator = globalQueuedDoc->GetAllocator();
+			ot::JsonDocument::AllocatorType& allocator = globalQueuedDoc->GetAllocator();
 
 			std::string projectName = DataBase::GetDataBase()->getProjectName();
 
@@ -166,7 +164,7 @@ void MicroserviceAPI::queuedHttpRequestToUI(rapidjson::Document &doc, std::list<
 			globalQueuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_Version, prefVersion, allocator);
 		}
 
-		rapidjson::Document::AllocatorType& allocator = globalQueuedDoc->GetAllocator();
+		ot::JsonDocument::AllocatorType& allocator = globalQueuedDoc->GetAllocator();
 
 		rapidjson::Value v(doc, allocator);
 		(*globalQueuedDoc)[OT_ACTION_PARAM_PREFETCH_Documents].PushBack(v, allocator);
@@ -186,9 +184,9 @@ void MicroserviceAPI::queuedHttpRequestToUI(rapidjson::Document &doc, std::list<
 	lock = false;
 }
 
-bool MicroserviceAPI::sendHttpRequest(RequestType operation, const std::string &url, rapidjson::Document &doc, std::string &response)
+bool MicroserviceAPI::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response)
 {
-	return sendHttpRequest(operation, url, ot::rJSON::toJSON(doc), response);
+	return sendHttpRequest(operation, url, doc.toJson(), response);
 }
 
 bool MicroserviceAPI::sendHttpRequest(RequestType operation, const std::string &url, const std::string & message, std::string &response)
@@ -226,7 +224,7 @@ const char *MicroserviceAPI::performAction(const char *json, const char *senderI
 	lock = true;
 
 	// Parse json -> action + arguments
-	rapidjson::Document doc;
+	ot::JsonDocument doc;
 	doc.Parse(json);
 	assert(doc.IsObject());
 
@@ -264,11 +262,11 @@ std::string initInternal() {
 		"\"; SessionID = \"" + globalSessionID + "\")");
 
 	// Get the database information
-	OT_rJSON_createDOC(request);
-	ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_GetDatabaseUrl);
+	ot::JsonDocument request;
+	request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetDatabaseUrl, request.GetAllocator()), request.GetAllocator());
 
 	std::string response;
-	if (!MicroserviceAPI::sendHttpRequest(MicroserviceAPI::EXECUTE, globalSessionServiceURL, ot::rJSON::toJSON(request), response)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message"; }
+	if (!MicroserviceAPI::sendHttpRequest(MicroserviceAPI::EXECUTE, globalSessionServiceURL, request.toJson(), response)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message"; }
 	if (response.rfind("ERROR:") != std::string::npos) { 
 		return response;
 	}
@@ -282,32 +280,32 @@ std::string initInternal() {
 
 	// Register service
 	response.clear();
-	OT_rJSON_createDOC(commandDoc);
-	ot::rJSON::add(commandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_RegisterNewService);
-	ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SESSION_ID, globalSessionID);
-	ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_NAME, SERVICE_INFO_NAME);
-	ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_TYPE, OT_INFO_SERVICE_TYPE_MODEL);
-	ot::rJSON::add(commandDoc, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(globalServiceURL));
+	ot::JsonDocument commandDoc;
+	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewService, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(globalSessionID, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(SERVICE_INFO_NAME, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(globalServiceURL), commandDoc.GetAllocator()), commandDoc.GetAllocator());
 
 #ifdef _DEBUG
 	auto handle = GetCurrentProcess();
 	if (handle != nullptr) {
 		unsigned long handleID = GetProcessId(handle);
 		assert(handleID != 0); // Failed to get process handle ID
-		ot::rJSON::add(commandDoc, OT_ACTION_PARAM_PROCESS_ID, std::to_string(handleID));
+		commandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, ot::JsonString(std::to_string(handleID), commandDoc.GetAllocator()), commandDoc.GetAllocator());
 	}
 	else {
 		assert(0); // Failed to get current process handle
 	}
 #endif // _DEBUG
 
-	if (!ot::msg::send(globalServiceURL, globalSessionServiceURL, ot::EXECUTE, ot::rJSON::toJSON(commandDoc), response)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message"; }
+	if (!ot::msg::send(globalServiceURL, globalSessionServiceURL, ot::EXECUTE, commandDoc.toJson(), response)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message"; }
 	OT_ACTION_IF_RESPONSE_ERROR(response) { return response; }
 	else OT_ACTION_IF_RESPONSE_WARNING(response) { return response; }
 
-	OT_rJSON_parseDOC(reply, response.c_str());
-	OT_rJSON_docCheck(reply);
-	globalServiceID = ot::rJSON::getUInt(reply, OT_ACTION_PARAM_SERVICE_ID);
+	ot::JsonDocument reply;
+	reply.fromJson(response);
+	globalServiceID = ot::json::getUInt(reply, OT_ACTION_PARAM_SERVICE_ID);
 
 	OT_LOG_I("Initialization completed successfully");
 
@@ -355,16 +353,16 @@ int MicroserviceAPI::init(const char * _localDirectoryServiceURL, const char * _
 			std::string info(inBuffer);
 
 			// Parse doc
-			rapidjson::Document params;
+			ot::JsonDocument params;
 			params.Parse(info.c_str());
 			assert(params.IsObject());
 
 			// Apply data
-			globalServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-			globalSessionServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-			globalDirectoryServiceURL = ot::rJSON::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-			globalSessionID = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_ID);
-			globalSiteID = ot::rJSON::getString(params, OT_ACTION_PARAM_SITE_ID);
+			globalServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+			globalSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+			globalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
+			globalSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
+			globalSiteID = ot::json::getString(params, OT_ACTION_PARAM_SITE_ID);
 
 			initInternal();
 		}
@@ -384,7 +382,7 @@ int MicroserviceAPI::init(const char * _localDirectoryServiceURL, const char * _
 	}
 }
 
-std::string MicroserviceAPI::getStringFromDocument(rapidjson::Document &doc, const char *attribute)
+std::string MicroserviceAPI::getStringFromDocument(ot::JsonDocument &doc, const char *attribute)
 {
 	std::string value = doc[attribute].GetString();
 
@@ -398,7 +396,7 @@ std::string MicroserviceAPI::getStringFromDocument(rapidjson::Document &doc, con
 	return value;
 }
 
-std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std::string &senderIP)
+std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::string &senderIP)
 {
 	try {
 		std::string action = getStringFromDocument(doc, OT_ACTION_MEMBER);
@@ -447,25 +445,25 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			return OT_ACTION_CMD_Ping;
 		}
 		else if (action == OT_ACTION_CMD_Init) {
-			globalSessionServiceURL = ot::rJSON::getString(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-			globalSessionID = ot::rJSON::getString(doc, OT_ACTION_PARAM_SESSION_ID);
+			globalSessionServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+			globalSessionID = ot::json::getString(doc, OT_ACTION_PARAM_SESSION_ID);
 
 			return initInternal();
 		}
 		else if (action == OT_ACTION_CMD_Run) {
 
-			std::string credentialsUsername = ot::rJSON::getString(doc, OT_PARAM_AUTH_USERNAME);
-			std::string credentialsPassword = ot::rJSON::getString(doc, OT_PARAM_AUTH_PASSWORD);
+			std::string credentialsUsername = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
+			std::string credentialsPassword = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
 
 			DataBase::GetDataBase()->setUserCredentials(credentialsUsername, credentialsPassword);
 			DataBase::GetDataBase()->InitializeConnection(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString());
 
 			// Change the service to visible
 			{
-				OT_rJSON_createDOC(visibilityCommand);
-				ot::rJSON::add(visibilityCommand, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShow);
-				ot::rJSON::add(visibilityCommand, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-				ot::rJSON::add(visibilityCommand, OT_ACTION_PARAM_SESSION_ID, globalSessionID);
+				ot::JsonDocument visibilityCommand;
+				visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShow, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
+				visibilityCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, visibilityCommand.GetAllocator());
+				visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(globalSessionID, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
 
 				std::string response;
 				if (!sendHttpRequest(QUEUE, globalSessionServiceURL, visibilityCommand, response)) {
@@ -497,9 +495,9 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 			// Create a model in the UI
 			if (globalUIserviceURL.length() > 0) {
-				OT_rJSON_createDOC(commandDoc);
-				ot::rJSON::add(commandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_MODEL_Create);
-				ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+				ot::JsonDocument commandDoc;
+				commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MODEL_Create, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+				commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, commandDoc.GetAllocator());
 
 				std::string response;
 				if (!sendHttpRequest(QUEUE, globalUIserviceURL, commandDoc, response)) {
@@ -560,14 +558,14 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_ItemRenamed)
 		{
-			ot::UID entityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_ID);
-			std::string newName = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_ITM_Name);
+			ot::UID entityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_ID);
+			std::string newName = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ITM_Name);
 			globalModel->modelItemRenamed(entityID, newName);
 		}
 		else if (action == OT_ACTION_CMD_SetVisualizationModel)
 		{
-			ot::UID viewerModelID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_ID);
-			ot::UID viewerViewID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_VIEW_ID);
+			ot::UID viewerModelID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_ID);
+			ot::UID viewerViewID = ot::json::getUInt64(doc, OT_ACTION_PARAM_VIEW_ID);
 			std::cout << "Visualization model set to \"" << viewerModelID << "\". Opening project" << std::endl;
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			globalModel->projectOpen();
@@ -603,7 +601,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GenerateEntityIDs)
 		{
-			unsigned long long count = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_COUNT);
+			unsigned long long count = ot::json::getUInt64(doc, OT_ACTION_PARAM_COUNT);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -625,17 +623,17 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GetListOfFolderItems)
 		{
-			std::string folder = ot::rJSON::getString(doc, OT_ACTION_PARAM_Folder);
-			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
+			std::string folder = ot::json::getString(doc, OT_ACTION_PARAM_Folder);
+			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			
 			return getReturnJSONFromStringList(globalModel->getListOfFolderItems(folder,recursive));
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType)
 		{
-			std::string folder    = ot::rJSON::getString(doc, OT_ACTION_PARAM_Folder);
-			std::string className = ot::rJSON::getString(doc, OT_ACTION_PARAM_Type);
-			bool recursive        = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
+			std::string folder    = ot::json::getString(doc, OT_ACTION_PARAM_Folder);
+			std::string className = ot::json::getString(doc, OT_ACTION_PARAM_Type);
+			bool recursive        = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -644,10 +642,10 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 		else if (action == OT_ACTION_CMD_MODEL_UpdateVisualizationEntity)
 		{
-			ot::UID visEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);
-			ot::UID visEntityVersion = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
-			ot::UID binaryDataItemID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_DataID);
-			ot::UID binaryDataItemVersion = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_DataVersion);
+			ot::UID visEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
+			ot::UID visEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
+			ot::UID binaryDataItemID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_DataID);
+			ot::UID binaryDataItemVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_DataVersion);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -655,11 +653,11 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdateGeometryEntity)
 		{
-			ot::UID geomEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);
-			ot::UID brepEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID_Brep);
-			ot::UID facetsEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID_Facets);
-			ot::UID brepEntityVersion = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep);
-			ot::UID facetsEntityVersion = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets);
+			ot::UID geomEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
+			ot::UID brepEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID_Brep);
+			ot::UID facetsEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID_Facets);
+			ot::UID brepEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep);
+			ot::UID facetsEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets);
 			bool overrideGeometry = doc[OT_ACTION_PARAM_MODEL_OverrideGeometry].GetBool();
 
 			std::string properties;
@@ -667,7 +665,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 			try
 			{
-				properties = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_NewProperties);
+				properties = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_NewProperties);
 				updateProperties = true;
 			}
 			catch (std::exception)
@@ -681,7 +679,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted)
 		{
-			std::string description = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_Description);
+			std::string description = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Description);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -689,7 +687,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity)
 		{
-			ot::UID visEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);
+			ot::UID visEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -697,7 +695,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_CheckParentUpdates)
 		{
-			std::list<ot::UID> modifiedEntities = ot::rJSON::getULongLongList(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> modifiedEntities = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
 			return globalModel->checkParentUpdates(modifiedEntities);
@@ -727,8 +725,8 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_AddGeometryOperation)
 		{
-			ot::UID geometryEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);
-			ot::UID geometryEntityVersion = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
+			ot::UID geometryEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
+			ot::UID geometryEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
 			std::string geomEntityName = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityName);
 			std::list<ot::UID> dataEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
 			std::list<ot::UID> dataEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
@@ -743,7 +741,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		else if (action == OT_ACTION_CMD_MODEL_DeleteEntity)
 		{
 			std::list<std::string> entityNameList = getStringListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityNameList);
-			bool saveModel = ot::rJSON::getBool(doc, OT_ACTION_PARAM_MODEL_SaveModel);
+			bool saveModel = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_SaveModel);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -751,7 +749,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_MeshingCompleted)
 		{
-			ot::UID meshEntityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);
+			ot::UID meshEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
 
 			globalModel->setMeshingActive(meshEntityID, false);
 		}
@@ -802,7 +800,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			std::string entityName = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_ITM_Name);
+			std::string entityName = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ITM_Name);
 			std::list<ot::UID> entityIDList;
 
 			EntityContainer *entity = dynamic_cast<EntityContainer*>(globalModel->findEntityFromName(entityName));
@@ -820,7 +818,7 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			ot::UID entityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_ITM_ID);
+			ot::UID entityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_ITM_ID);
 			std::list<ot::UID> entityIDList;
 
 			EntityContainer *entity = dynamic_cast<EntityContainer*>(globalModel->getEntity(entityID));
@@ -838,18 +836,18 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			OT_rJSON_createDOC(newDoc);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, globalModel->getAllGeometryEntitiesForMeshing());
+			ot::JsonDocument newDoc;
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(globalModel->getAllGeometryEntitiesForMeshing(), newDoc.GetAllocator()), newDoc.GetAllocator());
 
-			return ot::rJSON::toJSON(newDoc);
+			return newDoc.toJson();
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GetEntityProperties)
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			ot::UID entityID = ot::rJSON::getULongLong(doc, OT_ACTION_PARAM_MODEL_EntityID);
-			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
-			std::string propertyGroupFilter = ot::rJSON::getString(doc, OT_ACTION_PARAM_Filter);
+			ot::UID entityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
+			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
+			std::string propertyGroupFilter = ot::json::getString(doc, OT_ACTION_PARAM_Filter);
 
 			std::map<ot::UID, std::string> entityProperties;
 
@@ -865,19 +863,19 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 				propertyList.push_back(item.second);
 			}
 
-			OT_rJSON_createDOC(newDoc);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_PropertyList, propertyList);
+			ot::JsonDocument newDoc;
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, ot::JsonArray(propertyList, newDoc.GetAllocator()), newDoc.GetAllocator());
 
-			return ot::rJSON::toJSON(newDoc);
+			return newDoc.toJson();
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName)
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			std::string entityName = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_EntityName);
-			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
-			std::string propertyGroupFilter = ot::rJSON::getString(doc, OT_ACTION_PARAM_Filter);
+			std::string entityName = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_EntityName);
+			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
+			std::string propertyGroupFilter = ot::json::getString(doc, OT_ACTION_PARAM_Filter);
 
 			EntityBase *entity = globalModel->findEntityFromName(entityName);
 
@@ -898,11 +896,11 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 				propertyList.push_back(item.second);
 			}
 
-			OT_rJSON_createDOC(newDoc);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_PropertyList, propertyList);
+			ot::JsonDocument newDoc;
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, ot::JsonArray(propertyList, newDoc.GetAllocator()), newDoc.GetAllocator());
 
-			return ot::rJSON::toJSON(newDoc);
+			return newDoc.toJson();
 		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdatePropertyGrid)
 		{
@@ -1026,9 +1024,9 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 
 					// Create a model in the UI
 					if (globalUIserviceURL.length() > 0) {
-						OT_rJSON_createDOC(commandDoc);
-						ot::rJSON::add(commandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_MODEL_Create);
-						ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+						ot::JsonDocument commandDoc;
+						commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MODEL_Create, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+						commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, commandDoc.GetAllocator());
 
 						std::string response;
 						if (!sendHttpRequest(QUEUE, globalUIserviceURL, commandDoc, response)) {
@@ -1080,32 +1078,33 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER)
 		{
-			const int numberOfIdentifier = ot::rJSON::getInt(doc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT);
+			const int numberOfIdentifier = ot::json::getInt(doc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT);
 			ot::UIDList requestedUIDs, requestedVersions;
 			for (int i = 0; i < numberOfIdentifier; i++)
 			{
 				requestedUIDs.push_back(globalModel->createEntityUID());
 				requestedVersions.push_back(globalModel->createEntityUID());
 			}
-			const std::string& requestingService = ot::rJSON::getString(doc, OT_ACTION_PARAM_SENDER_URL);
-			const std::string& subsequentFunction = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_FunctionName);
-			rapidjson::Document replyDoc;
-			replyDoc.SetObject();
-			ot::rJSON::add(replyDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
-			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
-			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_EntityIDList, requestedUIDs);
-			ot::rJSON::add(replyDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, requestedVersions);
+			const std::string& requestingService = ot::json::getString(doc, OT_ACTION_PARAM_SENDER_URL);
+			const std::string& subsequentFunction = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_FunctionName);
+			
+			ot::JsonDocument replyDoc;
+			replyDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, replyDoc.GetAllocator()), replyDoc.GetAllocator());
+			replyDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, replyDoc.GetAllocator()), replyDoc.GetAllocator());
+			replyDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(requestedUIDs, replyDoc.GetAllocator()), replyDoc.GetAllocator());
+			replyDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(requestedVersions, replyDoc.GetAllocator()), replyDoc.GetAllocator());
+			
 			std::string response;
 			//Currently only the ui service uses this function but the ui url is currently not available when this method is being invoked.
 			sendHttpRequest(QUEUE, globalUIserviceURL, replyDoc, response);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION)
 		{
-			std::string projectName = ot::rJSON::getString(doc, OT_ACTION_PARAM_PROJECT_NAME);
-			std::string	collectionName = ot::rJSON::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
-			std::string folder = ot::rJSON::getString(doc, OT_ACTION_PARAM_Folder);
-			std::string className = ot::rJSON::getString(doc, OT_ACTION_PARAM_Type);
-			bool recursive = ot::rJSON::getBool(doc, OT_ACTION_PARAM_Recursive);
+			std::string projectName = ot::json::getString(doc, OT_ACTION_PARAM_PROJECT_NAME);
+			std::string	collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
+			std::string folder = ot::json::getString(doc, OT_ACTION_PARAM_Folder);
+			std::string className = ot::json::getString(doc, OT_ACTION_PARAM_Type);
+			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
 			
 			std::string actualOpenedProject= DataBase::GetDataBase()->getProjectName();
 			DataBase::GetDataBase()->setProjectName(collectionName);
@@ -1143,11 +1142,11 @@ std::string MicroserviceAPI::dispatchAction(rapidjson::Document &doc, const std:
 			DataBase::GetDataBase()->setProjectName(actualOpenedProject);
 			DataBase::GetDataBase()->RemovePrefetchedDocument(0);
 
-			OT_rJSON_createDOC(newDoc);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
-			ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersionList);
-
-			return ot::rJSON::toJSON(newDoc);
+			ot::JsonDocument newDoc;
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersionList, newDoc.GetAllocator()), newDoc.GetAllocator());
+			
+			return newDoc.toJson();
 		}
 
 		else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
@@ -1192,13 +1191,13 @@ std::string MicroserviceAPI::getEntityInformation(std::list<ot::UID> &entityIDLi
 	globalModel->getEntityNames(entityIDList, entityNames);
 	globalModel->getEntityTypes(entityIDList, entityTypes);
 
-	OT_rJSON_createDOC(newDoc);
-	ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
-	ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersions);
-	ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityNameList, entityNames);
-	ot::rJSON::add(newDoc, OT_ACTION_PARAM_MODEL_EntityTypeList, entityTypes);
+	ot::JsonDocument newDoc;
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, newDoc.GetAllocator()), newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityNameList, ot::JsonArray(entityNames, newDoc.GetAllocator()), newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityTypeList, ot::JsonArray(entityTypes, newDoc.GetAllocator()), newDoc.GetAllocator());
 
-	return ot::rJSON::toJSON(newDoc);
+	return newDoc.toJson();
 }
 
 std::string MicroserviceAPI::CreateTmpFileFromCompressedData(const std::string &data, ot::UID uncompressedDataLength)
@@ -1231,7 +1230,7 @@ std::string MicroserviceAPI::CreateTmpFileFromCompressedData(const std::string &
 	return tmpFileName;
 }
 
-std::list<ot::UID> MicroserviceAPI::getUIDListFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::list<ot::UID> MicroserviceAPI::getUIDListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::list<ot::UID> result;
 
@@ -1245,7 +1244,7 @@ std::list<ot::UID> MicroserviceAPI::getUIDListFromDocument(rapidjson::Document &
 	return result;
 }
 
-std::list<bool> MicroserviceAPI::getBooleanListFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::list<bool> MicroserviceAPI::getBooleanListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::list<bool> result;
 
@@ -1259,7 +1258,7 @@ std::list<bool> MicroserviceAPI::getBooleanListFromDocument(rapidjson::Document 
 	return result;
 }
 
-std::list<std::string> MicroserviceAPI::getStringListFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::list<std::string> MicroserviceAPI::getStringListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::list<std::string> result;
 
@@ -1275,61 +1274,61 @@ std::list<std::string> MicroserviceAPI::getStringListFromDocument(rapidjson::Doc
 
 std::string MicroserviceAPI::getReturnJSONFromUID(ot::UID uid)
 {
-	rapidjson::Document newDoc;
+	ot::JsonDocument newDoc;
 	newDoc.SetObject();
 
-	rapidjson::Document::AllocatorType& allocator = newDoc.GetAllocator();
+	ot::JsonDocument::AllocatorType& allocator = newDoc.GetAllocator();
 
 	newDoc.AddMember(OT_ACTION_PARAM_BASETYPE_UID, uid, allocator);
 
-	return ot::rJSON::toJSON(newDoc);
+	return newDoc.toJson();
 }
 
 std::string MicroserviceAPI::getReturnJSONFromString(std::string props)
 {
-	rapidjson::Document newDoc;
+	ot::JsonDocument newDoc;
 	newDoc.SetObject();
 
 	newDoc.AddMember(OT_ACTION_PARAM_BASETYPE_Props, rapidjson::Value(props.c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
 
-	return ot::rJSON::toJSON(newDoc);
+	return newDoc.toJson();
 }
 
 std::string MicroserviceAPI::getReturnJSONFromBool(bool flag)
 {
-	rapidjson::Document newDoc;
+	ot::JsonDocument newDoc;
 	newDoc.SetObject();
 
-	rapidjson::Document::AllocatorType& allocator = newDoc.GetAllocator();
+	ot::JsonDocument::AllocatorType& allocator = newDoc.GetAllocator();
 
 	newDoc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, flag, allocator);
 
-	return ot::rJSON::toJSON(newDoc);
+	return newDoc.toJson();
 }
 
 std::string MicroserviceAPI::getReturnJSONFromUIDList(std::list<ot::UID> list)
 {
-	rapidjson::Document newDoc;
+	ot::JsonDocument newDoc;
 	newDoc.SetObject();
 
 	AddUIDListToJsonDoc(newDoc, OT_ACTION_PARAM_BASETYPE_List, list);
 
-	return ot::rJSON::toJSON(newDoc);
+	return newDoc.toJson();
 }
 
 std::string MicroserviceAPI::getReturnJSONFromStringList(std::list<std::string> list)
 {
-	rapidjson::Document newDoc;
+	ot::JsonDocument newDoc;
 	newDoc.SetObject();
 
 	AddStringListToJsonDoc(newDoc, OT_ACTION_PARAM_BASETYPE_List, list);
 
-	return ot::rJSON::toJSON(newDoc);
+	return newDoc.toJson();
 }
 
-rapidjson::Document MicroserviceAPI::BuildJsonDocFromAction(const std::string &action)
+ot::JsonDocument MicroserviceAPI::BuildJsonDocFromAction(const std::string &action)
 {
-	rapidjson::Document newDoc;
+	ot::JsonDocument newDoc;
 	newDoc.SetObject();
 
 	newDoc.AddMember(OT_ACTION_MEMBER, rapidjson::Value(action.c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
@@ -1337,23 +1336,23 @@ rapidjson::Document MicroserviceAPI::BuildJsonDocFromAction(const std::string &a
 	return newDoc;
 }
 
-rapidjson::Document MicroserviceAPI::BuildJsonDocFromString(std::string json)
+ot::JsonDocument MicroserviceAPI::BuildJsonDocFromString(std::string json)
 {
-	rapidjson::Document doc;
+	ot::JsonDocument doc;
 	doc.Parse(json.c_str());
 	assert(doc.IsObject());
 
 	return doc;
 }
 
-void MicroserviceAPI::addTreeIconsToJsonDoc(rapidjson::Document &doc, const TreeIcon &treeIcons)
+void MicroserviceAPI::addTreeIconsToJsonDoc(ot::JsonDocument &doc, const TreeIcon &treeIcons)
 {
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconSize, rapidjson::Value(treeIcons.size), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemVisible, rapidjson::Value(treeIcons.visibleIcon.c_str(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemHidden, rapidjson::Value(treeIcons.hiddenIcon.c_str(), doc.GetAllocator()), doc.GetAllocator());
 }
 
-void MicroserviceAPI::AddUIDListToJsonDoc(rapidjson::Document &doc, const std::string &itemName,const std::list<ot::UID> &list)
+void MicroserviceAPI::AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName,const std::list<ot::UID> &list)
 {
 	rapidjson::Value listUID(rapidjson::kArrayType);
 	for (auto id : list)
@@ -1364,7 +1363,7 @@ void MicroserviceAPI::AddUIDListToJsonDoc(rapidjson::Document &doc, const std::s
 	doc.AddMember(rapidjson::Value(itemName.c_str(), doc.GetAllocator()), listUID, doc.GetAllocator());
 }
 
-void MicroserviceAPI::AddStringListToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::list<std::string> &list)
+void MicroserviceAPI::AddStringListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<std::string> &list)
 {
 	rapidjson::Value listUID(rapidjson::kArrayType);
 	for (auto id : list)
@@ -1375,7 +1374,7 @@ void MicroserviceAPI::AddStringListToJsonDoc(rapidjson::Document &doc, const std
 	doc.AddMember(rapidjson::Value(itemName.c_str(), doc.GetAllocator()), listUID, doc.GetAllocator());
 }
 
-void MicroserviceAPI::AddUIDVectorToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::vector<ot::UID> &list)
+void MicroserviceAPI::AddUIDVectorToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::vector<ot::UID> &list)
 {
 	rapidjson::Value listUID(rapidjson::kArrayType);
 	for (auto id : list)
@@ -1386,7 +1385,7 @@ void MicroserviceAPI::AddUIDVectorToJsonDoc(rapidjson::Document &doc, const std:
 	doc.AddMember(rapidjson::Value(itemName.c_str(), doc.GetAllocator()), listUID, doc.GetAllocator());
 }
 
-void MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(rapidjson::Document &doc, const std::string &name, const std::vector<std::array<double, 3>> &vector)
+void MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(ot::JsonDocument &doc, const std::string &name, const std::vector<std::array<double, 3>> &vector)
 {
 	rapidjson::Value vectorDouble(rapidjson::kArrayType);
 	vectorDouble.Reserve(3 * (int) vector.size(), doc.GetAllocator());
@@ -1400,7 +1399,7 @@ void MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(rapidjson::Document &doc, co
 	doc.AddMember(rapidjson::Value(name.c_str(), doc.GetAllocator()), vectorDouble, doc.GetAllocator());
 }
 
-void MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(rapidjson::Document &doc, const std::string &name, const double *doubleArray, int size)
+void MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(ot::JsonDocument &doc, const std::string &name, const double *doubleArray, int size)
 {
 	rapidjson::Value doubleArr(rapidjson::kArrayType);
 	doubleArr.Reserve(size, doc.GetAllocator());
@@ -1412,7 +1411,7 @@ void MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(rapidjson::Document &doc, c
 	doc.AddMember(rapidjson::Value(name.c_str(), doc.GetAllocator()), doubleArr, doc.GetAllocator());
 }
 
-std::vector<ot::UID> MicroserviceAPI::getVectorFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::vector<ot::UID> MicroserviceAPI::getVectorFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::vector<ot::UID> result;
 
@@ -1426,7 +1425,7 @@ std::vector<ot::UID> MicroserviceAPI::getVectorFromDocument(rapidjson::Document 
 	return result;
 }
 
-void MicroserviceAPI::AddNodeToJsonDoc(rapidjson::Document &doc, const std::string &name, const std::vector<Geometry::Node> &nodes)
+void MicroserviceAPI::AddNodeToJsonDoc(ot::JsonDocument &doc, const std::string &name, const std::vector<Geometry::Node> &nodes)
 {
 	rapidjson::Value nodeList(rapidjson::kArrayType);
 	nodeList.Reserve(8 * (int) nodes.size(), doc.GetAllocator());
@@ -1444,31 +1443,24 @@ void MicroserviceAPI::AddNodeToJsonDoc(rapidjson::Document &doc, const std::stri
 }
 
 bool MicroserviceAPI::checkForUiConnection() {
-	rapidjson::Document request;
-	request.SetObject();
-	ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_GetSessionServices);
-	ot::rJSON::add(request, OT_ACTION_PARAM_SESSION_ID, globalSessionID);
-
+	ot::JsonDocument request;
+	request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetSessionServices, request.GetAllocator()), request.GetAllocator());
+	request.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(globalSessionID, request.GetAllocator()), request.GetAllocator());
+	
 	std::string response;
 	if (!sendHttpRequest(EXECUTE, globalSessionServiceURL, request, response)) { return false; }
 	OT_ACTION_IF_RESPONSE_ERROR(response) { return false; }
 	else OT_ACTION_IF_RESPONSE_WARNING(response) { return false; }
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
-	OT_rJSON_ifNoMember(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES) {
+	if (!responseDoc.HasMember(OT_ACTION_PARAM_SESSION_SERVICES)) {
 		throw std::exception("The member \"" OT_ACTION_PARAM_SESSION_SERVICES "\" is missing");
 	}
-	if (!responseDoc[OT_ACTION_PARAM_SESSION_SERVICES].IsArray()) {
-		throw std::exception("The member \"" OT_ACTION_PARAM_SESSION_SERVICES "\" is not an array");
-	}
-	rapidjson::Value services = responseDoc[OT_ACTION_PARAM_SESSION_SERVICES].GetArray();
-	int numberOfentrys = services.Size();
-
-	for (long i = 0; i < numberOfentrys; i++)
+	ot::ConstJsonObjectList services = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES);
+	for (auto service : services)
 	{
-		rapidjson::Value service = services[i].GetObject();
 		if (service.HasMember(OT_ACTION_PARAM_SERVICE_TYPE)) {
 			std::string type = service[OT_ACTION_PARAM_SERVICE_TYPE].GetString();
 			if (type == OT_INFO_SERVICE_TYPE_UI) {
@@ -1490,14 +1482,14 @@ bool MicroserviceAPI::checkForUiConnection() {
 
 bool MicroserviceAPI::registerAtUI() {
 
-	OT_rJSON_createDOC(request);
-	ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RegisterForModelEvents);
-	ot::rJSON::add(request, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(globalServiceURL));
-	ot::rJSON::add(request, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-	ot::rJSON::add(request, OT_ACTION_PARAM_RegisterForModelEvents, true);
+	ot::JsonDocument request;
+	request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RegisterForModelEvents, request.GetAllocator()), request.GetAllocator());
+	request.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(globalServiceURL), request.GetAllocator()), request.GetAllocator());
+	request.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, request.GetAllocator());
+	request.AddMember(OT_ACTION_PARAM_RegisterForModelEvents, true, request.GetAllocator());
 	
 	std::string response;
-	if (!sendHttpRequest(QUEUE, globalUIserviceURL, ot::rJSON::toJSON(request), response)) {
+	if (!sendHttpRequest(QUEUE, globalUIserviceURL, request.toJson(), response)) {
 		std::cout << "ERROR: Failed to register at UI: Failed to send HTTP request" << std::endl;
 		return false;
 	}
@@ -1515,12 +1507,12 @@ bool MicroserviceAPI::registerAtUI() {
 
 bool MicroserviceAPI::deregisterAtUI() {
 
-	OT_rJSON_createDOC(request);
-	ot::rJSON::add(request, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_DeregisterForModelEvents);
-	ot::rJSON::add(request, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
+	ot::JsonDocument request;
+	request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_DeregisterForModelEvents, request.GetAllocator()), request.GetAllocator());
+	request.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, request.GetAllocator());
 
 	std::string response;
-	if (!sendHttpRequest(QUEUE, globalUIserviceURL, ot::rJSON::toJSON(request), response)) {
+	if (!sendHttpRequest(QUEUE, globalUIserviceURL, request.toJson(), response)) {
 		std::cout << "ERROR: Failed to register at UI: Failed to send HTTP request" << std::endl;
 		return false;
 	}
@@ -1535,7 +1527,7 @@ bool MicroserviceAPI::deregisterAtUI() {
 	return true;
 }
 
-void MicroserviceAPI::AddEdgeToJsonDoc(rapidjson::Document &doc, const std::string &name,const std::list<Geometry::Edge> &edges)
+void MicroserviceAPI::AddEdgeToJsonDoc(ot::JsonDocument &doc, const std::string &name,const std::list<Geometry::Edge> &edges)
 {
 	int elements = 0;
 
@@ -1560,7 +1552,7 @@ void MicroserviceAPI::AddEdgeToJsonDoc(rapidjson::Document &doc, const std::stri
 	doc.AddMember(rapidjson::Value(name.c_str(), doc.GetAllocator()), edgeList, doc.GetAllocator());
 }
 
-void MicroserviceAPI::AddTriangleToJsonDoc(rapidjson::Document &doc, const std::string &name, const std::list<Geometry::Triangle> &triangles)
+void MicroserviceAPI::AddTriangleToJsonDoc(ot::JsonDocument &doc, const std::string &name, const std::list<Geometry::Triangle> &triangles)
 {
 	rapidjson::Value triangleArr(rapidjson::kArrayType);
 	triangleArr.Reserve(4 * (int) triangles.size(), doc.GetAllocator());
@@ -1576,12 +1568,13 @@ void MicroserviceAPI::AddTriangleToJsonDoc(rapidjson::Document &doc, const std::
 
 void MicroserviceAPI::shutdown(bool _receivedAsCommand) {
 	if (!_receivedAsCommand) {
-		OT_rJSON_createDOC(commandDoc);
-		ot::rJSON::add(commandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceClosing);
-		ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_ID, globalServiceID);
-		ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SESSION_ID, globalSessionID);
+		ot::JsonDocument commandDoc;
+		commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceClosing, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+		commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, commandDoc.GetAllocator());
+		commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(globalSessionID, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+
 		std::string response;
-		if (!sendHttpRequest(QUEUE, globalSessionServiceURL, ot::rJSON::toJSON(commandDoc), response)) {
+		if (!sendHttpRequest(QUEUE, globalSessionServiceURL, commandDoc.toJson(), response)) {
 			assert(0); // Failed to send http request
 		}
 	}
@@ -1593,14 +1586,14 @@ std::string MicroserviceAPI::getUIURL(void)
 	return globalUIserviceURL; 
 }
 
-std::string MicroserviceAPI::sendMessageToService(RequestType operation, const std::string &owner, rapidjson::Document &doc)
+std::string MicroserviceAPI::sendMessageToService(RequestType operation, const std::string &owner, ot::JsonDocument &doc)
 {
 	getSessionServices();
 	std::string response;
 
 	if (globalServiceURLs.count(owner) > 0)
 	{
-		if (!sendHttpRequest(operation, globalServiceURLs[owner], ot::rJSON::toJSON(doc), response)) {
+		if (!sendHttpRequest(operation, globalServiceURLs[owner], doc.toJson(), response)) {
 			assert(0); // Failed to send http request
 		}
 	}
@@ -1613,13 +1606,13 @@ void MicroserviceAPI::getSessionServices(void)
 	if (globalServiceURLsRetrieved) return;
 
 	// Create the request doc
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_GetSessionServices);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_SESSION_ID, globalSessionID);
-
+	ot::JsonDocument commandDoc;
+	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetSessionServices, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(globalSessionID, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(globalServiceURL, globalSessionServiceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response)) {
+	if (!ot::msg::send(globalServiceURL, globalSessionServiceURL, ot::EXECUTE, commandDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get session information: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -1633,27 +1626,19 @@ void MicroserviceAPI::getSessionServices(void)
 	}
 
 	// Parse and check the document (it will be checked if the received document is an object)
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	// Check if the received document contains the required information
-	OT_rJSON_ifNoMember(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES) {
+	if(!responseDoc.HasMember(OT_ACTION_PARAM_SESSION_SERVICES)) {
 		std::cout << "ERROR: The member \"" OT_ACTION_PARAM_SESSION_SERVICES "\" is missing";
-		return;
-	}
-	if (!responseDoc[OT_ACTION_PARAM_SESSION_SERVICES].IsArray()) {
-		std::cout << "ERROR The member \"" OT_ACTION_PARAM_SESSION_SERVICES "\" is not an array";
 		return;
 	}
 
 	// Get information and iterate trough entries
-	rapidjson::Value services = responseDoc[OT_ACTION_PARAM_SESSION_SERVICES].GetArray();
-	int numberOfentrys = services.Size();
-
-	for (long i = 0; i < numberOfentrys; i++)
+	ot::ConstJsonObjectList services = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES);
+	for (auto service : services)
 	{
-		rapidjson::Value service = services[i].GetObject();
-
 		std::string name = service[OT_ACTION_PARAM_SERVICE_NAME].GetString();
 		std::string ip = service[OT_ACTION_PARAM_SERVICE_URL].GetString();
 		std::string type;

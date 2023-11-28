@@ -117,7 +117,7 @@ void EntityResultTable<T>::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (ot::UID)tableDataStorageId, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (ot::UID)tableDataStorageVersion, doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(&doc);
+	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }
