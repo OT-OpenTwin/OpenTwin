@@ -372,6 +372,16 @@ namespace ot {
 
 		//! @brief Check and return the requested value
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT std::list<float> getFloatList(const JsonValue& _value, const char* _member, const std::list<float>& _default = std::list<float>());
+		OT_CORE_API_EXPORT std::list<float> getFloatList(const ConstJsonObject& _value, const char* _member, const std::list<float>& _default = std::list<float>());
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT std::list<double> getDoubleList(const JsonValue& _value, const char* _member, const std::list<double>& _default = std::list<double>());
+		OT_CORE_API_EXPORT std::list<double> getDoubleList(const ConstJsonObject& _value, const char* _member, const std::list<double>& _default = std::list<double>());
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
 		OT_CORE_API_EXPORT std::list<std::string> getStringList(const JsonValue& _value, const char* _member, const std::list<std::string>& _default = std::list<std::string>());
 		OT_CORE_API_EXPORT std::list<std::string> getStringList(const ConstJsonObject& _value, const char* _member, const std::list<std::string>& _default = std::list<std::string>());
 
@@ -404,6 +414,16 @@ namespace ot {
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
 		OT_CORE_API_EXPORT std::vector<uint64_t> getUInt64Vector(const JsonValue& _value, const char* _member, const std::vector<uint64_t>& _default = std::vector<uint64_t>());
 		OT_CORE_API_EXPORT std::vector<uint64_t> getUInt64Vector(const ConstJsonObject& _value, const char* _member, const std::vector<uint64_t>& _default = std::vector<uint64_t>());
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT std::vector<float> getFloatVector(const JsonValue& _value, const char* _member, const std::vector<float>& _default = std::vector<float>());
+		OT_CORE_API_EXPORT std::vector<float> getFloatVector(const ConstJsonObject& _value, const char* _member, const std::vector<float>& _default = std::vector<float>());
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT std::vector<double> getDoubleVector(const JsonValue& _value, const char* _member, const std::vector<double>& _default = std::vector<double>());
+		OT_CORE_API_EXPORT std::vector<double> getDoubleVector(const ConstJsonObject& _value, const char* _member, const std::vector<double>& _default = std::vector<double>());
 
 		//! @brief Check and return the requested value
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type

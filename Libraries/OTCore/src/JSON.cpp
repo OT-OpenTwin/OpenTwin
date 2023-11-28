@@ -166,6 +166,26 @@ std::list<uint64_t> ot::json::getUInt64List(const ConstJsonObject& _value, const
 	OT_JSON_getListFromObject(_value, _member, Uint64, ret, return _default);
 }
 
+std::list<float> ot::json::getFloatList(const JsonValue& _value, const char* _member, const std::list<float>& _default) {
+	std::list<float> ret;
+	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
+}
+
+std::list<float> ot::json::getFloatList(const ConstJsonObject& _value, const char* _member, const std::list<float>& _default) {
+	std::list<float> ret;
+	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
+}
+
+std::list<double> ot::json::getDoubleList(const JsonValue& _value, const char* _member, const std::list<double>& _default) {
+	std::list<double> ret;
+	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
+}
+
+std::list<double> ot::json::getDoubleList(const ConstJsonObject& _value, const char* _member, const std::list<double>& _default) {
+	std::list<double> ret;
+	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
+}
+
 std::list<std::string> ot::json::getStringList(const JsonValue& _value, const char* _member, const std::list<std::string>& _default) {
 	std::list<std::string> ret;
 	OT_JSON_getListFromObject(_value, _member, String, ret, return _default);
@@ -234,6 +254,26 @@ std::vector<uint64_t> ot::json::getUInt64Vector(const JsonValue& _value, const c
 std::vector<uint64_t> ot::json::getUInt64Vector(const ConstJsonObject& _value, const char* _member, const std::vector<uint64_t>& _default) {
 	std::vector<uint64_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Uint64, ret, return _default);
+}
+
+std::vector<float> ot::json::getFloatVector(const JsonValue& _value, const char* _member, const std::vector<float>& _default) {
+	std::vector<float> ret;
+	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
+}
+
+std::vector<float> ot::json::getFloatVector(const ConstJsonObject& _value, const char* _member, const std::vector<float>& _default) {
+	std::vector<float> ret;
+	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
+}
+
+std::vector<double> ot::json::getDoubleVector(const JsonValue& _value, const char* _member, const std::vector<double>& _default) {
+	std::vector<double> ret;
+	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
+}
+
+std::vector<double> ot::json::getDoubleVector(const ConstJsonObject& _value, const char* _member, const std::vector<double>& _default) {
+	std::vector<double> ret;
+	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
 }
 
 std::vector<std::string> ot::json::getStringVector(const JsonValue& _value, const char* _member, const std::vector<std::string>& _default) {
