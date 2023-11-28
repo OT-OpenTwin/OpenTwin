@@ -248,7 +248,9 @@ namespace ot {
 
 	//! @brief JSON document
 	class JsonDocument : public rapidjson::Document {
-		OT_DECL_NOCOPY(JsonDocument)
+	private:
+		JsonDocument(const JsonDocument&) = delete;
+		JsonDocument& operator = (const JsonDocument&) = delete;
 	public:
 		//! @brief Constructor
 		//! Set the document as object
@@ -257,6 +259,10 @@ namespace ot {
 		//! @brief Constructor
 		//! @param _type The type for the json document
 		JsonDocument(rapidjson::Type _type) : rapidjson::Document(_type) {};
+
+		//! @brief Move constructor
+		JsonDocument(JsonDocument&& _other) noexcept : rapidjson::Document((rapidjson::Document&& )_other) {};
+
 		virtual ~JsonDocument() {};
 
 		bool fromJson(const std::string& _json) { return this->fromJson(_json.c_str()); };
