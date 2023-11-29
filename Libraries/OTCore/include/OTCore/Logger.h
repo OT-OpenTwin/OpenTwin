@@ -25,6 +25,28 @@
 //! @brief Time format string for the timetamps
 #define OT_LOG_TIME_FORMAT_STDSTRING "%Y-%m-%d %H:%M:%S"
 
+//! @brief OpenTwin log macros enabled
+//! If undefined all the OT_LOG macros wont generate any code (empty line)
+#define OT_GLOBAL_LOGFLAG_LOGEnabled
+
+//! @brief OpenTwin log information macros enabled
+//! If undefined the OT_LOG_I macros wont generate any code (empty line)
+#define OT_GLOBAL_LOGFLAG_LOG_IEnabled
+
+//! @brief OpenTwin log detailed information macros enabled
+//! If undefined the OT_LOG_D macros wont generate any code (empty line)
+#define OT_GLOBAL_LOGFLAG_LOG_DEnabled
+
+//! @brief OpenTwin log warning macros enabled
+//! If undefined the OT_LOG_W macros wont generate any code (empty line)
+#define OT_GLOBAL_LOGFLAG_LOG_WEnabled
+
+//! @brief OpenTwin log error macros enabled
+//! If undefined the OT_LOG_E macros wont generate any code (empty line)
+#define OT_GLOBAL_LOGFLAG_LOG_EEnabled
+
+#ifdef OT_GLOBAL_LOGFLAG_LOGEnabled
+
 #ifdef _DEBUG
 
 //! Log a message according to the service logger configuration and the provided flags
@@ -45,6 +67,8 @@
 
 #endif
 
+#ifdef OT_GLOBAL_LOGFLAG_LOG_IEnabled
+
 //! @brief Log a information message according to the service logger configuration.
 //! Information messages should contain general information.
 //! @param ___text The log message.
@@ -60,6 +84,28 @@
 //! Information messages should contain general information.
 //! @param ___text The log message.
 #define OT_LOG_IAS(___text) OTAssert(0, ""); OT_LOG(___text, ot::INFORMATION_LOG)
+
+#else // ifdef OT_GLOBAL_LOGFLAG_LOG_IEnabled
+
+//! @brief Log a information message according to the service logger configuration.
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_I(___text)
+
+//! @brief Log a information message according to the service logger configuration and OTAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_IA(___text)
+
+//! @brief Log a information message according to the service logger configuration and assert.
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_IAS(___text)
+
+#endif // ifdef OT_GLOBAL_LOGFLAG_LOG_IEnabled
+
+#ifdef OT_GLOBAL_LOGFLAG_LOG_DEnabled
 
 //! @brief Log a detailed information message according to the service logger configuration.
 //! Detailed information messages may contain more information than regular information messages.
@@ -77,6 +123,28 @@
 //! @param ___text The log message.
 #define OT_LOG_DAS(___text) OTAssert(0, ""); OT_LOG(___text, ot::DETAILED_LOG)
 
+#else // ifdef OT_GLOBAL_LOGFLAG_LOG_DEnabled
+
+//! @brief Log a detailed information message according to the service logger configuration.
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_D(___text)
+
+//! @brief Log a detailed information message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_DA(___text)
+
+//! @brief Log a detailed information message according to the service logger configuration and assert.
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_DAS(___text)
+
+#endif // ifdef OT_GLOBAL_LOGFLAG_LOG_DEnabled
+
+#ifdef OT_GLOBAL_LOGFLAG_LOG_WEnabled
+
 //! @brief Log a warning message according to the service logger configuration.
 //! @param ___text The log message.
 #define OT_LOG_W(___text) OT_LOG(___text, ot::WARNING_LOG)
@@ -90,6 +158,25 @@
 //! @param ___text The log message.
 #define OT_LOG_WAS(___text) OTAssert(0, ""); OT_LOG(___text, ot::WARNING_LOG)
 
+#else // ifdef OT_GLOBAL_LOGFLAG_LOG_WEnabled
+
+//! @brief Log a warning message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_W(___text)
+
+//! @brief Log a warning message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! @param ___text The log message.
+#define OT_LOG_WA(___text)
+
+//! @brief Log a warning message according to the service logger configuration and assert.
+//! @param ___text The log message.
+#define OT_LOG_WAS(___text)
+
+#endif // ifdef OT_GLOBAL_LOGFLAG_LOG_WEnabled
+
+#ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
+
 //! @brief Log a error message according to the service logger configuration.
 //! @param ___text The log message.
 #define OT_LOG_E(___text) OT_LOG(___text, ot::ERROR_LOG)
@@ -102,6 +189,92 @@
 //! @brief Log a error message according to the service logger configuration and assert.
 //! @param ___text The log message.
 #define OT_LOG_EAS(___text) OTAssert(0, ""); OT_LOG(___text, ot::ERROR_LOG)
+
+#else // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
+
+//! @brief Log a error message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_E(___text)
+
+//! @brief Log a error message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! @param ___text The log message.
+#define OT_LOG_EA(___text)
+
+//! @brief Log a error message according to the service logger configuration and assert.
+//! @param ___text The log message.
+#define OT_LOG_EAS(___text)
+
+#endif // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
+
+#else // ifdef OT_GLOBAL_LOGFLAG_LOGEnabled
+
+//! Log a message according to the service logger configuration and the provided flags
+//! In debug mode every single log message will be dispatched.
+//! In release mode only log messages with "enabled log flags" will be logged (See: LogDispatcher::dispatch(LogMessage))
+//! @param ___text The log message text
+//! @param ___flags LogFlags describing the type of the created log message
+#define OT_LOG(___text, ___flags)
+
+//! @brief Log a information message according to the service logger configuration.
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_I(___text)
+
+//! @brief Log a information message according to the service logger configuration and OTAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_IA(___text)
+
+//! @brief Log a information message according to the service logger configuration and assert.
+//! Information messages should contain general information.
+//! @param ___text The log message.
+#define OT_LOG_IAS(___text)
+
+//! @brief Log a detailed information message according to the service logger configuration.
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_D(___text)
+
+//! @brief Log a detailed information message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_DA(___text)
+
+//! @brief Log a detailed information message according to the service logger configuration and assert.
+//! Detailed information messages may contain more information than regular information messages.
+//! @param ___text The log message.
+#define OT_LOG_DAS(___text)
+
+//! @brief Log a warning message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_W(___text)
+
+//! @brief Log a warning message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! @param ___text The log message.
+#define OT_LOG_WA(___text)
+
+//! @brief Log a warning message according to the service logger configuration and assert.
+//! @param ___text The log message.
+#define OT_LOG_WAS(___text)
+
+//! @brief Log a error message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_E(___text)
+
+//! @brief Log a error message according to the service logger configuration and otAssert with the provided message.
+//! Note that the provided text should be a C-String
+//! @param ___text The log message.
+#define OT_LOG_EA(___text)
+
+//! @brief Log a error message according to the service logger configuration and assert.
+//! @param ___text The log message.
+#define OT_LOG_EAS(___text)
+
+#endif // ifdef OT_GLOBAL_LOGFLAG_LOGEnabled
 
 #pragma warning (disable: 4251)
 
