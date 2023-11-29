@@ -6,9 +6,9 @@
 #pragma once
 
 #include "OTCore/Logger.h"
+#include "OTWidgets/Dialog.h"
 
 #include <QtCore/qlist.h>
-#include <QtWidgets/qdialog.h>
 
 #include <list>
 
@@ -19,10 +19,10 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 
-class ConnectToLoggerDialog : public QDialog {
+class ConnectToLoggerDialog : public ot::Dialog {
 	Q_OBJECT
 public:
-	ConnectToLoggerDialog(bool _isAutoConnect);
+	ConnectToLoggerDialog();
 	virtual ~ConnectToLoggerDialog();
 
 	const QList<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
@@ -30,12 +30,16 @@ public:
 
 	QString loggerServiceUrl(void) const;
 
+	void queueConnectRequest(void);
+	void queueRecenterRequest(void);
+
 private slots:
 	void slotCancel(void);
 	void slotConnect(void);
 	void slotPingFail(void);
 	void slotRegisterFail(void);
 	void slotDone(void);
+	void slotRecenter(void);
 
 private:
 	void worker(QString _url);
@@ -52,6 +56,4 @@ private:
 
 	QList<ot::LogMessage>	m_messageBuffer;
 	bool						m_success;
-
-	ConnectToLoggerDialog() = delete;
 };

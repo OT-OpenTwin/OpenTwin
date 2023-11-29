@@ -307,6 +307,10 @@ void AppBase::slotSetErrorStatus(const QString& _text) {
 	m_toolManager->statusManager()->setErrorInfo(_text);
 }
 
+void AppBase::slotInitialize(void) {
+	QMetaObject::invokeMethod(this, &AppBase::slotInitializeTools, Qt::QueuedConnection);
+}
+
 void AppBase::slotInitializeTools(void) {
 	
 	// Create tools
@@ -390,5 +394,5 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m
 	this->connect(m_toolManager->menuManager(), &MenuManager::exitRequested , this, &AppBase::close);
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 
-	QMetaObject::invokeMethod(this, &AppBase::slotInitializeTools, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
 }

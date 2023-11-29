@@ -674,7 +674,11 @@ void LogVisualization::connectToLogger(bool _isAutoConnect) {
 		return;
 	}
 
-	ConnectToLoggerDialog dia(_isAutoConnect);
+	ConnectToLoggerDialog dia;
+	if (_isAutoConnect) {
+		dia.queueConnectRequest();
+	}
+	dia.queueRecenterRequest();
 	dia.exec();
 
 	if (!dia.success()) {

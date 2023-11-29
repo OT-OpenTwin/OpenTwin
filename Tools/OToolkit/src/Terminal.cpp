@@ -72,8 +72,8 @@
 #define TERMINAL_JSON_MEM_CHECK(___jsonObject, ___memberName, ___memberType, ___errorReturnCase) TERMINAL_JSON_MEM_CHECK_EXISTS(___jsonObject, ___memberName, ___errorReturnCase); TERMINAL_JSON_MEM_CHECK_TYPE(___jsonObject, ___memberName, ___memberType, ___errorReturnCase)
 
 namespace intern {
-	const Qt::ItemFlags FilterFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	const Qt::ItemFlags RequestFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	const Qt::ItemFlags FilterFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+	const Qt::ItemFlags RequestFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 }
 
 TerminalCollectionItem::TerminalCollectionItem(Terminal * _owner, const QString& _title) : m_owner(_owner) {
@@ -510,7 +510,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
-	//m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
+	m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & (~Qt::ItemIsEditable));
 	m_navigation->addTopLevelItem(m_requestsRootFilter);
 
 	this->slotLoadRequestCollection();
@@ -519,6 +519,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	connect(m_navigation, &QTreeWidget::customContextMenuRequested, this, &Terminal::slotShowNavigationContextMenu);
 	connect(m_navigation, &QTreeWidget::itemDoubleClicked, this, &Terminal::slotNavigationItemDoubleClicked);
 	connect(m_navigation, &QTreeWidget::itemChanged, this, &Terminal::slotNavigationItemChanged);
+	connect(m_navigation, &QTreeWidget::itemSelectionChanged, this, &Terminal::slotSelectionChanged);
 	connect(m_btnSend, &QPushButton::clicked, this, &Terminal::slotSendMessage);
 	connect(m_receiverName, &QComboBox::currentTextChanged, this, &Terminal::slotServiceNameChanged);
 
@@ -527,7 +528,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	connect(m_shortcutRename, &QShortcut::activated, this, &Terminal::slotRenameCurrent);
 	connect(m_shortcutDelete, &QShortcut::activated, this, &Terminal::slotDeleteCurrent);
 	connect(m_shortcutClone, &QShortcut::activated, this, &Terminal::slotCloneCurrent);
-
+	
 	TERMINAL_LOG("Terminal initialization completed");
 
 	return m_splitter;
@@ -665,6 +666,19 @@ void Terminal::slotServiceNameChanged(void) {
 	}
 }
 
+void Terminal::slotSelectionChanged() {
+	auto sel = m_navigation->selectedItems();
+	if (sel.isEmpty()) return;
+	if (sel.count() > 1) {
+		TERMINAL_LOGW("Multiselection not supported");
+		return;
+	}
+	TerminalRequest* request = dynamic_cast<TerminalRequest*>(sel[0]);
+	if (request) {
+		this->applyRequest(request);
+	}
+}
+
 void Terminal::slotShowNavigationContextMenu(const QPoint& _pt) {
 	// Get the desired item
 	QTreeWidgetItem * selectedItem = m_navigation->itemAt(_pt);
@@ -700,10 +714,7 @@ void Terminal::slotShowNavigationContextMenu(const QPoint& _pt) {
 }
 
 void Terminal::slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _column) {
-	TerminalRequest* request = dynamic_cast<TerminalRequest*>(_item);
-	if (request) {
-		applyRequest(request);
-	}
+	
 }
 
 void Terminal::slotNavigationItemChanged(QTreeWidgetItem* _item, int _column) {

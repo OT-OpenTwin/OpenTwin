@@ -1,34 +1,28 @@
-//! @file TabWidget.h
+//! @file Dialog.h
 //! @author Alexander Kuester (alexk95)
-//! @date October 2023
+//! @date November 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
-#include <QtWidgets/qtabwidget.h>
+#include <QtWidgets/qdialog.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT TabWidget : public QTabWidget, public ot::QWidgetInterface {
-		Q_OBJECT
+	class OT_WIDGETS_API_EXPORT Dialog : public QDialog, public ot::QWidgetInterface {
+		OT_DECL_NOCOPY(Dialog)
 	public:
-		TabWidget();
-		virtual ~TabWidget();
-
-		virtual void focusInEvent(QFocusEvent* _event) override;
-		virtual void focusOutEvent(QFocusEvent* _event) override;
+		Dialog(QWidget* _parent = (QWidget*)nullptr);
+		virtual ~Dialog();
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getQWidget(void) override { return this; };
-
-	signals:
-		void widgetGotFocus(void);
-		void widgetLostFocus(void);
+		virtual QWidget* getQWidget(void) { return this; }
 	};
 
 }

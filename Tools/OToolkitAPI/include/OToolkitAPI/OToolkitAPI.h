@@ -46,6 +46,8 @@ namespace otoolkit {
 
 		virtual SettingsRef createSettingsInstance(void) = 0;
 
+		virtual const QWidget* rootWidget(void) const = 0;
+
 	protected:
 		APIInterface();
 		virtual ~APIInterface();

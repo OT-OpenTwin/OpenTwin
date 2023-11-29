@@ -23,7 +23,7 @@
 #define DIA_LOGW(___message) OTOOLKIT_LOGW("Logger Service Connector", ___message)
 #define DIA_LOGE(___message) OTOOLKIT_LOGE("Logger Service Connector", ___message)
 
-ConnectToLoggerDialog::ConnectToLoggerDialog(bool _isAutoConnect) : m_success(false) {
+ConnectToLoggerDialog::ConnectToLoggerDialog() : m_success(false) {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
 	// Create layouts
@@ -58,10 +58,6 @@ ConnectToLoggerDialog::ConnectToLoggerDialog(bool _isAutoConnect) : m_success(fa
 	// Connect signals
 	connect(m_btnConnect, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotConnect);
 	connect(m_btnCancel, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotCancel);
-
-	if (_isAutoConnect) {
-		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotConnect, Qt::QueuedConnection);
-	}
 }
 
 ConnectToLoggerDialog::~ConnectToLoggerDialog() {
@@ -70,6 +66,14 @@ ConnectToLoggerDialog::~ConnectToLoggerDialog() {
 
 QString ConnectToLoggerDialog::loggerServiceUrl(void) const {
 	return m_url->text();
+}
+
+void ConnectToLoggerDialog::queueConnectRequest(void) {
+	QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotConnect, Qt::QueuedConnection);
+}
+
+void ConnectToLoggerDialog::queueRecenterRequest(void) {
+	QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotRecenter, Qt::QueuedConnection);
 }
 
 void ConnectToLoggerDialog::slotCancel(void) {
@@ -109,6 +113,10 @@ void ConnectToLoggerDialog::slotDone(void) {
 
 	m_success = true;
 	this->close();
+}
+
+void ConnectToLoggerDialog::slotRecenter(void) {
+	this->centerOnParent(otoolkit::api::getGlobalInterface()->rootWidget());
 }
 
 void ConnectToLoggerDialog::worker(QString _url) {

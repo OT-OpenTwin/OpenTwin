@@ -100,6 +100,12 @@
     <ClCompile Include="src\ToolTipHandler.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\QWidgetInterface.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dialog.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -202,6 +208,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
       <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Dialog.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

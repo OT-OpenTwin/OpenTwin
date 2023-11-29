@@ -30,8 +30,8 @@ ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn)
 		m_tree->setObjectName("OT_W_TreeWidgetFilterTemplateTree");
 	}
 
-	m_layout->addWidget(m_lineEdit->getWidget());
-	m_layout->addWidget(m_tree->getWidget(), 1);
+	m_layout->addWidget(m_lineEdit->getQWidget());
+	m_layout->addWidget(m_tree->getQWidget(), 1);
 
 	connect(m_lineEdit, &ot::LineEdit::returnPressed, this, &ot::TreeWidgetFilter::slotReturnPressed);
 	connect(m_lineEdit, &ot::LineEdit::textChanged, this, &ot::TreeWidgetFilter::slotTextChanged);

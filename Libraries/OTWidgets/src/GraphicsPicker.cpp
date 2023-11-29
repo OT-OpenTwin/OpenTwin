@@ -37,12 +37,12 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation) : m_navigation(
 
 	m_navigation = new ot::TreeWidgetFilter;
 	m_navigation->treeWidget()->setHeaderHidden(true);
-	m_navigation->setWidgetFlags(ot::ApplyFilterOnTextChange);
+	m_navigation->setOTWidgetFlags(ot::ApplyFilterOnTextChange);
 
 	m_viewLayoutW = new QWidget;
 	m_viewLayout = new QGridLayout(m_viewLayoutW);
 
-	m_splitter->addWidget(m_navigation->getWidget());
+	m_splitter->addWidget(m_navigation->getQWidget());
 	m_splitter->addWidget(m_viewLayoutW);
 
 	connect(m_navigation->treeWidget(), &QTreeWidget::itemSelectionChanged, this, &GraphicsPicker::slotSelectionChanged);

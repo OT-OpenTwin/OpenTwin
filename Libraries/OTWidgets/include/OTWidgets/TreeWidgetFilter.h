@@ -32,7 +32,7 @@ namespace ot {
 		virtual void clearFilter(void);
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getWidget(void) override { return m_layoutW; };
+		virtual QWidget* getQWidget(void) override { return m_layoutW; };
 		ot::LineEdit* filterLineEdit(void) { return m_lineEdit; };
 		ot::TreeWidget* treeWidget(void) { return m_tree; };
 

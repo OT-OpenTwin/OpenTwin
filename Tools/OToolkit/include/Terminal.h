@@ -162,6 +162,7 @@ private slots:
 	void slotMessageSendSuccessful(const QByteArray& _response);
 	void slotMessageSendFailed(const QString& _errorString);
 	void slotServiceNameChanged(void);
+	void slotSelectionChanged(void);
 	void slotShowNavigationContextMenu(const QPoint& _pt);
 	void slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _column);
 	void slotNavigationItemChanged(QTreeWidgetItem* _item, int _column);
