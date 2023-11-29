@@ -48,7 +48,7 @@ Application * g_instance{ nullptr };
 #define EXAMPLE_NAME_Block2 "VoltageSource"
 #define EXAMPLE_NAME_Block3 "Diode"
 #define EXAMPLE_NAME_BLOCK4 "Transistor"
-
+#define EXAMPLE_NAME_BLOCK5 "Connector"
 #undef GetObject
 
 namespace ottest
@@ -62,6 +62,8 @@ namespace ottest
 	static unsigned long long currentDiodeID = 1;
 
 	static unsigned long long currentTransistoriD = 1;
+
+	static unsigned long long currenConnectorID = 1;
 
 	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
 		ot::GraphicsFlowItemConnector cfg;
@@ -84,13 +86,14 @@ namespace ottest
 		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
 		image->setImagePath("CircuitElementImages/ResistorBG.png");
 		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
 
 		myStack->addItemBottom(image, false, true);
 
 		//Then I create a layout
 		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
 		
-		myLayout->setMinimumSize(ot::Size2DD(300.0, 150.0));
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
 		myStack->addItemTop(myLayout, true, false);
 		
 
@@ -98,18 +101,16 @@ namespace ottest
 		
 
 		//Now i want connections on the item for this i need rectangle items
-		ot::GraphicsRectangularItemCfg* connection1 = new ot::GraphicsRectangularItemCfg();
-		connection1->setName("Input1");
-		connection1->setSize(ot::Size2DD(10.0, 10.0));
+		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
+		connection1->setName("Input1");		
 		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		connection1->setBackgroundPainer(painter1);
 		connection1->setAlignment(ot::AlignCenter);
 		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 
-		ot::GraphicsRectangularItemCfg* connection2 = new ot::GraphicsRectangularItemCfg();
-		connection2->setName("Output1");
-		connection2->setSize(ot::Size2DD(10.0, 10.0));
+		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
+		connection2->setName("Output1");		
 		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		connection2->setBackgroundPainer(painter2);
@@ -143,26 +144,26 @@ namespace ottest
 		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
 		image->setImagePath("CircuitElementImages/VoltageSource.png");
 		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
 
 		myStack->addItemBottom(image, false, true);
 
 		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-		myLayout->setMinimumSize(ot::Size2DD(300.0, 150.0));
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
 
 		myStack->addItemTop(myLayout, true, false);
 
-		ot::GraphicsRectangularItemCfg* connection1 = new ot::GraphicsRectangularItemCfg();
+		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
 		connection1->setName("Input2");
-		connection1->setSize(ot::Size2DD(10.0, 10.0));
 		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		connection1->setBackgroundPainer(painter1);
 		connection1->setAlignment(ot::AlignCenter);
 		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		//connection1->setMargins(10.0, 0.0, 0.0, 0.0);
 
-		ot::GraphicsRectangularItemCfg* connection2 = new ot::GraphicsRectangularItemCfg();
+		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
 		connection2->setName("Ouput2");
-		connection2->setSize(ot::Size2DD(10.0, 10.0));
 		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		connection2->setBackgroundPainer(painter2);
@@ -193,26 +194,25 @@ namespace ottest
 		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
 		image->setImagePath("CircuitElementImages/Diod2.png");
 		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
 
 		myStack->addItemBottom(image,false,true);
 
 		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-		myLayout->setMinimumSize(ot::Size2DD(300.0, 150.0));
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
 
 		myStack->addItemTop(myLayout,true,false);
 
-		ot::GraphicsRectangularItemCfg* connection1 = new ot::GraphicsRectangularItemCfg();
+		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
 		connection1->setName("Input3");
-		connection1->setSize(ot::Size2DD(10.0, 10.0));
 		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		connection1->setBackgroundPainer(painter1);
 		connection1->setAlignment(ot::AlignCenter);
 		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 
-		ot::GraphicsRectangularItemCfg* connection2 = new ot::GraphicsRectangularItemCfg();
+		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
 		connection2->setName("Ouput3");
-		connection2->setSize(ot::Size2DD(10.0, 10.0));
 		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		connection2->setBackgroundPainer(painter2);
@@ -240,60 +240,85 @@ namespace ottest
 		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
 		image->setImagePath("CircuitElementImages/Transistor.png");
 		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
 
 		myStack->addItemBottom(image, false, true);
 
 		ot::GraphicsGridLayoutItemCfg* myLayout = new ot::GraphicsGridLayoutItemCfg(5,5);
-		myLayout->setMinimumSize(ot::Size2DD(50.0, 50.0));
+		myLayout->setMinimumSize(ot::Size2DD(100.0, 100.0));
 		myStack->addItemTop(myLayout,true,false);
 
-		ot::GraphicsRectangularItemCfg* base = new ot::GraphicsRectangularItemCfg();
-		base->setName("Input4");
-		base->setSize(ot::Size2DD(10.0, 10.0));
+		ot::GraphicsEllipseItemCfg* base = new ot::GraphicsEllipseItemCfg();
+		base->setName("base");
 		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		base->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 		base->setBackgroundPainer(painter1);
-		base->setAlignment(ot::AlignCenter);
+		base->setAlignment(ot::AlignLeft);
 		base->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		base->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		base->setMargins(2.9, 0.0, 0.0, 0.0);
 
-		ot::GraphicsRectangularItemCfg* collector = new ot::GraphicsRectangularItemCfg();
-		collector->setName("Input4");
-		collector->setSize(ot::Size2DD(10.0, 10.0));
+		ot::GraphicsEllipseItemCfg* collector = new ot::GraphicsEllipseItemCfg();
+		collector->setName("collector");
 		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		collector->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
-		collector->setBackgroundPainer(painter1);
-		collector->setAlignment(ot::AlignCenter);
+		collector->setBackgroundPainer(painter2);
+		collector->setAlignment(ot::AlignTop);
 		collector->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		collector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		collector->setMargins(0.0, 0.0, 0.0, 30.0);
 
-		ot::GraphicsRectangularItemCfg* emitter = new ot::GraphicsRectangularItemCfg();
-		emitter->setName("Input4");
-		emitter->setSize(ot::Size2DD(10.0, 10.0));
+		ot::GraphicsEllipseItemCfg* emitter = new ot::GraphicsEllipseItemCfg();
+		emitter->setName("emitter");
 		ot::FillPainter2D* painter3 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 		emitter->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
-		emitter->setBackgroundPainer(painter1);
-		emitter->setAlignment(ot::AlignCenter);
+		emitter->setBackgroundPainer(painter3);
+		emitter->setAlignment(ot::AlignBottom);
 		emitter->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		emitter->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		emitter->setMargins(0.0, 0.0, 0.0, 30.0);
 
-		//myLayout->setColumnStretch(3, 3);
-		myLayout->addChildItem(3,3,base);
-		//myLayout->setColumnStretch(1, 1);
-		//myLayout->setRowStretch(3, 1);
-		//myLayout->addChildItem(collector);
-		//myLayout->setColumnStretch(4, 1);
-		//myLayout->addChildItem(emitter);
-		//myLayout->setColumnStretch(4, 1);
+		myLayout->addChildItem(2,0,base);
+		myLayout->addChildItem(0, 4, collector);
+		myLayout->addChildItem(4, 4, emitter);
+
+		myLayout->setColumnStretch(4, 1);
+		
+		
 
 		return myStack;
 
 	}
 
-	ot::GraphicsItemCfg* createConnector()
+	ot::GraphicsItemCfg* createConnector(const std::string _name)
 	{
+		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
+		myStack->setName("Connector");
+		myStack->setTitle("Connector");
+		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
+
+		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
+		image->setImagePath("CircuitElementImages/Connector.png");
+		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
+
+		myStack->addItemBottom(image, false, true);
+
+		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
+		myStack->addItemTop(myLayout, true, false);
+
 		ot::GraphicsEllipseItemCfg* connector = new ot::GraphicsEllipseItemCfg();
-		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 
 		connector->setName("Connector");
+		connector->setMinimumSize(ot::Size2DD(50.0, 50.0));
+		connector->setAlignment(ot::AlignCenter);
+
+		myLayout->addChildItem(connector);
+		myLayout->addStrech(1);
+
+		return connector;
 	}
 }
 
@@ -326,7 +351,7 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document)
 {
 	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
-	else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
+	//else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
 	else {
 		OT_LOG_W("Unknown model action");
 		assert(0);
@@ -356,6 +381,7 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
 	else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createVoltageSource(EXAMPLE_NAME_Block2); }
 	else if (itemName == EXAMPLE_NAME_Block3) { itm = ottest::createDiode(EXAMPLE_NAME_Block3); }
 	else if (itemName == EXAMPLE_NAME_BLOCK4) { itm = ottest::createTransistor(EXAMPLE_NAME_BLOCK4); }
+	else if (itemName == EXAMPLE_NAME_BLOCK5) { itm = ottest::createConnector(EXAMPLE_NAME_BLOCK5); }
 	else
 	{
 		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
@@ -389,6 +415,18 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
 	else if(element.getItemName() == "VoltageSource")
 	{
 		element.setNetlistElementName("V1");
+	}
+	else if (element.getItemName() == "Transistor")
+	{
+		std::string temp = std::to_string(ottest::currentTransistoriD++);
+		std::string tran = "Q";
+		element.setNetlistElementName(tran + temp);
+	}
+	else if (element.getItemName() == "Connector")
+	{
+		std::string temp = std::to_string(ottest::currenConnectorID++);
+		std::string conn = "C";
+		element.setNetlistElementName(conn + temp);
 	}
 	else
 	{
@@ -450,9 +488,25 @@ std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document
 	{
 		Connection connection(c);
 
-		connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
 		
 		auto it = mapOfCircuits.find(pckg.name());
+
+		//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
+		//the same nodeNumber
+
+		if (it->second.findElement(connection.destUid()) == "Connector")
+		{
+			connection.setNodeNumber(std::to_string(0));
+		}
+		else if (it->second.findElement(connection.originUid()) == "Connector")
+		{
+			connection.setNodeNumber(std::to_string(0));
+		}
+		else
+		{
+			connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
+		}
+
 		if(it == mapOfCircuits.end())
 		{
 			OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
@@ -547,6 +601,7 @@ std::string Application:: createNewCircuitEditor(void)
 		a1->addItem(ottest::createVoltageSource(EXAMPLE_NAME_Block2));
 		a1->addItem(ottest::createDiode(EXAMPLE_NAME_Block3));
 		a1->addItem(ottest::createTransistor(EXAMPLE_NAME_BLOCK4));
+		a1->addItem(ottest::createConnector(EXAMPLE_NAME_BLOCK5));
 		
 		pckg.addCollection(a);
 		
@@ -634,10 +689,10 @@ std::string Application::ngSpice_Initialize()
 
 
 	// Some simulation
-
+	
 	//generateNetlist();
 
-	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\Transistor.cir";
+	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\MyCircuit.cir";
 
 	char command[100];
 	sprintf_s(command, "source %s", netlistPath);
@@ -671,9 +726,10 @@ std::string Application::generateNetlist()
 	std::string Title = "*Test";
 	outfile << Title << std::endl;
 	
-	int counter = 0;
-
-	std::vector<Connection> parallelConnections;
+	int DiodeCounter = 0;
+	int TransistorCounter = 0;
+	//!!!!!Es fehlt noch dass der connector nicht in die netlist eingetragen wird und der transistor werte und das model eintragen
+	//!!!!!Es fehlen noch richtige simulations einstellungen für transistor
 
 	
 	
@@ -691,6 +747,10 @@ std::string Application::generateNetlist()
 		std::string value;
 		std::string elmentUID = it.second.getUID();
 
+		if (elementName_temp == "Connector")
+		{
+			continue;
+		}
 
 		//Here i get the Connection List
 		auto connectionList = it.second.getList();
@@ -733,11 +793,15 @@ std::string Application::generateNetlist()
 		{
 			value = "200";
 		}
-		else
+		else if(elementName_temp == "Diode")
 		{
 			value = "myDiode";
-			counter++;
-			
+			DiodeCounter++;
+		}
+		else
+		{
+			value = "BC546B";
+			TransistorCounter++;
 		}
 
 		//Create the end string 
@@ -746,10 +810,16 @@ std::string Application::generateNetlist()
 		outfile << NetlistLine << std::endl;
 	}
 
-	if (counter > 0)
+	if (DiodeCounter > 0)
 	{
 		std::string diodeModel = ".model myDiode D (IS=1n RS=0.1 N=1)";
 		outfile << diodeModel << std::endl;
+	}
+
+	if (TransistorCounter > 0)
+	{
+		std::string tranModel = ".model BC546B npn (BF=200)";
+		outfile << tranModel << std::endl;
 	}
 
 	std::string Properties = ".dc V1 0V 12V 1V";

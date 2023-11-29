@@ -74,3 +74,15 @@ void Circuit::addConnection(const std::string& key, const Connection& obj)
 	}
 
 }
+
+std::string Circuit::findElement(const std::string& key)
+{
+	if (mapOfElements.find(key) != mapOfElements.end())
+	{
+		return mapOfElements[key].getItemName();
+	}
+	else
+	{
+		return "Not Found!";
+	}
+}

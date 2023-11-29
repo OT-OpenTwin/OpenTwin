@@ -24,7 +24,7 @@ public:
 	
 	//additionalFunctions
 	void addConnection(const std::string& key, const Connection& obj);
-	std::vector<Connection> getParallelConnections(std::map <std::string, CircuitElement>);
+	std::string findElement(const std::string& key);
 		
 private:
 
