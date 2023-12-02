@@ -26,6 +26,7 @@
 #define TOOLMANAGER_LOGE(___msg) OTOOLKIT_LOGE("ToolManager", ___msg)
 
 ToolManager::ToolManager(QMainWindow* _mainWindow)
+	: m_ignoreEvents(false)
 {
 	m_tabManager = new TabManager;
 	m_menuManager = new MenuManager;
@@ -147,14 +148,17 @@ void ToolManager::runToolTriggered(void) {
 
 	}
 	else {
+		m_ignoreEvents = true;
 		std::list<QWidget*> status;
 		QSettings settings("OpenTwin", "OToolkit");
 		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status, settings));
 		m_statusManager->addTool(it->first, status);
+		m_ignoreEvents = false;
 	}
 }
 
 void ToolManager::currentToolChanged(const QString& _toolName) {
+	if (m_ignoreEvents) return;
 	m_statusManager->setCurrentTool(_toolName);
 }
 

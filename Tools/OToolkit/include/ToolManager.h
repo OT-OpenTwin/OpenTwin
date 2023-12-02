@@ -73,6 +73,7 @@ private:
 
 	std::map<QString, ToolRuntimeHandler*> m_tools;
 	
+	bool m_ignoreEvents;
 	TabManager* m_tabManager;
 	DockManager* m_dockManager;
 	MenuManager* m_menuManager;
