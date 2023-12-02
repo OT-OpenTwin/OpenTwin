@@ -352,6 +352,7 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m
 	
 	outputDock->setObjectName("OToolkit_Dock_Output");
 	m_output->setObjectName("OToolkit_Output");
+	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 	QFont f = m_output->font();
 	f.setFamily("Consolas");

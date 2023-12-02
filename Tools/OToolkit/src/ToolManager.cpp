@@ -107,7 +107,8 @@ void ToolManager::clear(void) {
 void ToolManager::stopAll(void) {
 	std::map<QString, ToolRuntimeHandler*> bak = m_tools;
 	for (auto it : bak) {
-		this->removeTool(it.first);
+		//this->removeTool(it.first);
+		this->stopTool(it.first);
 	}
 }
 
@@ -117,6 +118,11 @@ void ToolManager::stopTool(const QString& _toolName) {
 		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + _toolName + "\" }");
 		return;
 	}
+
+	if (!it->second->isRunning()) {
+		return;
+	}
+
 	QSettings settings("OpenTwin", "OToolkit");
 
 	it->second->setStopped();
@@ -152,6 +158,7 @@ void ToolManager::runToolTriggered(void) {
 		std::list<QWidget*> status;
 		QSettings settings("OpenTwin", "OToolkit");
 		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status, settings));
+		it->second->setRunning();
 		m_statusManager->addTool(it->first, status);
 		m_ignoreEvents = false;
 	}

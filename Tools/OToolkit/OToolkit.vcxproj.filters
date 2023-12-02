@@ -101,9 +101,6 @@
     <ClInclude Include="include\ToolRuntimeHandler.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\FAR.h">
-      <Filter>Header Files\Tools</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\AppBase.h">
@@ -132,6 +129,9 @@
     </QtMoc>
     <QtMoc Include="include\TabManager.h">
       <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\FAR.h">
+      <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
