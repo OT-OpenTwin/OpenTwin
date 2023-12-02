@@ -294,9 +294,6 @@ namespace ottest
 		connector->setMinimumSize(ot::Size2DD(50.0, 50.0));
 		connector->setAlignment(ot::AlignCenter);
 
-		myLayout->addChildItem(connector);
-		myLayout->addStrech(1);
-		
 		return connector;
 	}
 }
