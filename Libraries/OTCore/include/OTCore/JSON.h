@@ -352,6 +352,11 @@ namespace ot {
 
 		//! @brief Check and return the requested value
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT std::list<bool> getBoolList(const JsonValue& _value, const char* _member, const std::list<bool>& _default = std::list<bool>());
+		OT_CORE_API_EXPORT std::list<bool> getBoolList(const ConstJsonObject& _value, const char* _member, const std::list<bool>& _default = std::list<bool>());
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
 		OT_CORE_API_EXPORT std::list<int32_t> getIntList(const JsonValue& _value, const char* _member, const std::list<int32_t>& _default = std::list<int32_t>());
 		OT_CORE_API_EXPORT std::list<int32_t> getIntList(const ConstJsonObject& _value, const char* _member, const std::list<int32_t>& _default = std::list<int32_t>());
 
@@ -394,6 +399,11 @@ namespace ot {
 		//! Asserts, logs and throws when the provided member does not exist or is invalid type
 		OT_CORE_API_EXPORT std::list<ConstJsonArray> getArrayList(const JsonValue& _value, const char* _member);
 		OT_CORE_API_EXPORT std::list<ConstJsonArray> getArrayList(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT std::vector<bool> getBoolVector(const JsonValue& _value, const char* _member, const std::vector<bool>& _default = std::vector<bool>());
+		OT_CORE_API_EXPORT std::vector<bool> getBoolVector(const ConstJsonObject& _value, const char* _member, const std::vector<bool>& _default = std::vector<bool>());
 
 		//! @brief Check and return the requested value
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type

@@ -212,7 +212,7 @@ void EntityAnnotation::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) annotationDataStorageId, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, isHidden, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion, doc.GetAllocator());
 
 	treeIcons.addToJsonDoc(doc);
 

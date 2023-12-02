@@ -28,9 +28,6 @@ namespace MicroserviceAPI
 	std::string getReturnJSONFromStringList(std::list<std::string> list);
 	std::string getReturnJSONFromString(std::string props);
 	std::string getReturnJSONFromBool(bool flag);
-	std::list<ot::UID> getUIDListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	std::list<bool> getBooleanListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	std::list<std::string> getStringListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
 	std::string getEntityInformation(std::list<ot::UID> &entityIDList);
 
 	void AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<ot::UID> &list);

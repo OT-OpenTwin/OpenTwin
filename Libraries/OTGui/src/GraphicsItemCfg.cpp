@@ -60,7 +60,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	_object.AddMember(OT_JSON_MEMBER_MaxSize, maxSizeObj, _allocator);
 
 	JsonObject marginObj;
-	m_maxSize.addToJsonObject(marginObj, _allocator);
+	m_margins.addToJsonObject(marginObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Margin, marginObj, _allocator);
 
 	JsonArray flagArr;

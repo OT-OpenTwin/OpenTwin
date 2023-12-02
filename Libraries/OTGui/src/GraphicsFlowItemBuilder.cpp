@@ -185,13 +185,13 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 		JsonDocument titleBackDoc;
 		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc.GetAllocator());
-		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc.constRef().GetObject());
-		painterBack->setFromJsonObject(titleBackDoc.constRef().GetObject());
+		painterTitleBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc.constRef().GetObject());
+		painterTitleBack->setFromJsonObject(titleBackDoc.constRef().GetObject());
 
 		JsonDocument titleFrontDoc;
 		m_titleForegroundPainter->addToJsonObject(titleFrontDoc, titleFrontDoc.GetAllocator());
-		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleFrontDoc.constRef().GetObject());
-		painterBack->setFromJsonObject(titleFrontDoc.constRef().GetObject());
+		painterTitleFront = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleFrontDoc.constRef().GetObject());
+		painterTitleFront->setFromJsonObject(titleFrontDoc.constRef().GetObject());
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());

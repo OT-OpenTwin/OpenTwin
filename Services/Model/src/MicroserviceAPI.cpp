@@ -551,8 +551,8 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		}
 		else if (action == OT_ACTION_CMD_MODEL_SelectionChanged)
 		{
-			std::list<ot::UID> selectedEntityID = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-			std::list<ot::UID> selectedVisibleEntityID = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs);
+			std::list<ot::UID> selectedEntityID = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+			std::list<ot::UID> selectedVisibleEntityID = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			globalModel->modelSelectionChangedNotification(selectedEntityID, selectedVisibleEntityID);
 		}
@@ -585,14 +585,14 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		}
 		else if (action == OT_ACTION_CMD_MODEL_CommonPropertiesJSON)
 		{
-			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			std::string props = globalModel->getCommonPropertiesAsJson(entityIDList, false);
 			result = getReturnJSONFromString(props);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_SetPropertiesFromJSON)
 		{
-			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			std::string props = doc[OT_ACTION_PARAM_MODEL_PropertyList].GetString();
 			bool update = doc[OT_ACTION_PARAM_MODEL_Update].GetBool();
 			bool itemsVisible = doc[OT_ACTION_PARAM_MODEL_ItemsVisible].GetBool();
@@ -702,12 +702,12 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		}
 		else if (action == OT_ACTION_CMD_MODEL_AddEntities)
 		{
-			std::list<ot::UID> topologyEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
-			std::list<ot::UID> topologyEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
-			std::list<bool> topologyEntityForceVisible = getBooleanListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList);
-			std::list<ot::UID> dataEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
-			std::list<ot::UID> dataEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
-			std::list<ot::UID> dataEntityParentList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityParentList);
+			std::list<ot::UID> topologyEntityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
+			std::list<ot::UID> topologyEntityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
+			std::list<bool> topologyEntityForceVisible = ot::json::getBoolList(doc, OT_ACTION_PARAM_MODEL_TopologyEntityForceShowList);
+			std::list<ot::UID> dataEntityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
+			std::list<ot::UID> dataEntityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
+			std::list<ot::UID> dataEntityParentList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityParentList);
 			std::string changeComment = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Description);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
@@ -716,8 +716,8 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdateTopologyEntity)
 		{
-			std::list<ot::UID> topologyEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
-			std::list<ot::UID> topologyEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
+			std::list<ot::UID> topologyEntityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
+			std::list<ot::UID> topologyEntityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
 			std::string comment = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Description);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
@@ -728,10 +728,10 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			ot::UID geometryEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
 			ot::UID geometryEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
 			std::string geomEntityName = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityName);
-			std::list<ot::UID> dataEntityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
-			std::list<ot::UID> dataEntityVersionList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
-			std::list<ot::UID> dataEntityParentList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_DataEntityParentList);
-			std::list<std::string> childrenList = getStringListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityChildrenList);
+			std::list<ot::UID> dataEntityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
+			std::list<ot::UID> dataEntityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
+			std::list<ot::UID> dataEntityParentList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityParentList);
+			std::list<std::string> childrenList = ot::json::getStringList(doc, OT_ACTION_PARAM_MODEL_EntityChildrenList);
 			std::string changeComment = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Description);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
@@ -740,7 +740,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		}
 		else if (action == OT_ACTION_CMD_MODEL_DeleteEntity)
 		{
-			std::list<std::string> entityNameList = getStringListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityNameList);
+			std::list<std::string> entityNameList = ot::json::getStringList(doc, OT_ACTION_PARAM_MODEL_EntityNameList);
 			bool saveModel = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_SaveModel);
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
@@ -757,7 +757,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 
 			return getEntityInformation(entityIDList);
 		}
@@ -765,7 +765,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			std::list<std::string> entityNameList = getStringListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityNameList);
+			std::list<std::string> entityNameList = ot::json::getStringList(doc, OT_ACTION_PARAM_MODEL_EntityNameList);
 
 			std::list<ot::UID> entityIDList;
 			for (auto name : entityNameList)
@@ -930,7 +930,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			std::string propertiesJson = doc[OT_ACTION_PARAM_MODEL_JSON].GetString();
 
 			globalModel->addPropertiesToEntities(entityIDList, propertiesJson);
@@ -939,7 +939,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			std::string propertiesJson = doc[OT_ACTION_PARAM_MODEL_JSON].GetString();
 
 			globalModel->updatePropertiesOfEntities(entityIDList, propertiesJson);
@@ -948,7 +948,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			
-			std::list<ot::UID> entityIDList = getUIDListFromDocument(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			std::string propertyName = doc[OT_ACTION_PARAM_MODEL_EntityName].GetString();
 
 			globalModel->deleteProperty(entityIDList, propertyName);
@@ -991,8 +991,8 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			std::string selectionAction = doc[OT_ACTION_PARAM_MODEL_SelectionAction].GetString();
 			std::string selectionInfo = doc[OT_ACTION_PARAM_MODEL_SelectionInfo].GetString();
-			std::list<std::string> optionNames = getStringListFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
-			std::list<std::string> optionValues = getStringListFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
+			std::list<std::string> optionNames = ot::json::getStringList(doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
+			std::list<std::string> optionValues = ot::json::getStringList(doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
 
 			// Build a map from the option name and values lists
 			std::map<std::string, std::string> options;
@@ -1228,48 +1228,6 @@ std::string MicroserviceAPI::CreateTmpFileFromCompressedData(const std::string &
 	decodedString = nullptr;
 
 	return tmpFileName;
-}
-
-std::list<ot::UID> MicroserviceAPI::getUIDListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
-{
-	std::list<ot::UID> result;
-
-	rapidjson::Value list = doc[itemName.c_str()].GetArray();
-
-	for (unsigned int i = 0; i < list.Size(); i++)
-	{
-		result.push_back(list[i].GetUint64());
-	}
-
-	return result;
-}
-
-std::list<bool> MicroserviceAPI::getBooleanListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
-{
-	std::list<bool> result;
-
-	rapidjson::Value list = doc[itemName.c_str()].GetArray();
-
-	for (unsigned int i = 0; i < list.Size(); i++)
-	{
-		result.push_back(list[i].GetBool());
-	}
-
-	return result;
-}
-
-std::list<std::string> MicroserviceAPI::getStringListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
-{
-	std::list<std::string> result;
-
-	rapidjson::Value list = doc[itemName.c_str()].GetArray();
-
-	for (unsigned int i = 0; i < list.Size(); i++)
-	{
-		result.push_back(list[i].GetString());
-	}
-
-	return result;
 }
 
 std::string MicroserviceAPI::getReturnJSONFromUID(ot::UID uid)

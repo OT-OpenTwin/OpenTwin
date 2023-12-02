@@ -23,7 +23,7 @@ void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
 	_object.AddMember(OT_JSON_MEMBER_ImagePath, JsonString(m_imageSubPath, _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_ImagePath, m_maintainAspectRatio, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_MaintainAspectRatio, m_maintainAspectRatio, _allocator);
 
 	JsonObject maskObj;
 	m_colorMask.addToJsonObject(maskObj, _allocator);

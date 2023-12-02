@@ -79,6 +79,7 @@ void ot::GraphicsNewEditorPackage::addToJsonObject(JsonValue& _object, JsonAlloc
 	ot::GraphicsCollectionPackage::addToJsonObject(_object, _allocator);
 
 	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
+	_object.AddMember(OT_JSON_Member_Title, JsonString(m_title, _allocator), _allocator);
 }
 
 void ot::GraphicsNewEditorPackage::setFromJsonObject(const ConstJsonObject& _object) {

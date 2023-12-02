@@ -79,7 +79,7 @@ void EntityResultText::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_TEXT_ID, (ot::UID)textDataStorageId, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_TEXT_VERSION, (ot::UID)textDataStorageVersion, doc.GetAllocator());

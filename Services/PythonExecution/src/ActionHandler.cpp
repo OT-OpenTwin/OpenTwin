@@ -1,7 +1,9 @@
 #pragma once
+
 #include "ActionHandler.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable.h"
+#include "OTCore/Logger.h"
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
 
@@ -18,6 +20,7 @@ ActionHandler::ActionHandler(const std::string& urlMasterService)
 const char* ActionHandler::Handle(const char* json, const char* senderIP)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
+	OT_LOG("Handle json: " + std::string(json), ot::INBOUND_MESSAGE_LOG);
 	std::string returnMessage;
 	ot::JsonDocument doc;
 	doc.fromJson(json);
@@ -60,6 +63,9 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Message requires a senderURL which is missing.");
 		returnMessage = rMsg.toJson();
 	}
+
+	OT_LOG("Handle json result: " + returnMessage, ot::INBOUND_MESSAGE_LOG);
+
 	char* returnValue = new char[returnMessage.size() + 1];
 	std::strcpy(returnValue, returnMessage.c_str());
 

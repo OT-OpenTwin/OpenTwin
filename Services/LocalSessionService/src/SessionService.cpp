@@ -435,13 +435,14 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string servicePort = ot::json::getString(_commandDoc, OT_ACTION_PARAM_PORT);
-	// fixme: critical: instead of providing the service port, the service URL should be passed to the sender
+	// fixme: instead of providing the service port, the service URL should be passed to the sender
 	std::string senderIP(ot::IpConverter::filterIpFromSender("127.0.0.1:xxxx", servicePort));
 
 	// Optional params
 	bool shouldRunRelayService = false;
-	try { shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY); }
-	catch (...) {}
+	if (_commandDoc.HasMember(OT_ACTION_PARAM_START_RELAY)) {
+		shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY); 
+	}
 
 	// Get the requested session
 	m_masterLock.lock();
