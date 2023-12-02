@@ -16,6 +16,7 @@
 #include "EntityMeshCartesianNodes.h"
 #include "EntityCartesianVector.h"
 #include "CartesianMeshTree.h"
+#include "ClassFactory.h"
 #include "ClassFactoryCAD.h"
 #include "TemplateDefaultManager.h"
 #include "EntityVis2D3D.h"
@@ -510,7 +511,8 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 
-	ClassFactoryCAD classFactory;
+	ClassFactory classFactory;
+	//ClassFactoryCAD classFactory;
 
 	for (auto info : materialInfo)
 	{

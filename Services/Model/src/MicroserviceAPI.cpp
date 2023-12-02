@@ -663,14 +663,9 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			std::string properties;
 			bool updateProperties = false;
 
-			try
-			{
+			if (doc.HasMember(OT_ACTION_PARAM_MODEL_NewProperties)) {
 				properties = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_NewProperties);
 				updateProperties = true;
-			}
-			catch (std::exception)
-			{
-				updateProperties = false;
 			}
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");

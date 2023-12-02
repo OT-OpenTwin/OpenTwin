@@ -440,28 +440,32 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 
 	// Check for duplicate
 	if (m_serviceIdMap.find(_id) != m_serviceIdMap.end()) {
-		assert(0); // service already registered
+		OT_LOG_EAS("Service already registered { \"Name\": \"" + _name + "\", \"Type\": \"" + _type + "\", \"URL\": \"" + _url + "\", \"ID\": " + std::to_string(_id) + " }");
 		return;
 	}
 
 	if (_type == OT_INFO_SERVICE_TYPE_UI) {
+		if (m_uiComponent) {
+			OT_LOG_EA("UI component already registered. Multiple UIs not supported");
+			return;
+		}
 		// Store information
-		assert(m_uiComponent == nullptr);
 		m_uiComponent = new components::UiComponent(_name, _type, _url, _id, this);
 		info.service = m_uiComponent;
 		m_serviceIdMap.insert_or_assign(_id, info);
 		m_serviceNameMap.insert_or_assign(_name, info);
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
-		enableMessageQueuing(m_uiComponent->serviceName(), true);
+		this->enableMessageQueuing(m_uiComponent->serviceName(), true);
+
 		SettingsData * serviceSettings = createSettings();
 		if (serviceSettings) {
 			m_uiComponent->sendSettingsData(serviceSettings);
 			delete serviceSettings;
 		}
-		uiConnected(m_uiComponent);
+		this->uiConnected(m_uiComponent);
 		m_uiComponent->sendUpdatedControlState();
-		enableMessageQueuing(m_uiComponent->serviceName(), false);
+		this->enableMessageQueuing(m_uiComponent->serviceName(), false);
 	}
 	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
 		// Store information
