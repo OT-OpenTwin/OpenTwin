@@ -139,7 +139,7 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 	EntityPropertiesColor* color = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
 	assert(color != nullptr);
 
-	std::vector<double> colorRGB(3);
+	std::vector<double> colorRGB;
 	colorRGB.push_back(color->getColorR());
 	colorRGB.push_back(color->getColorG());
 	colorRGB.push_back(color->getColorB());

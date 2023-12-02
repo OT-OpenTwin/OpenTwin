@@ -293,7 +293,6 @@ private:
 
 	// JSON helper functions
 
-	std::string getStringFromDocument(ot::JsonDocument &doc, const char *attribute);
 	void AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<ModelUIDtype> &list);
 	void AddStringListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<std::string> &list);
 	void AddUIDVectorToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::vector<ModelUIDtype> &vector);

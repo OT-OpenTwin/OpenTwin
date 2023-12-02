@@ -1555,7 +1555,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 	std::string action;
 	try {
 		if (_doc.HasMember(OT_ACTION_MEMBER)) {
-			action = getStringFromDocument(_doc, OT_ACTION_MEMBER);
+			action = ot::json::getString(_doc, OT_ACTION_MEMBER);
 
 #ifdef _DEBUG
 			std::cout << ">>> Dispatch action: " << action << std::endl;
@@ -1569,7 +1569,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 			if (action == OT_ACTION_CMD_Compound)
 			{
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				rapidjson::Value documents = _doc[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
 				rapidjson::Value prefetchID = _doc[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
 				rapidjson::Value prefetchVersion = _doc[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
@@ -2101,18 +2101,18 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				getListTriangleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Triangles, triangles);
 				std::list<Geometry::Edge> edges;
 				getListEdgeFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Edges, edges);
-				std::string errors = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Errors);
+				std::string errors = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Errors);
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				addVisualizationNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, editable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase)
 			{
 				ViewerUIDtype visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				double *surfaceColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB);
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
-				std::string materialType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
-				std::string textureType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
+				std::string materialType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
+				std::string textureType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
 				bool reflective = _doc[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				bool backFaceCulling = _doc[OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling].GetBool();
@@ -2123,7 +2123,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				bool manageParentVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
 				bool manageChildVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
 				bool showWhenSelected = _doc[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ModelUIDtype entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ModelUIDtype entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
@@ -2144,7 +2144,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddContainerNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
@@ -2153,11 +2153,11 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 
 				ak::UID visualizationDataID = _doc[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
@@ -2169,7 +2169,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 
 				ak::UID visualizationDataID = _doc[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
 				ak::UID visualizationDataVersion = _doc[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
@@ -2182,8 +2182,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				double *surfaceColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB);
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
-				std::string materialType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
-				std::string textureType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
+				std::string materialType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
+				std::string textureType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
 				bool reflective = _doc[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
 				updateObjectColor(visModelID, modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
 			}
@@ -2233,21 +2233,21 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch)
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string branchName = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
+				std::string branchName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
 
 				showBranch(visualizationModelID, branchName);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch)
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string branchName = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
+				std::string branchName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
 
 				hideBranch(visualizationModelID, branchName);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
@@ -2263,10 +2263,10 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
@@ -2275,13 +2275,13 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				double edgeColorRGB[3];
 				edgeColorRGB[0] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
 				edgeColorRGB[1] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
 				edgeColorRGB[2] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				bool displayTetEdges = _doc[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
@@ -2291,7 +2291,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				double edgeColorRGB[3];
@@ -2306,7 +2306,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::vector<double> meshCoordsY = getVectorDoubleFromDocument(_doc, OT_ACTION_PARAM_MESH_CartesianCoordY);
 				std::vector<double> meshCoordsZ = getVectorDoubleFromDocument(_doc, OT_ACTION_PARAM_MESH_CartesianCoordZ);
 				bool showMeshLines = _doc[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID faceListEntityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID faceListEntityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				ak::UID nodeListEntityID = _doc[OT_ACTION_PARAM_MESH_NODE_ID].GetUint64();
@@ -2324,7 +2324,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				std::vector<int> facesList = getVectorIntFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_FacesList);
@@ -2345,10 +2345,10 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
@@ -2360,12 +2360,12 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddText)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				bool isEditable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID textID = _doc[OT_ACTION_PARAM_TEXT_ID].GetUint64();
 				ak::UID textVersion = _doc[OT_ACTION_PARAM_TEXT_VERSION].GetUint64();
 
@@ -2376,12 +2376,12 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddTable)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				bool isEditable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID tableID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				ak::UID tableVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
 
@@ -2392,8 +2392,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection)
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string senderURL = getStringFromDocument(_doc, OT_ACTION_PARAM_SENDER_URL);
-				std::string subsequentFunction = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 				ot::ConstJsonObject serializedColor = ot::json::getObject(_doc, OT_ACTION_PARAM_COLOUR_BACKGROUND);
 
 				try {
@@ -2418,8 +2418,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				ak::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				ak::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				std::string senderURL = getStringFromDocument(_doc, OT_ACTION_PARAM_SENDER_URL);
-				std::string subsequentFunction = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 				try
 				{
 					bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
@@ -2492,15 +2492,15 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 
 				int gridColor[3] = { 0, 0, 0 };
-				std::string title = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_Title);
-				std::string plotType = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
-				std::string plotQuantity = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
+				std::string title = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_Title);
+				std::string plotType = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
+				std::string plotQuantity = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
 				bool grid = _doc[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
 				bool legend = _doc[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
 				bool logscaleX = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
@@ -2529,9 +2529,9 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				int gridColor[3] = { 0, 0, 0 };
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				std::string title = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_Title);
-				std::string plotType = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
-				std::string plotQuantity = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
+				std::string title = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_Title);
+				std::string plotType = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
+				std::string plotQuantity = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
 				bool grid = _doc[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
 				bool legend = _doc[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
 				bool logscaleX = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
@@ -2558,11 +2558,11 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string selectionType = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_SelectionType);
+				std::string selectionType = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SelectionType);
 				bool allowMultipleSelection = _doc[OT_ACTION_PARAM_MODEL_ITM_Selection_AllowMultipleSelection].GetBool();
-				std::string selectionFilter = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Filter);
-				std::string selectionAction = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Action);
-				std::string selectionMessage = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Message);
+				std::string selectionFilter = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Filter);
+				std::string selectionAction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Action);
+				std::string selectionMessage = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Message);
 				ot::serviceID_t replyToService = ot::json::getUInt(_doc, OT_ACTION_PARAM_MODEL_REPLYTO);
 				std::list<std::string> optionNames = getStringListFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
 				std::list<std::string> optionValues = getStringListFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
@@ -2577,7 +2577,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			}
 			else if (action == OT_ACTION_CMD_UI_SetProgressVisibility)
 			{
-				std::string message = getStringFromDocument(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
 				bool visible = ot::json::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_VisibleState);
 				bool continuous = ot::json::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_ContinuousState);
 
@@ -2699,13 +2699,13 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_SetEntityName) {
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				std::string entityName = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Name);
+				std::string entityName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Name);
 
 				ViewerAPI::setEntityName(entityID, entityName);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_RenameEntityName) {
-				std::string fromPath = getStringFromDocument(_doc, OT_ACTION_PARAM_PATH_FROM);
-				std::string toPath = getStringFromDocument(_doc, OT_ACTION_PARAM_PATH_To);
+				std::string fromPath = ot::json::getString(_doc, OT_ACTION_PARAM_PATH_FROM);
+				std::string toPath = ot::json::getString(_doc, OT_ACTION_PARAM_PATH_To);
 
 				ViewerAPI::renameEntityPath(fromPath, toPath);
 			}
@@ -3877,7 +3877,7 @@ char *ExternalServicesComponent::performAction(const char *json, const char *sen
 		assert(doc.IsObject()); // Doc is not an object
 
 		//if (doc.HasMember(OT_ACTION_MEMBER)) {
-		//	std::string action = getStringFromDocument(doc, "action");
+		//	std::string action = ot::json::getString(doc, "action");
 		//	std::cout << "EXECUTE message: " << action << std::endl;
 		//}
 
@@ -3944,7 +3944,7 @@ void ExternalServicesComponent::queueAction(const char *json, const char *sender
 		assert(doc.IsObject()); // Doc is not an object
 
 		//if (doc.HasMember(OT_ACTION_MEMBER)) {
-		//	std::string action = getStringFromDocument(doc, "action");
+		//	std::string action = ot::json::getString(doc, "action");
 		//	std::cout << "QUEUE message: " << action << std::endl;
 		//}
 
@@ -3980,25 +3980,6 @@ void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 // ###################################################################################################
 
 // JSON helper functions
-
-std::string ExternalServicesComponent::getStringFromDocument(ot::JsonDocument &doc, const char *attribute)
-{
-	if (!doc.HasMember(attribute)) {
-		std::string ex("The member \"");
-		ex.append(attribute).append("\" is missing");
-		throw std::exception(ex.c_str());
-	}
-	std::string value = doc[attribute].GetString();
-	/*
-	// Skip the " at the beginning and at the end of the string
-	int index = value.find('"');
-	if (index != -1) value.erase(index, 1);
-
-	index = value.rfind('"');
-	if (index != -1) value.erase(index);
-	*/
-	return value;
-}
 
 void ExternalServicesComponent::AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<ModelUIDtype> &list)
 {

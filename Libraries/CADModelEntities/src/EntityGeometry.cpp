@@ -411,7 +411,7 @@ void EntityGeometry::addVisualizationNodes(void)
 	EntityPropertiesColor *colorProp = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
 	assert(colorProp != nullptr);
 
-	std::vector<double> colorRGB(3);
+	std::vector<double> colorRGB;
 	
 	if (colorProp)
 	{

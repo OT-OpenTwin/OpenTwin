@@ -363,17 +363,6 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visMode
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, showWhenSelected, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Transformation, ot::JsonArray(transformation, inDoc.GetAllocator()), inDoc.GetAllocator());
 
-	//ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase);
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, rapidjson::Value(treeName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, rapidjson::Value(backFaceCulling), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, rapidjson::Value(offsetFactor), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, rapidjson::Value(isHidden), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, rapidjson::Value(isEditable), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, rapidjson::Value(projectName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, rapidjson::Value((long long) entityID), inDoc.GetAllocator());
-	//inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, rapidjson::Value((long long) entityVersion), inDoc.GetAllocator());
 	MicroserviceAPI::addTreeIconsToJsonDoc(inDoc, treeIcons);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;

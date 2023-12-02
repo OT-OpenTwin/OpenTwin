@@ -1345,7 +1345,7 @@ void MicroserviceAPI::AddUIDVectorToJsonDoc(ot::JsonDocument &doc, const std::st
 
 void MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(ot::JsonDocument &doc, const std::string &name, const std::vector<std::array<double, 3>> &vector)
 {
-	rapidjson::Value vectorDouble(rapidjson::kArrayType);
+	ot::JsonArray vectorDouble;
 	vectorDouble.Reserve(3 * (int) vector.size(), doc.GetAllocator());
 	for (unsigned int i = 0; i < vector.size(); i++)
 	{
@@ -1354,19 +1354,19 @@ void MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(ot::JsonDocument &doc, const
 		vectorDouble.PushBack(rapidjson::Value().SetDouble(vector[i][2]), doc.GetAllocator());
 	}
 
-	doc.AddMember(rapidjson::Value(name.c_str(), doc.GetAllocator()), vectorDouble, doc.GetAllocator());
+	doc.AddMember(ot::JsonString(name, doc.GetAllocator()), vectorDouble, doc.GetAllocator());
 }
 
 void MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(ot::JsonDocument &doc, const std::string &name, const double *doubleArray, int size)
 {
-	rapidjson::Value doubleArr(rapidjson::kArrayType);
+	ot::JsonArray doubleArr;
 	doubleArr.Reserve(size, doc.GetAllocator());
 	for (int i = 0; i < size; i++)
 	{
-		doubleArr.PushBack(rapidjson::Value().SetDouble(doubleArray[i]), doc.GetAllocator());
+		doubleArr.PushBack(doubleArray[i], doc.GetAllocator());
 	}
 
-	doc.AddMember(rapidjson::Value(name.c_str(), doc.GetAllocator()), doubleArr, doc.GetAllocator());
+	doc.AddMember(ot::JsonString(name, doc.GetAllocator()), doubleArr, doc.GetAllocator());
 }
 
 std::vector<ot::UID> MicroserviceAPI::getVectorFromDocument(ot::JsonDocument &doc, const std::string &itemName)
