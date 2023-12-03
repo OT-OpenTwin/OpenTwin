@@ -7,6 +7,7 @@
 
 // Toolkit API header
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/Flags.h"
 #include "OToolkitAPI/Tool.h"
 
 // Qt header
@@ -18,6 +19,8 @@
 class QLabel;
 class QWidget;
 class QSplitter;
+class QGroupBox;
+class QCheckBox;
 class QLineEdit;
 class QTabWidget;
 class QVBoxLayout;
@@ -42,15 +45,28 @@ class FARFile;
 class FARDirectory;
 
 class FARFilter {
+public:
+	enum FilterFlag {
+		NoFlags    = 0x00,
+		StartsWith = 0x01,
+		Contains   = 0x02,
+		EndsWith   = 0x04,
+		AsRegex    = 0x08,
+		CheckCase  = 0x10
+	};
 
 	OT_PROPERTY_REF(QStringList, whitelistFiles, setWhitelistFiles, whitelistFiles)
+	OT_PROPERTY(FilterFlag, whitelistFilesFlags, setWhitelistFilesFlags, whitelistFilesFlags)
 	OT_PROPERTY_REF(QStringList, blacklistFiles, setBlacklistFiles, blacklistFiles)
+	OT_PROPERTY(FilterFlag, blacklistFilesFlags, setBlacklistFilesFlags, blacklistFilesFlags)
 	OT_PROPERTY_REF(QStringList, whitelistDirectories, setWhitelistDirectories, whitelistDirectories)
+	OT_PROPERTY(FilterFlag, whitelistDirectoriesFlags, setWhitelistDirectoriesFlags, whitelistDirectoriesFlags)
 	OT_PROPERTY_REF(QStringList, blacklistDirectories, setBlacklistDirectories, blacklistDirectories)
+	OT_PROPERTY(FilterFlag, blacklistDirectoriesFlags, setBlacklistDirectoriesFlags, blacklistDirectoriesFlags)
 
 public:
-	FARFilter() {};
-	FARFilter(const FARFilter& _other) : m_whitelistDirectories(_other.m_whitelistDirectories), m_blacklistDirectories(_other.m_blacklistDirectories), m_blacklistFiles(_other.m_blacklistFiles), m_whitelistFiles(_other.m_whitelistFiles) {};
+	FARFilter();
+	FARFilter(const FARFilter& _other);
 
 	bool validate(const FARFile& _file) const;
 	bool validate(const FARDirectory& _dir) const;
@@ -73,7 +89,7 @@ public:
 
 	bool readAll(void);
 
-	bool findText(const QString& _text, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const;
+	bool findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const;
 
 };
 
@@ -113,7 +129,7 @@ public:
 	//! @param _readFiles If true the found files will read their text
 	bool scanAll(const FARFilter& _filter, int& _fileCounter, int& _directoryCounter, bool _topLevelOnly = true, bool _readFiles = false);
 
-	bool findText(const QString& _text, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true) const;
+	bool findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true) const;
 
 private:
 };
@@ -145,11 +161,26 @@ private slots:
 	void slotUnlock(void);
 
 private:
+	struct FilterGroup {
+		QLabel* label;
+		QPlainTextEdit* edit;
+		QCheckBox* checkCase;
+		QCheckBox* starts;
+		QCheckBox* contains;
+		QCheckBox* ends;
+		QCheckBox* regex;
+		QVBoxLayout* layout;
+	};
+
 	//! @brief Setup the provided filter from the current configuration
 	void setupFilter(FARFilter& _filter) const;
+	FARFilter::FilterFlag filterFlagsFromGroup(const FilterGroup& _group) const;
 
-	void workerFindText(QString _root, QString _text, FARFilter _filter);
-	void workerFindTextLogic(const QString& _root, const QString& _text, const FARFilter& _filter);
+	void workerFindText(QString _root, QString _text, FARFilter::FilterFlag _textFilter, FARFilter _filter);
+	void workerFindTextLogic(const QString& _root, const QString& _text, FARFilter::FilterFlag _textFilter, const FARFilter& _filter);
+
+	FilterGroup createFilterGroup(const QString& _labelText, const QString& _settingsKey, QSettings& _settings, QGridLayout* _layout, int _row);
+	void saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);
 
 	QSplitter* m_centralSplitter;
 
@@ -157,14 +188,13 @@ private:
 	QGridLayout* m_leftGrid;
 	
 	QLabel* m_leftTitle;
-	QLabel* m_whitelistFilesL;
-	QPlainTextEdit* m_whitelistFiles;
-	QLabel* m_blacklistFilesL;
-	QPlainTextEdit* m_blacklistFiles;
-	QLabel* m_whitelistDirectoriesL;
-	QPlainTextEdit* m_whitelistDirectories;
-	QLabel* m_blacklistDirectoriesL;
-	QPlainTextEdit* m_blacklistDirectories;
+
+	
+
+	FilterGroup m_whitelistFiles;
+	FilterGroup m_blacklistFiles;
+	FilterGroup m_whitelistDirectories;
+	FilterGroup m_blacklistDirectories;
 
 	QWidget* m_rightLayoutW;
 	QVBoxLayout* m_rightLayout;
@@ -179,10 +209,18 @@ private:
 
 	QWidget* m_findTextLayoutW;
 	QVBoxLayout* m_findTextLayout;
-	QHBoxLayout* m_findTextTopLayout;
+	QGridLayout* m_findTextTopLayout;
 	QHBoxLayout* m_findTextButtonLayout;
 	QLabel* m_findTextL;
 	QLineEdit* m_findText;
+	QLabel* m_findTextMode;
+	QCheckBox* m_findTextCaseSensitive;
+	QCheckBox* m_findTextStartsWith;
+	QCheckBox* m_findTextContains;
+	QCheckBox* m_findTextEndsWith;
+	QCheckBox* m_findTextRegex;
 	QPushButton* m_findTextBtn;
 
 };
+
+OT_ADD_FLAG_FUNCTIONS(FARFilter::FilterFlag)
