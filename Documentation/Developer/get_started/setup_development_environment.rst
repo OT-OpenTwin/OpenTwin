@@ -358,7 +358,7 @@ Now set up the Qt plugin for Visual Studio by performing the following steps:
 #. Download and install this extension. Now Visual Studio must be restarted, please follow the steps described in point 1. again.
 #. Wait for the plugin to load.
 #. On the toolbar go to: **Qt VS Tools->Qt Versions**.
-#. At Qt->Versions add: ``Version name = 5.11.2`` and set the path to the path of the Qt installation in the Repository: ``X:\OpenTwin\Repo\Third_Party_Libraries\Qt\5.11.2\msvc2017_64.``
+#. At Qt->Versions add: ``Version name = 6.6.1`` and set the path to the path of the Qt installation in the Repository: ``X:\OpenTwin\Repo\Third_Party_Libraries\Qt\6.6.1\msvc2019_64.``
 #. Make sure to select this version as the **default** by checking the box in front of it.
 #. Press the **OK** button to close the Dialog.
 
