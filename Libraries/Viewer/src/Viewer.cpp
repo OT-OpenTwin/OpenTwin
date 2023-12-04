@@ -680,7 +680,7 @@ void Viewer::wheelEvent(QWheelEvent* event)
 	if (graphicsWindow == nullptr) return;
 	if (middleButtonDown) return;
 
-	int delta = event->angleDelta().x();
+	int delta = event->angleDelta().y();
 	osgGA::GUIEventAdapter::ScrollingMotion motion = delta > 0 ? osgGA::GUIEventAdapter::SCROLL_DOWN : osgGA::GUIEventAdapter::SCROLL_UP;
 
 	getEventQueue()->mouseScroll(motion);

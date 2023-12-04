@@ -31,10 +31,6 @@ void ot::Color::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) c
     _object.AddMember("g", m_g, _allocator);
     _object.AddMember("b", m_b, _allocator);
     _object.AddMember("a", m_a, _allocator);
-    auto x = ot::json::getObjectList(_object, "A");
-    for (const ot::ConstJsonObject& xx : x) {
-
-    }
 }
 
 void ot::Color::setFromJsonObject(const ConstJsonObject& _object) {
