@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <qglobal.h>
+#include <QtCore/qglobal.h>
 
 #if defined(UICORE_EXPORT) // inside DLL
 #   define UICORE_API_EXPORT   Q_DECL_EXPORT

@@ -6,6 +6,7 @@
 namespace osg
 {
 	class Node;
+	class Switch;
 	class Drawable;
 }
 
@@ -34,7 +35,7 @@ public:
 
 	virtual void mouseOver(bool flag) = 0;
 
-	void HandlerBase::createSelectLine(osg::Switch *node, std::list<osg::Vec3d> &pointList, bool visible = false);
+	void createSelectLine(osg::Switch *node, std::list<osg::Vec3d> &pointList, bool visible = false);
 
 	osg::Drawable *getSelectorDrawable(void) { return selectorDrawable; }
 

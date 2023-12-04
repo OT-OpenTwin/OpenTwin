@@ -332,8 +332,6 @@ public:
 
 	virtual QwtPointPolar sample(size_t _i) const override;
 
-	virtual QRectF boundingRect(void) const override;
-
 	void replaceData(double * _azimuth, double * _radius, size_t _dataSize);
 
 private:

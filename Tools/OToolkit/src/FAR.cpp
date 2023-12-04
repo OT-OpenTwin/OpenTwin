@@ -218,30 +218,30 @@ bool FARFile::exists(void) const {
 }
 
 bool FARFile::findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const {
-	int lineCt = 0;
+	int lineCt = 1;
 	bool added = false;
 	for (const QString& line : m_textLines) {
 		added = false;
 		if (_textFilter & FARFilter::StartsWith) {
 			if (!added && line.startsWith(_text, ((_textFilter & FARFilter::CheckCase) ? Qt::CaseSensitive : Qt::CaseInsensitive))) {
-				_longestText = std::max(_longestText, line.length());
-				_longestPath = std::max(_longestPath, this->fullPath().length());
+				_longestText = std::max((qsizetype)_longestText, line.length());
+				_longestPath = std::max((qsizetype)_longestPath, this->fullPath().length());
 				_matches.push_back(FARMatch(this->fullPath(), lineCt, line));
 				added = true;
 			}
 		}
 		if (_textFilter & FARFilter::Contains) {
 			if (!added && line.contains(_text, ((_textFilter & FARFilter::CheckCase) ? Qt::CaseSensitive : Qt::CaseInsensitive))) {
-				_longestText = std::max(_longestText, line.length());
-				_longestPath = std::max(_longestPath, this->fullPath().length());
+				_longestText = std::max((qsizetype)_longestText, line.length());
+				_longestPath = std::max((qsizetype)_longestPath, this->fullPath().length());
 				_matches.push_back(FARMatch(this->fullPath(), lineCt, line));
 				added = true;
 			}
 		}
 		if (_textFilter & FARFilter::EndsWith) {
 			if (!added && line.endsWith(_text, ((_textFilter & FARFilter::CheckCase) ? Qt::CaseSensitive : Qt::CaseInsensitive))) {
-				_longestText = std::max(_longestText, line.length());
-				_longestPath = std::max(_longestPath, this->fullPath().length());
+				_longestText = std::max((qsizetype)_longestText, line.length());
+				_longestPath = std::max((qsizetype)_longestPath, this->fullPath().length());
 				_matches.push_back(FARMatch(this->fullPath(), lineCt, line));
 				added = true;
 			}
@@ -249,8 +249,8 @@ bool FARFile::findText(const QString& _text, FARFilter::FilterFlag _textFilter, 
 		if (_textFilter & FARFilter::AsRegex) {
 			QRegularExpression regexp(_text);
 			if (!added && regexp.match(line).hasMatch()) {
-				_longestText = std::max(_longestText, line.length());
-				_longestPath = std::max(_longestPath, this->fullPath().length());
+				_longestText = std::max((qsizetype)_longestText, line.length());
+				_longestPath = std::max((qsizetype)_longestPath, this->fullPath().length());
 				_matches.push_back(FARMatch(this->fullPath(), lineCt, line));
 				added = true;
 			}
@@ -570,13 +570,13 @@ void FAR::slotUnlock(void) {
 }
 
 void FAR::setupFilter(FARFilter& _filter) const {
-	_filter.setWhitelistFiles(m_whitelistFiles.edit->toPlainText().split("\n", QString::SkipEmptyParts));
+	_filter.setWhitelistFiles(m_whitelistFiles.edit->toPlainText().split("\n", Qt::SkipEmptyParts));
 	_filter.setWhitelistFilesFlags(this->filterFlagsFromGroup(m_whitelistFiles));
-	_filter.setBlacklistFiles(m_blacklistFiles.edit->toPlainText().split("\n", QString::SkipEmptyParts));
+	_filter.setBlacklistFiles(m_blacklistFiles.edit->toPlainText().split("\n", Qt::SkipEmptyParts));
 	_filter.setBlacklistFilesFlags(this->filterFlagsFromGroup(m_blacklistFiles));
-	_filter.setWhitelistDirectories(m_whitelistDirectories.edit->toPlainText().split("\n", QString::SkipEmptyParts));
+	_filter.setWhitelistDirectories(m_whitelistDirectories.edit->toPlainText().split("\n", Qt::SkipEmptyParts));
 	_filter.setWhitelistDirectoriesFlags(this->filterFlagsFromGroup(m_whitelistDirectories));
-	_filter.setBlacklistDirectories(m_blacklistDirectories.edit->toPlainText().split("\n", QString::SkipEmptyParts));
+	_filter.setBlacklistDirectories(m_blacklistDirectories.edit->toPlainText().split("\n", Qt::SkipEmptyParts));
 	_filter.setBlacklistDirectoriesFlags(this->filterFlagsFromGroup(m_blacklistDirectories));
 }
 

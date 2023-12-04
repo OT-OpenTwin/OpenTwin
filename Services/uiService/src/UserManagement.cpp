@@ -446,7 +446,8 @@ std::string UserManagement::getUserSettingsCollection(void)
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
-		return false;
+		OT_LOG_E("Failed to send message");
+		return "ERROR: Failed to send message";
 	}
 
 	ot::JsonDocument responseDoc;

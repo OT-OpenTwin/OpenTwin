@@ -219,14 +219,14 @@ QString ak::aColor::toHexString(
 	QString out = _prefix;
 	QString v = "";
 	if (_includeA) {
-		v = ak::toHexString(_color.m_a, 2);
+		v = ak::valueToHexString(_color.m_a, 2);
 		out.append(v);
 	}
-	v = ak::toHexString(_color.m_r, 2);
+	v = ak::valueToHexString(_color.m_r, 2);
 	out.append(v);
-	v = ak::toHexString(_color.m_g, 2);
+	v = ak::valueToHexString(_color.m_g, 2);
 	out.append(v);
-	v = ak::toHexString(_color.m_b, 2);
+	v = ak::valueToHexString(_color.m_b, 2);
 	out.append(v);
 	return out;
 }
@@ -239,14 +239,14 @@ QString ak::aColor::toHexString(
 	QString out = _prefix;
 	QString v = "";
 	if (_includeA) {
-		v = ak::toHexString(_color.alpha(), 2);
+		v = ak::valueToHexString(_color.alpha(), 2);
 		out.append(v);
 	}
-	v = ak::toHexString(_color.red(), 2);
+	v = ak::valueToHexString(_color.red(), 2);
 	out.append(v);
-	v = ak::toHexString(_color.green(), 2);
+	v = ak::valueToHexString(_color.green(), 2);
 	out.append(v);
-	v = ak::toHexString(_color.blue(), 2);
+	v = ak::valueToHexString(_color.blue(), 2);
 	out.append(v);
 	return out;
 }
@@ -296,7 +296,7 @@ void ak::aColor::changeBy(int _value, bool _invertValueIfOutOfLimit, bool _inclu
 
 bool ak::aColor::wasChanged(void) const { return m_wasChanged; }
 
-QString ak::toHexString(
+QString ak::valueToHexString(
 	int					_value,
 	int					_minimumLength
 ) {

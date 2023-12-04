@@ -294,7 +294,6 @@
     <ClInclude Include="include\akCore\aDateHelper.h" />
     <ClInclude Include="include\akCore\aException.h" />
     <ClInclude Include="include\akCore\aFile.h" />
-    <ClInclude Include="include\akCore\aFlags.h" />
     <ClInclude Include="include\akCore\aJSONHelper.h" />
     <ClInclude Include="include\akCore\akCore.h" />
     <ClInclude Include="include\akCore\aMessenger.h" />

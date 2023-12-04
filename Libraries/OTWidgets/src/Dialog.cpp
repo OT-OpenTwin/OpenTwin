@@ -7,7 +7,7 @@
 #include "OTWidgets/Dialog.h"
 
 ot::Dialog::Dialog(QWidget* _parent) : QDialog(_parent) {
-	this->setWindowFlags(this->windowFlags() & (~Qt::AA_DisableWindowContextHelpButton));
+	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
 }
 
 ot::Dialog::~Dialog() {}

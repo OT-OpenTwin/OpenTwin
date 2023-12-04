@@ -11,7 +11,6 @@
  */
 
 #include <akGui/aCustomizableColorStyle.h>
-#include <akCore/aFlags.h>
 
 ak::aCustomizableColorStyle::aCustomizableColorStyle() {
 	setSheet(cafDefaultBorderWindow, "border: 1px solid; border-radius: 2px");
@@ -22,7 +21,7 @@ QString ak::aCustomizableColorStyle::toStyleSheet(
 	const QString &				_prefix,
 	const QString &				_suffix
 ) {
-	aFlags<colorAreaFlag> f(_colorAreas);
+	ot::Flags<colorAreaFlag> f(_colorAreas);
 	QString ret{ _prefix };
 
 	if (f.flagIsSet(cafBackgroundColorWindow)) {

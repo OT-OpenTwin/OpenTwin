@@ -44,8 +44,6 @@ namespace qwtw {
 
 	class PolarPlotData;
 
-	Q_DECLARE_METATYPE(PlotDataset *);
-
 	class QWTW_LIB_EXPORT AbstractPlotDatasetInformation {
 	public:
 		AbstractPlotDatasetInformation() {};
@@ -330,4 +328,7 @@ namespace qwtw {
 		double *		m_radius;
 		size_t			m_size;
 	};
+
+	Q_DECLARE_METATYPE(PlotDataset*);
+
 }

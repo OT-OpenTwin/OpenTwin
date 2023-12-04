@@ -693,8 +693,8 @@ void table::addRow(
 ) {
 	insertRow(rowCount());
 	for (int c = 0; c < TABLE_DATA_COLUMN_COUNT; c++) {
-		_columns[c]->setBackgroundColor(my_colorBack);
-		_columns[c]->setTextColor(my_colorFront);
+		_columns[c]->setBackground(my_colorBack);
+		_columns[c]->setForeground(my_colorFront);
 		setItem(rowCount() - 1, c, _columns[c]);
 		Qt::ItemFlags f = _columns[c]->flags();
 		f.setFlag(Qt::ItemFlag::ItemIsEditable, false);
@@ -728,12 +728,12 @@ void table::mouseMoveEvent(QMouseEvent * _event) {
 		for (auto r : my_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == my_selectedRow) {
-					c->setBackgroundColor(my_colorSelectedBack);
-					c->setTextColor(my_colorSelectedFront);
+					c->setBackground(my_colorSelectedBack);
+					c->setForeground(my_colorSelectedFront);
 				}
 				else {
-					c->setBackgroundColor(my_colorBack);
-					c->setTextColor(my_colorFront);
+					c->setBackground(my_colorBack);
+					c->setForeground(my_colorFront);
 				}
 			}
 		}
@@ -742,16 +742,16 @@ void table::mouseMoveEvent(QMouseEvent * _event) {
 		for (auto r : my_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == itm->row()) {
-					c->setBackgroundColor(my_colorFocusBack);
-					c->setTextColor(my_colorFocusFront);
+					c->setBackground(my_colorFocusBack);
+					c->setForeground(my_colorFocusFront);
 				}
 				else if (c->row() == my_selectedRow) {
-					c->setBackgroundColor(my_colorSelectedBack);
-					c->setTextColor(my_colorSelectedFront);
+					c->setBackground(my_colorSelectedBack);
+					c->setForeground(my_colorSelectedFront);
 				}
 				else {
-					c->setBackgroundColor(my_colorBack);
-					c->setTextColor(my_colorFront);
+					c->setBackground(my_colorBack);
+					c->setForeground(my_colorFront);
 				}
 			}
 		}
@@ -762,12 +762,12 @@ void table::leaveEvent(QEvent * _event) {
 	for (auto r : my_dataRowItems) {
 		for (auto c : r) {
 			if (c->row() == my_selectedRow) {
-				c->setBackgroundColor(my_colorSelectedBack);
-				c->setTextColor(my_colorSelectedFront);
+				c->setBackground(my_colorSelectedBack);
+				c->setForeground(my_colorSelectedFront);
 			}
 			else {
-				c->setBackgroundColor(my_colorBack);
-				c->setTextColor(my_colorFront);
+				c->setBackground(my_colorBack);
+				c->setForeground(my_colorFront);
 			}
 		}
 	}
@@ -809,16 +809,16 @@ void table::slotSelectionChanged() {
 	for (auto itm : selection) {
 		for (auto c : my_dataRowItems.at(itm->row())) {
 			c->setSelected(false);
-			c->setBackgroundColor(my_colorSelectedBack);
-			c->setTextColor(my_colorSelectedFront);
+			c->setBackground(my_colorSelectedBack);
+			c->setForeground(my_colorSelectedFront);
 		}
 		my_selectedRow = itm->row();
 	}
 	for (int r = 0; r < my_dataRowItems.size(); r++) {
 		if (r != my_selectedRow) {
 			for (auto c : my_dataRowItems.at(r)) {
-				c->setBackgroundColor(my_colorBack);
-				c->setTextColor(my_colorFront);
+				c->setBackground(my_colorBack);
+				c->setForeground(my_colorFront);
 			}
 		}
 	}

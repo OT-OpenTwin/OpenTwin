@@ -20,7 +20,7 @@
 #include <qobject.h>
 #include <qwindow.h>
 
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/qopenglwidget.h>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 #include <QMouseEvent>
@@ -668,7 +668,7 @@ void Viewer::leaveEvent(QEvent *event)
 	model->clearHoverView();
 }
 
-void Viewer::enterEvent(QEvent * event)
+void Viewer::enterEvent(QEnterEvent* event)
 {
 	if (graphicsWindow == nullptr) return;
 
@@ -680,7 +680,7 @@ void Viewer::wheelEvent(QWheelEvent* event)
 	if (graphicsWindow == nullptr) return;
 	if (middleButtonDown) return;
 
-	int delta = event->delta();
+	int delta = event->angleDelta().x();
 	osgGA::GUIEventAdapter::ScrollingMotion motion = delta > 0 ? osgGA::GUIEventAdapter::SCROLL_DOWN : osgGA::GUIEventAdapter::SCROLL_UP;
 
 	getEventQueue()->mouseScroll(motion);

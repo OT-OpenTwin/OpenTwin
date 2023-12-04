@@ -311,9 +311,6 @@
     <ClInclude Include="include\akCore\aFile.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\akCore\aFlags.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\akCore\akCore.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>

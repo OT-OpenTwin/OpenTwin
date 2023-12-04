@@ -44,7 +44,7 @@ ak::aLogInDialog::aLogInDialog(
 	const QString &								_hashedPassword,
 	QWidget *									_parent
 ) : aDialog(otLogInDialog, _parent), m_hashedPw(_hashedPassword),
-	m_buttonLogIn(nullptr), m_buttonRegister(nullptr), m_savePassword(false), m_mainLayout(nullptr), m_inputPassword(nullptr), m_inputUsername(nullptr),
+	m_buttonLogIn(nullptr), m_buttonRegister(nullptr), m_savePassword(nullptr), m_mainLayout(nullptr), m_inputPassword(nullptr), m_inputUsername(nullptr),
 	m_currentID(ak::invalidID), m_rowCounter(0), m_showSavePassword(_showSavePassword), m_passwordHashAlgorithm(hashSha_256), m_returnHashedPassword(true)
 {
 	// Create layouts

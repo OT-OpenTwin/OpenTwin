@@ -254,7 +254,7 @@ private:
 	void	   addSelectedVisibleModelEntityIDToList(SceneNodeBase *root, std::list<unsigned long long> &selectedVisibleModelEntityID);
 	void	   addSelectedTreeItemIDToList(SceneNodeBase *root, std::list<ot::UID> &selectedTreeItemID);
 	void	   removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &treeItemDeleteList);
-	SceneNodeBase *Model::findSelectedItem(osgUtil::LineSegmentIntersector *intersector, double sceneRadius, osg::Vec3d &intersectionPoint, unsigned long long &hitIndex);
+	SceneNodeBase* findSelectedItem(osgUtil::LineSegmentIntersector *intersector, double sceneRadius, osg::Vec3d &intersectionPoint, unsigned long long &hitIndex);
 	void	   selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed);
 	void	   faceSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry *selectedItem, unsigned long long faceId);
 	SceneNodeBase *getParentNode(const std::string &treeName);

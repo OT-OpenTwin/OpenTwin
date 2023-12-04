@@ -208,7 +208,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 
 	// Restore settings
 	QString tableColumnWidths = _settings.value("LogVisualization.Table.ColumnWidth", "").toString();
-	QStringList tableColumnWidthsList = tableColumnWidths.split(";", QString::SkipEmptyParts);
+	QStringList tableColumnWidthsList = tableColumnWidths.split(";", Qt::SkipEmptyParts);
 	if (tableColumnWidthsList.count() == m_table->columnCount()) {
 		int column = 0;
 		for (auto w : tableColumnWidthsList) {

@@ -57,7 +57,7 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 	QFontMetrics m(m_font);
-	return QSizeF(m.width(m_text), m.height());
+	return m.size(Qt::TextSingleLine, m_text);
 }
 
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {

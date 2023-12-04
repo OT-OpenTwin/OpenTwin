@@ -14,6 +14,7 @@
 #include <akAPI/uiAPI.h>
 #include <akGui/aPaintable.h>
 #include <akGui/aColorStyle.h>
+#include <akCore/aException.h>
 
 ak::aPaintable::aPaintable(
 	objectType		_type,

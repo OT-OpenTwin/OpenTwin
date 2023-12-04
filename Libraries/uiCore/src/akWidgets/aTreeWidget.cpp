@@ -303,7 +303,7 @@ void ak::aTreeWidget::setSortingEnabled(
 ) { 
 	m_tree->setSortingEnabled(_enabled);
 	if (_enabled) {
-		m_tree->sortByColumn(0);
+		m_tree->sortByColumn(0, Qt::DescendingOrder);
 	}
 }
 

@@ -61,7 +61,6 @@ void ak::aCalendarWidget::setColorStyle(
 	format.setBackground(b);
 	format.setForeground(_colorStyle->getHeaderForegroundColor().toQColor());
 	QFont font;
-	font.setWeight(14);
 	font.setBold(false);
 	format.setFont(font);
 	setHeaderTextFormat(format);
@@ -71,11 +70,7 @@ void ak::aCalendarWidget::setColorStyle(
 
 // Protected functions
 
-void ak::aCalendarWidget::paintCell(
-	QPainter *			_painter,
-	const QRect &		_rect,
-	const QDate &		_date
-) const {
+void ak::aCalendarWidget::paintCell(QPainter* _painter, const QRect& _rect, QDate _date) const {
 	if (m_onlyCurrentMonthVisible) {
 		if (_date.month() == monthShown()) {
 			QCalendarWidget::paintCell(_painter, _rect, _date);

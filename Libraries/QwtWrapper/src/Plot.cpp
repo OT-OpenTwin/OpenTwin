@@ -360,7 +360,7 @@ qwtw::PlotDataset::PlotDataset(
 	m_owner(_owner), m_xyPlot(_xyPlot), m_polarPlot(_polarPlot), m_curveTitle(_title), m_isAttatched(false),
 	m_curveColor(255, 0, 0), m_curvePenSize(1.0), m_isVisible(true), m_isDimmed(false), m_curvePointInnerColor(0, 255, 0),
 	m_curvePointOutterColor(0, 255, 0), m_curvePointOutterColorWidth(1.0), m_curvePointSize(5), m_dataYim(nullptr), m_dataYcalc(nullptr),
-	m_polarData(nullptr), m_dataXcalc(nullptr), m_information(nullptr)
+	m_polarData(nullptr), m_dataXcalc(nullptr), m_information(nullptr), m_curvePointsVisible(false)
 {
 	m_xyCurve = new QwtPlotCurve(_title);
 	m_xyCurvePointSymbol = new QwtSymbol;
@@ -674,9 +674,7 @@ QwtPointPolar qwtw::PolarPlotData::sample(size_t _i) const {
 }
 
 QRectF qwtw::PolarPlotData::boundingRect(void) const {
-	if (d_boundingRect.width() < 0.0) { d_boundingRect = qwtBoundingRect(*this); }
-
-	return d_boundingRect;
+	return qwtBoundingRect(*this);
 }
 
 void qwtw::PolarPlotData::replaceData(double * _azimuth, double * _radius, size_t _dataSize) {

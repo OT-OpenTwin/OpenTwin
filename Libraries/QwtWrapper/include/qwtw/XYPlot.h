@@ -235,7 +235,7 @@ namespace qwtw {
 		void clearAxisValueLabels(AbstractPlotAxis::AxisID _axis);
 
 	private:
-		QPoint			m_cursorPos;
+		QPointF			m_cursorPos;
 		bool			m_rightMouseIsPressed;
 		bool			m_mouseMoved;
 		XYPlot *		m_plot;

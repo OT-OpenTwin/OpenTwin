@@ -356,7 +356,7 @@ namespace ak {
 		);
 
 		void setIconSearchDirectories(
-			const std::vector<QString>							_paths
+			const QStringList&							_paths
 		);
 
 		void addColorStyle(
@@ -488,7 +488,7 @@ namespace ak {
 		
 		std::map<aPaintable *, bool>		m_externalPaintableObjects;
 
-		std::vector<QString>				m_iconSearchPaths;
+		QStringList				m_iconSearchPaths;
 		
 		// ###############################################################################################################################################
 

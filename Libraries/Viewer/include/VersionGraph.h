@@ -62,12 +62,6 @@ protected Q_SLOTS:
 		handleFullView();
 	}
 
-	void enterEvent(QEvent *event)
-	{
-		QGraphicsView::enterEvent(event);
-		viewport()->setCursor(Qt::CrossCursor);
-	}
-
 	void mousePressEvent(QMouseEvent *event)
 	{
 		QGraphicsView::mousePressEvent(event);

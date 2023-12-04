@@ -41,7 +41,7 @@
 #include <qcoreapplication.h>	// QCoreApplication
 #include <qfile.h>				// QFile
 #include <qapplication.h>		// QApplication
-#include <qdesktopwidget.h>		// QDesktopWidget
+#include <QtGui/qscreen.h>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
@@ -1487,7 +1487,7 @@ structModelViewInfo AppBase::createModelAndDisplay(
 	m_viewerComponent->activateModel(ret.view);
 
 	// Create DPI ratio
-	int DPIRatio = QApplication::desktop()->devicePixelRatio();
+	int DPIRatio = QApplication::primaryScreen()->devicePixelRatio();
 
 	const aColorStyle * cS = uiAPI::getCurrentColorStyle();
 	aColor col(255, 255, 255);

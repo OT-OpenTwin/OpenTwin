@@ -39,7 +39,7 @@ public:
 	bool getProjectAuthor(const std::string &projectName, std::string &author);
 	bool readProjectAuthor(std::list<std::string> &projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
-	std::vector<std::string> ProjectManagement::getDefaultTemplateList(void);
+	std::vector<std::string> getDefaultTemplateList(void);
 	bool canAccessProject(const std::string &projectCollection);
 
 private:

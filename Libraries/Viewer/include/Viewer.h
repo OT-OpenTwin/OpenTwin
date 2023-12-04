@@ -3,7 +3,7 @@
 #include "OTCore/CoreTypes.h"
 
 #include <QMainWindow>
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/qopenglwidget.h>
 
 #include "Table.h"
 #include "TableViewer.h"
@@ -42,7 +42,6 @@ namespace ot        { class AbstractSettingsItem; }
 
 class Viewer : public QOpenGLWidget
 {
-	Q_OBJECT
 public:
 	Viewer();
 	Viewer(ot::UID modelID, ot::UID viewerID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
@@ -120,23 +119,23 @@ public:
 	void hideClipPlaneHandles(void);
 
 protected:
-	virtual void paintGL();
-	virtual void resizeGL(int width, int height);
-	virtual void initializeGL();
+	virtual void paintGL() override;
+	virtual void resizeGL(int width, int height) override;
+	virtual void initializeGL() override;
 
-	virtual void mouseDoubleClickEvent(QMouseEvent *event);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
+	virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+	virtual void mouseMoveEvent(QMouseEvent *event) override;
+	virtual void mousePressEvent(QMouseEvent *event) override;
+	virtual void mouseReleaseEvent(QMouseEvent *event) override;
 
-	virtual void leaveEvent(QEvent *event);
-	virtual void enterEvent(QEvent * event);
+	virtual void leaveEvent(QEvent *event) override;
+	virtual void enterEvent(QEnterEvent* event) override;
 
-	virtual void wheelEvent(QWheelEvent *event);
+	virtual void wheelEvent(QWheelEvent *event) override;
 
-	virtual bool event(QEvent *evnt);
+	virtual bool event(QEvent *evnt) override;
 
-	virtual void keyPressEvent(QKeyEvent *event);
+	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 private:

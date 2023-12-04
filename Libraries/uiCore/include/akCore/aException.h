@@ -12,12 +12,12 @@
 
 #pragma once
 
+ // AK header
+#include <akCore/globalDataTypes.h>
+
 // C++ header
 #include <exception>			// Base class
 #include <string>				// std::string
-
-// AK header
-#include <akCore/globalDataTypes.h>
 
 namespace ak {
 
@@ -130,6 +130,16 @@ namespace ak {
 
 	private:
 		std::string						m_out;									//! Contains the output message which will be returned in the what() function
+	};
+
+	class UICORE_API_EXPORT InvalidObjectTypeException : public std::exception {
+	public:
+		InvalidObjectTypeException() noexcept : std::exception("Invalid object type") {};
+	};
+
+	class UICORE_API_EXPORT ItemNotFoundException : public std::exception {
+	public:
+		ItemNotFoundException() noexcept : std::exception("Item not found") {};
 	};
 
 } // namespace ak

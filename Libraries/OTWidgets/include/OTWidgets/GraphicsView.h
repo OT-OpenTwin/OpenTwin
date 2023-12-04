@@ -77,7 +77,6 @@ namespace ot {
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
-		virtual void enterEvent(QEvent* _event) override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
 		virtual void mouseMoveEvent(QMouseEvent* _event) override;

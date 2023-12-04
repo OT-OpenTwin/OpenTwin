@@ -136,7 +136,7 @@ bool LogInSessionServiceEntry::isValid(void) const {
 	bool ipOk{ false };
 	if (m_ip == "localhost") { ipOk = true; }
 	else if (m_ip.length() > 6) {
-		QStringList lst = m_ip.split(".", QString::SkipEmptyParts);
+		QStringList lst = m_ip.split(".", Qt::SkipEmptyParts);
 		if (lst.count() == 4) {
 			ipOk = true;
 			for (QString str : lst) {

@@ -72,7 +72,7 @@
 #include <qfiledialog.h>					// Open/Save file dialog
 #include <qfile.h>
 #include <qmovie.h>
-#include <qdesktopwidget.h>
+#include <QtGui/qscreen.h>
 #include <qfiledialog.h>
 #include <qdatetime.h>
 #include <qsettings.h>
@@ -128,7 +128,7 @@ void ak::uiAPI::apiManager::ini(
 ) {
 	assert(!m_isInitialized); // Is already initialized
 	m_app = new aApplication;
-	m_desktop = m_app->desktop();
+	m_screen = m_app->primaryScreen();
 	
 	m_companyName = _organizationName;
 	m_applicationName = _applicationName;
@@ -2932,7 +2932,7 @@ void ak::uiAPI::window::setCentralWidgetMinimumSize(
 	int													_height
 ) { object::get<aWindowManager>(_windowUID)->setCentralWidgetMinimumSize(QSize(_width, _height)); }
 
-int ak::uiAPI::window::devicePixelRatio(void) { return m_apiManager.desktop()->devicePixelRatio(); }
+int ak::uiAPI::window::devicePixelRatio(void) { return m_apiManager.screen()->devicePixelRatio(); }
 
 void ak::uiAPI::window::resize(
 	UID												_windowUID,
@@ -3030,7 +3030,7 @@ void ak::uiAPI::addIconSearchPath(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	ot::IconManager::instance().addSearchPath(_path);
-	m_objManager->setIconSearchDirectories(ot::IconManager::instance().searchPaths().toVector().toStdVector());
+	m_objManager->setIconSearchDirectories(ot::IconManager::instance().searchPaths());
 }
 
 ak::UID ak::uiAPI::createUid(void) {
@@ -3282,7 +3282,3 @@ QString ak::uiAPI::special::toEventText(
 	out.append("}");
 	return out;
 }
-
-ak::InvalidObjectTypeException::InvalidObjectTypeException() : std::exception("Invalid object type") {}
-
-ak::ItemNotFoundException::ItemNotFoundException() : std::exception("Item not found") {}

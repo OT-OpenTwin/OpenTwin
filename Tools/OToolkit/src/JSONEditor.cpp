@@ -23,5 +23,5 @@ void JSONEditor::ini(void) {
 	f.setFamily("Consolas");
 	setFont(f);
 	QFontMetrics fm(f);
-	setTabStopWidth(4 * fm.width(' '));
+	setTabStopDistance(4 * fm.size(Qt::TextSingleLine, " ").width());
 }

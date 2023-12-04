@@ -19,7 +19,7 @@
 #include <qscrollbar.h>
 
 ak::aListWidget::aListWidget()
-	: aWidget(otList), m_currentId(invalidID), m_verticalScrollbarAlwaysVisible(true)
+	: aWidget(otList), m_currentId(invalidID)
 {}
 
 ak::aListWidget::~aListWidget() {
@@ -51,24 +51,6 @@ void ak::aListWidget::keyReleaseEvent(QKeyEvent * _event)
 
 void ak::aListWidget::mouseMoveEvent(QMouseEvent * _event)
 { QListWidget::mouseMoveEvent(_event); emit mouseMove(_event); }
-
-void ak::aListWidget::enterEvent(QEvent *_event)
-{
-	QListWidget::leaveEvent(_event);
-	if (!m_verticalScrollbarAlwaysVisible) {
-		verticalScrollBar()->setVisible(true);
-	}
-	emit leave(_event);
-}
-
-void ak::aListWidget::leaveEvent(QEvent *_event)
-{
-	QListWidget::leaveEvent(_event);
-	if (!m_verticalScrollbarAlwaysVisible) {
-		verticalScrollBar()->setVisible(false);
-	}
-	emit leave(_event);
-}
 
 // ###########################################################################################################################################
 
@@ -183,8 +165,7 @@ void ak::aListWidget::Clear() { m_currentId = ak::invalidID; memFree(); clear();
 void ak::aListWidget::setVerticalScrollbarAlwaysVisible(
 	bool							_vis
 ) {
-	m_verticalScrollbarAlwaysVisible = _vis;
-	verticalScrollBar()->setVisible(false);
+	setVerticalScrollBarPolicy((_vis ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAsNeeded));
 }
 
 void ak::aListWidget::memFree(void) {

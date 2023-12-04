@@ -24,7 +24,7 @@ ak::aNiceLineEditWidget::aNiceLineEditWidget(const QString & _initialText, const
 {
 	// Create layout 
 	m_layout = new QHBoxLayout(this);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	this->setContentsMargins(0, 0, 0, 0);
 
 	// Create controls

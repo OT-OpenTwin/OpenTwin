@@ -93,7 +93,7 @@ public:
 
 	// #####################################################################################################################################
 
-	void ViewerComponent::setProcessingGroupOfMessages(bool flag);
+	void setProcessingGroupOfMessages(bool _flag);
 
 	// Intern calls
 

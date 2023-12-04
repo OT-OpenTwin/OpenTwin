@@ -3,8 +3,10 @@
 #include "xyPlot.h"
 #include "Plot.h"
 
+#include <qwt_text.h>
 #include <qwt_symbol.h>
 #include <qwt_scale_engine.h>
+#include <qwt_scale_map.h>
 #include <qwt_plot_curve.h>
 
 #include <qevent.h>
@@ -371,13 +373,13 @@ void xyPlotMagnifier::widgetMouseReleaseEvent(QMouseEvent * _event) {
 }
 
 void xyPlotMagnifier::widgetWheelEvent(QWheelEvent * _wheelEvent) {
-	m_cursorPos = _wheelEvent->pos();
+	m_cursorPos = _wheelEvent->position();
 
 	if (_wheelEvent->modifiers() != wheelModifiers()) { return; }
 
 	if (wheelFactor() != 0.0)
 	{
-		int delta = _wheelEvent->delta() * (-1);
+		int delta = _wheelEvent->angleDelta().x() * (-1);
 		double f = qPow(wheelFactor(),
 			qAbs(delta / 120.0));
 

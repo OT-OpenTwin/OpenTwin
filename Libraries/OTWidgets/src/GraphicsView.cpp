@@ -201,12 +201,6 @@ void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 	this->viewAll();
 }
 
-void ot::GraphicsView::enterEvent(QEvent* _event)
-{
-	QGraphicsView::enterEvent(_event);
-	this->viewport()->setCursor(Qt::CrossCursor);
-}
-
 void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 {
 	QGraphicsView::mousePressEvent(_event);

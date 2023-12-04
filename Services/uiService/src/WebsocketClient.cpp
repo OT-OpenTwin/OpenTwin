@@ -9,6 +9,7 @@
 // OpenTwin header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/JSON.h"
+#include "OTCore/Logger.h"
 
 // SSL
 #include <QtCore/QFile>
@@ -87,8 +88,7 @@ void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 
 	foreach(QSslError err, errors)
 	{
-		std::string errStr = err.errorString().toStdString();
-		std::cout << errStr << endl;
+		OT_LOG_E(err.errorString().toStdString());
 	}
 	// WARNING: Never ignore SSL errors in production code.
 	// The proper way to handle self-signed certificates is to add a custom root
@@ -100,7 +100,7 @@ void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 
 void WebsocketClient::onConnected()
 {
-	std::cout << "Client connected" << endl;
+	OT_LOG_D("Client connected");
 
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::onMessageReceived);
 	isConnected = true;
@@ -108,7 +108,7 @@ void WebsocketClient::onConnected()
 
 void WebsocketClient::socketDisconnected()
 {
-	std::cout << "Relay server disconnected on websocket" << std::endl;
+	OT_LOG_D("Relay server disconnected on websocket");
 	isConnected = false;
 
 	if (!sessionIsClosing)

@@ -977,12 +977,6 @@ QwtPointPolar PolarPlotData::sample(size_t _i) const {
 	else { assert(0); return QwtPointPolar(0, 0); }
 }
 
-QRectF PolarPlotData::boundingRect(void) const {
-	if (d_boundingRect.width() < 0.0) { d_boundingRect = qwtBoundingRect(*this); }
-
-	return d_boundingRect;
-}
-
 void PolarPlotData::replaceData(double * _azimuth, double * _radius, size_t _dataSize) {
 	m_azimuth = _azimuth;
 	m_radius = _radius;

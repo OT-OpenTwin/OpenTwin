@@ -12,10 +12,16 @@
 
 #pragma once
 
-// C++ header
-#include <vector>						// vector<>
-#include <map>							// map<>
-#include <exception>
+// AK header
+#include <akCore/aException.h>
+#include <akCore/akCore.h>
+#include <akCore/globalDataTypes.h>
+
+#include <akGui/aColor.h>
+#include <akGui/aApplication.h>
+#include <akGui/aObjectManager.h>
+
+#include <akWidgets/aComboButtonWidgetItem.h>
 
 // Qt header
 #include <qstring.h>					// QString
@@ -26,15 +32,9 @@
 #include <qpixmap.h>
 #include <qbytearray.h>
 
-// AK header
-#include <akCore/akCore.h>
-#include <akCore/globalDataTypes.h>
-
-#include <akGui/aColor.h>
-#include <akGui/aApplication.h>
-#include <akGui/aObjectManager.h>
-
-#include <akWidgets/aComboButtonWidgetItem.h>
+// std header
+#include <vector>						// vector<>
+#include <map>							// map<>
 
 // Forward declaration
 class QSurfaceFormat;
@@ -43,6 +43,7 @@ class QMovie;
 class QTabBar;
 class QSettings;
 class QDockWidget;
+class QScreen;
 
 namespace ak {
 
@@ -112,7 +113,7 @@ namespace ak {
 
 			aApplication * app() { return m_app; }
 
-			QDesktopWidget * desktop() { return m_desktop; }
+			QScreen* screen() { return m_screen; }
 
 			QSettings * settings(void) const { return m_settings; }
 
@@ -120,7 +121,7 @@ namespace ak {
 			aApplication *				m_app;							//! The core application
 			bool						m_appIsRunning;				//! True if the core application is already running
 			QSurfaceFormat *			m_defaultSurfaceFormat;
-			QDesktopWidget *			m_desktop;
+			QScreen*					m_screen;
 
 			QString						m_companyName;
 			QString						m_applicationName;
@@ -1301,7 +1302,10 @@ namespace ak {
 			) {
 				T * obj = nullptr;
 				obj = dynamic_cast<T *>(getObjectManager()->object(_objectUID));
-				if (obj == nullptr) { assert(0); throw InvalidObjectTypeException(); }
+				if (obj == nullptr) { 
+					assert(0);
+					throw ak::InvalidObjectTypeException(); 
+				}
 				return obj;
 			}
 
@@ -2903,15 +2907,5 @@ namespace ak {
 		}
 
 	} // namespace uiAPI
-
-	class UICORE_API_EXPORT InvalidObjectTypeException : public std::exception {
-	public:
-		InvalidObjectTypeException();
-	};
-
-	class UICORE_API_EXPORT ItemNotFoundException : public std::exception {
-	public:
-		ItemNotFoundException();
-	};
 
 } // namespace ak

@@ -153,16 +153,16 @@ namespace ot {
 
 	template <class T> bool Point3D<T>::operator != (const Point3D<T> & _other) { return !(*this == _other); }
 	
-	template <class T> T Point3D<T>::addX(T _v) { m_x = m_x + v; return m_x; }
+	template <class T> T Point3D<T>::addX(T _v) { m_x = m_x + _v; return m_x; }
 
-	template <class T> T Point3D<T>::addY(T _v) { m_y = m_y + v; return m_y; }
+	template <class T> T Point3D<T>::addY(T _v) { m_y = m_y + _v; return m_y; }
 
-	template <class T> T Point3D<T>::addZ(T _v) { m_z = m_z + v; return m_z; }
+	template <class T> T Point3D<T>::addZ(T _v) { m_z = m_z + _v; return m_z; }
 
 	template <class T> T Point3D<T>::subX(T _v) { m_x = m_x - _v; return m_x; }
 
 	template <class T> T Point3D<T>::subY(T _v) { m_y = m_y - _v; return m_y; }
 
-	template <class T> T Point3D<T>::subZ(T _z) { m_z = m_z - _v; return m_z; }
+	template <class T> T Point3D<T>::subZ(T _v) { m_z = m_z - _v; return m_z; }
 
 }
