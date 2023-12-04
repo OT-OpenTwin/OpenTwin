@@ -438,6 +438,8 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	// Setup controls
 	m_navigation->setHeaderHidden(true);
 	m_navigation->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_navigation->setSortingEnabled(true);
+	m_navigation->sortItems(0, Qt::AscendingOrder);
 
 	QFont rFont = m_receiverName->font();
 	rFont.setFixedPitch(true);
@@ -1044,6 +1046,8 @@ void Terminal::addNewFilter(TerminalCollectionFilter * _parentFilter) {
 
 	slotSaveRequestCollection();
 
+	_parentFilter->setSelected(false);
+	newFilter->setSelected(true);
 	m_navigation->editItem(newFilter);
 }
 
@@ -1094,6 +1098,8 @@ void Terminal::addNewRequestFromCurrent(TerminalCollectionFilter * _parentFilter
 	// This call will save the collection
 	updateRequestFromCurrent(newRequest);
 
+	_parentFilter->setSelected(false);
+	newRequest->setSelected(true);
 	m_navigation->editItem(newRequest);
 }
 
