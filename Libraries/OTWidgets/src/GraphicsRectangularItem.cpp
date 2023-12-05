@@ -5,8 +5,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTWidgets/GraphicsRectangularItem.h"
 #include "OTWidgets/Painter2DFactory.h"
@@ -54,7 +54,7 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setRectangleSize(m_size);
 
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

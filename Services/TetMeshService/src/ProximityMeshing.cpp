@@ -13,8 +13,8 @@
 #include "EntityAnnotation.h"
 #include "EntityAnnotationData.h"
 
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include <gmsh_cwrap.h>
 

@@ -3,7 +3,7 @@
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityTableSelectedRanges.h"
 #include "EntityResultTableData.h"
-#include <OpenTwinFoundation/ModelComponent.h>
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include <memory>
 #include <string>

@@ -214,7 +214,7 @@ ak::aTime ak::aTime::parseString(const std::wstring & _string, const std::wstrin
 }
 
 ak::aTime ak::aTime::parseString(const QString & _string, const QString & _delimiter) {
-	QStringList lst{ _string.split(_delimiter, QString::KeepEmptyParts) };
+	QStringList lst{ _string.split(_delimiter, Qt::KeepEmptyParts) };
 	switch (lst.length())
 	{
 	case 1: return aTime(lst[0].toInt(), 0, 0, 0);

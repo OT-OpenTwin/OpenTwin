@@ -1,7 +1,7 @@
 #ifndef OTDEVLOGGER__H
 #define OTDEVLOGGER__H
 
-#include <OpenTwinCore/Logger.h>
+#include "OTCore/Logger.h"
 
 //! @brief If set to 1 the developer logger will be used for the UI service (in debug and release mode)
 //! @warning This should be used with care and 

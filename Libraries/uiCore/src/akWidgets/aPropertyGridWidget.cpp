@@ -409,8 +409,8 @@ ak::aPropertyGridGroup::aPropertyGridGroup(aPropertyGridWidget * _owner, const Q
 {
 	assert(m_owner);
 	m_headerItem = new QTableWidgetItem(_title);
-	m_headerItem->setBackgroundColor(m_headerColorB.toQColor());
-	m_headerItem->setTextColor(m_headerColorF.toQColor());
+	m_headerItem->setBackground(m_headerColorB.toQColor());
+	m_headerItem->setForeground(m_headerColorF.toQColor());
 	m_headerItem->setFlags(m_headerItem->flags() ^ Qt::ItemIsEditable ^ Qt::ItemIsSelectable);
 	
 	int r = m_owner->m_table->rowCount();
@@ -444,8 +444,8 @@ int ak::aPropertyGridGroup::headerRow(void) const { return m_headerItem->row(); 
 // Manipulators
 
 void ak::aPropertyGridGroup::repaint(void) {
-	m_headerItem->setBackgroundColor(m_headerColorB.toQColor());
-	m_headerItem->setTextColor(m_headerColorF.toQColor());
+	m_headerItem->setBackground(m_headerColorB.toQColor());
+	m_headerItem->setForeground(m_headerColorF.toQColor());
 
 	for (auto itm : m_items) { itm->repaint(); }
 }
@@ -621,8 +621,8 @@ int ak::aPropertyGridItem::row(void) const { return m_nameItem->row(); }
 
 void ak::aPropertyGridItem::repaint(void) {
 	setErrorState(m_isError, true);
-	m_nameItem->setBackgroundColor(m_colorBackground.toQColor());
-	m_nameItem->setTextColor(m_colorNormal.toQColor());
+	m_nameItem->setBackground(m_colorBackground.toQColor());
+	m_nameItem->setForeground(m_colorNormal.toQColor());
 }
 
 void ak::aPropertyGridItem::setEnabled(bool _isEnabled) {
@@ -649,7 +649,7 @@ void ak::aPropertyGridItem::setDeletable(bool _isDeletable) {
 			QHBoxLayout* l = new QHBoxLayout();
 			l->addStretch(0);
 			l->addWidget(button);
-			l->setMargin(0);
+			l->setContentsMargins(0, 0, 0, 0);
 
 			QWidget* w = new QWidget();
 			w->setLayout(l);
@@ -672,8 +672,8 @@ void ak::aPropertyGridItem::setColor(const aColor& _normalForeground, const aCol
 	m_colorNormal = _normalForeground;
 	m_colorError = _errorForeground;
 	m_ignoreEvent = true;
-	m_nameItem->setBackgroundColor(m_colorBackground.toQColor());
-	m_nameItem->setTextColor(m_colorNormal.toQColor());
+	m_nameItem->setBackground(m_colorBackground.toQColor());
+	m_nameItem->setForeground(m_colorNormal.toQColor());
 	m_ignoreEvent = false;
 	rebuildStylesheet();
 	setErrorState(m_isError, true);
@@ -682,7 +682,7 @@ void ak::aPropertyGridItem::setColor(const aColor& _normalForeground, const aCol
 void ak::aPropertyGridItem::clearFocus(void) {
 	if (m_ignoreEvent) { return; }
 	if (m_textItem) {
-		m_textItem->setBackgroundColor(m_colorBackground.toQColor());
+		m_textItem->setBackground(m_colorBackground.toQColor());
 	}
 	return;
 	switch (m_valueType)
@@ -819,8 +819,8 @@ void ak::aPropertyGridItem::setErrorState(bool _isError, bool _forceRepaint) {
 			}
 		case ak::vtDouble:
 		case ak::vtString:
-			m_textItem->setTextColor(m_colorError.toQColor());
-			m_textItem->setBackgroundColor(m_colorBackground.toQColor());
+			m_textItem->setForeground(m_colorError.toQColor());
+			m_textItem->setBackground(m_colorBackground.toQColor());
 			break;
 		default:
 			assert(0);
@@ -842,8 +842,8 @@ void ak::aPropertyGridItem::setErrorState(bool _isError, bool _forceRepaint) {
 			}
 		case ak::vtDouble:
 		case ak::vtString:
-			m_textItem->setTextColor(m_colorNormal.toQColor());
-			m_textItem->setBackgroundColor(m_colorBackground.toQColor());
+			m_textItem->setForeground(m_colorNormal.toQColor());
+			m_textItem->setBackground(m_colorBackground.toQColor());
 			break;
 		default:
 			assert(0);
@@ -1049,8 +1049,8 @@ void ak::aPropertyGridItem::ini(void) {
 	// Create items
 	m_nameItem = new QTableWidgetItem(m_name);
 	m_nameItem->setFlags(m_nameItem->flags() ^ Qt::ItemIsSelectable ^ Qt::ItemIsEditable);
-	m_nameItem->setTextColor(m_colorNormal.toQColor());
-	m_nameItem->setBackgroundColor(m_colorBackground.toQColor());
+	m_nameItem->setForeground(m_colorNormal.toQColor());
+	m_nameItem->setBackground(m_colorBackground.toQColor());
 	m_table->setItem(m_row, tcName, m_nameItem);
 	switch (m_valueType)
 	{
@@ -1087,8 +1087,8 @@ void ak::aPropertyGridItem::ini(void) {
 		// Create and setup item
 		if (m_isMultipleValues) { m_textItem = new QTableWidgetItem("..."); }
 		else { m_textItem = new QTableWidgetItem(QString::number(m_vDouble)); }
-		m_textItem->setTextColor(m_colorNormal.toQColor());
-		m_textItem->setBackgroundColor(m_colorBackground.toQColor());
+		m_textItem->setForeground(m_colorNormal.toQColor());
+		m_textItem->setBackground(m_colorBackground.toQColor());
 		m_table->setItem(m_row, tcValue, m_textItem);
 		// Connect callback
 		connect(m_table, &aTableWidget::itemChanged, this, &aPropertyGridItem::slotItemChanged);
@@ -1098,8 +1098,8 @@ void ak::aPropertyGridItem::ini(void) {
 		if (m_numberInputMode == TextForm) {
 			if (m_isMultipleValues) { m_textItem = new QTableWidgetItem("..."); }
 			else { m_textItem = new QTableWidgetItem(QString::number(m_vInt)); }
-			m_textItem->setTextColor(m_colorNormal.toQColor());
-			m_textItem->setBackgroundColor(m_colorBackground.toQColor());
+			m_textItem->setForeground(m_colorNormal.toQColor());
+			m_textItem->setBackground(m_colorBackground.toQColor());
 			m_table->setItem(m_row, tcValue, m_textItem);
 			// Connect callback
 			connect(m_table, &aTableWidget::itemChanged, this, &aPropertyGridItem::slotItemChanged);
@@ -1133,8 +1133,8 @@ void ak::aPropertyGridItem::ini(void) {
 		// Create and setup item
 		if (m_isMultipleValues) { m_textItem = new QTableWidgetItem("..."); }
 		else { m_textItem = new QTableWidgetItem(m_vString); }
-		m_textItem->setTextColor(m_colorNormal.toQColor());
-		m_textItem->setBackgroundColor(m_colorBackground.toQColor());
+		m_textItem->setForeground(m_colorNormal.toQColor());
+		m_textItem->setBackground(m_colorBackground.toQColor());
 		m_table->setItem(m_row, tcValue, m_textItem);
 		// Connect callback
 		connect(m_table, &aTableWidget::itemChanged, this, &aPropertyGridItem::slotItemChanged);

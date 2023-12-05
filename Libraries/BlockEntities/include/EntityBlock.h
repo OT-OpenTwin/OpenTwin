@@ -1,16 +1,15 @@
 #pragma once
 #include "EntityBase.h"
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/Point2D.h"
-#include "OpenTwinCore/BasicServiceInformation.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/BasicServiceInformation.h"
 #include "EntityCoordinates2D.h"
 
 #include "Connector.h"
 
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 class __declspec(dllexport) EntityBlock : public EntityBase
@@ -62,5 +61,5 @@ protected:
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();
 	void CreateConnections();
-	void AddConnectors(ot::GraphicsFlowItemCfg* flowBlockConfig);
+	void AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 };

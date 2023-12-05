@@ -56,8 +56,6 @@ namespace ak {
 		virtual void keyPressEvent(QKeyEvent * _event) override;
 		virtual void keyReleaseEvent(QKeyEvent * _event) override;
 		virtual void mouseMoveEvent(QMouseEvent *) override;
-		virtual void enterEvent(QEvent *) override;
-		virtual void leaveEvent(QEvent *) override;
 
 		// ###########################################################################################################################################
 
@@ -131,8 +129,6 @@ namespace ak {
 
 		//! Will clear the memory allocated by this object
 		void memFree(void);
-
-		bool							m_verticalScrollbarAlwaysVisible;
 
 		ID								m_currentId;
 		std::map<ID, aListWidgetItem *>	m_items;

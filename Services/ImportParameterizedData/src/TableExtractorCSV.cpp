@@ -1,8 +1,8 @@
 #include "TableExtractorCSV.h"
 #include "FileToTableExtractorRegistrar.h"
 #include "EntityFileCSV.h"
-#include "OpenTwinCore/EncodingConverter_ISO88591ToUTF8.h"
-#include "OpenTwinCore/EncodingConverter_UTF16ToUTF8.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 
 #include <algorithm>
 #include <exception>

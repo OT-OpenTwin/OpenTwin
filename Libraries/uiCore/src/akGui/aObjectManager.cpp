@@ -779,7 +779,7 @@ void ak::aObjectManager::destroy(
 }
 
 void ak::aObjectManager::setIconSearchDirectories(
-	const std::vector<QString>							_paths
+	const QStringList&							_paths
 ) {
 	m_iconSearchPaths = _paths;
 	for (auto itm : m_colorStyles) {

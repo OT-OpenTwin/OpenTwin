@@ -59,7 +59,7 @@ void ak::aFile::setPath(
 	rebuildPath();
 
 	// Filter file name and extension
-	QStringList fileName = m_path.split("/", QString::SplitBehavior::KeepEmptyParts);
+	QStringList fileName = m_path.split("/", Qt::KeepEmptyParts);
 	QStringList extension = fileName.at(fileName.count() - 1).split(".");
 	m_name = extension.at(0);
 	for (int i = 1; i < extension.count() - 1; i++) {
@@ -103,7 +103,7 @@ bool ak::aFile::hasChanged() const { return m_changed; }
 // Private members
 
 void ak::aFile::rebuildPath() {
-	QStringList fileName = m_path.split("\\", QString::SplitBehavior::SkipEmptyParts);
+	QStringList fileName = m_path.split("\\", Qt::SkipEmptyParts);
 	m_path = fileName.at(0);
 
 	// Rebuild path

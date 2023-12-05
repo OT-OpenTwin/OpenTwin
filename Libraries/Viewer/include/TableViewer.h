@@ -15,8 +15,8 @@
 #include "EntityResultTable.h"
 #include "EntityTableSelectedRanges.h"
 
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinFoundation/TableRange.h"
+#include "OTCore/Color.h"
+#include "OTServiceFoundation/TableRange.h"
 
 class TableViewer
 {

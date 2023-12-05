@@ -203,7 +203,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -285,7 +285,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

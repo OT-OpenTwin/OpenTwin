@@ -59,9 +59,9 @@
 #include <chrono>
 #include <thread>	
 
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTCommunication/Msg.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 GmshMeshCreation::GmshMeshCreation(Application *app) : 
 	application(app),
@@ -421,16 +421,16 @@ void GmshMeshCreation::deleteMesh(void)
 
 std::list<ot::UID> GmshMeshCreation::getAllGeometryEntitiesForMeshing(void)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing);
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response = application->modelComponent()->sendMessage(false, requestDoc);
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
-	OT_rJSON_docCheck(responseDoc);
-
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+	
 	std::list<ot::UID> entityIDs;
-	entityIDs = ot::rJSON::getULongLongList(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
 
 	return entityIDs;
 }
@@ -619,24 +619,24 @@ void GmshMeshCreation::setUILock(bool flag, lockType type)
 
 void GmshMeshCreation::hideAllOtherEntities(EntityMeshTet *thisMesh)
 {
-	OT_rJSON_createDOC(docHideGeometry);
-	ot::rJSON::add(docHideGeometry, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch);
-	ot::rJSON::add(docHideGeometry, OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID());
-	ot::rJSON::add(docHideGeometry, OT_ACTION_PARAM_MODEL_ITM_BRANCH, "Geometry");
+	ot::JsonDocument docHideGeometry;
+	docHideGeometry.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
+	docHideGeometry.AddMember(OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
+	docHideGeometry.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString("Geometry", docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	application->uiComponent()->sendMessage(true, docHideGeometry);
 
-	OT_rJSON_createDOC(docHideMeshes);
-	ot::rJSON::add(docHideMeshes, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch);
-	ot::rJSON::add(docHideMeshes, OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID());
-	ot::rJSON::add(docHideMeshes, OT_ACTION_PARAM_MODEL_ITM_BRANCH, "Meshes");
+	ot::JsonDocument docHideMeshes;
+	docHideMeshes.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
+	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
+	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString("Meshes", docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	application->uiComponent()->sendMessage(true, docHideMeshes);
 
-	OT_rJSON_createDOC(docShowMesh);
-	ot::rJSON::add(docShowMesh, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch);
-	ot::rJSON::add(docShowMesh, OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID());
-	ot::rJSON::add(docShowMesh, OT_ACTION_PARAM_MODEL_ITM_BRANCH, thisMesh->getName());
+	ot::JsonDocument docShowMesh;
+	docShowMesh.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
+	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
+	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString(thisMesh->getName(), docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	application->uiComponent()->sendMessage(true, docShowMesh);
 }

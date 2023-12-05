@@ -1,18 +1,18 @@
 #include <openTwin/AbstractUIWidgetInterface.h>
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 void ot::AbstractUIWidgetInterface::appenInfoMessage(const char * _message) {
-	appenInfoMessage(QString(_message));
+	this->appenInfoMessage(QString(_message));
 }
 
 void ot::AbstractUIWidgetInterface::appenInfoMessage(const std::string& _message) {
-	appenInfoMessage(QString(_message.c_str()));
+	this->appenInfoMessage(QString(_message.c_str()));
 }
 
 void ot::AbstractUIWidgetInterface::appenDebugMessage(const char * _message) {
-	appenDebugMessage(QString(_message));
+	this->appenDebugMessage(QString(_message));
 }
 
 void ot::AbstractUIWidgetInterface::appenDebugMessage(const std::string& _message) {
-	appenDebugMessage(QString(_message.c_str()));
+	this->appenDebugMessage(QString(_message.c_str()));
 }

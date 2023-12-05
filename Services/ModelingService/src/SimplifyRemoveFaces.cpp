@@ -7,9 +7,9 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"
@@ -39,12 +39,13 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 	uiComponent->lockUI(lockFlags);
 
-	OT_rJSON_parseDOC(_doc, selectionInfo.c_str());
+	ot::JsonDocument doc;
+	doc.fromJson(selectionInfo);
 
-	rapidjson::Value modelID = _doc["modelID"].GetArray();
-	rapidjson::Value posX = _doc["posX"].GetArray();
-	rapidjson::Value posY = _doc["posY"].GetArray();
-	rapidjson::Value posZ = _doc["posZ"].GetArray();
+	ot::ConstJsonArray modelID = ot::json::getArray(doc, "modelID");
+	ot::ConstJsonArray posX = ot::json::getArray(doc, "posX");
+	ot::ConstJsonArray posY = ot::json::getArray(doc, "posY");
+	ot::ConstJsonArray posZ = ot::json::getArray(doc, "posZ");
 
 	// Get a list of all shapes which are involved in this operation for prefetching
 	std::set<ot::UID> affectedEntitiesSet;
@@ -248,15 +249,15 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 
 		// Store the information about the entities such that they can be added to the model
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateGeometryEntity);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, geometryEntity->getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID_Brep, (unsigned long long) geometryEntity->getBrepStorageObjectID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID_Facets, (unsigned long long) geometryEntity->getFacetsStorageObjectID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_OverrideGeometry, false);	// The modified entity was not yet written 
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_NewProperties, geometryEntity->getProperties().getJSON(nullptr, false));	
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, geometryEntity->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, (unsigned long long) geometryEntity->getBrepStorageObjectID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, (unsigned long long) geometryEntity->getFacetsStorageObjectID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, doc.GetAllocator());	// The modified entity was not yet written 
+		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, ot::JsonString(geometryEntity->getProperties().getJSON(nullptr, false), doc.GetAllocator()), doc.GetAllocator());
 
 		modelComponent->sendMessage(false, doc);
 	}

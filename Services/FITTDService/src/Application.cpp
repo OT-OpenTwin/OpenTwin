@@ -12,11 +12,10 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/rJSON.h"				// json convenience functions
-#include "OpenTwinCommunication/ActionTypes.h"		// action member and types definition
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinFoundation/EntityInformation.h"
+#include "OTCommunication/ActionTypes.h"		// action member and types definition
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/EntityInformation.h"
 
 // Application specific includes
 #include "EntitySolverFITTD.h"
@@ -66,11 +65,11 @@ void Application::run(void)
 
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
-		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 		if (action == _buttonCreateSolver.GetFullDescription())
 		{
 			addSolver();
@@ -99,7 +98,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	return "";
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

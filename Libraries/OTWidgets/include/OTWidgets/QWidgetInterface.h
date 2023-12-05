@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/Flags.h"
+#include "OTCore/Flags.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt widget
@@ -14,17 +14,19 @@ class QWidget;
 
 namespace ot {
 
-	class QWidgetInterface {
+	class OT_WIDGETS_API_EXPORTONLY QWidgetInterface {
 	public:
 		QWidgetInterface() {};
 		virtual ~QWidgetInterface() {};
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getWidget(void) = 0;
+		virtual QWidget* getQWidget(void) = 0;
 
-		void setWidgetFlags(const WidgetFlags& _flags) { if (m_widgetFlags.update(_flags)) { widgetFlagsChanged(m_widgetFlags); }; };
-		const WidgetFlags& widgetFlags(void) const { return m_widgetFlags; };
-		virtual void widgetFlagsChanged(const WidgetFlags& _flags) {};
+		void setOTWidgetFlags(const WidgetFlags& _flags) { if (m_widgetFlags.update(_flags)) { this->otWidgetFlagsChanged(m_widgetFlags); }; };
+		const WidgetFlags& otWidgetFlags(void) const { return m_widgetFlags; };
+		virtual void otWidgetFlagsChanged(const WidgetFlags& _flags) {};
+
+		void centerOnParent(const QWidget* _parentWidget);
 
 	protected:
 		WidgetFlags m_widgetFlags;

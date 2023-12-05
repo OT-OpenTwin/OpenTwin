@@ -26,14 +26,14 @@ namespace ak {
 	public:
 
 		//! @brief Default constructor
-		aColor();
+		explicit aColor();
 
 		//! @brief Assignment constructor, set the initial channel values
 		//! @param _r The red channel value to set
 		//! @param _g The green channel value to set
 		//! @param _b The blue channel value to set
 		//! @param _a The alpha channel value to set
-		aColor(
+		explicit aColor(
 			int					_r,
 			int					_g,
 			int					_b,
@@ -48,7 +48,7 @@ namespace ak {
 
 		//! @brief Copy constructor, copies the channel values of the other QColor
 		//! @param _other The object to retreive the data from
-		aColor(
+		explicit aColor(
 			const QColor &		_other
 		);
 
@@ -194,9 +194,9 @@ namespace ak {
 		bool	m_wasChanged;			//! If true, a value has been changed after creation
 	};
 
-	//! @brief Returns a Hex-String representation of the value provided like: (int) 24 = "18"
-	QString toHexString(
+	QString valueToHexString(
 		int					_value,
-		int					_minimumLength = 1
+		int					_minimumLength
 	);
+
 } // namespace ak

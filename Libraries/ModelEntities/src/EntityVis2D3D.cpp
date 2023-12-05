@@ -3,7 +3,7 @@
 #include "Types.h"
 #include "Database.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -93,21 +93,21 @@ void EntityVis2D3D::addVisualizationNodes(void)
 		treeIcons.visibleIcon = "Vis2DVisible";
 		treeIcons.hiddenIcon = "Vis2DHidden";
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_DataID, visualizationDataID);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_DataVersion, visualizationDataVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_SourceID, sourceID);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_SourceVersion, sourceVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_MeshID, meshID);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_MeshVersion, meshVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, getInitiallyHidden());
-		
-		treeIcons.addToJsonDoc(&doc);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_DataID, visualizationDataID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, visualizationDataVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceID, sourceID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceVersion, sourceVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshID, meshID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshVersion, meshVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());
+
+		treeIcons.addToJsonDoc(doc);
 
 		getObserver()->sendMessageToViewer(doc);
 	}

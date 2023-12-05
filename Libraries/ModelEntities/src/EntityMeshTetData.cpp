@@ -6,7 +6,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -304,19 +304,19 @@ void EntityMeshTetData::addVisualizationItem(void)
 		displayTetEdges = showVolumeMesh->getValue();
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EDGE_COLOR_R, edgeColorRGB[0]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EDGE_COLOR_G, edgeColorRGB[1]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EDGE_COLOR_B, edgeColorRGB[2]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, getCurrentEntityVersion(getEntityID()));
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES, displayTetEdges);
-	
-	treeIcons.addToJsonDoc(&doc);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_R, edgeColorRGB[0], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_G, edgeColorRGB[1], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_B, edgeColorRGB[2], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getCurrentEntityVersion(this->getEntityID()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES, displayTetEdges, doc.GetAllocator());
+
+	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -356,10 +356,10 @@ bool EntityMeshTetData::updateFromProperties(void)
 
 			bool displayTetEdges = showVolumeMesh->getValue();
 
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges);
-			ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-			ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES, displayTetEdges);
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES, displayTetEdges, doc.GetAllocator());
 
 			getObserver()->sendMessageToViewer(doc);
 		}

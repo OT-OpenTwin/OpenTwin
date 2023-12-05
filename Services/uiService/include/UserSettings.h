@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/JSON.h"
 
 #include <qobject.h>
 #include <qstring.h>
@@ -62,7 +62,7 @@ public:
 
 	void clear(void);
 
-	void addFromService(ot::ServiceBase * _sender, rapidjson::Document& _document);
+	void addFromService(ot::ServiceBase * _sender, ot::JsonDocument& _document);
 
 	void updateUiServiceSettings(ot::SettingsData * _data);
 

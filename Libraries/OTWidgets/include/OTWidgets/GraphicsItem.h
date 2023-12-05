@@ -9,15 +9,18 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Margins.h"
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCore/Flags.h"
+#include "OTGui/GraphicsItemCfg.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTCore/Flags.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
+#include <QtCore/qpoint.h>
 
 // std header
 #include <list>
+#include <string>
 
 #define OT_GRAPHICSITEM_MIMETYPE_ItemName "GraphicsItem.Name"
 
@@ -37,13 +40,13 @@ namespace ot {
 			ItemResized
 		};
 
-		enum GraphicsItemFlag {
-			NoFlags = 0x00, //! @brief No graphics item flags
-			ItemIsConnectable = 0x01, //! @brief Item can be used as source or destination of a conncetion
-			ItemIsMoveable = 0x02, //! @brief The item can be moved by a user
-			ItemPreviewContext = 0x10, //! @brief Item is placed in a preview (preview box)
-			ItemNetworkContext = 0x20  //! @brief Item is placed in a network (editor)
+		enum GraphicsItemContext {
+			NoContext, //! @brief Item is not placed anywhere
+			ItemPreviewContext, //! @brief Item is placed in a preview
+			ItemNetworkContext  //! @brief Item is placed in a network
 		};
+
+		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
 
 		GraphicsItem(bool _isLayoutOrStack);
 		virtual ~GraphicsItem();
@@ -71,7 +74,7 @@ namespace ot {
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {};
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItemCfg::GraphicsItemFlag _flags) {};
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
@@ -83,6 +86,9 @@ namespace ot {
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
+		void handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event);
+		void handleToolTip(QGraphicsSceneHoverEvent* _event);
+		void handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event);
 		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		//! @brief Will expand the size according to the margins
@@ -100,8 +106,11 @@ namespace ot {
 
 		// Getter / Setter
 
-		void setGraphicsItemFlags(ot::GraphicsItem::GraphicsItemFlag _flags);
-		ot::GraphicsItem::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlag _flags);
+		ot::GraphicsItemCfg::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+
+		void setGraphicsItemContext(GraphicsItem::GraphicsItemContext _context) { m_context = _context; };
+		GraphicsItem::GraphicsItemContext graphicsItemContext(void) const { return m_context; };
 
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void);
@@ -129,6 +138,9 @@ namespace ot {
 		void setGraphicsItemAlignment(ot::Alignment _align) { m_alignment = _align; };
 		ot::Alignment graphicsItemAlignment(void) const { return m_alignment; };
 
+		void setConnectionDirection(ot::ConnectionDirection _direction) { m_connectionDirection = _direction; };
+		ot::ConnectionDirection connectionDirection(void) const { return m_connectionDirection; };
+
 		void addGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 		void removeGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 
@@ -144,14 +156,20 @@ namespace ot {
 		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
+		virtual bool graphicsItemRequiresHover(void) const { return !m_toolTip.empty(); };
+
 	private:
 		bool m_isLayoutOrStack;
 		bool m_hasHover;
 		std::string m_uid;
 		std::string m_name;
+		std::string m_toolTip;
 		ot::Alignment m_alignment;
+		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
-		GraphicsItemFlag m_flags;
+		GraphicsItemCfg::GraphicsItemFlag m_flags;
+		GraphicsItemContext m_context;
+		ot::ConnectionDirection m_connectionDirection;
 
 		QPointF m_moveStartPt; //! @brief Item move origin
 		GraphicsItem* m_parent; //! @brief Parent graphics item
@@ -171,5 +189,3 @@ namespace ot {
 	};
 
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemFlag);

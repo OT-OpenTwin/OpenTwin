@@ -6,7 +6,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -355,10 +355,10 @@ bool EntityMeshCartesianData::updateFromProperties(void)
 
 			bool showMesh = showMeshLines->getValue();
 
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_CartesianMeshNodeShowLines);
-			ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-			ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_ShowMeshLines, showMesh);
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_CartesianMeshNodeShowLines, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MESH_ShowMeshLines, showMesh, doc.GetAllocator());
 
 			getObserver()->sendMessageToViewer(doc);
 		}
@@ -387,28 +387,28 @@ void EntityMeshCartesianData::addVisualizationItem(bool isHidden)
 	double edgeColorRGB[3] = { 1.0, 1.0, 1.0 };
 	double meshLineColorRGB[3] = { 0.5, 0.5, 0.5 };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_UID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EDGE_COLOR_R, edgeColorRGB[0]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EDGE_COLOR_G, edgeColorRGB[1]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EDGE_COLOR_B, edgeColorRGB[2]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_R, meshLineColorRGB[0]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_G, meshLineColorRGB[1]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_B, meshLineColorRGB[2]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_CartesianCoordX, meshCoords[0]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_CartesianCoordY, meshCoords[1]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_CartesianCoordZ, meshCoords[2]);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_ShowMeshLines, showMesh);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, meshFacesStorageId == -1 ? 0 : (unsigned long long) meshFacesStorageId);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, meshFacesStorageVersion == -1 ? 0 : (unsigned long long) meshFacesStorageVersion);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_NODE_ID, meshNodesStorageId == -1 ? 0 : (unsigned long long) meshNodesStorageId);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESH_NODE_VERSION, meshNodesStorageVersion == -1 ? 0 : (unsigned long long) meshNodesStorageVersion);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_R, edgeColorRGB[0], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_G, edgeColorRGB[1], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_B, edgeColorRGB[2], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_R, meshLineColorRGB[0], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_G, meshLineColorRGB[1], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_B, meshLineColorRGB[2], doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESH_CartesianCoordX, ot::JsonArray(meshCoords[0], doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESH_CartesianCoordY, ot::JsonArray(meshCoords[1], doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESH_CartesianCoordZ, ot::JsonArray(meshCoords[2], doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESH_ShowMeshLines, showMesh, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, meshFacesStorageId == -1 ? 0 : (unsigned long long) meshFacesStorageId, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, meshFacesStorageVersion == -1 ? 0 : (unsigned long long) meshFacesStorageVersion, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESH_NODE_ID, meshNodesStorageId == -1 ? 0 : (unsigned long long) meshNodesStorageId, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESH_NODE_VERSION, meshNodesStorageVersion == -1 ? 0 : (unsigned long long) meshNodesStorageVersion, doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(&doc);
+	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }

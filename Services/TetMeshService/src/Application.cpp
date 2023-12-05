@@ -19,8 +19,8 @@
 #include "MeshImport.h"
 
 // Open twin header
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include "ModelState.h"
 
@@ -71,12 +71,12 @@ void Application::run(void)
 	}
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	return OT_ACTION_RETURN_UnknownAction;
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
@@ -104,7 +104,7 @@ void Application::modelSelectionChangedNotification(void)
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	enableMessageQueuing("uiService", true);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("Mesh");
 
@@ -122,7 +122,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	modelSelectionChangedNotification();
 
-	enableMessageQueuing("uiService", false);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -177,8 +177,8 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 
 // ##################################################################################################################################
 
-std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
-	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (     action == "Mesh:Tet Mesh:Create Tet Mesh")	createMesh();
 	else if (action == "Mesh:Tet Mesh:Update Tet Mesh")	updateMesh();
 	else if (action == "Mesh:Import / Export:Import Tet Mesh") importMesh();
@@ -187,22 +187,22 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 	return std::string();
 }
 
-std::string Application::handleExecuteFunction(OT_rJSON_doc& _document) {
+std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
 
-	std::string function = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	std::string function = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 
 	if (function == "exportMeshFile")
 	{
-		std::string fileName = ot::rJSON::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
+		std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
 
 		exportMeshFile(fileName);
 	}
 	else if (function == "importMeshFile")
 	{
-		std::string originalName = ot::rJSON::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
+		std::string originalName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
 
-		std::string content = ot::rJSON::getString(_document, OT_ACTION_PARAM_FILE_Content);
-		ot::UID uncompressedDataLength = ot::rJSON::getULongLong(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+		std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
+		ot::UID uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 
 		// Process the file content
 		importMeshFile(originalName, content, uncompressedDataLength);
@@ -215,8 +215,8 @@ std::string Application::handleExecuteFunction(OT_rJSON_doc& _document) {
 	return std::string();
 }
 
-std::string Application::handleModelSelectionChanged(OT_rJSON_doc& _document) {
-	selectedEntities = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
+	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
 	modelSelectionChangedNotification();
 	return std::string();
 }
@@ -403,12 +403,12 @@ void Application::exportMesh(void)
 	std::string fileExtensions = meshExporter.getFileExtensions();
 
 	// First of all, we need to request a file name for the export from the frontend
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_SelectFileForStoring);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Export Mesh File");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, fileExtensions);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "exportMeshFile");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SelectFileForStoring, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Export Mesh File", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileExtensions, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("exportMeshFile", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }
@@ -419,13 +419,13 @@ void Application::importMesh(void)
 	std::string fileExtensions = meshImporter.getFileExtensions();
 
 	// Get a file name for the STEP file from the UI
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestFileForReading);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Import Mesh File");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Mask, fileExtensions);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, "importMeshFile");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SENDER_URL, serviceURL());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_LoadContent, true);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Mesh File", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileExtensions, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importMeshFile", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }
@@ -472,12 +472,12 @@ void Application::exportMeshFile(const std::string &fileName)
 
 	meshExporter.cleanUp();
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_SaveFileContent);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_DIALOG_TITLE, "Mesh Export");
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_OriginalName, fileName);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Content, fileContent);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SaveFileContent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Mesh Export", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength, doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }

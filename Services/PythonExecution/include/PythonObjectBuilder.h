@@ -16,6 +16,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include "OTCore/Variable.h"
 #include <optional>
 
 class PythonObjectBuilder

@@ -36,6 +36,8 @@ namespace ot {
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* _event) override;
+		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
@@ -44,7 +46,7 @@ namespace ot {
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) override;
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 

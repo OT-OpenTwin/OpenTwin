@@ -1,6 +1,7 @@
 #include "EntityBlock.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
+#include "OTCommunication/ActionTypes.h"
 #include "BlockConnectionBSON.h"
 #include "EntityBlock.h"
 
@@ -127,8 +128,9 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 std::string EntityBlock::CreateBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_first_of("/") + 1, getName().size());
-	const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
-	return blockTitel;
+	//const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
+	if (nameWithoutRootDirectory.empty()) return _blockTitle;
+	else return nameWithoutRootDirectory;
 }
 
 void EntityBlock::CreateNavigationTreeEntry()
@@ -141,13 +143,13 @@ void EntityBlock::CreateNavigationTreeEntry()
 		treeIcons.visibleIcon = _navigationTreeIconName;
 		treeIcons.hiddenIcon = _navigationTreeIconNameHidden;
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(&doc);
+		treeIcons.addToJsonDoc(doc);
 		getObserver()->sendMessageToViewer(doc);
 	}
 }
@@ -168,13 +170,14 @@ void EntityBlock::CreateBlockItem()
 	ot::GraphicsScenePackage pckg(_graphicsScenePackage);
 	pckg.addItem(blockCfg);
 
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-	_info.addToJsonObject(reqDoc, reqDoc);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	OT_rJSON_createValueObject(pckgDoc);
-	pckg.addToJsonObject(reqDoc, pckgDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgDoc);
+	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(reqDoc);
 }
@@ -186,44 +189,42 @@ void EntityBlock::CreateConnections()
 	// Store connection information
 	for (auto& connection : _connections)
 	{
+		connection.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
+
 		connectionPckg.addConnection(connection);
 	}
 
-	// Request UI to add connections
-	OT_rJSON_createDOC(connectionReqDoc);
-	ot::rJSON::add(connectionReqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
-	_info.addToJsonObject(connectionReqDoc, connectionReqDoc);
-	OT_rJSON_createValueObject(reqConnectionPckgObj);
-	connectionPckg.addToJsonObject(connectionReqDoc, reqConnectionPckgObj);
-	ot::rJSON::add(connectionReqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqConnectionPckgObj);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
-	getObserver()->sendMessageToViewer(connectionReqDoc);
+	ot::JsonObject pckgObj;
+	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+	getObserver()->sendMessageToViewer(reqDoc);
 }
 
-void EntityBlock::AddConnectors(ot::GraphicsFlowItemCfg* flowBlockConfig)
+void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {
-	if (flowBlockConfig != nullptr)
+	for (auto connectorByName : _connectorsByName)
 	{
-		for (auto connectorByName : _connectorsByName)
+		const ot::Connector& connector = connectorByName.second;
+		ot::ConnectorType connectorType = connector.getConnectorType();
+		if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS(""); };
+		const std::string connectorName = connector.getConnectorName();
+		const std::string connectorTitle = connector.getConnectorTitle();
+		if (connectorType == ot::ConnectorType::In)
 		{
-			const ot::Connector& connector = connectorByName.second;
-			ot::ConnectorType connectorType = connector.getConnectorType();
-			if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS(""); };
-			const std::string connectorName = connector.getConnectorName();
-			const std::string connectorTitle = connector.getConnectorTitle();
-			if (connectorType == ot::ConnectorType::In)
-			{
-				flowBlockConfig->addLeft(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Black);
-			}
-			else if (connectorType == ot::ConnectorType::InOptional)
-			{
-				flowBlockConfig->addLeft(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
-			}
-			else if (connectorType == ot::ConnectorType::Out)
-			{
-				flowBlockConfig->addRight(connectorName, connectorTitle, ot::GraphicsFlowConnectorCfg::Square, ot::Color::Black);
-			}
+			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
+		}
+		else if (connectorType == ot::ConnectorType::InOptional)
+		{
+			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
+		}
+		else if (connectorType == ot::ConnectorType::Out)
+		{
+			flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Square);
 		}
 	}
-
 }

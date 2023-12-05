@@ -3,7 +3,7 @@
 #include <set>
 #include <list>
 #include <string>
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>

@@ -26,10 +26,10 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/JSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
 
 ProjectManagement::ProjectManagement() :
 	isConnected(false),
@@ -60,25 +60,26 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CREATE_PROJECT);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, projectName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	std::string collectionName;
 
 	try
 	{
-		collectionName = ot::rJSON::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
+		collectionName = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
 	}
 	catch (std::exception)
 	{
@@ -93,14 +94,14 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_REMOVE_PROJECT);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, projectName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -114,15 +115,15 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CHANGE_PROJECT_NAME);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, oldProjectName);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_NEW_PROJECT_NAME, newProjectName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_PROJECT_NAME, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(oldProjectName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_NAME, ot::JsonString(newProjectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -136,14 +137,14 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
- 	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_PROJECT_DATA);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, projectName);
+	ot::JsonDocument doc;
+ 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -154,12 +155,13 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 		return false;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(responseMessage.getWhat());
 
 	canBeDeleted = false;
 	try
 	{
-		std::string owner = ot::rJSON::getString(responseDoc, OT_PARAM_AUTH_OWNER);
+		std::string owner = ot::json::getString(responseDoc, OT_PARAM_AUTH_OWNER);
 
 		if (owner == app->getCredentialUserName())
 		{
@@ -175,11 +177,11 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 
 bool ProjectManagement::hasError(const std::string &response)
 {
-	OT_rJSON_parseDOC(doc, response.c_str());
-
+	ot::JsonDocument doc;
+	doc.fromJson(response);
 	try
 	{
-		int error = ot::rJSON::getInt(doc, OT_ACTION_AUTH_ERROR);
+		int error = ot::json::getInt(doc, OT_ACTION_AUTH_ERROR);
 		return (error == 1);
 	}
 	catch (std::exception)
@@ -190,11 +192,12 @@ bool ProjectManagement::hasError(const std::string &response)
 
 bool ProjectManagement::hasSuccessful(const std::string &response)
 {
-	OT_rJSON_parseDOC(doc, response.c_str());
+	ot::JsonDocument doc;
+	doc.fromJson(response);
 
 	try
 	{
-		bool success = ot::rJSON::getBool(doc, OT_ACTION_AUTH_SUCCESS);
+		bool success = ot::json::getBool(doc, OT_ACTION_AUTH_SUCCESS);
 		return success;
 	}
 	catch (std::exception)
@@ -209,14 +212,14 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_PROJECT_DATA);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAME, projectName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return "";
 	}
@@ -227,13 +230,14 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 		return "";
 	}
 
-	OT_rJSON_parseDOC(responseDoc, responseMessage.getWhat().c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(responseMessage.getWhat());
 
 	std::string collectionName;
 
 	try
 	{
-		collectionName = ot::rJSON::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
+		collectionName = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
 	}
 	catch (std::exception)
 	{
@@ -251,22 +255,23 @@ bool ProjectManagement::findProjectNames(const std::string &projectNameFilter, i
 
 	AppBase * app{ AppBase::instance() };
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_ALL_USER_PROJECTS);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_FILTER, projectNameFilter);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_LIMIT, maxNumberOfResults+1);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, maxNumberOfResults + 1, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
-	const rapidjson::Value& projectArray = responseDoc[ "projects" ];
+	const rapidjson::Value& projectArray = responseDoc["projects"];
 	assert(projectArray.IsArray());
 
 	for (rapidjson::Value::ConstValueIterator itr = projectArray.Begin(); itr != projectArray.End(); ++itr)
@@ -274,7 +279,8 @@ bool ProjectManagement::findProjectNames(const std::string &projectNameFilter, i
 		const rapidjson::Value& project = *itr;
 		std::string projectData = project.GetString();
 
-		OT_rJSON_parseDOC(projectDoc, projectData.c_str());
+		ot::JsonDocument projectDoc;
+		projectDoc.fromJson(projectData);
 
 		std::string projectName = projectDoc[OT_PARAM_AUTH_NAME].GetString();
 		std::string owner = projectDoc[OT_PARAM_AUTH_OWNER].GetString();
@@ -360,19 +366,20 @@ bool ProjectManagement::readProjectAuthor(std::list<std::string> &projects)
 
 	std::list<std::string> validProjects;
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_ALL_PROJECT_OWNERS);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, app->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, app->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_NAMES, projects);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_PROJECT_OWNERS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(projects, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
 
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
 	const rapidjson::Value& projectArray = responseDoc[ "projects" ];
 	assert(projectArray.IsArray());
@@ -382,7 +389,8 @@ bool ProjectManagement::readProjectAuthor(std::list<std::string> &projects)
 		const rapidjson::Value& project = *itr;
 		std::string projectData = project.GetString();
 
-		OT_rJSON_parseDOC(projectDoc, projectData.c_str());
+		ot::JsonDocument projectDoc;
+		projectDoc.fromJson(projectData);
 
 		std::string projectName = projectDoc[OT_PARAM_AUTH_NAME].GetString();
 		std::string owner = projectDoc[OT_PARAM_AUTH_OWNER].GetString();

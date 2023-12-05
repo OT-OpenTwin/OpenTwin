@@ -41,22 +41,22 @@
 #include <qcoreapplication.h>	// QCoreApplication
 #include <qfile.h>				// QFile
 #include <qapplication.h>		// QApplication
-#include <qdesktopwidget.h>		// QDesktopWidget
+#include <QtGui/qscreen.h>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 #include <qfiledialog.h>		// Open/Save file dialog
 
 // Open twin header
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/Flags.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Point2D.h"
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
-#include "OpenTwinFoundation/SettingsData.h"
-#include "OpenTwinFoundation/OTObject.h"
+#include "OTCore/Logger.h"
+#include "OTCore/Flags.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/UiTypes.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTServiceFoundation/OTObject.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsView.h"
@@ -171,7 +171,7 @@ AppBase::~AppBase() {
 
 int AppBase::run() {
 	try {
-		otAssert(!m_isInitialized, "Application was already initialized");
+		OTAssert(!m_isInitialized, "Application was already initialized");
 		m_isInitialized = true;
 
 		QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
@@ -221,7 +221,7 @@ int AppBase::run() {
 
 		// Check if at least one icon directory was found
 		if (iconPathCounter == 0) {
-			otAssert(0, "No icon path was found!");
+			OTAssert(0, "No icon path was found!");
 			OT_LOG_E("No icon path found");
 			showErrorPrompt("No icon path was found. Try to reinstall the application", "Error");
 			return 3;
@@ -392,7 +392,7 @@ void AppBase::setCurrentProjectIsModified(
 
 aWindow * AppBase::mainWindow(void) {
 	if (m_mainWindow == invalidUID) {
-		otAssert(0, "Window not created"); return nullptr;
+		OTAssert(0, "Window not created"); return nullptr;
 	}
 	return uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 }
@@ -1163,13 +1163,13 @@ void AppBase::viewerSettingsChanged(ot::AbstractSettingsItem * _item) {
 		m_viewerComponent->settingsItemChanged(_item);
 	}
 	else {
-		otAssert(0, "No viewer component found");
+		OTAssert(0, "No viewer component found");
 	}
 }
 
 void AppBase::settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem * _item) {
-	if (_item->parentGroup() == nullptr) { otAssert(0, "Item is not attached to a group"); return; }
-	if (_owner == nullptr) { otAssert(0, "No settings owner provided"); return; }
+	if (_item->parentGroup() == nullptr) { OTAssert(0, "Item is not attached to a group"); return; }
+	if (_owner == nullptr) { OTAssert(0, "No settings owner provided"); return; }
 	ot::SettingsData * data = new ot::SettingsData("DataChangedEvent", "1.0");
 	ot::SettingsGroup * group = new ot::SettingsGroup(_item->parentGroup()->name(), _item->parentGroup()->title());
 	ot::SettingsGroup * groupOrigin = _item->parentGroup();
@@ -1182,19 +1182,19 @@ void AppBase::settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem
 	}
 	data->addGroup(group);
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_SettingsItemChanged);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SettingsItemChanged, doc.GetAllocator()), doc.GetAllocator());
 	data->addToJsonDocument(doc);
 	delete data;
 
 	std::string response;
 	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, _owner->serviceURL(), doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		otAssert(0, "Error from service");
+		OTAssert(0, "Error from service");
 		appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		otAssert(0, "Warning from service");
+		OTAssert(0, "Warning from service");
 		appendInfoMessage(QString("[WARNING] Sending message resulted in error: ") + response.c_str() + "\n");
 	}
 }
@@ -1487,7 +1487,7 @@ structModelViewInfo AppBase::createModelAndDisplay(
 	m_viewerComponent->activateModel(ret.view);
 
 	// Create DPI ratio
-	int DPIRatio = QApplication::desktop()->devicePixelRatio();
+	int DPIRatio = QApplication::primaryScreen()->devicePixelRatio();
 
 	const aColorStyle * cS = uiAPI::getCurrentColorStyle();
 	aColor col(255, 255, 255);
@@ -1557,6 +1557,14 @@ void AppBase::applyColorStyle(
 	if (m_uiPluginManager) {
 		m_uiPluginManager->forwardColorStyle(_colorStyle);
 	}
+
+	QString graphicsPickerSheet = _colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QDockWidget {", "}");
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafForegroundColorHeader | cafBackgroundColorHeader | cafBorderColorHeader, "QDockWidget::title{border-width: 1px;", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QSplitter {", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QTreeWidget {", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QLineEdit {", "}"));
+	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafForegroundColorControls, "QLabel {", "}"));
+	m_graphicsPickerDock->setStyleSheet(graphicsPickerSheet);
 }
 
 void AppBase::registerSession(
@@ -2171,19 +2179,19 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 		return;
 	}
 	
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, _name.toStdString());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, ot::JsonString(_name.toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	
 	ot::Point2DD itmPos(_pos.x(), _pos.y());
-	OT_rJSON_createValueObject(itemPosObj);
-	itmPos.addToJsonObject(doc, itemPosObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
+	ot::JsonObject itemPosObj;
+	itmPos.addToJsonObject(itemPosObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
 
 	try {
 		
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2212,18 +2220,18 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 		return;
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, _uid);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, ot::JsonString(_uid, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::Point2DD itmPos(_newPos.x(), _newPos.y());
-	OT_rJSON_createValueObject(itemPosObj);
-	itmPos.addToJsonObject(doc, itemPosObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj);
+	ot::JsonObject itemPosObj;
+	itmPos.addToJsonObject(itemPosObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
 
 	try {
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2252,15 +2260,15 @@ void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const
 		return;
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::GraphicsConnectionPackage pckg(view->graphicsViewName());
 	pckg.addConnection(_fromUid, _fromConnector, _toUid, _toConnector);
 
-	OT_rJSON_createValueObject(pckgObj);
-	pckg.addToJsonObject(doc, pckgObj);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 	
 	try {
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
@@ -2291,8 +2299,8 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		return;
 	}
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, doc.GetAllocator()), doc.GetAllocator());
 
 	std::list<std::string> sel;
 	for (auto s : scene->selectedItems()) {
@@ -2300,12 +2308,12 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		OTAssertNullptr(itm);
 		sel.push_back(itm->graphicsItemUid());
 	}
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, sel);
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
 		ot::GraphicsView* view = scene->getGraphicsView();
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, view->graphicsViewName());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_EA("Failed to send http request");

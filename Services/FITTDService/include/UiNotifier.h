@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenTwinFoundation/AbstractUiNotifier.h>
+#include "OTServiceFoundation/AbstractUiNotifier.h"
 
 #include <string>
 

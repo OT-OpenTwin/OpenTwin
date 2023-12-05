@@ -7,8 +7,9 @@
 #include <thread>
 
 // OpenTwin header
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCore/JSON.h"
+#include "OTCore/Logger.h"
 
 // SSL
 #include <QtCore/QFile>
@@ -87,8 +88,7 @@ void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 
 	foreach(QSslError err, errors)
 	{
-		std::string errStr = err.errorString().toStdString();
-		std::cout << errStr << endl;
+		OT_LOG_E(err.errorString().toStdString());
 	}
 	// WARNING: Never ignore SSL errors in production code.
 	// The proper way to handle self-signed certificates is to add a custom root
@@ -100,7 +100,7 @@ void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 
 void WebsocketClient::onConnected()
 {
-	std::cout << "Client connected" << endl;
+	OT_LOG_D("Client connected");
 
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::onMessageReceived);
 	isConnected = true;
@@ -108,17 +108,16 @@ void WebsocketClient::onConnected()
 
 void WebsocketClient::socketDisconnected()
 {
-	std::cout << "Relay server disconnected on websocket" << std::endl;
+	OT_LOG_D("Relay server disconnected on websocket");
 	isConnected = false;
 
 	if (!sessionIsClosing)
 	{
 		// This is an unexpected disconnect of the relay service -> we need to close the session
-
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceEmergencyShutdown);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
 		currentlyProcessingQueuedMessage = true;
-		queueAction(ot::rJSON::toJSON(doc).c_str(), "");
+		queueAction(doc.toJson().c_str(), "");
 	}
 }
 

@@ -1,6 +1,6 @@
 #include "OTGui/GuiTypes.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
 
 std::string ot::toString(ot::Alignment _alignment) {
 	switch (_alignment)
@@ -71,7 +71,6 @@ std::string ot::toString(ot::FontFamily _fontFamily) {
 	case ot::TrebuchetMS: return "TrebuchetMS";
 	case ot::Verdana: return "Verdana";
 	default:
-		OT_LOG_EAS("Unknown font family provided: \"" + std::to_string((int)_fontFamily) + "\"");
 		OT_LOG_EA("Unknown font family provided");
 		throw std::exception("Unknown font family provided");
 	}
@@ -92,5 +91,87 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 	else {
 		OT_LOG_EAS("Unknown font family provided: \"" + _string + "\"");
 		throw std::exception("Unknown font family provided");
+	}
+}
+
+std::string ot::toString(SizePolicy _policy) {
+	switch (_policy)
+	{
+	case ot::Preferred: return "Preferred";
+	case ot::Dynamic: return "Dynamic";
+	default:
+		OT_LOG_EA("Unknown size policy");
+		throw std::exception("Unknown size policy");
+	}
+}
+
+ot::SizePolicy ot::stringToSizePolicy(const std::string& _string) {
+	if (_string == toString(ot::Preferred)) { return ot::Preferred; }
+	else if (_string == toString(ot::Dynamic)) { return ot::Dynamic; }
+	else {
+		OT_LOG_EAS("Unknown size policy \"" + _string + "\"");
+		throw std::exception("Unknown size policy");
+	}
+}
+
+std::string ot::toString(ot::ConnectionDirection _direction) {
+	switch (_direction)
+	{
+	case ot::ConnectAny: return "Any";
+	case ot::ConnectLeft: return "Left";
+	case ot::ConnectUp: return "Up";
+	case ot::ConnectRight: return "Right";
+	case ot::ConnectDown: return "Down";
+	default:
+		OT_LOG_EA("Unknown connection direction");
+		throw std::exception("Unknown connection direction");
+	}
+}
+
+ot::ConnectionDirection ot::stringToConnectionDirection(const std::string& _direction) {
+	if (_direction == toString(ot::ConnectAny)) return ot::ConnectAny;
+	else if (_direction == toString(ot::ConnectLeft)) return ot::ConnectLeft;
+	else if (_direction == toString(ot::ConnectUp)) return ot::ConnectUp;
+	else if (_direction == toString(ot::ConnectRight)) return ot::ConnectRight;
+	else if (_direction == toString(ot::ConnectDown)) return ot::ConnectDown;
+	else {
+		OT_LOG_EAS("Unknown connection direction \"" + _direction + "\"");
+		throw std::exception("Unknown connection direction");
+	}
+}
+
+ot::ConnectionDirection ot::inversedConnectionDirection(ConnectionDirection _direction) {
+	switch (_direction)
+	{
+	case ot::ConnectAny: return ot::ConnectAny;
+	case ot::ConnectLeft: return ot::ConnectRight;
+	case ot::ConnectUp: return ot::ConnectDown;
+	case ot::ConnectRight: return ot::ConnectLeft;
+	case ot::ConnectDown: return ot::ConnectUp;
+	default:
+		OT_LOG_EA("Unknown connection direction");
+		return ot::ConnectAny;
+	}
+}
+
+std::string ot::toString(GradientSpread _spread) {
+	switch (_spread)
+	{
+	case ot::PadSpread: return "Pad";
+	case ot::RepeatSpread: return "Repeat";
+	case ot::ReflectSpread: return "Reflect";
+	default:
+		OT_LOG_EA("Unknown gradient spread");
+		throw std::exception("Unknown gradient spread");
+	}
+}
+
+ot::GradientSpread ot::stringToGradientSpread(const std::string& _spread) {
+	if (_spread == toString(PadSpread)) return PadSpread;
+	else if (_spread == toString(RepeatSpread)) return RepeatSpread;
+	else if (_spread == toString(ReflectSpread)) return ReflectSpread;
+	else {
+		OT_LOG_EAS("Unknown gradient spread \"" + _spread + "\"");
+		throw std::exception("Unknown gradient spread");
 	}
 }

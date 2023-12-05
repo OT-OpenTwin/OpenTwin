@@ -30,9 +30,9 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCommunication/UiTypes.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include "TopExp_Explorer.hxx"
 #include "TopoDS.hxx"
@@ -378,7 +378,7 @@ void Model::setupUIControls()
 	updateUndoRedoStatus();
 }
 
-void Model::executeAction(const std::string &action, rapidjson::Document &doc)
+void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 {
 	// Now process actions for all modal commands
 
@@ -1510,10 +1510,10 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	{
 		reportError(error);
 
-		OT_rJSON_createDOC(notify);
-		ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_SetEntityName);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ITM_ID, entityID);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ITM_Name, entity->getName());
+		ot::JsonDocument notify;
+		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetEntityName, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, entityID, notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, ot::JsonString(entity->getName(), notify.GetAllocator()), notify.GetAllocator());
 
 		std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 		getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
@@ -1558,10 +1558,10 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	modelChangeOperationCompleted("rename shapes");
 
 	// Finally send the path rename operation to the entity
-	OT_rJSON_createDOC(notify);
-	ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_RenameEntityName);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_PATH_FROM, fromPath);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_PATH_To, toPath);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RenameEntityName, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_PATH_FROM, ot::JsonString(fromPath, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(toPath, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
@@ -1611,9 +1611,9 @@ void Model::otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ow
 {
 	for (auto owner : ownerEntityListMap)
 	{
-		OT_rJSON_createDOC(notify);
-		ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_SelectionChanged);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_SelectedEntityIDs, owner.second);
+		ot::JsonDocument notify;
+		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_SelectedEntityIDs, ot::JsonArray(owner.second, notify.GetAllocator()), notify.GetAllocator());
 
 		getNotifier()->sendMessageToService(true, owner.first, notify);
 	}
@@ -2167,12 +2167,12 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 			brepVersions.push_back(brepVersion);
 		}
 
-		OT_rJSON_createDOC(notify);
-		ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_PropertyChanged);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDs);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersions);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_BrepVersionList, brepVersions);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible);
+		ot::JsonDocument notify;
+		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, notify.GetAllocator());
 
 		getNotifier()->sendMessageToService(false, serviceUpdate.first, notify);
 	}
@@ -2996,7 +2996,7 @@ void Model::getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> 
 
 void Model::entitiesSelected(const std::string &selectionAction, const std::string &selectionInfo, std::map<std::string, std::string> &options)
 {
-	rapidjson::Document doc;
+	ot::JsonDocument doc;
 
 	// Parse the document with the json string we have "received"
 	doc.Parse(selectionInfo.c_str());
@@ -3620,14 +3620,14 @@ void Model::sendVersionGraphToUI(std::list<std::tuple<std::string, std::string, 
 			descriptionList.push_back(std::get<2>(item));
 		}
 
-		OT_rJSON_createDOC(notify);
-		ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_SetVersionGraph);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ID, visualizationModelID);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_VERSION, versionList);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_PARENT, parentList);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION, descriptionList);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_ACTIVE, currentVersion);
-		ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_BRANCH, activeBranch);
+		ot::JsonDocument notify;
+		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraph, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonArray(versionList, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_PARENT, ot::JsonArray(parentList, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION, ot::JsonArray(descriptionList, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_ACTIVE, ot::JsonString(currentVersion, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 		std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 		getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
@@ -3641,11 +3641,11 @@ void Model::setActiveVersionTreeState(void)
 	std::string currentVersion = getStateManager()->getModelStateVersion();
 	std::string activeBranch   = getStateManager()->getActiveBranch();
 
-	OT_rJSON_createDOC(notify);
-	ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ID, visualizationModelID);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_ACTIVE, currentVersion);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_BRANCH, activeBranch);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_ACTIVE, ot::JsonString(currentVersion, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
@@ -3653,10 +3653,10 @@ void Model::setActiveVersionTreeState(void)
 
 void Model::removeVersionGraphVersions(const std::list<std::string> &versions)
 {
-	OT_rJSON_createDOC(notify);
-	ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ID, visualizationModelID);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_VERSION, versions);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonArray(versions, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
@@ -3664,22 +3664,22 @@ getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 
 void Model::addNewVersionTreeStateAndActivate(const std::string &parentVersion, const std::string &newVersion, const std::string &activeBranch, const std::string &description)
 {
-	OT_rJSON_createDOC(notify);
-	ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ID, visualizationModelID);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_VERSION, newVersion);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_PARENT, parentVersion);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION, description);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_UI_GRAPH_BRANCH, activeBranch);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonString(newVersion, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_PARENT, ot::JsonString(parentVersion, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION, ot::JsonString(description, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
-void Model::sendMessageToViewer(rapidjson::Document &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
+void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
 {
 	// Here we need to add the information about the visualization model to the document 
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, visualizationModelID);
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, doc.GetAllocator());
 
 	// And sent the message to the viewer
 	getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
@@ -4140,14 +4140,14 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	visEntity->StoreToDataBase();
 
 	// Now send the update view message to the viewer
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, visEntity->getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, DataBase::GetDataBase()->getProjectName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityID, visEntity->getEntityID(), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion, notify.GetAllocator());
 
-	sendMessageToViewer(doc, prefetchIds);
+	sendMessageToViewer(notify, prefetchIds);
 }
 
 void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const std::string &properties, bool updateProperties)
@@ -4281,12 +4281,12 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 
 void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService)
 {
-	OT_rJSON_createDOC(notify);
-	ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_PropertyChanged);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDs);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersions);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_BrepVersionList, brepVersions);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_ItemsVisible, true);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, true, notify.GetAllocator());
 
 	getNotifier()->sendMessageToService(false, owningService, notify);
 
@@ -4902,14 +4902,14 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 		return "";
 	}
 
-	OT_rJSON_createDOC(notify);
-	ot::rJSON::add(notify, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ParentNeedsUpdate);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDs);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityVersionList, entityVersions);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityInfoID, entityInfoIDList);
-	ot::rJSON::add(notify, OT_ACTION_PARAM_MODEL_EntityInfoVersion, entityInfoVersionList);
+	ot::JsonDocument notify;
+	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ParentNeedsUpdate, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfoID, ot::JsonArray(entityInfoIDList, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfoVersion, ot::JsonArray(entityInfoVersionList, notify.GetAllocator()), notify.GetAllocator());
 
-	return ot::rJSON::toJSON(notify);
+	return notify.toJson();
 }
 
 int Model::getServiceIDAsInt(void)

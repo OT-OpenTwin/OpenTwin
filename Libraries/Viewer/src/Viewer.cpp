@@ -14,13 +14,13 @@
 #include "HandleArrow.h"
 #include "TransformManipulator.h"
 
-#include "OpenTwinFoundation/SettingsData.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTCore/OTAssert.h"
 
 #include <qobject.h>
 #include <qwindow.h>
 
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/qopenglwidget.h>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 #include <QMouseEvent>
@@ -668,7 +668,7 @@ void Viewer::leaveEvent(QEvent *event)
 	model->clearHoverView();
 }
 
-void Viewer::enterEvent(QEvent * event)
+void Viewer::enterEvent(QEnterEvent* event)
 {
 	if (graphicsWindow == nullptr) return;
 
@@ -680,7 +680,7 @@ void Viewer::wheelEvent(QWheelEvent* event)
 	if (graphicsWindow == nullptr) return;
 	if (middleButtonDown) return;
 
-	int delta = event->delta();
+	int delta = event->angleDelta().y();
 	osgGA::GUIEventAdapter::ScrollingMotion motion = delta > 0 ? osgGA::GUIEventAdapter::SCROLL_DOWN : osgGA::GUIEventAdapter::SCROLL_UP;
 
 	getEventQueue()->mouseScroll(motion);
@@ -860,7 +860,7 @@ void Viewer::finishRubberbandExecution(void)
 		rubberband = nullptr;
 	}
 	else {
-		otAssert(0, "Finishing execution of not existing rubberband");
+		OTAssert(0, "Finishing execution of not existing rubberband");
 	}
 }
 
@@ -902,7 +902,7 @@ void Viewer::settingsItemChanged(ot::AbstractSettingsItem * _item) {
 		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
 	}
 	else {
-		otAssert(0, "Unknown logical name");
+		OTAssert(0, "Unknown logical name");
 	}
 	if (updateRequired) {
 		ot::SettingsData *settings = createSettings();
@@ -917,70 +917,70 @@ bool Viewer::workingPlaneSettingsItemChanged(const std::string& _logicalName, ot
 	// Check the name (Group:Subgroup:...:Item)
 	if (_logicalName == "Viewer:WorkingPlane:Style") {
 		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneStyle = actualItem->selectedValue();
 		_settingsUpdateRequired = true;
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:DefaultSize") {
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneDefaultSize = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:AutoSize") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneAutoSize = actualItem->value();
 		_settingsUpdateRequired = true;
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:Size") {
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneSize = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:PlaneColor") {
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlanePlaneColor = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:GridColor") {
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneGridLineColor = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:GridAutoResolution") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneAutoGridResolution = actualItem->value();
 		_settingsUpdateRequired = true;
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:GridResolution") {
 		ot::SettingsItemDouble * actualItem = dynamic_cast<ot::SettingsItemDouble *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneGridResolution = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:GridHighlightStep") {
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneHighlightEveryStep = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:GridLineWidth") {
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneGridLineWidth = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:WorkingPlane:GridWideLineWidth") {
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneWideGridLineWidth = actualItem->value();
 		return true;
 	}
@@ -993,43 +993,43 @@ bool Viewer::axisCrossSettingsItemChanged(const std::string& _logicalName, ot::A
 	// Check the name (Group:Subgroup:...:Item)
 	if (_logicalName == "Viewer:AxisCross:ColorX") {
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisXColor = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:AxisCross:ColorY") {
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisYColor = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:AxisCross:ColorZ") {
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisZColor = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:AxisCross:ColorCenter") {
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisCenterColor = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:AxisCross:CenterCrossLineWidth") {
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisCenterCrossLineWidth = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:AxisCross:DashedLineVisible") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisCenterCrossDashedLineVisible = actualItem->value();
 		return true;
 	}
 	else if (_logicalName == "Viewer:AxisCross:CenterCrossAlswaysAtFront") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->axisCenterCrossLineAtFront = actualItem->value();
 		return true;
 	}
@@ -1043,7 +1043,7 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::Ab
 	if (_logicalName == "Viewer:Geometry:HighlightColor") {
 		ot::SettingsItemColor *actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
 		if (actualItem == nullptr) {
-			otAssert(0, "Cast item fialed");
+			OTAssert(0, "Cast item fialed");
 			return true;
 		}
 		settings->geometryHighlightColor = actualItem->value();
@@ -1052,7 +1052,7 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::Ab
 	else if (_logicalName == "Viewer:Geometry:EdgeColorMode") {
 		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
 		if (actualItem == nullptr) {
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			return true;
 		}
 		settings->geometryEdgeColorMode = actualItem->selectedValue();
@@ -1062,7 +1062,7 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::Ab
 	else if (_logicalName == "Viewer:Geometry:LightSourceDistance") {
 		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
 		if (actualItem == nullptr) {
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			return true;
 		}
 		settings->geometryLightSourceDistance = actualItem->selectedValue();
@@ -1071,7 +1071,7 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::Ab
 	}
 	else if (_logicalName == "Viewer:Geometry:ViewBackgroundColorAutomatic") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->viewBackgroundColorAutomatic = actualItem->value();
 		setClearColorAutomatic();
 		_settingsUpdateRequired = true;
@@ -1080,7 +1080,7 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::Ab
 	else if (_logicalName == "Viewer:Geometry:ViewBackgroundColor") {
 		ot::SettingsItemColor *actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
 		if (actualItem == nullptr) {
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			return true;
 		}
 		settings->viewBackgroundColor = actualItem->value();
@@ -1090,7 +1090,7 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::Ab
 	else if (_logicalName == "Viewer:Geometry:ViewForegroundColor") {
 		ot::SettingsItemColor *actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
 		if (actualItem == nullptr) {
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			return true;
 		}
 		settings->viewForegroundColor = actualItem->value();
@@ -1106,7 +1106,7 @@ bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, ot::Abs
 	// Check the item (Group:Subgroup:...:Item)
 	if (_logicalName == "Viewer:Display:UseDisplayList") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->useDisplayLists = actualItem->value();
 		updateDisplaySettings(rootNode);
 		_settingsUpdateRequired = true;
@@ -1114,7 +1114,7 @@ bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, ot::Abs
 	}
 	else if (_logicalName == "Viewer:Display:UseVertexBuffers") {
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Cast item failed"); return true; }
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->useVertexBufferObjects = actualItem->value();
 		updateDisplaySettings(rootNode);
 		_settingsUpdateRequired = true;

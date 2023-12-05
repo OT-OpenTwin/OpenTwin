@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OpenTwinCore/Flags.h"
+#include "OTCore/Flags.h"
 
 namespace ot {
 

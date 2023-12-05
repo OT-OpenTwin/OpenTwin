@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class __declspec(dllexport) GenericDocument
 {

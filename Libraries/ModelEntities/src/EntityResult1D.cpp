@@ -6,7 +6,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -103,13 +103,13 @@ void EntityResult1D::addVisualizationNodes(void)
 		treeIcons.visibleIcon = "TextVisible";
 		treeIcons.hiddenIcon = "TextHidden";
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(&doc);
+		treeIcons.addToJsonDoc(doc);
 
 		getObserver()->sendMessageToViewer(doc);
 	}
@@ -171,10 +171,10 @@ bool EntityResult1D::updateFromProperties(void)
 	StoreToDataBase();
 
 	// Send a notification message to the observer, that the result1d properties have changed
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_ID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_Version, getEntityStorageVersion());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getEntityStorageVersion(), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 

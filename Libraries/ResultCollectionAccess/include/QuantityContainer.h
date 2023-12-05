@@ -4,7 +4,7 @@
 #include <string>
 #include <set>
 
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 
 #include <bsoncxx/builder/stream/document.hpp>

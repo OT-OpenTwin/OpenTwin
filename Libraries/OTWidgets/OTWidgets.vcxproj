@@ -20,11 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
+    <ClCompile Include="src\Dialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
-    <ClCompile Include="src\GraphicsDirectConnectionItem.cpp" />
+    <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
     <ClCompile Include="src\GraphicsFactory.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
@@ -41,22 +42,26 @@
     <ClCompile Include="src\GraphicsScene.cpp" />
     <ClCompile Include="src\GraphicsStackItem.cpp" />
     <ClCompile Include="src\GraphicsTextItem.cpp" />
+    <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\OTQtConverter.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
+    <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
+    <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
+    <ClInclude Include="include\OTWidgets\Dialog.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
-    <ClInclude Include="include\OTWidgets\GraphicsDirectConnectionItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h" />
@@ -72,6 +77,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsRectangularItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsStackItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsTextItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsTriangleItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsVBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.h" />
     <ClInclude Include="include\OTWidgets\LineEdit.h" />
@@ -79,6 +85,7 @@
     <ClInclude Include="include\OTWidgets\Painter2DFactory.h" />
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h" />
     <QtMoc Include="include\OTWidgets\TabWidget.h" />
+    <QtMoc Include="include\OTWidgets\ToolTipHandler.h" />
     <ClInclude Include="include\OTWidgets\TreeWidget.h" />
     <ClInclude Include="include\OTWidgets\WidgetTypes.h" />
     <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h" />
@@ -192,7 +199,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -233,7 +240,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

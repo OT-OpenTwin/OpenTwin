@@ -72,7 +72,7 @@
 #include <qfiledialog.h>					// Open/Save file dialog
 #include <qfile.h>
 #include <qmovie.h>
-#include <qdesktopwidget.h>
+#include <QtGui/qscreen.h>
 #include <qfiledialog.h>
 #include <qdatetime.h>
 #include <qsettings.h>
@@ -128,7 +128,7 @@ void ak::uiAPI::apiManager::ini(
 ) {
 	assert(!m_isInitialized); // Is already initialized
 	m_app = new aApplication;
-	m_desktop = m_app->desktop();
+	m_screen = m_app->primaryScreen();
 	
 	m_companyName = _organizationName;
 	m_applicationName = _applicationName;
@@ -354,7 +354,7 @@ ak::UID ak::uiAPI::createAction(
 	const QString &										_iconSize
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName));
+	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName + ".png"));
 }
 
 ak::UID ak::uiAPI::createAction(
@@ -420,8 +420,8 @@ ak::UID ak::uiAPI::createColorStyleSwitch(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return createColorStyleSwitch(_creatorUid, _brightModeTitle, _darkModeTitle,
-		ot::IconManager::instance().getIcon(_brightModeIconFolder + "/" + _brightModeIconName),
-		ot::IconManager::instance().getIcon(_darkModeIconFolder + "/" + _darkModeIconName),
+		ot::IconManager::instance().getIcon(_brightModeIconFolder + "/" + _brightModeIconName + ".png"),
+		ot::IconManager::instance().getIcon(_darkModeIconFolder + "/" + _darkModeIconName + ".png"),
 		_isBright);
 }
 
@@ -473,7 +473,7 @@ ak::UID ak::uiAPI::createDockWatcher(
 	const QString &						_text
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createDockWatcher(_creatorUid, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _text);
+	return m_objManager->createDockWatcher(_creatorUid, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _text);
 }
 
 ak::UID ak::uiAPI::createGlobalKeyListener(
@@ -515,7 +515,7 @@ ak::UID ak::uiAPI::createLogInDialog(
 	const QString &										_password
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, ot::IconManager::instance().getPixmap("Images/" + _imageName), _username, _password);
+	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, ot::IconManager::instance().getPixmap("Images/" + _imageName + ".png"), _username, _password);
 }
 
 ak::UID ak::uiAPI::createNiceLineEdit(
@@ -639,7 +639,7 @@ ak::UID ak::uiAPI::createToolButton(
 	const QString &										_iconFolder
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
+	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 ak::UID ak::uiAPI::createTree(
@@ -689,7 +689,7 @@ void ak::uiAPI::action::setIcon(
 	const QString &										_iconName,
 	const QString &										_iconFolder
 ) {
-	object::get<aAction>(_actionUID)->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
+	object::get<aAction>(_actionUID)->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 QString ak::uiAPI::action::getText(
@@ -833,7 +833,7 @@ ak::ID ak::uiAPI::contextMenu::addItem(
 	assert(m_objManager != nullptr); // API not initialized
 	aObject * obj = m_objManager->object(_widgetUID);
 	assert(obj != nullptr); // Invalid UID
-	aContextMenuItem * newItem = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName), _text, _role);
+	aContextMenuItem * newItem = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName + ".png"), _text, _role);
 
 	switch (obj->type())
 	{
@@ -1389,7 +1389,7 @@ ak::dialogResult ak::uiAPI::promptDialog::show(
 	const QString &				_iconPath,
 	QWidget *					_parentWidget
 ) {
-	return show(_message, _title, _type, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName), _parentWidget);
+	return show(_message, _title, _type, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName + ".png"), _parentWidget);
 }
 
 ak::dialogResult ak::uiAPI::promptDialog::show(
@@ -1809,8 +1809,8 @@ void ak::uiAPI::propertyGrid::setGroupStateIcons(
 	const QString &									_groupExpandIconName,
 	const QString &									_groupExpandIconFolder
 ) {
-	setGroupStateIcons(_propertyGridUID, ot::IconManager::instance().getIcon(_groupCollapseIconFolder + "/" + _groupCollapseIconName),
-		ot::IconManager::instance().getIcon(_groupExpandIconFolder + "/" + _groupExpandIconName));
+	setGroupStateIcons(_propertyGridUID, ot::IconManager::instance().getIcon(_groupCollapseIconFolder + "/" + _groupCollapseIconName + ".png"),
+		ot::IconManager::instance().getIcon(_groupExpandIconFolder + "/" + _groupExpandIconName + ".png"));
 }
 
 void ak::uiAPI::propertyGrid::setDeleteIcon(
@@ -1818,7 +1818,7 @@ void ak::uiAPI::propertyGrid::setDeleteIcon(
 	const QString& _deleteIconName,
 	const QString& _deleteIconFolder
 ) {
-	object::get<aPropertyGridWidget>(_propertyGridUID)->setDeleteIcon(ot::IconManager::instance().getIcon(_deleteIconFolder + "/" + _deleteIconName));
+	object::get<aPropertyGridWidget>(_propertyGridUID)->setDeleteIcon(ot::IconManager::instance().getIcon(_deleteIconFolder + "/" + _deleteIconName + ".png"));
 }
 
 void ak::uiAPI::propertyGrid::resetItemAsError(
@@ -1961,7 +1961,7 @@ ak::ID ak::uiAPI::tabWidget::addTab(
 	const QString &		_iconName,
 	const QString &		_iconFolder
 ) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _title);
+	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
 }
 
 ak::ID ak::uiAPI::tabWidget::addTab(
@@ -1986,7 +1986,7 @@ ak::ID ak::uiAPI::tabWidget::addTab(
 	const QString &		_iconName,
 	const QString &		_iconFolder
 ) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _title);
+	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
 }
 
 ak::ID ak::uiAPI::tabWidget::addTab(
@@ -2315,7 +2315,7 @@ void ak::uiAPI::toolButton::setIcon(
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->getAction()->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
+	actualToolButton->getAction()->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 ak::ID ak::uiAPI::toolButton::addMenuItem(
@@ -2353,7 +2353,7 @@ ak::ID ak::uiAPI::toolButton::addMenuItem(
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
-	aContextMenuItem * itm = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName), _text, cmrNone);
+	aContextMenuItem * itm = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _text, cmrNone);
 	return actualToolButton->addMenuItem(itm);
 }
 
@@ -2434,7 +2434,7 @@ ak::ID ak::uiAPI::tree::addItem(
 	textAlignment				_textAlignment
 ) {
 	auto actualTree = object::get<aTreeWidget>(_treeUID);
-	return actualTree->add(_parentId, _text, _textAlignment, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName));
+	return actualTree->add(_parentId, _text, _textAlignment, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName + ".png"));
 }
 
 ak::ID ak::uiAPI::tree::addItem(
@@ -2456,7 +2456,7 @@ ak::ID ak::uiAPI::tree::addItem(
 	textAlignment				_textAlignment
 ) {
 	auto actualTree = object::get<aTreeWidget>(_treeUID);
-	return actualTree->add(_cmd, _delimiter, _textAlignment, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName));
+	return actualTree->add(_cmd, _delimiter, _textAlignment, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName + ".png"));
 }
 
 void ak::uiAPI::tree::clear(
@@ -2644,7 +2644,7 @@ void ak::uiAPI::tree::setItemIcon(
 	const QString &					_iconFolder
 ) {
 	auto actualTree = object::get<aTreeWidget>(_treeUID);
-	actualTree->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName));
+	actualTree->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 void ak::uiAPI::tree::setItemEnabled(
@@ -2923,7 +2923,7 @@ void ak::uiAPI::window::setWaitingAnimation(
 	UID												_windowUID,
 	const QString &										_animationName
 ) {
-	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(&ot::IconManager::instance().getMovie("Animations/" + _animationName));
+	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(&ot::IconManager::instance().getMovie("Animations/" + _animationName + ".gif"));
  }
 
 void ak::uiAPI::window::setCentralWidgetMinimumSize(
@@ -2932,7 +2932,7 @@ void ak::uiAPI::window::setCentralWidgetMinimumSize(
 	int													_height
 ) { object::get<aWindowManager>(_windowUID)->setCentralWidgetMinimumSize(QSize(_width, _height)); }
 
-int ak::uiAPI::window::devicePixelRatio(void) { return m_apiManager.desktop()->devicePixelRatio(); }
+int ak::uiAPI::window::devicePixelRatio(void) { return m_apiManager.screen()->devicePixelRatio(); }
 
 void ak::uiAPI::window::resize(
 	UID												_windowUID,
@@ -3030,7 +3030,7 @@ void ak::uiAPI::addIconSearchPath(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	ot::IconManager::instance().addSearchPath(_path);
-	m_objManager->setIconSearchDirectories(ot::IconManager::instance().searchPaths().toVector().toStdVector());
+	m_objManager->setIconSearchDirectories(ot::IconManager::instance().searchPaths());
 }
 
 ak::UID ak::uiAPI::createUid(void) {
@@ -3044,25 +3044,25 @@ const QIcon & ak::uiAPI::getIcon(
 	const QString &											_iconName,
 	const QString &											_iconSubPath
 ) {
-	return ot::IconManager::instance().getIcon(_iconSubPath + "/" + _iconName);
+	return ot::IconManager::instance().getIcon(_iconSubPath + "/" + _iconName + ".png");
 }
 
 const QIcon & ak::uiAPI::getApplicationIcon(
 	const QString &											_iconName
 ) {
-	return ot::IconManager::instance().getIcon("Application/" + _iconName);
+	return ot::IconManager::instance().getIcon("Application/" + _iconName + ".ico");
 }
 
 const QPixmap & ak::uiAPI::getPixmap(
 	const QString &											_name
 ) {
-	return ot::IconManager::instance().getPixmap("Images/" + _name);
+	return ot::IconManager::instance().getPixmap("Images/" + _name + ".png");
 }
 
 QMovie * ak::uiAPI::getMovie(
 	const QString&											_name
 ) {
-	return &ot::IconManager::instance().getMovie("Animations/" + _name);
+	return &ot::IconManager::instance().getMovie("Animations/" + _name + ".gif");
 }
 
 // ###############################################################################################################################################
@@ -3282,7 +3282,3 @@ QString ak::uiAPI::special::toEventText(
 	out.append("}");
 	return out;
 }
-
-ak::InvalidObjectTypeException::InvalidObjectTypeException() : std::exception("Invalid object type") {}
-
-ak::ItemNotFoundException::ItemNotFoundException() : std::exception("Item not found") {}

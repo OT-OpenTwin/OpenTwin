@@ -13,16 +13,14 @@
 #include <exception>
 #include <fstream>
 
-#include <Logger.h>
-
 #include <QtCore/QCoreApplication>
 #include <QtWebSockets/QtWebSockets>
 
 // Open Twin header
-#include "OpenTwinCore/rJSON.h"					// rapidjson wrapper
-#include "OpenTwinCore/Logger.h"				// Logger
-#include "OpenTwinCore/ServiceBase.h"			// Logger initialization
-#include "OpenTwinCommunication/ActionTypes.h"	// action member and types definition
+#include "OTCore/JSON.h"					// rapidjson wrapper
+#include "OTCore/Logger.h"				// Logger
+#include "OTCore/ServiceBase.h"			// Logger initialization
+#include "OTCommunication/ActionTypes.h"	// action member and types definition
 
 #include "SocketServer.h"
 
@@ -51,9 +49,9 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	// Create ping request
-	OT_rJSON_createDOC(pingDoc);
-	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	std::string ping = ot::rJSON::toJSON(pingDoc);
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string ping = pingDoc.toJson();
 
 	bool alive = true;
 	while (alive) {
@@ -140,16 +138,16 @@ extern "C"
 				assert(info.length() > 0);	// No file created
 
 				// Parse doc
-				OT_rJSON_parseDOC(params, info.c_str());
-				OT_rJSON_docCheck(params);
+				ot::JsonDocument params;
+				params.fromJson(info);
 
 				// Apply data
-				globalServiceIP = ot::rJSON::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-				std::string websocketUrl = ot::rJSON::getString(params, OT_ACTION_PARAM_WebsocketURL);
+				globalServiceIP = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+				std::string websocketUrl = ot::json::getString(params, OT_ACTION_PARAM_WebsocketURL);
 				globalWebsocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
 				globalWebsocketIP = websocketUrl.substr(0, websocketUrl.rfind(":"));
-				globalSessionServiceIP = ot::rJSON::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-				globalDirectoryServiceIP = ot::rJSON::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
+				globalSessionServiceIP = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+				globalDirectoryServiceIP = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
 
 				OT_LOG_I("Application parameters were overwritten by configuration file: " + path);
 			}

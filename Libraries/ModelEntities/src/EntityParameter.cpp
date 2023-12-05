@@ -5,7 +5,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -97,13 +97,13 @@ void EntityParameter::addVisualizationItem(bool isHidden)
 	treeIcons.visibleIcon = "ParameterVisible";
 	treeIcons.hiddenIcon = "ParameterHidden";
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(&doc);
+	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }

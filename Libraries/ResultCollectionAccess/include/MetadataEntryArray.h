@@ -1,6 +1,6 @@
 #pragma once
 #include "MetadataEntry.h"
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 #include <list>
 

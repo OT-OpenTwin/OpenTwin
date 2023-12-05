@@ -5,7 +5,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
+#include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 #include "OTWidgets/Painter2DFactory.h"
@@ -18,16 +19,18 @@ static ot::SimpleFactoryRegistrar<ot::GraphicsEllipseItem> elliItem(OT_SimpleFac
 static ot::GlobalKeyMapRegistrar elliItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
 
 ot::GraphicsEllipseItem::GraphicsEllipseItem()
-	: ot::GraphicsItem(false), m_radiusX(5), m_radiusY(5)
+	: ot::CustomGraphicsItem(false), m_radiusX(5.), m_radiusY(5.)
 {
-	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
-	this->setGraphicsItem(this);
-	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+
 }
 
 ot::GraphicsEllipseItem::~GraphicsEllipseItem() {
 
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::GraphicsItems
 
 bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
@@ -46,66 +49,37 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
 	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
 
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsEllipseItem::prepareGraphicsItemGeometryChange(void) {
-	this->prepareGeometryChange();
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::CustomGraphicsItem
+
+QSizeF ot::GraphicsEllipseItem::getPreferredGraphicsItemSize(void) const {
+	return QSizeF(m_radiusX * 2., m_radiusY * 2.);
 }
 
-QSizeF ot::GraphicsEllipseItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m_radiusX * 2., m_radiusY * 2.));
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-QRectF ot::GraphicsEllipseItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(m_radiusX * 2., m_radiusY * 2.)));
-}
+// Base class functions: ot::CustomGraphicsItem
 
-void ot::GraphicsEllipseItem::setGeometry(const QRectF& _rect) {
-	this->prepareGeometryChange();
-	this->setPos(_rect.topLeft());
-	this->handleSetItemGeometry(_rect);
-	QGraphicsLayoutItem::setGeometry(this->boundingRect());
-}
-
-QVariant ot::GraphicsEllipseItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	this->handleItemChange(_change, _value);
-	return _value;
-}
-
-void ot::GraphicsEllipseItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
-}
-
-void ot::GraphicsEllipseItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsEllipseItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+void ot::GraphicsEllipseItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
-	QRectF rect = this->calculatePaintArea(QSizeF(m_radiusX * 2., m_radiusY * 2.));
-	_painter->drawEllipse(rect.center(), rect.width() / 2., rect.height() / 2.);
+	_painter->drawEllipse(_rect.center(), _rect.width() / 2., _rect.height() / 2.);
 }
 
-void ot::GraphicsEllipseItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
-	QGraphicsItem::mousePressEvent(_event);
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::GraphicsEllipseItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
-	QGraphicsItem::mouseReleaseEvent(_event);
-}
+// Setter/Getter
 
 void ot::GraphicsEllipseItem::setRadius(double _x, double _y) {
-	this->prepareGeometryChange();
+	// Avoid resizing if the size did not change
+	if (_x == m_radiusX && _y == m_radiusY) { return; }
 	m_radiusX = _x;
 	m_radiusY = _y;
-}
-
-QSizeF ot::GraphicsEllipseItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->sizeHint(_hint, _constrains);
+	this->setGeometry(QRectF(this->pos(), QSizeF(m_radiusX * 2., m_radiusY * 2.)).toRect());
+	this->raiseEvent(GraphicsItem::ItemResized);
 }

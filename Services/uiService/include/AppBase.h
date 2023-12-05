@@ -21,11 +21,11 @@
 #include <akWidgets/aComboButtonWidgetItem.h>
 #include <akWidgets/aWindow.h>
 
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/OwnerService.h"
-#include "OpenTwinCore/OwnerManagerTemplate.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/OwnerService.h"
+#include "OTCore/OwnerManagerTemplate.h"
 
-#include "OpenTwinFoundation/UserCredentials.h"
+#include "OTServiceFoundation/UserCredentials.h"
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
 #include <akGui/aPaintable.h>

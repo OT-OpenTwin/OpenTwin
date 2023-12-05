@@ -1,7 +1,7 @@
 #pragma once
 
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include "ModelState.h"
 #include "ClassFactory.h"

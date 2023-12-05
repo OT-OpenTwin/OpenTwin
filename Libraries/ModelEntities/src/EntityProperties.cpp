@@ -1,10 +1,6 @@
 
 #include "EntityProperties.h"
 
-#include "rapidjson/document.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
-
 #include <cassert>
 #include <list>
 
@@ -158,7 +154,7 @@ std::string EntityProperties::getJSON(EntityBase *root, bool visibleOnly)
 {
 	// Here we convert the entire container with all its entities into a JSON document
 
-	rapidjson::Document jsonDoc;
+	ot::JsonDocument jsonDoc;
 	jsonDoc.SetObject();	
 	
 	for (auto prop : propertiesList)
@@ -187,54 +183,50 @@ void EntityProperties::buildFromJSON(const std::string &prop)
 	deleteAllProperties();
 
 	// Read settings into JSOC Doc
-	rapidjson::Document doc;
+	ot::JsonDocument doc;
 
 	// Parse the document with the json string we have "received"
-	doc.Parse(prop.c_str());
-
-	// Check if the document is an object
-	assert(doc.IsObject()); // Doc is not an object
+	doc.fromJson(prop);
 
 	// Now loop through all members of the document
-	for (rapidjson::Value::ConstMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
+	for (ot::JsonMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
 	{
 		std::string propertyName = i->name.GetString();
 
 		if (i->value.IsObject())
 		{
-			const rapidjson::Value &object = i->value;
-
-			std::string type = object["Type"].GetString();
-			bool multipleValues = object["MultipleValues"].GetBool();
+			//const rapidjson::Value &object = i->value;
+			std::string type = ot::json::getString(i->value, "Type");
+			bool multipleValues = ot::json::getBool(i->value, "MultipleValues");
 
 			bool readOnly = false;
-			if (object.FindMember("ReadOnly") != object.MemberEnd())
+			if (i->value.HasMember("ReadOnly"))
 			{
-				readOnly = object["ReadOnly"].GetBool();
+				readOnly = ot::json::getBool(i->value, "ReadOnly");
 			}
 
 			bool protectedProperty = true;
-			if (object.FindMember("Protected") != object.MemberEnd())
+			if (i->value.HasMember("Protected"))
 			{
-				protectedProperty = object["Protected"].GetBool();
+				protectedProperty = ot::json::getBool(i->value, "Protected");
 			}
 
 			bool visible = true;
-			if (object.FindMember("Visible") != object.MemberEnd())
+			if (i->value.HasMember("Visible"))
 			{
-				visible = object["Visible"].GetBool();
+				visible = ot::json::getBool(i->value, "Visible");
 			}
 
 			bool errorState = false;
-			if (object.FindMember("ErrorState") != object.MemberEnd())
+			if (i->value.HasMember("ErrorState"))
 			{
-				errorState = object["ErrorState"].GetBool();
+				errorState = ot::json::getBool(i->value, "ErrorState");
 			}
 
 			std::string group;
-			if (object.FindMember("Group") != object.MemberEnd())
+			if (i->value.HasMember("Group"))
 			{
-				group = object["Group"].GetString();
+				group = ot::json::getString(i->value, "Group");
 			}
 
 			EntityPropertiesBase *newSetting(nullptr);
@@ -256,7 +248,7 @@ void EntityProperties::buildFromJSON(const std::string &prop)
 
 			if (newSetting != nullptr)
 			{
-				newSetting->readFromJsonObject(object);
+				newSetting->readFromJsonObject(i->value.GetObject());
 				newSetting->setName(propertyName);
 				newSetting->setHasMultipleValues(multipleValues);
 				newSetting->setReadOnly(readOnly);

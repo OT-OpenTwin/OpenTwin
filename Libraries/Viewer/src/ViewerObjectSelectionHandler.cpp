@@ -11,7 +11,7 @@
 
 #include <qapplication.h>
 
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 #include <osgViewer/Viewer>
 
@@ -209,7 +209,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 							case rbeCore::Step::pUV: processRubberbandUpdate(viewer, ea.getX(), ea.getY(), IN_PLANE, n, p); break;
 							case rbeCore::Step::pW: processRubberbandUpdate(viewer, ea.getX(), ea.getY(), HEIGHT, n, p); break;
 							default:
-								otAssert(0, "Unknown step projection");
+								OTAssert(0, "Unknown step projection");
 								break;
 							}
 						}

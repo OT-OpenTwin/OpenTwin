@@ -1,5 +1,5 @@
 #include "EntityBlockPython.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 #include "PythonHeaderInterpreter.h"
 
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
@@ -26,19 +26,21 @@ std::string EntityBlockPython::getSelectedScript()
 
 ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 {
-	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
+	ot::GraphicsFlowItemBuilder block;
+	block.setName(this->getClassName());
+	block.setTitle(this->CreateBlockHeadline());
 
 	const ot::Color colourTitle(ot::Color::Cyan);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
-	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	block->setLeftTitleCornerImagePath("Images/Python");
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setLeftTitleCornerImagePath("Images/Python.png");
+	block.setBackgroundImagePath("Images/Script.svg");
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
-	AddConnectors(block.get());
+	AddConnectors(block);
 	
-	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
 }
 

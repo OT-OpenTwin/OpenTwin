@@ -1,8 +1,8 @@
 #include "UserSettings.h"
 #include "AppBase.h"
 
-#include "OpenTwinFoundation/SettingsData.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTCore/OTAssert.h"
 
 #include <akAPI/uiAPI.h>
 #include <akGui/aColorStyleDefaultDark.h>
@@ -119,14 +119,14 @@ void UserSettings::showDialog(const QString& _group) {
 }
 
 void UserSettings::clear(void) {
-	if (m_dialog) { otAssert(0, "Can not clear user settings while dialog is active"); return; }
+	if (m_dialog) { OTAssert(0, "Can not clear user settings while dialog is active"); return; }
 	if (m_viewerSettings) { delete m_viewerSettings; m_viewerSettings = nullptr; }
 	for (auto serviceData : m_serviceToSettingsMap) { delete serviceData.second; }
 	m_serviceToSettingsMap.clear();
 	m_uiToOwnerMap.clear();
 }
 
-void UserSettings::addFromService(ot::ServiceBase * _sender, rapidjson::Document& _document) {
+void UserSettings::addFromService(ot::ServiceBase * _sender, ot::JsonDocument& _document) {
 	QString lastSelection;
 	if (m_dialog) {
 		lastSelection = m_dialog->lastSelectedGroupName();
@@ -138,10 +138,12 @@ void UserSettings::addFromService(ot::ServiceBase * _sender, rapidjson::Document
 		m_serviceToSettingsMap.erase(_sender);
 	}
 	ot::SettingsData * serviceSettings = ot::SettingsData::parseFromJsonDocument(_document);
-	if (serviceSettings) { m_serviceToSettingsMap.insert_or_assign(_sender, serviceSettings); }
-	if (m_dialog) {
-		for (auto g : serviceSettings->groups()) { m_dialog->addGroup(parseFromSettingsGroup(_sender, g)); }
-		m_dialog->selectGroupByLogicalName(lastSelection);
+	if (serviceSettings) {
+		m_serviceToSettingsMap.insert_or_assign(_sender, serviceSettings);
+		if (m_dialog) {
+			for (auto g : serviceSettings->groups()) { m_dialog->addGroup(parseFromSettingsGroup(_sender, g)); }
+			m_dialog->selectGroupByLogicalName(lastSelection);
+		}
 	}
 }
 
@@ -178,78 +180,78 @@ void UserSettings::updateViewerSettings(ot::SettingsData * _data) {
 // Slots
 
 void UserSettings::slotItemChanged(ak::aAbstractOptionsItem * _item) {
-	if (_item == nullptr) { otAssert(0, "Slot called with nullptr"); return; }
+	if (_item == nullptr) { OTAssert(0, "Slot called with nullptr"); return; }
 	QString itemName = _item->logicalName();
 	auto owner = m_uiToOwnerMap.find(_item);
-	if (owner == m_uiToOwnerMap.end()) { otAssert(0, "Owner data for options item not found"); return; }
+	if (owner == m_uiToOwnerMap.end()) { OTAssert(0, "Owner data for options item not found"); return; }
 	switch (owner->second.item()->type())
 	{
 	case ot::AbstractSettingsItem::InfoText:
 	{
-		otAssert(0, "The info text item should not emit any signals");
+		OTAssert(0, "The info text item should not emit any signals");
 		return;
 	}
 	break;
 	case ot::AbstractSettingsItem::String:
 	{
 		ot::SettingsItemString * actualItem = dynamic_cast<ot::SettingsItemString *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemLineEdit * actualUiItem = dynamic_cast<aOptionsItemLineEdit *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setValue(actualUiItem->text().toStdString());
 	}
 		break;
 	case ot::AbstractSettingsItem::Integer:
 	{
 		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemSpinBox * actualUiItem = dynamic_cast<aOptionsItemSpinBox *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setValue(actualUiItem->value());
 	}
 	break;
 	case ot::AbstractSettingsItem::Double:
 	{
 		ot::SettingsItemDouble * actualItem = dynamic_cast<ot::SettingsItemDouble *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemDoubleSpinBox * actualUiItem = dynamic_cast<aOptionsItemDoubleSpinBox *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setValue(actualUiItem->value());
 	}
 	break;
 	case ot::AbstractSettingsItem::Boolean:
 	{
 		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemCheckBox * actualUiItem = dynamic_cast<aOptionsItemCheckBox *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setValue(actualUiItem->isChecked());
 		break;
 	}
 	case ot::AbstractSettingsItem::Selection:
 	{
 		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemComboButton * actualUiItem = dynamic_cast<aOptionsItemComboButton *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setSelectedValue(actualUiItem->text().toStdString());
 	}
 		break;
 	case ot::AbstractSettingsItem::EditableSelection:
 	{
 		ot::SettingsItemEditableSelection * actualItem = dynamic_cast<ot::SettingsItemEditableSelection *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemComboBox * actualUiItem = dynamic_cast<aOptionsItemComboBox *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setSelectedValue(actualUiItem->text().toStdString());
 	}
 		break;
 	case ot::AbstractSettingsItem::ListSelection:
 	{
 		ot::SettingsItemListSelection * actualItem = dynamic_cast<ot::SettingsItemListSelection *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemList * actualUiItem = dynamic_cast<aOptionsItemList *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		std::list<std::string> selection;
 		for (auto itm : actualUiItem->currentSelection()) { selection.push_back(itm.toStdString()); }
 		actualItem->setSelectedValues(selection);
@@ -258,9 +260,9 @@ void UserSettings::slotItemChanged(ak::aAbstractOptionsItem * _item) {
 	case ot::AbstractSettingsItem::Color:
 	{
 		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemColorEdit * actualUiItem = dynamic_cast<aOptionsItemColorEdit *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		ak::aColor color = actualUiItem->color();
 		actualItem->setValue(ot::Color(color.r(), color.g(), color.b(), color.a()));
 	}
@@ -268,32 +270,32 @@ void UserSettings::slotItemChanged(ak::aAbstractOptionsItem * _item) {
 	case ot::AbstractSettingsItem::DirectorySelect:
 	{
 		ot::SettingsItemDirectorySelect * actualItem = dynamic_cast<ot::SettingsItemDirectorySelect *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemDirectorySelect * actualUiItem = dynamic_cast<aOptionsItemDirectorySelect *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setDirectory(actualUiItem->selectedDirectory().toStdString());
 	}
 	break;
 	case ot::AbstractSettingsItem::FileSelectSave:
 	{
 		ot::SettingsItemFileSelectSave * actualItem = dynamic_cast<ot::SettingsItemFileSelectSave *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemFileSelectSave * actualUiItem = dynamic_cast<aOptionsItemFileSelectSave *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setFile(actualUiItem->selectedFile().toStdString());
 	}
 	break;
 	case ot::AbstractSettingsItem::FileSelectOpen:
 	{
 		ot::SettingsItemFileSelectOpen * actualItem = dynamic_cast<ot::SettingsItemFileSelectOpen *>(owner->second.item());
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		aOptionsItemFileSelectOpen * actualUiItem = dynamic_cast<aOptionsItemFileSelectOpen *>(_item);
-		if (actualUiItem == nullptr) { otAssert(0, "UI item cast failed"); return; }
+		if (actualUiItem == nullptr) { OTAssert(0, "UI item cast failed"); return; }
 		actualItem->setFile(actualUiItem->selectedFile().toStdString());
 	}
 	break;
 	default:
-		otAssert(0, "Unknown item type");
+		OTAssert(0, "Unknown item type");
 		return;
 	}
 	if (owner->second.owner()) { AppBase::instance()->settingsChanged(owner->second.owner(), owner->second.item()); }
@@ -308,7 +310,7 @@ void UserSettings::uiServiceSettingsChanged(ot::AbstractSettingsItem * _item) {
 	std::string itemName = _item->logicalName();
 	if (itemName == "General:Appearance:ColorStyle") {
 		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
-		if (actualItem == nullptr) { otAssert(0, "Item cast failed"); return; }
+		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
 		if (actualItem->selectedValue() == "Bright") { uiAPI::setDefaultColorStyle(); }
 		else if (actualItem->selectedValue() == "Blue") { uiAPI::setDefaultBlueColorStyle(); }
 		else { uiAPI::setDefaultDarkColorStyle(); }
@@ -354,7 +356,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 			if (actualItem) {
 				return new aOptionsItemInfoText(actualItem->name().c_str(), actualItem->title().c_str());
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::Boolean:
@@ -363,7 +365,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 			if (actualItem) {
 				return new aOptionsItemCheckBox(actualItem->name().c_str(), actualItem->title().c_str(), actualItem->value());
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::String:
@@ -376,7 +378,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				}
 				return newItem;
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::Integer:
@@ -385,7 +387,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 			if (actualItem) {
 				return new aOptionsItemSpinBox(actualItem->name().c_str(), actualItem->title().c_str(), actualItem->value(), actualItem->minValue(), actualItem->maxValue());
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::Double:
@@ -394,7 +396,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 			if (actualItem) {
 				return new aOptionsItemDoubleSpinBox(actualItem->name().c_str(), actualItem->title().c_str(), actualItem->value(), actualItem->minValue(), actualItem->maxValue(), actualItem->decimalPlaces());
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::Selection:
@@ -405,7 +407,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				for (auto ps : actualItem->possibleSelection()) { possibleSelection.push_back(ps.c_str()); }
 				return new aOptionsItemComboButton(actualItem->name().c_str(), actualItem->title().c_str(), possibleSelection, actualItem->selectedValue().c_str());
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::EditableSelection:
@@ -420,7 +422,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				}
 				return newItem;
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::ListSelection:
@@ -433,7 +435,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				for (auto cs : actualItem->selectedValues()) { possibleSelection.push_back(cs.c_str()); }
 				return new aOptionsItemList(actualItem->name().c_str(), actualItem->title().c_str(), possibleSelection, currentSelection);
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::Color:
@@ -446,7 +448,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				newItem->setEditAlphaChannel(true);
 				return newItem;
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::DirectorySelect:
@@ -459,7 +461,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				}
 				return newItem;
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::FileSelectOpen:
@@ -472,7 +474,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				}
 				return newItem;
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		case ot::AbstractSettingsItem::FileSelectSave:
@@ -485,11 +487,11 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 				}
 				return newItem;
 			}
-			otAssert(0, "Cast item failed");
+			OTAssert(0, "Cast item failed");
 			break;
 		}
 		default:
-			otAssert(0, "Unknown item type provided");
+			OTAssert(0, "Unknown item type provided");
 		}
 	}
 	return nullptr;

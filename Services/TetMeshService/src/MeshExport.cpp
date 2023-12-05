@@ -6,7 +6,7 @@
 #include "EntityMeshTetData.h"
 #include "EntityBinaryData.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include <gmsh_cwrap.h>
 

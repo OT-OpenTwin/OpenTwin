@@ -5,9 +5,8 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/uiComponent.h>
-//#include "openTwin/msg.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <map>
 
@@ -159,15 +158,15 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 
 		// Store the information about the entities such that they can be added to the model
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateGeometryEntity);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, geometryEntity->getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID_Brep, (unsigned long long) geometryEntity->getBrepStorageObjectID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID_Facets, (unsigned long long) geometryEntity->getFacetsStorageObjectID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_OverrideGeometry, false);	// The modified entity was not yet written 
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_NewProperties, geometryEntity->getProperties().getJSON(nullptr, false));	
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, geometryEntity->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, (unsigned long long) geometryEntity->getBrepStorageObjectID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, (unsigned long long) geometryEntity->getFacetsStorageObjectID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, doc.GetAllocator());	// The modified entity was not yet written 
+		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, ot::JsonString(geometryEntity->getProperties().getJSON(nullptr, false), doc.GetAllocator()), doc.GetAllocator());
 
 		application->modelComponent()->sendMessage(false, doc);
 

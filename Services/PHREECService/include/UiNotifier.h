@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinFoundation/AbstractUiNotifier.h"
+#include "OTServiceFoundation/AbstractUiNotifier.h"
 
 // C++ header
 #include <string>

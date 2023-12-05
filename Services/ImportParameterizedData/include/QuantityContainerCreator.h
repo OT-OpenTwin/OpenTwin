@@ -7,7 +7,7 @@
 #include "QuantityContainer.h"
 #include "ResultDataStorageAPI.h"
 #include "ProgressUpdater.h"
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class QuantityContainerCreator
 {

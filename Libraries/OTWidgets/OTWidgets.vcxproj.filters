@@ -58,12 +58,6 @@
     <ClCompile Include="src\GraphicsTextItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsLineItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsDirectConnectionItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -93,6 +87,24 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsConnectionItem.cpp">
       <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsTriangleItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsLineItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ToolTipHandler.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QWidgetInterface.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dialog.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,12 +173,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsTextItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsDirectConnectionItem.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
@@ -194,6 +200,18 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsTriangleItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Dialog.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -215,6 +233,9 @@
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ToolTipHandler.h">
       <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>

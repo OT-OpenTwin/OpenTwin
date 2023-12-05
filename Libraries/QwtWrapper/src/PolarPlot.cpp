@@ -240,7 +240,7 @@ void qwtw::PolarPlotMagnifier::widgetWheelEvent(QWheelEvent * _wheelEvent) {
 
 	if (wheelFactor() != 0.0)
 	{
-		int delta = _wheelEvent->delta() * (-1);
+		int delta = _wheelEvent->angleDelta().y() * (-1);
 		double f = qPow(wheelFactor(),
 			qAbs(delta / 120.0));
 

@@ -12,11 +12,10 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/rJSON.h"				// json convenience functions
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/actionTypes.h"		// action member and types definition
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"		// action member and types definition
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 // Application specific includes
 #include "EntitySolverKriging.h"
@@ -61,11 +60,11 @@ void Application::run(void)
 	//krig.initializePython();
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
-		std::string action = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 
 		if      (action == "Post Processing:Kriging:Load")			loadDataset();
 		else if (action == "Post Processing:Kriging:Train")			train();
@@ -82,7 +81,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
 	{
-		selectedEntities = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+		selectedEntities = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
 		modelSelectionChangedNotification();
 	}
 	else {
@@ -91,7 +90,7 @@ std::string Application::processAction(const std::string & _action, OT_rJSON_doc
 	return "";
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

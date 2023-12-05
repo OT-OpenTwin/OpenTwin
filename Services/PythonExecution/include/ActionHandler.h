@@ -2,10 +2,10 @@
 #include <mutex>
 #include <map>
 #include <functional>
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/JSON.h"
+#include "OTCommunication/ActionTypes.h"
 #include "PythonAPI.h"
-#include "OpenTwinCore/ReturnMessage.h"
+#include "OTCore/ReturnMessage.h"
 
 class ActionHandler
 {
@@ -15,16 +15,16 @@ public:
 
 private:
 
-	using handlerMethod = std::function<ot::ReturnMessage(OT_rJSON_doc&)>;
+	using handlerMethod = std::function<ot::ReturnMessage(ot::JsonDocument&)>;
 	std::mutex _mutex;
 	const std::string _urlMasterService;
 	std::map<std::string, handlerMethod> _handlingFunctions;
 	std::map<std::string, handlerMethod> _checkParameterFunctions;
-	handlerMethod _noParameterCheck = [](OT_rJSON_doc& doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
+	handlerMethod _noParameterCheck = [](ot::JsonDocument& doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
 	PythonAPI _pythonAPI;
 
-	ot::ReturnMessage ShutdownProcess(OT_rJSON_doc& doc);
-	ot::ReturnMessage Execute(OT_rJSON_doc& doc);
-	ot::ReturnMessage CheckParameterExecute(OT_rJSON_doc& doc);
+	ot::ReturnMessage ShutdownProcess(ot::JsonDocument& doc);
+	ot::ReturnMessage Execute(ot::JsonDocument& doc);
+	ot::ReturnMessage CheckParameterExecute(ot::JsonDocument& doc);
 
 };

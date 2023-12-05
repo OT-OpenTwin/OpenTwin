@@ -96,7 +96,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;CIRCUITSIMULATORSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;$(ProjectDir)include</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -104,7 +104,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)/$(OT_LIBD);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Debug.x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Debug.x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;ngspice.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;CIRCUITSIMULATORSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -180,12 +180,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Circuit.cpp" />
+    <ClCompile Include="src\CircuitElement.cpp" />
+    <ClCompile Include="src\Connection.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Circuit.h" />
+    <ClInclude Include="include\CircuitElement.h" />
+    <ClInclude Include="include\Connection.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>

@@ -4,11 +4,10 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/Painter2D.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/rJSONHelper.h"
 
 // <^^\\ '## u ##' \\ ^^^^^^O^          .    .          .     '                   '      .             '                     ^O^^^^^^// '## w ##' //^^3
 //  <^^\\ '## u ##' \\ ^^^^^^O^                                                                                          ^O^^^^^^// '## w ##' //^^3
@@ -30,74 +29,78 @@
 #define OT_JSON_MEMBER_Margin "Margin"
 #define OT_JSON_MEMBER_MinSize "Size.Min"
 #define OT_JSON_MEMBER_MaxSize "Size.Max"
+#define OT_JSON_MEMBER_ToolTip "ToolTip"
 #define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_Alignment "Alignment"
+#define OT_JSON_MEMBER_SizePolicy "SizePolicy"
+#define OT_JSON_MEMBER_ConnectionDirection "ConnectionDirection"
 
+#define OT_JSON_VALUE_Moveable "Moveable"
 #define OT_JSON_VALUE_Connectable "Connectable"
+#define OT_JSON_VALUE_ForwardTooltip "ForwardTooltip"
 
-ot::GraphicsItemCfg::GraphicsItemCfg() : m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX) {}
+ot::GraphicsItemCfg::GraphicsItemCfg()
+	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), 
+	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
+{}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
-void ot::GraphicsItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	OT_rJSON_createValueObject(posObj);
-	m_pos.addToJsonObject(_document, posObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Position, posObj);
+void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	JsonObject posObj;
+	m_pos.addToJsonObject(posObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Position, posObj, _allocator);
 
-	OT_rJSON_createValueObject(minSizeObj);
-	m_minSize.addToJsonObject(_document, minSizeObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_MinSize, minSizeObj);
+	JsonObject minSizeObj;
+	m_minSize.addToJsonObject(minSizeObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_MinSize, minSizeObj, _allocator);
 
-	OT_rJSON_createValueObject(maxSizeObj);
-	m_maxSize.addToJsonObject(_document, maxSizeObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_MaxSize, maxSizeObj);
+	JsonObject maxSizeObj;
+	m_maxSize.addToJsonObject(maxSizeObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_MaxSize, maxSizeObj, _allocator);
 
-	OT_rJSON_createValueObject(marginObj);
-	m_margins.addToJsonObject(_document, marginObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Margin, marginObj);
+	JsonObject marginObj;
+	m_margins.addToJsonObject(marginObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Margin, marginObj, _allocator);
 
-	OT_rJSON_createValueArray(flagArr);
-	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _document.GetAllocator()), _document.GetAllocator());
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Flags, flagArr);
+	JsonArray flagArr;
+	if (m_flags & GraphicsItemCfg::ItemIsMoveable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Moveable, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Flags, flagArr, _allocator);
 
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Uid, m_uid);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Name, m_name);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Title, m_tile);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Alignment, ot::toString(m_alignment));
-	ot::rJSON::add(_document, _object, OT_SimpleFactoryJsonKey, this->simpleFactoryObjectKey());
+	_object.AddMember(OT_JSON_MEMBER_Uid, JsonString(m_uid, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_tile, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
+	_object.AddMember(OT_SimpleFactoryJsonKey, JsonString(this->simpleFactoryObjectKey(), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Alignment, JsonString(ot::toString(m_alignment), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_SizePolicy, JsonString(ot::toString(m_sizePolicy), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ConnectionDirection, JsonString(ot::toString(m_connectionDirection), _allocator), _allocator);
 }
 
-void ot::GraphicsItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Uid, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Name, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Title, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Position, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_MinSize, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_MaxSize, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Margin, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Flags, Array);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Alignment, String);
+void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
+	m_uid = json::getString(_object, OT_JSON_MEMBER_Uid);
+	m_name = json::getString(_object, OT_JSON_MEMBER_Name);
+	m_tile = json::getString(_object, OT_JSON_MEMBER_Title);
+	m_tooltip = json::getString(_object, OT_JSON_MEMBER_ToolTip);
+	m_alignment = stringToAlignment(json::getString(_object, OT_JSON_MEMBER_Alignment));
+	m_sizePolicy = stringToSizePolicy(json::getString(_object, OT_JSON_MEMBER_SizePolicy));
+	m_connectionDirection = stringToConnectionDirection(json::getString(_object, OT_JSON_MEMBER_ConnectionDirection));
 
-	m_uid = _object[OT_JSON_MEMBER_Uid].GetString();
-	m_name = _object[OT_JSON_MEMBER_Name].GetString();
-	m_tile = _object[OT_JSON_MEMBER_Title].GetString();
-	m_alignment = ot::stringToAlignment(_object[OT_JSON_MEMBER_Alignment].GetString());
-
-	OT_rJSON_val posObj = _object[OT_JSON_MEMBER_Position].GetObject();
-	OT_rJSON_val marginObj = _object[OT_JSON_MEMBER_Margin].GetObject();
-	OT_rJSON_val minSizeObj = _object[OT_JSON_MEMBER_MinSize].GetObject();
-	OT_rJSON_val maxSizeObj = _object[OT_JSON_MEMBER_MaxSize].GetObject();
-
-	m_pos.setFromJsonObject(posObj);
-	m_margins.setFromJsonObject(marginObj);
-	m_minSize.setFromJsonObject(minSizeObj);
-	m_maxSize.setFromJsonObject(maxSizeObj);
+	m_pos.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Position));
+	m_margins.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Margin));
+	m_minSize.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_MinSize));
+	m_maxSize.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_MaxSize));
 
 	m_flags = NoFlags;
-	OT_rJSON_val flagArr = _object[OT_JSON_MEMBER_Flags].GetArray();
-	for (rapidjson::SizeType i = 0; i < flagArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(flagArr, i, String);
-		std::string f = flagArr[i].GetString();
-		if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
+	std::list<std::string> flagsArr = json::getStringList(_object, OT_JSON_MEMBER_Flags);
+	for (auto f : flagsArr) {
+		if (f == OT_JSON_VALUE_Moveable) m_flags |= ItemIsMoveable;
+		else if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
+		else if (f == OT_JSON_VALUE_ForwardTooltip) m_flags |= ItemForwardsTooltip;
+		else {
+			OT_LOG_EAS("Unknown GraphicsItem flag \"" + f + "\"");
+		}
 	}
 }

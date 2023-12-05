@@ -22,7 +22,7 @@ When a service is started the logger should be setup by providing at least the c
 
 .. code-block:: c++
 
-    #include "OpenTwinCore/Logger.h"
+    #include "OTCore/Logger.h"
 
     char * init(const char * _serviceURL, const char * _localDirectoryServiceURL, const char * _unused1, const char * _unused2) {
     #ifdef _DEBUG
@@ -38,7 +38,7 @@ This notifier will register itself at the LogDispatcher aswell as call the initi
 
 .. code-block:: c++
 
-    #include "OpenTwinCommunication/ServiceLogNotifier.h"
+    #include "OTCommunication/ServiceLogNotifier.h"
 
     char * init(const char * _serviceURL, const char * _localDirectoryServiceURL, const char * _unused1, const char * _unused2) {
     // Note that the _DEBUG must be defined in your projects debug configuration    
@@ -107,13 +107,13 @@ When creating the Service Logger instance, it sets the logging options from the 
 Generate Log Messages
 ---------------------
 
-To generate log messages at any point in your code use the :ref:`macros<logMacros>` defined in the ``openTwin/ServiceLogger`` header file.
+To generate log messages at any point in your code use the :ref:`macros<logMacros>` defined in the ``OTCore/Logger.h`` header file.
 Log messages will be send to the :doc:`Logger Service</services/logger_service>` if the provided log flags are allowed. 
 When the service is running in Debug Mode, the Log Messages will also be written to std::cout.
 
 .. code-block:: c++
 
-    #include <openTwin/ServiceLogger.h>
+    #include "OTCore/Logger.h"
 
     namespace test {
         void foo(void) {

@@ -2,7 +2,7 @@
 #include "MongoGroupFunctions.h"
 #include "MongoProjectFunctions.h"
 #include "MongoURL.h"
-
+#include "OTCore/JSON.h"
 /*
 	These functions must cover the following functionalities
 	1) Register ✅
@@ -577,11 +577,11 @@ namespace MongoUserFunctions
 
 	std::string userToJson(User& user)
 	{
-		OT_rJSON_createDOC(json);
-		ot::rJSON::add(json, "username", user.username);
-		ot::rJSON::add(json, "settingsCollectionName", user.settingsCollectionName);
+		ot::JsonDocument json;
+		json.AddMember("username", ot::JsonString(user.username, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("settingsCollectionName", ot::JsonString(user.settingsCollectionName, json.GetAllocator()), json.GetAllocator());
 
-		return ot::rJSON::toJSON(json);
+		return json.toJson();
 	}
 
 	std::string usersToJson(std::vector<User>& users)
@@ -593,8 +593,8 @@ namespace MongoUserFunctions
 			jsonUsers.push_back(userToJson(user));
 		}
 
-		OT_rJSON_createDOC(json);
-		ot::rJSON::add(json, "users", jsonUsers);
-		return ot::rJSON::toJSON(json);
+		ot::JsonDocument json;
+		json.AddMember("users", ot::JsonArray(jsonUsers, json.GetAllocator()), json.GetAllocator());
+		return json.toJson();
 	}
 }

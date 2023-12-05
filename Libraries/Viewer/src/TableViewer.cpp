@@ -6,7 +6,7 @@
 #include <QTableWidgetSelectionRange>
 #include <memory>
 #include <qheaderview.h>
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 TableViewer::TableViewer(QWidget* parent) 
 {

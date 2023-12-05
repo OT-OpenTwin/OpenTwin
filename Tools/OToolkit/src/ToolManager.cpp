@@ -19,13 +19,14 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 #define TOOLMANAGER_LOG(___msg) OTOOLKIT_LOG("ToolManager", ___msg)
 #define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)
 #define TOOLMANAGER_LOGE(___msg) OTOOLKIT_LOGE("ToolManager", ___msg)
 
 ToolManager::ToolManager(QMainWindow* _mainWindow)
+	: m_ignoreEvents(false)
 {
 	m_tabManager = new TabManager;
 	m_menuManager = new MenuManager;
@@ -103,6 +104,32 @@ void ToolManager::clear(void) {
 	m_tools.clear();
 }
 
+void ToolManager::stopAll(void) {
+	std::map<QString, ToolRuntimeHandler*> bak = m_tools;
+	for (auto it : bak) {
+		//this->removeTool(it.first);
+		this->stopTool(it.first);
+	}
+}
+
+void ToolManager::stopTool(const QString& _toolName) {
+	auto it = m_tools.find(_toolName);
+	if (it == m_tools.end()) {
+		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + _toolName + "\" }");
+		return;
+	}
+
+	if (!it->second->isRunning()) {
+		return;
+	}
+
+	QSettings settings("OpenTwin", "OToolkit");
+
+	it->second->setStopped();
+	it->second->tool()->prepareToolShutdown(settings);
+	this->fwdRemoveTool(_toolName);
+}
+
 void ToolManager::runToolTriggered(void) {
 	ToolMenuManager* tmm = dynamic_cast<ToolMenuManager*>(sender());
 	if (tmm == nullptr) {
@@ -127,13 +154,18 @@ void ToolManager::runToolTriggered(void) {
 
 	}
 	else {
+		m_ignoreEvents = true;
 		std::list<QWidget*> status;
-		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status));
+		QSettings settings("OpenTwin", "OToolkit");
+		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status, settings));
+		it->second->setRunning();
 		m_statusManager->addTool(it->first, status);
+		m_ignoreEvents = false;
 	}
 }
 
 void ToolManager::currentToolChanged(const QString& _toolName) {
+	if (m_ignoreEvents) return;
 	m_statusManager->setCurrentTool(_toolName);
 }
 

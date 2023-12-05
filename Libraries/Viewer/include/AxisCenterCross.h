@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OpenTwinCore/Point3D.h"
-#include "OpenTwinCore/Color.h"
+#include "OTCore/Point3D.h"
+#include "OTCore/Color.h"
 #include <osg/Geode>
 
 namespace osg {

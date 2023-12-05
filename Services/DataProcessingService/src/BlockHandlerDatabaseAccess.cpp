@@ -21,12 +21,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		const std::string dbURL = "Projects";
 		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
 		
-		OT_rJSON_createDOC(query);
-		OT_rJSON_createDOC(projection);
-		
-		ot::rJSON::add(projection, "_id", 0);
-	
-		
+		ot::JsonDocument query;
+		ot::JsonDocument projection;
+				
+		projection.AddMember("_id", 0, projection.GetAllocator());
 	}
 }
 

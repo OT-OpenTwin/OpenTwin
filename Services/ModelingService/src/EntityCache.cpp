@@ -4,7 +4,7 @@
 #include "ClassFactory.h"
 #include "DataBase.h"
 
-#include <OpenTwinFoundation/ModelComponent.h>
+#include "OTServiceFoundation/ModelComponent.h"
 
 EntityCache::EntityCache()
 	: maxNumberOfCacheItems(40)

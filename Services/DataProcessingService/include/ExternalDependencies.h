@@ -1,6 +1,6 @@
 #pragma once
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/FolderNames.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/FolderNames.h"
 
 class ExternalDependencies
 {

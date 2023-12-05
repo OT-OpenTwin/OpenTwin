@@ -1,6 +1,6 @@
 #include "SolverBase.h"
 
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <windows.h> // winapi
 #include <UserEnv.h>

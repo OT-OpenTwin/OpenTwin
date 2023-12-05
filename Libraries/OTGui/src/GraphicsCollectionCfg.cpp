@@ -1,9 +1,8 @@
 // OpenTwin header
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTCore/Logger.h"
 
 #define OT_JSON_Member_Name "Name"
 #define OT_JSON_Member_Title "Title"
@@ -20,42 +19,36 @@ ot::GraphicsCollectionCfg::~GraphicsCollectionCfg() {
 	this->memFree();
 }
 
-void ot::GraphicsCollectionCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Name, m_name);
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Title, m_title);
+void ot::GraphicsCollectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
+	_object.AddMember(OT_JSON_Member_Title, JsonString(m_title, _allocator), _allocator);
 
-	OT_rJSON_createValueArray(collectionArr);
+	JsonArray collectionArr;
 	for (auto c : m_collections) {
-		OT_rJSON_createValueObject(collectionObj);
-		c->addToJsonObject(_document, collectionObj);
-		collectionArr.PushBack(collectionObj, _document.GetAllocator());
+		JsonObject collectionObj;
+		c->addToJsonObject(collectionObj, _allocator);
+		collectionArr.PushBack(collectionObj, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Collections, collectionArr);
+	_object.AddMember(OT_JSON_Member_Collections, collectionArr, _allocator);
 
-	OT_rJSON_createValueArray(itemArr);
+	JsonArray itemArr;
 	for (auto i : m_items) {
-		OT_rJSON_createValueObject(itemObj);
-		i->addToJsonObject(_document, itemObj);
-		itemArr.PushBack(itemObj, _document.GetAllocator());
+		JsonObject itemObj;
+		i->addToJsonObject(itemObj, _allocator);
+		itemArr.PushBack(itemObj, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_Member_Items, itemArr);
+	_object.AddMember(OT_JSON_Member_Items, itemArr, _allocator);
 }
 
-void ot::GraphicsCollectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsCollectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	this->memFree();
 
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Name, String);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Title, String);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Collections, Array);
-	OT_rJSON_checkMember(_object, OT_JSON_Member_Items, Array);
+	m_name = json::getString(_object, OT_JSON_Member_Name);
+	m_title = json::getString(_object, OT_JSON_Member_Title);
 
-	m_name = _object[OT_JSON_Member_Name].GetString();
-	m_title = _object[OT_JSON_Member_Title].GetString();
-
-	OT_rJSON_val collectionArr = _object[OT_JSON_Member_Collections].GetArray();
+	ConstJsonArray collectionArr = json::getArray(_object, OT_JSON_Member_Collections);
 	for (rapidjson::SizeType i = 0; i < collectionArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(collectionArr, i, Object);
-		OT_rJSON_val collectionObj = collectionArr[i].GetObject();
+		ConstJsonObject collectionObj = json::getObject(collectionArr, i);
 		GraphicsCollectionCfg* newChild = new GraphicsCollectionCfg;
 		try {
 			newChild->setFromJsonObject(collectionObj);
@@ -69,10 +62,9 @@ void ot::GraphicsCollectionCfg::setFromJsonObject(OT_rJSON_val& _object) {
 		}
 	}
 
-	OT_rJSON_val itemArr = _object[OT_JSON_Member_Items].GetArray();
+	ConstJsonArray itemArr = json::getArray(_object, OT_JSON_Member_Items);
 	for (rapidjson::SizeType i = 0; i < itemArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(itemArr, i, Object);
-		OT_rJSON_val itemObj = itemArr[i].GetObject();
+		ConstJsonObject itemObj = json::getObject(itemArr, i);
 
 		GraphicsItemCfg* itm = nullptr;
 		try {

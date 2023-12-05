@@ -11,7 +11,7 @@
 #include "TemplateDefaultManager.h"
 #include "Database.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include "BRepPrimAPI_MakeSphere.hxx"
 #include "BRepAlgoAPI_BuilderAlgo.hxx"

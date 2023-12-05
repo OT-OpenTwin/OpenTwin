@@ -18,7 +18,7 @@
 #include "ViewerAPI.h"
 
 // openTwin header
-#include "OpenTwinCore/ServiceBase.h"
+#include "OTCore/ServiceBase.h"
 
 // AK header
 #include <akCore/aNotifier.h>
@@ -93,7 +93,7 @@ public:
 
 	// #####################################################################################################################################
 
-	void ViewerComponent::setProcessingGroupOfMessages(bool flag);
+	void setProcessingGroupOfMessages(bool _flag);
 
 	// Intern calls
 

@@ -5,7 +5,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
+#include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
@@ -89,7 +90,7 @@ void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphics
 	ot::GraphicsGroupItem::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsStackItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsStackItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
 	ot::GraphicsGroupItem::graphicsItemFlagsChanged(_flags);
 }
 
@@ -135,7 +136,12 @@ void ot::GraphicsStackItem::adjustChildItems(void) {
 QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	QSizeF s;
 	for (auto itm : m_items) {
-		s = s.expandedTo(itm.item->graphicsItemSizeHint(_hint, _constrains));
+		if (itm.isMaster) {
+			s = s.expandedTo(itm.item->graphicsItemSizeHint(_hint, _constrains));
+		}
+		else {
+			s = s.expandedTo(itm.item->graphicsItemSizeHint(Qt::MinimumSize, _constrains));
+		}
 	}
 	return s;
 }

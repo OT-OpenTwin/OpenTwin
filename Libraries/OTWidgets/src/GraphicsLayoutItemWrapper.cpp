@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 
@@ -33,6 +34,16 @@ void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* 
 	QGraphicsWidget::mouseReleaseEvent(_event);
 }
 
+void ot::GraphicsLayoutItemWrapper::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	OTAssertNullptr(m_owner);
+	m_owner->handleHoverEnterEvent(_event);
+}
+
+void ot::GraphicsLayoutItemWrapper::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	OTAssertNullptr(m_owner);
+	m_owner->handleHoverLeaveEvent(_event);
+}
+
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	OTAssertNullptr(m_owner);
 	m_owner->handleItemChange(_change, _value);
@@ -47,9 +58,9 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
 
 void ot::GraphicsLayoutItemWrapper::removeAllConnections(void) {

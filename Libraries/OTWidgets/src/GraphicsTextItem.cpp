@@ -5,13 +5,15 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/KeyMap.h"
+#include "OTCore/KeyMap.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OTWidgets/GraphicsTextItem.h"
 #include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/Painter2DFactory.h"
 
 // Qt header
-#include <QtGui/qfont.h>
+#include <QtGui/qpainter.h>
 #include <QtGui/qfontmetrics.h>
 #include <QtGui/qtextdocument.h>
 
@@ -19,11 +21,9 @@ static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactor
 static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
 
 ot::GraphicsTextItem::GraphicsTextItem()
-	: ot::GraphicsItem(false)
+	: ot::CustomGraphicsItem(false)
 {
-	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
-	this->setGraphicsItem(this);
-	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+
 }
 
 ot::GraphicsTextItem::~GraphicsTextItem() {
@@ -40,72 +40,28 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	this->prepareGeometryChange();
 
-	QFont f = this->font();
-	f.setPixelSize(cfg->textFont().size());
-	f.setItalic(cfg->textFont().isItalic());
-	f.setBold(cfg->textFont().isBold());
+	m_font.setPixelSize(cfg->textFont().size());
+	m_font.setItalic(cfg->textFont().isItalic());
+	m_font.setBold(cfg->textFont().isBold());
 
+	m_pen.setBrush(ot::Painter2DFactory::brushFromPainter2D(cfg->textPainter()));
 
-	this->setFont(f);
-	this->setDefaultTextColor(ot::OTQtConverter::toQt(cfg->textColor()));
-	this->setPlainText(QString::fromStdString(cfg->text()));
+	m_text = QString::fromStdString(cfg->text());
 
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
-void ot::GraphicsTextItem::prepareGraphicsItemGeometryChange(void) {
-	this->prepareGeometryChange();
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::CustomGraphicsItem
+
+QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
+	QFontMetrics m(m_font);
+	return m.size(Qt::TextSingleLine, m_text);
 }
 
-QSizeF ot::GraphicsTextItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	
-	QFontMetrics m(this->font());
-	//return this->handleGetGraphicsItemSizeHint(_hint, QSizeF(m.width(this->toPlainText()), m.height()));
-	//return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
-	return this->handleGetGraphicsItemSizeHint(_hint, this->document()->size());
-}
-
-QRectF ot::GraphicsTextItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QGraphicsTextItem::boundingRect());
-}
-
-void ot::GraphicsTextItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paintGeneralGraphics(_painter, _opt, _widget);
-	QGraphicsTextItem::paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsTextItem::setGeometry(const QRectF& _rect) {
-	this->prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(_rect);
-	this->setPos(_rect.topLeft());
-
-	this->handleSetItemGeometry(_rect);
-}
-
-void ot::GraphicsTextItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
-}
-
-void ot::GraphicsTextItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
-	QGraphicsItem::mousePressEvent(_event);
-}
-
-void ot::GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
-	QGraphicsItem::mouseReleaseEvent(_event);
-}
-
-QVariant ot::GraphicsTextItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	this->handleItemChange(_change, _value);
-	return QGraphicsTextItem::itemChange(_change, _value);
-}
-
-QSizeF ot::GraphicsTextItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->sizeHint(_hint, _constrains);
+void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+	_painter->setFont(m_font);
+	_painter->setPen(m_pen);
+	_painter->drawText(_rect, Qt::AlignCenter, m_text);
 }

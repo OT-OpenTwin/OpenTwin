@@ -24,7 +24,7 @@ namespace ot {
 		virtual void focusOutEvent(QFocusEvent* _event) override;
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getWidget(void) override { return this; };
+		virtual QWidget* getQWidget(void) override { return this; };
 
 	signals:
 		void widgetGotFocus(void);

@@ -10,6 +10,7 @@ See here for more details:
    user_interface
    datamodel
    messaging
+   json
    logging
    session_management
    

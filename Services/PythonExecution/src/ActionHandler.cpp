@@ -1,12 +1,12 @@
 #pragma once
-#include "ActionHandler.h"
-#include "PortDataBuffer.h"
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/VariableToJSONConverter.h"
-#include "OpenTwinCore/JSONToVariableConverter.h"
-#include "OpenTwinCore/ReturnValues.h"
 
+#include "ActionHandler.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCore/Variable.h"
+#include "OTCore/Logger.h"
+#include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/ReturnValues.h"
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
 {
@@ -20,11 +20,13 @@ ActionHandler::ActionHandler(const std::string& urlMasterService)
 const char* ActionHandler::Handle(const char* json, const char* senderIP)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
+	OT_LOG("Handle json: " + std::string(json), ot::INBOUND_MESSAGE_LOG);
 	std::string returnMessage;
-	OT_rJSON_doc doc = ot::rJSON::fromJSON(json);
-	if (ot::rJSON::memberExists(doc, OT_ACTION_PARAM_SENDER_URL))
+	ot::JsonDocument doc;
+	doc.fromJson(json);
+	if (doc.HasMember(OT_ACTION_PARAM_SENDER_URL))
 	{
-		std::string senderURL = ot::rJSON::getString(doc, OT_ACTION_PARAM_SENDER_URL);
+		std::string senderURL = ot::json::getString(doc, OT_ACTION_PARAM_SENDER_URL);
 		
 		if (senderURL != _urlMasterService)
 		{
@@ -33,7 +35,7 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		}
 		else
 		{
-			std::string action = ot::rJSON::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
+			std::string action = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (_handlingFunctions.find(action) != _handlingFunctions.end())
 			{
 				auto& checkParameter = _checkParameterFunctions[action];
@@ -61,18 +63,21 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 		ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Message requires a senderURL which is missing.");
 		returnMessage = rMsg.toJson();
 	}
+
+	OT_LOG("Handle json result: " + returnMessage, ot::INBOUND_MESSAGE_LOG);
+
 	char* returnValue = new char[returnMessage.size() + 1];
 	std::strcpy(returnValue, returnMessage.c_str());
 
     return returnValue;
 }
 
-ot::ReturnMessage ActionHandler::ShutdownProcess(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::ShutdownProcess(ot::JsonDocument& doc)
 {
 	exit(1);
 }
 
-ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 {
 	try
 	{
@@ -139,9 +144,9 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 
 }
 
-ot::ReturnMessage ActionHandler::CheckParameterExecute(OT_rJSON_doc& doc)
+ot::ReturnMessage ActionHandler::CheckParameterExecute(ot::JsonDocument& doc)
 {
-	if (!ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Scripts) || !ot::rJSON::memberExists(doc, OT_ACTION_CMD_PYTHON_Parameter))
+	if (!doc.HasMember(OT_ACTION_CMD_PYTHON_Scripts) || !doc.HasMember(OT_ACTION_CMD_PYTHON_Parameter))
 	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Either the scripts or parameter are not contained in the message");
 	}

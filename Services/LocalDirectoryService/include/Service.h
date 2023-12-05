@@ -8,9 +8,8 @@
 #include <map>
 #include <thread>
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinSystem/Application.h"
-#include "OpenTwinSystem/Network.h"
+#include "OTSystem/Application.h"
+#include "OTSystem/Network.h"
 
 class ServiceManager;
 
@@ -23,7 +22,7 @@ public:
 	//! @brief Add the object contents to the provided JSON object
 	//! @param _document The JSON document (used to get the allocator)
 	//! @param _object The JSON object to add the contents to
-	void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const;
+	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 	ot::app::RunResult run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
 	bool shutdown(void);

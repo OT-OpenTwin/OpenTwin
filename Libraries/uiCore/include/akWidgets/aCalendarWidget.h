@@ -60,11 +60,7 @@ namespace ak {
 		//! @param _painter The design to set
 		//! @param _rect The rectangle to set
 		//! @param _date The current date to set
-		virtual void paintCell(
-			QPainter *			_painter,
-			const QRect &		_rect,
-			const QDate &		_date
-		) const override;
+		virtual void paintCell(QPainter* _painter, const QRect& _rect, QDate _date) const override;
 
 	private:
 

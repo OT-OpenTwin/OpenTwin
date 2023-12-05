@@ -8,8 +8,8 @@
 #include "Types.h"
 #include "Geometry.h"
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCommunication/UiTypes.h"
 
 class MicroserviceNotifier
 {
@@ -76,10 +76,10 @@ public:
 	void isModified(ot::UID visualizationModelID, bool modifiedState);
 
 	void enableQueuingHttpRequests(bool flag);
-	void queuedHttpRequestToUI(rapidjson::Document &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds);
+	void queuedHttpRequestToUI(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds);
 
-	std::string sendMessageToService(bool queue, const std::string &owner, rapidjson::Document &doc);
-	std::string dispatchAction(rapidjson::Document &doc);
+	std::string sendMessageToService(bool queue, const std::string &owner, ot::JsonDocument &doc);
+	std::string dispatchAction(ot::JsonDocument &doc);
 
 	bool isUIAvailable(void);
 

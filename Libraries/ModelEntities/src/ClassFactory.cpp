@@ -50,7 +50,6 @@
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityTableSelectedRanges.h"
 #include "EntityParameterizedDataPreviewTable.h"
-#include "OpenTwinCore/TypeNames.h"
 #include "EntityResearchMetadata.h"
 #include "EntitySolverGetDP.h"
 #include "EntityMeasurementMetadata.h"
@@ -61,6 +60,8 @@
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "EntityVisUnstructuredScalarVolume.h"
 #include "EntityVisUnstructuredVectorVolume.h"
+
+#include "OTCore/TypeNames.h"
 
 EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 {

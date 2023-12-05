@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 #include "OTWidgets/OTQtConverter.h"
 
 QColor ot::OTQtConverter::toQt(const ot::Color& _color) {
@@ -39,4 +39,28 @@ QPointF ot::OTQtConverter::toQt(const ot::Point2DF& _pt) {
 
 QPointF ot::OTQtConverter::toQt(const ot::Point2DD& _pt) {
 	return QPointF(_pt.x(), _pt.y());
+}
+
+QSize ot::OTQtConverter::toQt(const ot::Size2D& _s) {
+	return QSize(_s.width(), _s.height());
+}
+
+QSizeF ot::OTQtConverter::toQt(const ot::Size2DF& _s) {
+	return QSizeF(_s.width(), _s.height());
+}
+
+QSizeF ot::OTQtConverter::toQt(const ot::Size2DD& _s) {
+	return QSizeF(_s.width(), _s.height());
+}
+
+QGradient::Spread ot::OTQtConverter::toQt(ot::GradientSpread _spread) {
+	switch (_spread)
+	{
+	case ot::PadSpread: return QGradient::PadSpread;
+	case ot::RepeatSpread: return QGradient::RepeatSpread;
+	case ot::ReflectSpread: return QGradient::ReflectSpread;
+	default:
+		OT_LOG_EA("Unknown gradient spread");
+		return QGradient::PadSpread;
+	}
 }

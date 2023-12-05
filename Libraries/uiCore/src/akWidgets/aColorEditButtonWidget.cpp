@@ -22,8 +22,6 @@
 #include <qlayout.h>						// QHBoxLayout
 #include <qcolordialog.h>					// QColorDialog
 
-#define TYPE_COLORAREA aColorAreaFlag
-
 ak::aColorEditButtonWidget::aColorEditButtonWidget(
 	const aColor &						_color,
 	const QString &						_textOverride,
@@ -103,7 +101,7 @@ void ak::aColorEditButtonWidget::setColor(
 	const aColor &							_color
 ) {
 	m_color = _color;
-	m_view->setStyleSheet(m_color.toHexString(false, "background-color:#"));
+	m_view->setStyleSheet(m_color.toHexString(false, QString("background-color:#")));
 	m_button->setText(m_color.toRGBString(","));
 	QString toolTip{"R "};
 	toolTip.append(QString::number(m_color.r())).append(" | G ");

@@ -4,8 +4,8 @@
 #include "ServiceInformation.h"
 
 // OpenTwin header
-#include "OpenTwinCore/OTClassHelper.h"
-#include "OpenTwinCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTCore/Serializable.h"
 
 // C++ header
 #include <string>
@@ -18,32 +18,32 @@ class Configuration : public ot::Serializable {
 public:
 	static Configuration& instance(void);
 
+	OT_PROPERTY_REF(std::list<ServiceInformation>, supportedServices, setSupportedService, supportedServices);
+	OT_PROPERTY_REF(std::string, launcherPath, setLauncherPath, launcherPath);
+	OT_PROPERTY_REF(std::string, servicesLibraryPath, setServicesLibraryPath, servicesLibraryPath);
+	OT_PROPERTY(unsigned int, defaultMaxCrashRestarts, setDefaultMaxCrashRestarts, defaultMaxCrashRestarts);
+	OT_PROPERTY(unsigned int, defaultMaxStartupRestarts, setDefaultMaxStartupRestarts, defaultMaxStartupRestarts);
+
 	//! @brief Add the object contents to the provided JSON object
-	//! @param _document The JSON document (used to get the allocator)
-	//! @param _object The JSON object to add the contents to
-	virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
+	//! @param _object Json object reference
+	//! @param _allocator Allocator
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 
 	//! @brief Will set the object contents from the provided JSON object
 	//! @param _object The JSON object containing the information
 	//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
-	virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	//! @brief Will load the confiuguration from the environment
 	//! Returns an exit code (use LDS_EXIT_... macros to determine error: ExitCodes.h)
 	//! LDS_EXIT_Ok will be returned if no error occured
 	int importFromEnvironment(void);
 
-	OT_PROPERTY_GET(std::list<ServiceInformation>, SupportedServices);
-	OT_PROPERTY_GET(std::string, LauncherPath);
-	OT_PROPERTY_GET(std::string, ServicesLibraryPath);
-	OT_PROPERTY_GET(unsigned int, DefaultMaxCrashRestarts);
-	OT_PROPERTY_GET(unsigned int, DefaultMaxStartupRestarts);
-
 	//! @brief Returns true if the provided service is supported by this LDS
 	bool supportsService(const std::string& _serviceName) const;
 
 private:
-	bool		m_configurationImported;
+	bool m_configurationImported;
 
 	Configuration();
 	virtual ~Configuration();

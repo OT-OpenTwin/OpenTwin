@@ -22,6 +22,8 @@
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\FillPainter2D.h" />
     <ClInclude Include="include\OTGui\Font.h" />
+    <ClInclude Include="include\OTGui\GradientPainter2D.h" />
+    <ClInclude Include="include\OTGui\GradientPainterStop2D.h" />
     <ClInclude Include="include\OTGui\GraphicsBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsConnectionCfg.h" />
@@ -30,25 +32,29 @@
     <ClInclude Include="include\OTGui\GraphicsHBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsImageItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsPackage.h" />
-    <ClInclude Include="include\OTGui\GraphicsFlowItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsFlowItemBuilder.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsRectangularItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsStackItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsTextItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsTriangleItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsVBoxLayoutItemCfg.h" />
     <ClInclude Include="include\OTGui\GuiTypes.h" />
-    <ClInclude Include="include\OTGui\LengthLimitation.h" />
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
+    <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
+    <ClInclude Include="include\OTGui\StyleValue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FillPainter2D.cpp" />
     <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\GradientPainter2D.cpp" />
+    <ClCompile Include="src\GradientPainterStop2D.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsCollectionCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCfg.cpp" />
@@ -57,18 +63,20 @@
     <ClCompile Include="src\GraphicsHBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsImageItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPackage.cpp" />
-    <ClCompile Include="src\GraphicsFlowItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsFlowItemBuilder.cpp" />
     <ClCompile Include="src\GraphicsItemCfg.cpp" />
     <ClCompile Include="src\GraphicsLayoutItemCfg.cpp" />
     <ClCompile Include="src\GraphicsRectangularItemCfg.cpp" />
     <ClCompile Include="src\GraphicsStackItemCfg.cpp" />
     <ClCompile Include="src\GraphicsTextItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItemCfg.cpp" />
     <ClCompile Include="src\GuiTypes.cpp" />
-    <ClCompile Include="src\LengthLimitation.cpp" />
     <ClCompile Include="src\LinearGradientPainter2D.cpp" />
     <ClCompile Include="src\Margins.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
+    <ClCompile Include="src\RadialGradientPainter2D.cpp" />
+    <ClCompile Include="src\StyleValue.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -153,7 +161,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;Userenv.lib;wsock32.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;Userenv.lib;wsock32.lib;Advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -195,7 +203,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>OpenTwinSystem.lib;OpenTwinCore.lib;Userenv.lib;wsock32.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;Userenv.lib;wsock32.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

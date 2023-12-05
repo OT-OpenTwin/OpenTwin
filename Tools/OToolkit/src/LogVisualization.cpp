@@ -8,8 +8,8 @@
 #include "ConnectToLoggerDialog.h"
 
 // OT header
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
@@ -98,7 +98,7 @@ QString LogVisualization::toolName(void) const {
 	return QString("Log Visualization");
 }
 
-QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
@@ -207,10 +207,8 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	splitter->setStretchFactor(1, 1);
 
 	// Restore settings
-	QSettings s("OpenTwin", "OToolkit");
-
-	QString tableColumnWidths = s.value("LogVisualization.Table.ColumnWidth", "").toString();
-	QStringList tableColumnWidthsList = tableColumnWidths.split(";", QString::SkipEmptyParts);
+	QString tableColumnWidths = _settings.value("LogVisualization.Table.ColumnWidth", "").toString();
+	QStringList tableColumnWidthsList = tableColumnWidths.split(";", Qt::SkipEmptyParts);
 	if (tableColumnWidthsList.count() == m_table->columnCount()) {
 		int column = 0;
 		for (auto w : tableColumnWidthsList) {
@@ -218,16 +216,16 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 		}
 	}
 
-	m_autoScrollToBottom->setChecked(s.value("LogVisualization.AutoScrollToBottom", true).toBool());
+	m_autoScrollToBottom->setChecked(_settings.value("LogVisualization.AutoScrollToBottom", true).toBool());
 
-	m_msgTypeFilterDetailed->setChecked(s.value("LogVisualization.FilterActive.Detailed", true).toBool());
-	m_msgTypeFilterInfo->setChecked(s.value("LogVisualization.FilterActive.Info", true).toBool());
-	m_msgTypeFilterWarning->setChecked(s.value("LogVisualization.FilterActive.Warning", true).toBool());
-	m_msgTypeFilterError->setChecked(s.value("LogVisualization.FilterActive.Error", true).toBool());
-	m_msgTypeFilterMsgIn->setChecked(s.value("LogVisualization.FilterActive.Message.In", false).toBool());
-	m_msgTypeFilterMsgOut->setChecked(s.value("LogVisualization.FilterActive.Message.Out", false).toBool());
+	m_msgTypeFilterDetailed->setChecked(_settings.value("LogVisualization.FilterActive.Detailed", true).toBool());
+	m_msgTypeFilterInfo->setChecked(_settings.value("LogVisualization.FilterActive.Info", true).toBool());
+	m_msgTypeFilterWarning->setChecked(_settings.value("LogVisualization.FilterActive.Warning", true).toBool());
+	m_msgTypeFilterError->setChecked(_settings.value("LogVisualization.FilterActive.Error", true).toBool());
+	m_msgTypeFilterMsgIn->setChecked(_settings.value("LogVisualization.FilterActive.Message.In", false).toBool());
+	m_msgTypeFilterMsgOut->setChecked(_settings.value("LogVisualization.FilterActive.Message.Out", false).toBool());
 
-	QByteArray serviceFilter = s.value("LogVisualization.ServiceFilter.List", QByteArray()).toByteArray();
+	QByteArray serviceFilter = _settings.value("LogVisualization.ServiceFilter.List", QByteArray()).toByteArray();
 	if (!serviceFilter.isEmpty()) {
 		QJsonDocument serviceFilterDoc = QJsonDocument::fromJson(serviceFilter);
 		if (serviceFilterDoc.isArray()) {
@@ -285,7 +283,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	// Create menu bar
 	m_connectButton = _rootMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
 	m_autoConnect = _rootMenu->addAction("Auto-Connect");
-	bool needAutoConnect = s.value("LogVisualization.AutoConnect", false).toBool();
+	bool needAutoConnect = _settings.value("LogVisualization.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
 
 	_rootMenu->addSeparator();
@@ -317,7 +315,33 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 //	return ret;
 //}
 
-bool LogVisualization::prepareToolShutdown(void) {
+bool LogVisualization::prepareToolShutdown(QSettings& _settings) {
+	_settings.setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
+
+	_settings.setValue("LogVisualization.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Error", m_msgTypeFilterError->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
+	_settings.setValue("LogVisualization.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
+
+	QJsonArray serviceFilterArr;
+	for (int i = 0; i < m_serviceFilter->count(); i++) {
+		QJsonObject serviceObj;
+		serviceObj["Name"] = m_serviceFilter->item(i)->text();
+		serviceObj["Active"] = (m_serviceFilter->item(i)->checkState() == Qt::Checked);
+		serviceFilterArr.push_back(serviceObj);
+	}
+	QJsonDocument serviceFilterDoc(serviceFilterArr);
+	_settings.setValue("LogVisualization.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
+
+	QString tableColumnWidths;
+	for (int i = 0; i < m_table->columnCount(); i++) {
+		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
+	}
+	_settings.setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
+
+
 	if (this->disconnectFromLogger()) {
 		return true;
 	}
@@ -346,7 +370,8 @@ void LogVisualization::slotImport(void) {
 		return;
 	}
 
-	OT_rJSON_parseDOC(doc, f.readAll().toStdString().c_str());
+	ot::JsonDocument doc;
+	doc.fromJson(f.readAll().toStdString());
 	f.close();
 
 	if (!doc.IsArray()) {
@@ -357,10 +382,8 @@ void LogVisualization::slotImport(void) {
 
 	for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
 		try {
-			if (!doc[i].IsObject()) {
-				throw std::exception("Array entry is not an object");
-			}
-			OT_rJSON_val obj = doc[i].GetObject();
+			ot::ConstJsonObject obj = ot::json::getObject(doc, i);
+			
 			ot::LogMessage m;
 			m.setFromJsonObject(obj);
 			msg.push_back(m);
@@ -401,16 +424,15 @@ void LogVisualization::slotExport(void) {
 		return;
 	}
 
-	OT_rJSON_doc doc;
-	doc.SetArray();
-
+	ot::JsonDocument doc(rapidjson::kArrayType);
+	
 	for (auto m : m_messages) {
-		OT_rJSON_createValueObject(msgObj);
-		m.addToJsonObject(doc, msgObj);
+		ot::JsonObject msgObj;
+		m.addToJsonObject(msgObj, doc.GetAllocator());
 		doc.PushBack(msgObj, doc.GetAllocator());
 	}
 
-	f.write(QByteArray::fromStdString(ot::rJSON::toJSON(doc)));
+	f.write(QByteArray::fromStdString(doc.toJson()));
 	f.close();
 
 	settings->setValue("LogVisualization.LastExportedFile", fn);
@@ -652,7 +674,11 @@ void LogVisualization::connectToLogger(bool _isAutoConnect) {
 		return;
 	}
 
-	ConnectToLoggerDialog dia(_isAutoConnect);
+	ConnectToLoggerDialog dia;
+	if (_isAutoConnect) {
+		dia.queueConnectRequest();
+	}
+	dia.queueRecenterRequest();
 	dia.exec();
 
 	if (!dia.success()) {
@@ -675,11 +701,11 @@ bool LogVisualization::disconnectFromLogger(void) {
 	if (m_loggerUrl.empty()) return true;
 
 	std::string response;
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_RemoveService);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, AppBase::instance()->url().toStdString());
-
-	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RemoveService, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->url().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	
+	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, doc.toJson(), response)) {
 		LOGVIS_LOGE("Failed to send remove service request to logger service.");
 		return false;
 	}
@@ -851,52 +877,33 @@ void LogVisualizationItemViewDialog::slotRecenter(void) {
 }
 
 void LogVisualizationItemViewDialog::slotDisplayMessageText(int _state) {
+	QString str = QString::fromStdString(m_msg.text());
 	if (m_findMessageSyntax->isChecked()) {
-		std::string res;
-		std::string str = m_msg.text();
-
 		// JSON check
 		str = this->findJsonSyntax(str);
 
-		// Check if the buffer string contains information
-		if (!str.empty()) {
-			res.append(str);
-		}
-
 		// Display result string
-		m_message->setPlainText(QString::fromStdString(res));
+		m_message->setPlainText(str);
 	}
 	else {
-		m_message->setPlainText(QString::fromStdString(m_msg.text()));
+		m_message->setPlainText(str);
 	}
 }
 
-std::string LogVisualizationItemViewDialog::findJsonSyntax(std::string _str) {
-	std::string ret;
+QString LogVisualizationItemViewDialog::findJsonSyntax(const QString& _inputString) {
+	//QRegularExpression regex("(.*?)(\\s*([\\{\\[])(?:[^{}\\[\\]]|(?3))*\\3\\s*)(.*$)");
+	QRegularExpression regex("(.*?)(\\s*\\{.*\\}\\s*)(.*$)");
+	QRegularExpressionMatch match = regex.match(_inputString);
 
-	size_t ixBegin = _str.find('{');
-	while (ixBegin != std::string::npos) {
-		size_t ixEnd = _str.find('}', ixBegin);
-		if (ixEnd != std::string::npos) {
-			ret.append(_str.substr(0, ixBegin));
-			std::string json = _str.substr(ixBegin, (ixEnd - ixBegin) + 1);
-			QJsonParseError err;
-			QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(json), &err);
-			if (err.error == QJsonParseError::NoError) {
-				json = '\n' + doc.toJson(QJsonDocument::Indented).toStdString() + '\n';
-			}
-			ret.append(json);
-			_str = _str.substr(ixEnd + 1);
-			ixBegin = _str.find('{');
-		}
-		else {
-			ixBegin = std::string::npos;
-		}
+	if (match.hasMatch()) {
+		QString pre = match.captured(1);
+		QString doc = match.captured(2);
+		QString suf = match.captured(3);
+		return (pre + "\n\n" + 
+			QJsonDocument::fromJson(QByteArray::fromStdString(doc.toStdString())).toJson(QJsonDocument::Indented) +
+			"\n\n" + suf);
 	}
-
-	// Check if the buffer string contains information
-	if (!_str.empty()) {
-		ret.append(_str);
+	else {
+		return _inputString; // Return an empty string if no match is found
 	}
-	return ret;
 }

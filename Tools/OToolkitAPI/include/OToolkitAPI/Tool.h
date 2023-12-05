@@ -9,11 +9,12 @@
 #include "OToolkitAPI/otoolkitapi_global.h"
 
 // OpenTwin header
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 
 // Qt header
 #include <QtCore/qlist.h>
 #include <QtCore/qstring.h>
+#include <QtCore/qsettings.h>
 #include <QtGui/qicon.h>
 #include <QtWidgets/qmenu.h>
 
@@ -42,7 +43,7 @@ namespace otoolkit {
 		//! //! The menu already contains the following items:
 		//!   Run / Stop (Starts or stops the tool)
 		//!   [] Autorun (Autostart mode checkbox for the tool upon OToolkit start)
-		virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) = 0;
+		virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) = 0;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -52,7 +53,7 @@ namespace otoolkit {
 		virtual QIcon toolIcon(void) const { return QIcon(); };
 
 		//! @brief Stop all the logic of this tool
-		virtual bool prepareToolShutdown(void) { return true; };
+		virtual bool prepareToolShutdown(QSettings& _settings) { return true; };
 
 		virtual void toolWasShown(void) {};
 

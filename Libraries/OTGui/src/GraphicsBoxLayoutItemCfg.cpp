@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsBoxLayoutItemCfg.h"
 
 #define OT_JSON_MEMBER_Item "Item"
@@ -19,44 +20,40 @@ ot::GraphicsBoxLayoutItemCfg::~GraphicsBoxLayoutItemCfg() {
 	this->clearItems();
 }
 
-void ot::GraphicsBoxLayoutItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	ot::GraphicsLayoutItemCfg::addToJsonObject(_document, _object);
+void ot::GraphicsBoxLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	ot::GraphicsLayoutItemCfg::addToJsonObject(_object, _allocator);
 
-	OT_rJSON_createValueArray(itemArr);
+	JsonArray itemArr;
 	for (auto i : m_items) {
-		OT_rJSON_createValueObject(pairObj);
-		ot::rJSON::add(_document, pairObj, OT_JSON_MEMBER_Stretch, i.second);
+		JsonObject pairObj;
+		pairObj.AddMember(OT_JSON_MEMBER_Stretch, i.second, _allocator);
 		if (i.first == nullptr) {
-			OT_rJSON_createValueNull(stretchObj);
-			ot::rJSON::add(_document, pairObj, OT_JSON_MEMBER_Item, stretchObj);
+			JsonNullValue itemObj;
+			pairObj.AddMember(OT_JSON_MEMBER_Item, itemObj, _allocator);
 		}
 		else {
-			OT_rJSON_createValueObject(itemObj);
-			i.first->addToJsonObject(_document, itemObj);
-			ot::rJSON::add(_document, pairObj, OT_JSON_MEMBER_Item, itemObj);
+			JsonObject itemObj;
+			i.first->addToJsonObject(itemObj, _allocator);
+			pairObj.AddMember(OT_JSON_MEMBER_Item, itemObj, _allocator);
 		}
-		itemArr.PushBack(pairObj, _document.GetAllocator());
+		itemArr.PushBack(pairObj, _allocator);
 	}
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Items, itemArr);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Orientation, ot::toString(m_orientation));
+
+	_object.AddMember(OT_JSON_MEMBER_Items, itemArr, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Orientation, JsonString(ot::toString(m_orientation), _allocator), _allocator);
 }
 
-void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	this->clearItems();
 
 	ot::GraphicsLayoutItemCfg::setFromJsonObject(_object);
 
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Orientation, String);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Items, Array);
+	m_orientation = stringToOrientation(json::getString(_object, OT_JSON_MEMBER_Orientation));
+	ConstJsonArray itemArr = json::getArray(_object, OT_JSON_MEMBER_Items);
 
-	m_orientation = stringToOrientation(_object[OT_JSON_MEMBER_Orientation].GetString());
-
-	OT_rJSON_val itemArr = _object[OT_JSON_MEMBER_Items].GetArray();
 	for (rapidjson::SizeType i = 0; i < itemArr.Size(); i++) {
-		OT_rJSON_checkArrayEntryType(itemArr, i, Object);
-		OT_rJSON_val pairObj = itemArr[i].GetObject();
-		OT_rJSON_checkMember(pairObj, OT_JSON_MEMBER_Stretch, Int);
-		OT_rJSON_checkMemberExists(pairObj, OT_JSON_MEMBER_Item);
+		ConstJsonObject pairObj = json::getObject(itemArr, i);
+		if (!pairObj.HasMember(OT_JSON_MEMBER_Item)) { OT_LOG_EA("Invalid item entry"); return; }
 
 		if (pairObj[OT_JSON_MEMBER_Item].IsNull()) {
 			m_items.push_back(itemStrechPair_t(nullptr, pairObj[OT_JSON_MEMBER_Stretch].GetInt()));
@@ -64,11 +61,11 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
 		else if (pairObj[OT_JSON_MEMBER_Item].IsObject()) {
 			GraphicsItemCfg* itm = nullptr;
 			try {
-				OT_rJSON_val itemObj = pairObj[OT_JSON_MEMBER_Item].GetObject();
+				ConstJsonObject itemObj = json::getObject(pairObj, OT_JSON_MEMBER_Item);
 				itm = ot::SimpleFactory::instance().createType<GraphicsItemCfg>(itemObj);
 				if (itm) {
 					itm->setFromJsonObject(itemObj);
-					m_items.push_back(itemStrechPair_t(itm, pairObj[OT_JSON_MEMBER_Stretch].GetInt()));
+					m_items.push_back(itemStrechPair_t(itm, json::getInt(pairObj, OT_JSON_MEMBER_Stretch)));
 				}
 				else {
 					OT_LOG_EA("Factory failed");
@@ -96,12 +93,12 @@ void ot::GraphicsBoxLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item) {
 }
 
 void ot::GraphicsBoxLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item, int _stretch) {
-	otAssert(_stretch >= 0, "Stretch should be greater or equal to 0");
+	OTAssert(_stretch >= 0, "Stretch should be greater or equal to 0");
 	m_items.push_back(itemStrechPair_t(_item, _stretch));
 }
 
 void ot::GraphicsBoxLayoutItemCfg::addStrech(int _stretch) {
-	otAssert(_stretch > 0, "Stretch should be greater than 0");
+	OTAssert(_stretch > 0, "Stretch should be greater than 0");
 	m_items.push_back(itemStrechPair_t(nullptr, _stretch));
 }
 

@@ -17,8 +17,8 @@
 #include "EntityMeshCartesian.h"
 
 // Open twin header
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include "ModelState.h"
 
@@ -68,12 +68,12 @@ void Application::run(void)
 	}
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
 {
 	return OT_ACTION_RETURN_UnknownAction;
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
@@ -99,7 +99,7 @@ void Application::modelSelectionChangedNotification(void)
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	enableMessageQueuing("uiService", true);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("Mesh");
 
@@ -113,7 +113,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	modelSelectionChangedNotification();
 
-	enableMessageQueuing("uiService", false);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -168,16 +168,16 @@ bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
 
 // ##################################################################################################################################
 
-std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
-	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (     action == "Mesh:Cartesian Mesh:Create Cartesian Mesh")	createMesh();
 	else if (action == "Mesh:Cartesian Mesh:Update Cartesian Mesh")	updateMesh();
 	else assert(0); // Unhandled button action
 	return std::string();
 }
 
-std::string Application::handleModelSelectionChanged(OT_rJSON_doc& _document) {
-	selectedEntities = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
+	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
 	modelSelectionChangedNotification();
 	return std::string();
 }

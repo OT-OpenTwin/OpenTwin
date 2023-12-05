@@ -15,7 +15,7 @@
 #include <list>
 #include <memory>
 #include <stdint.h>
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class MetadataAssemblyRangeData
 {

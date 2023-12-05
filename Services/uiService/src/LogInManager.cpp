@@ -3,9 +3,9 @@
 #include "ExternalServicesComponent.h"
 #include "UserManagement.h"
 
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCore/JSON.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include <akAPI/uiAPI.h>
 #include <akDialogs/aLogInDialog.h>
@@ -34,10 +34,10 @@ enum tableColumn {
 void threadConnectToSessionService(LogInManager * _notifier, ExternalServicesComponent * _externalServicesComponent, const std::string& _sessionServiceUrl) {
 	std::string response;
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_GetDBandAuthServerUrl);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESSAGE, OT_INFO_MESSAGE_LogIn);
-	if (!_externalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, _sessionServiceUrl, ot::rJSON::toJSON(doc), response)) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetDBandAuthServerUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(OT_INFO_MESSAGE_LogIn, doc.GetAllocator()), doc.GetAllocator());
+	if (!_externalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, _sessionServiceUrl, doc.toJson(), response)) {
 		QMetaObject::invokeMethod(_notifier, "slotConnectToSessionServiceFail", Qt::QueuedConnection, Q_ARG(const QString&, "Failed to connect to the session service at url: " + QString::fromStdString(_sessionServiceUrl))); return;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -52,10 +52,10 @@ void threadConnectToSessionService(LogInManager * _notifier, ExternalServicesCom
 void threadConnectToSessionServiceRegister(LogInManager * _notifier, ExternalServicesComponent * _externalServicesComponent, const std::string& _sessionServiceUrl) {
 	std::string response;
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_GetDBandAuthServerUrl);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MESSAGE, OT_INFO_MESSAGE_LogIn);
-	if (!_externalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, _sessionServiceUrl, ot::rJSON::toJSON(doc), response)) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetDBandAuthServerUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(OT_INFO_MESSAGE_LogIn, doc.GetAllocator()), doc.GetAllocator());
+	if (!_externalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, _sessionServiceUrl, doc.toJson(), response)) {
 		QMetaObject::invokeMethod(_notifier, "slotConnectToSessionServiceFail", Qt::QueuedConnection, Q_ARG(const QString&, "Failed to connect to the session service at url: " + QString::fromStdString(_sessionServiceUrl))); return;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -136,7 +136,7 @@ bool LogInSessionServiceEntry::isValid(void) const {
 	bool ipOk{ false };
 	if (m_ip == "localhost") { ipOk = true; }
 	else if (m_ip.length() > 6) {
-		QStringList lst = m_ip.split(".", QString::SkipEmptyParts);
+		QStringList lst = m_ip.split(".", Qt::SkipEmptyParts);
 		if (lst.count() == 4) {
 			ipOk = true;
 			for (QString str : lst) {
@@ -353,9 +353,10 @@ void LogInManager::slotSessionServiceChanged(void) {
 
 void LogInManager::slotConnectToSessionServiceSuccess(const QString& _dbAndAuthUrl) {
 
-	OT_rJSON_parseDOC(doc, _dbAndAuthUrl.toStdString().c_str());
-	std::string databaseUrl = ot::rJSON::getString(doc, OT_ACTION_PARAM_SERVICE_DBURL);
-	std::string authUrl = ot::rJSON::getString(doc, OT_ACTION_PARAM_SERVICE_AUTHURL);
+	ot::JsonDocument doc;
+	doc.fromJson(_dbAndAuthUrl.toStdString());
+	std::string databaseUrl = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_DBURL);
+	std::string authUrl = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_AUTHURL);
 
 	LogInSessionServiceEntry entry = currentEntry();
 	uiAPI::settings::setString("SessionServiceURL", entry.displayText());
@@ -371,9 +372,10 @@ void LogInManager::slotConnectToSessionServiceSuccess(const QString& _dbAndAuthU
 
 void LogInManager::slotConnectToSessionServiceRegisterSuccess(const QString& _dbAndAuthUrl) 
 {
-	OT_rJSON_parseDOC(doc, _dbAndAuthUrl.toStdString().c_str());
-	std::string databaseUrl = ot::rJSON::getString(doc, OT_ACTION_PARAM_SERVICE_DBURL);
-	std::string authUrl = ot::rJSON::getString(doc, OT_ACTION_PARAM_SERVICE_AUTHURL);
+	ot::JsonDocument doc;
+	doc.fromJson(_dbAndAuthUrl.toStdString());
+	std::string databaseUrl = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_DBURL);
+	std::string authUrl = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_AUTHURL);
 
 	QMetaObject::invokeMethod(this, "slotConnectToDatabaseNewUser", Qt::QueuedConnection, Q_ARG(const QString&, databaseUrl.c_str()), Q_ARG(const QString&, authUrl.c_str()), Q_ARG(const QString&, m_dialog->username()), Q_ARG(const QString&, m_dialog->password()));
 }

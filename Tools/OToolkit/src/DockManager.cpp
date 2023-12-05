@@ -11,7 +11,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 #include "OTWidgets/DockWatcherAction.h"
 
 // Qt header

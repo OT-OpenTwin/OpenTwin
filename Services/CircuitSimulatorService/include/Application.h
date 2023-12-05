@@ -7,13 +7,15 @@
  */
 
 #pragma once
+//Service Header
+#include "Circuit.h"
 
 // Open twin header
-#include "OpenTwinCore/rJSON.h"					// OpenTwin rapidjson wrapper
-#include "OpenTwinFoundation/ApplicationBase.h" // Base class
+#include "OTServiceFoundation/ApplicationBase.h"	// Base class
 
 // C++ header
 #include <string>
+#include <map>
 
 // Forward declaration
 namespace ot {
@@ -52,6 +54,9 @@ public:
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
 	
 	std::string createNewCircuitEditor(void);
+	std::string generateNetlist();
+	std::map<std::string, Circuit> mapOfCircuits;
+	
 	
 	//NgSpice functions
 	std::string ngSpice_Initialize();
@@ -76,13 +81,13 @@ public:
 	//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
 	//! @param _action The action that should be processed
 	//! @param _doc The document containing all the information
-	virtual std::string processAction(const std::string & _action, OT_rJSON_doc & _doc) override;
+	virtual std::string processAction(const std::string & _action, ot::JsonDocument& _doc) override;
 
 	//! @brief Will be called whenever a message should be processed. Core messages will be processed in the base and will not be forwarded to this function (see documentation)
 	//! @param _sender The service that this message was sent from
 	//! @param _message The message that should be processed
 	//! @param _doc The document containing all the information
-	virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc) override;
+	virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc) override;
 
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;

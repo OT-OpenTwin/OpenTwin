@@ -9,8 +9,8 @@
 #include "Database.h"
 #include "MeshWriter.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <gmsh_cwrap.h>
 

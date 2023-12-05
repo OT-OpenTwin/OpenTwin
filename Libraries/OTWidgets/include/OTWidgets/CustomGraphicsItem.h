@@ -23,7 +23,7 @@ namespace ot {
 
 		// Pure virtual functions
 
-		virtual QSizeF getDefaultGraphicsItemSize(void) const = 0;
+		virtual QSizeF getPreferredGraphicsItemSize(void) const = 0;
 
 	protected:
 
@@ -39,7 +39,7 @@ namespace ot {
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 		virtual void prepareGraphicsItemGeometryChange(void) override;
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) override;
+		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) override;
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
@@ -60,7 +60,8 @@ namespace ot {
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
-
+		virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* _event) override;
+		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 	private:
 		QSizeF m_customItemSize;
 

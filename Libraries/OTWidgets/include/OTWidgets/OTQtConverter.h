@@ -7,14 +7,17 @@
 #define OT_OTQTCONVERTER_H
 
 // OpenTwin header
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinCore/Point2D.h"
+#include "OTCore/Color.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/Size2D.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qpoint.h>
+#include <QtCore/qsize.h>
 #include <QtGui/qcolor.h>
+#include <QtGui/qbrush.h>
 
 namespace ot {
 	namespace OTQtConverter {
@@ -27,7 +30,12 @@ namespace ot {
 		OT_WIDGETS_API_EXPORTONLY QPoint toQt(const ot::Point2D& _pt);
 		OT_WIDGETS_API_EXPORTONLY QPointF toQt(const ot::Point2DF& _pt);
 		OT_WIDGETS_API_EXPORTONLY QPointF toQt(const ot::Point2DD& _pt);
+		
+		OT_WIDGETS_API_EXPORTONLY QSize toQt(const ot::Size2D& _s);
+		OT_WIDGETS_API_EXPORTONLY QSizeF toQt(const ot::Size2DF& _s);
+		OT_WIDGETS_API_EXPORTONLY QSizeF toQt(const ot::Size2DD& _s);
 
+		OT_WIDGETS_API_EXPORTONLY QGradient::Spread toQt(ot::GradientSpread _spread);
 	}
 }
 

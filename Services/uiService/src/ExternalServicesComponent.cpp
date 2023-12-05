@@ -23,26 +23,25 @@
 #include <qeventloop.h>
 
 // OpenTwin header
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinCore/BasicServiceInformation.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCore/Color.h"
+#include "OTCore/BasicServiceInformation.h"
 
-#include "OpenTwinCore/OwnerManagerTemplate.h"
-#include "OpenTwinCore/OwnerService.h"
-#include "OpenTwinCore/OwnerServiceGlobal.h"
+#include "OTCore/OwnerManagerTemplate.h"
+#include "OTCore/OwnerService.h"
+#include "OTCore/OwnerServiceGlobal.h"
 
-#include "OpenTwinCore/SimpleFactory.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/IpConverter.h"
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCommunication/UiTypes.h"
-#include "OpenTwinFoundation/SettingsData.h"
-#include "OpenTwinFoundation/Dispatcher.h"
-#include "OpenTwinFoundation/TableRange.h"
-#include "OpenTwinFoundation/ContextMenu.h"
+#include "OTCore/SimpleFactory.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/UiTypes.h"
+#include "OTServiceFoundation/SettingsData.h"
+#include "OTServiceFoundation/Dispatcher.h"
+#include "OTServiceFoundation/TableRange.h"
+#include "OTServiceFoundation/ContextMenu.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -180,10 +179,10 @@ ExternalServicesComponent::~ExternalServicesComponent(void)
 
 void ExternalServicesComponent::shutdown(void) {
 	if (m_currentSessionID.length() == 0) { return; }
-	OT_rJSON_createDOC(commandDoc);
-	ot::rJSON::add(commandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_ShutdownSession);
-	ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->serviceID());
-	ot::rJSON::add(commandDoc, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
+	ot::JsonDocument commandDoc;
+	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->serviceID(), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, commandDoc.GetAllocator()), commandDoc.GetAllocator());
 	std::string response;
 	sendHttpRequest(EXECUTE, m_sessionServiceURL, commandDoc, response);
 
@@ -429,7 +428,7 @@ void ExternalServicesComponent::fillPropertyGrid(const std::string &settings)
 		app->clearPropertyGrid();
 
 		// Read settings into JSOC Doc
-		rapidjson::Document doc;
+		ot::JsonDocument doc;
 
 		// Parse the document with the json string we have "received"
 		doc.Parse(settings.c_str());
@@ -908,25 +907,29 @@ void ExternalServicesComponent::isModified(ModelUIDtype visualizationModelID, bo
 std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 {
 	std::string authorizationURL = AppBase::instance()->getAuthorizationServiceURL();
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_GET_ALL_USER_PROJECTS);
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USERNAME, AppBase::instance()->getCredentialUserName());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, AppBase::instance()->getCredentialUserPasswordClear());
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_FILTER, "");
-	ot::rJSON::add(doc, OT_PARAM_AUTH_PROJECT_LIMIT, 0);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(AppBase::instance()->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(AppBase::instance()->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
 	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE, ot::rJSON::toJSON(doc), response))
+	if (!ot::msg::send("", authorizationURL, ot::EXECUTE, doc.toJson(), response))
 	{
 		throw std::exception("Could not get the projectlist of the authorization service.");
 	}
-	OT_rJSON_parseDOC(responseDoc, response.c_str());
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+
 	const rapidjson::Value& projectArray = responseDoc["projects"];
 	assert(projectArray.IsArray());
 	std::list<std::string> projectList;
 	for (auto& element : projectArray.GetArray())
 	{
 		std::string projectDescription = element.GetString();
-		OT_rJSON_parseDOC(projectDescriptionDoc, projectDescription.c_str());
+		ot::JsonDocument projectDescriptionDoc;
+		projectDescriptionDoc.fromJson(projectDescription);
 		projectList.push_back(projectDescriptionDoc[OT_PARAM_AUTH_NAME].GetString());
 	}
 	return projectList;
@@ -1016,7 +1019,8 @@ ModelUIDtype ExternalServicesComponent::createModel(
 bool ExternalServicesComponent::deleteModel(ModelUIDtype modelID)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_Delete);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_Delete, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		std::string response;
 		try {
@@ -1045,7 +1049,8 @@ void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, Mode
 {
 	assert(0); // Not in use anymore
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_SetVisualizationModel);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_VIEW_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
@@ -1071,7 +1076,8 @@ void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, Mode
 ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype modelID)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_GetVisualizationModel);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetVisualizationModel, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 
 		std::string response;
@@ -1088,7 +1094,8 @@ ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype model
 		}
 		//NOTE, WARNING, at this point only the last response will be taken into accout..
 
-		rapidjson::Document outDoc = BuildJsonDocFromString(response);
+		ot::JsonDocument outDoc;
+		outDoc.fromJson(response);
 		ak::UID uid = outDoc[OT_ACTION_PARAM_BASETYPE_UID].GetInt64();
 		return uid;
 	}
@@ -1101,7 +1108,8 @@ ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype model
 bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_GetIsModified);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetIsModified, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		std::string response;
 
@@ -1117,7 +1125,8 @@ bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID)
 		}
 		//NOTE, WARNING, at this point only the last response will be taken into accout..
 
-		rapidjson::Document outDoc = BuildJsonDocFromString(response);
+		ot::JsonDocument outDoc;
+		outDoc.fromJson(response);
 		bool modified = outDoc[OT_ACTION_PARAM_BASETYPE_Bool].GetBool();
 		return modified;
 	}
@@ -1146,7 +1155,8 @@ bool ExternalServicesComponent::isCurrentModelModified(void)
 std::string ExternalServicesComponent::getCommonPropertiesAsJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_CommonPropertiesJSON);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_CommonPropertiesJSON, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
 		std::string response;
@@ -1162,7 +1172,8 @@ std::string ExternalServicesComponent::getCommonPropertiesAsJson(ModelUIDtype mo
 			}
 		}
 
-		rapidjson::Document outDoc = BuildJsonDocFromString(response);
+		ot::JsonDocument outDoc;
+		outDoc.fromJson(response);
 		std::string props = outDoc[OT_ACTION_PARAM_MODEL_PropertyList].GetString();
 		return props;
 	}
@@ -1175,17 +1186,17 @@ std::string ExternalServicesComponent::getCommonPropertiesAsJson(ModelUIDtype mo
 void ExternalServicesComponent::setPropertiesFromJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList, std::string props, bool update, bool itemsVisible)
 {
 	try {
-		OT_rJSON_createDOC(inDoc);
-		ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_SetPropertiesFromJSON);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ID, modelID);
-		AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_PropertyList, props);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_Update, update);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		AddUIDListToJsonDoc(doc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDList);
+		doc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, ot::JsonString(props, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, update, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->serviceURL(), inDoc, response);
+			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				assert(0); // ERROR
@@ -1211,16 +1222,16 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 		{
 			auto receiver = m_controlsManager->objectCreator(_senderId);
 			if (receiver != nullptr) {
-				OT_rJSON_createDOC(doc);
-				ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ActionName, ak::uiAPI::object::getObjectUniqueName(_senderId).toStdString());
-				ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ID, AppBase::instance()->getViewerComponent()->getActiveDataModel());
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(ak::uiAPI::object::getObjectUniqueName(_senderId).toStdString(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, AppBase::instance()->getViewerComponent()->getActiveDataModel(), doc.GetAllocator());
 				std::string response;
 
 				if (_event == ak::etEditingFinished)
 				{
 					std::string editText = ak::uiAPI::niceLineEdit::text(_senderId).toStdString();
-					ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText, editText);
+					doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, doc.GetAllocator()), doc.GetAllocator());
 				}
 
 				if (!sendHttpRequest(EXECUTE, receiver->serviceURL(), doc, response)) {
@@ -1250,7 +1261,8 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype> &selectedEntityID, std::list<ModelUIDtype> &selectedVisibleEntityID)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_SelectionChanged);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs, selectedEntityID);
 		AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs, selectedVisibleEntityID);
@@ -1278,7 +1290,8 @@ void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype m
 void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::string &newName)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_ItemRenamed);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ItemRenamed, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, rapidjson::Value(newName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
@@ -1306,10 +1319,10 @@ void ExternalServicesComponent::propertyGridValueChanged(int itemID)
 	try {
 		std::string name = AppBase::instance()->getPropertyName(itemID).toStdString();
 
-		rapidjson::Document doc;
+		ot::JsonDocument doc;
 		doc.SetObject();
 
-		rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+		ot::JsonDocument::AllocatorType& allocator = doc.GetAllocator();
 
 		rapidjson::Value container(rapidjson::kObjectType);
 		rapidjson::Value jsonType(rapidjson::kStringType);
@@ -1426,7 +1439,7 @@ void ExternalServicesComponent::propertyGridValueChanged(int itemID)
 
 		// Finally send the string
 		ak::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
-		setPropertiesFromJson(modelID, selectedModelEntityIDs, OT_rJSON_toJSON(doc), true, itemsVisible);
+		setPropertiesFromJson(modelID, selectedModelEntityIDs, doc.toJson(), true, itemsVisible);
 
 	}
 	catch (...) {
@@ -1455,14 +1468,14 @@ void ExternalServicesComponent::propertyGridValueDeleted(int itemID)
 	}
 
 	try {
-		OT_rJSON_createDOC(inDoc);
-		ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_DeleteProperty);
-		AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_EntityIDList, selectedModelEntityIDs);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_EntityName, propertyName);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteProperty, doc.GetAllocator()), doc.GetAllocator());
+		AddUIDListToJsonDoc(doc, OT_ACTION_PARAM_MODEL_EntityIDList, selectedModelEntityIDs);
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(propertyName, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->serviceURL(), inDoc, response);
+			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				assert(0); // ERROR
@@ -1482,7 +1495,8 @@ void ExternalServicesComponent::propertyGridValueDeleted(int itemID)
 void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues)
 {
 	try {
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_EntitiesSelected);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_EntitiesSelected, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_SelectionAction, rapidjson::Value(selectionAction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_SelectionInfo, rapidjson::Value(selectionInfo.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -1512,14 +1526,14 @@ void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::servi
 void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype buttonID)
 {
 	try {
-		OT_rJSON_createDOC(inDoc);
-		ot::rJSON::add(inDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ID, modelID);
-		ot::rJSON::add(inDoc, OT_ACTION_PARAM_MODEL_ActionName, ak::uiAPI::object::getObjectUniqueName(buttonID).toStdString());
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(ak::uiAPI::object::getObjectUniqueName(buttonID).toStdString(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->serviceURL(), inDoc, response);
+			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				assert(0); // ERROR
@@ -1536,12 +1550,12 @@ void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype
 	}
 }
 
-std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc, const char * _senderIP)
+std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, const char * _senderIP)
 {
 	std::string action;
 	try {
 		if (_doc.HasMember(OT_ACTION_MEMBER)) {
-			action = getStringFromDocument(_doc, OT_ACTION_MEMBER);
+			action = ot::json::getString(_doc, OT_ACTION_MEMBER);
 
 #ifdef _DEBUG
 			std::cout << ">>> Dispatch action: " << action << std::endl;
@@ -1555,7 +1569,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 
 			if (action == OT_ACTION_CMD_Compound)
 			{
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				rapidjson::Value documents = _doc[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
 				rapidjson::Value prefetchID = _doc[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
 				rapidjson::Value prefetchVersion = _doc[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
@@ -1601,7 +1615,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				{
 					rapidjson::Value subdoc = documents[i].GetObject();
 
-					rapidjson::Document d;
+					ot::JsonDocument d;
 					d.CopyFrom(subdoc, d.GetAllocator());
 					dispatchAction(d, _senderIP);
 				}
@@ -1617,14 +1631,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 			{
-				const std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				const std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 
-				ot::UIDList entityIDs = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-				ot::UIDList entityVersions = ot::rJSON::getULongLongList(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+				ot::UIDList entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				ot::UIDList entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
 				
 				if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
 				{
-					rapidjson::Document  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
+					ot::JsonDocument  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
 					std::string response;
 					sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
 					// Check if response is an error or warning
@@ -1638,37 +1652,37 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}		
 			else if (action == OT_ACTION_CMD_UI_DisplayMessage)
 			{
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
 				displayInfoMessage(message);
 			}
 			else if (action == OT_ACTION_CMD_UI_DisplayDebugMessage) {
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
 				displayDebugMessage(message);
 			}
 			else if (action == OT_ACTION_CMD_UI_ReportError)
 			{
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
 				ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 			}
 			else if (action == OT_ACTION_CMD_UI_ReportWarning)
 			{
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
 				ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
 			}
 			else if (action == OT_ACTION_CMD_UI_ReportInformation)
 			{
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
 				ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
 			}
 			else if (action == OT_ACTION_CMD_UI_PromptInformation)
 			{
 #pragma message("Invalid Service Information (sender type missing)")
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				std::string icon = ot::rJSON::getString(_doc, OT_ACTION_PARAM_ICON);
-				std::string options = ot::rJSON::getString(_doc, OT_ACTION_PARAM_OPTIONS);
-				std::string promptResponse = ot::rJSON::getString(_doc, OT_ACTION_PARAM_RESPONSE);
-				std::string sender = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER);
-				std::string parameter1 = ot::rJSON::getString(_doc, OT_ACTION_PARAM_PARAMETER1);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string icon = ot::json::getString(_doc, OT_ACTION_PARAM_ICON);
+				std::string options = ot::json::getString(_doc, OT_ACTION_PARAM_OPTIONS);
+				std::string promptResponse = ot::json::getString(_doc, OT_ACTION_PARAM_RESPONSE);
+				std::string sender = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER);
+				std::string parameter1 = ot::json::getString(_doc, OT_ACTION_PARAM_PARAMETER1);
 
 				ak::promptType promptType = ak::promptIconLeft;
 
@@ -1710,12 +1724,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					assert(0); // Unknown type
 				}
 
-				rapidjson::Document docOut;
-				docOut.SetObject();
-				ot::rJSON::add(docOut, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_PromptResponse);
-				ot::rJSON::add(docOut, OT_ACTION_PARAM_RESPONSE, promptResponse);
-				ot::rJSON::add(docOut, OT_ACTION_PARAM_ANSWER, queryResult);
-				ot::rJSON::add(docOut, OT_ACTION_PARAM_PARAMETER1, parameter1);
+				ot::JsonDocument docOut;
+				docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
+				docOut.AddMember(OT_ACTION_PARAM_RESPONSE, ot::JsonString(promptResponse, docOut.GetAllocator()), docOut.GetAllocator());
+				docOut.AddMember(OT_ACTION_PARAM_ANSWER, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
+				docOut.AddMember(OT_ACTION_PARAM_PARAMETER1, ot::JsonString(parameter1, docOut.GetAllocator()), docOut.GetAllocator());
 
 				if (this->getServiceFromNameType(sender, sender) != nullptr)
 				{
@@ -1728,7 +1741,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_RegisterForModelEvents) {
-				ot::serviceID_t senderID(ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
+				ot::serviceID_t senderID(ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
 				auto s = m_serviceIdMap.find(senderID);
 
 				// Check if the service was registered before
@@ -1748,7 +1761,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				std::cout << "Service with ID \"" << s->second->serviceID() << "\" was registered from model view events" << std::endl;
 			}
 			else if (action == OT_ACTION_CMD_UI_DeregisterForModelEvents) {
-				ot::serviceID_t senderID(ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
+				ot::serviceID_t senderID(ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
 				auto s = m_serviceIdMap.find(senderID);
 
 				// Check if the service was registered before
@@ -1782,33 +1795,34 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_RequestFileForReading)
 			{
-				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileMask = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-				std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-				bool loadContent = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_FILE_LoadContent);
+				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+				bool loadContent = ot::json::getBool(_doc, OT_ACTION_PARAM_FILE_LoadContent);
 
 				requestFileForReading(dialogTitle, fileMask, subsequentFunction, senderURL, loadContent);
 			}
 			else if (action == OT_Action_CMD_UI_StoreFileInDataBase)
 			{
-				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileMask = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
 				try
 				{
 					const std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
 
 					if (absoluteFilePaths.size() != 0)
 					{
-						rapidjson::Document sendingDoc;
-						sendingDoc.SetObject();
+						ot::JsonDocument sendingDoc;
+
 						int requiredIdentifierPairsPerFile = 2;
 						const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPairsPerFile;
-						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs);
+
+						sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs, sendingDoc.GetAllocator());
 						const std::string url = uiServiceURL();
-						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_SENDER_URL, url);
-						ot::rJSON::add(sendingDoc, OT_ACTION_PARAM_MODEL_FunctionName, m_fileHandler.GetStoreFileFunctionName());
-						ot::rJSON::add(sendingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER);
+						sendingDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(url, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+						sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(m_fileHandler.GetStoreFileFunctionName(), sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+						sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
 						
 						std::string response;
 						sendHttpRequest(QUEUE, m_modelServiceURL, sendingDoc, response);
@@ -1820,11 +1834,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 							assert(0); // WARNING
 						}
 
-						std::list<std::string> takenNames = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
-						std::string senderName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER);
-						std::string entityPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_NAME);
-						std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-						std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+						std::list<std::string> takenNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
+						std::string senderName = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER);
+						std::string entityPath = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
+						std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+						std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
 						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath));
 					}
 				}
@@ -1835,95 +1849,95 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_SaveFileContent)
 			{
-				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				std::string fileContent = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-				ot::UID uncompressedDataLength = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+				std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 
 				saveFileContent(dialogTitle, fileName, fileContent, uncompressedDataLength);
 			}
 			else if (action == OT_ACTION_CMD_UI_SelectFileForStoring)
 			{
-				std::string dialogTitle = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileMask = ot::rJSON::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-				std::string subsequentFunction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
 
 				selectFileForStoring(dialogTitle, fileMask, subsequentFunction, senderURL);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
 			{
-				bool insertAbove = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
-				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				bool insertAbove = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
+				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
 				ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
 			{
-				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
 				ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
 			{
-				bool insertLeft = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
-				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				bool insertLeft = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
+				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
 				ViewerAPI::AddToSelectedTableColumn(insertLeft,visualizationModelID);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn)
 			{
-				ak::UID visualizationModelID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
 				ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
 			}
 			
 			else if (action == OT_ACTION_CMD_UI_FillPropertyGrid)
 			{
-				std::string settings = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);
+				std::string settings = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);
 				fillPropertyGrid(settings);
 			}
 			else if (action == OT_ACTION_CMD_UI_AddMenuPage)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				addMenuPage(getService(serviceId), pageName);
 			}
 			else if (action == OT_ACTION_CMD_UI_AddMenuGroup)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				addMenuGroup(getService(serviceId), pageName, groupName);
 			}
 			else if (action == OT_ACTION_CMD_UI_AddMenuSubgroup)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				std::string subgroupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+				std::string subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				addMenuSubgroup(getService(serviceId), pageName, groupName, subgroupName);
 			}
 			else if (action == OT_ACTION_CMD_UI_AddMenuButton)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
 				std::string subgroupName = "";
-				if (ot::rJSON::memberExists(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName))
+				if (_doc.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName))
 				{
-					subgroupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+					subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
 				}
-				std::string buttonName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string text = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				std::string iconName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconName);
-				std::string iconFolder = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string buttonName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string text = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+				std::string iconName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconName);
+				std::string iconFolder = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				ot::ContextMenu contextMenu("");
 				if (_doc.HasMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu)) {
-					OT_rJSON_val contextMenuData = _doc[OT_ACTION_PARAM_UI_CONTROL_ContextMenu].GetObject();
+					ot::ConstJsonObject contextMenuData = ot::json::getObject(_doc, OT_ACTION_PARAM_UI_CONTROL_ContextMenu);
 					contextMenu.setFromJsonObject(contextMenuData);
 				}
 				ot::ServiceBase * senderService = getService(serviceId);
 				ak::UID btnUid;
 
-				OT_rJSON_ifMember(_doc, OT_ACTION_PARAM_ElementLockTypes) {
-					auto flags = ot::ui::toLockType(ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
+				if (_doc.HasMember(OT_ACTION_PARAM_ElementLockTypes)) {
+					auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
 					flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external push buttons
 					btnUid = addMenuPushButton(senderService, pageName, groupName, subgroupName, buttonName, text, iconName, iconFolder, flags);
 				}
@@ -1932,8 +1946,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 
 				if (btnUid != ak::invalidUID) {
-					OT_rJSON_ifMember(_doc, OT_ACTION_PARAM_UI_KeySequence) {
-						std::string keySquence = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_KeySequence);
+					if (_doc.HasMember(OT_ACTION_PARAM_UI_KeySequence)) {
+						std::string keySquence = ot::json::getString(_doc, OT_ACTION_PARAM_UI_KeySequence);
 						if (keySquence.length() > 0) {
 							KeyboardCommandHandler * newHandler = addShortcut(senderService, keySquence.c_str());
 							if (newHandler) {
@@ -1951,29 +1965,29 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_ActivateToolbarTab)
 			{
-				std::string tabName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_TabName);
+				std::string tabName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_TabName);
 
 				AppBase::instance()->activateToolBarTab(tabName.c_str());
 			}
 			else if (action == OT_ACTION_CMD_UI_AddMenuCheckbox)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
 				std::string subgroupName = ""; // Subgroup is optional
-				try { subgroupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
+				try { subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
 				catch (...) {}
-				std::string boxName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string boxText = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+				std::string boxName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string boxText = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 				bool checked = _doc[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
 				flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
 
 				addMenuCheckBox(getService(serviceId), pageName, groupName, subgroupName, boxName, boxText, checked, flags);
 			}
 			else if (action == OT_ACTION_CMD_UI_AddShortcut) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string keySequence = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_KeySequence);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string keySequence = ot::json::getString(_doc, OT_ACTION_PARAM_UI_KeySequence);
 				if (keySequence.length() > 0) {
 					addShortcut(getService(serviceId), keySequence);
 				}
@@ -1983,61 +1997,61 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_AddMenuLineEdit)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
 				std::string subgroupName = ""; // Subgroup is optional
-				try { subgroupName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
+				try { subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
 				catch (...) {}
-				std::string editName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string editText = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				std::string editLabel = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
+				std::string editName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string editText = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+				std::string editLabel = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
 				flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
 
 				addMenuLineEdit(getService(serviceId), pageName, groupName, subgroupName, editName, editText, editLabel, flags);
 			}
 			else if (action == OT_ACTION_CMD_UI_SetCheckboxValues)
 			{
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string controlName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string controlName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				bool checked = _doc[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
 
 				setCheckBoxValues(getService(serviceId), controlName, checked);
 			}
 			else if (action == OT_ACTION_CMD_UI_SetLineEditValues)
 			{
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string controlName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string editText = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string controlName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string editText = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 				bool error = _doc[OT_ACTION_PARAM_UI_CONTROL_ErrorState].GetBool();
 
 				setLineEditValues(getService(serviceId), controlName, editText, error);
 			}
 			else if (action == OT_ACTION_CMD_UI_SwitchMenuTab)
 			{
-				std::string pageName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				AppBase::instance()->switchToTab(pageName);
 			}
 			else if (action == OT_ACTION_CMD_UI_RemoveElements)
 			{
-				std::list<std::string> itemList = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectNames);
+				std::list<std::string> itemList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectNames);
 				removeUIElements(itemList);
 			}
 			else if (action == OT_ACTION_CMD_UI_EnableDisableControls)
 			{
-				std::list<std::string> enabled = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_EnabledControlsList);
-				std::list<std::string> disabled = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_DisabledControlsList);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::list<std::string> enabled = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_EnabledControlsList);
+				std::list<std::string> disabled = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_DisabledControlsList);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 
 				enableDisableControls(getService(serviceId), enabled, disabled);
 			}
 			else if (action == OT_ACTION_CMD_UI_OBJ_SetToolTip)
 			{
-				std::string item = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string text = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string item = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string text = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 
 				setTooltipText(getService(serviceId), item, text);
 			}
@@ -2070,11 +2084,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				double *surfaceColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB);
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
 				ak::UID modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				bool backFaceCulling = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling);
+				bool backFaceCulling = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling);
 				double offsetFactor = _doc[OT_ACTION_PARAM_MODEL_ITM_OffsetFactor].GetDouble();
 				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 				bool selectChildren = _doc[OT_ACTION_PARAM_MODEL_ITM_SelectChildren].GetBool();
@@ -2087,18 +2101,18 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				getListTriangleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Triangles, triangles);
 				std::list<Geometry::Edge> edges;
 				getListEdgeFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Edges, edges);
-				std::string errors = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Errors);
+				std::string errors = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Errors);
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				addVisualizationNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, editable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase)
 			{
 				ViewerUIDtype visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				double *surfaceColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB);
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
-				std::string materialType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
-				std::string textureType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
+				std::string materialType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
+				std::string textureType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
 				bool reflective = _doc[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				bool backFaceCulling = _doc[OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling].GetBool();
@@ -2109,14 +2123,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				bool manageParentVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
 				bool manageChildVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
 				bool showWhenSelected = _doc[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ModelUIDtype entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ModelUIDtype entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				std::vector<double> transformation;
 				try
 				{
-					transformation = ot::rJSON::getDoubleVector(_doc, OT_ACTION_PARAM_MODEL_ITM_Transformation);
+					transformation = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_MODEL_ITM_Transformation);
 				}
 				catch (std::exception)
 				{
@@ -2130,7 +2144,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddContainerNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
@@ -2139,11 +2153,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_TREE_Name);
+				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
 				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 
 				ak::UID visualizationDataID = _doc[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
@@ -2155,7 +2169,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 
 				ak::UID visualizationDataID = _doc[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
 				ak::UID visualizationDataVersion = _doc[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
@@ -2168,8 +2182,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				double *surfaceColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB);
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
-				std::string materialType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
-				std::string textureType = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
+				std::string materialType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
+				std::string textureType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
 				bool reflective = _doc[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
 				updateObjectColor(visModelID, modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
 			}
@@ -2219,21 +2233,21 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch)
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string branchName = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
+				std::string branchName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
 
 				showBranch(visualizationModelID, branchName);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch)
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string branchName = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
+				std::string branchName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
 
 				hideBranch(visualizationModelID, branchName);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				double *edgeColorRGB = getDoubleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB);
@@ -2249,10 +2263,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
@@ -2261,13 +2275,13 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				double edgeColorRGB[3];
 				edgeColorRGB[0] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
 				edgeColorRGB[1] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
 				edgeColorRGB[2] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				bool displayTetEdges = _doc[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
@@ -2277,7 +2291,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				double edgeColorRGB[3];
@@ -2292,7 +2306,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				std::vector<double> meshCoordsY = getVectorDoubleFromDocument(_doc, OT_ACTION_PARAM_MESH_CartesianCoordY);
 				std::vector<double> meshCoordsZ = getVectorDoubleFromDocument(_doc, OT_ACTION_PARAM_MESH_CartesianCoordZ);
 				bool showMeshLines = _doc[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID faceListEntityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID faceListEntityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				ak::UID nodeListEntityID = _doc[OT_ACTION_PARAM_MESH_NODE_ID].GetUint64();
@@ -2310,7 +2324,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				std::vector<int> facesList = getVectorIntFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_FacesList);
@@ -2331,10 +2345,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
@@ -2346,12 +2360,12 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddText)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				bool isEditable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID textID = _doc[OT_ACTION_PARAM_TEXT_ID].GetUint64();
 				ak::UID textVersion = _doc[OT_ACTION_PARAM_TEXT_VERSION].GetUint64();
 
@@ -2362,12 +2376,12 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddTable)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 				bool isEditable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 				ak::UID tableID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				ak::UID tableVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
 
@@ -2378,13 +2392,13 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection)
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string senderURL = getStringFromDocument(_doc, OT_ACTION_PARAM_SENDER_URL);
-				std::string subsequentFunction = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				OT_rJSON_val serializedColour = _doc[OT_ACTION_PARAM_COLOUR_BACKGROUND].GetObject();
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				ot::ConstJsonObject serializedColor = ot::json::getObject(_doc, OT_ACTION_PARAM_COLOUR_BACKGROUND);
 
 				try {
 					ot::Color colour;
-					colour.setFromJsonObject(serializedColour);
+					colour.setFromJsonObject(serializedColor);
 					std::pair<ot::UID, ot::UID> activeTableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visualizationModelID);
 
 					if (activeTableIdentifyer.first != -1)
@@ -2404,8 +2418,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				ak::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				ak::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				std::string senderURL = getStringFromDocument(_doc, OT_ACTION_PARAM_SENDER_URL);
-				std::string subsequentFunction = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
+				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 				try
 				{
 					bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
@@ -2414,10 +2428,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 					{
 						std::string tableName = ViewerAPI::getTableName(visualizationModelID);
 
-						OT_rJSON_createDOC(doc);
-						ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
-						ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
-						ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityName, tableName);
+						ot::JsonDocument doc;
+						doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
+						doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
+						doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(tableName, doc.GetAllocator()), doc.GetAllocator());
 
 						std::string response;
 						sendHttpRequest(EXECUTE, senderURL, doc, response);
@@ -2441,14 +2455,13 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			{
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				
-				auto listOfSerializedRanges = ot::rJSON::getObjectList(_doc, "Ranges");
+				auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
 				std::vector<ot::TableRange> ranges;
 				ranges.reserve(listOfSerializedRanges.size());
 				for (auto range : listOfSerializedRanges)
 				{
-					OT_rJSON_parseDOC(serializedRange, range.c_str());
 					ot::TableRange tableRange;
-					tableRange.setFromJsonObject(serializedRange);
+					tableRange.setFromJsonObject(range);
 					ranges.push_back(tableRange);
 				}
 				try
@@ -2462,13 +2475,13 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection)
 			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				OT_rJSON_val serializedColour = _doc[OT_ACTION_PARAM_COLOUR_BACKGROUND].GetObject();
+				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ot::ConstJsonObject serializedColor = ot::json::getObject(_doc, OT_ACTION_PARAM_COLOUR_BACKGROUND);
 				
 				try
 				{
 					ot::Color colour;
-					colour.setFromJsonObject(serializedColour);
+					colour.setFromJsonObject(serializedColor);
 					ViewerAPI::ChangeColourOfSelection(visualizationModelID, colour);
 				}
 				catch (std::exception& e)
@@ -2479,15 +2492,15 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
 				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = getStringFromDocument(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 
 				int gridColor[3] = { 0, 0, 0 };
-				std::string title = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_Title);
-				std::string plotType = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
-				std::string plotQuantity = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
+				std::string title = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_Title);
+				std::string plotType = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
+				std::string plotQuantity = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
 				bool grid = _doc[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
 				bool legend = _doc[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
 				bool logscaleX = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
@@ -2516,9 +2529,9 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				int gridColor[3] = { 0, 0, 0 };
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				std::string title = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_Title);
-				std::string plotType = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
-				std::string plotQuantity = getStringFromDocument(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
+				std::string title = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_Title);
+				std::string plotType = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
+				std::string plotQuantity = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
 				bool grid = _doc[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
 				bool legend = _doc[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
 				bool logscaleX = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
@@ -2545,12 +2558,12 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode)
 			{
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string selectionType = getStringFromDocument(_doc, OT_ACTION_PARAM_UI_CONTROL_SelectionType);
+				std::string selectionType = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SelectionType);
 				bool allowMultipleSelection = _doc[OT_ACTION_PARAM_MODEL_ITM_Selection_AllowMultipleSelection].GetBool();
-				std::string selectionFilter = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Filter);
-				std::string selectionAction = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Action);
-				std::string selectionMessage = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Message);
-				ot::serviceID_t replyToService = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_MODEL_REPLYTO);
+				std::string selectionFilter = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Filter);
+				std::string selectionAction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Action);
+				std::string selectionMessage = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Message);
+				ot::serviceID_t replyToService = ot::json::getUInt(_doc, OT_ACTION_PARAM_MODEL_REPLYTO);
 				std::list<std::string> optionNames = getStringListFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
 				std::list<std::string> optionValues = getStringListFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
 				enterEntitySelectionMode(visModelID, replyToService, selectionType, allowMultipleSelection, selectionFilter, selectionAction, selectionMessage, optionNames, optionValues);
@@ -2564,9 +2577,9 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_SetProgressVisibility)
 			{
-				std::string message = getStringFromDocument(_doc, OT_ACTION_PARAM_MESSAGE);
-				bool visible = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_VisibleState);
-				bool continuous = ot::rJSON::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_ContinuousState);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				bool visible = ot::json::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_VisibleState);
+				bool continuous = ot::json::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_ContinuousState);
 
 				AppBase * app = AppBase::instance();
 				assert(app != nullptr);
@@ -2574,7 +2587,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_SetProgressbarValue)
 			{
-				int percentage = ot::rJSON::getInt(_doc, OT_ACTION_PARAM_PERCENT);
+				int percentage = ot::json::getInt(_doc, OT_ACTION_PARAM_PERCENT);
 
 				AppBase * app = AppBase::instance();
 				assert(app != nullptr);
@@ -2588,18 +2601,18 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				freeze3DView(visModelID, flag);
 			}
 			else if (action == OT_ACTION_CMD_ServiceConnected) {
-				ot::serviceID_t senderID = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-				std::string senderName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
-				std::string senderType = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SERVICE_TYPE);
+				ot::serviceID_t senderID = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+				std::string senderName = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
+				std::string senderType = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_TYPE);
 				ot::ServiceBase * connectedService = new ot::ServiceBase(senderName, senderType, senderURL, senderID);
 				m_serviceIdMap.insert_or_assign(senderID, connectedService);
 			}
 			else if (action == OT_ACTION_CMD_ServiceDisconnected) {
-				ot::serviceID_t senderID = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string senderURL = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-				std::string senderName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
-				std::string senderType = ot::rJSON::getString(_doc, OT_ACTION_PARAM_SERVICE_TYPE);
+				ot::serviceID_t senderID = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+				std::string senderName = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
+				std::string senderType = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_TYPE);
 				auto itm = m_serviceIdMap.find(senderID);
 				if (itm != m_serviceIdMap.end()) {
 					ot::ServiceBase * actualService = itm->second;
@@ -2623,8 +2636,8 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				assert(0);	// Add external shutdown
 			}
 			else if (action == OT_ACTION_CMD_Message) {
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				ot::serviceID_t senderID = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				ot::serviceID_t senderID = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				//NOTE, add shutdown and pre shutdown requests
 				std::string msg("Message from ");
 				msg.append(std::to_string(senderID)).append(": ").append(message);
@@ -2638,15 +2651,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectName());
 				app->getViewerComponent()->activateModel(modelID);
 
-				auto service = m_serviceIdMap.find(ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
+				auto service = m_serviceIdMap.find(ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
 				if (service == m_serviceIdMap.end()) { throw std::exception("Sender service was not registered"); }
 
 				// Write data to JSON string
-				rapidjson::Document docOut;
-				docOut.SetObject();
-				ot::rJSON::add(docOut, OT_ACTION_MEMBER, OT_ACTION_CMD_SetVisualizationModel);
-				ot::rJSON::add(docOut, OT_ACTION_PARAM_MODEL_ID, modelID);
-				ot::rJSON::add(docOut, OT_ACTION_PARAM_VIEW_ID, viewID);
+				ot::JsonDocument docOut;
+				docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, docOut.GetAllocator()), docOut.GetAllocator());
+				docOut.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, docOut.GetAllocator());
+				docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
 
 				std::string response;
 				if (!sendHttpRequest(QUEUE, service->second->serviceURL(), docOut, response)) {
@@ -2672,12 +2684,12 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			else if (action == OT_ACTION_CMD_UI_VIEW_Create) {
 				auto manager = AppBase::instance();
 
-				rapidjson::Document docOut;
+				ot::JsonDocument docOut;
 				docOut.SetObject();
-				docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, manager->createView(ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_MODEL_ID),
+				docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, manager->createView(ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID),
 					AppBase::instance()->getCurrentProjectName()), docOut.GetAllocator());
 
-				return ot::rJSON::toJSON(docOut);
+				return docOut.toJson();
 			}
 			else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
 
@@ -2687,35 +2699,35 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_SetEntityName) {
 				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				std::string entityName = getStringFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Name);
+				std::string entityName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Name);
 
 				ViewerAPI::setEntityName(entityID, entityName);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_RenameEntityName) {
-				std::string fromPath = getStringFromDocument(_doc, OT_ACTION_PARAM_PATH_FROM);
-				std::string toPath = getStringFromDocument(_doc, OT_ACTION_PARAM_PATH_To);
+				std::string fromPath = ot::json::getString(_doc, OT_ACTION_PARAM_PATH_FROM);
+				std::string toPath = ot::json::getString(_doc, OT_ACTION_PARAM_PATH_To);
 
 				ViewerAPI::renameEntityPath(fromPath, toPath);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_CreateRubberband) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string note = ot::rJSON::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
-				std::string cfg = ot::rJSON::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Document);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string note = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
+				std::string cfg = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Document);
 
 				ViewerAPI::createRubberband(AppBase::instance()->getViewerComponent()->getActiveViewerModel(), serviceId, note, cfg);
 			}
 			else if (action == OT_ACTION_CMD_UI_Lock) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
 				m_lockManager->lock(getService(serviceId), flags);
 			}
 			else if (action == OT_ACTION_CMD_UI_Unlock) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
 				m_lockManager->unlock(getService(serviceId), flags);
 			}
 			else if (action == OT_ACTION_CMD_UI_AddSettingsData) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 				ot::ServiceBase * service = getService(serviceId);
 				if (service) {
 					UserSettings::instance()->addFromService(service, _doc);
@@ -2727,7 +2739,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_AddIconSearchPath) {
 #ifdef _DEBUG
-				std::string iconPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
+				std::string iconPath = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 				try {
 					ak::uiAPI::addIconSearchPath(iconPath.c_str());
 					AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
@@ -2739,30 +2751,30 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_AddPluginSearchPath) {
 #ifdef _DEBUG
-				std::string pluginPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_PATH);
+				std::string pluginPath = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_PATH);
 				m_owner->uiPluginManager()->addPluginSearchPath(pluginPath.c_str());
 				AppBase::instance()->appendDebugMessage("[ERROR] Added UI plugin search path: " + QString::fromStdString(pluginPath));
 #endif // _DEBUG
 			}
 			else if (action == OT_ACTION_CMD_UI_RequestPlugin) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string pluginName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-				std::string pluginPath = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_PATH);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string pluginName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_NAME);
+				std::string pluginPath = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_PATH);
 				ot::ServiceBase * service = getService(serviceId);
 				ak::UID pluginUid = m_owner->uiPluginManager()->loadPlugin(pluginName.c_str(), pluginPath.c_str(), service);
 
 				if (pluginUid) {
 					AppBase * app = AppBase::instance();
 
-					OT_rJSON_createDOC(doc);
-					ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestPluginSuccess);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_ID, app->serviceID());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_URL, app->getServiceURL());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, app->serviceName());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, app->serviceType());
-					ot::rJSON::add(doc, OT_ACTION_PARAM_UI_PLUGIN_NAME, pluginName);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_UI_PLUGIN_UID, pluginUid);
-					ot::rJSON::add(doc, OT_ACTION_PARAM_UI_PLUGIN_PATH, pluginPath);
+					ot::JsonDocument doc;
+					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestPluginSuccess, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->serviceID(), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(app->serviceName(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(app->serviceType(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, ot::JsonString(pluginName, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, pluginUid, doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, ot::JsonString(pluginPath, doc.GetAllocator()), doc.GetAllocator());
 
 					std::string response;
 					sendHttpRequest(EXECUTE, service->serviceURL(), doc, response);
@@ -2773,11 +2785,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_PluginMessage) {
-				ot::serviceID_t serviceId = ot::rJSON::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string pluginAction = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER);
-				std::string message = ot::rJSON::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				std::string pluginName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-				unsigned long long pluginUID = ot::rJSON::getULongLong(_doc, OT_ACTION_PARAM_UI_PLUGIN_UID);
+				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
+				std::string pluginAction = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER);
+				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+				std::string pluginName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_NAME);
+				unsigned long long pluginUID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_UI_PLUGIN_UID);
 				ot::ServiceBase * service = getService(serviceId);
 				if (!AppBase::instance()->uiPluginManager()->forwardMessageToPlugin(pluginUID, pluginAction, message)) {
 					return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
@@ -2785,11 +2797,11 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_SetVersionGraph) {
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<std::string> versionList = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-				std::list<std::string> parentList = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_PARENT);
-				std::list<std::string> descriptionList = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
-				std::string activeVersion = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
-				std::string activeBranch = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+				std::list<std::string> versionList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+				std::list<std::string> parentList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_PARENT);
+				std::list<std::string> descriptionList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
+				std::string activeVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
+				std::string activeBranch = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
 
 				std::list<std::tuple<std::string, std::string, std::string>> versionGraph;
 
@@ -2807,47 +2819,41 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive) {
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string activeVersion = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
-				std::string activeBranch = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+				std::string activeVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
+				std::string activeBranch = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
 
 				ViewerAPI::setVersionGraphActive(visModelID, activeVersion, activeBranch);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions) {
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<std::string> versions = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+				std::list<std::string> versions = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
 
 				ViewerAPI::removeVersionGraphVersions(visModelID, versions);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion) {
 				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string newVersion = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-				std::string parentVersion = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_PARENT);
-				std::string description = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
-				std::string activeBranch = ot::rJSON::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+				std::string newVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+				std::string parentVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_PARENT);
+				std::string description = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
+				std::string activeBranch = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
 
 				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker) {
 				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc);
-
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+				info.setFromJsonObject(_doc.GetConstObject());
 
 				ot::GraphicsCollectionPackage pckg;
-				pckg.setFromJsonObject(pckgObj);
+				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor) {
 				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc);
-
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-				
+				info.setFromJsonObject(_doc.GetConstObject());
+								
 				ot::GraphicsNewEditorPackage pckg("", "");
-				pckg.setFromJsonObject(pckgObj);
+				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 				AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
 
@@ -2855,20 +2861,18 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem) {
 				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc);
-
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+				info.setFromJsonObject(_doc.GetConstObject());
 
 				ot::GraphicsScenePackage pckg("");
-				pckg.setFromJsonObject(pckgObj);
+				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 				ot::GraphicsView * editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (auto itm : pckg.items()) {
 					ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm);
 					if (i) {
-						i->setGraphicsItemFlags(i->graphicsItemFlags() | ot::GraphicsItem::ItemIsMoveable | ot::GraphicsItem::ItemNetworkContext);
+						i->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
+						//i->setGraphicsItemFlags(i->graphicsItemFlags() | ot::GraphicsItem::ItemIsMoveable | ot::GraphicsItem::ItemNetworkContext);
 						i->getQGraphicsItem()->setPos(QPointF(itm->position().x(), itm->position().y()));
 						editor->addItem(i);
 					}
@@ -2876,14 +2880,14 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem) {
 				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc);
+				info.setFromJsonObject(_doc.GetConstObject());
 
-				std::list<std::string> itemUids = ot::rJSON::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+				std::list<std::string> itemUids = ot::json::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
 				if (_doc.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName)) {
 					// Specific view
 
-					std::string editorName = ot::rJSON::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+					std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
 
 					if (editor) {
@@ -2906,13 +2910,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
 				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc);
-
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+				info.setFromJsonObject(_doc.GetConstObject());
 
 				ot::GraphicsConnectionPackage pckg;
-				pckg.setFromJsonObject(pckgObj);
+				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
@@ -2926,7 +2927,7 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 						ot::GraphicsItem* destConn = dest->findItem(connection.destConnectable());
 
 						if (srcConn && destConn) {
-							editor->addConnection(srcConn, destConn);
+							editor->addConnection(srcConn, destConn, connection);
 						}
 						else {
 							OT_LOG_EA("Invalid graphics item name");
@@ -2937,13 +2938,10 @@ std::string ExternalServicesComponent::dispatchAction(rapidjson::Document & _doc
 			}
 			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection) {
 				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc);
-
-				OT_rJSON_checkMember(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-				OT_rJSON_val pckgObj = _doc[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+				info.setFromJsonObject(_doc.GetConstObject());
 
 				ot::GraphicsConnectionPackage pckg;
-				pckg.setFromJsonObject(pckgObj);
+				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 				if (!pckg.name().empty()) {
 					// Specific editor
@@ -2999,10 +2997,10 @@ void ExternalServicesComponent::prefetchDataThread(const std::string &projectNam
 }
 
 void ExternalServicesComponent::contextMenuItemClicked(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_ContextMenuItemClicked);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, _menuName);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, _itemName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemClicked, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	sendHttpRequest(EXECUTE, _sender->serviceURL(), doc, response);
@@ -3019,11 +3017,11 @@ void ExternalServicesComponent::contextMenuItemClicked(ot::ServiceBase * _sender
 }
 
 void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, _menuName);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, _itemName);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, doc.GetAllocator());
 
 	std::string response;
 	sendHttpRequest(EXECUTE, _sender->serviceURL(), doc, response);
@@ -3041,14 +3039,14 @@ void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase * 
 
 bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, std::string &projectUser)
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_IsProjectOpen);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_PROJECT_NAME, projectName);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_IsProjectOpen, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	AppBase * app{ AppBase::instance() };
 
 	std::string response;
-	sendHttpRequest(EXECUTE, m_globalSessionServiceURL, ot::rJSON::toJSON(doc), response);
+	sendHttpRequest(EXECUTE, m_globalSessionServiceURL, doc.toJson(), response);
 
 	// todo: add json return value containing true/false and username instead of empty string for more clarity
 	if (response.empty()) return false;
@@ -3073,7 +3071,7 @@ size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
 	return 0;
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::OwnerService _service, rapidjson::Document& doc, std::string& response) {
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument& doc, std::string& response) {
 	auto it = m_serviceIdMap.find(_service.getId());
 	if (it == m_serviceIdMap.end()) {
 		OT_LOG_E("Failed to find service with id \"" + std::to_string(_service.getId()) + "\"");
@@ -3082,7 +3080,7 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::Owner
 	return sendHttpRequest(operation, it->second->serviceURL(), doc, response);
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, rapidjson::Document& doc, std::string& response) {
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument& doc, std::string& response) {
 	auto s = this->getService(_service);
 	if (s) {
 		return this->sendHttpRequest(operation, s->serviceURL(), doc, response);
@@ -3092,9 +3090,9 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot:
 	}
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, rapidjson::Document &doc, std::string &response)
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response)
 {
-	try { return sendHttpRequest(operation, url, ot::rJSON::toJSON(doc), response); }
+	try { return sendHttpRequest(operation, url, doc.toJson(), response); }
 	catch (...) {
 		assert(0); // Error handling
 		return false;
@@ -3164,9 +3162,9 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const 
 }
 
 bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_KeySequenceActivated);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_UI_KeySequence, _sender->keySequence().toStdString());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_KeySequenceActivated, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_KeySequence, ot::JsonString(_sender->keySequence().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	std::string response;
 
 	if (!sendHttpRequest(EXECUTE, _sender->creator()->serviceURL(), doc, response)) {
@@ -3194,11 +3192,11 @@ void ExternalServicesComponent::sendRubberbandResultsToService(ot::serviceID_t _
 			return;
 		}
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note, _note);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_PointDocument, _pointJson);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Transform, transform);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VIEW_RUBBERBAND_Note, ot::JsonString(_note, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VIEW_RUBBERBAND_PointDocument, ot::JsonString(_pointJson, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VIEW_RUBBERBAND_Transform, ot::JsonArray(transform, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
 		sendHttpRequest(EXECUTE, receiver->second->serviceURL(), doc, response);
@@ -3220,9 +3218,9 @@ void ExternalServicesComponent::requestUpdateVTKEntity(unsigned long long modelE
 {
 	try {
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, modelEntityID);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, modelEntityID, doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier)
@@ -3248,9 +3246,9 @@ void ExternalServicesComponent::activateVersion(const std::string &version)
 
 		if (this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL) != nullptr)
 		{
-			OT_rJSON_createDOC(doc);
-			ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ActivateVersion);
-			ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_Version, version);
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ActivateVersion, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 			std::string response;
 
 			this->sendHttpRequest(EXECUTE, this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL)->serviceURL(), doc, response);
@@ -3291,12 +3289,12 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		std::string response;
 #ifdef OT_USE_GSS
 		// Request a session service from the global session service
-		OT_rJSON_createDOC(gssDoc);
-		ot::rJSON::add(gssDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_CreateNewSession);
-		ot::rJSON::add(gssDoc, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
-		ot::rJSON::add(gssDoc, OT_ACTION_PARAM_USER_NAME, app->getCurrentUserName());
+		ot::JsonDocument gssDoc;
+		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+		gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
-		if (!sendHttpRequest(EXECUTE, m_globalSessionServiceURL, ot::rJSON::toJSON(gssDoc), response)) {
+		if (!sendHttpRequest(EXECUTE, m_globalSessionServiceURL, gssDoc.toJson(), response)) {
 			assert(0); // Failed to send
 			OT_LOG_E("Failed to send \"Create new session\" request to the global session service");
 			app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
@@ -3324,31 +3322,31 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		// ##################################################################
 
 		// Create new session command
-		OT_rJSON_createDOC(sessionDoc);
-		ot::rJSON::add(sessionDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_CreateNewSession);
+		ot::JsonDocument sessionDoc;
+		sessionDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add project and user information
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_COLLECTION_NAME, collectionName);
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_PROJECT_NAME, projectName);
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_USER_NAME, AppBase::instance()->getCurrentUserName());
-		ot::rJSON::add(sessionDoc, OT_PARAM_SETTINGS_USERCOLLECTION, AppBase::instance()->getCurrentUserCollection());
+		sessionDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(AppBase::instance()->getCurrentUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(AppBase::instance()->getCurrentUserCollection(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add session information
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SESSION_TYPE, "Default");
+		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString("Default", sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add service information
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SERVICE_NAME, OT_INFO_SERVICE_TYPE_UI);
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_SERVICE_TYPE, OT_INFO_SERVICE_TYPE_UI);
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_PORT, ot::IpConverter::portFromIp(m_uiServiceURL)); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
-		ot::rJSON::add(sessionDoc, OT_ACTION_PARAM_START_RELAY, m_isRelayServiceRequired);
+		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(m_uiServiceURL), sessionDoc.GetAllocator()), sessionDoc.GetAllocator()); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
+		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, m_isRelayServiceRequired, sessionDoc.GetAllocator());
 
 		// Add user credentials
-		ot::rJSON::add(sessionDoc, OT_PARAM_AUTH_USERNAME, app->getCredentialUserName());
-		ot::rJSON::add(sessionDoc, OT_PARAM_AUTH_PASSWORD, app->getCredentialUserPasswordClear());
+		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		response.clear();
-		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, ot::rJSON::toJSON(sessionDoc), response)) {
+		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {
 			assert(0); // Failed to send
 			OT_LOG_E("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->showErrorPrompt("Failed to send http request to Local Session Service", "Connection Error");
@@ -3368,18 +3366,18 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		}
 		
 		// Check response
-		OT_rJSON_parseDOC(responseDoc, response.c_str());
-		OT_rJSON_docCheck(responseDoc);
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
 
 		// ##################################################################
 
-		app->setServiceID(ot::rJSON::getUInt(responseDoc, OT_ACTION_PARAM_SERVICE_ID));
+		app->setServiceID(ot::json::getUInt(responseDoc, OT_ACTION_PARAM_SERVICE_ID));
 
 		// Ensure to update the window title containing the project name
 		app->setCurrentProjectIsModified(false);
 
 		if (m_isRelayServiceRequired) {
-			std::string websocketIP = ot::rJSON::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
+			std::string websocketIP = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
 
 			if (m_websocket) delete m_websocket;
 			m_websocket = new WebsocketClient(websocketIP);
@@ -3390,7 +3388,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 		// TabToolBar tab order
 		QStringList ttbOrder;
-		std::list<std::string> ttbOrderL = ot::rJSON::getStringList(responseDoc, OT_ACTION_PARAM_UI_ToolBarTabOrder);
+		std::list<std::string> ttbOrderL = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_UI_ToolBarTabOrder);
 		for (auto orderItem : ttbOrderL) {
 			ttbOrder.push_back(orderItem.c_str());
 		}
@@ -3401,10 +3399,10 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		// Now we check whether the startup sequence is completed
 		bool startupReady = false;
 
-		OT_rJSON_createDOC(checkCommandDoc);
-		ot::rJSON::add(checkCommandDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_CheckStartupCompleted);
-		ot::rJSON::add(checkCommandDoc, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
-		std::string checkCommandString = ot::rJSON::toJSON(checkCommandDoc);
+		ot::JsonDocument checkCommandDoc;
+		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+		checkCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+		std::string checkCommandString = checkCommandDoc.toJson();
 
 		OT_LOG_D("Waiting for Startup Completed");
 
@@ -3431,11 +3429,11 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		OT_LOG_D("Startup is completed");
 
 		// Set service visible (will notify others that the UI is available)
-		OT_rJSON_createDOC(visibilityCommand);
-		ot::rJSON::add(visibilityCommand, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceShow);
-		ot::rJSON::add(visibilityCommand, OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->serviceID());
-		ot::rJSON::add(visibilityCommand, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
-		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, ot::rJSON::toJSON(visibilityCommand), response)) {
+		ot::JsonDocument visibilityCommand;
+		visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShow, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
+		visibilityCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->serviceID(), visibilityCommand.GetAllocator());
+		visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
+		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), response)) {
 			throw std::exception("Failed to send http request");
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -3452,14 +3450,14 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		}
 
 		// Add services that are running in this session to the services list
-		OT_rJSON_parseDOC(serviceListDoc, response.c_str());
-		auto serviceList = ot::rJSON::getObjectList(serviceListDoc, OT_ACTION_PARAM_SESSION_SERVICES);
+		ot::JsonDocument serviceListDoc;
+		serviceListDoc.fromJson(response);
+		auto serviceList = ot::json::getObjectList(serviceListDoc, OT_ACTION_PARAM_SESSION_SERVICES);
 		for (auto serviceJSON : serviceList) {
-			OT_rJSON_parseDOC(serviceDoc, serviceJSON.c_str());
-			std::string senderURL = ot::rJSON::getString(serviceDoc, OT_ACTION_PARAM_SERVICE_URL);
-			std::string senderName = ot::rJSON::getString(serviceDoc, OT_ACTION_PARAM_SERVICE_NAME);
-			std::string senderType = ot::rJSON::getString(serviceDoc, OT_ACTION_PARAM_SERVICE_TYPE);
-			ot::serviceID_t senderID = ot::rJSON::getUInt(serviceDoc, OT_ACTION_PARAM_SERVICE_ID);
+			std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
+			std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
+			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
+			ot::serviceID_t senderID = ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID);
 
 			auto oldService = m_serviceIdMap.find(senderID);
 			if (oldService == m_serviceIdMap.end()) {
@@ -3505,10 +3503,10 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		m_modelViewNotifier.clear();
 
 		// Notify the session service that the sesion should be closed now
-		OT_rJSON_createDOC(shutdownCommand);
-		ot::rJSON::add(shutdownCommand, OT_ACTION_MEMBER, OT_ACTION_CMD_ShutdownSession);
-		ot::rJSON::add(shutdownCommand, OT_ACTION_PARAM_SERVICE_ID, app->serviceID());
-		ot::rJSON::add(shutdownCommand, OT_ACTION_PARAM_SESSION_ID, m_currentSessionID);
+		ot::JsonDocument shutdownCommand;
+		shutdownCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
+		shutdownCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->serviceID(), shutdownCommand.GetAllocator());
+		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
 
 		std::string response;
 		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, response)) {
@@ -3610,7 +3608,8 @@ void ExternalServicesComponent::saveProject() {
 		ModelUIDtype modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 		if (modelID == 0) return;  // No project currently active
 
-		rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_PROJ_Save);
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PROJ_Save, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
 
 		std::string response;
@@ -3647,7 +3646,8 @@ void ExternalServicesComponent::selectFileForStoring(const std::string & dialogT
 
 		if (fileName != "")
 		{
-			rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_ExecuteFunction);
+			ot::JsonDocument inDoc;
+			inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
 			inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 			inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
@@ -3711,8 +3711,9 @@ void ExternalServicesComponent::requestFileForReading(const std::string &dialogT
 
 		if (fileName != "")
 		{
-			rapidjson::Document inDoc = BuildJsonDocFromAction(OT_ACTION_CMD_MODEL_ExecuteFunction);
-
+			ot::JsonDocument inDoc;
+			inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+			
 			if (loadContent)
 			{
 				std::string fileContent;
@@ -3827,22 +3828,20 @@ void ExternalServicesComponent::RequestTableSelection(ModelUIDtype visModelID, s
 	std::vector<ot::TableRange> ranges = ViewerAPI::GetSelectedTableRange(visModelID);
 	std::pair<ot::UID, ot::UID> tableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visModelID);
 
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteFunction);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, tableIdentifyer.first);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityVersion, tableIdentifyer.second);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, tableIdentifyer.first, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, tableIdentifyer.second, doc.GetAllocator());
 
-
-	OT_rJSON_createValueArray(vectOfRanges);
-	
+	ot::JsonArray vectOfRanges;
 	for (auto range : ranges)
 	{
-		OT_rJSON_createValueObject(temp);
-		range.addToJsonObject(doc, temp);
-		vectOfRanges.PushBack(temp, doc.GetAllocator());
+		ot::JsonObject tmp;
+		range.addToJsonObject(tmp, doc.GetAllocator());
+		vectOfRanges.PushBack(tmp, doc.GetAllocator());
 	}
-	ot::rJSON::add(doc, "Ranges", vectOfRanges);
+	doc.AddMember("Ranges", vectOfRanges, doc.GetAllocator());
 	
 	std::string response;
 	sendHttpRequest(EXECUTE, URL, doc, response);
@@ -3869,7 +3868,7 @@ char *ExternalServicesComponent::performAction(const char *json, const char *sen
 		// std::cout << "Entered: ExternalServicesComponent::performAction " << json << std::endl;
 
 		// Build a json document from the string
-		rapidjson::Document doc;
+		ot::JsonDocument doc;
 
 		// Parse the document with the json string we have "received"
 		doc.Parse(json);
@@ -3878,7 +3877,7 @@ char *ExternalServicesComponent::performAction(const char *json, const char *sen
 		assert(doc.IsObject()); // Doc is not an object
 
 		//if (doc.HasMember(OT_ACTION_MEMBER)) {
-		//	std::string action = getStringFromDocument(doc, "action");
+		//	std::string action = ot::json::getString(doc, "action");
 		//	std::cout << "EXECUTE message: " << action << std::endl;
 		//}
 
@@ -3904,9 +3903,9 @@ char *ExternalServicesComponent::performAction(const char *json, const char *sen
 
 void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction)
 {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_RETURN_VALUE_TRUE);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_FunctionName, subsequentFunction);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_RETURN_VALUE_TRUE, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	sendHttpRequest(EXECUTE, URL, doc, response);
@@ -3930,7 +3929,7 @@ void ExternalServicesComponent::queueAction(const char *json, const char *sender
 		// std::cout << "Entered: ExternalServicesComponent::queueAction " << json << std::endl;
 
 		// Build a json document from the string
-		rapidjson::Document doc;
+		ot::JsonDocument doc;
 
 		//std::string info(json);
 
@@ -3945,7 +3944,7 @@ void ExternalServicesComponent::queueAction(const char *json, const char *sender
 		assert(doc.IsObject()); // Doc is not an object
 
 		//if (doc.HasMember(OT_ACTION_MEMBER)) {
-		//	std::string action = getStringFromDocument(doc, "action");
+		//	std::string action = ot::json::getString(doc, "action");
 		//	std::cout << "QUEUE message: " << action << std::endl;
 		//}
 
@@ -3982,46 +3981,7 @@ void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 
 // JSON helper functions
 
-std::string ExternalServicesComponent::getStringFromDocument(rapidjson::Document &doc, const char *attribute)
-{
-	if (!doc.HasMember(attribute)) {
-		std::string ex("The member \"");
-		ex.append(attribute).append("\" is missing");
-		throw std::exception(ex.c_str());
-	}
-	std::string value = doc[attribute].GetString();
-	/*
-	// Skip the " at the beginning and at the end of the string
-	int index = value.find('"');
-	if (index != -1) value.erase(index, 1);
-
-	index = value.rfind('"');
-	if (index != -1) value.erase(index);
-	*/
-	return value;
-}
-
-rapidjson::Document ExternalServicesComponent::BuildJsonDocFromAction(const std::string &action)
-{
-	rapidjson::Document newDoc;
-	try {
-		newDoc.SetObject();
-		newDoc.AddMember(OT_ACTION_MEMBER, rapidjson::Value(action.c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-	return newDoc;
-}
-
-rapidjson::Document ExternalServicesComponent::BuildJsonDocFromString(std::string json)
-{
-	OT_rJSON_parseDOC(doc, json.c_str());
-	OT_rJSON_docCheck(doc);
-	return doc;
-}
-
-void ExternalServicesComponent::AddUIDListToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::list<ModelUIDtype> &list)
+void ExternalServicesComponent::AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<ModelUIDtype> &list)
 {
 	try {
 		rapidjson::Value listUID(rapidjson::kArrayType);
@@ -4037,7 +3997,7 @@ void ExternalServicesComponent::AddUIDListToJsonDoc(rapidjson::Document &doc, co
 	}
 }
 
-void ExternalServicesComponent::AddStringListToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::list<std::string> &list)
+void ExternalServicesComponent::AddStringListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<std::string> &list)
 {
 	try {
 		rapidjson::Value listUID(rapidjson::kArrayType);
@@ -4053,7 +4013,7 @@ void ExternalServicesComponent::AddStringListToJsonDoc(rapidjson::Document &doc,
 	}
 }
 
-void ExternalServicesComponent::AddUIDVectorToJsonDoc(rapidjson::Document &doc, const std::string &itemName, const std::vector<ModelUIDtype> &vector)
+void ExternalServicesComponent::AddUIDVectorToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::vector<ModelUIDtype> &vector)
 {
 	try {
 		rapidjson::Value vectorUID(rapidjson::kArrayType);
@@ -4072,12 +4032,10 @@ void ExternalServicesComponent::AddUIDVectorToJsonDoc(rapidjson::Document &doc, 
 std::string ExternalServicesComponent::getReturnJSONFromString(std::string fileName)
 {
 	try {
-		rapidjson::Document newDoc;
-		newDoc.SetObject();
-
+		ot::JsonDocument newDoc;
 		newDoc.AddMember(OT_ACTION_PARAM_FILE_Name, rapidjson::Value(fileName.c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
 
-		return ot::rJSON::toJSON(newDoc);
+		return newDoc.toJson();
 	}
 	catch (...) {
 		assert(0); // Error handling
@@ -4088,9 +4046,7 @@ std::string ExternalServicesComponent::getReturnJSONFromString(std::string fileN
 std::string ExternalServicesComponent::getReturnJSONFromVector(std::vector<ModelUIDtype> idList)
 {
 	try {
-		rapidjson::Document newDoc;
-		newDoc.SetObject();
-
+		ot::JsonDocument newDoc;
 		rapidjson::Value vectorUID(rapidjson::kArrayType);
 		for (auto id : idList)
 		{
@@ -4099,7 +4055,7 @@ std::string ExternalServicesComponent::getReturnJSONFromVector(std::vector<Model
 
 		newDoc.AddMember("idList", vectorUID, newDoc.GetAllocator());
 
-		return ot::rJSON::toJSON(newDoc);
+		return newDoc.toJson();
 	}
 	catch (...) {
 		assert(0); // Error handling
@@ -4107,7 +4063,7 @@ std::string ExternalServicesComponent::getReturnJSONFromVector(std::vector<Model
 	}
 }
 
-std::list<ModelUIDtype> ExternalServicesComponent::getListFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::list<ModelUIDtype> ExternalServicesComponent::getListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::list<ModelUIDtype> result;
 	try {
@@ -4120,7 +4076,7 @@ std::list<ModelUIDtype> ExternalServicesComponent::getListFromDocument(rapidjson
 	return result;
 }
 
-std::list<std::string> ExternalServicesComponent::getStringListFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::list<std::string> ExternalServicesComponent::getStringListFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::list<std::string> result;
 	try {
@@ -4133,7 +4089,7 @@ std::list<std::string> ExternalServicesComponent::getStringListFromDocument(rapi
 	return result;
 }
 
-double *ExternalServicesComponent::getDoubleFromDocument(rapidjson::Document &doc, const std::string &itemName)
+double *ExternalServicesComponent::getDoubleFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	try {
 		rapidjson::Value doubleArray = doc[itemName.c_str()].GetArray();
@@ -4153,7 +4109,7 @@ double *ExternalServicesComponent::getDoubleFromDocument(rapidjson::Document &do
 	}
 }
 
-std::vector<ModelUIDtype> ExternalServicesComponent::getVectorFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::vector<ModelUIDtype> ExternalServicesComponent::getVectorFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::vector<ModelUIDtype> result;
 	try {
@@ -4166,7 +4122,7 @@ std::vector<ModelUIDtype> ExternalServicesComponent::getVectorFromDocument(rapid
 	return result;
 }
 
-std::vector<double> ExternalServicesComponent::getVectorDoubleFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::vector<double> ExternalServicesComponent::getVectorDoubleFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::vector<double> result;
 	try {
@@ -4179,7 +4135,7 @@ std::vector<double> ExternalServicesComponent::getVectorDoubleFromDocument(rapid
 	return result;
 }
 
-std::vector<int> ExternalServicesComponent::getVectorIntFromDocument(rapidjson::Document &doc, const std::string &itemName)
+std::vector<int> ExternalServicesComponent::getVectorIntFromDocument(ot::JsonDocument &doc, const std::string &itemName)
 {
 	std::vector<int> result;
 	try {
@@ -4192,7 +4148,7 @@ std::vector<int> ExternalServicesComponent::getVectorIntFromDocument(rapidjson::
 	return result;
 }
 
-std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArrayFromDocument(rapidjson::Document &doc, const std::string &itemNname)
+std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArrayFromDocument(ot::JsonDocument &doc, const std::string &itemNname)
 {
 	std::vector<std::array<double, 3>> result;
 	try {
@@ -4212,7 +4168,7 @@ std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArr
 	return result;
 }
 
-TreeIcon ExternalServicesComponent::getTreeIconsFromDocument(rapidjson::Document &doc)
+TreeIcon ExternalServicesComponent::getTreeIconsFromDocument(ot::JsonDocument &doc)
 {
 	TreeIcon treeIcons;
 
@@ -4231,7 +4187,7 @@ TreeIcon ExternalServicesComponent::getTreeIconsFromDocument(rapidjson::Document
 	return treeIcons;
 }
 
-void ExternalServicesComponent::getVectorNodeFromDocument(rapidjson::Document &doc, const std::string &itemName, std::vector<Geometry::Node> &result)
+void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument &doc, const std::string &itemName, std::vector<Geometry::Node> &result)
 {
 	try {
 		rapidjson::Value nodeList = doc[itemName.c_str()].GetArray();
@@ -4250,7 +4206,7 @@ void ExternalServicesComponent::getVectorNodeFromDocument(rapidjson::Document &d
 	}
 }
 
-void ExternalServicesComponent::getListTriangleFromDocument(rapidjson::Document &doc, const std::string &itemName, std::list <Geometry::Triangle > &result)
+void ExternalServicesComponent::getListTriangleFromDocument(ot::JsonDocument &doc, const std::string &itemName, std::list <Geometry::Triangle > &result)
 {
 	try {
 		rapidjson::Value triangleList = doc[itemName.c_str()].GetArray();
@@ -4267,7 +4223,7 @@ void ExternalServicesComponent::getListTriangleFromDocument(rapidjson::Document 
 	}
 }
 
-void ExternalServicesComponent::getListEdgeFromDocument(rapidjson::Document &doc, const std::string &itemName, std::list <Geometry::Edge > &result)
+void ExternalServicesComponent::getListEdgeFromDocument(ot::JsonDocument &doc, const std::string &itemName, std::list <Geometry::Edge > &result)
 {
 	try {
 		rapidjson::Value edgeList = doc[itemName.c_str()].GetArray();
@@ -4388,9 +4344,9 @@ ot::ServiceBase* ExternalServicesComponent::getServiceFromNameType(const std::st
 
 void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	// Create ping request
-	OT_rJSON_createDOC(pingDoc);
-	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	std::string ping = ot::rJSON::toJSON(pingDoc);
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string ping = pingDoc.toJson();
 
 	bool sessionServiceDied{ false };
 	while (g_runSessionServiceHealthCheck && !sessionServiceDied) {

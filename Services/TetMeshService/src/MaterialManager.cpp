@@ -4,11 +4,12 @@
 
 #include "EntityGeometry.h"
 #include "EntityMaterial.h"
+#include "ClassFactory.h"
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinFoundation/EntityInformation.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/EntityInformation.h"
 
 void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties)
 {

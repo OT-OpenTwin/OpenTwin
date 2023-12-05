@@ -160,7 +160,7 @@ ak::aDate ak::aDate::parseString(const std::wstring & _string, const std::wstrin
 }
 
 ak::aDate ak::aDate::parseString(const QString & _string, const QString & _delimiter, dateFormat _dateFormat) {
-	QStringList lst{ _string.split(_delimiter, QString::SkipEmptyParts) };
+	QStringList lst{ _string.split(_delimiter, Qt::SkipEmptyParts) };
 	if (lst.length() != 3) {
 		assert(0);
 		return aDate();

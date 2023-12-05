@@ -11,6 +11,7 @@ ot::CustomGraphicsItem::CustomGraphicsItem(bool _isLayoutOrStack)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
+	this->setAcceptHoverEvents(true);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
@@ -34,9 +35,9 @@ void ot::CustomGraphicsItem::callPaint(QPainter* _painter, const QStyleOptionGra
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::CustomGraphicsItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & ot::GraphicsItem::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & ot::GraphicsItem::ItemIsMoveable);
+void ot::CustomGraphicsItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
 
 QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
@@ -48,14 +49,13 @@ QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QS
 // QGraphicsLayoutItem
 
 QSizeF ot::CustomGraphicsItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, this->getDefaultGraphicsItemSize());
+	return this->handleGetGraphicsItemSizeHint(_hint, this->getPreferredGraphicsItemSize());
 }
 
 void ot::CustomGraphicsItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
 	this->setPos(_rect.topLeft());
-
 	this->handleSetItemGeometry(_rect);
 }
 
@@ -64,25 +64,33 @@ void ot::CustomGraphicsItem::setGeometry(const QRectF& _rect) {
 // QGraphicsItem
 
 QRectF ot::CustomGraphicsItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(this->getDefaultGraphicsItemSize())));
+	return this->handleGetGraphicsItemBoundingRect(QRectF(QPointF(0., 0.), QSizeF(this->getPreferredGraphicsItemSize())));
 }
 
 void ot::CustomGraphicsItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintGeneralGraphics(_painter, _opt, _widget);
-	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getDefaultGraphicsItemSize()));
+	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getPreferredGraphicsItemSize()));
 }
 
 QVariant ot::CustomGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	this->handleItemChange(_change, _value);
-	return _value;
+	return QGraphicsItem::itemChange(_change, _value);
 }
 
 void ot::CustomGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
+	this->handleMousePressEvent(_event);
 	QGraphicsItem::mousePressEvent(_event);
 }
 
 void ot::CustomGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
+	this->handleMouseReleaseEvent(_event);
 	QGraphicsItem::mouseReleaseEvent(_event);
+}
+
+void ot::CustomGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleHoverEnterEvent(_event);
+}
+
+void ot::CustomGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	this->handleHoverLeaveEvent(_event);
 }

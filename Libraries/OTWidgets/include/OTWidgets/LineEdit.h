@@ -21,7 +21,7 @@ namespace ot {
 		virtual ~LineEdit() {};
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getWidget(void) override { return this; };
+		virtual QWidget* getQWidget(void) override { return this; };
 
 	private:
 

@@ -212,7 +212,7 @@ public:
 	xyPlotMarker * marker(void) const { return m_marker; }
 
 private:
-	QPoint			m_cursorPos;
+	QPointF			m_cursorPos;
 	bool			m_rightMouseIsPressed;
 	bool			m_mouseMoved;
 	xyPlot *		m_plot;

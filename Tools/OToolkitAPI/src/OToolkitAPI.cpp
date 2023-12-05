@@ -5,7 +5,7 @@
 
 #include "OToolkitAPI/OToolkitAPI.h"
 
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 namespace otoolkit {
 
@@ -16,7 +16,7 @@ namespace otoolkit {
 				g_interface = _interface;
 			}
 			else {
-				otAssert(g_interface != _interface, "Global Interface already set");
+				OTAssert(g_interface != _interface, "Global Interface already set");
 			}
 			OTAssertNullptr(g_interface);
 			return g_interface;

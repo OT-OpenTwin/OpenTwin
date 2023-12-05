@@ -3,6 +3,19 @@
 #include <sstream>
 #include <algorithm>
 
+PythonHeaderInterpreter::~PythonHeaderInterpreter() {
+	for (auto doc : _allConnectorsAsJSON) {
+		delete doc;
+	}
+	_allConnectorsAsJSON.clear();
+
+	for (auto doc : _allPropertiesAsJSON) {
+		delete doc;
+	}
+	_allPropertiesAsJSON.clear();
+
+}
+
 bool PythonHeaderInterpreter::interprete(std::shared_ptr<EntityFile> pythonScript)
 {
 	_allConnectors.clear();

@@ -2,9 +2,9 @@
 #include <vector>
 #include <string>
 
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "EntityMeasurementMetadata.h"
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class MeasurementCampaignHandler : public BusinessLogicHandler
 {

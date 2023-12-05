@@ -1,6 +1,6 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 #include "ExternalDependencies.h"
 
 #include "Application.h"
@@ -99,14 +99,14 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 void BlockEntityHandler::OrderUIToCreateBlockPicker()
 {
 	auto graphicsEditorPackage = BuildUpBlockPicker();
-	OT_rJSON_createDOC(doc);
-	OT_rJSON_createValueObject(pckgObj);
-	graphicsEditorPackage->addToJsonObject(doc, pckgObj);
+	ot::JsonDocument doc;
+	ot::JsonObject pckgObj;
+	graphicsEditorPackage->addToJsonObject(pckgObj, doc.GetAllocator());
 
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 
-	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc);
+	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
 	// Message is queued, no response here
 	_uiComponent->sendMessage(true, doc);

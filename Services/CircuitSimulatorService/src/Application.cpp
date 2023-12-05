@@ -12,69 +12,289 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTCommunication/Msg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/GraphicsFlowItemCfg.h"
-
+#include "OTGui/GraphicsFlowItemBuilder.h"
+#include "OTGui/GraphicsStackItemCfg.h"
+#include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/GraphicsGridLayoutItemCfg.h"
+#include "OTGui/GraphicsEllipseItemCfg.h"
 
 // Third Party Header
-#include "ngspice/sharedspice.h"
+#include <ngspice/sharedspice.h>
 #include <iostream>
 #include <string>
-
-
+#include <fstream>
+#include <filesystem>
+#include <string.h>
 
 Application * g_instance{ nullptr };
 
-#define EXAMPLE_NAME_BLOCK1 "First"
-#define EXAMPLE_NAME_Block2 "Second"
-
+#define EXAMPLE_NAME_BLOCK1 "Resistor"
+#define EXAMPLE_NAME_Block2 "VoltageSource"
+#define EXAMPLE_NAME_Block3 "Diode"
+#define EXAMPLE_NAME_BLOCK4 "Transistor"
+#define EXAMPLE_NAME_BLOCK5 "Connector"
 #undef GetObject
 
 namespace ottest
 {
-	static unsigned long long currentBlocikUid = 0;
+	static unsigned long long currentBlockUid = 0;
 
-	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
-		ot::GraphicsFlowConnectorCfg cfg;
+	static unsigned long long currentResistorUid = 1;
 
-		cfg.setTextColor(ot::Color(0, 0, 0));
+	static unsigned long long currentNodeNumber = 0;
+
+	static unsigned long long currentDiodeID = 1;
+
+	static unsigned long long currentTransistoriD = 1;
+
+	static unsigned long long currenConnectorID = 1;
+
+	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
+		ot::GraphicsFlowItemConnector cfg;
+
+		cfg.setTextColor(ot::Color(0,0,0,0));
 
 		return cfg;
 	}
 
-	ot::GraphicsItemCfg* createTestBlock1(const std::string _name)
+	ot::GraphicsItemCfg* createResistor(const std::string _name)
 	{
-		ot::GraphicsFlowItemCfg flow;
-		flow.setTitleBackgroundColor(0, 255, 0);
-		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
+		//First I create a stack item;
+		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
+		myStack->setName(_name);
+		myStack->setTitle(_name);
+		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 		
-		flow.setBackgroundColor(ot::Color(0, 255, 255));
 
-		flow.addLeft("Input1", "Input1", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Black);
-		flow.addRight("Output1", "Output1", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Black);
+		//Second I create an Image
+		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
+		image->setImagePath("CircuitElementImages/ResistorBG.png");
+		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
 
-		return flow.createGraphicsItem(_name, _name);
+		myStack->addItemBottom(image, false, true);
+
+		//Then I create a layout
+		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
+		
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
+		myStack->addItemTop(myLayout, true, false);
+		
+
+		
+		
+
+		//Now i want connections on the item for this i need rectangle items
+		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
+		connection1->setName("Input1");		
+		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection1->setBackgroundPainer(painter1);
+		connection1->setAlignment(ot::AlignCenter);
+		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
+
+		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
+		connection2->setName("Output1");		
+		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection2->setBackgroundPainer(painter2);
+		connection2->setAlignment(ot::AlignCenter);
+		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
+
+		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		
+
+		//Here i add them to the Layout
+		myLayout->addChildItem(connection1);
+		myLayout->addStrech(1);
+		myLayout->addChildItem(connection2);
+		
+
+		
+		
+
+		return myStack;
+		
 	}
 
-	ot::GraphicsItemCfg* createTestBlock2(const std::string _name)
+	ot::GraphicsItemCfg* createVoltageSource(const std::string _name)
 	{
-		ot::GraphicsFlowItemCfg flow;
-		flow.setTitleBackgroundColor(0, 255, 0);
-		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
+		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
+		myStack->setName(_name);
+		myStack->setTitle(_name);
+		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
+
+		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
+		image->setImagePath("CircuitElementImages/VoltageSource.png");
+		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
+
+		myStack->addItemBottom(image, false, true);
+
+		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
+
+		myStack->addItemTop(myLayout, true, false);
+
+		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
+		connection1->setName("Input2");
+		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection1->setBackgroundPainer(painter1);
+		connection1->setAlignment(ot::AlignCenter);
+		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		//connection1->setMargins(10.0, 0.0, 0.0, 0.0);
+
+		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
+		connection2->setName("Ouput2");
+		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection2->setBackgroundPainer(painter2);
+		connection2->setAlignment(ot::AlignCenter);
+		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
+
+		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+
+		myLayout->addChildItem(connection1);
+		myLayout->addStrech(1);
+		myLayout->addChildItem(connection2);
+
+
+		return myStack;
+
+
+	}
+
+	ot::GraphicsItemCfg* createDiode(const std::string _name)
+	{
+		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
+		myStack->setName(_name);
+		myStack->setTitle(_name);
+		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
+		
+
+		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
+		image->setImagePath("CircuitElementImages/Diod2.png");
+		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
+
+		myStack->addItemBottom(image,false,true);
+
+		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
+		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
+
+		myStack->addItemTop(myLayout,true,false);
+
+		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
+		connection1->setName("Input3");
+		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection1->setBackgroundPainer(painter1);
+		connection1->setAlignment(ot::AlignCenter);
+		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
+
+		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
+		connection2->setName("Ouput3");
+		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		connection2->setBackgroundPainer(painter2);
+		connection2->setAlignment(ot::AlignCenter);
+		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		
+		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+
+		myLayout->addChildItem(connection1);
+		myLayout->addStrech(1);
+		myLayout->addChildItem(connection2);
 		
 		
-		flow.setBackgroundColor(ot::Color(0, 255, 255));
+		return myStack;
+	}
 
-		flow.addLeft("Input2", "Input2", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("Output2", "Output2", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::Blue);
+	ot::GraphicsItemCfg* createTransistor(const std::string _name)
+	{
+		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
+		myStack->setName(_name);
+		myStack->setTitle(_name);
+		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
-		return flow.createGraphicsItem(_name, _name);
+		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
+		image->setImagePath("CircuitElementImages/Transistor.png");
+		image->setSizePolicy(ot::SizePolicy::Dynamic);
+		image->setMaintainAspectRatio(true);
+
+		myStack->addItemBottom(image, false, true);
+
+		ot::GraphicsGridLayoutItemCfg* myLayout = new ot::GraphicsGridLayoutItemCfg(5,5);
+		myLayout->setMinimumSize(ot::Size2DD(100.0, 100.0));
+		myStack->addItemTop(myLayout,true,false);
+
+		ot::GraphicsEllipseItemCfg* base = new ot::GraphicsEllipseItemCfg();
+		base->setName("base");
+		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		base->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		base->setBackgroundPainer(painter1);
+		base->setAlignment(ot::AlignLeft);
+		base->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		base->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		base->setMargins(2.9, 0.0, 0.0, 0.0);
+
+		ot::GraphicsEllipseItemCfg* collector = new ot::GraphicsEllipseItemCfg();
+		collector->setName("collector");
+		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		collector->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		collector->setBackgroundPainer(painter2);
+		collector->setAlignment(ot::AlignTop);
+		collector->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		collector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		collector->setMargins(0.0, 0.0, 0.0, 30.0);
+
+		ot::GraphicsEllipseItemCfg* emitter = new ot::GraphicsEllipseItemCfg();
+		emitter->setName("emitter");
+		ot::FillPainter2D* painter3 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
+		emitter->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+		emitter->setBackgroundPainer(painter3);
+		emitter->setAlignment(ot::AlignBottom);
+		emitter->setMaximumSize(ot::Size2DD(10.0, 10.0));
+		emitter->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+		emitter->setMargins(0.0, 0.0, 0.0, 30.0);
+
+		myLayout->addChildItem(2,0,base);
+		myLayout->addChildItem(0, 4, collector);
+		myLayout->addChildItem(4, 4, emitter);
+
+		myLayout->setColumnStretch(4, 1);
+		
+		
+
+		return myStack;
+
+	}
+
+	ot::GraphicsItemCfg* createConnector(const std::string _name)
+	{
+		ot::GraphicsEllipseItemCfg* connector = new ot::GraphicsEllipseItemCfg();
+		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
+		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+
+		connector->setName("Connector");
+		connector->setMinimumSize(ot::Size2DD(50.0, 50.0));
+		connector->setAlignment(ot::AlignCenter);
+
+		return connector;
 	}
 }
 
@@ -103,11 +323,11 @@ Application::~Application()
 // ##################################################################################################################################################################################################################
 
 // Custom functions
-std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) 
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
-	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
-	else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
+	//else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
 	else {
 		OT_LOG_W("Unknown model action");
 		assert(0);
@@ -115,15 +335,14 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document)
 	return std::string();
 }
 
-std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
+std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 {
 	//Here we get the Item Information
-	std::string itemName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	OT_rJSON_val posObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
 	ot::Point2DD pos;
-	pos.setFromJsonObject(posObj);
+	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 
 	//check and store information
 	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
@@ -133,39 +352,95 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document)
 
 	// Create item configuration for the item to add
 	ot::GraphicsItemCfg* itm = nullptr;
-	if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createTestBlock1(EXAMPLE_NAME_BLOCK1); }
-	else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createTestBlock2(EXAMPLE_NAME_Block2); }
+	if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createResistor(EXAMPLE_NAME_BLOCK1); }
+	else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createVoltageSource(EXAMPLE_NAME_Block2); }
+	else if (itemName == EXAMPLE_NAME_Block3) { itm = ottest::createDiode(EXAMPLE_NAME_Block3); }
+	else if (itemName == EXAMPLE_NAME_BLOCK4) { itm = ottest::createTransistor(EXAMPLE_NAME_BLOCK4); }
+	else if (itemName == EXAMPLE_NAME_BLOCK5) { itm = ottest::createConnector(EXAMPLE_NAME_BLOCK5); }
 	else
 	{
 		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
-
+	
 	itm->setPosition(pos);
-	itm->setUid(std::to_string(++ottest::currentBlocikUid));
+	itm->setUid(std::to_string(++ottest::currentBlockUid));
 	pckg.addItem(itm);
 
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+	
 
-	OT_rJSON_createValueObject(pckgObj);
-	pckg.addToJsonObject(reqDoc, pckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	// Here i Create a buffer Object for generating netlist
+	
+	CircuitElement element;
+	element.setItemName(itemName);
+	element.setEditorName(editorName);
+	element.setUID(itm->uid());
+	if (element.getItemName() == "Resistor")
+	{
+		std::string temp = std::to_string(ottest::currentResistorUid++);
+		std::string resistor = "R";
+		element.setNetlistElementName(resistor + temp);
+	}
+	else if(element.getItemName() == "Diode")
+	{
+		std::string temp = std::to_string(ottest::currentDiodeID++);
+		std::string diode = "D";
+		element.setNetlistElementName(diode + temp);
+	}
+	else if(element.getItemName() == "VoltageSource")
+	{
+		element.setNetlistElementName("V1");
+	}
+	else if (element.getItemName() == "Transistor")
+	{
+		std::string temp = std::to_string(ottest::currentTransistoriD++);
+		std::string tran = "Q";
+		element.setNetlistElementName(tran + temp);
+	}
+	else if (element.getItemName() == "Connector")
+	{
+		std::string temp = std::to_string(ottest::currenConnectorID++);
+		std::string conn = "C";
+		element.setNetlistElementName(conn + temp);
+	}
+	else
+	{
+		std::string temp = std::to_string(ottest::currentTransistoriD++);
+		std::string transistor = "Q";
+		element.setNetlistElementName(transistor+temp);
+	}
+	
+	auto it = mapOfCircuits.find(editorName);
+	if (it == mapOfCircuits.end())
+	{
+		Application::instance()->uiComponent()->displayMessage("No Circuit found");
+	}
+	else
+	{
+		it->second.addElement(element.getUID(), element);
+	}
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+	
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, ot::rJSON::toJSON(pckgObj));
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 
-std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document)
+std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 {	
 	std::list<std::string> items;
 
 	// Add Item UIDs to the list above (Items to be removed)
-	std::string itemUID = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+	std::string itemUID = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 	items.push_back(itemUID);
 
 
@@ -173,56 +448,102 @@ std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document)
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document)
+std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document)
 {
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-
 	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(pckgObj);
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	
+	for (auto c : pckg.connections())
+	{
+		Connection connection(c);
+
+		
+		auto it = mapOfCircuits.find(pckg.name());
+
+		//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
+		//the same nodeNumber
+
+		if (it->second.findElement(connection.destUid()) == "Connector")
+		{
+			connection.setNodeNumber(std::to_string(0));
+		}
+		else if (it->second.findElement(connection.originUid()) == "Connector")
+		{
+			connection.setNodeNumber(std::to_string(0));
+		}
+		else
+		{
+			connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
+		}
+
+		if(it == mapOfCircuits.end())
+		{
+			OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
+		}
+
+		else
+		{	
+			//Here I add the connection to the Origin Element
+			it->second.addConnection(connection.originUid(), connection);
+
+			
+
+
+			//Some Tests
+			//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
+			
+			//Here I add the connection to the Destination Element
+			it->second.addConnection(connection.destUid(), connection);
+
+			//test of print
+			
+			
+			
+		}
+	}
+	
+	
+	
+
+	
 
 	// Here we would check and store the connection information
 	OT_LOG_D("Handling new graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to add connections
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	// Add received package to reuest (all connections are allowed)
-	OT_rJSON_createValueObject(reqPckgObj);
-	pckg.addToJsonObject(reqDoc, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _document)
+std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document)
 {
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(pckgObj);
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 	// Here we would check and remove the connection information
 	OT_LOG_D("Handling remove graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to remove connections
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection);
-	
-	// Add received package to reuest (all connections are allowed)
-    OT_rJSON_createValueObject(reqPckgObj);
-	pckg.addToJsonObject(reqDoc, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, editorName);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(editorName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -238,21 +559,30 @@ std::string Application:: createNewCircuitEditor(void)
 		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
 		
 		a->addChildCollection(a1);
-		a1->addItem(ottest::createTestBlock1(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
-		a1->addItem(ottest::createTestBlock2(EXAMPLE_NAME_Block2));
+		a1->addItem(ottest::createResistor(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
+		a1->addItem(ottest::createVoltageSource(EXAMPLE_NAME_Block2));
+		a1->addItem(ottest::createDiode(EXAMPLE_NAME_Block3));
+		a1->addItem(ottest::createTransistor(EXAMPLE_NAME_BLOCK4));
+		a1->addItem(ottest::createConnector(EXAMPLE_NAME_BLOCK5));
 		
 		pckg.addCollection(a);
+		
+		Circuit circuit;
+		circuit.setEditorName(pckg.title());
+		circuit.setId(pckg.name());
+		mapOfCircuits.insert_or_assign(pckg.name(), circuit);
 
-		OT_rJSON_createDOC(doc);
-		OT_rJSON_createValueObject(pckgObj);
-		pckg.addToJsonObject(doc, pckgObj);
+		ot::JsonDocument reqDoc;
+		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-		this->getBasicServiceInformation().addToJsonObject(doc, doc);
+		ot::JsonObject pckgObj;
+		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 		std::string response;
-		std::string req = ot::rJSON::toJSON(doc);
+		std::string req = reqDoc.toJson();
 
 		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
 
@@ -269,7 +599,7 @@ std::string Application:: createNewCircuitEditor(void)
 
  int Application::MySendCharFunction(char* output, int ident, void* userData)
 {
-	 OT_LOG_D(output);
+	 Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
 
 	return 0;
 }
@@ -309,8 +639,8 @@ std::string Application::ngSpice_Initialize()
 		std::list<std::string> enabled;
 		
 		std::list<std::string> disabled;
-		disabled.push_back("Circuit Simulator:Simulate:New Simulation");
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		/*disabled.push_back("Circuit Simulator:Simulate:New Simulation");
+		m_uiComponent->setControlsEnabledState(enabled, disabled);*/
 
 	}
 	else if (status == 1)
@@ -319,51 +649,17 @@ std::string Application::ngSpice_Initialize()
 	}
 
 
-	// Here i do 3 test Simulations
-
-	//const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\TransientTest.cir";
-
-	//Transient Analysis
-
-	// The command always have to be char* so i make them as arrays and write a command into
-	/*char run[100] = "run";
-
-	sprintf_s(run, "source %s", netlistPath);
-	ngSpice_Command(run);
-
+	// Some simulation
 	
-	char tran[100] = "tran 1ms 10ms";
-	ngSpice_Command(tran);*/
-	
-	//AC-Analysis
+	//generateNetlist();
 
-	//char command[100];
-	//sprintf_s(command, "source %s", netlistPath);
-	//ngSpice_Command(command);
-
-	//sprintf_s(command, "ac dec 1 10k 10");
-	//ngSpice_Command(command);
-
-	////Plot
-	//char* currentPlot = ngSpice_CurPlot();
-	//std::cout << "Aktueller Plot: " << currentPlot << std::endl;
-
-	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\inv-example.cir";
+	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\MyCircuit.cir";
 
 	char command[100];
 	sprintf_s(command, "source %s", netlistPath);
 	ngSpice_Command(command);
 
 
-	//For waiting then end of Simulation
-	//while (ngSpice_running()) {
-	//	using namespace std::chrono_literals;
-	//	std::this_thread::sleep_for(1ms);	// Warten
-	//}
-
-	// quit NGSpice
-	/*char quit[100] = "quit";
-	ngSpice_Command(quit);*/
 
 	myString = std::to_string(status);
 
@@ -372,6 +668,145 @@ std::string Application::ngSpice_Initialize()
 	
 	
 }
+
+std::string Application::generateNetlist()
+{
+	//1Möglichkeit: Man könnte nach der Größe der NodenNumber sortieren das heißt dass alle knoten dann innerhalb eines NetlistString sortiert sind z.b statt
+	// 2 1 kommt dann immer 1 2 also -> knoten 1 < knoten 2 . Jedoch müsste man für die spoannungsquelle das umgedreht machen für positive ergebnisse
+
+	//2 Möglichkeit: Man sortiert die Liste der Connections für jedes Element aufsteigend der Nodenumbers nach mittels einer Funktion und dann bekommt man die 
+	//Connections schon sortiert aus der Liste 
+
+
+	// First I declare the path to the file
+	
+	std::ofstream outfile("C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/output.cir");
+	//Here i have two Vectors for incomging and putgoing Connections
+	
+
+	std::string Title = "*Test";
+	outfile << Title << std::endl;
+	
+	int DiodeCounter = 0;
+	int TransistorCounter = 0;
+	//!!!!!Es fehlt noch dass der connector nicht in die netlist eingetragen wird und der transistor werte und das model eintragen
+	//!!!!!Es fehlen noch richtige simulations einstellungen für transistor
+
+	
+	
+	// Now I write the informations to the File
+	// Here i get the Circuit and the map of Elements
+	auto map = mapOfCircuits.find("Circuit")->second.getMapOfElements();
+	// Now i iterate through this Map of Elements and save the information
+	for (auto it : map)
+	{
+		
+		
+		std::string NodeNumbersString = "";
+		std::string elementName_temp = it.second.getItemName();
+		std::string netlistElementName = it.second.getNetlistElementName();
+		std::string value;
+		std::string elmentUID = it.second.getUID();
+
+		if (elementName_temp == "Connector")
+		{
+			continue;
+		}
+
+		//Here i get the Connection List
+		auto connectionList = it.second.getList();
+		
+		if(elementName_temp == "VoltageSource")
+		{
+			for (auto c = connectionList.rbegin(); c != connectionList.rend(); c++)
+			{
+
+				NodeNumbersString += c->getNodeNumber();
+				NodeNumbersString += " ";
+			}
+		}
+
+		else
+		{
+
+			for (auto c : connectionList)
+			{
+				NodeNumbersString += c.getNodeNumber();
+				NodeNumbersString += " ";
+
+			}
+
+		}
+
+		
+
+		
+		
+
+		//I set default values
+		if (elementName_temp == "VoltageSource")
+		{
+			value = "12V";
+
+
+		}
+		else if(elementName_temp == "Resistor")
+		{
+			value = "200";
+		}
+		else if(elementName_temp == "Diode")
+		{
+			value = "myDiode";
+			DiodeCounter++;
+		}
+		else
+		{
+			value = "BC546B";
+			TransistorCounter++;
+		}
+
+		//Create the end string 
+		std::string NetlistLine = netlistElementName + " " + NodeNumbersString + value;
+
+		outfile << NetlistLine << std::endl;
+	}
+
+	if (DiodeCounter > 0)
+	{
+		std::string diodeModel = ".model myDiode D (IS=1n RS=0.1 N=1)";
+		outfile << diodeModel << std::endl;
+	}
+
+	if (TransistorCounter > 0)
+	{
+		std::string tranModel = ".model BC546B npn (BF=200)";
+		outfile << tranModel << std::endl;
+	}
+
+	std::string Properties = ".dc V1 0V 12V 1V";
+	outfile << Properties << std::endl;
+
+	std::string control = ".Control";
+	outfile << control << std::endl;;
+
+	std::string run = "run";
+	outfile << run << std::endl;
+
+	std::string print = "print all";
+	outfile << print << std::endl;
+
+	std::string endc = ".endc";
+	outfile << endc << std::endl;;
+
+	std::string end = ".end";
+	outfile << end << std::endl;
+
+
+	std::string myString = "Succesfull";
+	return myString;
+}
+
+
 // ############################## ####################################################################################################################################################################################
 
 // Required functions
@@ -384,12 +819,12 @@ void Application::run(void)
 	}
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

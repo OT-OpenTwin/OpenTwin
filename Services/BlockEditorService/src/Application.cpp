@@ -12,10 +12,10 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OpenTwinCore/ReturnMessage.h"
-#include "OpenTwinFoundation/UiComponent.h"
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTCommunication/Msg.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 
@@ -27,7 +27,7 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTGui/GraphicsFlowItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 
@@ -44,8 +44,8 @@ Application * g_instance{ nullptr };
 namespace ottest {
 	static unsigned long long currentBlockUid = 0;
 
-	ot::GraphicsFlowConnectorCfg getDefaultConnectorStyle(void) {
-		ot::GraphicsFlowConnectorCfg cfg;
+	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
+		ot::GraphicsFlowItemConnector cfg;
 
 		cfg.setTextColor(ot::Color(0, 0, 0));
 
@@ -53,48 +53,54 @@ namespace ottest {
 	}
 
 	ot::GraphicsItemCfg* createTestBlock1(const std::string& _name) {
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
+		flow.setName(_name);
+		flow.setTitle(_name);
 		flow.setTitleBackgroundColor(0, 255, 0);
 		flow.setBackgroundImagePath("Images/Test2");
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		flow.setBackgroundColor(ot::Color(255, 255, 255));
 		//flow->setBackgroundImagePath("Default/python");
 
-		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowItemConnector::Square, ot::Color::Orange);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowItemConnector::Square, ot::Color::Yellow);
 
-		return flow.createGraphicsItem(_name, _name);
+		return flow.createGraphicsItem();
 	}
 
 	ot::GraphicsItemCfg* createTestBlock2(const std::string& _name) {
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
+		flow.setName(_name);
+		flow.setTitle(_name);
 		flow.setTitleBackgroundColor(255, 0, 0);
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		//flow->setBackgroundImagePath("Default/python");
 		flow.setLeftTitleCornerImagePath("Images/Test3");
 
-		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Orange);
-		flow.addLeft("SomeIn3", "Perform shutdown", ot::GraphicsFlowConnectorCfg::Circle, ot::Color::IndianRed);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addLeft("SomeIn2", "Test", ot::GraphicsFlowItemConnector::Square, ot::Color::Orange);
+		flow.addLeft("SomeIn3", "Perform shutdown", ot::GraphicsFlowItemConnector::Circle, ot::Color::IndianRed);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowItemConnector::TriangleLeft, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowItemConnector::TriangleRight, ot::Color::Yellow);
 
-		return flow.createGraphicsItem(_name, _name);
+		return flow.createGraphicsItem();
 	}
 
 	ot::GraphicsItemCfg* createTestBlock3(const std::string& _name) {
-		ot::GraphicsFlowItemCfg flow;
+		ot::GraphicsFlowItemBuilder flow;
+		flow.setName(_name);
+		flow.setTitle(_name);
 		
 		flow.setTitleBackgroundGradientColor(ot::Color(ot::Color::Orange));
 		flow.setDefaultConnectorStyle(ottest::getDefaultConnectorStyle());
 		
-		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Blue);
-		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowConnectorCfg::Square, ot::Color::Yellow);
+		flow.addLeft("SomeIn1", "Run", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("SomeOut1", "Success", ot::GraphicsFlowItemConnector::Square, ot::Color::Blue);
+		flow.addRight("SomeOut2", "Failed", ot::GraphicsFlowItemConnector::Square, ot::Color::Yellow);
 
-		return flow.createGraphicsItem(_name, _name);
+		return flow.createGraphicsItem();
 	}
 
 	ot::GraphicsItemCfg* createTestItem1(const std::string& _name) {
@@ -243,8 +249,8 @@ Application::~Application()
 
 // Custom functions
 
-std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
-	std::string action = ot::rJSON::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "Block Editor:Test:Empty") return createEmptyTestEditor();
 	else { 
 		OT_LOG_W("Unknown model action");
@@ -252,15 +258,15 @@ std::string Application::handleExecuteModelAction(OT_rJSON_doc& _document) {
 	return std::string();
 }
 
-std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
+std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 
 	// We allow all items and do NOT store any information
 	
 	// Get item information
-	std::string itemName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	OT_rJSON_val posObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
+	ot::ConstJsonObject posObj = ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition);
 	ot::Point2DD pos;
 	pos.setFromJsonObject(posObj);
 
@@ -285,98 +291,89 @@ std::string Application::handleNewGraphicsItem(OT_rJSON_doc& _document) {
 	itm->setUid(std::to_string(++ottest::currentBlockUid));
 	pckg.addItem(itm);
 
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER,ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	OT_rJSON_createValueObject(pckgObj);
-	pckg.addToJsonObject(reqDoc, pckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	pckgObj.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, ot::rJSON::toJSON(pckgObj));
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, reqDoc.toJson());
 }
 
-std::string Application::handleRemoveGraphicsItem(OT_rJSON_doc& _document) {
+std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleNewGraphicsItemConnection(OT_rJSON_doc& _document) {
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
-
+std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
 	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(pckgObj);
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 	// Here we would check and store the connection information
 	OT_LOG_D("Handling new graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to add connections
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
 	// Add received package to reuest (all connections are allowed)
-	OT_rJSON_createValueObject(reqPckgObj);
-	pckg.addToJsonObject(reqDoc, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	pckgObj.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleRemoveGraphicsItemConnection(OT_rJSON_doc& _document) {
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, Object);
-	OT_rJSON_val pckgObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_Package].GetObject();
+std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document) {
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
 	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(pckgObj);
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 	// Here we would check and remove the connection information
 	OT_LOG_D("Handling remove graphics item connection request ( editor = \"" + pckg.name() + "\" )");
 
 	// Request UI to add connections
-	OT_rJSON_createDOC(reqDoc);
-	ot::rJSON::add(reqDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection);
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
 	// Add received package to reuest (all connections are allowed)
-	OT_rJSON_createValueObject(reqPckgObj);
-	pckg.addToJsonObject(reqDoc, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj);
-	ot::rJSON::add(reqDoc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, editorName);
+	ot::JsonObject reqPckgObj;
+	pckg.addToJsonObject(reqPckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, reqPckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(editorName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc);
+	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	m_uiComponent->sendMessage(true, reqDoc);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleGraphicsSelectionChanged(OT_rJSON_doc& _document) {
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	auto sel = ot::rJSON::getULongLongList(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+std::string Application::handleGraphicsSelectionChanged(ot::JsonDocument& _document) {
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	auto sel = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
 	OT_LOG_D("Graphics Editor selection changed ( editor = \"" + editorName + "\" )");
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleGraphicsItemMoved(OT_rJSON_doc& _document) {
-	OT_rJSON_checkMember(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, Object);
-
-	std::string editorName = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	std::string itemUid = ot::rJSON::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+std::string Application::handleGraphicsItemMoved(ot::JsonDocument& _document) {
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	std::string itemUid = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 
 	ot::Point2DD itmPos;
-	OT_rJSON_val itemPosObj = _document[OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition].GetObject();
-	itmPos.setFromJsonObject(itemPosObj);
+	itmPos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 
 	OT_LOG_D("Graphics Editor item moved ( editor = \"" + editorName + "\"; uid = \"" + itemUid + "\"; x = " + std::to_string(itmPos.x()) + "; y = " + std::to_string(itmPos.y()) + " )");
 
@@ -406,16 +403,17 @@ std::string Application::createEmptyTestEditor(void) {
 		a2->addItem(ottest::createTestItem2(EXAMPLE_NAME_Block5));
 		pckg.addCollection(a);
 
-		OT_rJSON_createDOC(doc);
-		OT_rJSON_createValueObject(pckgObj);
-		pckg.addToJsonObject(doc, pckgObj);
+		ot::JsonDocument reqDoc;
+		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-		this->getBasicServiceInformation().addToJsonObject(doc, doc);
+		ot::JsonObject pckgObj;
+		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+
+		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 		std::string response;
-		std::string req = ot::rJSON::toJSON(doc);
+		std::string req = reqDoc.toJson();
 
 		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
 
@@ -436,12 +434,12 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 }
 
-std::string Application::processAction(const std::string & _action, OT_rJSON_doc & _doc)
+std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, OT_rJSON_doc & _doc)
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }

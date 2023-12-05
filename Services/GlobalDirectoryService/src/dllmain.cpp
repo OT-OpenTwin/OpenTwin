@@ -7,10 +7,10 @@
 #include <iostream>
 
 // OpenTwin header
-#include <OpenTwinCore/Logger.h>
-#include <OpenTwinFoundation/Dispatcher.h>
-#include <OpenTwinCommunication/ServiceLogNotifier.h>
-#include <OpenTwinFoundation/ExternalServicesComponent.h>
+#include "OTCore/Logger.h"
+#include "OTServiceFoundation/Dispatcher.h"
+#include "OTCommunication/ServiceLogNotifier.h"
+#include "OTServiceFoundation/ExternalServicesComponent.h"
 
 // Service header
 #include <Application.h>

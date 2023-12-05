@@ -12,7 +12,7 @@
 #include "ClassFactoryModel.h"
 #include "EntityFaceAnnotation.h"
 
-#include "OpenTwinCommunication/UiTypes.h"
+#include "OTCommunication/UiTypes.h"
 
 class EntityMesh;
 class EntityMeshTet;
@@ -35,7 +35,7 @@ public:
 	// Overrides from EntityObserver
 	virtual void entityRemoved(EntityBase *entity) override;
 	virtual void entityModified(EntityBase *entity) override;
-	virtual void sendMessageToViewer(rapidjson::Document &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
+	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 
 	Model(const std::string &_projectName, const std::string &_collectionName);
 	virtual ~Model();
@@ -51,7 +51,7 @@ public:
 	void			getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax);
 	void			setVisualizationModel(ot::UID visModelID);
 	ot::UID				getVisualizationModel(void);
-	void			executeAction(const std::string &action, rapidjson::Document &doc);
+	void			executeAction(const std::string &action, ot::JsonDocument &doc);
 	void			executeFunction(const std::string &function, const std::string &fileName, bool removeFile);
 	void			modelSelectionChangedNotification(std::list<ot::UID> &selectedEntityID, std::list<ot::UID> &selectedVisibleEntityID);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);

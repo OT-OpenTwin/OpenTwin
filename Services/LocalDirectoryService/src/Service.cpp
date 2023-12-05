@@ -4,12 +4,11 @@
 #include "Application.h"
 
 // Open Twin core types header
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinSystem/Application.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/otAssert.h"
+#include "OTCore/Logger.h"
+#include "OTSystem/Application.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // Standard headers
 #include <iostream>
@@ -33,20 +32,21 @@ Service::~Service() {
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
 }
 
-void Service::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	OT_rJSON_createValueObject(infoObj);
-	m_info.addToJsonObject(_document, infoObj);
-	ot::rJSON::add(_document, _object, "Information", infoObj);
-	ot::rJSON::add(_document, _object, "StartCounter", m_startCounter);
-	ot::rJSON::add(_document, _object, "IsAlive", m_isAlive);
-	ot::rJSON::add(_document, _object, "URL", m_url);
-	ot::rJSON::add(_document, _object, "Port", m_port);
-	ot::rJSON::add(_document, _object, "WebsocketURL", m_websocketUrl);
-	ot::rJSON::add(_document, _object, "WebsocketPort", m_websocketPort);
+void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	ot::JsonObject infoObj;
+	m_info.addToJsonObject(infoObj, _allocator);
+
+	_object.AddMember("Information", infoObj, _allocator);
+	_object.AddMember("StartCounter", m_startCounter, _allocator);
+	_object.AddMember("IsAlive", m_isAlive, _allocator);
+	_object.AddMember("URL", ot::JsonString(m_url, _allocator), _allocator);
+	_object.AddMember("Port", m_port, _allocator);
+	_object.AddMember("WebsocketURL", ot::JsonString(m_websocketUrl, _allocator), _allocator);
+	_object.AddMember("WebsocketPort", m_websocketPort, _allocator);
 }
 
 ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
-	OT_LOG_D("Starting service (Name = \"" + m_info.getName() + "\"; Type = \"" + m_info.getType() + "\"; Session.ID = \"" + 
+	OT_LOG_D("Starting service (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; Session.ID = \"" + 
 		_sessionInformation.id() + "\"; LSS.Url = \"" + _sessionInformation.sessionServiceURL() + "\")");
 
 	m_port = _port;
@@ -59,16 +59,16 @@ ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, c
 
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
 
-	std::string launcherName = LDS_CFG.getLauncherPath();
+	std::string launcherName = LDS_CFG.launcherPath();
 
-	std::string path = LDS_CFG.getServicesLibraryPath();
+	std::string path = LDS_CFG.servicesLibraryPath();
 	if (!path.empty()) path.append("\\");
-	path.append(m_info.getName()).append(".dll");
+	path.append(m_info.name()).append(".dll");
 
 	// Websocket: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "websocketURL" "sessionServiceURL"
 	// Others:    open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "sessionServiceURL" "session ID"
 	std::string commandLine = launcherName + " \"" + path + "\" \"" + LDS_APP->serviceURL() + "\" \"" + m_url + "\" \"";
-	if (m_info.getType() == OT_INFO_SERVICE_TYPE_RelayService) {
+	if (m_info.type() == OT_INFO_SERVICE_TYPE_RelayService) {
 		commandLine.append(m_websocketUrl).append("\" \"").append(_sessionInformation.sessionServiceURL()).append("\"");
 	}
 	else {
@@ -116,7 +116,7 @@ bool Service::checkAlive(void)
 		}
 	}
 	else {
-		OT_LOG_E("Failed to get service exit code (Name = \"" + m_info.getName() + "\"; Type = \"" + m_info.getType() + "\"; URL = \"" + m_url + "\")");
+		OT_LOG_E("Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")");
 		m_isAlive = false;
 		CloseHandle(m_processHandle);
 		m_processHandle = OT_INVALID_PROCESS_HANDLE;

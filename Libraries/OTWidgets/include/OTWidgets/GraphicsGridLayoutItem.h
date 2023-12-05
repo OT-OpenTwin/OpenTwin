@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 
 // Qt header
@@ -16,6 +17,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsGridLayoutItem : public QGraphicsGridLayout, public ot::GraphicsLayoutItem {
+		OT_DECL_NOCOPY(GraphicsGridLayoutItem)
 	public:
 		GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsGridLayoutItem() {};
@@ -28,12 +30,6 @@ namespace ot {
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-
-	private:
-		QSizeF m_size;
-
-		GraphicsGridLayoutItem(const GraphicsGridLayoutItem&) = delete;
-		GraphicsGridLayoutItem& operator = (const GraphicsGridLayoutItem&) = delete;
 	};
 
 }

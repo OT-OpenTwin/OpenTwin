@@ -1,7 +1,7 @@
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockPlot1D.h"
-#include "OpenTwinCore/FolderNames.h"
+#include "OTCore/FolderNames.h"
 
 class BlockHandlerPlot1D : public BlockHandler
 {

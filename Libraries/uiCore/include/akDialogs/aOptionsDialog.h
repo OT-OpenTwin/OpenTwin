@@ -50,10 +50,7 @@ namespace ak {
 	class aOptionsGroup;
 	class aAbstractOptionsItem;
 	class aBasicOptionsItem;
-
-	Q_DECLARE_METATYPE(aOptionsGroup *);
-	Q_DECLARE_METATYPE(aAbstractOptionsItem *);
-
+	
 	class UICORE_API_EXPORT aOptionsDialog : public aDialog {
 		Q_OBJECT
 	public:
@@ -1033,5 +1030,8 @@ namespace ak {
 		aOptionsItemFileSelectOpen(aOptionsItemFileSelectOpen&) = delete;
 		aOptionsItemFileSelectOpen& operator = (aOptionsItemFileSelectOpen&) = delete;
 	};
+
+	Q_DECLARE_METATYPE(aOptionsGroup*);
+	Q_DECLARE_METATYPE(aAbstractOptionsItem*);
 
 }

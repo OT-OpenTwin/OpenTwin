@@ -2,10 +2,10 @@
 #include <string>
 #include <memory>
 
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "EntityBlock.h"
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/FolderNames.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/FolderNames.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 

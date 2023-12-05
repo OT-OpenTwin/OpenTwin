@@ -1,6 +1,6 @@
 #include "MinimalSubService.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/JSON.h"
+#include "OTCore/Logger.h"
 #include <thread>
 
 int MinimalSubService::Startup(const char* urlOwn, const char* urlMasterService)
@@ -21,15 +21,17 @@ void MinimalSubService::RequestInitializationByMasterService()
 {
 	OT_LOG_D("Initializing python subservice with PythonService URL: " + _urlMasterService);
 	OT_LOG_D("Initializing python subservice with URL: " + _urlOwn);
-	OT_rJSON_createDOC(message);
+	ot::JsonDocument message;
 	try
 	{
-		ot::rJSON::add(message, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_ExecuteAction);
-		ot::rJSON::add(message, OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_PYTHON_Request_Initialization);
+		message.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, message.GetAllocator()), message.GetAllocator());
+		message.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_Request_Initialization, message.GetAllocator()), message.GetAllocator());
+
 		std::string response;
 		Application::instance()->SendHttpRequest(ot::MessageType::EXECUTE, _urlMasterService, message, response);
 
-		OT_rJSON_doc doc = ot::rJSON::fromJSON(response);
+		ot::JsonDocument doc;
+		doc.fromJson(response);
 		std::string urlModelService = doc["ModelService.URL"].GetString();
 		std::string sessionID = doc["Session.ID"].GetString();
 		std::string urlDataBase = doc["DataBase.URL"].GetString();
@@ -65,8 +67,9 @@ void MinimalSubService::InitializeFromConfig()
 	{
 		std::stringstream buffer;
 		buffer << stream.rdbuf();
-		OT_rJSON_doc config = ot::rJSON::fromJSON(buffer.str());
-
+		ot::JsonDocument config;
+		config.fromJson(buffer.str());
+		
 		_urlOwn = config["Service.URL"].GetString();
 		_urlMasterService = config["MasterService.URL"].GetString();
 		urlModelService = config["ModelService.URL"].GetString();

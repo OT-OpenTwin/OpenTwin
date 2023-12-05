@@ -9,8 +9,8 @@
 #include "StatusManager.h"
 
 // OT header
-#include "OpenTwinCommunication/Msg.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/OTAssert.h"
 
 // Qt header
 #include <QtCore/qjsondocument.h>
@@ -72,8 +72,8 @@
 #define TERMINAL_JSON_MEM_CHECK(___jsonObject, ___memberName, ___memberType, ___errorReturnCase) TERMINAL_JSON_MEM_CHECK_EXISTS(___jsonObject, ___memberName, ___errorReturnCase); TERMINAL_JSON_MEM_CHECK_TYPE(___jsonObject, ___memberName, ___memberType, ___errorReturnCase)
 
 namespace intern {
-	const Qt::ItemFlags FilterFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	const Qt::ItemFlags RequestFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	const Qt::ItemFlags FilterFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+	const Qt::ItemFlags RequestFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 }
 
 TerminalCollectionItem::TerminalCollectionItem(Terminal * _owner, const QString& _title) : m_owner(_owner) {
@@ -109,7 +109,7 @@ TerminalCollectionItem * TerminalCollectionItem::createFromJsonObject(Terminal *
 	}
 	else {
 		TERMINAL_LOGE("Unknown terminal collection item type");
-		otAssert(0, "Unknown item type");
+		OTAssert(0, "Unknown item type");
 	}
 	return newItm;
 }
@@ -185,7 +185,7 @@ void TerminalCollectionFilter::addToJsonObject(QJsonObject& _object) const {
 		}
 		else {
 			TERMINAL_LOGE("Invalid treewidget item, cast to terminal collectio item failed");
-			otAssert(0, "Invalid item");
+			OTAssert(0, "Invalid item");
 		}
 	}
 	_object[OT_JSON_COLLECTION_Childs] = childArr;
@@ -377,9 +377,6 @@ Terminal::Terminal() : m_exportLock(false) {
 }
 
 Terminal::~Terminal() {
-	QSettings s("OpenTwin", "OToolkit");
-	s.setValue("Terminal.Receiver", m_receiverUrl->text());
-	s.setValue("Terminal.Message", m_messageEdit->toPlainText());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -390,7 +387,7 @@ QString Terminal::toolName(void) const {
 	return "OTerminal";
 }
 
-QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
@@ -441,6 +438,8 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	// Setup controls
 	m_navigation->setHeaderHidden(true);
 	m_navigation->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_navigation->setSortingEnabled(true);
+	m_navigation->sortItems(0, Qt::AscendingOrder);
 
 	QFont rFont = m_receiverName->font();
 	rFont.setFixedPitch(true);
@@ -508,13 +507,12 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
 
 	// Restore settings
-	QSettings s("OpenTwin", "OToolkit");
-	m_receiverUrl->setText(s.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
-	m_messageEdit->setPlainText(s.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
+	m_receiverUrl->setText(_settings.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
+	m_messageEdit->setPlainText(_settings.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
 
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
-	//m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & ~(Qt::ItemIsEditable));
+	m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & (~Qt::ItemIsEditable));
 	m_navigation->addTopLevelItem(m_requestsRootFilter);
 
 	this->slotLoadRequestCollection();
@@ -523,6 +521,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	connect(m_navigation, &QTreeWidget::customContextMenuRequested, this, &Terminal::slotShowNavigationContextMenu);
 	connect(m_navigation, &QTreeWidget::itemDoubleClicked, this, &Terminal::slotNavigationItemDoubleClicked);
 	connect(m_navigation, &QTreeWidget::itemChanged, this, &Terminal::slotNavigationItemChanged);
+	connect(m_navigation, &QTreeWidget::itemSelectionChanged, this, &Terminal::slotSelectionChanged);
 	connect(m_btnSend, &QPushButton::clicked, this, &Terminal::slotSendMessage);
 	connect(m_receiverName, &QComboBox::currentTextChanged, this, &Terminal::slotServiceNameChanged);
 
@@ -531,13 +530,15 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	connect(m_shortcutRename, &QShortcut::activated, this, &Terminal::slotRenameCurrent);
 	connect(m_shortcutDelete, &QShortcut::activated, this, &Terminal::slotDeleteCurrent);
 	connect(m_shortcutClone, &QShortcut::activated, this, &Terminal::slotCloneCurrent);
-
+	
 	TERMINAL_LOG("Terminal initialization completed");
 
 	return m_splitter;
 }
 
-bool Terminal::prepareToolShutdown(void) {
+bool Terminal::prepareToolShutdown(QSettings& _settings) {
+	_settings.setValue("Terminal.Receiver", m_receiverUrl->text());
+	_settings.setValue("Terminal.Message", m_messageEdit->toPlainText());
 	return true;
 }
 
@@ -555,10 +556,10 @@ void Terminal::setEndpointFromMessageType(ot::MessageType _type) {
 	case ot::EXECUTE_ONE_WAY_TLS: m_endpoint->setCurrentText(TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS); break;
 	case ot::SECURE_MESSAGE_TYPES:
 	case ot::ALL_MESSAGE_TYPES:
-		otAssert(0, "Invalid message type");
+		OTAssert(0, "Invalid message type");
 		break;
 	default:
-		otAssert(0, "Unknown message type");
+		OTAssert(0, "Unknown message type");
 		break;
 	}
 }
@@ -569,7 +570,7 @@ ot::MessageType Terminal::endpointToMessageType(void) const {
 	else if (txt == TERMINAL_TXT_ENDPOINT_EXECUTE_OW_TLS) return ot::EXECUTE_ONE_WAY_TLS;
 	else if (txt == TERMINAL_TXT_ENDPOINT_QUEUE) return ot::QUEUE;
 	else {
-		otAssert(0, "Unknown endpoint");
+		OTAssert(0, "Unknown endpoint");
 		return ot::EXECUTE;
 	}
 }
@@ -667,6 +668,19 @@ void Terminal::slotServiceNameChanged(void) {
 	}
 }
 
+void Terminal::slotSelectionChanged() {
+	auto sel = m_navigation->selectedItems();
+	if (sel.isEmpty()) return;
+	if (sel.count() > 1) {
+		TERMINAL_LOGW("Multiselection not supported");
+		return;
+	}
+	TerminalRequest* request = dynamic_cast<TerminalRequest*>(sel[0]);
+	if (request) {
+		this->applyRequest(request);
+	}
+}
+
 void Terminal::slotShowNavigationContextMenu(const QPoint& _pt) {
 	// Get the desired item
 	QTreeWidgetItem * selectedItem = m_navigation->itemAt(_pt);
@@ -691,21 +705,18 @@ void Terminal::slotShowNavigationContextMenu(const QPoint& _pt) {
 			handleContextRequest(_pt, request);
 		}
 		else {
-			otAssert(0, "Cast failed");
+			OTAssert(0, "Cast failed");
 			OTOOLKIT_LOGE("Terminal", "Navigation item cast failed");
 		}
 	}
 	else {
-		otAssert(0, "Unknown root item");
+		OTAssert(0, "Unknown root item");
 		OTOOLKIT_LOGE("Terminal", "Unknown navigation root item");
 	}
 }
 
 void Terminal::slotNavigationItemDoubleClicked(QTreeWidgetItem* _item, int _column) {
-	TerminalRequest* request = dynamic_cast<TerminalRequest*>(_item);
-	if (request) {
-		applyRequest(request);
-	}
+	
 }
 
 void Terminal::slotNavigationItemChanged(QTreeWidgetItem* _item, int _column) {
@@ -1035,6 +1046,8 @@ void Terminal::addNewFilter(TerminalCollectionFilter * _parentFilter) {
 
 	slotSaveRequestCollection();
 
+	_parentFilter->setSelected(false);
+	newFilter->setSelected(true);
 	m_navigation->editItem(newFilter);
 }
 
@@ -1085,6 +1098,8 @@ void Terminal::addNewRequestFromCurrent(TerminalCollectionFilter * _parentFilter
 	// This call will save the collection
 	updateRequestFromCurrent(newRequest);
 
+	_parentFilter->setSelected(false);
+	newRequest->setSelected(true);
 	m_navigation->editItem(newRequest);
 }
 
@@ -1107,7 +1122,7 @@ void Terminal::removeRequest(TerminalRequest * _request) {
 		m_exportLock = false;
 	}
 	else {
-		otAssert(0, "No parent item");
+		OTAssert(0, "No parent item");
 		TERMINAL_LOGE("Parent item not found");
 	}
 

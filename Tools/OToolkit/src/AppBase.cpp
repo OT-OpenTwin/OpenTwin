@@ -18,9 +18,8 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCommunication/actionTypes.h"
+#include "OTCore/JSON.h"
+#include "OTCommunication/actionTypes.h"
 
 // Qt header
 #include <QtCore/qdatetime.h>
@@ -73,7 +72,7 @@ void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogTy
 			this->slotLogError(_sender, _message);
 			break;
 		default:
-			otAssert(0, "Unknown log type");
+			OTAssert(0, "Unknown log type");
 			this->slotLogError("OToolkit", "Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }");
 			break;
 		}
@@ -92,7 +91,7 @@ void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogTy
 			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
 			break;
 		default:
-			otAssert(0, "Unknown log type");
+			OTAssert(0, "Unknown log type");
 			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, QString("Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }")));
 			break;
 		}
@@ -148,6 +147,7 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	settings->setValue("WindowState", saveState());
 
 	// Clear tools
+	m_toolManager->stopAll();
 	m_toolManager->clear();
 
 	// Qt
@@ -170,20 +170,20 @@ void AppBase::setUrl(const QString& _url) {
 void AppBase::slotProcessMessage(const QString& _json) {
 	try {
 		std::string msgStd = _json.toStdString();
-		OT_rJSON_parseDOC(inboundAction, msgStd.c_str());
+		ot::JsonDocument inboundAction;
+		inboundAction.fromJson(msgStd);
 		if (inboundAction.IsObject()) {
 
-			std::string action = ot::rJSON::getString(inboundAction, OT_ACTION_MEMBER);
+			std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
 
 			if (action == OT_ACTION_CMD_Log) {
-				OT_rJSON_checkMember(inboundAction, OT_ACTION_PARAM_LOG, Object);
-				OT_rJSON_val logObj = inboundAction[OT_ACTION_PARAM_LOG].GetObject();
+				ot::ConstJsonObject logObj = ot::json::getObject(inboundAction, OT_ACTION_PARAM_LOG);
 
 				ot::LogMessage msg;
 				msg.setFromJsonObject(logObj);
 				msg.setCurrentTimeAsGlobalSystemTime();
 
-				m_logger->appendLogMessage(msg);
+				if (m_logger) m_logger->appendLogMessage(msg);
 			}
 		}
 		else {
@@ -307,6 +307,10 @@ void AppBase::slotSetErrorStatus(const QString& _text) {
 	m_toolManager->statusManager()->setErrorInfo(_text);
 }
 
+void AppBase::slotInitialize(void) {
+	QMetaObject::invokeMethod(this, &AppBase::slotInitializeTools, Qt::QueuedConnection);
+}
+
 void AppBase::slotInitializeTools(void) {
 	
 	// Create tools
@@ -333,7 +337,7 @@ void AppBase::slotRecenter(void) {
 	this->resize(800, 600);
 }
 
-AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
+AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m_logger(nullptr) {
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
 
@@ -348,6 +352,7 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	
 	outputDock->setObjectName("OToolkit_Dock_Output");
 	m_output->setObjectName("OToolkit_Output");
+	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 	QFont f = m_output->font();
 	f.setFamily("Consolas");
@@ -390,5 +395,5 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr) {
 	this->connect(m_toolManager->menuManager(), &MenuManager::exitRequested , this, &AppBase::close);
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 
-	QMetaObject::invokeMethod(this, &AppBase::slotInitializeTools, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
 }

@@ -3,10 +3,10 @@
 #include "Geometry.h"
 #include "Types.h"
 
-#include "OpenTwinCore/CoreTypes.h"
-#include "OpenTwinCore/Color.h"
-#include "OpenTwinFoundation/ContextMenu.h"
-#include "OpenTwinFoundation/TableRange.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/Color.h"
+#include "OTServiceFoundation/ContextMenu.h"
+#include "OTServiceFoundation/TableRange.h"
 
 #include <list>
 #include <vector>

@@ -2,7 +2,7 @@
 #include <exception>
 #include <vector>
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 #include "DataSourceHandler.h"
 

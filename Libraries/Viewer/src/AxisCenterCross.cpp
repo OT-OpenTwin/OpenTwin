@@ -2,7 +2,7 @@
 #include "AxisCenterCross.h"
 #include "ViewerSettings.h"
 
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
 #include <osg/Group>
 #include <osg/Shape>
@@ -114,7 +114,7 @@ void AxisCenterCross::createArrow(osg::Geode * _geode, const ot::Color& _color, 
 	case AxisCenterCross::oY: pos.setY(m_lineLength); break;
 	case AxisCenterCross::oZ: pos.setZ(m_lineLength); break;
 	default:
-		otAssert(0, "Unknown orientation");
+		OTAssert(0, "Unknown orientation");
 		break;
 	}
 	std::list<osg::Vec3> pointList;
@@ -163,7 +163,7 @@ void AxisCenterCross::createArrow(osg::Geode * _geode, const ot::Color& _color, 
 void AxisCenterCross::createDashedLine(osg::Geode * _geode, const ot::Color& _color, float _lineWidth, eOrientation _o) {
 	
 	float stepLen = m_lineLength / 50.f;
-	if (stepLen <= 0.f) { otAssert(0, "No steps"); return; }
+	if (stepLen <= 0.f) { OTAssert(0, "No steps"); return; }
 	std::list<osg::Vec3> pointList;
 
 	for (float pt{ stepLen * 2.f }; pt < m_lineLength; pt += (2.f * stepLen)) {
@@ -175,7 +175,7 @@ void AxisCenterCross::createDashedLine(osg::Geode * _geode, const ot::Color& _co
 		case AxisCenterCross::oY: posF.setY((pt - stepLen) * (-1.f)); posT.setY(pt * (-1.f)); break;
 		case AxisCenterCross::oZ: posF.setZ((pt - stepLen) * (-1.f)); posT.setZ(pt * (-1.f)); break;
 		default:
-			otAssert(0, "Unknown orientation");
+			OTAssert(0, "Unknown orientation");
 			break;
 		}
 		pointList.push_back(osg::Vec3(posF.x(), posF.y(), posF.z()));

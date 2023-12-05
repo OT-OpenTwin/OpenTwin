@@ -4,9 +4,10 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
 
 ot::GraphicsLayoutItem::GraphicsLayoutItem()
 	: ot::GraphicsItem(true), m_layoutWrap(nullptr)
@@ -17,7 +18,8 @@ ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 }
 
 bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	//if (m_layoutWrap) m_layoutWrap->resize(QSizeF(_cfg->size().width(), _cfg->size().height()));
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setAcceptHoverEvents(true);
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
@@ -55,7 +57,7 @@ void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
 	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
-void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(ot::GraphicsItem::GraphicsItemFlag _flags) {
+void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemFlags(_flags);
 }
@@ -86,7 +88,7 @@ ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName)
 }
 
 void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
-	otAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
+	OTAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 	m_layoutWrap->setLayout(_layout);
 

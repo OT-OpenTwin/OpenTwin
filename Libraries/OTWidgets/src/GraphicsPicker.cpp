@@ -14,11 +14,12 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 // Qt header
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qlabel.h>
 
 // std header
 #include <string>
@@ -36,12 +37,12 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation) : m_navigation(
 
 	m_navigation = new ot::TreeWidgetFilter;
 	m_navigation->treeWidget()->setHeaderHidden(true);
-	m_navigation->setWidgetFlags(ot::ApplyFilterOnTextChange);
+	m_navigation->setOTWidgetFlags(ot::ApplyFilterOnTextChange);
 
 	m_viewLayoutW = new QWidget;
 	m_viewLayout = new QGridLayout(m_viewLayoutW);
 
-	m_splitter->addWidget(m_navigation->getWidget());
+	m_splitter->addWidget(m_navigation->getQWidget());
 	m_splitter->addWidget(m_viewLayoutW);
 
 	connect(m_navigation->treeWidget(), &QTreeWidget::itemSelectionChanged, this, &GraphicsPicker::slotSelectionChanged);
@@ -80,11 +81,13 @@ void ot::GraphicsPicker::add(const std::list<ot::GraphicsCollectionCfg*>& _topLe
 }
 
 void ot::GraphicsPicker::clear(void) {
-	for (auto v : m_views) {
-		m_viewLayout->removeWidget(v);
-		delete v;
+	for (auto v : m_previews) {
+		m_viewLayout->removeWidget(v.layoutWidget);
+		delete v.label;
+		delete v.view;
+		delete v.layout;
 	}
-	m_views.clear();
+	m_previews.clear();
 
 	for (auto d : m_previewData) {
 		for (auto e : *d.second) delete e;
@@ -99,11 +102,13 @@ void ot::GraphicsPicker::clear(void) {
 // Private: Slots
 
 void ot::GraphicsPicker::slotSelectionChanged(void) {
-	for (auto v : m_views) {
-		m_viewLayout->removeWidget(v);
-		delete v;
+	for (auto v : m_previews) {
+		m_viewLayout->removeWidget(v.layoutWidget);
+		delete v.label;
+		delete v.view;
+		delete v.layout;
 	}
-	m_views.clear();
+	m_previews.clear();
 
 	std::list<GraphicsView *> previews;
 
@@ -114,20 +119,37 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 				// Construct block
 				ot::GraphicsItem* newItem = ot::GraphicsFactory::itemFromConfig(bCfg);
 				
-				if (newItem) {					
-					GraphicsView* newView = new GraphicsView;
-					newView->setMaximumSize(m_previewSize);
-					newView->setMinimumSize(m_previewSize);
-					newView->setDragMode(QGraphicsView::NoDrag);
+				if (newItem) {
+					newItem->setGraphicsItemContext(ot::GraphicsItem::ItemPreviewContext);
 					
-					newView->getGraphicsScene()->setBackgroundBrush(QBrush());
-					newView->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
-					newItem->setGraphicsItemFlags(ot::GraphicsItem::ItemPreviewContext);
+					PreviewBox box;
 
-					newView->viewAll();
+					box.view = new GraphicsView;
+					box.view->setMaximumSize(m_previewSize);
+					box.view->setMinimumSize(m_previewSize);
+					box.view->setDragMode(QGraphicsView::NoDrag);
+					box.view->setMouseWheelEnabled(false);
+					box.view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+					box.view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-					m_viewLayout->addWidget(newView);
-					m_views.push_back(newView);
+					box.view->getGraphicsScene()->setBackgroundBrush(QBrush());
+					newItem->getQGraphicsItem()->setPos(QPointF(0., 0.));
+					box.view->getGraphicsScene()->addItem(newItem->getQGraphicsItem());
+
+					box.label = new QLabel(QString::fromStdString(bCfg->title()));
+					box.label->setAlignment(Qt::AlignCenter);
+
+					box.layoutWidget = new QWidget;
+
+					box.layout = new QVBoxLayout(box.layoutWidget);
+					box.layout->addWidget(box.view, 0, Qt::AlignCenter);
+					box.layout->addWidget(box.label, 1, Qt::AlignTop);
+
+					m_viewLayout->addWidget(box.layoutWidget);
+
+					m_previews.push_back(box);
+
+					box.view->resetView();
 				}
 				else {
 					OT_LOG_E("Failed to create preview item from factory");
@@ -142,7 +164,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 // Private: Helper
 
 void ot::GraphicsPicker::addCollection(ot::GraphicsCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem) {
-	otAssert(_category, "nullptr provided");
+	OTAssert(_category, "nullptr provided");
 
 	QTreeWidgetItem* categoryItem = nullptr;
 	if (_parentNavigationItem) {
@@ -191,8 +213,8 @@ void ot::GraphicsPicker::addCollections(const std::list<ot::GraphicsCollectionCf
 }
 
 void ot::GraphicsPicker::addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _parentNavigationItem) {
-	otAssert(_item, "nullptr provided");
-	otAssert(_parentNavigationItem, "nullptr provided");
+	OTAssert(_item, "nullptr provided");
+	OTAssert(_parentNavigationItem, "nullptr provided");
 
 	QTreeWidgetItem* treeItem = nullptr;
 	for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
@@ -207,15 +229,14 @@ void ot::GraphicsPicker::addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _p
 		treeItem = new QTreeWidgetItem;
 		treeItem->setText(intern::ntTitle, QString::fromStdString(_item->title()));
 
-		OT_rJSON_createDOC(doc);
-		OT_rJSON_createValueObject(obj);
-		_item->addToJsonObject(doc, obj);
+		JsonDocument doc;
+		_item->addToJsonObject(doc, doc.GetAllocator());
 
 		ot::GraphicsItemCfg* config = nullptr;
 		try {
-			config = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(obj);
+			config = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(doc.GetConstObject());
 			if (config) {
-				config->setFromJsonObject(obj);
+				config->setFromJsonObject(doc.GetConstObject());
 				_parentNavigationItem->addChild(treeItem);
 				treeItem->setHidden(true);
 				this->storePreviewData(_parentNavigationItem, config);
@@ -280,7 +301,7 @@ ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(const QString& _title, QW
 ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(GraphicsPicker* _customPickerWidget, const QString& _title, QWidget* _parentWidget)
 	: QDockWidget(_title, _parentWidget), m_widget(_customPickerWidget)
 {
-	otAssert(m_widget, "No block picker widget provided");
+	OTAssert(m_widget, "No block picker widget provided");
 	setWidget(m_widget->widget());
 }
 

@@ -10,10 +10,10 @@
 #include <memory>
 #include <list>
 
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 #include "EntityMeasurementMetadata.h"
 #include "EntityResearchMetadata.h"
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 class __declspec(dllexport) CrossCollectionAccess
 {

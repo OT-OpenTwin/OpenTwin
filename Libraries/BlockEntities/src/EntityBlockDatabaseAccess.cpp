@@ -1,5 +1,5 @@
 #include "EntityBlockDatabaseAccess.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 
 
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
@@ -262,19 +262,19 @@ void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<o
 
 ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 {
-	std::unique_ptr<ot::GraphicsFlowItemCfg> block( new ot::GraphicsFlowItemCfg());
+	ot::GraphicsFlowItemBuilder block;
+	block.setName(this->getClassName());
+	block.setTitle(this->CreateBlockHeadline());
 
 	const ot::Color colourTitle(ot::Color::Lime);
 	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
-	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	block->setLeftTitleCornerImagePath("Images/Database");
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setLeftTitleCornerImagePath("Images/Database.png");
+	block.setBackgroundImagePath("Images/Database.svg");
 
-	AddConnectors(block.get());
+	AddConnectors(block);
 
-	const std::string blockName = getClassName();
-	const std::string blockTitel = CreateBlockHeadline();
-	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
 }
 
@@ -375,7 +375,6 @@ const std::string& EntityBlockDatabaseAccess::getParameter2QueryComparator()
 	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	return selectProp->getValue();
 }
-
 
 const std::string& EntityBlockDatabaseAccess::getParameter3QueryValue()
 {

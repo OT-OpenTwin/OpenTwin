@@ -8,13 +8,13 @@
 #pragma once
 #include "EntityContainer.h"
 #include "GenericBsonDocument.h"
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 
 #include <string>
 #include <map>
 #include <stdint.h>
 #include <exception>
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer
 {

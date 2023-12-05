@@ -47,16 +47,16 @@ ECHO Clean: Model Entities Library
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\ModelEntities\clean.bat"
 
 ECHO Clean: OpenTwin Communication Library
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication\clean.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTCommunication\clean.bat"
 
 ECHO Clean: OpenTwin Service Foundation Library
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinServiceFoundation\clean.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTServiceFoundation\clean.bat"
 
 ECHO Clean: OpenTwin Core Library
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCore\clean.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTCore\clean.bat"
 
 ECHO Clean: OpenTwin System Library
-CALL "%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinSystem\clean.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Libraries\OTSystem\clean.bat"
 
 ECHO Clean: Qwt Wrapper
 CALL "%OPENTWIN_DEV_ROOT%\Libraries\QwtWrapper\clean.bat"
@@ -127,8 +127,8 @@ CALL "%OPENTWIN_DEV_ROOT%\Services\PHREECService\clean.bat"
 ECHO Clean: Relay Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\RelayService\clean.bat"
 
-ECHO Clean: "Local" Session Service
-CALL "%OPENTWIN_DEV_ROOT%\Services\SessionService\clean.bat"
+ECHO Clean: Local Session Service
+CALL "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService\clean.bat"
 
 ECHO Clean: Tet Mesh Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\clean.bat"

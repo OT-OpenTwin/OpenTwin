@@ -2,9 +2,9 @@
 #include <fstream>
 #include <exception>
 #include "EntityFileCSV.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/TextEncoding.h"
-#include "OpenTwinCore/EncodingGuesser.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCore/TextEncoding.h"
+#include "OTCore/EncodingGuesser.h"
 
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)
@@ -28,7 +28,7 @@ std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fil
 	}
 }
 
-rapidjson::Document FileHandler::StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions)
+ot::JsonDocument FileHandler::StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions)
 {
 	assert(entityIDs.size() == _filePaths.size() * 2);
 	assert(entityVersions.size() == _filePaths.size() * 2);
@@ -126,16 +126,15 @@ std::shared_ptr<EntityFile> FileHandler::CreateNewSourceEntity(const std::string
 	return std::shared_ptr<EntityFile>(newSource);
 }
 
-rapidjson::Document FileHandler::CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers)
+ot::JsonDocument FileHandler::CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers)
 {
-	rapidjson::Document reply;
-	reply.SetObject();
-	ot::rJSON::add(reply,OT_ACTION_MEMBER,OT_ACTION_CMD_MODEL_ExecuteFunction);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_MODEL_FunctionName, _subsequentFunction);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_FILE_OriginalName, _filePaths);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_MODEL_TopologyEntityIDList, topoID);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, topoVers);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_MODEL_DataEntityIDList, dataID);
-	ot::rJSON::add(reply, OT_ACTION_PARAM_MODEL_DataEntityVersionList, dataVers);
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_subsequentFunction, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonArray(_filePaths, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, ot::JsonArray(topoID, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, ot::JsonArray(topoVers, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_MODEL_DataEntityIDList, ot::JsonArray(dataID, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_MODEL_DataEntityVersionList, ot::JsonArray(dataVers, reply.GetAllocator()), reply.GetAllocator());
 	return reply;
 }

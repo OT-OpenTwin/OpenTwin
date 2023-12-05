@@ -1,7 +1,7 @@
 #pragma once
 
 #include "openTwin/UIPluginAPISharedTypes.h"
-#include "OpenTwinCore/ServiceBase.h"
+#include "OTCore/ServiceBase.h"
 
 #include <string>
 #include <qstring.h>

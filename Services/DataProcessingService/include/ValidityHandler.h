@@ -1,6 +1,6 @@
 #pragma
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
-#include "OpenTwinCore/FolderNames.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTCore/FolderNames.h"
 #include "EntityBlock.h"
 #include "Graph.h"
 

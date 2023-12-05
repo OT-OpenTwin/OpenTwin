@@ -115,7 +115,7 @@ namespace ak {
 		//! @brief Will set the provided directories to the colorStyle
 		//! @param _directory The new search directory to add
 		void setDirectories(
-			const std::vector<QString> &	_directories
+			const QStringList&	_directories
 		) {
 			m_directories = _directories;
 		}
@@ -156,6 +156,6 @@ namespace ak {
 		aColor					m_controlsSelectedBackColor;
 		aColor					m_controlsSelectedForeColor;
 
-		std::vector<QString>	m_directories;					//! Contains all directories to scan for incons
+		QStringList	m_directories;					//! Contains all directories to scan for incons
 	};
 } // namespace ak

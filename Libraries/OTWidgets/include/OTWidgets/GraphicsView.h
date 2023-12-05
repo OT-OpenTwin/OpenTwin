@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsview.h>
@@ -21,7 +21,7 @@
 namespace ot {
 
 	class GraphicsItem;
-	class GraphicsDirectConnectionItem;
+	class GraphicsConnectionItem;
 	class GraphicsScene;
 
 	//! @brief View widget used to display GraphicsItems
@@ -33,6 +33,7 @@ namespace ot {
 		virtual ~GraphicsView();
 
 		void resetView(void);
+		void fitInCurrentView(void);
 		void viewAll(void);
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
@@ -41,7 +42,7 @@ namespace ot {
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
 		GraphicsItem* getItem(const std::string& _itemUid);
-		GraphicsDirectConnectionItem* getConnection(const std::string& _connectionUid);
+		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
 		
 		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
 
@@ -52,7 +53,7 @@ namespace ot {
 
 		void addItem(ot::GraphicsItem* _item);
 		void removeItem(const std::string& _itemUid);
-		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest);
+		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest, const GraphicsConnectionCfg& _config);
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 
@@ -76,7 +77,6 @@ namespace ot {
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
-		virtual void enterEvent(QEvent* _event) override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
 		virtual void mouseMoveEvent(QMouseEvent* _event) override;
@@ -97,6 +97,6 @@ namespace ot {
 		QPoint m_lastPanPos;
 
 		std::map<std::string, ot::GraphicsItem*> m_items;
-		std::map<std::string, ot::GraphicsDirectConnectionItem*> m_connections;
+		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
 	};
 }

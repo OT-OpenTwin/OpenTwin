@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 
  // Type definition
 typedef ot::UID ViewerUIDtype;

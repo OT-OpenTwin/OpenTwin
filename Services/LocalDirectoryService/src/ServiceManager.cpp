@@ -4,12 +4,11 @@
 #include "Configuration.h"
 
 // OpenTwin header
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinSystem/PortManager.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTSystem/PortManager.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
 
 // C++ header
 #include <iostream>
@@ -26,98 +25,97 @@ ServiceManager::~ServiceManager() {
 	m_isShuttingDown = true;
 }
 
-void ServiceManager::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) {
+void ServiceManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) {
 	// Info
-	ot::rJSON::add(_document, _object, "Services.IP", m_servicesIpAddress);
-	ot::rJSON::add(_document, _object, "LastError", m_lastError);
-	ot::rJSON::add(_document, _object, "Site.ID", m_siteID);
-	ot::rJSON::add(_document, _object, "IsShuttingDown", m_isShuttingDown);
-	ot::rJSON::add(_document, _object, "Starter.ThreadRunning", (m_threadServiceStarter != nullptr));
-	ot::rJSON::add(_document, _object, "Initializer.ThreadRunning", (m_threadServiceInitializer != nullptr));
-	ot::rJSON::add(_document, _object, "HealthCheck.ThreadRunning", (m_threadHealthCheck != nullptr));
+	_object.AddMember("Services.IP", ot::JsonString(m_servicesIpAddress, _allocator), _allocator);
+	_object.AddMember("LastError", ot::JsonString(m_lastError, _allocator), _allocator);
+	_object.AddMember("Site.ID", ot::JsonString(m_siteID, _allocator), _allocator);
+	_object.AddMember("IsShuttingDown", m_isShuttingDown, _allocator);
+	_object.AddMember("Starter.ThreadRunning", (m_threadServiceStarter != nullptr), _allocator);
+	_object.AddMember("Initializer.ThreadRunning", (m_threadServiceInitializer != nullptr), _allocator);
+	_object.AddMember("HealthCheck.ThreadRunning", (m_threadHealthCheck != nullptr), _allocator);
 	
 	// Stopping Services
 	m_mutexStoppingServices.lock();
-	OT_rJSON_createValueArray(stoppingArray);
+	ot::JsonArray stoppingArray;
 	for (auto s : m_stoppingServices) {
-		OT_rJSON_createValueObject(stoppingObj);
-		s->addToJsonObject(_document, stoppingObj);
-		stoppingArray.PushBack(stoppingObj, _document.GetAllocator());
+		ot::JsonObject stoppingObj;
+		s->addToJsonObject(stoppingObj, _allocator);
+		stoppingArray.PushBack(stoppingObj, _allocator);
 	}
 	m_mutexStoppingServices.unlock();
-	ot::rJSON::add(_document, _object, "StoppingServices", stoppingArray);
+	_object.AddMember("StoppingServices", stoppingArray, _allocator);
 
 	// Running Services
 	m_mutexServices.lock();
-	OT_rJSON_createValueArray(sessionsArray);
+	ot::JsonArray sessionsArray;
 	for (auto s : m_services) {
-		OT_rJSON_createValueArray(serviceArray);
+		ot::JsonArray serviceArray;
 		for (auto service : *s.second) {
-			OT_rJSON_createValueObject(serviceObject);
-			service->addToJsonObject(_document, serviceObject);
-			serviceArray.PushBack(serviceObject, _document.GetAllocator());
+			ot::JsonObject serviceObj;
+			service->addToJsonObject(serviceObj, _allocator);
+			serviceArray.PushBack(serviceObj, _allocator);
 		}
 
-		OT_rJSON_createValueObject(sessionInfoObj);
-		s.first.addToJsonObject(_document, sessionInfoObj);
+		ot::JsonObject sessionInfoObj;
+		s.first.addToJsonObject(sessionInfoObj, _allocator);
 
-		OT_rJSON_createValueObject(sessionTopLvlObj);
-		ot::rJSON::add(_document, sessionTopLvlObj, "SessionInformation", sessionInfoObj);
-		ot::rJSON::add(_document, sessionTopLvlObj, "Services", serviceArray);
+		ot::JsonObject sessionTopLvlObj;
+		_object.AddMember("SessionInformation", sessionInfoObj, _allocator);
+		_object.AddMember("Services", serviceArray, _allocator);
 
-		sessionsArray.PushBack(sessionTopLvlObj, _document.GetAllocator());
+		sessionsArray.PushBack(sessionTopLvlObj, _allocator);
 	}
 	m_mutexServices.unlock();
-	ot::rJSON::add(_document, _object, "AliveSessions", sessionsArray);
+	_object.AddMember("AliveSessions", sessionsArray, _allocator);
 
 	// Initializing Services
 	m_mutexInitializingServices.lock();
-	OT_rJSON_createValueArray(iniArray);
+	ot::JsonArray iniArray;
 	for (auto s : m_initializingServices) {
-		OT_rJSON_createValueObject(sessionInfoObj);
-		s.startInfo.session.addToJsonObject(_document, sessionInfoObj);
+		ot::JsonObject sessionInfoObj;
+		s.startInfo.session.addToJsonObject(sessionInfoObj, _allocator);
 
-		OT_rJSON_createValueObject(serviceInfoObj);
-		s.startInfo.service.addToJsonObject(_document, serviceInfoObj);
+		ot::JsonObject serviceInfoObj;
+		s.startInfo.service.addToJsonObject(serviceInfoObj, _allocator);
 
-		OT_rJSON_createValueObject(requestObj);
-		ot::rJSON::add(_document, requestObj, "SessionInformation", sessionInfoObj);
-		ot::rJSON::add(_document, requestObj, "ServiceInformation", serviceInfoObj);
-		ot::rJSON::add(_document, requestObj, "StartAttempt", s.startInfo.startAttempt);
+		ot::JsonObject requestObj;
+		requestObj.AddMember("SessionInformation", sessionInfoObj, _allocator);
+		requestObj.AddMember("ServiceInformation", serviceInfoObj, _allocator);
+		requestObj.AddMember("StartAttempt", s.startInfo.startAttempt, _allocator);
 
+		ot::JsonObject serviceObj;
+		s.service->addToJsonObject(serviceObj, _allocator);
 
-		OT_rJSON_createValueObject(serviceObj);
-		s.service->addToJsonObject(_document, serviceObj);
+		ot::JsonObject iniObj;
+		iniObj.AddMember("Service", serviceObj, _allocator);
+		iniObj.AddMember("StartInformation", requestObj, _allocator);
+		iniObj.AddMember("InitializeAttempt", s.initializeAttempt, _allocator);
 
-		OT_rJSON_createValueObject(iniObj);
-		ot::rJSON::add(_document, iniObj, "Service", serviceObj);
-		ot::rJSON::add(_document, iniObj, "StartInformation", requestObj);
-		ot::rJSON::add(_document, iniObj, "InitializeAttempt", s.initializeAttempt);
-
-		iniArray.PushBack(iniObj, _document.GetAllocator());
+		iniArray.PushBack(iniObj, _allocator);
 	}
 	m_mutexInitializingServices.unlock();
-	ot::rJSON::add(_document, _object, "InitializingServices", iniArray);
+	_object.AddMember("InitializingServices", iniArray, _allocator);
 
 	// Startng Services
 	m_mutexRequestedServices.lock();
-	OT_rJSON_createValueArray(startArray);
+	ot::JsonArray startArray;
 	for (auto s : m_requestedServices) {
-		OT_rJSON_createValueObject(sessionInfoObj);
-		s.session.addToJsonObject(_document, sessionInfoObj);
+		ot::JsonObject sessionInfoObj;
+		s.session.addToJsonObject(sessionInfoObj, _allocator);
 
-		OT_rJSON_createValueObject(serviceInfoObj);
-		s.service.addToJsonObject(_document, serviceInfoObj);
+		ot::JsonObject serviceInfoObj;
+		s.service.addToJsonObject(serviceInfoObj, _allocator);
 
-		OT_rJSON_createValueObject(startObj);
-		ot::rJSON::add(_document, startObj, "SessionInformation", sessionInfoObj);
-		ot::rJSON::add(_document, startObj, "ServiceInformation", serviceInfoObj);
-		ot::rJSON::add(_document, startObj, "StartAttempt", s.startAttempt);
+		ot::JsonObject startObj;
+		startObj.AddMember("SessionInformation", sessionInfoObj, _allocator);
+		startObj.AddMember("ServiceInformation", serviceInfoObj, _allocator);
+		startObj.AddMember("StartAttempt", s.startAttempt, _allocator);
 
-		startArray.PushBack(startObj, _document.GetAllocator());
+		startArray.PushBack(startObj, _allocator);
 	}
 	m_mutexRequestedServices.unlock();
-	ot::rJSON::add(_document, _object, "StartingServices", startArray);
+	_object.AddMember("StartingServices", startArray, _allocator);
 }
 
 // ##################################################################################################################################
@@ -126,9 +124,9 @@ void ServiceManager::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _obj
 
 bool ServiceManager::requestStartService(const SessionInformation& _sessionInformation, const ServiceInformation& _serviceInformation) {
 	// Check if the service is supported
-	if (!LDS_CFG.supportsService(_serviceInformation.getName())) {
-		OT_LOG_E("The service \"" + _serviceInformation.getName() + "\" is not supported by this Local Directory Service");
-		m_lastError = "The service \"" + _serviceInformation.getName() + "\" is not supported by this Local Directory Service";
+	if (!LDS_CFG.supportsService(_serviceInformation.name())) {
+		OT_LOG_E("The service \"" + _serviceInformation.name() + "\" is not supported by this Local Directory Service");
+		m_lastError = "The service \"" + _serviceInformation.name() + "\" is not supported by this Local Directory Service";
 		return false;
 	}
 
@@ -245,7 +243,7 @@ void ServiceManager::serviceDisconnected(const std::string& _sessionID, const Se
 		for (std::list<RequestedService>::iterator it = m_requestedServices.begin();
 			it != m_requestedServices.end(); it++)
 		{
-			if (it->service.getName() == _info.getName() && it->service.getType() == _info.getType()) {
+			if (it->service.name() == _info.name() && it->service.type() == _info.type()) {
 				m_requestedServices.erase(it);
 				erased = true;
 				break;
@@ -262,8 +260,8 @@ void ServiceManager::serviceDisconnected(const std::string& _sessionID, const Se
 		erased = false;
 		for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); it++) {
 			if (it->startInfo.session.id() == _sessionID && 
-				it->startInfo.service.getName() == _info.getName() &&
-				it->startInfo.service.getType() == _info.getType()) 
+				it->startInfo.service.name() == _info.name() &&
+				it->startInfo.service.type() == _info.type())
 			{
 				m_stoppingServices.push_back(it->service);
 				m_initializingServices.erase(it);
@@ -279,8 +277,8 @@ void ServiceManager::serviceDisconnected(const std::string& _sessionID, const Se
 	for (auto s : m_services) {
 		if (s.first.id() == _sessionID) {
 			for (auto it = s.second->begin(); it != s.second->end(); it++) {
-				if ((*it._Ptr)->information().getName() == _info.getName() && 
-					(*it._Ptr)->information().getType() == _info.getType() &&
+				if ((*it._Ptr)->information().name() == _info.name() &&
+					(*it._Ptr)->information().type() == _info.type() &&
 					(*it._Ptr)->url() == _serviceURL) 
 				{
 					m_stoppingServices.push_back((*it._Ptr));
@@ -318,38 +316,38 @@ void ServiceManager::runThreads(void) {
 }
 
 void ServiceManager::serviceStartFailed(RequestedService _info) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceStartupFailed);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, _info.service.getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, _info.service.getType());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _info.session.id());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceStartupFailed, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_info.service.name(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_info.service.type(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_info.session.id(), doc.GetAllocator()), doc.GetAllocator());
 
 	// Clean data
 	//todo: Check which information to clear
 
 	// Fire message
-	ot::msg::sendAsync("", _info.session.sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(doc));
+	ot::msg::sendAsync("", _info.session.sessionServiceURL(), ot::EXECUTE, doc.toJson());
 }
 
 void ServiceManager::sendInitializeMessage(InitializingService _info) {
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_Init);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, _info.service->information().getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, _info.service->information().getType());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, _info.startInfo.session.id());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_SERVICE_URL, _info.startInfo.session.sessionServiceURL());
-
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_info.service->information().name(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_info.service->information().type(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_info.startInfo.session.id(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_info.startInfo.session.sessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	
 	// Send message
 	std::string response;
-	if (!ot::msg::send("", _info.service->url(), ot::EXECUTE, ot::rJSON::toJSON(doc), response)) {
-		OT_LOG_W("Failed to send initialize message to service (name = \"" + _info.service->information().getName() + "\"; type = \"" +
-			_info.service->information().getType() + "\"; url = \"" + _info.service->url() + "\")");
+	if (!ot::msg::send("", _info.service->url(), ot::EXECUTE, doc.toJson(), response)) {
+		OT_LOG_W("Failed to send initialize message to service (name = \"" + _info.service->information().name() + "\"; type = \"" +
+			_info.service->information().type() + "\"; url = \"" + _info.service->url() + "\")");
 
 		serviceInitializeFailed(_info);
 	}
 	else if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_W("Invalid initialize message response from service (name = \"" + _info.service->information().getName() + "\"; type = \"" +
-			_info.service->information().getType() + "\"; url = \"" + _info.service->url() + "\"; response = \"" + response + ")");
+		OT_LOG_W("Invalid initialize message response from service (name = \"" + _info.service->information().name() + "\"; type = \"" +
+			_info.service->information().type() + "\"; url = \"" + _info.service->url() + "\"; response = \"" + response + ")");
 
 		serviceInitializeFailed(_info);
 	}
@@ -392,7 +390,7 @@ void ServiceManager::notifySessionEmergencyShutdown(const SessionInformation& _s
 	// Clean up startup requests
 	m_mutexRequestedServices.lock();
 
-	OT_LOG_E("Preparing Session Emergency Shutdown for session: \"" + session.id() + "\". Reason: Service crashed (Name = \"" + service.getName() + "\"; Type = \"" + service.getType() + "\")");
+	OT_LOG_E("Preparing Session Emergency Shutdown for session: \"" + session.id() + "\". Reason: Service crashed (Name = \"" + service.name() + "\"; Type = \"" + service.type() + "\")");
 
 	std::list<RequestedService>::iterator it;
 	bool erased = true;
@@ -421,14 +419,14 @@ void ServiceManager::notifySessionEmergencyShutdown(const SessionInformation& _s
 	m_mutexRequestedServices.unlock();
 		
 	// Notify session service about the crash
-	OT_rJSON_createDOC(doc);
-	ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceFailure);
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SESSION_ID, session.id());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_NAME, service.getName());
-	ot::rJSON::add(doc, OT_ACTION_PARAM_SERVICE_TYPE, service.getType());
-
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceFailure, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(service.name(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service.type(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(session.id(), doc.GetAllocator()), doc.GetAllocator());
+	
 	// Fire message
-	ot::msg::sendAsync("", session.sessionServiceURL(), ot::EXECUTE, ot::rJSON::toJSON(doc));
+	ot::msg::sendAsync("", session.sessionServiceURL(), ot::EXECUTE, doc.toJson());
 }
 
 void ServiceManager::workerServiceStarter(void) {
@@ -451,10 +449,10 @@ void ServiceManager::workerServiceStarter(void) {
 			info.startAttempt = info.startAttempt + 1;
 
 			// Check if max restarts is reached
-			if (info.startAttempt > info.service.getMaxStartupRestarts()) {
-				otAssert(0, "Maximum number of start attempts reached");
-				OT_LOG_E("Maximum number of start attempts (" + std::to_string(info.service.getMaxStartupRestarts()) + 
-					") reached for service (name = \"" + info.service.getName() + "\"; type = \"" + info.service.getType() + "\")");
+			if (info.startAttempt > info.service.maxStartupRestarts()) {
+				OTAssert(0, "Maximum number of start attempts reached");
+				OT_LOG_E("Maximum number of start attempts (" + std::to_string(info.service.maxStartupRestarts()) + 
+					") reached for service (name = \"" + info.service.name() + "\"; type = \"" + info.service.type() + "\")");
 				
 				// Notify and skip
 				serviceStartFailed(info);
@@ -479,7 +477,7 @@ void ServiceManager::workerServiceStarter(void) {
 				serviceStartFailed(info);
 			}
 			else {
-				OT_LOG_D("Service was started (name = \"" + info.service.getName() + "\"; type = \"" + info.service.getType() + "\")");
+				OT_LOG_D("Service was started (name = \"" + info.service.name() + "\"; type = \"" + info.service.type() + "\")");
 
 				// Move from start to initialize
 				m_mutexInitializingServices.lock();
@@ -498,9 +496,9 @@ void ServiceManager::workerServiceStarter(void) {
 
 void ServiceManager::workerServiceInitializer(void) {
 	// Create ping command once
-	OT_rJSON_createDOC(pingDoc);
-	ot::rJSON::add(pingDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_Ping);
-	std::string pingCommand = ot::rJSON::toJSON(pingDoc);
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string pingCommand = pingDoc.toJson();
 
 	while (!m_isShuttingDown) {
 
@@ -520,15 +518,15 @@ void ServiceManager::workerServiceInitializer(void) {
 			info.initializeAttempt = info.initializeAttempt + 1;
 
 			if (info.service->checkAlive()) {
-				OT_LOG_D("Pinging service (name = \"" + info.service->information().getName() + "\"; type = \"" + info.service->information().getType() + "\")");
+				OT_LOG_D("Pinging service (name = \"" + info.service->information().name() + "\"; type = \"" + info.service->information().type() + "\")");
 
 				// Attempt to send ping
 				std::string response;
 				if (!ot::msg::send("", info.service->url(), ot::EXECUTE, pingCommand, response, 1000)) {
 					// Failed to ping
 
-					OT_LOG_D("Failed to ping service (attempt = \"" + std::to_string(info.initializeAttempt) + "\"; name = \"" + info.service->information().getName() + "\"; type = \"" +
-						info.service->information().getType() + "\"; url = \"" + info.service->url() + "\")");
+					OT_LOG_D("Failed to ping service (attempt = \"" + std::to_string(info.initializeAttempt) + "\"; name = \"" + info.service->information().name() + "\"; type = \"" +
+						info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
 
 					if (info.initializeAttempt > 3) {
 						OT_LOG_W("Failed to ping service 3 times. Moving service back to restart");
@@ -543,8 +541,8 @@ void ServiceManager::workerServiceInitializer(void) {
 				else if (response != OT_ACTION_CMD_Ping) {
 					// Invalid response
 
-					OT_LOG_W("Invalid response from service (name = \"" + info.service->information().getName() + "\"; type = \"" +
-						info.service->information().getType() + "\"; url = \"" + info.service->url() + "\")");
+					OT_LOG_W("Invalid response from service (name = \"" + info.service->information().name() + "\"; type = \"" +
+						info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
 
 					if (info.initializeAttempt > 3) {
 						serviceInitializeFailed(info);
@@ -556,8 +554,8 @@ void ServiceManager::workerServiceInitializer(void) {
 					}
 				}
 				else {
-					OT_LOG_D("Service ping success (name = \"" + info.service->information().getName() + "\"; type = \"" +
-						info.service->information().getType() + "\"; url = \"" + info.service->url() + "\")");
+					OT_LOG_D("Service ping success (name = \"" + info.service->information().name() + "\"; type = \"" +
+						info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
 
 					// Service alive
 
@@ -565,8 +563,8 @@ void ServiceManager::workerServiceInitializer(void) {
 				}
 			}
 			else {
-				OT_LOG_W("Service died while attempting to ping (name = \"" + info.service->information().getName() + "\"; type = \"" +
-					info.service->information().getType() + "\"; url = \"" + info.service->url() + "\")");
+				OT_LOG_W("Service died while attempting to ping (name = \"" + info.service->information().name() + "\"; type = \"" +
+					info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
 
 				serviceInitializeFailed(info);
 			}
@@ -585,7 +583,7 @@ void ServiceManager::workerHealthCheck(void) {
 				for (auto service : *session.second) {
 					// Chek if service crashed
 					if (!service->checkAlive()) {
-						if (service->startCounter() < service->information().getMaxCrashRestarts()) {
+						if (service->startCounter() < service->information().maxCrashRestarts()) {
 							// Attempt to restart service, if successful the list did not change and
 							// we can continue the health check
 							if (restartServiceAfterCrash(session.first, service)) continue;

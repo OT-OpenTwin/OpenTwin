@@ -48,6 +48,8 @@ public:
 
 	virtual otoolkit::SettingsRef createSettingsInstance(void) override;
 
+	virtual const QWidget* rootWidget(void) const override { return this; };
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Qt base functions
@@ -77,6 +79,7 @@ private slots:
 	void slotLogError(const QString& _sender, const QString& _message);
 	void slotSetStatus(const QString& _text);
 	void slotSetErrorStatus(const QString& _text);
+	void slotInitialize(void);
 	void slotInitializeTools(void);
 	void slotRecenter(void);
 

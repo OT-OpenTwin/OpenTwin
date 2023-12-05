@@ -23,7 +23,6 @@
     <ClCompile Include="src\SocketServer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Logger.h" />
     <QtMoc Include="include\SocketServer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

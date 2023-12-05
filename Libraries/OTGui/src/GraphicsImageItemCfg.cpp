@@ -8,21 +8,32 @@
 #include "OTGui/GraphicsImageItemCfg.h"
 
 #define OT_JSON_MEMBER_ImagePath "ImagePath"
+#define OT_JSON_MEMBER_ColorMask "ColorMask"
+#define OT_JSON_MEMBER_MaintainAspectRatio "MaintainAspectRatio"
 
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg);
 
-ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath) : m_imageSubPath(_imageSubPath) {}
+ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
+	: m_imageSubPath(_imageSubPath), m_maintainAspectRatio(false), m_colorMask(-1.f, -1.f, -1.f, -1.f)
+{}
 
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
-void ot::GraphicsImageItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
-	GraphicsItemCfg::addToJsonObject(_document, _object);
+void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_ImagePath, m_imageSubPath);
+	_object.AddMember(OT_JSON_MEMBER_ImagePath, JsonString(m_imageSubPath, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_MaintainAspectRatio, m_maintainAspectRatio, _allocator);
+
+	JsonObject maskObj;
+	m_colorMask.addToJsonObject(maskObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ColorMask, maskObj, _allocator);
 }
 
-void ot::GraphicsImageItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsImageItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_ImagePath, String);
-	m_imageSubPath = _object[OT_JSON_MEMBER_ImagePath].GetString();
+	
+	m_imageSubPath = json::getString(_object, OT_JSON_MEMBER_ImagePath);
+	m_maintainAspectRatio = json::getBool(_object, OT_JSON_MEMBER_MaintainAspectRatio);
+	m_colorMask.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_ColorMask));
 }

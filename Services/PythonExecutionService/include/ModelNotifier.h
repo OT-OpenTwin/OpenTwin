@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinFoundation/AbstractModelNotifier.h"
+#include "OTServiceFoundation/AbstractModelNotifier.h"
 
 // C++ header
 #include <string>

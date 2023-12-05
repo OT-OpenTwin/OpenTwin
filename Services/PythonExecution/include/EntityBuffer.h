@@ -10,7 +10,7 @@
 #include "EntityBase.h"
 #include <string>
 #include <memory>
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 #include "EntityResultTable.h"
 #include "ClassFactory.h"
 #include "ClassFactoryBlock.h"

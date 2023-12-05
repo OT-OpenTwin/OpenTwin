@@ -157,7 +157,7 @@ void ak::aTableWidget::setCellForecolor (
 		setItem(_row, _column, itm);
 	}
 	// Set item text color
-	itm->setTextColor(_color);
+	itm->setForeground(_color);
 }
 
 void ak::aTableWidget::setColumnHeader(

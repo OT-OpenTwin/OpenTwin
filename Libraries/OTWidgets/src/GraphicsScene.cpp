@@ -4,18 +4,21 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/GraphicsLineItem.h"
+#include "OTWidgets/GraphicsConnectionPreviewItem.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::GraphicsScene::GraphicsScene(GraphicsView* _view) : m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_lineItem(nullptr) {
-
+ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
+	: m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr), m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine) 
+{
+	
 }
 
 ot::GraphicsScene::~GraphicsScene() {}
@@ -43,11 +46,12 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	for (auto itm : lst) {
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
-		OTAssertNullptr(actualItm);
-		if (actualItm->graphicsItemFlags() & ot::GraphicsItem::ItemIsConnectable) {
-			this->startConnection(actualItm);
-			QGraphicsScene::mouseDoubleClickEvent(_event);
-			return;
+		if (actualItm) {
+			if (actualItm->graphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
+				this->startConnection(actualItm);
+				QGraphicsScene::mouseDoubleClickEvent(_event);
+				return;
+			}
 		}
 	}
 
@@ -57,9 +61,10 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 }
 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
-	if (m_lineItem) {
+	if (m_connectionPreview) {
 		OTAssertNullptr(m_connectionOrigin);
-		m_lineItem->setLine(QLineF(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(), _event->scenePos()));
+		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
+		m_connectionPreview->setDestPos(_event->scenePos());
 	}
 	QGraphicsScene::mouseMoveEvent(_event);
 }
@@ -69,17 +74,17 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		// Start new connection
 		m_connectionOrigin = _item;
 
-		// ToDo: add preview line
-		m_lineItem = new GraphicsLineItem;
+		m_connectionPreview = new GraphicsConnectionPreviewItem;
 		QPen p;
 		p.setColor(QColor(64, 64, 255));
 		p.setWidth(1);
-		m_lineItem->setPen(p);
-		m_lineItem->setLine(QLineF(
-			m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center(),
-			m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center()
-		));
-		this->addItem(m_lineItem->getQGraphicsItem());
+		m_connectionPreview->setPen(p);
+		m_connectionPreview->setConnectionStyle(m_connectionPreviewStyle);
+		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
+		m_connectionPreview->setOriginDir(m_connectionOrigin->connectionDirection());
+		m_connectionPreview->setDestPos(m_connectionPreview->originPos());
+		m_connectionPreview->setDestDir(ot::inversedConnectionDirection(m_connectionOrigin->connectionDirection()));
+		this->addItem(m_connectionPreview);
 		
 		return;
 	}
@@ -96,10 +101,10 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 
 void ot::GraphicsScene::stopConnection(void) {
 	// Stop connection
-	if (m_lineItem) {
-		removeItem(m_lineItem);
-		delete m_lineItem;
-		m_lineItem = nullptr;
+	if (m_connectionPreview) {
+		this->removeItem(m_connectionPreview);
+		delete m_connectionPreview;
+		m_connectionPreview = nullptr;
 		m_connectionOrigin = nullptr;
 	}
 }

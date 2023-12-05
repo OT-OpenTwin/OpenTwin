@@ -1,5 +1,5 @@
 #include "EntityBlockPlot1D.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 
 EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
@@ -75,18 +75,16 @@ void EntityBlockPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view& do
 
 ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 {
-	std::unique_ptr<ot::GraphicsFlowItemCfg> block(new ot::GraphicsFlowItemCfg());
+	ot::GraphicsFlowItemBuilder block;
+	block.setName(this->getClassName());
+	block.setTitle(this->CreateBlockHeadline());
 
 	const ot::Color colourTitle(ot::Color::Yellow);
-	const ot::Color colourBackground(ot::Color::White);
-	block->setTitleBackgroundColor(colourTitle.rInt(), colourTitle.gInt(), colourTitle.bInt());
-	block->setBackgroundColor(colourBackground.rInt(), colourBackground.gInt(), colourBackground.gInt());
-	//block->setBackgroundImagePath("Images/Graph");
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setBackgroundImagePath("Images/Graph.svg");
+	//block.setToolTip("Plots the X and Y values in a 1D plot");
+	AddConnectors(block);
 
-	AddConnectors(block.get());
-
-	const std::string blockName = getClassName();
-	const std::string blockTitel = CreateBlockHeadline();
-	auto graphicsItemConfig = block->createGraphicsItem(blockName, blockTitel);
+	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
 }

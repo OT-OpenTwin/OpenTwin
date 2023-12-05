@@ -12,7 +12,7 @@
 #include "EntityMaterial.h"
 #include "EntityMesh.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include "TopExp_Explorer.hxx"
 #include "TopoDS_Face.hxx"

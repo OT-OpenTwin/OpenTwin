@@ -6,8 +6,8 @@
  * \date   April 2023
  *********************************************************************/
 #pragma once
-#include <OpenTwinFoundation/UiComponent.h>
-#include <OpenTwinFoundation/ModelComponent.h>
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include <string>
 #include <vector>

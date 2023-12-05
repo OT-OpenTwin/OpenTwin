@@ -1,8 +1,12 @@
+// OpenTwin header
 #include "EntityFile.h"
+#include "OTCore/JSON.h"
+#include "OTCommunication/ActionTypes.h"
+
+// std header
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <OpenTwinCommunication/ActionTypes.h>
 
 EntityFile::EntityFile(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner) :
 	EntityBase(ID,parent,obs,ms,factory,owner)
@@ -36,13 +40,13 @@ void EntityFile::addVisualizationNodes(void)
 		treeIcons.visibleIcon = "TextVisible";
 		treeIcons.hiddenIcon = "TextHidden";
 
-		OT_rJSON_createDOC(doc);
-		ot::rJSON::add(doc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_AddContainerNode);
-		ot::rJSON::add(doc, OT_ACTION_PARAM_UI_TREE_Name, getName());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_EntityID, getEntityID());
-		ot::rJSON::add(doc, OT_ACTION_PARAM_MODEL_ITM_IsEditable, getEditable());
-
-		treeIcons.addToJsonDoc(&doc);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+		
+		treeIcons.addToJsonDoc(doc);
 
 		getObserver()->sendMessageToViewer(doc);
 	}

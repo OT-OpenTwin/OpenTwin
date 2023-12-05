@@ -2,7 +2,7 @@
 #include <string>
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "SerializeWithBSON.h"
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 
 namespace ot
 {

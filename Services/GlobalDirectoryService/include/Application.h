@@ -11,11 +11,10 @@
 #include "StartupDispatcher.h"
 
 // Open twin header
-#include <OpenTwinCore/ServiceBase.h>		// Base class
-#include <OpenTwinFoundation/OTObject.h>		// Base class
-#include <OpenTwinCore/rJSON.h>					// open twins rapid json layer
-#include <OpenTwinCommunication/actionTypes.h>
-#include <OpenTwinFoundation/IDManager.h>
+#include "OTCore/ServiceBase.h"		// Base class
+#include "OTServiceFoundation/OTObject.h"		// Base class
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/IDManager.h"
 
 // C++ header
 #include <string>

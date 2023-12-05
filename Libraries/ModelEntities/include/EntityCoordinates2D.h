@@ -1,6 +1,6 @@
 #pragma once
 #include "EntityBase.h"
-#include "OpenTwinCore/Point2D.h"
+#include "OTCore/Point2D.h"
 
 class __declspec(dllexport) EntityCoordinates2D : public EntityBase
 {

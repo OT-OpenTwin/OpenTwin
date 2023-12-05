@@ -7,7 +7,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header

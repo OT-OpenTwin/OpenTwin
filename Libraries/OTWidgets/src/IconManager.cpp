@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/IconManager.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -30,23 +30,20 @@ void ot::IconManager::addSearchPath(const QString& _path) {
 }
 
 QIcon& ot::IconManager::getIcon(const QString& _subPath) {
-	return this->get<QIcon>(_subPath, { ".png", ".jpg", ".ico" }, m_icons);
+	return this->get<QIcon>(_subPath, m_icons);
 }
 
 QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {
-	return this->get<QPixmap>(_subPath, { ".png", ".jpg" }, m_pixmaps);
+	return this->get<QPixmap>(_subPath, m_pixmaps);
 }
 
 QMovie& ot::IconManager::getMovie(const QString& _subPath) {
-	return this->get<QMovie>(_subPath, { ".gif" }, m_movies);
+	return this->get<QMovie>(_subPath, m_movies);
 }
 
-QString ot::IconManager::findFullPath(const QString& _subPath, const QStringList& _extensions) {
+QString ot::IconManager::findFullPath(const QString& _subPath) {
 	for (auto p : m_searchPaths) {
-		for (auto ext : _extensions) {
-			if (QFile::exists(p + _subPath + ext)) return p + _subPath + ext;
-		}
-		
+		if (QFile::exists(p + _subPath)) return p + _subPath;
 	}
 	return QString();
 }

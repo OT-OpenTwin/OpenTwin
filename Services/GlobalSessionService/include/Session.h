@@ -1,6 +1,11 @@
+//! @file Session.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 #include <string>
 
 class Session {
@@ -12,6 +17,6 @@ public:
 
 	Session& operator = (const Session& _other);
 
-	OT_PROPERTY(std::string, ID);
-	OT_PROPERTY(std::string, UserName);
+	OT_PROPERTY_REF(std::string, id, setId, id);
+	OT_PROPERTY_REF(std::string, userName, setUserName, userName);
 };

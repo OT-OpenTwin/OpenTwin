@@ -12,11 +12,11 @@
 #include <Windows.h>
 #include <string>
 
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCore/rJSON.h"
-#include "OpenTwinCommunication/IpConverter.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCore/JSON.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/Msg.h"
 
 // SessionService header
 
@@ -49,12 +49,13 @@ static std::string globalServiceURL;
 
 std::string dispatchAction(const char * _json, const char * _senderIP) {
 	try {
-		OT_rJSON_parseDOC(actionDocument, _json);
-		if (actionDocument.IsObject()) {
+		ot::JsonDocument actionDoc;
+		actionDoc.fromJson(_json);
+		if (actionDoc.IsObject()) {
 
-			std::string action = ot::rJSON::getString(actionDocument, OT_ACTION_MEMBER);
+			std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
 
-			return AppBase::instance().dispatchAction(action, actionDocument);
+			return AppBase::instance().dispatchAction(action, actionDoc);
 		}
 		else {
 			return OT_ACTION_RETURN_INDICATOR_Error "Ivalid action format";

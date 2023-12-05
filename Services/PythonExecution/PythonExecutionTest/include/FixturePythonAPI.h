@@ -5,7 +5,7 @@
 #include "PythonObjectBuilder.h"
 #include "PythonAPI.h"
 #include "PythonModuleAPI.h"
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class FixturePythonAPI : public testing::Test
 {

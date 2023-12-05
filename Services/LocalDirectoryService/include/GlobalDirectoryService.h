@@ -1,7 +1,6 @@
 #pragma once
 
-#include "OpenTwinCore/ServiceBase.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/ServiceBase.h"
 
 #include <string>
 
@@ -28,7 +27,7 @@ public:
 private:
 	void registerAtGlobalDirectoryService(void);
 	void healthCheck(void);
-	void addSystemValues(OT_rJSON_doc& _jsonDocument);
+	void addSystemValues(ot::JsonDocument& _jsonDocument);
 
 	bool				m_isShuttingDown;
 	ConnectionStatus	m_connectionStatus;

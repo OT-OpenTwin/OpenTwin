@@ -1,6 +1,6 @@
 #include "EntityFileCSV.h"
 
-#include <OpenTwinCommunication/ActionTypes.h>
+#include "OTCommunication/ActionTypes.h"
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}

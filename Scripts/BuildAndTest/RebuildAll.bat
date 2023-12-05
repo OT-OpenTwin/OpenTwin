@@ -173,7 +173,6 @@ ECHO Build Library: Result Collection Access
 ECHO ===============================================================
 CALL "%OT_RESULT_COLLECTION_ACCESS_ROOT%\build.bat" %1 %2
 
-
 ECHO ===============================================================
 ECHO Build Microservice Launcher: OpenTwin
 ECHO ===============================================================
@@ -277,7 +276,6 @@ ECHO ===============================================================
 ECHO Build Service: PythonExecution
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_ROOT%\build.bat" %1 %2
-
 
 ECHO ===============================================================
 ECHO Build Service: BlockEditorService

@@ -5,9 +5,9 @@
 #include "ShapeHealing.h"
 #include "Application.h"
 
-#include <OpenTwinCommunication/Msg.h>
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/uiComponent.h>
+#include "OTCommunication/Msg.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/uiComponent.h"
 
 #include "XSControl_WorkSession.hxx"
 #include "XSControl_TransferReader.hxx"

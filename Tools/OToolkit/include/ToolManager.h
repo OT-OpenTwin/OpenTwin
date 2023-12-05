@@ -9,7 +9,7 @@
 #include "ToolRuntimeHandler.h"
 
 // OpenTwin header
-#include "OpenTwinCore/OTClassHelper.h"
+#include "OTCore/OTClassHelper.h"
 
 // Qt header
 #include <QtCore/qstring.h>
@@ -55,6 +55,10 @@ public:
 
 	void clear(void);
 
+	void stopAll(void);
+
+	void stopTool(const QString& _toolName);
+
 	TabManager* tabManager(void) { return m_tabManager; };
 	DockManager* dockManager(void) { return m_dockManager; };
 	MenuManager* menuManager(void) { return m_menuManager; };
@@ -69,6 +73,7 @@ private:
 
 	std::map<QString, ToolRuntimeHandler*> m_tools;
 	
+	bool m_ignoreEvents;
 	TabManager* m_tabManager;
 	DockManager* m_dockManager;
 	MenuManager* m_menuManager;

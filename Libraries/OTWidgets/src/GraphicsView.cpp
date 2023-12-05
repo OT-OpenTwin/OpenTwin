@@ -4,12 +4,13 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/GraphicsDirectConnectionItem.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -37,12 +38,21 @@ void ot::GraphicsView::resetView(void) {
 	QGraphicsScene* s = scene();
 	if (s == nullptr) return;
 	QRectF boundingRect = s->itemsBoundingRect();
-	setSceneRect(QRectF());
+	this->setSceneRect(QRectF());
 	int w = boundingRect.width();
 	int h = boundingRect.height();
 	QRectF viewRect = boundingRect.marginsAdded(QMarginsF(w, h, w, h));
-	fitInView(viewRect, Qt::AspectRatioMode::KeepAspectRatio);
-	centerOn(viewRect.center());
+	this->fitInView(viewRect, Qt::AspectRatioMode::KeepAspectRatio);
+	this->centerOn(viewRect.center());
+}
+
+void ot::GraphicsView::fitInCurrentView(void) {
+	QGraphicsScene* s = scene();
+	if (s == nullptr) return;
+	QRectF boundingRect = s->itemsBoundingRect();
+	this->setSceneRect(boundingRect);
+	this->fitInView(boundingRect, Qt::AspectRatioMode::KeepAspectRatio);
+	this->centerOn(boundingRect.center());
 }
 
 void ot::GraphicsView::viewAll(void) {
@@ -70,7 +80,7 @@ ot::GraphicsItem* ot::GraphicsView::getItem(const std::string&  _itemUid) {
 	}
 }
 
-ot::GraphicsDirectConnectionItem* ot::GraphicsView::getConnection(const std::string& _connectionUid) {
+ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _connectionUid) {
 	auto it = m_connections.find(_connectionUid);
 	if (it == m_connections.end()) {
 		OT_LOG_WAS("Connection with the UID \"" + _connectionUid + "\" does not exist");
@@ -111,14 +121,12 @@ void ot::GraphicsView::removeItem(const std::string& _itemUid) {
 	m_items.erase(_itemUid);
 }
 
-void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest) {
-	ot::GraphicsDirectConnectionItem* newConnection = new ot::GraphicsDirectConnectionItem;
-	QPen p;
-	p.setColor(QColor(255, 0, 0));
-	p.setWidth(1);
+void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest, const GraphicsConnectionCfg& _config) {
+	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
+	newConnection->setupFromConfig(_config);
 	
 	m_scene->addItem(newConnection);
-	newConnection->setGraphicsScene(m_scene);
+	//newConnection->setGraphicsScene(m_scene);
 	newConnection->connectItems(_origin, _dest);
 
 	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
@@ -142,7 +150,7 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 	it->second->disconnectItems();
 
 	// Remove connection from view
-	m_scene->removeItem(it->second->getQGraphicsItem());
+	m_scene->removeItem(it->second);
 
 	// Destroy connection
 	delete it->second;
@@ -191,12 +199,6 @@ void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 	this->setTransformationAnchor(anchor);
 
 	this->viewAll();
-}
-
-void ot::GraphicsView::enterEvent(QEvent* _event)
-{
-	QGraphicsView::enterEvent(_event);
-	this->viewport()->setCursor(Qt::CrossCursor);
 }
 
 void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)

@@ -6,9 +6,9 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include <OpenTwinFoundation/EntityInformation.h>
-#include <OpenTwinFoundation/ModelComponent.h>
-#include <OpenTwinFoundation/UiComponent.h>
+#include "OTServiceFoundation/EntityInformation.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <string>
 #include <list>
@@ -98,8 +98,9 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	modelComponent->getEntityInformation(baseEntityName, baseEntityInfo);
 
 	// Get the information about the selected entities.
-	OT_rJSON_parseDOC(doc, selectionInfo.c_str());
-	std::list<ot::UID> selectedEntities = ot::rJSON::getULongLongList(doc, "modelID");
+	ot::JsonDocument doc;
+	doc.fromJson(selectionInfo);
+	std::list<ot::UID> selectedEntities = ot::json::getUInt64List(doc, "modelID");
 
 	std::list<ot::EntityInformation> entityInfo;
 	modelComponent->getEntityInformation(selectedEntities, entityInfo);

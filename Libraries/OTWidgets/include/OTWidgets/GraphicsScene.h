@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -15,7 +16,7 @@ namespace ot {
 
 	class GraphicsView;
 	class GraphicsItem;
-	class GraphicsLineItem;
+	class GraphicsConnectionPreviewItem;
 
 	//! @brief Graphics Scene for ot::GraphicsItem
 	//! Adding QGraphicsItems to the scene that do not inherit ot::GraphicsItem might lead to undefined behavior
@@ -43,6 +44,9 @@ namespace ot {
 
 		GraphicsView* getGraphicsView(void) { return m_view; };
 
+		void setConnectionPreviewStyle(GraphicsConnectionCfg::ConnectionStyle _style) { m_connectionPreviewStyle = _style; };
+		GraphicsConnectionCfg::ConnectionStyle connectionPreviewStyle(void) const { return m_connectionPreviewStyle; };
+
 	protected:
 		virtual void drawBackground(QPainter* _painter, const QRectF& _rect) override;
 
@@ -50,8 +54,9 @@ namespace ot {
 		int m_gridSize;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
-		GraphicsLineItem* m_lineItem;
-		GraphicsScene();
+		GraphicsConnectionPreviewItem* m_connectionPreview;
+		ot::GraphicsConnectionCfg::ConnectionStyle m_connectionPreviewStyle;
+		GraphicsScene() = delete;
 	};
 
 }

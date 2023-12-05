@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "OpenTwinFoundation/UserCredentials.h"
+#include "OTServiceFoundation/UserCredentials.h"
 
 int main()
 {

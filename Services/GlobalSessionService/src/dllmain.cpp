@@ -1,10 +1,7 @@
-/*
- * dllmain.cpp
- *
- *  Created on: November 26, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date March 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // C++ header
 #include <Windows.h>
@@ -18,11 +15,11 @@
 #include "GlobalSessionService.h"
 
 // OpenTwin header
-#include "OpenTwinCore/otAssert.h"
-#include "OpenTwinCore/Logger.h"
-#include "OpenTwinCommunication/ActionTypes.h"
-#include "OpenTwinCommunication/ServiceLogNotifier.h"
-#include "OpenTwinFoundation/Dispatcher.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
+#include "OTServiceFoundation/Dispatcher.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -49,7 +46,7 @@ extern "C"
 	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownIP, const char * _databaseIP, const char * _authURL)
 	{
 		if (GlobalSessionService::hasInstance()) {
-			otAssert(0, "Global session service was already initialized");
+			OTAssert(0, "Global session service was already initialized");
 			return -1;
 		}
 
@@ -70,9 +67,9 @@ extern "C"
 
 		// Create session service and add data to session service
 		GlobalSessionService * sessionService = GlobalSessionService::instance();
-		sessionService->setDatabaseURL(_databaseIP);
-		sessionService->setURL(_ownIP);
-		sessionService->setAuthorizationServiceURL(_authURL);
+		sessionService->setDatabaseUrl(_databaseIP);
+		sessionService->setUrl(_ownIP);
+		sessionService->setAuthorizationUrl(_authURL);
 
 		OT_LOG_I("Service initialized");
 
@@ -99,12 +96,12 @@ extern "C"
 
 		// Check if the global session service was initialized
 		if (!GlobalSessionService::hasInstance()) {
-			otAssert(0, "Global session service not initialized");
+			OTAssert(0, "Global session service not initialized");
 			returnValue = new char[1]{ 0 };
 			return returnValue;
 		}
 
-		std::string serviceURL = GlobalSessionService::instance()->URL();
+		std::string serviceURL = GlobalSessionService::instance()->url();
 
 		char * retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());

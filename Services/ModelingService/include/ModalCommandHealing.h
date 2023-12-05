@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenTwinFoundation/ModalCommandBase.h>
+#include "OTServiceFoundation/ModalCommandBase.h"
 
 class ModalCommandHealing : public ot::ModalCommandBase
 {

@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Color.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KeyMap.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Point2D.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Queue.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServiceBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleFactory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Size2D.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEncoding.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingGuesser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Variable.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONToVariableConverter.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VariableToJSONConverter.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Owner.cpp">
+      <Filter>src\Owner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OwnerServiceGlobal.cpp">
+      <Filter>src\Owner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OwnerService.cpp">
+      <Filter>src\Owner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicServiceInformation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ReturnMessage.cpp">
+      <Filter>src\ServiceReturnMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ReturnValues.cpp">
+      <Filter>src\ServiceReturnMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSON.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\OTCore\Owner.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OwnerManagerTemplate.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OwnerService.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OwnerServiceGlobal.h">
+      <Filter>include\Owner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\EncodingConverter_ISO88591ToUTF8.h">
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\EncodingConverter_UTF16ToUTF8.h">
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\EncodingGuesser.h">
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TextEncoding.h">
+      <Filter>include\TextEncoding</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONToVariableConverter.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Variable.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\VariableToJSONConverter.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\BasicServiceInformation.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Color.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CoreAPIExport.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CoreTypes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Flags.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FlagsHelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FolderNames.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\KeyMap.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ObjectManagerTemplate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTAssert.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTClassHelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PerformanceTests.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Point2D.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Point3D.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Queue.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ReturnMessage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Serializable.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ServiceBase.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\SimpleFactory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Size2D.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\StringHelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TemplateTypeName.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TemplateTypeName.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TypeNames.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSON.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\DataObject.h">
+      <Filter>include\DataObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\Tensor.h">
+      <Filter>include\DataObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\ReturnMessage.h">
+      <Filter>include\ServiceReturnMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenTwinCore\ReturnValues.h">
+      <Filter>include\ServiceReturnMessages</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{cf49fbe1-05e8-4bdb-86d0-0819432cd5b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{f95c9d0a-a228-4afe-8a7a-69a62477e479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\TextEncoding">
+      <UniqueIdentifier>{73977dab-7521-4c1c-a2a9-e677cd97e934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\VariableType">
+      <UniqueIdentifier>{425822ce-f53b-454a-9990-b097ca2f1f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Variable">
+      <UniqueIdentifier>{cf7eae33-666c-468a-823f-a33dc893eda9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Owner">
+      <UniqueIdentifier>{786c0c6a-b16f-4378-920d-b23d5783c2bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Owner">
+      <UniqueIdentifier>{535507a4-a4fb-42be-9614-b9301bf40ec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\DataObjects">
+      <UniqueIdentifier>{db4094f0-bb18-4f12-93e8-f802607f293a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ServiceReturnMessages">
+      <UniqueIdentifier>{bb4b9512-777d-46dc-a8e7-3f34845e584b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ServiceReturnMessages">
+      <UniqueIdentifier>{ebbd8b6c-4f78-47ba-b85a-ef04bfe43531}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

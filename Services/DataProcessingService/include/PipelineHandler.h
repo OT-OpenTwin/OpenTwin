@@ -2,7 +2,7 @@
 #include <list>
 
 #include "EntityBlock.h"
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "GraphNode.h"
 #include "BlockHandler.h"
 //#include "Pipeline.h"

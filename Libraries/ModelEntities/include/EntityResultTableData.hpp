@@ -6,7 +6,7 @@
 #include <exception>
 #include <bsoncxx/builder/basic/array.hpp>
 
-#include <OpenTwinCore/TemplateTypeName.h>
+#include <OTCore/TemplateTypeName.h>
 
 #include "BsonArrayTypeGetterWrapper.h"
 

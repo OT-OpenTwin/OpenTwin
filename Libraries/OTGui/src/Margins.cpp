@@ -1,75 +1,73 @@
+//! @file Margins.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include "OTGui/Margins.h"
-#include "OpenTwinCore/rJSONHelper.h"
-#include "OpenTwinCore/otAssert.h"
+#include "OTCore/OTAssert.h"
 
-void ot::Margins::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const {
-	ot::rJSON::add(_document, _jsonObject, "Top", m_top);
-	ot::rJSON::add(_document, _jsonObject, "Right", m_right);
-	ot::rJSON::add(_document, _jsonObject, "Bottom", m_bottom);
-	ot::rJSON::add(_document, _jsonObject, "Left", m_left);
-	ot::rJSON::add(_document, _jsonObject, "Type", "int");
+ot::Margins& ot::Margins::operator = (const Margins& _other) {
+	m_left = _other.m_left;
+	m_top = _other.m_top;
+	m_right = _other.m_right;
+	m_bottom = _other.m_bottom;
+	return *this;
 }
 
-void ot::Margins::setFromJsonObject(OT_rJSON_val& _jsonObject) {
-	OT_rJSON_checkMember(_jsonObject, "Top", Int);
-	OT_rJSON_checkMember(_jsonObject, "Right", Int);
-	OT_rJSON_checkMember(_jsonObject, "Bottom", Int);
-	OT_rJSON_checkMember(_jsonObject, "Left", Int);
-	OT_rJSON_checkMember(_jsonObject, "Type", String);
-	if (_jsonObject["Type"].GetString() != std::string("int")) {
-		otAssert(0, "Invalid type");
-		throw std::exception("Invalid Margins type provided");
-	}
-	m_top = _jsonObject["Top"].GetInt();
-	m_right = _jsonObject["Right"].GetInt();
-	m_bottom = _jsonObject["Bottom"].GetInt();
-	m_left = _jsonObject["Left"].GetInt();
+void ot::Margins::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("l", m_left, _allocator);
+	_object.AddMember("t", m_top, _allocator);
+	_object.AddMember("r", m_right, _allocator);
+	_object.AddMember("b", m_bottom, _allocator);
 }
 
-void ot::MarginsF::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const {
-	ot::rJSON::add(_document, _jsonObject, "Top", m_top);
-	ot::rJSON::add(_document, _jsonObject, "Right", m_right);
-	ot::rJSON::add(_document, _jsonObject, "Bottom", m_bottom);
-	ot::rJSON::add(_document, _jsonObject, "Left", m_left);
-	ot::rJSON::add(_document, _jsonObject, "Type", "float");
+void ot::Margins::setFromJsonObject(const ConstJsonObject& _jsonObject) {
+	m_left = json::getInt(_jsonObject, "l");
+	m_top = json::getInt(_jsonObject, "t");
+	m_right = json::getInt(_jsonObject, "r");
+	m_bottom = json::getInt(_jsonObject, "b");
 }
 
-void ot::MarginsF::setFromJsonObject(OT_rJSON_val& _jsonObject) {
-	OT_rJSON_checkMember(_jsonObject, "Top", Float);
-	OT_rJSON_checkMember(_jsonObject, "Right", Float);
-	OT_rJSON_checkMember(_jsonObject, "Bottom", Float);
-	OT_rJSON_checkMember(_jsonObject, "Left", Float);
-	OT_rJSON_checkMember(_jsonObject, "Type", String);
-	if (_jsonObject["Type"].GetString() != std::string("float")) {
-		otAssert(0, "Invalid type");
-		throw std::exception("Invalid Margins type provided");
-	}
-	m_top = _jsonObject["Top"].GetFloat();
-	m_right = _jsonObject["Right"].GetFloat();
-	m_bottom = _jsonObject["Bottom"].GetFloat();
-	m_left = _jsonObject["Left"].GetFloat();
+ot::MarginsF& ot::MarginsF::operator = (const MarginsF& _other) {
+	m_left = _other.m_left;
+	m_top = _other.m_top;
+	m_right = _other.m_right;
+	m_bottom = _other.m_bottom;
+	return *this;
 }
 
-void ot::MarginsD::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _jsonObject) const {
-	ot::rJSON::add(_document, _jsonObject, "Top", m_top);
-	ot::rJSON::add(_document, _jsonObject, "Right", m_right);
-	ot::rJSON::add(_document, _jsonObject, "Bottom", m_bottom);
-	ot::rJSON::add(_document, _jsonObject, "Left", m_left);
-	ot::rJSON::add(_document, _jsonObject, "Type", "double");
+void ot::MarginsF::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("l", m_left, _allocator);
+	_object.AddMember("t", m_top, _allocator);
+	_object.AddMember("r", m_right, _allocator);
+	_object.AddMember("b", m_bottom, _allocator);
 }
 
-void ot::MarginsD::setFromJsonObject(OT_rJSON_val& _jsonObject) {
-	OT_rJSON_checkMember(_jsonObject, "Top", Double);
-	OT_rJSON_checkMember(_jsonObject, "Right", Double);
-	OT_rJSON_checkMember(_jsonObject, "Bottom", Double);
-	OT_rJSON_checkMember(_jsonObject, "Left", Double);
-	OT_rJSON_checkMember(_jsonObject, "Type", String);
-	if (_jsonObject["Type"].GetString() != std::string("double")) {
-		otAssert(0, "Invalid type");
-		throw std::exception("Invalid Margins type provided");
-	}
-	m_top = _jsonObject["Top"].GetDouble();
-	m_right = _jsonObject["Right"].GetDouble();
-	m_bottom = _jsonObject["Bottom"].GetDouble();
-	m_left = _jsonObject["Left"].GetDouble();
+void ot::MarginsF::setFromJsonObject(const ConstJsonObject& _jsonObject) {
+	m_left = json::getFloat(_jsonObject, "l");
+	m_top = json::getFloat(_jsonObject, "t");
+	m_right = json::getFloat(_jsonObject, "r");
+	m_bottom = json::getFloat(_jsonObject, "b");
+}
+
+ot::MarginsD& ot::MarginsD::operator = (const MarginsD& _other) {
+	m_left = _other.m_left;
+	m_top = _other.m_top;
+	m_right = _other.m_right;
+	m_bottom = _other.m_bottom;
+	return *this;
+}
+
+void ot::MarginsD::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("l", m_left, _allocator);
+	_object.AddMember("t", m_top, _allocator);
+	_object.AddMember("r", m_right, _allocator);
+	_object.AddMember("b", m_bottom, _allocator);
+}
+
+void ot::MarginsD::setFromJsonObject(const ConstJsonObject& _jsonObject) {
+	m_left = json::getDouble(_jsonObject, "l");
+	m_top = json::getDouble(_jsonObject, "t");
+	m_right = json::getDouble(_jsonObject, "r");
+	m_bottom = json::getDouble(_jsonObject, "b");
 }

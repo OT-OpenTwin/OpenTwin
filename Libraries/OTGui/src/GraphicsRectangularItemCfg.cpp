@@ -5,6 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
@@ -29,46 +30,38 @@ ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
-void ot::GraphicsRectangularItemCfg::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
+void ot::GraphicsRectangularItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	OTAssertNullptr(m_backgroundPainter);
 
-	GraphicsItemCfg::addToJsonObject(_document, _object);
+	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_CornerRadius, m_cornerRadius);
+	_object.AddMember(OT_JSON_MEMBER_CornerRadius, m_cornerRadius, _allocator);
 
-	OT_rJSON_createValueObject(sizeObj);
-	m_size.addToJsonObject(_document, sizeObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Size, sizeObj);
+	JsonObject sizeObj;
+	m_size.addToJsonObject(sizeObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Size, sizeObj, _allocator);
 
-	OT_rJSON_createValueObject(backgroundPainterObj);
-	m_backgroundPainter->addToJsonObject(_document, backgroundPainterObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj);
+	JsonObject backgroundPainterObj;
+	m_backgroundPainter->addToJsonObject(backgroundPainterObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj, _allocator);
 
-	OT_rJSON_createValueObject(borderObj);
-	m_border.addToJsonObject(_document, borderObj);
-	ot::rJSON::add(_document, _object, OT_JSON_MEMBER_Border, borderObj);
+	JsonObject borderObj;
+	m_border.addToJsonObject(borderObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Border, borderObj, _allocator);
 }
 
-void ot::GraphicsRectangularItemCfg::setFromJsonObject(OT_rJSON_val& _object) {
+void ot::GraphicsRectangularItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_CornerRadius, Int);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Border, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_BackgroundPainter, Object);
-	OT_rJSON_checkMember(_object, OT_JSON_MEMBER_Size, Object);
+	m_cornerRadius = json::getInt(_object, OT_JSON_MEMBER_CornerRadius);
 
-	m_cornerRadius = _object[OT_JSON_MEMBER_CornerRadius].GetInt();
-
-	OT_rJSON_val backgroundPainterObj = _object[OT_JSON_MEMBER_BackgroundPainter].GetObject();
+	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
 	ot::Painter2D* p = ot::SimpleFactory::instance().createType<ot::Painter2D>(backgroundPainterObj);
 	p->setFromJsonObject(backgroundPainterObj);
 	this->setBackgroundPainer(p);
 
-	OT_rJSON_val borderObj = _object[OT_JSON_MEMBER_Border].GetObject();
-	m_border.setFromJsonObject(borderObj);
-
-	OT_rJSON_val sizeObj = _object[OT_JSON_MEMBER_Size].GetObject();
-	m_size.setFromJsonObject(sizeObj);
+	m_border.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Border));
+	m_size.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Size));
 }
 
 void ot::GraphicsRectangularItemCfg::setBackgroundPainer(ot::Painter2D* _painter) {

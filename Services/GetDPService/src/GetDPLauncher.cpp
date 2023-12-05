@@ -14,8 +14,8 @@
 
 #include "Types.h"
 
-#include "OpenTwinFoundation/ModelComponent.h"
-#include "OpenTwinFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <windows.h> // winapi
 
