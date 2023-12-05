@@ -55,6 +55,11 @@ std::string ot::ReturnMessage::toJson(ot::ReturnMessage::ReturnMessageStatus _st
 
 ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const std::string& _what) : m_status(_status), m_what(_what) {}
 
+ot::ReturnMessage::ReturnMessage(ot::ReturnValues& values)
+	: m_status(ot::ReturnMessage::ReturnMessageStatus::Ok), m_values(values)
+{
+}
+
 ot::ReturnMessage::ReturnMessage(const ReturnMessage& _other) : m_status(_other.m_status), m_what(_other.m_what) {}
 
 ot::ReturnMessage& ot::ReturnMessage::operator = (const ReturnMessage& _other) {
@@ -99,11 +104,21 @@ bool ot::ReturnMessage::operator != (const ReturnMessage& _other) const {
 void ot::ReturnMessage::addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const {
 	ot::rJSON::add(_document, _object, "Status", statusToString(m_status));
 	ot::rJSON::add(_document, _object, "What", m_what);
+	if (m_values.getNumberOfEntries() != 0)
+	{
+		OT_rJSON_createValueObject(values);
+		m_values.addToJsonObject(_document, values);
+		ot::rJSON::add(_document, _object, "Values", values);
+	}
 }
 
 void ot::ReturnMessage::setFromJsonObject(OT_rJSON_val& _object) {
 	m_what = ot::rJSON::getString(_object, "What");
 	m_status = stringToStatus(ot::rJSON::getString(_object, "Status"));
+	if(ot::rJSON::memberExists(_object,"Values"))
+	{
+		m_values.setFromJsonObject(_object["Values"]);
+	}
 }
 
 std::string ot::ReturnMessage::getStatusString(void) const {

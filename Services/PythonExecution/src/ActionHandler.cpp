@@ -5,6 +5,7 @@
 #include "OpenTwinCore/Variable.h"
 #include "OpenTwinCore/VariableToJSONConverter.h"
 #include "OpenTwinCore/JSONToVariableConverter.h"
+#include "OpenTwinCore/ReturnValues.h"
 
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
@@ -112,23 +113,19 @@ ot::ReturnMessage ActionHandler::Execute(OT_rJSON_doc& doc)
 			for (uint32_t i = 0; i < portData.Size(); i++)
 			{
 				auto portDataEntry = portData[i].GetArray();
-				PythonObjectBuilder builder;
-				CPythonObjectNew pPortData = builder.setVariableList(portDataEntry);
-				PortDataBuffer::INSTANCE().addPortData(*portName,std::move(pPortData));
+				const std::list<ot::Variable> values = converterJ2V(portDataEntry);
+				PortDataBuffer::INSTANCE().addNewPortData(*portName, values);
 				portName++;
 			}
 		}
 
 		//Execute
-		std::list<ot::Variable> result = _pythonAPI.Execute(scripts, allParameter);
-		if (result.size() != 0)
-		{
-			ot::VariableToJSONConverter converterV2J;
-			OT_rJSON_createDOC(returnMessageContent);
-			OT_rJSON_val returnValueArray = converterV2J(result, returnMessageContent);
-			ot::rJSON::add(returnMessageContent, OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS, returnValueArray);
-			const std::string whatMessage = ot::rJSON::toJSON(returnMessageContent);
-			return ot::ReturnMessage(ot::ReturnMessage::Ok, whatMessage);
+		ot::ReturnValues result = _pythonAPI.Execute(scripts, allParameter);
+		PortDataBuffer::INSTANCE().AddModifiedPortData(result);
+
+		if (result.getNumberOfEntries() != 0)
+		{		
+			return ot::ReturnMessage(result);
 		}
 		else
 		{

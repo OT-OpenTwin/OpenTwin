@@ -145,10 +145,10 @@ namespace PythonExtensions
     static PyObject* OT_GetPortData(PyObject* self, PyObject* args)
     {
         auto numberOfArguments = PyTuple_Size(args);
-        const int expectedNumberOfArguments = 2;
+        const int expectedNumberOfArguments = 1;
         if (numberOfArguments != expectedNumberOfArguments)
         {
-            throw std::exception("OT_GetPortData expects two arguments");
+            throw std::exception("OT_GetPortData expects one arguments");
         }
         PythonObjectBuilder pyObBuilder;
         std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
@@ -159,15 +159,17 @@ namespace PythonExtensions
     static PyObject* OT_SetPortData(PyObject* self, PyObject* args)
     {
         auto numberOfArguments = PyTuple_Size(args);
-        const int expectedNumberOfArguments = 1;
+        const int expectedNumberOfArguments = 2;
         if (numberOfArguments != expectedNumberOfArguments)
         {
-            throw std::exception("OT_GetPortData expects one argument");
+            throw std::exception("OT_GetPortData expects two argument");
         }
         PythonObjectBuilder pyObBuilder;
         std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
-        PyObject* returnValue = PortDataBuffer::INSTANCE().getPortData(portName);
-        return returnValue;
+        CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 1");
+        std::list<ot::Variable> values = pyObBuilder.getVariableList(pvalue);
+        PortDataBuffer::INSTANCE().addOrOverridePortData(portName, std::move(values));
+        return PyBool_FromLong(true);
     }
 
     static PyMethodDef OTMethods[] = {
@@ -179,6 +181,7 @@ namespace PythonExtensions
         {"FlushEntity",  OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
         {"GetPythonScript",  OT_GetScript, METH_VARARGS, "Executes another python script that is stored within OpenTwin."},
         {"GetPortData",  OT_GetPortData, METH_VARARGS, "For Block Items. Gets datachunks from the ingoing ports."},
+        {"SetPortData",  OT_SetPortData, METH_VARARGS, "For Block Items. Sets datachunks from the outgoing ports."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 

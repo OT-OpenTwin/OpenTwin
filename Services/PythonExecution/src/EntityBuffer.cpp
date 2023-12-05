@@ -1,5 +1,5 @@
 #include "EntityBuffer.h"
-#include "ClassFactory.h"
+
 #include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
 
@@ -94,18 +94,25 @@ void EntityBuffer::EnsureTableToBeLoaded(const std::string& absoluteEntityName)
 	}
 }
 
+
+EntityBuffer::EntityBuffer()
+{
+	_classFactory.SetNextHandler(&_classFactoryBlock);
+	_classFactoryBlock.SetChainRoot(&_classFactory);
+}
+
 std::shared_ptr<EntityBase> EntityBuffer::LoadEntity(const std::string& absoluteEntityName)
 {
 	if (_bufferedEntities.find(absoluteEntityName) == _bufferedEntities.end())
 	{
 		ot::EntityInformation entityInfo;
-		ClassFactory* classFactory = new ClassFactory();
+
 		_modelComponent->getEntityInformation(absoluteEntityName, entityInfo);
 		if (entityInfo.getName() == "")
 		{
 			throw std::exception(("Requested entity " + absoluteEntityName + " does not exist.").c_str());
 		}
-		EntityBase* entity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory);
+		EntityBase* entity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), _classFactory);
 		_bufferedEntities[absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return _bufferedEntities[absoluteEntityName];

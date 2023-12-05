@@ -1,9 +1,10 @@
 #pragma once
-
+#pragma warning(disable:4251)
 // OpenTwin header
 #include "OpenTwinCore/CoreAPIExport.h"
 #include "OpenTwinCore/Serializable.h"
 #include "OpenTwinCore/rJSON.h"
+#include "OpenTwinCore/ReturnValues.h"
 
 // std header
 #include <string>
@@ -36,6 +37,7 @@ namespace ot
 		//! @param _status The status
 		//! @param _what The message contents
 		ReturnMessage(ReturnMessageStatus _status = ReturnMessageStatus::Ok, const std::string& _what = std::string());
+		ReturnMessage(ot::ReturnValues& values);
 		ReturnMessage(const ReturnMessage& _other);
 		~ReturnMessage() {};
 		ReturnMessage& operator = (const ReturnMessage& _other);
@@ -65,6 +67,8 @@ namespace ot
 		//! @brief Get the return message status
 		ReturnMessageStatus getStatus(void) const { return m_status; }
 
+		const ReturnValues& getValues() const { return m_values; }
+
 		//! @brief Returns a string representation of the status
 		std::string getStatusString(void) const;
 
@@ -75,15 +79,6 @@ namespace ot
 	private:
 		ReturnMessageStatus m_status;
 		std::string m_what;
+		ot::ReturnValues m_values;
 	};
-
-	/*
-	struct ReturnStatus
-	{
-		static const std::string Ok() { return "OK"; };
-		static const std::string Failed() { return "FAILED"; };
-		static const std::string True() { return "TRUE"; };
-		static const std::string False() { return "FALSE"; };
-	};
-	*/
 }

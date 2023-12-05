@@ -12,6 +12,8 @@
 #include <memory>
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "EntityResultTable.h"
+#include "ClassFactory.h"
+#include "ClassFactoryBlock.h"
 
 class EntityBuffer
 {
@@ -32,8 +34,10 @@ public:
 	std::shared_ptr<EntityBase> GetEntity (const std::string& absoluteEntityName);
 
 private:
-	EntityBuffer() {};
+	EntityBuffer();
 
+	ClassFactory _classFactory;
+	ClassFactoryBlock _classFactoryBlock;
 	std::map<std::string, std::shared_ptr<EntityBase>> _bufferedEntities;
 	std::map<std::string, std::shared_ptr<EntityResultTable<std::string>>> _bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> _bufferedEntityProperties;

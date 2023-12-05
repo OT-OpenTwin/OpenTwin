@@ -26,7 +26,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(rapidjson::Value& value)
 
 std::list<ot::Variable> ot::JSONToVariableConverter::operator()(rapidjson::GenericArray<false, rapidjson::Value>& value)
 {
-	std::list<Variable> variables{};
+	std::list<ot::Variable> variables;
 	const rapidjson::SizeType arraySize = value.Size();
 
 	for (rapidjson::SizeType i = 0; i < arraySize; i++)

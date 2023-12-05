@@ -32,6 +32,7 @@
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Queue.cpp" />
     <ClCompile Include="src\ReturnMessage.cpp" />
+    <ClCompile Include="src\ReturnValues.cpp" />
     <ClCompile Include="src\rJSON.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
     <ClCompile Include="src\Logger.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="include\OpenTwinCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OpenTwinCore\Color.h" />
     <ClInclude Include="include\OpenTwinCore\CoreAPIExport.h" />
+    <ClInclude Include="include\OpenTwinCore\DataObject.h" />
     <ClInclude Include="include\OpenTwinCore\EncodingConverter_ISO88591ToUTF8.h" />
     <ClInclude Include="include\OpenTwinCore\EncodingConverter_UTF16ToUTF8.h" />
     <ClInclude Include="include\OpenTwinCore\EncodingGuesser.h" />
@@ -54,6 +56,8 @@
     <ClInclude Include="include\OpenTwinCore\CoreTypes.h" />
     <ClInclude Include="include\OpenTwinCore\FlagsHelper.h" />
     <ClInclude Include="include\OpenTwinCore\FolderNames.h" />
+    <ClInclude Include="include\OpenTwinCore\ReturnValues.h" />
+    <ClInclude Include="include\OpenTwinCore\Tensor.h" />
     <ClInclude Include="include\OpenTwinCore\OwnerServiceGlobal.h" />
     <ClInclude Include="include\OpenTwinCore\JSONToVariableConverter.h" />
     <ClInclude Include="include\OpenTwinCore\OwnerManagerTemplate.h" />

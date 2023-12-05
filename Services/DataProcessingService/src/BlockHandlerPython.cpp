@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ClassFactory.h"
 #include "EntityFile.h"
+#include "OpenTwinCore/ReturnValues.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const HandlerMap& handlerMap)
     : BlockHandler(handlerMap)
@@ -18,6 +19,10 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const Han
            if (connector.getConnectorType() == ot::ConnectorType::In)
            {
                _requiredInput.push_back(connector.getConnectorName());
+           }
+           else if (connector.getConnectorType() == ot::ConnectorType::Out)
+           {
+               _outputs.push_back(connector.getConnectorName());
            }
       }     
       _entityName = blockEntity->getName();
@@ -46,15 +51,19 @@ bool BlockHandlerPython::executeSpecialized()
         ot::ReturnMessage returnMessage = _pythonServiceInterface->SendExecutionOrder();
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
         {
-            const std::string returnValue = returnMessage.getWhat();
-            OT_rJSON_doc returnDoc = ot::rJSON::fromJSON(returnValue);
-            if (ot::rJSON::memberExists(returnDoc, OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS))
+            const ot::ReturnValues& returnValues = returnMessage.getValues();
+            const auto& valuesByName =  returnValues.getValuesByName();
+            for (const std::string& outputName : _outputs)
             {
-
-            }
-            else
-            {
-                //_uiComponent->displayMessage("Python script was executed succeblock did not receive any result da")
+                auto valuesPointer = valuesByName.find(outputName);
+                if (valuesPointer == valuesByName.end())
+                {
+                    _uiComponent->displayMessage("Output " + outputName + " was not set in the python script.");
+                }
+                else
+                {
+                    _dataPerPort[outputName] = valuesPointer->second;
+                }
             }
         }
         else

@@ -20,16 +20,16 @@ PythonAPI::PythonAPI()
 	_wrapper.InitializePythonInterpreter();
 }
 
-std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet)
+ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
 	EntityBuffer::INSTANCE().setModelComponent(Application::instance()->modelComponent());
 	auto currentParameterSet = parameterSet.begin();
-	std::list<ot::Variable> returnValues;
+	
 	PythonObjectBuilder pyObBuilder;
+	ot::ReturnValues returnValues;
 	for (std::string& scriptName : scripts)
 	{
-		
 		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
 		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
 
@@ -39,12 +39,10 @@ std::list<ot::Variable> PythonAPI::Execute(std::list<std::string>& scripts, std:
 		{
 			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript));
 		}
-		CPythonObjectNew returnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
+		CPythonObjectNew pReturnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 
-		auto vReturnValue = pyObBuilder.getVariableList(returnValue);
-		returnValues.splice(returnValues.begin(),vReturnValue);
+		returnValues.addData(scriptName, pyObBuilder.getVariableList(pReturnValue));
 		currentParameterSet++;
-
 	}
 	return returnValues;
 }

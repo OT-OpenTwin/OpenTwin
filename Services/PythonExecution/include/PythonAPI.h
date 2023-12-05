@@ -6,13 +6,14 @@
 #include "EntityFile.h"
 #include "PythonObjectBuilder.h"
 #include "OpenTwinFoundation/EntityInformation.h"
+#include "OpenTwinCore/ReturnValues.h"
 
 class PythonAPI
 {
 	friend class FixturePythonAPI;
 public:
 	PythonAPI();
-	std::list<ot::Variable> Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet) noexcept(false);
+	ot::ReturnValues Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet) noexcept(false);
 
 private:
 	std::map<std::string , std::string> _moduleEntrypointByScriptName;

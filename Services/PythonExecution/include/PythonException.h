@@ -93,7 +93,6 @@ public:
 			message += "Python exception type " + errorType + " was thrown: ";
 			message += exceptionCause;
 		}
-
 		Py_DECREF(errorMessagePython);
 	}
 

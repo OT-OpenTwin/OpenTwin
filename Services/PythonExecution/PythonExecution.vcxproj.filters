@@ -13,6 +13,12 @@
     <Filter Include="src\Backbone">
       <UniqueIdentifier>{4167f33b-5aa2-49d7-95a1-659034d8f24c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\DataHandling">
+      <UniqueIdentifier>{da34591f-a274-44a4-8ee6-9ed1c0ef73d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\DataHandling">
+      <UniqueIdentifier>{33c1bb2d-ed47-468a-92e0-217063987e20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ModelNotifier.cpp">
@@ -53,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="src\PortDataBuffer.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PortData.cpp">
+      <Filter>src\DataHandling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="include\PortDataBuffer.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PortData.h">
+      <Filter>include\DataHandling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
