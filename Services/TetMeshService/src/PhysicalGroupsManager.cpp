@@ -7,7 +7,6 @@
 #include "MaterialManager.h"
 #include "FaceAnnotationsManager.h"
 
-#include "ClassFactoryCAD.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"
 #include "EntityMaterial.h"

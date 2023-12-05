@@ -5,6 +5,7 @@
 #include "EntityGeometry.h"
 #include "EntityMaterial.h"
 #include "ClassFactoryCAD.h"
+#include "ClassFactory.h"
 
 #include "OpenTwinFoundation/ModelComponent.h"
 #include "OpenTwinFoundation/EntityInformation.h"
@@ -50,7 +51,10 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 	// Finally, load all materials and add them to the material map
 	application->prefetchDocumentsFromStorage(materialInformation);
 
-	ClassFactoryCAD classFactory;
+	ClassFactory classFactory;
+	ClassFactoryCAD classFactoryCAD;
+	classFactory.SetNextHandler(&classFactoryCAD);
+	classFactoryCAD.SetChainRoot(&classFactory);
 	for (auto mat : materialInformation)
 	{
 		EntityMaterial *material = dynamic_cast<EntityMaterial *> (application->modelComponent()->readEntityFromEntityIDandVersion(mat.getID(), mat.getVersion(), classFactory));

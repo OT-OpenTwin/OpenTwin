@@ -27,6 +27,7 @@
 #include "SelfIntersectionCheck.h"
 #include "TemplateDefaultManager.h"
 #include "Application.h"
+#include "ClassFactory.h"
 #include "ClassFactoryCAD.h"
 
 #include <set>
@@ -457,8 +458,11 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 
 	// Now load all geometry entities in the model
 	application->prefetchDocumentsFromStorage(geometryEntitiesID);
-
-	ClassFactoryCAD classFactory;
+	
+	ClassFactory classFactory;
+	ClassFactoryCAD classFactoryCAD;
+	classFactory.SetNextHandler(&classFactoryCAD);
+	classFactoryCAD.SetChainRoot(&classFactory);
 	std::list<EntityGeometry *> geometryEntities;
 
 	for (auto entityID : geometryEntitiesID)

@@ -16,6 +16,7 @@
 #include "EntityMeshCartesianNodes.h"
 #include "EntityCartesianVector.h"
 #include "CartesianMeshTree.h"
+#include "ClassFactory.h"
 #include "ClassFactoryCAD.h"
 #include "TemplateDefaultManager.h"
 #include "EntityVis2D3D.h"
@@ -135,8 +136,10 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 
 		// Now load all geometry entities in the model
 		getApplication()->prefetchDocumentsFromStorage(geometryEntitiesID);
-
-		ClassFactoryCAD classFactory;
+		ClassFactory classFactory;
+		ClassFactoryCAD classFactoryCAD;
+		classFactory.SetNextHandler(&classFactoryCAD);
+		classFactoryCAD.SetChainRoot(&classFactory);
 
 		for (auto entityID : geometryEntitiesID)
 		{
@@ -510,7 +513,10 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 
-	ClassFactoryCAD classFactory;
+	ClassFactory classFactory;
+	ClassFactoryCAD classFactoryCAD;
+	classFactory.SetNextHandler(&classFactoryCAD);
+	classFactoryCAD.SetChainRoot(&classFactory);
 
 	for (auto info : materialInfo)
 	{

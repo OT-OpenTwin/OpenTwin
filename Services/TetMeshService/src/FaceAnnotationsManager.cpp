@@ -3,6 +3,7 @@
 #include "Application.h"
 
 #include "ClassFactoryCAD.h"
+#include "ClassFactory.h"
 #include "EntityFaceAnnotation.h"
 
 #include "OpenTwinFoundation/ModelComponent.h"
@@ -21,7 +22,11 @@ void FaceAnnotationsManager::loadAllFaceAnnotations(void)
 
 	application->prefetchDocumentsFromStorage(annotationEntityIDs);
 
-	ClassFactoryCAD classFactory;
+	ClassFactory classFactory;
+	ClassFactoryCAD classFactoryCAD;
+	classFactory.SetNextHandler(&classFactoryCAD);
+	classFactoryCAD.SetChainRoot(&classFactory);
+
 	for (auto annotation : annotationEntityIDs)
 	{
 		ot::UID entityID = annotation;
