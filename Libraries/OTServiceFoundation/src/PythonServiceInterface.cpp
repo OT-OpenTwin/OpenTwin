@@ -59,6 +59,28 @@ ot::JsonDocument ot::PythonServiceInterface::AssembleMessage()
 		}
 	}
 
+	if (_portDataByPortName.size() > 0)
+	{
+		ot::JsonArray portDataEntries;
+		ot::JsonArray portDataNames;
+		for (auto& portDataByPortName : _portDataByPortName)
+		{
+			ot::JsonValue portName;
+			portName.SetString(portDataByPortName.first.c_str(), doc.GetAllocator());
+			portDataNames.PushBack(portName, doc.GetAllocator());
+
+			std::list<ot::Variable>& portData = portDataByPortName.second;
+			ot::JsonArray portDataJSON;
+			for (ot::Variable& value : portData)
+			{
+				portDataJSON.PushBack(converter(value, doc.GetAllocator()), doc.GetAllocator());
+			}
+			portDataEntries.PushBack(portDataJSON, doc.GetAllocator());
+		}
+		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Data, portDataEntries, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Names, portDataNames,doc.GetAllocator());
+	}
+
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());

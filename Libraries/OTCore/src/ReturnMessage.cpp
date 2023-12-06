@@ -128,8 +128,9 @@ void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allo
 	if (m_values.getNumberOfEntries() != 0)
 	{
 		ot::JsonValue values;
-		m_values.addToJsonObject(_object, _allocator);
-		_object.AddMember(values, "Values", _allocator);
+		values.SetObject();
+		m_values.addToJsonObject(values, _allocator);
+		_object.AddMember(ot::JsonValue("Values",_allocator), std::move(values), _allocator);
 	}
 }
 

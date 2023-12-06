@@ -28,8 +28,8 @@ void ot::ReturnValues::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 		ot::JsonValue jValues = converterV2J(values, _allocator);
 		jValuesList.PushBack(jValues, _allocator);
 	}
-	_object.AddMember(jNames,"NameList",_allocator);
-	_object.AddMember(jValuesList,"ValueLists", _allocator);
+	_object.AddMember(ot::JsonValue("NameList",_allocator),	std::move(jNames),_allocator);
+	_object.AddMember(ot::JsonValue("ValueLists", _allocator), std::move(jValuesList), _allocator);
 }
 
 void ot::ReturnValues::setFromJsonObject(const ot::ConstJsonObject& _object)

@@ -37,7 +37,7 @@ PyObject* PortDataBuffer::getPortData(const std::string& portName)
 	}
 	else
 	{
-		OT_LOG_E("Python script tried to get data from a prot that is not known.");
+		throw std::exception("Python script tried to get data from a unknown port .");
 		return nullptr;
 	}
 }

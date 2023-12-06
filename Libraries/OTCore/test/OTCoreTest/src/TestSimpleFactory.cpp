@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "OpenTwinCore/SimpleFactory.h"
+#include "OTCore/SimpleFactory.h"
 #include <string>
 
 class TesterA : public ot::SimpleFactoryObject {

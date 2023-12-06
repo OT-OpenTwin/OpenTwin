@@ -1,7 +1,7 @@
 #include "FixtureTextEncoding.h"
-#include "OpenTwinCore/EncodingGuesser.h"
-#include "OpenTwinCore/EncodingConverter_ISO88591ToUTF8.h"
-#include "OpenTwinCore/EncodingConverter_UTF16ToUTF8.h"
+#include "OTCore/EncodingGuesser.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 TEST_F(FixtureTextEncoding, ReadFileUTF8)
 {
 	auto fileContent = ReadFile(ot::TextEncoding::UTF8);

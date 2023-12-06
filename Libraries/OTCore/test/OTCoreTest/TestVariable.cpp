@@ -1,18 +1,18 @@
 #include <iostream>
 #include "gtest/gtest.h"
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/VariableToJSONConverter.h"
-#include "OpenTwinCore/JSONToVariableConverter.h"
+#include "OTCore/Variable.h"
+#include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/JSONToVariableConverter.h"
 #include "FixtureVariable.h"
 
 #include <string>
 
 TEST(VariableTest, VariableToJSON)
 {
-	OT_rJSON_createDOC(doc);
+	ot::JsonDocument (doc);
 	ot::Variable var = 5;
 	ot::VariableToJSONConverter converter;
-	rapidjson::Value result = converter(var,doc);
+	rapidjson::Value result = converter(var,doc.GetAllocator());
 	EXPECT_TRUE(result.IsInt());
 	EXPECT_EQ(result.GetInt(), var.getInt32());
 }

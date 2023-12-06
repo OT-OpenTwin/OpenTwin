@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "OpenTwinCore/PerformanceTests.h"
+#include "OTCore/PerformanceTests.h"
 
 
 TEST(PerformanceAnalysisTests, GetTimestamp)

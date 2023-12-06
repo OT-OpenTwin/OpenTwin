@@ -1,6 +1,6 @@
 #pragma once
 #include "gtest/gtest.h"
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 
 class FixtureVariable : public testing::TestWithParam<ot::Variable>
 {
