@@ -1,7 +1,7 @@
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockPython.h"
-#include "OpenTwinFoundation/PythonServiceInterface.h"
+#include "OTServiceFoundation/PythonServiceInterface.h"
 
 class BlockHandlerPython : public BlockHandler
 {

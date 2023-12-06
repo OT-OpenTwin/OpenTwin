@@ -3,7 +3,8 @@
 #include "Application.h"
 #include "ClassFactory.h"
 #include "EntityFile.h"
-#include "OpenTwinCore/ReturnValues.h"
+#include "OTCore/ReturnValues.h"
+#include "OTServiceFoundation/PythonServiceInterface.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const HandlerMap& handlerMap)
     : BlockHandler(handlerMap)

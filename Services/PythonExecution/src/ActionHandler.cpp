@@ -7,6 +7,8 @@
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
+#include "PortDataBuffer.h"
+
 ActionHandler::ActionHandler(const std::string& urlMasterService)
 	:_urlMasterService(urlMasterService)
 {
@@ -81,12 +83,14 @@ ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 {
 	try
 	{
-		std::string temp = ot::rJSON::toJSON(doc);
+		
+		std::string temp = doc.toJson();
 
 		PortDataBuffer::INSTANCE().clearPortData();
 
 		//Extract script entity names from json doc
-		std::list<std::string> scripts = ot::rJSON::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
+
+		std::list<std::string> scripts = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
 		
 		//Extract parameter array from json doc
 		auto parameterArrayArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
@@ -101,7 +105,7 @@ ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 			}
 			else
 			{
-				auto parameterArray = parameterArrayArray[i].GetArray();
+				auto parameterArray = ot::json::getArray(parameterArrayArray, i);
 				//Todo: support of lists/maps as parameter
 				
 				std::list<ot::Variable> scriptParameter = converterJ2V(parameterArray);
@@ -112,12 +116,12 @@ ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 		//Extract port data if existing
 		if (doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Names))
 		{
-			std::list<std::string> portDataNames = ot::rJSON::getStringList(doc,OT_ACTION_CMD_PYTHON_Portdata_Names);
+			std::list<std::string> portDataNames = ot::json::getStringList(doc,OT_ACTION_CMD_PYTHON_Portdata_Names);
 			auto portData = doc[OT_ACTION_CMD_PYTHON_Portdata_Data].GetArray();
 			auto portName = portDataNames.begin();
 			for (uint32_t i = 0; i < portData.Size(); i++)
 			{
-				auto portDataEntry = portData[i].GetArray();
+				auto portDataEntry = ot::json::getArray(portData, i);
 				const std::list<ot::Variable> values = converterJ2V(portDataEntry);
 				PortDataBuffer::INSTANCE().addNewPortData(*portName, values);
 				portName++;

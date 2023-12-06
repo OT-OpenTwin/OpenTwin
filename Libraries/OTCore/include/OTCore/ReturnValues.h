@@ -1,8 +1,8 @@
 #pragma once
 #include <map>
 
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/Serializable.h"
+#include "OTCore/Variable.h"
+#include "OTCore/Serializable.h"
 
 namespace ot
 {
@@ -15,8 +15,8 @@ namespace ot
 		const std::map<std::string, std::list<ot::Variable>>& getValuesByName() const { return _valuesByName; }
 
 
-		virtual void addToJsonObject(OT_rJSON_doc& _document, OT_rJSON_val& _object) const override;
-		virtual void setFromJsonObject(OT_rJSON_val& _object) override;
+		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	private:
 		std::map<std::string, std::list<ot::Variable>> _valuesByName;

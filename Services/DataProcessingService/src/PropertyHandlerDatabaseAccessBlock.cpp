@@ -2,12 +2,12 @@
 #include "PropertyHandlerDatabaseAccessBlock.h"
 #include "EntityPropertiesItems.h"
 #include "EntityProperties.h"
-#include "OpenTwinCommunication/ActionTypes.h"
+#include "OTCommunication/ActionTypes.h"
 #include "CrossCollectionAccess.h"
 #include "MeasurementCampaignFactory.h"
-#include "OpenTwinCommunication/Msg.h"
+#include "OTCommunication/Msg.h"
 #include "ClassFactory.h"
-#include "OpenTwinCore/OwnerServiceGlobal.h"
+#include "OTCore/OwnerServiceGlobal.h"
 #include "Application.h"
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
@@ -126,13 +126,14 @@ const MeasurementCampaign PropertyHandlerDatabaseAccessBlock::GetMeasurementCamp
 
 void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON)
 {
-	OT_rJSON_createDOC(requestDoc);
-	ot::rJSON::add(requestDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_EntityIDList, entityIDs);
-	ot::rJSON::add(requestDoc, OT_ACTION_PARAM_MODEL_JSON, propertiesAsJSON);
-	
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities,requestDoc.GetAllocator());
+	ot::JsonObject jEntityIDs;
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs,requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_JSON, ot::JsonString(propertiesAsJSON,requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
 	std::string response;
-	if (!ot::msg::send("", modelServiceURL, ot::EXECUTE, ot::rJSON::toJSON(requestDoc), response))
+	if (!ot::msg::send("", modelServiceURL, ot::EXECUTE, requestDoc.toJson(), response))
 	{
 		throw std::runtime_error("Updating properties failed due to error: " + response);
 	}

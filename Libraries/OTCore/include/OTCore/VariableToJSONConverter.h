@@ -8,6 +8,7 @@ namespace ot
 	class __declspec(dllexport) VariableToJSONConverter
 	{
 	public:
-		rapidjson::Value operator() (Variable& value, JsonAllocator& jsonAllocator);
+		ot::JsonValue operator() (const Variable& value, JsonAllocator& jsonAllocator);
+		ot::JsonValue operator()(const std::list<Variable>& variables, JsonAllocator& emebeddingDocument);
 	};
 }

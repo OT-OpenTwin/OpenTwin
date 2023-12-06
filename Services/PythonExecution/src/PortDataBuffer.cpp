@@ -1,5 +1,5 @@
 #include "PortDataBuffer.h"
-#include "OpenTwinCore/Logger.h"
+#include "OTCore/Logger.h"
 #include "PythonObjectBuilder.h"
 
 void PortDataBuffer::addNewPortData(const std::string& portName, const std::list<ot::Variable>& data)

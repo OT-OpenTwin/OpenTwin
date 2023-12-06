@@ -3,7 +3,6 @@
 
 #include "OTCore/CoreAPIExport.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/rJSON.h"
 #include "OTCore/ReturnValues.h"
 
 // std header

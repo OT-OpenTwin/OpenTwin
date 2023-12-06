@@ -8,7 +8,7 @@ namespace ot
 	{
 	public:
 
-		Variable operator() (JsonValue& value);
-		std::list<Variable> operator() (rapidjson::GenericArray<false,rapidjson::Value>& value);
+		Variable operator() (const JsonValue& value);
+		std::list<Variable> operator() (ot::ConstJsonArray & value);
 	};
 }

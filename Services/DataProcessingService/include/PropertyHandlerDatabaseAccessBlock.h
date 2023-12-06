@@ -1,9 +1,9 @@
 #pragma once
 #include "BufferBlockDatabaseAccess.h"
-#include "OpenTwinCore/CoreTypes.h"
+#include "OTCore/CoreTypes.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "MeasurementCampaign.h"
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 #include <map>

@@ -5,8 +5,8 @@
 #include "PythonWrapper.h"
 #include "EntityFile.h"
 #include "PythonObjectBuilder.h"
-#include "OpenTwinFoundation/EntityInformation.h"
-#include "OpenTwinCore/ReturnValues.h"
+#include "OTServiceFoundation/EntityInformation.h"
+#include "OTCore/ReturnValues.h"
 
 class PythonAPI
 {

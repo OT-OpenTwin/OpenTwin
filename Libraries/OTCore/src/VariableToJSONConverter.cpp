@@ -1,6 +1,6 @@
 #include "OTCore/VariableToJSONConverter.h"
 
-OT_rJSON_val ot::VariableToJSONConverter::operator()(const Variable& value, JsonAllocator& jsonAllocator)
+ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, JsonAllocator& jsonAllocator)
 {
 
 	if (value.isInt32())
@@ -46,12 +46,12 @@ OT_rJSON_val ot::VariableToJSONConverter::operator()(const Variable& value, Json
 	}
 }
 
-OT_rJSON_val ot::VariableToJSONConverter::operator()(const std::list<Variable>& variables, OT_rJSON_doc& emebeddingDocument)
+ot::JsonValue ot::VariableToJSONConverter::operator()(const std::list<Variable>& variables, JsonAllocator& allocator)
 {
-	OT_rJSON_createValueArray(jVariables)
+	ot::JsonArray jVariables;
 		for (const ot::Variable& variable : variables)
 		{
-			jVariables.PushBack(operator()(variable, emebeddingDocument), emebeddingDocument.GetAllocator());
+			jVariables.PushBack(operator()(variable, allocator), allocator);
 		}
 		return jVariables;
 }

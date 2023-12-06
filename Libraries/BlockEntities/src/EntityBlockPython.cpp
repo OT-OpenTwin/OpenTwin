@@ -92,9 +92,10 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 	{
 		std::string report = headerInterpreter.getErrorReport();
 		report = "\nError while analysing pythonscript:\n" + report;
-		OT_rJSON_createDOC(cmdDoc);
-		ot::rJSON::add(cmdDoc, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_DisplayMessage);
-		ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_MESSAGE, report);
+		ot::JsonDocument cmdDoc;
+		cmdDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_DisplayMessage,cmdDoc.GetAllocator());
+		auto jReport =	ot::JsonString(report, cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, jReport, cmdDoc.GetAllocator());
 		getObserver()->sendMessageToViewer(cmdDoc);
 	}
 }

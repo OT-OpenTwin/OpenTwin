@@ -90,15 +90,16 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 						auto& scripts = _doc[OT_ACTION_CMD_PYTHON_Scripts];
 						subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, subprocessDoc.GetAllocator());
 						auto& parameter = _doc[OT_ACTION_CMD_PYTHON_Parameter];
-						ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Parameter, parameter);
-
-						if (ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Portdata_Names) && _doc[OT_ACTION_CMD_PYTHON_Portdata_Names].IsArray())
+						subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, parameter,subprocessDoc.GetAllocator());
+						
+						if (_doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Names) && _doc[OT_ACTION_CMD_PYTHON_Portdata_Names].IsArray())
 						{
-							assert(ot::rJSON::memberExists(_doc, OT_ACTION_CMD_PYTHON_Portdata_Data));
+							assert(_doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Data));
 							auto& portData = _doc[OT_ACTION_CMD_PYTHON_Portdata_Data];
-							ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Portdata_Data, portData);
+							subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Data, portData, subprocessDoc.GetAllocator());
 							auto& portNames = _doc[OT_ACTION_CMD_PYTHON_Portdata_Names];
-							ot::rJSON::add(subprocessDoc, OT_ACTION_CMD_PYTHON_Portdata_Names, portNames);
+
+							subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Names, portNames,subprocessDoc.GetAllocator());
 						}
 
 						return _subprocessHandler->SendExecutionOrder(subprocessDoc);					

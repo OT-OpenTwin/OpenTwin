@@ -128,17 +128,18 @@ void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allo
 	if (m_values.getNumberOfEntries() != 0)
 	{
 		ot::JsonValue values;
-		m_values.addToJsonObject(_document, values);
-		ot::rJSON::add(_document, _object, "Values", values);
+		m_values.addToJsonObject(_object, _allocator);
+		_object.AddMember(values, "Values", _allocator);
 	}
 }
 
 void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_what = json::getString(_object, "What");
 	m_status = stringToStatus(json::getString(_object, "Status"));
-		if(ot::rJSON::memberExists(_object,"Values"))
+		if(_object.HasMember("Values"))
 	{
-		m_values.setFromJsonObject(_object["Values"]);
+		const auto& temp = _object["Values"];
+		m_values.setFromJsonObject(temp.GetObject());
 	}
 
 }

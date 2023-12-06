@@ -14,6 +14,12 @@ void ot::PythonServiceInterface::AddScriptWithParameter(const std::string& scrip
 	_scriptNamesWithParameter.push_back(std::make_tuple(scriptName, scriptParameter));
 }
 
+void ot::PythonServiceInterface::AddPortData(const std::string& portName, const std::list<ot::Variable>& data)
+{
+	assert(_portDataByPortName.find(portName) == _portDataByPortName.end());
+	_portDataByPortName[portName] = data;
+}
+
 ot::ReturnMessage ot::PythonServiceInterface::SendExecutionOrder()
 {
 	if (_scriptNamesWithParameter.size() == 0)
@@ -22,11 +28,11 @@ ot::ReturnMessage ot::PythonServiceInterface::SendExecutionOrder()
 	}
 
 	std::string response;
-	ot::msg::send("", _pythonExecutionServiceURL, ot::MessageType::EXECUTE, this->AssembleMessage(), response);
+	ot::msg::send("", _pythonExecutionServiceURL, ot::MessageType::EXECUTE, this->AssembleMessage().toJson(), response);
 	return ot::ReturnMessage::fromJson(response);
 }
 
-std::string ot::PythonServiceInterface::AssembleMessage()
+ot::JsonDocument ot::PythonServiceInterface::AssembleMessage()
 {
 	JsonDocument doc;
 	JsonArray allparameter;
@@ -58,5 +64,5 @@ std::string ot::PythonServiceInterface::AssembleMessage()
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE, doc.GetAllocator()), doc.GetAllocator());
 	
-	return doc.toJson();
+	return doc;
 }

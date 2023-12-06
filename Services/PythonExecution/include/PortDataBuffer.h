@@ -4,8 +4,8 @@
 #include <optional>
 #include <map>
 
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/ReturnValues.h"
+#include "OTCore/Variable.h"
+#include "OTCore/ReturnValues.h"
 #include "PortData.h"
 #include "CPythonObject.h"
 

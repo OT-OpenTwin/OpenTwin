@@ -18,7 +18,7 @@ private:
 
 	std::list<EntityPropertiesBase*> _allProperties;
 	std::list<ot::Connector> _allConnectors;
-	std::map<OT_rJSON_doc*, int> _jsonEntryToScriptLine;
+	std::map<ot::JsonDocument *, int> _jsonEntryToScriptLine;
 	std::string _report;
 
 	const std::string _entryTypeNameProperty = "property";

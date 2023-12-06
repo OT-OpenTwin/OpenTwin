@@ -90,14 +90,18 @@ bool PythonHeaderInterpreter::ExtractOTHeader(const std::string& scriptLine, con
 
 	if(entryType == _entryTypeNameProperty)
 	{
-		_allPropertiesAsJSON.push_back(ot::rJSON::fromJSON(entryDefinition));
-		_jsonEntryToScriptLine[&_allPropertiesAsJSON.back()] = scriptLineNumber;
+		ot::JsonDocument* doc = new ot::JsonDocument();
+		doc->fromJson(entryDefinition);
+		_allPropertiesAsJSON.push_back(doc);
+		_jsonEntryToScriptLine[_allPropertiesAsJSON.back()] = scriptLineNumber;
 		return true;
 	}
 	else if (entryType == _entryTypeNameConnector)
 	{
-		_allConnectorsAsJSON.push_back(ot::rJSON::fromJSON(entryDefinition));
-		_jsonEntryToScriptLine[&_allConnectorsAsJSON.back()] = scriptLineNumber;
+		ot::JsonDocument* doc = new ot::JsonDocument();
+		doc->fromJson(entryDefinition);
+		_allConnectorsAsJSON.push_back(doc);
+		_jsonEntryToScriptLine[_allConnectorsAsJSON.back()] = scriptLineNumber;
 		return true;
 	}
 	else
@@ -118,19 +122,19 @@ bool PythonHeaderInterpreter::CreateConnectorsFromJSON()
 {
 	bool allObjectsCreated = true;
 	auto connectorJSON = _allConnectorsAsJSON.begin();
+	
 	for (size_t i = 0; i < _allConnectorsAsJSON.size(); i++)
 	{
-
+		
 		bool allMemberFound = true;
 		std::string missingMember("");
-
-		if (!connectorJSON->HasMember(_connectorDefName.c_str()))
+		if (!(*connectorJSON)->HasMember(_connectorDefName.c_str()))
 		{
 			allMemberFound = false;
 			missingMember += _connectorDefName + ", ";
 		}
 
-		if (!connectorJSON->HasMember(_defTitle.c_str()))
+		if (!(*connectorJSON)->HasMember(_defTitle.c_str()))
 		{
 			allMemberFound = false;
 			missingMember += _defTitle + ", ";
@@ -138,25 +142,26 @@ bool PythonHeaderInterpreter::CreateConnectorsFromJSON()
 
 		ot::ConnectorType connectorType = ot::ConnectorType::UNKNOWN;
 		std::string status = "";
-		if (!connectorJSON->HasMember(_defType.c_str()))
+		if (!(*connectorJSON)->HasMember(_defType.c_str()))
 		{
 			allMemberFound = false;
 			missingMember += _defTitle + ", ";
 		}
 		else
 		{
-			connectorType = getConnectorType(*connectorJSON, status);
+
+			connectorType = getConnectorType(**connectorJSON, status);
 		}
 
 		if (allMemberFound && connectorType != ot::ConnectorType::UNKNOWN)
 		{
-			const std::string title = ot::rJSON::getString(*connectorJSON, _defTitle.c_str());
-			const std::string name = ot::rJSON::getString(*connectorJSON, _connectorDefName.c_str());
+			const std::string title = ot::json::getString(**connectorJSON, _defTitle.c_str());
+			const std::string name = ot::json::getString(**connectorJSON, _connectorDefName.c_str());
 			_allConnectors.push_back({ connectorType, name, title });
 		}
 		else
 		{
-			int scriptLine = _jsonEntryToScriptLine[&(*connectorJSON)];
+			int scriptLine = _jsonEntryToScriptLine[(*connectorJSON)];
 			_report += "Could not create port in line " + std::to_string(scriptLine) + " because\n"
 				"following fields are missing: " + missingMember.substr(0, missingMember.size() - 2) + "\n";
 
@@ -178,7 +183,7 @@ bool PythonHeaderInterpreter::CreatePropertiesFromJSON()
 		std::string missingEntries = "";
 		bool allEntriesFound = true;
 
-		if (!propertyJSON->HasMember(_defTitle.c_str()))
+		if (!(*propertyJSON)->HasMember(_defTitle.c_str()))
 		{
 			allEntriesFound = false;
 			missingEntries += _defTitle + ", ";
@@ -186,21 +191,21 @@ bool PythonHeaderInterpreter::CreatePropertiesFromJSON()
 		
 		EntityPropertiesBase* propertyBase = nullptr;
 		std::string status("");
-		if (!propertyJSON->HasMember(_defType.c_str()))
+		if (!(*propertyJSON)->HasMember(_defType.c_str()))
 		{
 			allEntriesFound = false;
 			missingEntries += _defType + ", ";
 		}
 		else
 		{
-			std::string type = ot::rJSON::getString(*propertyJSON,_defType.c_str());
-			if (type == _propertyDefTypeSelection && !propertyJSON->HasMember(_propertyDefOptions.c_str()))
+			std::string type = ot::json::getString(**propertyJSON,_defType.c_str());
+			if (type == _propertyDefTypeSelection && !(*propertyJSON)->HasMember(_propertyDefOptions.c_str()))
 			{
 				allEntriesFound = false;
 				missingEntries += _propertyDefOptions + ", ";
 			}
 			
-			propertyBase = createPropertyEntity(*propertyJSON, status);
+			propertyBase = createPropertyEntity(**propertyJSON, status);
 			if (propertyBase == nullptr)
 			{
 				allEntriesFound = false;
@@ -209,14 +214,15 @@ bool PythonHeaderInterpreter::CreatePropertiesFromJSON()
 		}
 		if (allEntriesFound)
 		{
-			const std::string title = ot::rJSON::getString(*propertyJSON, _defTitle.c_str());
+			const std::string title = ot::json::getString((**propertyJSON), _defTitle.c_str());
+			
 			propertyBase->setGroup(_propertyGroupName);
 			propertyBase->setName(title);
 			_allProperties.push_back(propertyBase);
 		}
 		else
 		{
-			int scriptLine = _jsonEntryToScriptLine[&(*propertyJSON)];
+			int scriptLine = _jsonEntryToScriptLine[(*propertyJSON)];
 			_report += "Could not create property in line " +std::to_string(scriptLine) + " because\n"
 				"following fields are missing: " + missingEntries.substr(0, missingEntries.size() - 2) + "\n";
 			if (propertyBase == nullptr) { _report += status + "\n"; }
@@ -229,9 +235,9 @@ bool PythonHeaderInterpreter::CreatePropertiesFromJSON()
 	return allObjectsCreated;
 }
 
-ot::ConnectorType PythonHeaderInterpreter::getConnectorType(OT_rJSON_doc& jsonEntry, std::string& returnMessage )
+ot::ConnectorType PythonHeaderInterpreter::getConnectorType(ot::JsonDocument& jsonEntry, std::string& returnMessage )
 {
-	std::string typeString = ot::rJSON::getString(jsonEntry, _defType.c_str());
+	std::string typeString = ot::json::getString(jsonEntry, _defType.c_str());
 	
 	if (_connectorDefTypeIn == typeString)
 	{
@@ -252,19 +258,20 @@ ot::ConnectorType PythonHeaderInterpreter::getConnectorType(OT_rJSON_doc& jsonEn
 	}
 }
 
-EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(OT_rJSON_doc& jsonEntry, std::string& returnMessage)
+EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocument& jsonEntry, std::string& returnMessage)
 {
-	std::string typeString = ot::rJSON::getString(jsonEntry, _defType.c_str());
+	std::string typeString = ot::json::getString(jsonEntry, _defType.c_str());
 	
 	if (typeString == _propertyDefTypeBoolean)
 	{
 		auto entityBase = new EntityPropertiesBoolean();
-		if (ot::rJSON::memberExists(jsonEntry, _propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
 		{
-			const bool typeIsCorrect =  ot::rJSON::isBool(jsonEntry, _propertyDefDefault.c_str());
+			auto& jPropertyDefaultVal =	jsonEntry[_propertyDefDefault.c_str()];
+			const bool typeIsCorrect = jPropertyDefaultVal.IsBool();
 			if (typeIsCorrect)
 			{
-				const bool defaultValue = ot::rJSON::getBool(jsonEntry, _propertyDefDefault.c_str());
+				const bool defaultValue = jPropertyDefaultVal.GetBool();
 				entityBase->setValue(defaultValue);
 			}
 			else
@@ -279,12 +286,13 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(OT_rJSON_doc
 	else if (typeString == _propertyDefTypeDouble)
 	{
 		auto entityBase =new EntityPropertiesDouble();
-		if (ot::rJSON::memberExists(jsonEntry, _propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
 		{
-			const bool typeIsCorrect = ot::rJSON::isDouble(jsonEntry, _propertyDefDefault.c_str());
+			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			const bool typeIsCorrect = jPropertyDefaultVal.IsDouble();
 			if (typeIsCorrect)
 			{
-				const double defaultValue = ot::rJSON::getDouble(jsonEntry, _propertyDefDefault.c_str());
+				const double defaultValue = jPropertyDefaultVal.GetDouble();
 				entityBase->setValue(defaultValue);
 			}
 			else
@@ -299,12 +307,13 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(OT_rJSON_doc
 	else if (typeString == _propertyDefTypeInteger)
 	{
 		auto entityBase = new EntityPropertiesInteger();
-		if (ot::rJSON::memberExists(jsonEntry, _propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
 		{
-			const bool typeIsCorrect = ot::rJSON::isInteger(jsonEntry, _propertyDefDefault.c_str());
+			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			const bool typeIsCorrect = jPropertyDefaultVal.IsInt();
 			if (typeIsCorrect)
 			{
-				const int defaultValue = ot::rJSON::getInt(jsonEntry, _propertyDefDefault.c_str());
+				const int defaultValue = jPropertyDefaultVal.GetInt();
 				entityBase->setValue(defaultValue);
 			}
 			else
@@ -320,12 +329,13 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(OT_rJSON_doc
 	else if (typeString == _propertyDefTypeString)
 	{
 		auto entityBase = new EntityPropertiesString();
-		if (ot::rJSON::memberExists(jsonEntry, _propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
 		{
-			const bool typeIsCorrect = ot::rJSON::isString(jsonEntry, _propertyDefDefault.c_str());
+			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			const bool typeIsCorrect = jPropertyDefaultVal.IsString();
 			if (typeIsCorrect)
 			{
-				const std::string defaultValue = ot::rJSON::getString(jsonEntry, _propertyDefDefault.c_str());
+				const std::string defaultValue = jPropertyDefaultVal.GetString();
 				entityBase->setValue(defaultValue);
 			}
 			else
@@ -340,12 +350,13 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(OT_rJSON_doc
 	else if (typeString == _propertyDefTypeSelection)
 	{
 		auto entityBase = new EntityPropertiesSelection();
-		if (ot::rJSON::memberExists(jsonEntry, _propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
 		{
-			const bool typeIsCorrect = ot::rJSON::isString(jsonEntry, _propertyDefDefault.c_str());
+			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			const bool typeIsCorrect = jPropertyDefaultVal.IsString();
 			if (typeIsCorrect)
 			{
-				const std::string defaultValue = ot::rJSON::getString(jsonEntry, _propertyDefDefault.c_str());
+				const std::string defaultValue = jPropertyDefaultVal.GetString();
 				entityBase->setValue(defaultValue);
 			}
 			else
@@ -356,18 +367,10 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(OT_rJSON_doc
 				return entityBase;
 			}
 		}
-		const bool typeIsCorrect = ot::rJSON::isStringList(jsonEntry, _propertyDefOptions.c_str());
-		if (typeIsCorrect)
-		{
-			std::list<std::string> options = ot::rJSON::getStringList(jsonEntry, _propertyDefOptions.c_str());
-			entityBase->resetOptions(options);
-		}
-		else
-		{
-			returnMessage = "The optional member needs to be a string list.";
-			delete entityBase;
-			entityBase = nullptr;
-		}
+		auto& jPropertyDefOptions = jsonEntry[_propertyDefOptions.c_str()];
+		
+		std::list<std::string> options = ot::json::getStringList(jsonEntry, _propertyDefOptions.c_str());
+		entityBase->resetOptions(options);
 		return entityBase;
 	}
 	else

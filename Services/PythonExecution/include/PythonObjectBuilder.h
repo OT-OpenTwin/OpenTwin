@@ -9,8 +9,8 @@
 #include <Python.h>
 #include "CPythonObjectNew.h"
 #include "CPythonObjectBorrowed.h"
-#include "OpenTwinCore/Variable.h"
-#include "OpenTwinCore/rJSON.h"
+#include "OTCore/Variable.h"
+#include "OTCore/JSON.h"
 
 #include <stdint.h>
 #include <string>

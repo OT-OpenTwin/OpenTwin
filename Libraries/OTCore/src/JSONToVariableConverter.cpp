@@ -1,6 +1,6 @@
 #include "OTCore/JSONToVariableConverter.h"
 
-ot::Variable ot::JSONToVariableConverter::operator()(JsonValue& value)
+ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 {
 	if (value.IsString())
 	{
@@ -24,7 +24,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(JsonValue& value)
 	}
 }
 
-std::list<ot::Variable> ot::JSONToVariableConverter::operator()(rapidjson::GenericArray<false, rapidjson::Value>& value)
+std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArray& value)
 {
 	std::list<ot::Variable> variables;
 	const rapidjson::SizeType arraySize = value.Size();

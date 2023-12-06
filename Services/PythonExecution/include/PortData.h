@@ -1,5 +1,5 @@
 #pragma once
-#include "OpenTwinCore/Variable.h"
+#include "OTCore/Variable.h"
 #include <list>
 
 class PortData
