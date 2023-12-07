@@ -94,6 +94,7 @@ std::string Application::handleEditorSaveRequested(ot::JsonDocument& _document) 
 
 	// Add the "SetSaved" action to notify the editor that the changes have been saved
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editorName, doc.GetAllocator()), doc.GetAllocator());
 
 	// Send the request
 	std::string response;

@@ -24,6 +24,7 @@ Note that calling SetText for an existing editor will set the editors contents c
 
         // Add the "SetSaved" action to notify the editor that the changes have been saved
         doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, doc.GetAllocator()), doc.GetAllocator());
+        doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editorName, doc.GetAllocator()), doc.GetAllocator());
 
         // Now we can send the request
     }
@@ -68,10 +69,10 @@ When the handler is called, the provided document holds the editor name and text
 
 	    // Send the request
 	    std::string response;
-    	std::string req = doc.toJson();
-    	if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
-	    	return OT_ACTION_RETURN_VALUE_FAILED;
-	    }
+        std::string req = doc.toJson();
+        if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
+            return OT_ACTION_RETURN_VALUE_FAILED;
+        }
 
 	    return OT_ACTION_RETURN_VALUE_OK;
     }
