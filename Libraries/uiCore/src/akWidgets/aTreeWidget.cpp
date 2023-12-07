@@ -60,6 +60,8 @@ ak::aTreeWidget::aTreeWidget(
 	m_tree->setMouseTracking(true);
 	m_tree->setHeaderHidden(true);
 	m_tree->header()->setSortIndicator(0, Qt::SortOrder::AscendingOrder);
+	m_tree->setSortingEnabled(true);
+	m_tree->sortByColumn(0, Qt::AscendingOrder);
 
 	connect(m_filter, &aLineEditWidget::keyPressed, this, &aTreeWidget::slotFilterKeyPressed);
 	connect(m_filter, &QLineEdit::textChanged, this, &aTreeWidget::slotFilterTextChanged);
@@ -303,7 +305,7 @@ void ak::aTreeWidget::setSortingEnabled(
 ) { 
 	m_tree->setSortingEnabled(_enabled);
 	if (_enabled) {
-		m_tree->sortByColumn(0, Qt::DescendingOrder);
+		m_tree->sortByColumn(0, Qt::AscendingOrder);
 	}
 }
 
