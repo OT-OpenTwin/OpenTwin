@@ -231,6 +231,11 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged "UI.GraphicsEditor.SelectionChanged"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved "UI.GraphicsEditor.ItemMoved"
 
+#define OT_ACTION_CMD_UI_TEXTEDITOR_SetText "UI.TextEditor.SetText"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest "UI.TextEditor.SaveRequest"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved "UI.TextEditor.SetSaved"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_SetModified "UI.TextEditor.SetModified"
+
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
 #define OT_ACTION_PARAM_BASETYPE_UID "BaseTypes.UID"
@@ -504,6 +509,10 @@
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName "GraphicsEditor.Origin.ConName"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName "GraphicsEditor.Dest.ConName"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition "GraphicsEditor.Item.Pos"
+
+#define OT_ACTION_PARAM_TEXTEDITOR_Name "TextEditor.Name"
+#define OT_ACTION_PARAM_TEXTEDITOR_Text "TextEditor.Text"
+#define OT_ACTION_PARAM_TEXTEDITOR_Title "TextEditor.Title"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

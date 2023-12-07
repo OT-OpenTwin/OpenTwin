@@ -61,6 +61,7 @@ namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsView; }
 namespace ot { class GraphicsItem; }
+namespace ot { class TextEditor; }
 namespace ot { class GraphicsPickerDockWidget; }
 struct structModelViewInfo
 {
@@ -455,7 +456,13 @@ public:
 
 	ot::GraphicsView* findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo);
 
-	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
+	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::TextEditor* createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::TextEditor* findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::TextEditor* findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
 	std::list<ot::GraphicsView*> getAllGraphicsEditors(void);
 
@@ -498,6 +505,7 @@ public slots:
 	void slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos);
 	void slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 	void slotGraphicsSelectionChanged(void);
+	void slotTextEditorSaveRequested(void);
 
 private slots:
 	void reapplyColorStyle(void);
@@ -617,6 +625,7 @@ private:
 	std::string					m_currentStateColorStyle;
 
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsView> m_graphicsViews;
+	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditor> m_textEditors;
 
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;

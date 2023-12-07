@@ -62,6 +62,7 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/TextEditor.h"
 #include "DataBase.h"
 
 // C++ header
@@ -2072,7 +2073,7 @@ ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, con
 	connect(newEditor, &ot::GraphicsView::itemMoved, this, &AppBase::slotGraphicsItemMoved);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
 
-	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _name  + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" } Test { \"Test\": \"Tt\" }");
+	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _name  + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
 	return newEditor;
 }
@@ -2089,12 +2090,52 @@ ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::Basi
 	return nullptr;
 }
 
-ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
+ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
 	ot::GraphicsView* v = this->findGraphicsEditor(_name, _serviceInfo);
 	if (v) return v;
 
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
+}
+
+ot::TextEditor* AppBase::createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TextEditor* newEditor = this->findTextEditor(_name, _serviceInfo);
+	if (newEditor != nullptr) {
+		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		return newEditor;
+	}
+
+	newEditor = new ot::TextEditor;
+	newEditor->setTextEditorName(_name);
+
+	this->addTabToCentralView(_title, newEditor);
+	m_textEditors.store(_serviceInfo, newEditor);
+
+	connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
+
+	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+
+	return newEditor;
+}
+
+ot::TextEditor* AppBase::findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_textEditors.contains(_serviceInfo)) {
+		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+
+		for (auto v : lst) {
+			if (v->textEditorName() == _name) return v;
+		}
+	}
+
+	return nullptr;
+}
+
+ot::TextEditor* AppBase::findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TextEditor* v = this->findTextEditor(_name, _serviceInfo);
+	if (v) return v;
+
+	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	return this->createNewTextEditor(_name, _title, _serviceInfo);
 }
 
 std::list<ot::GraphicsView*> AppBase::getAllGraphicsEditors(void) {
@@ -2320,6 +2361,41 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 			return;
 		}
 		
+		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+		if (rMsg != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + rMsg.getWhat());
+			return;
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotTextEditorSaveRequested(void) {
+	ot::TextEditor* editor = dynamic_cast<ot::TextEditor*>(sender());
+	if (editor == nullptr) {
+		OT_LOG_E("GraphicsScene cast failed");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
+		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->textEditorName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_EA("Failed to send http request");
+			return;
+		}
+
 		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
 		if (rMsg != ot::ReturnMessage::Ok) {
 			OT_LOG_E("Request failed: " + rMsg.getWhat());

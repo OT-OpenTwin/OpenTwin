@@ -106,6 +106,12 @@
     <ClCompile Include="src\Dialog.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextEditor.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlainTextEdit.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -212,6 +218,9 @@
     <ClInclude Include="include\OTWidgets\Dialog.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlainTextEdit.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -236,6 +245,9 @@
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ToolTipHandler.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TextEditor.h">
       <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>

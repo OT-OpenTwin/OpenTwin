@@ -28,29 +28,32 @@
 #include "OTCore/Logger.h"
 #include "OTCore/Color.h"
 #include "OTCore/BasicServiceInformation.h"
-
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerServiceGlobal.h"
-
 #include "OTCore/SimpleFactory.h"
+
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/UiTypes.h"
+
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTServiceFoundation/Dispatcher.h"
 #include "OTServiceFoundation/TableRange.h"
 #include "OTServiceFoundation/ContextMenu.h"
+
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
+
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/TextEditor.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -2961,6 +2964,43 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 							v->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
 						}
 					}
+				}
+			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SetText) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
+				std::string editorText = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
+				std::string editorTitle = editorName;
+				if (_doc.HasMember(OT_ACTION_PARAM_TEXTEDITOR_Title)) {
+					editorTitle = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Title);
+				}
+
+				ot::TextEditor* editor = AppBase::instance()->findOrCreateTextEditor(editorName, QString::fromStdString(editorTitle), info);
+				editor->setPlainText(QString::fromStdString(editorText));
+				editor->setContentChanged(false);
+			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
+				ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
+
+				if (editor) {
+					editor->setContentChanged(false);
+				}
+			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SetModified) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
+				ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
+
+				if (editor) {
+					editor->setContentChanged(true);
 				}
 			}
 			else
