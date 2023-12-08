@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\BlockConnectionBSON.h" />
+    <ClInclude Include="include\CircuitElement.h" />
     <ClInclude Include="include\ClassFactoryBlock.h" />
     <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityBlock.h" />
@@ -170,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BlockConnectionBSON.cpp" />
+    <ClCompile Include="src\CircuitElement.cpp" />
     <ClCompile Include="src\ClassFactoryBlock.cpp" />
     <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\EntityBlock.cpp" />
