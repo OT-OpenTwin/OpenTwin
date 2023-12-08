@@ -1,6 +1,6 @@
 #pragma once
-//
-////Service Header
+
+//Service Header
 #include "CircuitElement.h"
 
 //C++ Header

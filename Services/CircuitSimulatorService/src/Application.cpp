@@ -671,11 +671,13 @@ std::string Application::ngSpice_Initialize()
 
 std::string Application::generateNetlist()
 {
-	//1Möglichkeit: Man könnte nach der Größe der NodenNumber sortieren das heißt dass alle knoten dann innerhalb eines NetlistString sortiert sind z.b statt
-	// 2 1 kommt dann immer 1 2 also -> knoten 1 < knoten 2 . Jedoch müsste man für die spoannungsquelle das umgedreht machen für positive ergebnisse
 
-	//2 Möglichkeit: Man sortiert die Liste der Connections für jedes Element aufsteigend der Nodenumbers nach mittels einer Funktion und dann bekommt man die 
-	//Connections schon sortiert aus der Liste 
+	//1st Approach: One could sort based on the size of the node numbers, meaning that all nodes within a NetlistString would be sorted. 
+	//For example, instead of "2 1," it would be "1 2," ensuring that node 1 comes before node 2. However, for positive results concerning voltage sources, 
+	//the order would need to be reversed.
+
+	//2nd Approach: Another option is to sort the list of connections for each element in ascending order of node numbers using a function. 
+	//This way, the connections are already sorted when retrieved from the list.
 
 
 	// First I declare the path to the file
@@ -689,8 +691,9 @@ std::string Application::generateNetlist()
 	
 	int DiodeCounter = 0;
 	int TransistorCounter = 0;
-	//!!!!!Es fehlt noch dass der connector nicht in die netlist eingetragen wird und der transistor werte und das model eintragen
-	//!!!!!Es fehlen noch richtige simulations einstellungen für transistor
+
+	// Note: The connector is not yet added to the netlist, and the transistor values along with the model are missing.
+	// Additionally, appropriate simulation settings for the transistor are still pending.
 
 	
 	
