@@ -27,6 +27,8 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTCommunication/ActionTypes.h"
+
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -326,12 +328,12 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
+	//if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
 	//else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
-	else {
-		OT_LOG_W("Unknown model action");
-		assert(0);
-	}// Unhandled button action
+	//else {
+		//OT_LOG_W("Unknown model action");
+		//assert(0);
+	//}// Unhandled button action
 	return std::string();
 }
 
@@ -347,91 +349,96 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 	//check and store information
 	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
 
-	// Create the Package
-	ot::GraphicsScenePackage pckg("Circuit");
-
-	// Create item configuration for the item to add
-	ot::GraphicsItemCfg* itm = nullptr;
-	if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createResistor(EXAMPLE_NAME_BLOCK1); }
-	else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createVoltageSource(EXAMPLE_NAME_Block2); }
-	else if (itemName == EXAMPLE_NAME_Block3) { itm = ottest::createDiode(EXAMPLE_NAME_Block3); }
-	else if (itemName == EXAMPLE_NAME_BLOCK4) { itm = ottest::createTransistor(EXAMPLE_NAME_BLOCK4); }
-	else if (itemName == EXAMPLE_NAME_BLOCK5) { itm = ottest::createConnector(EXAMPLE_NAME_BLOCK5); }
-	else
-	{
-		m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
-		return OT_ACTION_RETURN_VALUE_FAILED;
-	}
 	
-	itm->setPosition(pos);
-	itm->setUid(std::to_string(++ottest::currentBlockUid));
-	pckg.addItem(itm);
+	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
 
-	
+	return "";
 
-	// Here i Create a buffer Object for generating netlist
-	
-	CircuitElement element;
-	element.setItemName(itemName);
-	element.setEditorName(editorName);
-	element.setUID(itm->uid());
-	if (element.getItemName() == "Resistor")
-	{
-		std::string temp = std::to_string(ottest::currentResistorUid++);
-		std::string resistor = "R";
-		element.setNetlistElementName(resistor + temp);
-	}
-	else if(element.getItemName() == "Diode")
-	{
-		std::string temp = std::to_string(ottest::currentDiodeID++);
-		std::string diode = "D";
-		element.setNetlistElementName(diode + temp);
-	}
-	else if(element.getItemName() == "VoltageSource")
-	{
-		element.setNetlistElementName("V1");
-	}
-	else if (element.getItemName() == "Transistor")
-	{
-		std::string temp = std::to_string(ottest::currentTransistoriD++);
-		std::string tran = "Q";
-		element.setNetlistElementName(tran + temp);
-	}
-	else if (element.getItemName() == "Connector")
-	{
-		std::string temp = std::to_string(ottest::currenConnectorID++);
-		std::string conn = "C";
-		element.setNetlistElementName(conn + temp);
-	}
-	else
-	{
-		std::string temp = std::to_string(ottest::currentTransistoriD++);
-		std::string transistor = "Q";
-		element.setNetlistElementName(transistor+temp);
-	}
-	
-	auto it = mapOfCircuits.find(editorName);
-	if (it == mapOfCircuits.end())
-	{
-		Application::instance()->uiComponent()->displayMessage("No Circuit found");
-	}
-	else
-	{
-		it->second.addElement(element.getUID(), element);
-	}
+	//// Create the Package
+	//ot::GraphicsScenePackage pckg("Circuit");
 
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	//// Create item configuration for the item to add
+	//ot::GraphicsItemCfg* itm = nullptr;
+	//if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createResistor(EXAMPLE_NAME_BLOCK1); }
+	//else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createVoltageSource(EXAMPLE_NAME_Block2); }
+	//else if (itemName == EXAMPLE_NAME_Block3) { itm = ottest::createDiode(EXAMPLE_NAME_Block3); }
+	//else if (itemName == EXAMPLE_NAME_BLOCK4) { itm = ottest::createTransistor(EXAMPLE_NAME_BLOCK4); }
+	//else if (itemName == EXAMPLE_NAME_BLOCK5) { itm = ottest::createConnector(EXAMPLE_NAME_BLOCK5); }
+	//else
+	//{
+	//	m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
+	//	return OT_ACTION_RETURN_VALUE_FAILED;
+	//}
+	//
+	//itm->setPosition(pos);
+	//itm->setUid(std::to_string(++ottest::currentBlockUid));
+	//pckg.addItem(itm);
 
-	ot::JsonObject pckgObj;
-	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-	
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
+	//
 
-	m_uiComponent->sendMessage(true, reqDoc);
+	//// Here i Create a buffer Object for generating netlist
+	//
+	//CircuitElement element;
+	//element.setItemName(itemName);
+	//element.setEditorName(editorName);
+	//element.setUID(itm->uid());
+	//if (element.getItemName() == "Resistor")
+	//{
+	//	std::string temp = std::to_string(ottest::currentResistorUid++);
+	//	std::string resistor = "R";
+	//	element.setNetlistElementName(resistor + temp);
+	//}
+	//else if(element.getItemName() == "Diode")
+	//{
+	//	std::string temp = std::to_string(ottest::currentDiodeID++);
+	//	std::string diode = "D";
+	//	element.setNetlistElementName(diode + temp);
+	//}
+	//else if(element.getItemName() == "VoltageSource")
+	//{
+	//	element.setNetlistElementName("V1");
+	//}
+	//else if (element.getItemName() == "Transistor")
+	//{
+	//	std::string temp = std::to_string(ottest::currentTransistoriD++);
+	//	std::string tran = "Q";
+	//	element.setNetlistElementName(tran + temp);
+	//}
+	//else if (element.getItemName() == "Connector")
+	//{
+	//	std::string temp = std::to_string(ottest::currenConnectorID++);
+	//	std::string conn = "C";
+	//	element.setNetlistElementName(conn + temp);
+	//}
+	//else
+	//{
+	//	std::string temp = std::to_string(ottest::currentTransistoriD++);
+	//	std::string transistor = "Q";
+	//	element.setNetlistElementName(transistor+temp);
+	//}
+	//
+	//auto it = mapOfCircuits.find(editorName);
+	//if (it == mapOfCircuits.end())
+	//{
+	//	Application::instance()->uiComponent()->displayMessage("No Circuit found");
+	//}
+	//else
+	//{
+	//	it->second.addElement(element.getUID(), element);
+	//}
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	//ot::JsonDocument reqDoc;
+	//reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+
+	//ot::JsonObject pckgObj;
+	//pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	//reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+	//
+	//this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
+
+	//m_uiComponent->sendMessage(true, reqDoc);
+
+	//return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 
@@ -549,50 +556,50 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application:: createNewCircuitEditor(void)
-{
-	if (m_uiComponent) {
-		
-
-		ot::GraphicsNewEditorPackage pckg("Circuit", "Circuit Network");
-		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("CircuitElements", "Circuit Elements");
-		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
-		
-		a->addChildCollection(a1);
-		a1->addItem(ottest::createResistor(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
-		a1->addItem(ottest::createVoltageSource(EXAMPLE_NAME_Block2));
-		a1->addItem(ottest::createDiode(EXAMPLE_NAME_Block3));
-		a1->addItem(ottest::createTransistor(EXAMPLE_NAME_BLOCK4));
-		a1->addItem(ottest::createConnector(EXAMPLE_NAME_BLOCK5));
-		
-		pckg.addCollection(a);
-		
-		Circuit circuit;
-		circuit.setEditorName(pckg.title());
-		circuit.setId(pckg.name());
-		mapOfCircuits.insert_or_assign(pckg.name(), circuit);
-
-		ot::JsonDocument reqDoc;
-		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-		ot::JsonObject pckgObj;
-		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
-		std::string response;
-		std::string req = reqDoc.toJson();
-
-		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
-
-		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
-			return OT_ACTION_RETURN_VALUE_FAILED;
-		}
-	}
-
-	return OT_ACTION_RETURN_VALUE_OK;
-}
+//std::string Application:: createNewCircuitEditor(void)
+//{
+//	if (m_uiComponent) {
+//		
+//
+//		ot::GraphicsNewEditorPackage pckg("Circuit", "Circuit Network");
+//		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("CircuitElements", "Circuit Elements");
+//		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
+//		
+//		a->addChildCollection(a1);
+//		a1->addItem(ottest::createResistor(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
+//		a1->addItem(ottest::createVoltageSource(EXAMPLE_NAME_Block2));
+//		a1->addItem(ottest::createDiode(EXAMPLE_NAME_Block3));
+//		a1->addItem(ottest::createTransistor(EXAMPLE_NAME_BLOCK4));
+//		a1->addItem(ottest::createConnector(EXAMPLE_NAME_BLOCK5));
+//		
+//		pckg.addCollection(a);
+//		
+//		Circuit circuit;
+//		circuit.setEditorName(pckg.title());
+//		circuit.setId(pckg.name());
+//		mapOfCircuits.insert_or_assign(pckg.name(), circuit);
+//
+//		ot::JsonDocument reqDoc;
+//		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+//
+//		ot::JsonObject pckgObj;
+//		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+//		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+//
+//		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
+//
+//		std::string response;
+//		std::string req = reqDoc.toJson();
+//
+//		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
+//
+//		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
+//			return OT_ACTION_RETURN_VALUE_FAILED;
+//		}
+//	}
+//
+//	return OT_ACTION_RETURN_VALUE_OK;
+//}
 
 
 //Callback Functions for NGSpice
@@ -835,12 +842,14 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
-
 	_ui->addMenuPage("Circuit Simulator");
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
 	_ui->addMenuButton("Circuit Simulator", "Edit","New Circuit", "New Circuit", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add","Default");
 	_ui->addMenuButton("Circuit Simulator","Simulate","New Simulation","New Simulation", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add", "Default");
+
+	m_blockEntityHandler.setUIComponent(_ui);
+	m_blockEntityHandler.OrderUIToCreateBlockPicker();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
@@ -857,7 +866,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-
+	m_blockEntityHandler.setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

@@ -1,4 +1,4 @@
-#include "CircuitElement.h"
+#include "EntityBlockCircuitElement.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
@@ -9,11 +9,11 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 
 
-CircuitElement::CircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "CircuitElement";
-	_navigationTreeIconNameHidden = "CircuitElement";
+	_navigationTreeIconName = "Icon";
+	_navigationTreeIconNameHidden = "Icon";
 	_blockTitle = "Circuit Element";
 
 	const std::string connectorNameLeft = "Left";
@@ -27,42 +27,50 @@ CircuitElement::CircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* o
 
 }
 
-
-
-ot::GraphicsItemCfg* CircuitElement::CreateBlockCfg()
+void EntityBlockCircuitElement::createProperties()
 {
-	//First I create a stack item;
+	EntityPropertiesDouble::createProperty("Element Property", "ElementType", 100.0, "default", getProperties());
+}
+
+std::string EntityBlockCircuitElement::getElementType()
+{
+	auto propertyBase = getProperties().getProperty("ElementType");
+	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
+	assert(elementType != nullptr);
+
+	return elementType->getValue();
+}
+
+ot::GraphicsItemCfg* EntityBlockCircuitElement::CreateBlockCfg()
+{
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-	myStack->setName(this->getClassName());
-	myStack->setTitle(this->CreateBlockHeadline());
+	myStack->setName("EntityBlockCircuitElement");
+	myStack->setTitle("EntityBlockCircuitElement");
 	myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
-
-	//Second I create an Image
 	ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-	image->setImagePath("CircuitElementImages/ResistorBG.png");
+	image->setImagePath("CircuitElementImages/VoltageSource.png");
 	image->setSizePolicy(ot::SizePolicy::Dynamic);
 	image->setMaintainAspectRatio(true);
 
 	myStack->addItemBottom(image, false, true);
 
-	//Then I create a layout
 	ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-
 	myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
+
 	myStack->addItemTop(myLayout, true, false);
-	
-	//Now i want connections on the item for this i need rectangle items
+
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-	connection1->setName("Input1");
+	connection1->setName("Input2");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection1->setBackgroundPainer(painter1);
 	connection1->setAlignment(ot::AlignCenter);
 	connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
+	//connection1->setMargins(10.0, 0.0, 0.0, 0.0);
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-	connection2->setName("Output1");
+	connection2->setName("Ouput2");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection2->setBackgroundPainer(painter2);
@@ -71,22 +79,23 @@ ot::GraphicsItemCfg* CircuitElement::CreateBlockCfg()
 
 	connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
 	connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-	
 
-	//Here i add them to the Layout
 	myLayout->addChildItem(connection1);
 	myLayout->addStrech(1);
 	myLayout->addChildItem(connection2);
 
+
 	return myStack;
 }
 
-void CircuitElement::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitElement::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::AddStorageData(storage);
 }
 
-void CircuitElement::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitElement::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }
+
+

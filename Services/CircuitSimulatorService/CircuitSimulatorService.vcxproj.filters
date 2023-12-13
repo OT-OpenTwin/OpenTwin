@@ -36,7 +36,7 @@
     <ClCompile Include="src\Circuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BlockEntityHandler.cpp">
+    <ClCompile Include="src\BlockEntityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="include\Circuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BlockEntityHandler.h">
+    <ClInclude Include="include\BlockEntityHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
-#include "CircuitElement.h"
+#include "EntityBlockCircuitElement.h"
 #include <cassert>
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
@@ -20,9 +20,9 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	{
 		return new EntityBlockPython(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "CircuitElement")
+	else if (entityType == "EntityBlockCircuitElement")
 	{
-		return new CircuitElement(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityBlockCircuitElement(0, nullptr, nullptr, nullptr, this, "");
 	}
 	
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);

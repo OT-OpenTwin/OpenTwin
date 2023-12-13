@@ -45,7 +45,7 @@
     <ClInclude Include="include\PythonHeaderInterpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CircuitElement.h">
+    <ClInclude Include="include\EntityBlockCircuitElement.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,7 +74,7 @@
     <ClCompile Include="src\PythonHeaderInterpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CircuitElement.cpp">
+    <ClCompile Include="src\EntityBlockCircuitElement.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

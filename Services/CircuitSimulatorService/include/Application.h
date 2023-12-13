@@ -9,6 +9,7 @@
 #pragma once
 //Service Header
 #include "Circuit.h"
+#include "BlockEntityHandler.h"
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
@@ -30,11 +31,13 @@ class Application : public ot::ApplicationBase {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
-
+	BlockEntityHandler m_blockEntityHandler;
 private:
 	
 	Application();
 	virtual ~Application();
+
+	
 public:
 
 	// ##################################################################################################################################################################################################################
@@ -53,7 +56,7 @@ public:
 	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
 	
-	std::string createNewCircuitEditor(void);
+	//std::string createNewCircuitEditor(void);
 	std::string generateNetlist();
 	std::map<std::string, Circuit> mapOfCircuits;
 	
