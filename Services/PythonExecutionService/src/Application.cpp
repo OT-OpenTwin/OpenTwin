@@ -77,9 +77,9 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 	{
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-		{
-			
+		{			
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			OT_LOG_D("Executing action: " + action);
 			if (action == OT_ACTION_CMD_PYTHON_EXECUTE)
 			{
 				if (_doc.HasMember(OT_ACTION_CMD_PYTHON_Scripts) && _doc.HasMember(OT_ACTION_CMD_PYTHON_Parameter))
