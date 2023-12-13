@@ -30,9 +30,12 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 	{
 		std::string senderURL = ot::json::getString(doc, OT_ACTION_PARAM_SENDER_URL);
 		
+		OT_LOG_D("Received message from " + senderURL + "; excepts messages only from master service " + _urlMasterService);
+
 		if (senderURL != _urlMasterService)
 		{
-			ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Access denied.");
+			OT_LOG_D("Request denied")
+			ot::ReturnMessage rMsg(ot::ReturnMessage::Failed, "Request denied. Only PythonExecutionService is excepted."); //Lifecycle management is only implemented in PythonExecutionService and this service knows what to do on failed response and similar.
 			returnMessage = rMsg.toJson();
 		}
 		else
@@ -44,6 +47,7 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 				auto checkResult = checkParameter(doc);
 				if (checkResult.getStatus() == ot::ReturnMessage::Ok)
 				{
+					OT_LOG_D("Executing action " + action);
 					auto& handlingFunction = _handlingFunctions[action];
 					returnMessage = handlingFunction(doc).toJson();
 				}
@@ -76,6 +80,7 @@ const char* ActionHandler::Handle(const char* json, const char* senderIP)
 
 ot::ReturnMessage ActionHandler::ShutdownProcess(ot::JsonDocument& doc)
 {
+	OT_LOG_D("Shutting down process now.");
 	exit(1);
 }
 
@@ -89,8 +94,8 @@ ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 		PortDataBuffer::INSTANCE().clearPortData();
 
 		//Extract script entity names from json doc
-
 		std::list<std::string> scripts = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
+		OT_LOG_D("Number of scripts being executed: " + std::to_string(scripts.size()));
 		
 		//Extract parameter array from json doc
 		auto parameterArrayArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
@@ -117,6 +122,7 @@ ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 		if (doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Names))
 		{
 			std::list<std::string> portDataNames = ot::json::getStringList(doc,OT_ACTION_CMD_PYTHON_Portdata_Names);
+			OT_LOG_D("Number of port datasets: " + std::to_string(portDataNames.size()));
 			auto portData = doc[OT_ACTION_CMD_PYTHON_Portdata_Data].GetArray();
 			auto portName = portDataNames.begin();
 			for (uint32_t i = 0; i < portData.Size(); i++)
@@ -143,6 +149,7 @@ ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
 	}
 	catch (std::exception& e)
 	{
+		OT_LOG_D("Script execution failed due to exception: " + std::string(e.what()));
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
 	}
 

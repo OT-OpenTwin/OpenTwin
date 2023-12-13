@@ -39,10 +39,12 @@ ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<s
 		{
 			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript));
 		}
-		CPythonObjectNew pReturnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 
+		OT_LOG_D("Execute script " + scriptName);
+		CPythonObjectNew pReturnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 		returnValues.addData(scriptName, pyObBuilder.getVariableList(pReturnValue));
 		currentParameterSet++;
+		OT_LOG_D("Script execution succeeded");
 	}
 	return returnValues;
 }
@@ -75,6 +77,7 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 	for (auto& entityInfo : entityInfos)
 	{
 		std::string scriptName = entityInfo.getName();
+		OT_LOG_D("Loading script " + scriptName);
 		std::optional<std::string> moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName);
 		if (!moduleName.has_value())
 		{
