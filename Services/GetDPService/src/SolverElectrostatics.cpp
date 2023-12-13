@@ -281,7 +281,25 @@ void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map
     }
 
     controlFile <<
-        "      { Region SurfInf; Value 0.; }\n"
+        "      { Region SurfInf; Value 0.0; }\n"
+        "    }\n"
+        "  }\n";
+
+    controlFile <<
+        "  { Name ElectricScalarPotential_d2; Type Assign;\n"
+        "    Case {\n";
+
+    for (auto potential : potentialDefinitions)
+    {
+        std::string potentialName = potentialNameToAliasMap[potential.first];
+        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{potential.first});
+        std::string groupList = getGroupList(groupItemList);
+
+        controlFile << "      { Region " << potentialName << "; Value 0.0; }\n";
+    }
+
+    controlFile <<
+        "      { Region SurfInf; Value 0.0; }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
@@ -302,10 +320,14 @@ void SolverElectrostatics::writeFunctionSpace(std::ofstream& controlFile)
         "    BasisFunction {\n"
         "      { Name sn; NameOfCoef vn; Function BF_Node;\n"
         "        Support DomainCC_Ele; Entity NodesOf[All]; }\n"
+        "      { Name s2; NameOfCoef v2; Function BF_Node_2E;\n"
+        "        Support DomainCC_Ele; Entity EdgesOf[All]; }\n"
         "    }\n"
         "    Constraint {\n"
         "      { NameOfCoef vn; EntityType NodesOf;\n"
         "        NameOfConstraint ElectricScalarPotential; }\n"
+        "      { NameOfCoef v2; EntityType NodesOf;\n"
+        "        NameOfConstraint ElectricScalarPotential_d2; }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
@@ -338,21 +360,34 @@ void SolverElectrostatics::writeIntegration(std::ofstream& controlFile)
         "Integration {\n"
         "   { Name GradGrad; \n"
         "     Case{ {Type Gauss; \n"
-        "            Case { { GeoElement Triangle;    NumberOfPoints  4; }\n"
-        "                   { GeoElement Quadrangle;  NumberOfPoints  4; }\n"
-        "                   { GeoElement Tetrahedron; NumberOfPoints  4; }\n"
-        "                   { GeoElement Hexahedron;  NumberOfPoints  6; }\n"
-        "                   { GeoElement Prism;       NumberOfPoints  9; } }\n"
+        "            Case { { GeoElement Line;          NumberOfPoints   2; }\n"
+        "                   { GeoElement Triangle;      NumberOfPoints   4; }\n"
+        "                   { GeoElement Quadrangle;    NumberOfPoints   4; }\n"
+        "                   { GeoElement Tetrahedron;   NumberOfPoints   4; }\n"
+        "                   { GeoElement Hexahedron;    NumberOfPoints   6; }\n"
+        "                   { GeoElement Prism;         NumberOfPoints   9; }\n"
+        "                   { GeoElement Line2;         NumberOfPoints   3; }\n"
+        "                   { GeoElement Triangle2;     NumberOfPoints   6; }\n"
+        "                   { GeoElement Quadrangle2;   NumberOfPoints   7; }\n"
+        "                   { GeoElement Tetrahedron2;  NumberOfPoints  15; }\n"
+        "                   { GeoElement Hexahedron2;   NumberOfPoints  34; }\n"
+        "                   { GeoElement Prism2;        NumberOfPoints  21; } }\n"
         "           }\n"
         "         }\n"
         "   }\n"
         "   { Name CurlCurl; \n"
         "     Case{ {Type Gauss; \n"
-        "            Case { { GeoElement Triangle;    NumberOfPoints  4; }\n"
-        "                   { GeoElement Quadrangle;  NumberOfPoints  4; }\n"
-        "                   { GeoElement Tetrahedron; NumberOfPoints  4; }\n"
-        "                   { GeoElement Hexahedron;  NumberOfPoints  6; }\n"
-        "                   { GeoElement Prism;       NumberOfPoints  9; } }\n"
+        "            Case { { GeoElement Triangle;     NumberOfPoints  3; }\n"
+        "                   { GeoElement Quadrangle;   NumberOfPoints  4; }\n"
+        "                   { GeoElement Tetrahedron;  NumberOfPoints  4; }\n"
+        "                   { GeoElement Hexahedron;   NumberOfPoints  6; }\n"
+        "                   { GeoElement Prism;        NumberOfPoints  9; }\n"
+        "                   { GeoElement Line2;        NumberOfPoints  3; }\n"
+        "                   { GeoElement Triangle2;    NumberOfPoints  6; }\n"
+        "                   { GeoElement Quadrangle2;  NumberOfPoints  7; }\n"
+        "                   { GeoElement Tetrahedron2; NumberOfPoints 15; }\n"
+        "                   { GeoElement Hexahedron2;  NumberOfPoints 34; }\n"
+        "                   { GeoElement Prism2;       NumberOfPoints 21; } }\n"
         "            }\n"
         "         }\n"
         "   }\n"
@@ -368,7 +403,7 @@ void SolverElectrostatics::writeFormulation(std::ofstream& controlFile)
         "      { Name v; Type Local; NameOfSpace Hgrad_v_Ele; }\n"
         "    }\n"
         "    Equation {\n"
-        "      Galerkin { [epsr[] * Dof{d v} , {d v}] ; In DomainCC_Ele;\n"
+        "      Integral { [epsr[] * Dof{Grad v} , {Grad v}] ; In DomainCC_Ele;\n"
         "                 Jacobian Vol; Integration GradGrad; }\n"
         "    }\n"
         "  }\n"
