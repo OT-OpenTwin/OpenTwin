@@ -64,7 +64,7 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-	const MeasurementCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
+	const MetadataCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
 
 	UpdateBuffer(dbAccessEntity, measurementCampaign);
 
@@ -106,7 +106,7 @@ EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependenci
 	return properties;
 }
 
-const MeasurementCampaign PropertyHandlerDatabaseAccessBlock::GetMeasurementCampaign(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
+const MetadataCampaign PropertyHandlerDatabaseAccessBlock::GetMeasurementCampaign(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
 	CrossCollectionAccess access(dbAccessEntity->getSelectedProjectName(), sessionServiceURL, modelServiceURL);
 	if (access.ConnectedWithCollection())
@@ -115,7 +115,7 @@ const MeasurementCampaign PropertyHandlerDatabaseAccessBlock::GetMeasurementCamp
 		auto msmds = access.getMeasurementMetadata(_modelComponent);
 
 		MeasurementCampaignFactory factory;
-		const MeasurementCampaign measurementCampaign = factory.Create(rmd, msmds);
+		const MetadataCampaign measurementCampaign = factory.Create(rmd, msmds);
 		return measurementCampaign;
 	}
 	else
@@ -139,7 +139,7 @@ void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string
 	}
 }
 
-void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const MeasurementCampaign& campaignMetadata)
+void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const MetadataCampaign& campaignMetadata)
 {
 	BufferBlockDatabaseAccess buffer;
 	buffer.SelectedProject = dbAccessEntity->getSelectedProjectName();
@@ -147,7 +147,7 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 
 	buffer.parameters = campaignMetadata.getMetadataParameterByName();
 	buffer.quantities = campaignMetadata.getMetadataQuantitiesByName();
-	std::list<SeriesMetadata> seriesMetadata = campaignMetadata.getSeriesMetadata();
+	std::list<MetadataSeries> seriesMetadata = campaignMetadata.getSeriesMetadata();
 
 	std::string selectedQuantity, selectedParameter1, selectedParameter2, selectedParameter3;
 	getSelectedValues(dbAccessEntity, selectedQuantity, selectedParameter1, selectedParameter2, selectedParameter3);

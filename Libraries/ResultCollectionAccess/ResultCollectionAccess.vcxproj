@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
-    <ClInclude Include="include\MeasurementCampaign.h" />
+    <ClInclude Include="include\MetadataCampaign.h" />
     <ClInclude Include="include\MeasurementCampaignFactory.h" />
     <ClInclude Include="include\MetadataEntry.h" />
     <ClInclude Include="include\MetadataEntryArray.h" />
@@ -29,12 +29,12 @@
     <ClInclude Include="include\MetadataParameter.h" />
     <ClInclude Include="include\MetadataQuantity.h" />
     <ClInclude Include="include\QuantityContainer.h" />
-    <ClInclude Include="include\SeriesMetadata.h" />
+    <ClInclude Include="include\MetadataSeries.h" />
     <ClInclude Include="ResultCollectionAccess.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
-    <ClCompile Include="src\MeasurementCampaign.cpp" />
+    <ClCompile Include="src\MetadataCampaign.cpp" />
     <ClCompile Include="src\MeasurementCampaignFactory.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
   </ItemGroup>

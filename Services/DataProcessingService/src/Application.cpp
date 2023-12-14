@@ -145,6 +145,10 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 		_blockEntityHandler.UpdateBlockPosition(blockID,position);
 	}
+	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged)
+	{
+		
+	}
 
 	return ""; // Return empty string if the request does not expect a return
 }

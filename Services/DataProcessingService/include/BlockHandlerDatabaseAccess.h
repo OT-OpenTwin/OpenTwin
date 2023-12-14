@@ -2,7 +2,7 @@
 #include "BlockHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "Document/DocumentAccess.h"
-#include "MeasurementCampaign.h"
+#include "MetadataCampaign.h"
 
 
 class BlockHandlerDatabaseAccess : public BlockHandler
@@ -23,5 +23,5 @@ private:
 	std::string _queryString;
 	std::string _projectionString;
 
-	const MeasurementCampaign getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	const MetadataCampaign getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
 };

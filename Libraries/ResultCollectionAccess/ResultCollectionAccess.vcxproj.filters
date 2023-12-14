@@ -26,7 +26,7 @@
     <ClInclude Include="ResultCollectionAccess.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeasurementCampaign.h">
+    <ClInclude Include="include\MetadataCampaign.h">
       <Filter>include\Metadata</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataParameter.h">
@@ -41,7 +41,7 @@
     <ClInclude Include="include\CrossCollectionAccess.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SeriesMetadata.h">
+    <ClInclude Include="include\MetadataSeries.h">
       <Filter>include\Metadata</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataEntry.h">
@@ -61,7 +61,7 @@
     <ClCompile Include="src\QuantityContainer.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeasurementCampaign.cpp">
+    <ClCompile Include="src\MetadataCampaign.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\MeasurementCampaignFactory.cpp">

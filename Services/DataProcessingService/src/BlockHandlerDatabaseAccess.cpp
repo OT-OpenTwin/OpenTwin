@@ -1,6 +1,6 @@
 #include "BlockHandlerDatabaseAccess.h"
 #include "ResultCollectionHandler.h"
-#include "MeasurementCampaign.h"
+
 #include "Application.h"
 //#include "OpenTwinCore/JSONToVariableConverter.h"
 //#include "PropertyHandlerDatabaseAccessBlock.h"
@@ -48,9 +48,9 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	return true;
 }
 
-const MeasurementCampaign BlockHandlerDatabaseAccess::getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
+const MetadataCampaign BlockHandlerDatabaseAccess::getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-	return MeasurementCampaign();
+	return MetadataCampaign();
 }
 
 //BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)

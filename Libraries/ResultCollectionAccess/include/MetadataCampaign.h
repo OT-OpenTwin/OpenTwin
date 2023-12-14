@@ -3,19 +3,18 @@
 #include <string>
 #include <memory>
 
-#include "SeriesMetadata.h"
+#include "MetadataSeries.h"
 #include "MetadataQuantity.h"
 #include "MetadataParameter.h"
 #include "MetadataEntry.h"
-#include "SeriesMetadata.h"
 
 
-class __declspec(dllexport) MeasurementCampaign
+class __declspec(dllexport) MetadataCampaign
 {
 public:
-	void AddSeriesMetadata(SeriesMetadata&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
+	void AddSeriesMetadata(MetadataSeries&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
 	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadatametadata);
-	const std::list<SeriesMetadata>& getSeriesMetadata()const { return _seriesMetadata; };
+	const std::list<MetadataSeries>& getSeriesMetadata()const { return _seriesMetadata; };
 	const std::map <std::string, MetadataQuantity>& getMetadataQuantitiesByName() const { return _quantitiesByName; }
 	const std::map <std::string, MetadataParameter>& getMetadataParameterByName() const { return _parameterByName; }
 
@@ -24,7 +23,7 @@ public:
 
 	void reset();
 private:
-	std::list<SeriesMetadata> _seriesMetadata;
+	std::list<MetadataSeries> _seriesMetadata;
 	
 	std::map < std::string, MetadataQuantity > _quantitiesByName;
 	std::map < std::string, MetadataParameter > _parameterByName;

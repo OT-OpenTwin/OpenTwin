@@ -5,10 +5,10 @@
 #include <MetadataParameter.h>
 #include <MetadataQuantity.h>
 
-class __declspec(dllexport) SeriesMetadata
+class __declspec(dllexport) MetadataSeries
 {
 public:
-	SeriesMetadata(const std::string& name):_name(name) {};
+	MetadataSeries(const std::string& name):_name(name) {};
 	void AddParameter(MetadataParameter&& parameter) { _parameter.push_back(parameter); }
 	void AddQuantity(MetadataQuantity&& quantity) { _quantity.push_back(quantity); }
 	void AddMetadata(std::shared_ptr<MetadataEntry> metadata) { _metaData[metadata->getEntryName()] = metadata; }

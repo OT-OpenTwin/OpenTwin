@@ -6,16 +6,16 @@
 
 #include <vector>
 
-MeasurementCampaign MeasurementCampaignFactory::Create(std::shared_ptr<EntityResearchMetadata> rmd, std::list<std::shared_ptr<EntityMeasurementMetadata>> msmds)
+MetadataCampaign MeasurementCampaignFactory::Create(std::shared_ptr<EntityResearchMetadata> rmd, std::list<std::shared_ptr<EntityMeasurementMetadata>> msmds)
 {
-	MeasurementCampaign measurementCampaign;
+	MetadataCampaign measurementCampaign;
 	ExtractCampaignMetadata(measurementCampaign, rmd);
 	ExtractSeriesMetadata(measurementCampaign, msmds);
 	BuildUpOverviewLists(measurementCampaign);
 	return measurementCampaign;
 }
 
-void MeasurementCampaignFactory::ExtractCampaignMetadata(MeasurementCampaign& measurementCampaign, std::shared_ptr<EntityResearchMetadata> rmd)
+void MeasurementCampaignFactory::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityResearchMetadata> rmd)
 {
 	const GenericDocument* topLevel= rmd->getDocumentTopLevel();
 	auto fieldList = ExtractMetadataFields(*topLevel);
@@ -66,13 +66,13 @@ std::list<std::shared_ptr<MetadataEntry>> MeasurementCampaignFactory::ExtractMet
 	return metadata;
 }
 
-void MeasurementCampaignFactory::ExtractSeriesMetadata(MeasurementCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMeasurementMetadata>> msmds)
+void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMeasurementMetadata>> msmds)
 {
 	for (auto msmd : msmds)
 	{
 		std::string entityName = msmd->getName();
 		const std::string name = entityName.substr(entityName.find_last_of("/") +1);
-		SeriesMetadata seriesMetadata (name);
+		MetadataSeries seriesMetadata (name);
 		
 		const GenericDocument* parameterTopLevel = msmd->getDocument(msmd->getParameterDocumentName());
 		const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();
@@ -147,9 +147,9 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MeasurementCampaign& meas
 	}
 }
 
-void MeasurementCampaignFactory::BuildUpOverviewLists(MeasurementCampaign& measurementCampaign)
+void MeasurementCampaignFactory::BuildUpOverviewLists(MetadataCampaign& measurementCampaign)
 {
-	const std::list<SeriesMetadata> allSeriesMetadata = measurementCampaign.getSeriesMetadata();
+	const std::list<MetadataSeries> allSeriesMetadata = measurementCampaign.getSeriesMetadata();
 	std::map < std::string, MetadataParameter> parameterOverview;
 	std::map < std::string, MetadataQuantity > quantityOverview;
 
