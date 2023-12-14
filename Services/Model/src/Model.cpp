@@ -17,7 +17,7 @@
 #include "EntityVis2D3D.h"
 #include "EntityUnits.h"
 #include "EntityParameterizedDataCategorization.h"
-#include "EntityResearchMetadata.h"
+#include "EntityMetadataCampaign.h"
 #include "EntityParameterizedDataPreviewTable.h"
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
@@ -199,7 +199,7 @@ void Model::resetToNew(void)
 	EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
 	entityDatasetRoot->setName(getDatasetRootName());
 
-	EntityResearchMetadata* rmd = (new EntityResearchMetadata(createEntityUID(), nullptr, this, getStateManager(), &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager(), &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	rmd->setName(getDatasetRMD());
 	
 

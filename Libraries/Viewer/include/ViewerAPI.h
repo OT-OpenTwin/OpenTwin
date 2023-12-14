@@ -164,6 +164,8 @@ namespace ViewerAPI
 	__declspec(dllexport) void getSelectedModelEntityIDs(std::list<unsigned long long> &selected);
 	__declspec(dllexport) void getSelectedVisibleModelEntityIDs(std::list<unsigned long long> &selected);
 	__declspec(dllexport) ot::UID getModelEntityIDFromTreeID(ot::UID treeID);
+	__declspec(dllexport) ot::UID getTreeIDFromModelEntityID(ot::UID treeID);
+
 
 	__declspec(dllexport) void removeShapes(ot::UID osgModelID, std::list<unsigned long long> modelEntityID);
 	__declspec(dllexport) void setShapeVisibility(ot::UID osgModelID, std::list<unsigned long long> visibleID, std::list<unsigned long long> hiddenID);

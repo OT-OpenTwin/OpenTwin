@@ -162,6 +162,7 @@ public:
 	void clearHoverView(void);
 	void setHoverView(SceneNodeBase *selectedItem);
 	unsigned long long getModelEntityIDFromTreeID(ot::UID treeItem);
+	unsigned long long getTreeIDFromModelID(ot::UID modelID);
 
 	void setDataModel(unsigned long long modelID) { dataModelID = modelID; };
 	unsigned long long getDataModel(void) { return dataModelID; };

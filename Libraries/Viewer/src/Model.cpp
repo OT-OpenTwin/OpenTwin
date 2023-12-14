@@ -1883,6 +1883,18 @@ unsigned long long Model::getModelEntityIDFromTreeID(ot::UID treeItem)
 	return item->getModelEntityID();
 }
 
+unsigned long long Model::getTreeIDFromModelID(ot::UID modelID)
+{
+	for (const auto& treeItem : treeItemToSceneNodesMap)
+	{
+		if (treeItem.second->getModelEntityID() == modelID)
+		{
+			return treeItem.first;
+		}
+	}
+	throw std::exception("Could not find tree item associated with modelID");
+}
+
 void Model::setHoverView(SceneNodeBase *selectedItem)
 {
 	if (selectedItem != currentHoverItem)

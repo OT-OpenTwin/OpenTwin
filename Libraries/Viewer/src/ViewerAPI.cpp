@@ -590,6 +590,13 @@ ot::UID ViewerAPI::getModelEntityIDFromTreeID(ot::UID uid)
 	return globalActiveModel->getModelEntityIDFromTreeID(uid);
 }
 
+ot::UID ViewerAPI::getTreeIDFromModelEntityID(ot::UID modelID)
+{
+	if (globalActiveModel == nullptr) return 0;
+
+	return globalActiveModel->getTreeIDFromModelID(modelID);
+}
+
 void ViewerAPI::removeShapes(ot::UID osgModelID, std::list<unsigned long long> modelEntityID)
 {
 	try

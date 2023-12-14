@@ -2349,29 +2349,37 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		OTAssertNullptr(itm);
 		sel.push_back(itm->graphicsItemUid());
 	}
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
+	if (sel.size() != 0)
+	{
+		ot::UID blockID = std::stoull(sel.front());
+		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(blockID);
+		AppBase::instance()->clearNavigationTreeSelection();
+		AppBase::instance()->setNavigationTreeItemSelected(treeID, true);
 
-	try {
-		ot::GraphicsView* view = scene->getGraphicsView();
-		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
-		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-			OT_LOG_EA("Failed to send http request");
-			return;
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
+
+		try {
+			ot::GraphicsView* view = scene->getGraphicsView();
+			ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+			doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+			std::string response;
+			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+				OT_LOG_EA("Failed to send http request");
+				return;
+			}
+
+			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+			if (rMsg != ot::ReturnMessage::Ok) {
+				OT_LOG_E("Request failed: " + rMsg.getWhat());
+				return;
+			}
 		}
-		
-		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-		if (rMsg != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Request failed: " + rMsg.getWhat());
-			return;
+		catch (const std::exception& _e) {
+			OT_LOG_EAS(_e.what());
 		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		catch (...) {
+			OT_LOG_EA("[FATAL] Unknown error");
+		}
 	}
 }
 

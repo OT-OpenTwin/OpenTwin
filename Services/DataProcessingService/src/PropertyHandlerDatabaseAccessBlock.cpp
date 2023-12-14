@@ -64,7 +64,7 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-	const MetadataCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
+	MetadataCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
 
 	UpdateBuffer(dbAccessEntity, measurementCampaign);
 
@@ -139,7 +139,7 @@ void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string
 	}
 }
 
-void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const MetadataCampaign& campaignMetadata)
+void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, MetadataCampaign& campaignMetadata)
 {
 	BufferBlockDatabaseAccess buffer;
 	buffer.SelectedProject = dbAccessEntity->getSelectedProjectName();

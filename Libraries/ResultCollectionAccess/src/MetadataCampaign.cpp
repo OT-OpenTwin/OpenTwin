@@ -8,9 +8,22 @@ MetadataCampaign::MetadataCampaign(MetadataCampaign&& other)
 	_measurementCampaignName(other._measurementCampaignName)
 {}
 
+MetadataCampaign::MetadataCampaign(const MetadataCampaign& other)
+	:_seriesMetadata(other._seriesMetadata),
+	_quantitiesByName(other._quantitiesByName),
+	_parameterByName(other._parameterByName),
+	_metaData(other._metaData),
+	_measurementCampaignName(other._measurementCampaignName)
+{}
+
 MetadataCampaign MetadataCampaign::operator=(MetadataCampaign&& other)
 {
 	return MetadataCampaign(std::move(other));
+}
+
+MetadataCampaign MetadataCampaign::operator=(const MetadataCampaign& other)
+{
+	return MetadataCampaign(other);
 }
 
 void MetadataCampaign::AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadata)

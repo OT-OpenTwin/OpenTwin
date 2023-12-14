@@ -13,8 +13,8 @@ class __declspec(dllexport) MetadataCampaign
 {
 public:
 	MetadataCampaign(){}
-	MetadataCampaign(const MetadataCampaign& other) = delete;
-	MetadataCampaign operator=(const MetadataCampaign& other) = delete;
+	MetadataCampaign(const MetadataCampaign& other);
+	MetadataCampaign operator=(const MetadataCampaign& other);
 	MetadataCampaign(MetadataCampaign&& other);
 	MetadataCampaign operator=(MetadataCampaign&& other);
 
