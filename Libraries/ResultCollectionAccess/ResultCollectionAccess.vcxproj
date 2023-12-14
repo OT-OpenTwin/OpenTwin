@@ -30,13 +30,14 @@
     <ClInclude Include="include\MetadataQuantity.h" />
     <ClInclude Include="include\QuantityContainer.h" />
     <ClInclude Include="include\MetadataSeries.h" />
-    <ClInclude Include="ResultCollectionAccess.h" />
+    <ClInclude Include="include\DigitalTwinAccess.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
     <ClCompile Include="src\MeasurementCampaignFactory.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
+    <ClCompile Include="src\DigitalTwinAccess.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

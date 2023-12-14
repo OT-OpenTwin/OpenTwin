@@ -50,9 +50,9 @@
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityTableSelectedRanges.h"
 #include "EntityParameterizedDataPreviewTable.h"
-#include "EntityResearchMetadata.h"
+#include "EntityMetadataCampaign.h"
 #include "EntitySolverGetDP.h"
-#include "EntityMeasurementMetadata.h"
+#include "EntityMetadataSeries.h"
 #include "EntityCoordinates2D.h"
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
@@ -289,13 +289,13 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	{
 		return new EntityParameterizedDataPreviewTable(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityResearchMetadata")
+	else if (entityType == "EntityMetadataCampaign")
 	{
-		return new EntityResearchMetadata(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityMetadataCampaign(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityMeasurementMetadata")
+	else if (entityType == "EntityMetadataSeries")
 	{
-		return new EntityMeasurementMetadata(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityMetadataSeries(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else if (entityType == "EntitySolverGetDP")
 	{

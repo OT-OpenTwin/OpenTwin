@@ -18,12 +18,12 @@
     <Filter Include="include\MetadataEntries">
       <UniqueIdentifier>{1f56f169-44ce-43dd-9369-becc5fb42833}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\CollectionAccess">
+      <UniqueIdentifier>{c517615d-2880-4117-a44e-2eebd33af550}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\QuantityContainer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="ResultCollectionAccess.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataCampaign.h">
@@ -37,9 +37,6 @@
     </ClInclude>
     <ClInclude Include="include\MeasurementCampaignFactory.h">
       <Filter>include\MetadataFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CrossCollectionAccess.h">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataSeries.h">
       <Filter>include\Metadata</Filter>
@@ -56,6 +53,12 @@
     <ClInclude Include="include\MetadataEntrySingle.h">
       <Filter>include\MetadataEntries</Filter>
     </ClInclude>
+    <ClInclude Include="include\DigitalTwinAccess.h">
+      <Filter>include\CollectionAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CrossCollectionAccess.h">
+      <Filter>include\CollectionAccess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -68,6 +71,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\CrossCollectionAccess.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DigitalTwinAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

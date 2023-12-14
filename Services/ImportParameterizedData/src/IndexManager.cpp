@@ -12,7 +12,7 @@
 #include "OTCore/TypeNames.h"
 
 
-IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField)
+IndexManager::IndexManager(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField)
 	:_nameField(nameField), _valueField(valueField), _typeField(dataTypeField)
 {
 	if (existingMetadataEntities.size() != 0)
@@ -28,7 +28,7 @@ IndexManager::IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>>
 	}
 }
 
-void IndexManager::StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
+void IndexManager::StoreAllMSMDs(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities)
 {
 	for (auto& msmd : existingMetadataEntities)
 	{
@@ -39,7 +39,7 @@ void IndexManager::StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMeta
 	}
 }
 
-void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
+void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities)
 {
 	std::string parameterDocumentName = (*existingMetadataEntities.begin())->getParameterDocumentName();
 	for (auto existingMetadata : existingMetadataEntities)
@@ -76,7 +76,7 @@ void IndexManager::StoreAllParameter(std::list<std::shared_ptr<EntityMeasurement
 	}
 }
 
-void IndexManager::StoreAllQuantities(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities)
+void IndexManager::StoreAllQuantities(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities)
 {
 	std::string quantityDocumentName = (*existingMetadataEntities.begin())->getQuantityDocumentName();
 	for (auto& existingMetadata : existingMetadataEntities)

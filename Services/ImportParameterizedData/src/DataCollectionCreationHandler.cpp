@@ -3,8 +3,8 @@
 #include "ClassFactory.h"
 
 #include "MetadataAssemblyRangeData.h"
-#include "EntityMeasurementMetadata.h"
-#include "EntityResearchMetadata.h"
+#include "EntityMetadataSeries.h"
+#include "EntityMetadataCampaign.h"
 #include "BranchSynchronizer.h"
 #include "MetadataParameter.h"
 #include "GenericDocument.h"
@@ -90,7 +90,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	LoadRequiredTables(requiredTables, loadedTables);
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();
-	//Filling a new EntityMeasurementMetadata object with its fields.
+	//Filling a new EntityMetadataSeries object with its fields.
 	{
 		MetadataAssemblyRangeData rmdData;
 		rmdData.LoadAllRangeSelectionInformation(rmdAssemblyData->allSelectionRanges, loadedTables);
@@ -98,7 +98,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	}
 	
 	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
-	std::list<std::shared_ptr<EntityMeasurementMetadata>> allMetadata;
+	std::list<std::shared_ptr<EntityMetadataSeries>> allMetadata;
 	std::list<const std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
@@ -131,11 +131,11 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 		Documentation::INSTANCE()->ClearDocumentation();
 
-		//Filling a new EntityMeasurementMetadata object with its fields.
+		//Filling a new EntityMetadataSeries object with its fields.
 		MetadataAssemblyRangeData rangeData;
 		rangeData.LoadAllRangeSelectionInformation(metadataAssembly->allSelectionRanges, loadedTables);
 
-		std::shared_ptr<EntityMeasurementMetadata>metadataBuffer(new EntityMeasurementMetadata(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		std::shared_ptr<EntityMetadataSeries>metadataBuffer(new EntityMetadataSeries(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 		metadataBuffer->setName(_datasetFolder + "/" + msmdName);
 		AddFieldsToBaseLevel(rangeData, metadataBuffer);
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
@@ -236,19 +236,19 @@ std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExisting
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactory classFactory;
 
-	EntityResearchMetadata temp(-1, nullptr, nullptr, nullptr, nullptr, "");
+	EntityMetadataCampaign temp(-1, nullptr, nullptr, nullptr, nullptr, "");
 	
-	std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities;
+	std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities;
 	for (auto& entityInfo : entityInfos)
 	{
 		auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
 		if (entBase->getClassName() == temp.getClassName())
 		{
-			_rmdEntity.reset(dynamic_cast<EntityResearchMetadata*>(entBase));
+			_rmdEntity.reset(dynamic_cast<EntityMetadataCampaign*>(entBase));
 		}
 		else
 		{
-			existingMetadataEntities.push_back(std::shared_ptr<EntityMeasurementMetadata>(dynamic_cast<EntityMeasurementMetadata*>(entBase)));
+			existingMetadataEntities.push_back(std::shared_ptr<EntityMetadataSeries>(dynamic_cast<EntityMetadataSeries*>(entBase)));
 		}
 	}
 	return std::shared_ptr<IndexManager>(new IndexManager(existingMetadataEntities, _nameField, _dataTypeField,_valueField));
@@ -392,7 +392,7 @@ void DataCollectionCreationHandler::ExtractAllQuantities(std::map<std::string, M
 	}
 }
 
-void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMeasurementMetadata> msmd, const std::string& abbreviation, const std::string& name, const std::string& type)
+void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMetadataSeries> msmd, const std::string& abbreviation, const std::string& name, const std::string& type)
 {
 	std::list<ot::Variable> quantityName{ ot::Variable(name.c_str()) };
 	msmd->InsertToQuantityField("Name", quantityName, abbreviation);
@@ -572,7 +572,7 @@ void DataCollectionCreationHandler::AddFieldsToBaseLevel(const MetadataAssemblyR
 	}
 }
 
-void DataCollectionCreationHandler::AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMeasurementMetadata> msmd)
+void DataCollectionCreationHandler::AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMetadataSeries> msmd)
 {
 	Documentation::INSTANCE()->AddToDocumentation("Adding parameter:\n");
 	for (const auto& field : parameterBundle.getParameter())

@@ -3,7 +3,7 @@
 #include <string>
 
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "EntityMeasurementMetadata.h"
+#include "EntityMetadataSeries.h"
 #include "OTCore/Variable.h"
 
 class MeasurementCampaignHandler : public BusinessLogicHandler
@@ -16,5 +16,5 @@ public:
 private:
 
 	std::list<ot::EntityInformation> getMSMDEntityInformation(const std::string& collectionName, const std::string& projectName);
-	void CollectMetaInformation(std::vector<std::shared_ptr<EntityMeasurementMetadata>>& measurementMetadata);
+	void CollectMetaInformation(std::vector<std::shared_ptr<EntityMetadataSeries>>& measurementMetadata);
 };

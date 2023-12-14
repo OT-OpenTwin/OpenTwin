@@ -1,20 +1,20 @@
-#include "EntityMeasurementMetadata.h"
+#include "EntityMetadataSeries.h"
 
 #include "OTCommunication/ActionTypes.h"
 
-EntityMeasurementMetadata::EntityMeasurementMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	: EntityWithDynamicFields(ID,parent,mdl,ms,factory,owner)
 {
 	CreatePlainDocument(_parameterDocument);
 	CreatePlainDocument(_quantityDocument);
 }
 
-bool EntityMeasurementMetadata::getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax)
+bool EntityMetadataSeries::getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax)
 {
 	return false;
 }
 
-void EntityMeasurementMetadata::addVisualizationNodes()
+void EntityMetadataSeries::addVisualizationNodes()
 {
 	if (!getName().empty())
 	{
@@ -43,17 +43,17 @@ void EntityMeasurementMetadata::addVisualizationNodes()
 	EntityBase::addVisualizationNodes();
 }
 
-std::vector<std::string> EntityMeasurementMetadata::getAllParameterDocumentNames()
+std::vector<std::string> EntityMetadataSeries::getAllParameterDocumentNames()
 {
 	return getDocumentsNames(_parameterDocument);
 }
 
-std::vector<std::string> EntityMeasurementMetadata::getAllQuantityDocumentNames()
+std::vector<std::string> EntityMetadataSeries::getAllQuantityDocumentNames()
 {
 	return getDocumentsNames(_quantityDocument);
 }
 
-void EntityMeasurementMetadata::InsertToParameterField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+void EntityMetadataSeries::InsertToParameterField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
 {
 	std::string fullDocumentPath = _parameterDocument;
 	if (documentName != "")
@@ -63,7 +63,7 @@ void EntityMeasurementMetadata::InsertToParameterField(std::string fieldName, st
 	InsertInField(fieldName, values, fullDocumentPath);
 }
 
-void EntityMeasurementMetadata::InsertToQuantityField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+void EntityMetadataSeries::InsertToQuantityField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
 {
 	std::string fullDocumentPath = _quantityDocument;
 	if (documentName != "")

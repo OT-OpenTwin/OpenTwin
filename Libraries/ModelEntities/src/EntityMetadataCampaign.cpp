@@ -1,18 +1,18 @@
-#include "EntityResearchMetadata.h"
+#include "EntityMetadataCampaign.h"
 
 #include "OTCommunication/ActionTypes.h"
 
-EntityResearchMetadata::EntityResearchMetadata(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+EntityMetadataCampaign::EntityMetadataCampaign(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	: EntityWithDynamicFields(ID, parent, mdl, ms, factory, owner)
 {
 }
 
-bool EntityResearchMetadata::getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax)
+bool EntityMetadataCampaign::getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax)
 {
 	return false;
 }
 
-void EntityResearchMetadata::addVisualizationNodes()
+void EntityMetadataCampaign::addVisualizationNodes()
 {
 	if (!getName().empty())
 	{

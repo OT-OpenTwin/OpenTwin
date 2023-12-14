@@ -6,7 +6,7 @@
 
 #include <vector>
 
-MetadataCampaign MeasurementCampaignFactory::Create(std::shared_ptr<EntityResearchMetadata> rmd, std::list<std::shared_ptr<EntityMeasurementMetadata>> msmds)
+MetadataCampaign MeasurementCampaignFactory::Create(std::shared_ptr<EntityMetadataCampaign> rmd, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
 {
 	MetadataCampaign measurementCampaign;
 	ExtractCampaignMetadata(measurementCampaign, rmd);
@@ -15,7 +15,7 @@ MetadataCampaign MeasurementCampaignFactory::Create(std::shared_ptr<EntityResear
 	return measurementCampaign;
 }
 
-void MeasurementCampaignFactory::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityResearchMetadata> rmd)
+void MeasurementCampaignFactory::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityMetadataCampaign> rmd)
 {
 	const GenericDocument* topLevel= rmd->getDocumentTopLevel();
 	auto fieldList = ExtractMetadataFields(*topLevel);
@@ -66,7 +66,7 @@ std::list<std::shared_ptr<MetadataEntry>> MeasurementCampaignFactory::ExtractMet
 	return metadata;
 }
 
-void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMeasurementMetadata>> msmds)
+void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
 {
 	for (auto msmd : msmds)
 	{

@@ -286,13 +286,13 @@
     <ClInclude Include="include\EntitySolverGetDP.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityResearchMetadata.h">
+    <ClInclude Include="include\EntityMetadataCampaign.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\GenericDocument.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityMeasurementMetadata.h">
+    <ClInclude Include="include\EntityMetadataSeries.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityFileText.h">
@@ -564,10 +564,10 @@
     <ClCompile Include="src\EntitySolverGetDP.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityResearchMetadata.cpp">
+    <ClCompile Include="src\EntityMetadataCampaign.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityMeasurementMetadata.cpp">
+    <ClCompile Include="src\EntityMetadataSeries.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\GenericDocument.cpp">

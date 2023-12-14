@@ -9,7 +9,7 @@
  *********************************************************************/
 
 #pragma once
-#include "EntityMeasurementMetadata.h"
+#include "EntityMetadataSeries.h"
 #include "MetadataParameterBundle.h"
 #include "MetadataAssemblyRangeData.h"
 #include "MetadataQuantity.h"
@@ -22,7 +22,7 @@
 class IndexManager
 {
 public:
-	IndexManager(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField);
+	IndexManager(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities, const std::string& nameField, const std::string& dataTypeField, const std::string& valueField);
 	IndexManager(const IndexManager& other) = delete;
 	IndexManager(const IndexManager&& other) = delete;
 	IndexManager& operator=(const IndexManager& other) = delete;
@@ -57,9 +57,9 @@ private:
 	//It needs to be released again for the other, parallel running branches!
 
 
-	void StoreAllParameter(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities);
-	void StoreAllQuantities(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities);
-	void StoreAllMSMDs(std::list<std::shared_ptr<EntityMeasurementMetadata>> existingMetadataEntities);
+	void StoreAllParameter(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities);
+	void StoreAllQuantities(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities);
+	void StoreAllMSMDs(std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities);
 	bool CheckOnRMDLevelForParameterConsistency(MetadataAssemblyRangeData& allParameter, std::string& errorMessage);
 	bool CheckIfAllParameterHaveSameSize(MetadataAssemblyRangeData& allParameter, std::string& errorMessage);
 	

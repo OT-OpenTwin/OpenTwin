@@ -11,16 +11,16 @@
 #include <list>
 
 #include "OTCore/CoreTypes.h"
-#include "EntityMeasurementMetadata.h"
-#include "EntityResearchMetadata.h"
+#include "EntityMetadataSeries.h"
+#include "EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
 class __declspec(dllexport) CrossCollectionAccess
 {
 public:
 	CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL);
-	std::list<std::shared_ptr<EntityMeasurementMetadata>> getMeasurementMetadata(ot::components::ModelComponent* modelComponent);
-	std::shared_ptr<EntityResearchMetadata> getMeasurementCampaignMetadata(ot::components::ModelComponent* modelComponent);
+	std::list<std::shared_ptr<EntityMetadataSeries>> getMeasurementMetadata(ot::components::ModelComponent* modelComponent);
+	std::shared_ptr<EntityMetadataCampaign> getMeasurementCampaignMetadata(ot::components::ModelComponent* modelComponent);
 
 	bool ConnectedWithCollection() { return _collectionName != ""; }
 private:

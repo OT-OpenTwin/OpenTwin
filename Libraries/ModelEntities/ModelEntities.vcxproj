@@ -26,8 +26,8 @@
     <ClInclude Include="include\ClassFactoryHandler.h" />
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
-    <ClInclude Include="include\EntityMeasurementMetadata.h" />
-    <ClInclude Include="include\EntityResearchMetadata.h" />
+    <ClInclude Include="include\EntityMetadataSeries.h" />
+    <ClInclude Include="include\EntityMetadataCampaign.h" />
     <ClInclude Include="include\EntityResultUnstructuredMesh.h" />
     <ClInclude Include="include\EntityResultUnstructuredMeshData.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
@@ -141,7 +141,7 @@
     <ClCompile Include="src\EntityFacetData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />
-    <ClCompile Include="src\EntityMeasurementMetadata.cpp" />
+    <ClCompile Include="src\EntityMetadataSeries.cpp" />
     <ClCompile Include="src\EntityMeshCartesian.cpp" />
     <ClCompile Include="src\EntityMeshCartesianData.cpp" />
     <ClCompile Include="src\EntityMeshCartesianFace.cpp" />
@@ -160,7 +160,7 @@
     <ClCompile Include="src\EntityMeshTetNodes.cpp" />
     <ClCompile Include="src\EntityParameter.cpp" />
     <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
-    <ClCompile Include="src\EntityResearchMetadata.cpp" />
+    <ClCompile Include="src\EntityMetadataCampaign.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarSurface.cpp" />

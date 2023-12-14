@@ -15,16 +15,16 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 		DataBase::GetDataBase()->setProjectName(collectionName);
 		Application::instance()->prefetchDocumentsFromStorage(allMeasurementMetadata);
 
-		std::vector<std::shared_ptr<EntityMeasurementMetadata>> measurementMetadata;
+		std::vector<std::shared_ptr<EntityMetadataSeries>> measurementMetadata;
 		measurementMetadata.reserve(allMeasurementMetadata.size());
 
 		ClassFactory classFactory;
 		for (auto& entityInfo : allMeasurementMetadata)
 		{
 			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-			auto metadata = dynamic_cast<EntityMeasurementMetadata*>(baseEnt);
+			auto metadata = dynamic_cast<EntityMetadataSeries*>(baseEnt);
 			assert(metadata != nullptr);
-			measurementMetadata.push_back(std::shared_ptr<EntityMeasurementMetadata>(metadata));
+			measurementMetadata.push_back(std::shared_ptr<EntityMetadataSeries>(metadata));
 		}
 
 		DataBase::GetDataBase()->setProjectName(oldProjectName);
@@ -39,7 +39,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 
 std::list<ot::EntityInformation> MeasurementCampaignHandler::getMSMDEntityInformation(const std::string& collectionName, const std::string& projectName)
 {
-	EntityMeasurementMetadata temp(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityMetadataSeries temp(0, nullptr, nullptr, nullptr, nullptr, "");
 
 	ot::JsonDocument doc;
 
@@ -70,7 +70,7 @@ std::list<ot::EntityInformation> MeasurementCampaignHandler::getMSMDEntityInform
 	return entityInfos;
 }
 
-void MeasurementCampaignHandler::CollectMetaInformation(std::vector<std::shared_ptr<EntityMeasurementMetadata>>& measurementMetadata)
+void MeasurementCampaignHandler::CollectMetaInformation(std::vector<std::shared_ptr<EntityMetadataSeries>>& measurementMetadata)
 {
 	for (auto& metaData : measurementMetadata)
 	{
