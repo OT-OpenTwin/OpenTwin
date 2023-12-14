@@ -12,6 +12,12 @@
 class __declspec(dllexport) MetadataCampaign
 {
 public:
+	MetadataCampaign(){}
+	MetadataCampaign(const MetadataCampaign& other) = delete;
+	MetadataCampaign operator=(const MetadataCampaign& other) = delete;
+	MetadataCampaign(MetadataCampaign&& other);
+	MetadataCampaign operator=(MetadataCampaign&& other);
+
 	void AddSeriesMetadata(MetadataSeries&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
 	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadatametadata);
 	const std::list<MetadataSeries>& getSeriesMetadata()const { return _seriesMetadata; };
@@ -29,8 +35,8 @@ private:
 	std::map < std::string, MetadataParameter > _parameterByName;
 	
 	//Kann komischerweise nicht gelöscht werden
-	const std::string measurementCampaignName;
+	const std::string _measurementCampaignName;
 	
-	std::map <std::string, std::shared_ptr<MetadataEntry>> metaData;
+	std::map <std::string, std::shared_ptr<MetadataEntry>> _metaData;
 };
 

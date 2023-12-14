@@ -13,7 +13,6 @@ DigitalTwinAccess::DigitalTwinAccess(const std::string& projectName, ot::compone
 {
 	assert(_modelComponent != nullptr);
 	LoadExistingCampaignData();
-
 }
 
 void DigitalTwinAccess::LoadExistingCampaignData()
@@ -22,13 +21,23 @@ void DigitalTwinAccess::LoadExistingCampaignData()
 
 
 	EntityMetadataCampaign temp(-1, nullptr, nullptr, nullptr, nullptr, "");
+	std::shared_ptr<EntityMetadataCampaign> metadataCampaignEntity = nullptr;
+	std::list<std::shared_ptr<EntityMetadataSeries>> metadataSeriesEntities;
 
-	std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities;
-
-
+	for (EntityBase* entity : allExistingMetadata)
+	{
+		if (entity->getClassName() == temp.getClassName())
+		{
+			metadataCampaignEntity.reset(dynamic_cast<EntityMetadataCampaign*>(entity));
+		}
+		else
+		{
+			metadataSeriesEntities.push_back(std::shared_ptr<EntityMetadataSeries>(dynamic_cast<EntityMetadataSeries*>(entity)));
+		}
+	}
+	
 	MeasurementCampaignFactory campaignFactory;
-	//campaignFactory.Create()
-
+	_metadataCampaign =	campaignFactory.Create(metadataCampaignEntity, metadataSeriesEntities);
 }
 
 std::vector<EntityBase*> DigitalTwinAccess::FindAllExistingMetadata()
