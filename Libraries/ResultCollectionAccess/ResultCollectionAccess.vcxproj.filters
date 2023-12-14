@@ -62,6 +62,9 @@
     <ClInclude Include="include\DigitalTwinAccessCrossCollection.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
+    <ClInclude Include="include\DigitalTwinExtender.h">
+      <Filter>include\CollectionAccess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -80,6 +83,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DigitalTwinAccessCrossCollection.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DigitalTwinExtender.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

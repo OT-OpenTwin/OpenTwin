@@ -20,9 +20,9 @@ public:
 
 	void AddSeriesMetadata(MetadataSeries&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
 	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadatametadata);
-	const std::list<MetadataSeries>& getSeriesMetadata()const { return _seriesMetadata; };
-	const std::map <std::string, MetadataQuantity>& getMetadataQuantitiesByName() const { return _quantitiesByName; }
-	const std::map <std::string, MetadataParameter>& getMetadataParameterByName() const { return _parameterByName; }
+	std::list<MetadataSeries>& getSeriesMetadata() { return _seriesMetadata; };
+	std::map <std::string, MetadataQuantity>& getMetadataQuantitiesByName() { return _quantitiesByName; }
+	std::map <std::string, MetadataParameter>& getMetadataParameterByName() { return _parameterByName; }
 
 	void setParameterOverview(std::map <std::string, MetadataParameter>&& parameterByName) { _parameterByName = parameterByName; };
 	void setQuantityOverview(std::map <std::string, MetadataQuantity>&& quantitiesByName) { _quantitiesByName = quantitiesByName; };

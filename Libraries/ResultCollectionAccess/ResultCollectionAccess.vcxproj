@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\DigitalTwinAccessCrossCollection.h" />
+    <ClInclude Include="include\DigitalTwinExtender.h" />
     <ClInclude Include="include\MetadataCampaign.h" />
     <ClInclude Include="include\MeasurementCampaignFactory.h" />
     <ClInclude Include="include\MetadataEntry.h" />
@@ -36,6 +37,7 @@
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\DigitalTwinAccessCrossCollection.cpp" />
+    <ClCompile Include="src\DigitalTwinExtender.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
     <ClCompile Include="src\MeasurementCampaignFactory.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
