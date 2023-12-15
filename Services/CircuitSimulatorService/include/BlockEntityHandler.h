@@ -1,5 +1,6 @@
 #pragma once
 //Service Header
+#include "NGSpice.h"
 
 // Open twin header
 #include "OTServiceFoundation/BusinessLogicHandler.h"
@@ -18,6 +19,7 @@ class BlockEntityHandler : public BusinessLogicHandler
 public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void OrderUIToCreateBlockPicker();
+	NGSpice m_ngSpice;
 private:
 	const std::string _blockFolder = ot::FolderNames::BlockFolder;
 	const std::string _packageName = "Circuit Simulator";

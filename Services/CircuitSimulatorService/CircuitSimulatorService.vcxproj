@@ -188,6 +188,7 @@
     <ClCompile Include="src\Connection.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\NGSpice.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +198,7 @@
     <ClInclude Include="include\CircuitElement.h" />
     <ClInclude Include="include\Connection.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\NGSpice.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

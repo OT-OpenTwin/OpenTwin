@@ -1,6 +1,5 @@
 // Service header
 #include "BlockEntityHandler.h"
-
 // Open twin header
 #include "OTCommunication/ActionTypes.h"
 //#include "ExternalDependencies.h"
@@ -66,6 +65,11 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	a1->addItem(element.CreateBlockCfg());
 
 	pckg->addCollection(a);
+
+	Circuit circuit;
+	circuit.setEditorName(pckg->title());
+	circuit.setId(pckg->name());
+	Application::instance()->m_ngSpice.mapOfCircuits.insert_or_assign(pckg->name(), circuit);
 
 	return pckg;
 }

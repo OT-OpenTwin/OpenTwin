@@ -329,11 +329,11 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	//if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
-	//else if (action == "Circuit Simulator:Simulate:New Simulation") return ngSpice_Initialize();
+	//if (action == "Circuit Simulator:Simulate:New Simulation") return m_ngSpice.ngSpice_Initialize();
 	//else {
 		//OT_LOG_W("Unknown model action");
-		//assert(0);
-	//}// Unhandled button action
+	//	assert(0);
+	//	}// Unhandled button action
 	return std::string();
 }
 
@@ -349,10 +349,54 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 	//check and store information
 	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
 
-	
-	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
+	CircuitElement element;
+	element.setItemName(itemName);
+	element.setEditorName(editorName);
+	element.setUID(std::to_string(++ottest::currentBlockUid));
+	if (element.getItemName() == "EntityBlockCircuitElement")
+	{
+		std::string voltageSource = "V1";
+		element.setNetlistElementName(voltageSource);
+	}
+	else if (element.getItemName() == "Diode")
+	{
+		std::string temp = std::to_string(ottest::currentDiodeID++);
+		std::string diode = "D";
+		element.setNetlistElementName(diode + temp);
+	}
 
+	else if (element.getItemName() == "Transistor")
+	{
+		std::string temp = std::to_string(ottest::currentTransistoriD++);
+		std::string tran = "Q";
+		element.setNetlistElementName(tran + temp);
+	}
+	else if (element.getItemName() == "Connector")
+	{
+		std::string temp = std::to_string(ottest::currenConnectorID++);
+		std::string conn = "C";
+		element.setNetlistElementName(conn + temp);
+	}
+	else
+	{
+		std::string temp = std::to_string(ottest::currentTransistoriD++);
+		std::string transistor = "Q";
+		element.setNetlistElementName(transistor + temp);
+	}
+
+	auto it = m_ngSpice.mapOfCircuits.find(editorName);
+	if (it == m_ngSpice.mapOfCircuits.end())
+	{
+		Application::instance()->uiComponent()->displayMessage("No Circuit found");
+	}
+	else
+	{
+		it->second.addElement(element.getUID(), element);
+	}
+
+	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
 	return "";
+	
 
 	//// Create the Package
 	//ot::GraphicsScenePackage pckg("Circuit");
@@ -378,54 +422,8 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 
 	//// Here i Create a buffer Object for generating netlist
 	//
-	//CircuitElement element;
-	//element.setItemName(itemName);
-	//element.setEditorName(editorName);
-	//element.setUID(itm->uid());
-	//if (element.getItemName() == "Resistor")
-	//{
-	//	std::string temp = std::to_string(ottest::currentResistorUid++);
-	//	std::string resistor = "R";
-	//	element.setNetlistElementName(resistor + temp);
-	//}
-	//else if(element.getItemName() == "Diode")
-	//{
-	//	std::string temp = std::to_string(ottest::currentDiodeID++);
-	//	std::string diode = "D";
-	//	element.setNetlistElementName(diode + temp);
-	//}
-	//else if(element.getItemName() == "VoltageSource")
-	//{
-	//	element.setNetlistElementName("V1");
-	//}
-	//else if (element.getItemName() == "Transistor")
-	//{
-	//	std::string temp = std::to_string(ottest::currentTransistoriD++);
-	//	std::string tran = "Q";
-	//	element.setNetlistElementName(tran + temp);
-	//}
-	//else if (element.getItemName() == "Connector")
-	//{
-	//	std::string temp = std::to_string(ottest::currenConnectorID++);
-	//	std::string conn = "C";
-	//	element.setNetlistElementName(conn + temp);
-	//}
-	//else
-	//{
-	//	std::string temp = std::to_string(ottest::currentTransistoriD++);
-	//	std::string transistor = "Q";
-	//	element.setNetlistElementName(transistor+temp);
-	//}
-	//
-	//auto it = mapOfCircuits.find(editorName);
-	//if (it == mapOfCircuits.end())
-	//{
-	//	Application::instance()->uiComponent()->displayMessage("No Circuit found");
-	//}
-	//else
-	//{
-	//	it->second.addElement(element.getUID(), element);
-	//}
+	
+
 
 	//ot::JsonDocument reqDoc;
 	//reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
@@ -464,9 +462,9 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 	for (auto c : pckg.connections())
 	{
 		Connection connection(c);
-
 		
-		auto it = mapOfCircuits.find(pckg.name());
+		
+		auto it = m_ngSpice.mapOfCircuits.find(pckg.name());
 
 		//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
 		//the same nodeNumber
@@ -484,7 +482,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 			connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
 		}
 
-		if(it == mapOfCircuits.end())
+		if(it == m_ngSpice.mapOfCircuits.end())
 		{
 			OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
 		}
@@ -492,7 +490,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 		else
 		{	
 			//Here I add the connection to the Origin Element
-			it->second.addConnection(connection.originUid(), connection);
+			it->second.addConnection("1", connection);
 
 			
 
@@ -501,7 +499,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 			//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
 			
 			//Here I add the connection to the Destination Element
-			it->second.addConnection(connection.destUid(), connection);
+			it->second.addConnection("2", connection);
 
 			//test of print
 			
@@ -556,265 +554,6 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-//std::string Application:: createNewCircuitEditor(void)
-//{
-//	if (m_uiComponent) {
-//		
-//
-//		ot::GraphicsNewEditorPackage pckg("Circuit", "Circuit Network");
-//		ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("CircuitElements", "Circuit Elements");
-//		ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
-//		
-//		a->addChildCollection(a1);
-//		a1->addItem(ottest::createResistor(EXAMPLE_NAME_BLOCK1)); // In die Funktion kommt wie bei playground getItem bspw.
-//		a1->addItem(ottest::createVoltageSource(EXAMPLE_NAME_Block2));
-//		a1->addItem(ottest::createDiode(EXAMPLE_NAME_Block3));
-//		a1->addItem(ottest::createTransistor(EXAMPLE_NAME_BLOCK4));
-//		a1->addItem(ottest::createConnector(EXAMPLE_NAME_BLOCK5));
-//		
-//		pckg.addCollection(a);
-//		
-//		Circuit circuit;
-//		circuit.setEditorName(pckg.title());
-//		circuit.setId(pckg.name());
-//		mapOfCircuits.insert_or_assign(pckg.name(), circuit);
-//
-//		ot::JsonDocument reqDoc;
-//		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-//
-//		ot::JsonObject pckgObj;
-//		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-//		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-//
-//		this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
-//
-//		std::string response;
-//		std::string req = reqDoc.toJson();
-//
-//		OT_LOG_D("Requesting empty graphics editor ( editor = \"" + pckg.name() + "\"; title = \"" + pckg.title() + "\" )");
-//
-//		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
-//			return OT_ACTION_RETURN_VALUE_FAILED;
-//		}
-//	}
-//
-//	return OT_ACTION_RETURN_VALUE_OK;
-//}
-
-
-//Callback Functions for NGSpice
-
- int Application::MySendCharFunction(char* output, int ident, void* userData)
-{
-	 Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
-
-	return 0;
-}
-
-int Application::MySendStat(char* outputReturn, int ident, void* userData)
-{
-	Application::instance()->uiComponent()->displayMessage(std::string(outputReturn) + "\n");
-	
-
-	return 0;
-}
-
-int Application:: MyControlledExit(int exitstatus, bool immediate, bool quitexit, int ident, void* userdata)
-{
-	
-	OT_LOG_D(std::to_string(exitstatus));
-
-	return 0;
-
-}
-
-//Initialize Function for NGSpice
-
-std::string Application::ngSpice_Initialize()
-{
-	SendChar* printfcn = MySendCharFunction;
-	SendStat* statfcn = MySendStat;
-	ControlledExit* ngexit = MyControlledExit;
-	std::string myString;
-
-	int status = ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, nullptr, nullptr, nullptr, nullptr);
-
-	if (status == 0)
-	{
-		OT_LOG_D("Worked");
-
-		std::list<std::string> enabled;
-		
-		std::list<std::string> disabled;
-		/*disabled.push_back("Circuit Simulator:Simulate:New Simulation");
-		m_uiComponent->setControlsEnabledState(enabled, disabled);*/
-
-	}
-	else if (status == 1)
-	{
-		OT_LOG_E("Something went wrong");
-	}
-
-
-	// Some simulation
-	
-	//generateNetlist();
-
-	const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\MyCircuit.cir";
-
-	char command[100];
-	sprintf_s(command, "source %s", netlistPath);
-	ngSpice_Command(command);
-
-
-
-	myString = std::to_string(status);
-
-	return myString;
-
-	
-	
-}
-
-std::string Application::generateNetlist()
-{
-
-	//1st Approach: One could sort based on the size of the node numbers, meaning that all nodes within a NetlistString would be sorted. 
-	//For example, instead of "2 1," it would be "1 2," ensuring that node 1 comes before node 2. However, for positive results concerning voltage sources, 
-	//the order would need to be reversed.
-
-	//2nd Approach: Another option is to sort the list of connections for each element in ascending order of node numbers using a function. 
-	//This way, the connections are already sorted when retrieved from the list.
-
-
-	// First I declare the path to the file
-	
-	std::ofstream outfile("C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/output.cir");
-	//Here i have two Vectors for incomging and putgoing Connections
-	
-
-	std::string Title = "*Test";
-	outfile << Title << std::endl;
-	
-	int DiodeCounter = 0;
-	int TransistorCounter = 0;
-
-	// Note: The connector is not yet added to the netlist, and the transistor values along with the model are missing.
-	// Additionally, appropriate simulation settings for the transistor are still pending.
-
-	
-	
-	// Now I write the informations to the File
-	// Here i get the Circuit and the map of Elements
-	auto map = mapOfCircuits.find("Circuit")->second.getMapOfElements();
-	// Now i iterate through this Map of Elements and save the information
-	for (auto it : map)
-	{
-		
-		
-		std::string NodeNumbersString = "";
-		std::string elementName_temp = it.second.getItemName();
-		std::string netlistElementName = it.second.getNetlistElementName();
-		std::string value;
-		std::string elmentUID = it.second.getUID();
-
-		if (elementName_temp == "Connector")
-		{
-			continue;
-		}
-
-		//Here i get the Connection List
-		auto connectionList = it.second.getList();
-		
-		if(elementName_temp == "VoltageSource")
-		{
-			for (auto c = connectionList.rbegin(); c != connectionList.rend(); c++)
-			{
-
-				NodeNumbersString += c->getNodeNumber();
-				NodeNumbersString += " ";
-			}
-		}
-
-		else
-		{
-
-			for (auto c : connectionList)
-			{
-				NodeNumbersString += c.getNodeNumber();
-				NodeNumbersString += " ";
-
-			}
-
-		}
-
-		
-
-		
-		
-
-		//I set default values
-		if (elementName_temp == "VoltageSource")
-		{
-			value = "12V";
-
-
-		}
-		else if(elementName_temp == "Resistor")
-		{
-			value = "200";
-		}
-		else if(elementName_temp == "Diode")
-		{
-			value = "myDiode";
-			DiodeCounter++;
-		}
-		else
-		{
-			value = "BC546B";
-			TransistorCounter++;
-		}
-
-		//Create the end string 
-		std::string NetlistLine = netlistElementName + " " + NodeNumbersString + value;
-
-		outfile << NetlistLine << std::endl;
-	}
-
-	if (DiodeCounter > 0)
-	{
-		std::string diodeModel = ".model myDiode D (IS=1n RS=0.1 N=1)";
-		outfile << diodeModel << std::endl;
-	}
-
-	if (TransistorCounter > 0)
-	{
-		std::string tranModel = ".model BC546B npn (BF=200)";
-		outfile << tranModel << std::endl;
-	}
-
-	std::string Properties = ".dc V1 0V 12V 1V";
-	outfile << Properties << std::endl;
-
-	std::string control = ".Control";
-	outfile << control << std::endl;;
-
-	std::string run = "run";
-	outfile << run << std::endl;
-
-	std::string print = "print all";
-	outfile << print << std::endl;
-
-	std::string endc = ".endc";
-	outfile << endc << std::endl;;
-
-	std::string end = ".end";
-	outfile << end << std::endl;
-
-
-	std::string myString = "Succesfull";
-	return myString;
-}
 
 
 // ############################## ####################################################################################################################################################################################

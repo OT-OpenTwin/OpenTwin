@@ -10,6 +10,7 @@
 //Service Header
 #include "Circuit.h"
 #include "BlockEntityHandler.h"
+#include "NGSpice.h"
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
@@ -32,6 +33,7 @@ public:
 	static Application * instance(void);
 	static void deleteInstance(void);
 	BlockEntityHandler m_blockEntityHandler;
+	NGSpice m_ngSpice;
 private:
 	
 	Application();
@@ -56,22 +58,6 @@ public:
 	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
 	
-	//std::string createNewCircuitEditor(void);
-	std::string generateNetlist();
-	std::map<std::string, Circuit> mapOfCircuits;
-	
-	
-	//NgSpice functions
-	std::string ngSpice_Initialize();
-	static int MySendCharFunction( char*, int, void*);
-	
-	static int MySendStat(char*, int, void*);
-	static int MyControlledExit(int, bool imidiate, bool quitexit, int, void*);
-	//int SendData(pvecvaluesall, int, int, void*);
-	//int SendInitData(pvecinfoall, int, void*);
-	//int BGThreadRunning(NG_BOOL, int, void*);
-
-
 
 
 	// ##################################################################################################################################################################################################################
