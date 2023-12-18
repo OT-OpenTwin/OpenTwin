@@ -97,6 +97,9 @@ CALL "%OPENTWIN_DEV_ROOT%\Services\FITTDService\clean.bat"
 ECHO Clean: GetDP Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\GetDPService\clean.bat"
 
+ECHO Clean: ElmerFEM Service
+CALL "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\clean.bat"
+
 ECHO Clean: Global Directory Service
 CALL "%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\clean.bat"
 

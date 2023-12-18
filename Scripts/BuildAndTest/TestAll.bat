@@ -105,6 +105,11 @@ ECHO ===============================================================
 CALL "%OT_GETDP_SERVICE_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
+ECHO Test Service: ElmerFEM
+ECHO ===============================================================
+CALL "%OT_ELMERFEM_SERVICE_ROOT%%testBat%" %1 %2
+
+ECHO ===============================================================
 ECHO Test Service: Block Editor
 ECHO ===============================================================
 CALL "%OT_BLOCKEDITORSERVICE_ROOT%%testBat%" %1 %2

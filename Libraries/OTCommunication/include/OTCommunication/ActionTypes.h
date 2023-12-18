@@ -578,6 +578,7 @@
 #define OT_INFO_SERVICE_TYPE_ImportParameterizedDataService "ImportParameterizedDataService"
 #define OT_INFO_SERVICE_TYPE_DataProcessingService "DataProcessingService"
 #define OT_INFO_SERVICE_TYPE_GETDP "GetDPService"
+#define OT_INFO_SERVICE_TYPE_ELMERFEM "ElmerFEMService"
 #define OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "PythonExecutionService"
 #define OT_INFO_SERVICE_TYPE_BlockEditorService "BlockEditorService"
 #define OT_INFO_SERVICE_TYPE_CircuitSimulatorService "CircuitSimulatorService"

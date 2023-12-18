@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "3e22e947-bd98-4c71-a5f4-3a655871e164",
+		"_postman_id": "3442dfed-c7f6-47b5-932f-0a745d686d22",
 		"name": "SessionService",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "13477394"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -569,6 +568,68 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"action\":\"Service.DebugDisable\",\r\n    \"Service.Name\":\"GETDPService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8093/execute",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8093",
+							"path": [
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ELMERFEM.Debug.On",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"action\":\"Service.DebugEnable\",\r\n    \"Service.Name\":\"ElmerFEMService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://127.0.0.1:8093/execute",
+							"protocol": "https",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8093",
+							"path": [
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ElmerFEM.Debug.Off",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"action\":\"Service.DebugDisable\",\r\n    \"Service.Name\":\"ElmerFEMService\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

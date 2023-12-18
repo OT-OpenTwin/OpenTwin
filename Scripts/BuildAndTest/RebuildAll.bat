@@ -268,6 +268,11 @@ ECHO ===============================================================
 CALL "%OT_GETDP_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Service: ElmerFEMService
+ECHO ===============================================================
+CALL "%OT_ELMERFEM_SERVICE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Service: PythonExecutionService
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2

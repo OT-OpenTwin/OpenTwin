@@ -295,6 +295,7 @@ std::list<std::string> Session::toolBarTabOrder(void) {
 	tabOrder.push_back("FIT-TD");
 	tabOrder.push_back("PHREEC");
 	tabOrder.push_back("GetDP");
+	tabOrder.push_back("ElmerFEM");
 	tabOrder.push_back("Post Processing");
 	return tabOrder;
 }
