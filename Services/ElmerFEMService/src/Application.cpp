@@ -18,7 +18,7 @@
 
 // Application specific includes
 #include "ElmerFEMLauncher.h"
-#include "EntitySolverGetDP.h"
+#include "EntitySolverElmerFEM.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 #include "ClassFactory.h"
@@ -260,7 +260,7 @@ void Application::addSolver(void)
 	m_modelComponent->getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverGetDP *solverEntity = new EntitySolverGetDP(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	EntitySolverElmerFEM*solverEntity = new EntitySolverElmerFEM(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
@@ -304,7 +304,7 @@ void Application::runSolver(void)
 	std::map<std::string, bool> solverRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntitySolverGetDP")
+		if (entity.getType() == "EntitySolverElmerFEM")
 		{
 			if (entity.getName().substr(0, 8) == "Solvers/")
 			{
@@ -382,7 +382,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	}
 
 	if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-	m_uiComponent->displayMessage("\nGetDP solver started: " + solverName + "\n\n");
+	m_uiComponent->displayMessage("\nElmer FEM solver started: " + solverName + "\n\n");
 
 	if (solverEntity == nullptr)
 	{

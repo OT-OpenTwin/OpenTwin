@@ -305,7 +305,7 @@ std::string ElmerFEMLauncher::getUniqueTempDir(void)
 
 	do
 	{
-		uniqueTempDir = tempDir + "\\GETDP_WORK" + std::to_string(count);
+		uniqueTempDir = tempDir + "\\ELMERFEM_WORK" + std::to_string(count);
 		count++;
 
 	} while (checkFileOrDirExists(uniqueTempDir));

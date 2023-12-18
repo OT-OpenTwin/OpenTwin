@@ -30,6 +30,7 @@
     <ClInclude Include="include\EntityMetadataCampaign.h" />
     <ClInclude Include="include\EntityResultUnstructuredMesh.h" />
     <ClInclude Include="include\EntityResultUnstructuredMeshData.h" />
+    <ClInclude Include="include\EntitySolverElmerFEM.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
     <ClInclude Include="include\EntityFileText.h" />
     <ClInclude Include="include\EntityVisUnstructuredScalarSurface.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
+    <ClCompile Include="src\EntitySolverElmerFEM.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarSurface.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarVolume.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredVectorVolume.cpp" />

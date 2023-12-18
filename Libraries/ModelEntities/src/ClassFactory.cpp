@@ -52,6 +52,7 @@
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityMetadataCampaign.h"
 #include "EntitySolverGetDP.h"
+#include "EntitySolverElmerFEM.h"
 #include "EntityMetadataSeries.h"
 #include "EntityCoordinates2D.h"
 #include "EntityResultUnstructuredMesh.h"
@@ -300,6 +301,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntitySolverGetDP")
 	{
 		return new EntitySolverGetDP(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntitySolverElmerFEM")
+	{
+		return new EntitySolverElmerFEM(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else if (entityType == "EntityCoordinates2D")
 	{

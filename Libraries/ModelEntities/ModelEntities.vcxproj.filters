@@ -361,6 +361,9 @@
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h">
       <Filter>Header Files\ClassFactory</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntitySolverElmerFEM.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -620,6 +623,9 @@
     </ClCompile>
     <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredScalarSurface.cpp">
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntitySolverElmerFEM.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
