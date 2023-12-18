@@ -1391,7 +1391,7 @@ void Model::deleteSelectedShapes(void)
 		}
 	}
 
-	RemoveBlockConnections(selectedUnprotectedEntities);
+	std::list<ot::UID> topLevelBlockEntities = RemoveBlockConnections(selectedUnprotectedEntities);
 
 	// Remove all children from the list
 	std::list<EntityBase *> selectedTopLevelEntities = removeChildrenFromList(selectedUnprotectedEntities);
@@ -1407,6 +1407,9 @@ void Model::deleteSelectedShapes(void)
 		removeEntityFromMap(entity, false, false);
 		delete entity;
 	}
+
+	removeFromDisplay.splice(removeFromDisplay.begin(), topLevelBlockEntities);
+	removeFromDisplay.unique();
 
 	removeShapesFromVisualization(removeFromDisplay);
 
@@ -1941,13 +1944,14 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 	}
 }
 
-void Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
+std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
 {
 	std::list<EntityBase*> topLevelBlockEntities = FindTopLevelBlockEntities(entities);
-	if (topLevelBlockEntities.size() == 0) { return; }
+	if (topLevelBlockEntities.size() == 0) { return {}; }
 
 	//Now go through all top level block entities and delete all connections with this block, in other block entities
 	std::set<EntityBase*> entitiesMarkedForStorage;
+	std::list<ot::UID> topLevelBlockEntityIDs;
 	for (auto& entity : topLevelBlockEntities)
 	{
 		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(entity);
@@ -1972,6 +1976,7 @@ void Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
 			connectedBlockEntity->RemoveConnection(connection);
 			entitiesMarkedForStorage.insert(connectedEntity->second);
 		}
+		topLevelBlockEntityIDs.push_back(entity->getEntityID());
 	}
 
 	//Now check if the updated block entities are by themselve suppose to be deleted. In that case their change shall not be stored in the database.
@@ -1998,6 +2003,7 @@ void Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
 	{
 		setEntityOutdated(entity);
 	}
+	return topLevelBlockEntityIDs;
 }
 
 std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& allEntitiesForDeletion)
