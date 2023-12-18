@@ -65,6 +65,8 @@
 
 #include "tinyexpr.h"
 
+#include "EntityBlock.h"
+
 extern MicroserviceNotifier *globalNotifier;
 
 extern std::string getServiceName(void);
@@ -1389,6 +1391,8 @@ void Model::deleteSelectedShapes(void)
 		}
 	}
 
+	RemoveBlockConnections(selectedUnprotectedEntities);
+
 	// Remove all children from the list
 	std::list<EntityBase *> selectedTopLevelEntities = removeChildrenFromList(selectedUnprotectedEntities);
 
@@ -1937,6 +1941,116 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 	}
 }
 
+void Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
+{
+	std::list<EntityBase*> topLevelBlockEntities = FindTopLevelBlockEntities(entities);
+	if (topLevelBlockEntities.size() == 0) { return; }
+
+	//Now go through all top level block entities and delete all connections with this block, in other block entities
+	std::set<EntityBase*> entitiesMarkedForStorage;
+	for (auto& entity : topLevelBlockEntities)
+	{
+		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(entity);
+		assert(entityBlock != nullptr);
+		
+		auto& allConnections = entityBlock->getAllConnections();
+		for (auto& connection : allConnections)
+		{
+			ot::UID connectedEntityID;
+			if (connection.destUid() == std::to_string(entity->getEntityID()))
+			{
+				connectedEntityID = std::stoull(connection.originUid());
+			}
+			else
+			{
+				connectedEntityID = std::stoull(connection.destUid());
+			}
+			auto connectedEntity = entityMap.find(connectedEntityID);
+			assert(connectedEntity != entityMap.end());
+			EntityBlock* connectedBlockEntity =	dynamic_cast<EntityBlock*>(connectedEntity->second);
+			assert(connectedBlockEntity != nullptr);
+			connectedBlockEntity->RemoveConnection(connection);
+			entitiesMarkedForStorage.insert(connectedEntity->second);
+		}
+	}
+
+	//Now check if the updated block entities are by themselve suppose to be deleted. In that case their change shall not be stored in the database.
+	std::set<EntityBase*> entitiesForStorage;
+	for (auto& entityForStorage : entitiesMarkedForStorage)
+	{
+		bool entityShallBeDeleted = false;
+		for (auto& entity : topLevelBlockEntities)
+		{
+			if (entity->getEntityID() == entityForStorage->getEntityID())
+			{
+				entityShallBeDeleted = true;
+				break;
+			}
+		}
+		if (!entityShallBeDeleted)
+		{
+			entitiesForStorage.insert(entityForStorage);
+		}
+	}
+
+	//All block entities that got a connection removed and are not part of the deleting shall now be stored in the database and added to the model
+	for (EntityBase* entity : entitiesForStorage)
+	{
+		setEntityOutdated(entity);
+	}
+}
+
+std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& allEntitiesForDeletion)
+{
+	//This function sorts out the block entities and return only the top level block entities.
+	// 
+	// In a first step, bild a map with used entity pointers
+	std::map<EntityBase*, bool> entityMap;
+	for (auto entity : allEntitiesForDeletion)
+	{
+		entityMap[entity] = true;
+	}
+
+
+	std::list<EntityBase*> selectedTopLevelBlockEntities;
+
+	for (auto entity : allEntitiesForDeletion)
+	{
+		const bool entityIsABlockEntity = dynamic_cast<EntityBlock*>(entity) != nullptr;
+		if (entityIsABlockEntity)
+		{
+			// Now check whether a parent of the item is part of the list as well and if this parent is also a block entity.
+			// If not, add the entity to the new list of top level entities.
+			bool parentFoundAndIsBlock = false;
+
+			EntityBase* currentEntity = entity->getParent();
+
+			while (currentEntity != nullptr)
+			{
+				if (entityMap.find(currentEntity) != entityMap.end())
+				{
+					const bool parentIsABlockEntity = dynamic_cast<EntityBlock*>(currentEntity) != nullptr;
+					if (parentIsABlockEntity)
+					{
+						parentFoundAndIsBlock = true;
+						break;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				currentEntity = currentEntity->getParent();
+			}
+		
+			if (!parentFoundAndIsBlock) selectedTopLevelBlockEntities.push_back(entity);
+		}
+	}
+
+	return selectedTopLevelBlockEntities;
+}
+
 std::list<EntityBase*> Model::getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities)
 {
 	// Filter out properties which shall not be considered in this comparison
@@ -2095,12 +2209,12 @@ void Model::updateEntities(bool itemsVisible)
 		if (dynamic_cast<EntityParameter *>(entity) != nullptr)
 		{
 			// We are updating a parameter. Set all dependent properties to modified
-			EntityParameter *parameter = dynamic_cast<EntityParameter *>(entity);
+			EntityParameter* parameter = dynamic_cast<EntityParameter *>(entity);
 			std::map<ot::UID, std::map<std::string, bool>> dependencyMap = parameter->getDependencies();
 
 			for (auto &entityDependency : dependencyMap)
 			{
-				EntityBase *dependentEntity = getEntity(entityDependency.first);
+				EntityBase* dependentEntity = getEntity(entityDependency.first);
 
 				for (auto &propertyDependency : entityDependency.second)
 				{

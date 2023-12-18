@@ -286,7 +286,8 @@ private:
 	std::list<EntityBase*> getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities);
 	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, std::string>& entityProperties);
 	void addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible);
-
+	void RemoveBlockConnections(std::list<EntityBase*>& entityID);
+	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer               *entityRoot;
