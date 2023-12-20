@@ -7,6 +7,7 @@
 #include "ClassFactoryBlock.h"
 #include "ClassFactory.h"
 #include "EntityBlockCircuitElement.h"
+#include "EntityBlockCircuitResistor.h"
 // Third Party Header
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position)
@@ -30,10 +31,10 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 
 	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
-	//InitSpecialisedBlockEntity(blockEntity);
+	
+	InitSpecialisedCircuitElementEntity(blockEntity);
 
-	EntityBlockCircuitElement* CircuitElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
-	CircuitElement->createProperties();
+	
 
 	blockEntity->StoreToDataBase();
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
@@ -55,6 +56,22 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc);
 }
 
+void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity)
+{
+	EntityBlockCircuitElement* CircuitElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+	if (CircuitElement != nullptr)
+	{
+		CircuitElement->createProperties();
+	}
+
+	EntityBlockCircuitResistor* resistor = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
+	if (resistor != nullptr)
+	{
+		resistor->createProperties();
+	}
+	
+}
+
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
 	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
@@ -62,7 +79,9 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
 	a->addChildCollection(a1);
 	EntityBlockCircuitElement element(0, nullptr, nullptr, nullptr,nullptr, "");
+	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
 	a1->addItem(element.CreateBlockCfg());
+	a1->addItem(resistor.CreateBlockCfg());
 
 	pckg->addCollection(a);
 

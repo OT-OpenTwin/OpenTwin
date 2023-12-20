@@ -24,6 +24,7 @@ private:
 	const std::string _blockFolder = ot::FolderNames::BlockFolder;
 	const std::string _packageName = "Circuit Simulator";
 
+	void InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 
 };
