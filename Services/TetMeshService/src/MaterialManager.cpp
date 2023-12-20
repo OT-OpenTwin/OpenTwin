@@ -6,7 +6,6 @@
 #include "EntityMaterial.h"
 #include "ClassFactory.h"
 #include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/EntityInformation.h"
@@ -52,13 +51,9 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 	// Finally, load all materials and add them to the material map
 	application->prefetchDocumentsFromStorage(materialInformation);
 
-	ClassFactory classFactory;
-	ClassFactoryCAD classFactoryCAD;
-	classFactory.SetNextHandler(&classFactoryCAD);
-	classFactoryCAD.SetChainRoot(&classFactory);
 	for (auto mat : materialInformation)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *> (application->modelComponent()->readEntityFromEntityIDandVersion(mat.getID(), mat.getVersion(), classFactory));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *> (application->modelComponent()->readEntityFromEntityIDandVersion(mat.getID(), mat.getVersion(), application->getClassFactory()));
 
 		if (material == nullptr)
 		{

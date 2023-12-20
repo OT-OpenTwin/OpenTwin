@@ -137,8 +137,7 @@ ot::UID MeshExport::getGmshDataStorageID(ot::UID currentMeshDataID)
 	entityList.push_back(currentMeshDataID);
 	application->prefetchDocumentsFromStorage(entityList);
 
-	ClassFactory classFactory;
-	EntityMeshTetData *entity = dynamic_cast<EntityMeshTetData*> (application->modelComponent()->readEntityFromEntityIDandVersion(currentMeshDataID, application->getPrefetchedEntityVersion(currentMeshDataID), classFactory));
+	EntityMeshTetData *entity = dynamic_cast<EntityMeshTetData*> (application->modelComponent()->readEntityFromEntityIDandVersion(currentMeshDataID, application->getPrefetchedEntityVersion(currentMeshDataID), application->getClassFactory()));
 	if (entity == nullptr) return 0;
 
 	ot::UID gmshDataStorageID = entity->getGmshDataStorageId();
@@ -155,8 +154,7 @@ void MeshExport::loadGmshData(ot::UID gmshDataStorageID, std::vector<char> &mesh
 	entityList.push_back(gmshDataStorageID);
 	application->prefetchDocumentsFromStorage(entityList);
 
-	ClassFactory classFactory;
-	EntityBinaryData *entityData = dynamic_cast<EntityBinaryData*> (application->modelComponent()->readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), classFactory));
+	EntityBinaryData *entityData = dynamic_cast<EntityBinaryData*> (application->modelComponent()->readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), application->getClassFactory()));
 	if (entityData == nullptr) return;
 
 	meshContent = entityData->getData();

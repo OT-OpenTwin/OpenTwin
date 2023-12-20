@@ -459,16 +459,12 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 	// Now load all geometry entities in the model
 	application->prefetchDocumentsFromStorage(geometryEntitiesID);
 	
-	ClassFactory classFactory;
-	ClassFactoryCAD classFactoryCAD;
-	classFactory.SetNextHandler(&classFactoryCAD);
-	classFactoryCAD.SetChainRoot(&classFactory);
 	std::list<EntityGeometry *> geometryEntities;
 
 	for (auto entityID : geometryEntitiesID)
 	{
 		ot::UID entityVersion = application->getPrefetchedEntityVersion(entityID);
-		EntityGeometry *geom = dynamic_cast<EntityGeometry *>(application->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
+		EntityGeometry *geom = dynamic_cast<EntityGeometry *>(application->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
 
 		if (geom == nullptr)
 		{
@@ -500,7 +496,7 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 		ot::UID brepID = geomEntity->getBrepStorageObjectID();
 		ot::UID brepVersion = application->getPrefetchedEntityVersion(brepID);
 
-		EntityBrep *brep = dynamic_cast<EntityBrep *>(application->modelComponent()->readEntityFromEntityIDandVersion(brepID, brepVersion, classFactory));
+		EntityBrep *brep = dynamic_cast<EntityBrep *>(application->modelComponent()->readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
 
 		geomEntity->setBrepEntity(brep);
 	}

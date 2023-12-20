@@ -51,7 +51,8 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-
+	classFactory.SetNextHandler(&classFactoryCAD);
+	classFactoryCAD.SetChainRoot(&classFactory);
 }
 
 Application::~Application()
@@ -359,7 +360,6 @@ void Application::updateMesh(void)
 	std::map<std::string, EntityMeshTet *> mesherMap;
 	for (auto info : mesherInfo)
 	{
-		ClassFactory classFactory;
 		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory));
 		assert(entity != nullptr);
 

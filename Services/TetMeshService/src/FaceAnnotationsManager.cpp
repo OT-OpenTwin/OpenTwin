@@ -22,17 +22,14 @@ void FaceAnnotationsManager::loadAllFaceAnnotations(void)
 
 	application->prefetchDocumentsFromStorage(annotationEntityIDs);
 
-	ClassFactory classFactory;
-	ClassFactoryCAD classFactoryCAD;
-	classFactory.SetNextHandler(&classFactoryCAD);
-	classFactoryCAD.SetChainRoot(&classFactory);
+
 
 	for (auto annotation : annotationEntityIDs)
 	{
 		ot::UID entityID = annotation;
 		ot::UID entityVersion = application->getPrefetchedEntityVersion(entityID);
 
-		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(application->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
+		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(application->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
 		assert(annotationEntity != nullptr);
 
 		if (annotationEntity != nullptr)

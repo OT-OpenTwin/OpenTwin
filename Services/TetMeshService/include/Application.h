@@ -12,6 +12,9 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTServiceFoundation/EntityInformation.h"
 
+#include "ClassFactory.h"
+#include "ClassFactoryCAD.h"
+
 #include <Types.h>
 
 // C++ header
@@ -132,10 +135,15 @@ public:
 	std::string getCurrentlySelectedMeshName(void);
 	ot::UID getCurrentlySelectedMeshDataID(void);
 
+	ClassFactory& getClassFactory(void) { return classFactory;	}
+
 private:
 	std::list<ot::UID>	selectedEntities;
 	ot::UID				visualizationModelID;
 
 	static std::string materialsFolder;
 	static ot::UID materialsFolderID;
+
+	ClassFactory classFactory;
+	ClassFactoryCAD classFactoryCAD;
 };
