@@ -21,7 +21,7 @@ class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer
 public:
 	EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 
-	void InsertInField(std::string fieldName, std::list<ot::Variable> values, std::string documentName = "/");
+	void InsertInField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName = "/");
 
 	std::vector<std::string> getDocumentsNames(std::string parentDocument = "/") const;
 	const GenericDocument* getDocument(std::string documentName);

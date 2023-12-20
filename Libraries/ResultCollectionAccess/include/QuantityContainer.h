@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <list>
 #include <string>
-#include <set>
+#include <map>
 
 #include "OTCore/Variable.h"
 
@@ -16,17 +16,21 @@
 class __declspec(dllexport) QuantityContainer
 {
 public:
-	QuantityContainer(int32_t msmdIndex, std::set<std::string>& parameterAbbreviations, std::list<int32_t>& parameterValueIndices, int32_t quantityIndex, bool isFlatCollection);
-	const bsoncxx::builder::basic::document* GetDocument() const { return &_mongoDocument; };
+	QuantityContainer(int32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, int32_t quantityIndex);
+	QuantityContainer(QuantityContainer&& other);
+	QuantityContainer(const QuantityContainer& other) = delete;
+	QuantityContainer operator=(const QuantityContainer& other) = delete;
+	QuantityContainer operator=(QuantityContainer&& other);
+	~QuantityContainer();
 
-	void AddValue(ot::Variable& value);
+	bsoncxx::builder::basic::document* GetDocument() { return &_mongoDocument; };
+
+	void AddValue(const ot::Variable& value);
 	int64_t GetValueArraySize() const { return _values.size(); };
 	const bsoncxx::builder::basic::document& getMongoDocument();
+	static const std::string getFieldName() { return "Values"; }
 
 private:
-
 	bsoncxx::builder::basic::document _mongoDocument;
-	
 	std::list<ot::Variable> _values;
-	bool _isFlatCollection;
 };

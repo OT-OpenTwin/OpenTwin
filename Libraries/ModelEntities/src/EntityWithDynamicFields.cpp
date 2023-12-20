@@ -10,7 +10,7 @@ EntityWithDynamicFields::EntityWithDynamicFields(ot::UID ID, EntityBase* parent,
 	_bsonDocumentsByName["/"];
 }
 
-void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName)
 {
 	if (_bsonDocumentsByName.find(documentName) == _bsonDocumentsByName.end())
 	{

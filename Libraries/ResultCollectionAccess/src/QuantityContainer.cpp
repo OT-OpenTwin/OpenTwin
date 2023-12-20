@@ -1,37 +1,51 @@
 #include "QuantityContainer.h"
 #include "VariableToBSONConverter.h"
+#include "MetadataQuantity.h"
+#include "MetadataSeries.h"
 
-QuantityContainer::QuantityContainer(int32_t msmdIndex, std::set<std::string>& parameterAbbreviations, std::list<int32_t>& parameterValueIndices, int32_t quantityIndex, bool isFlatCollection)
-	: _isFlatCollection(isFlatCollection)
+QuantityContainer::QuantityContainer(int32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, int32_t quantityIndex)
 {
 	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaType", "QuantityContainer"));
 	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaVersion", 1));
-	_mongoDocument.append(bsoncxx::builder::basic::kvp("MSMD", msmdIndex));
-	_mongoDocument.append(bsoncxx::builder::basic::kvp("Quantity", quantityIndex));
-	auto paramValIndex = parameterValueIndices.begin();
-
-	for (const std::string& paramAbbrev : parameterAbbreviations)
+	_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataSeries::getFieldName(), seriesIndex));
+	_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataQuantity::getFieldName(), quantityIndex));
+	
+	VariableToBSONConverter converter;
+	auto parameterValue =parameterValues.begin();
+	for (const auto& parameterAbbreviation : parameterAbbreviations)
 	{
-		_mongoDocument.append(bsoncxx::builder::basic::kvp(paramAbbrev, *paramValIndex));
-		paramValIndex++;
+		converter(_mongoDocument,*parameterValue++,parameterAbbreviation);
 	}
+
 }
 
-void QuantityContainer::AddValue(ot::Variable& value)
+QuantityContainer::QuantityContainer(QuantityContainer&& other)
 {
-	if (_isFlatCollection && _values.size() > 0)
-	{
-		throw std::exception("Quantity document is defined for a flat collection and cannot hold more than one value.");
-	}
+	_values = std::move(other._values);
+	_mongoDocument = std::move(other._mongoDocument);
+}
+
+
+QuantityContainer QuantityContainer::operator=(QuantityContainer&& other)
+{
+	return QuantityContainer(std::move(other));
+}
+
+QuantityContainer::~QuantityContainer()
+{
+}
+
+void QuantityContainer::AddValue(const ot::Variable& value)
+{
 	_values.push_back(value);
 }
 
 const bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 {
 	VariableToBSONConverter converter;
-	if (_isFlatCollection)
+	if (_values.size() == 1)
 	{
-		converter(_mongoDocument, *_values.begin(), "Values");
+		converter(_mongoDocument, *_values.begin(), QuantityContainer::getFieldName());
 	}
 	else
 	{
@@ -40,7 +54,7 @@ const bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 		{
 			converter(valueArray, value);
 		}
-		_mongoDocument.append(bsoncxx::builder::basic::kvp("Values", valueArray));
+		_mongoDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), valueArray));
 	}
 	return _mongoDocument;
 }

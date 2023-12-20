@@ -3,12 +3,11 @@
 #include "EntityPropertiesItems.h"
 #include "EntityProperties.h"
 #include "OTCommunication/ActionTypes.h"
-#include "CrossCollectionAccess.h"
-#include "MeasurementCampaignFactory.h"
 #include "OTCommunication/Msg.h"
 #include "ClassFactory.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "Application.h"
+#include "ResultCollectionAccess.h"
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
@@ -64,9 +63,10 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-	MetadataCampaign measurementCampaign =	GetMeasurementCampaign(dbAccessEntity, sessionServiceURL, modelServiceURL);
+	const std::string projectName = dbAccessEntity->getSelectedProjectName();
+	ResultCollectionAccess access(projectName, *_modelComponent, sessionServiceURL, modelServiceURL);
 
-	UpdateBuffer(dbAccessEntity, measurementCampaign);
+	UpdateBuffer(dbAccessEntity, access.getMetadataCampaign());
 
 	const std::string propertyNameMSMD = dbAccessEntity->getPropertyNameMeasurementSeries();
 	
@@ -106,24 +106,6 @@ EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependenci
 	return properties;
 }
 
-const MetadataCampaign PropertyHandlerDatabaseAccessBlock::GetMeasurementCampaign(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
-{
-	CrossCollectionAccess access(dbAccessEntity->getSelectedProjectName(), sessionServiceURL, modelServiceURL);
-	if (access.ConnectedWithCollection())
-	{
-		auto rmd = access.getMeasurementCampaignMetadata(_modelComponent);
-		auto msmds = access.getMeasurementMetadata(_modelComponent);
-
-		MeasurementCampaignFactory factory;
-		const MetadataCampaign measurementCampaign = factory.Create(rmd, msmds);
-		return measurementCampaign;
-	}
-	else
-	{
-		throw std::exception("Could not connect with collection");
-	}
-}
-
 void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON)
 {
 	ot::JsonDocument requestDoc;
@@ -139,7 +121,7 @@ void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string
 	}
 }
 
-void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, MetadataCampaign& campaignMetadata)
+void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity,const MetadataCampaign& campaignMetadata)
 {
 	BufferBlockDatabaseAccess buffer;
 	buffer.SelectedProject = dbAccessEntity->getSelectedProjectName();

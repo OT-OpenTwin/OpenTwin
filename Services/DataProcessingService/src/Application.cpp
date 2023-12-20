@@ -77,8 +77,7 @@ void Application::run(void)
 #include "MeasurementCampaignHandler.h"
 #include "EntityCoordinates2D.h"
 #include "DataBase.h"
-#include "CrossCollectionAccess.h"
-#include "MeasurementCampaignFactory.h"
+#include "ResultCollectionAccess.h"
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {

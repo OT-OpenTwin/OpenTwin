@@ -1,4 +1,4 @@
-#include "MeasurementCampaignFactory.h"
+#include "MetadataEntityInterface.h"
 #include "MetadataEntry.h"
 #include "MetadataEntryArray.h"
 #include "MetadataEntryObject.h"
@@ -6,16 +6,59 @@
 
 #include <vector>
 
-MetadataCampaign MeasurementCampaignFactory::Create(std::shared_ptr<EntityMetadataCampaign> rmd, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
+MetadataCampaign MetadataEntityInterface::CreateCampaign(std::shared_ptr<EntityMetadataCampaign> rmd, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
 {
 	MetadataCampaign measurementCampaign;
 	ExtractCampaignMetadata(measurementCampaign, rmd);
 	ExtractSeriesMetadata(measurementCampaign, msmds);
-	BuildUpOverviewLists(measurementCampaign);
+	measurementCampaign.UpdateMetadataOverview();
 	return measurementCampaign;
 }
 
-void MeasurementCampaignFactory::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityMetadataCampaign> rmd)
+void MetadataEntityInterface::StoreCampaign(std::list<MetadataSeries>&& seriesMetadata, MetadataCampaign&& metaDataCampaign)
+{
+	for (auto& metadata : metaDataCampaign.getMetaData())
+	{
+		//ToDo
+	}
+	StoreCampaign(std::move(seriesMetadata));
+}
+
+void MetadataEntityInterface::StoreCampaign(std::list<MetadataSeries>&& seriesMetadata)
+{
+	for (auto& newSeriesMetadata : seriesMetadata)
+	{
+		const std::string name = newSeriesMetadata.getName();
+		EntityMetadataSeries entitySeries(0, nullptr, nullptr, nullptr, nullptr, "");
+		entitySeries.setName(name);
+		for (const MetadataParameter& parameter : newSeriesMetadata.getParameter())
+		{
+			MetadataParameter& parameterForChange = const_cast<MetadataParameter&>(parameter);
+			entitySeries.InsertToParameterField(_nameField, { ot::Variable(parameter.parameterName) }, parameter.parameterAbbreviation);
+			entitySeries.InsertToParameterField(_valuesField, std::move(parameterForChange.values), parameter.parameterAbbreviation);
+			for (auto& metadata : parameter.metaData)
+			{
+				//ToDo
+			}
+		}
+		for (const MetadataQuantity& quantity : newSeriesMetadata.getQuantities())
+		{
+			entitySeries.InsertToQuantityField(_nameField, { ot::Variable(quantity.quantityName) }, quantity.quantityAbbreviation);
+			entitySeries.InsertToQuantityField(_datatypeField, { ot::Variable(quantity.typeName) }, quantity.quantityAbbreviation);
+			for (auto& metadata : quantity.metaData)
+			{
+				//ToDo
+			}
+		}
+		for (auto& metadata : newSeriesMetadata.getMetadata())
+		{
+			//ToDo
+		}
+	}
+
+}
+
+void MetadataEntityInterface::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityMetadataCampaign> rmd)
 {
 	const GenericDocument* topLevel= rmd->getDocumentTopLevel();
 	auto fieldList = ExtractMetadataFields(*topLevel);
@@ -30,7 +73,7 @@ void MeasurementCampaignFactory::ExtractCampaignMetadata(MetadataCampaign& measu
 	}
 }
 
-std::list<std::shared_ptr<MetadataEntry>> MeasurementCampaignFactory::ExtractMetadataObjects(const GenericDocument& document)
+std::list<std::shared_ptr<MetadataEntry>> MetadataEntityInterface::ExtractMetadataObjects(const GenericDocument& document)
 {
 	auto& subDocuments = document.getSubDocuments();
 	std::list<std::shared_ptr<MetadataEntry>> allMetadata;
@@ -46,7 +89,7 @@ std::list<std::shared_ptr<MetadataEntry>> MeasurementCampaignFactory::ExtractMet
 	return allMetadata;
 }
 
-std::list<std::shared_ptr<MetadataEntry>> MeasurementCampaignFactory::ExtractMetadataFields(const GenericDocument& document)
+std::list<std::shared_ptr<MetadataEntry>> MetadataEntityInterface::ExtractMetadataFields(const GenericDocument& document)
 {
 	auto fields = document.getFields();
 	std::list<std::shared_ptr<MetadataEntry>> metadata;
@@ -66,7 +109,7 @@ std::list<std::shared_ptr<MetadataEntry>> MeasurementCampaignFactory::ExtractMet
 	return metadata;
 }
 
-void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
+void MetadataEntityInterface::ExtractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
 {
 	for (auto msmd : msmds)
 	{
@@ -83,12 +126,12 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measure
 			auto parameterFields = ExtractMetadataFields(*parameterDocument);
 			for (std::shared_ptr<MetadataEntry> entry : parameterFields)
 			{
-				if (entry->getEntryName() == "Name")
+				if (entry->getEntryName() == _nameField)
 				{
 					auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
 					parameter.parameterName = nameEntry->getValue().getConstCharPtr();
 				}
-				else if (entry->getEntryName() == "Value")
+				else if (entry->getEntryName() == _valuesField)
 				{
 					auto valueEntry = dynamic_cast<MetadataEntryArray*>(entry.get());
 					parameter.values = valueEntry->getValues();
@@ -120,12 +163,12 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measure
 			auto quantityFields = ExtractMetadataFields(*quantityDocument);
 			for (std::shared_ptr<MetadataEntry> entry : quantityFields)
 			{
-				if (entry->getEntryName() == "Datatype")
+				if (entry->getEntryName() == _datatypeField)
 				{
 					auto typeEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
 					quantity.typeName = typeEntry->getValue().getConstCharPtr();
 				}
-				else if (entry->getEntryName() == "Name")
+				else if (entry->getEntryName() == _nameField)
 				{
 					auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
 					quantity.quantityName = nameEntry->getValue().getConstCharPtr();
@@ -145,39 +188,4 @@ void MeasurementCampaignFactory::ExtractSeriesMetadata(MetadataCampaign& measure
 		}
 		measurementCampaign.AddSeriesMetadata(std::move(seriesMetadata));
 	}
-}
-
-void MeasurementCampaignFactory::BuildUpOverviewLists(MetadataCampaign& measurementCampaign)
-{
-	const std::list<MetadataSeries> allSeriesMetadata = measurementCampaign.getSeriesMetadata();
-	std::map < std::string, MetadataParameter> parameterOverview;
-	std::map < std::string, MetadataQuantity > quantityOverview;
-
-	for (auto& seriesMetadata : allSeriesMetadata)
-	{
-		auto allParameter =	seriesMetadata.getParameter();
-		for (auto& parameter : allParameter)
-		{
-			if (parameterOverview.find(parameter.parameterName) == parameterOverview.end())
-			{
-				parameterOverview[parameter.parameterName] = parameter;
-			}
-			else
-			{
-				std::list<ot::Variable>& values = parameterOverview[parameter.parameterName].values;
-				values.splice(values.begin(), parameter.values);
-			}
-		}
-
-		auto allQuanties = seriesMetadata.getQuantities();
-		for (auto& quantity : allQuanties)
-		{
-			if(quantityOverview.find(quantity.quantityName) == quantityOverview.end())
-			{
-				quantityOverview[quantity.quantityName] = quantity;
-			}
-		}
-	}
-	measurementCampaign.setParameterOverview(std::move(parameterOverview));
-	measurementCampaign.setQuantityOverview(std::move(quantityOverview));
 }

@@ -19,24 +19,28 @@ public:
 	MetadataCampaign operator=(MetadataCampaign&& other);
 
 	void AddSeriesMetadata(MetadataSeries&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
-	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadatametadata);
-	std::list<MetadataSeries>& getSeriesMetadata() { return _seriesMetadata; };
-	std::map <std::string, MetadataQuantity>& getMetadataQuantitiesByName() { return _quantitiesByName; }
-	std::map <std::string, MetadataParameter>& getMetadataParameterByName() { return _parameterByName; }
+	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadata) { _metaData[key] = metadata; }
+	const std::list<MetadataSeries>& getSeriesMetadata() const { return _seriesMetadata; };
 
-	void setParameterOverview(std::map <std::string, MetadataParameter>&& parameterByName) { _parameterByName = parameterByName; };
-	void setQuantityOverview(std::map <std::string, MetadataQuantity>&& quantitiesByName) { _quantitiesByName = quantitiesByName; };
+	const std::map <std::string, MetadataQuantity>& getMetadataQuantitiesByName() const { return _quantityOverviewByName; }
+	const std::map <std::string, MetadataParameter>& getMetadataParameterByName() const { return _parameterOverviewByName; }
+	const std::map <std::string, std::shared_ptr<MetadataEntry>>&	getMetaData() const { return _metaData; }
+	
+	void UpdateMetadataOverview();
+	void UpdateMetadataOverviewFromLastAddedSeries();
 
 	void reset();
 private:
 	std::list<MetadataSeries> _seriesMetadata;
 	
-	std::map < std::string, MetadataQuantity > _quantitiesByName;
-	std::map < std::string, MetadataParameter > _parameterByName;
+	std::map < std::string, MetadataQuantity > _quantityOverviewByName;
+	std::map < std::string, MetadataParameter > _parameterOverviewByName;
 	
-	//Kann komischerweise nicht gelöscht werden
 	const std::string _measurementCampaignName;
 	
 	std::map <std::string, std::shared_ptr<MetadataEntry>> _metaData;
+
+	void UpdateMetadataOverview(MetadataSeries& series);
+
 };
 

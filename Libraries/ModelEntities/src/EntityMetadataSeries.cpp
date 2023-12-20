@@ -53,23 +53,23 @@ std::vector<std::string> EntityMetadataSeries::getAllQuantityDocumentNames()
 	return getDocumentsNames(_quantityDocument);
 }
 
-void EntityMetadataSeries::InsertToParameterField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+void EntityMetadataSeries::InsertToParameterField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName)
 {
 	std::string fullDocumentPath = _parameterDocument;
 	if (documentName != "")
 	{
 		fullDocumentPath += "/" + documentName;
 	}
-	InsertInField(fieldName, values, fullDocumentPath);
+	InsertInField(fieldName, std::move(values), fullDocumentPath);
 }
 
-void EntityMetadataSeries::InsertToQuantityField(std::string fieldName, std::list<ot::Variable> values, std::string documentName)
+void EntityMetadataSeries::InsertToQuantityField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName)
 {
 	std::string fullDocumentPath = _quantityDocument;
 	if (documentName != "")
 	{
 		fullDocumentPath += "/" + documentName;
 	}
-	InsertInField(fieldName, values, fullDocumentPath);
+	InsertInField(fieldName, std::move(values), fullDocumentPath);
 }
 

@@ -2,16 +2,16 @@
 
 MetadataCampaign::MetadataCampaign(MetadataCampaign&& other)
 	:_seriesMetadata(std::move(other._seriesMetadata)),
-	_quantitiesByName(std::move(other._quantitiesByName)),
-	_parameterByName(std::move(other._parameterByName)),
+	_quantityOverviewByName(std::move(other._quantityOverviewByName)),
+	_parameterOverviewByName(std::move(other._parameterOverviewByName)),
 	_metaData(std::move(other._metaData)),
 	_measurementCampaignName(other._measurementCampaignName)
 {}
 
 MetadataCampaign::MetadataCampaign(const MetadataCampaign& other)
 	:_seriesMetadata(other._seriesMetadata),
-	_quantitiesByName(other._quantitiesByName),
-	_parameterByName(other._parameterByName),
+	_quantityOverviewByName(other._quantityOverviewByName),
+	_parameterOverviewByName(other._parameterOverviewByName),
 	_metaData(other._metaData),
 	_measurementCampaignName(other._measurementCampaignName)
 {}
@@ -26,14 +26,52 @@ MetadataCampaign MetadataCampaign::operator=(const MetadataCampaign& other)
 	return MetadataCampaign(other);
 }
 
-void MetadataCampaign::AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadata)
+
+void MetadataCampaign::UpdateMetadataOverview()
 {
+	for (auto& seriesMetadata : _seriesMetadata)
+	{
+		UpdateMetadataOverview(seriesMetadata);
+	}
 }
+
+void MetadataCampaign::UpdateMetadataOverviewFromLastAddedSeries()
+{
+	UpdateMetadataOverview(_seriesMetadata.back());
+}
+
+void MetadataCampaign::UpdateMetadataOverview(MetadataSeries& seriesMetadata)
+{
+	auto allParameter = seriesMetadata.getParameter();
+	for (auto& parameter : allParameter)
+	{
+		if (_parameterOverviewByName.find(parameter.parameterName) == _parameterOverviewByName.end())
+		{
+			_parameterOverviewByName[parameter.parameterName] = parameter;
+		}
+		else
+		{
+			std::list<ot::Variable>& values = _parameterOverviewByName[parameter.parameterName].values;
+			values.splice(values.begin(), parameter.values);
+		}
+	}
+
+	auto allQuanties = seriesMetadata.getQuantities();
+	for (auto& quantity : allQuanties)
+	{
+		if (_quantityOverviewByName.find(quantity.quantityName) == _quantityOverviewByName.end())
+		{
+			_quantityOverviewByName[quantity.quantityName] = quantity;
+		}
+	}
+}
+
 
 void MetadataCampaign::reset()
 {
 	_seriesMetadata.clear();
-	_quantitiesByName.clear();
-	_parameterByName.clear();
+	_quantityOverviewByName.clear();
+	_parameterOverviewByName.clear();
 	_metaData.clear();
 }
+

@@ -12,14 +12,14 @@
     <Filter Include="include\Metadata">
       <UniqueIdentifier>{a8ee48f3-0128-4d11-ad2e-a60be737bda2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\MetadataFactories">
-      <UniqueIdentifier>{7865cabd-cd12-42f8-9eaa-902da4f15303}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\MetadataEntries">
       <UniqueIdentifier>{1f56f169-44ce-43dd-9369-becc5fb42833}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\CollectionAccess">
       <UniqueIdentifier>{c517615d-2880-4117-a44e-2eebd33af550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\MetadataEntityInterface">
+      <UniqueIdentifier>{7865cabd-cd12-42f8-9eaa-902da4f15303}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -35,8 +35,8 @@
     <ClInclude Include="include\MetadataQuantity.h">
       <Filter>include\Metadata</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeasurementCampaignFactory.h">
-      <Filter>include\MetadataFactories</Filter>
+    <ClInclude Include="include\MetadataEntityInterface.h">
+      <Filter>include\MetadataEntityInterface</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataSeries.h">
       <Filter>include\Metadata</Filter>
@@ -53,7 +53,7 @@
     <ClInclude Include="include\MetadataEntrySingle.h">
       <Filter>include\MetadataEntries</Filter>
     </ClInclude>
-    <ClInclude Include="include\DigitalTwinAccess.h">
+    <ClInclude Include="include\ResultCollectionAccess.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
     <ClInclude Include="include\CrossCollectionAccess.h">
@@ -62,8 +62,11 @@
     <ClInclude Include="include\DigitalTwinAccessCrossCollection.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
-    <ClInclude Include="include\DigitalTwinExtender.h">
+    <ClInclude Include="include\ResultCollectionExtender.h">
       <Filter>include\CollectionAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataEntryComperator.h">
+      <Filter>include\MetadataEntries</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -73,19 +76,31 @@
     <ClCompile Include="src\MetadataCampaign.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeasurementCampaignFactory.cpp">
+    <ClCompile Include="src\MetadataEntityInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\CrossCollectionAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\DigitalTwinAccess.cpp">
+    <ClCompile Include="src\ResultCollectionAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DigitalTwinAccessCrossCollection.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\DigitalTwinExtender.cpp">
+    <ClCompile Include="src\ResultCollectionExtender.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataEntryArray.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataEntrySingle.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataEntryObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataEntryComperator.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

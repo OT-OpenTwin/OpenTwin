@@ -11,9 +11,13 @@
 #include "Documentation.h"
 #include "DataCategorizationConsistencyChecker.h"
 
-#include "QuantityContainerCreator.h"
 #include "ResultDataStorageAPI.h"
 #include "ProgressUpdater.h"
+
+#include "ResultCollectionExtender.h"
+#include "MetadataEntryArray.h"
+#include "MetadataEntryObject.h"
+#include "MetadataEntrySingle.h"
 
 DataCollectionCreationHandler::DataCollectionCreationHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
@@ -34,7 +38,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 
 	//All sorted ranges by the metadata they belong to. MSMD has a pointer to the parameter metadata, parameter has a pointer to the quantity metadata
 	Documentation::INSTANCE()->ClearDocumentation();
-	auto allMetadataAssembliesByNames = GetAllMetadataAssemblies(); 
+	auto allMetadataAssembliesByNames = GetAllMetadataAssemblies();
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();
 
@@ -50,16 +54,16 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
-	auto indexManager = ConsiderAllExistingMetadata();
-	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-	Documentation::INSTANCE()->ClearDocumentation();
+	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent);
+	/*_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+	Documentation::INSTANCE()->ClearDocumentation();*/
 
 	//Consistency checks for the data categorizations
 	DataCategorizationConsistencyChecker checker;
 	bool categorizationsAreValid = true;
 	categorizationsAreValid &= checker.isValidAllMSMDHaveParameterAndQuantities(allMetadataAssembliesByNames);
 	categorizationsAreValid &= checker.isValidAllParameterAndQuantitiesReferenceSameTable(allMetadataAssembliesByNames);
-	
+
 	if (!categorizationsAreValid)
 	{
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
@@ -94,11 +98,19 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	{
 		MetadataAssemblyRangeData rmdData;
 		rmdData.LoadAllRangeSelectionInformation(rmdAssemblyData->allSelectionRanges, loadedTables);
-		UpdateRMDEntity(rmdData);
+		std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries = RangeData2MetadataEntries(std::move(rmdData));
+		for (std::shared_ptr<MetadataEntry> metadataEntry : allMetadataEntries)
+		{
+			const bool fieldExists = resultCollectionExtender.CampaignMetadataWithSameNameExists(metadataEntry) && resultCollectionExtender.CampaignMetadataWithSameValueExists(metadataEntry);
+			if (fieldExists)
+			{
+				Documentation::INSTANCE()->AddToDocumentation("Update of campaign metadata field: " + metadataEntry->getEntryName() + "\n");
+				resultCollectionExtender.AddCampaignMetadata(metadataEntry);
+			}
+		}
 	}
-	
+
 	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
-	std::list<std::shared_ptr<EntityMetadataSeries>> allMetadata;
 	std::list<const std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
@@ -108,13 +120,13 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			allMSMDMetadataAssembliesByNames.push_back(&metadataAssemblyByName);
 		}
 	}
-
 	for (auto& metadataAssemblyByName : allMSMDMetadataAssembliesByNames)
 	{
 		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName->second;
 		std::string msmdName = metadataAssemblyByName->first;
 		msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
-		if (indexManager->DoesMSMDAlreadyExist(msmdName))
+		auto seriesMetadata = resultCollectionExtender.FindMetadataSeries(msmdName);
+		if (seriesMetadata != nullptr)
 		{
 			_uiComponent->displayMessage("Skipped " + msmdName + "\n");
 			continue;
@@ -134,35 +146,26 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		//Filling a new EntityMetadataSeries object with its fields.
 		MetadataAssemblyRangeData rangeData;
 		rangeData.LoadAllRangeSelectionInformation(metadataAssembly->allSelectionRanges, loadedTables);
+		msmdName += _datasetFolder + "/" + msmdName;
+		MetadataSeries metadataSeries(msmdName);
 
-		std::shared_ptr<EntityMetadataSeries>metadataBuffer(new EntityMetadataSeries(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		metadataBuffer->setName(_datasetFolder + "/" + msmdName);
-		AddFieldsToBaseLevel(rangeData, metadataBuffer);
-		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-		Documentation::INSTANCE()->ClearDocumentation();
+		auto allSeriesMetadataEntries = RangeData2MetadataEntries(std::move(rangeData));
+		for (auto seriesMetadata : allSeriesMetadataEntries)
+		{
+			metadataSeries.AddMetadata(seriesMetadata);
+		}
+
 		//Todo: MetadataAssemblyRangeData not needed anymore! Delete in process!
 
 		//Loading parameter information
 		auto parameterAssembly = metadataAssembly->next;
 		MetadataAssemblyRangeData parameterData;
 		parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, loadedTables);
-		MetadataParameterBundle parameterBundle = indexManager->CreateMetadataParameter(parameterData);
-		AddParameterFieldsToMSMD(parameterBundle, metadataBuffer);
-		_uiComponent->displayMessage("\n" + Documentation::INSTANCE()->GetFullDocumentation());
-		Documentation::INSTANCE()->ClearDocumentation();
 
 		//Loading quantity information
 		auto quantityAssembly = parameterAssembly->next;
 		MetadataAssemblyRangeData quantityData;
 		quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, loadedTables);
-		std::map<std::string, MetadataQuantity*> notExistingQuantities = indexManager->GetNonExistingQuantityAbbreviationsByName(quantityData);
-		Documentation::INSTANCE()->AddToDocumentation("\nCreate " + std::to_string(notExistingQuantities.size()) + " new quantit(y/ies):\n");
-		for (const auto& newQuantity : notExistingQuantities)
-		{
-			Documentation::INSTANCE()->AddToDocumentation(newQuantity.first + "\n");
-		}
-		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-		Documentation::INSTANCE()->ClearDocumentation();
 
 		bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
 		if (!isValid)
@@ -173,86 +176,78 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			continue;
 		}
 
-		//Adding quantity information and gradually flushing quantity container into the result collection
-		std::string msmdIndexString = msmdName.substr(msmdName.find_last_of('_') + 1, msmdName.size());
-		int32_t msmdIndex = std::stoi(msmdIndexString);
-		std::set<std::string> parameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
-		int32_t containerSize = 1;
-		QuantityContainerCreator qcCreator(msmdIndex, parameterAbbreviations, containerSize);
+		for (const auto& parameterEntry : *parameterData.getFields())
+		{
+			MetadataParameter parameter;
+			parameter.parameterName = std::move(parameterEntry.first);
+			parameter.values = std::move(parameterEntry.second);
+			parameter.typeName = parameter.values.begin()->getTypeName();
 
-		int fieldCounter = 0;
+			metadataSeries.AddParameter(std::move(parameter));
+		}
+
+		for (const auto& quantityEntry : *quantityData.getFields())
+		{
+			MetadataQuantity quantity;
+			quantity.typeName = quantityEntry.first;
+			quantity.typeName = quantityEntry.second.begin()->getTypeName();
+
+			metadataSeries.AddQuantity(std::move(quantity));
+		}
+
 		uint64_t totalNumberOfFields = quantityData.getNumberOfFields();
-
 		ProgressUpdater updater(_uiComponent, "Storing quantity container");
-		qcCreator.SetUpdateProgress(updater);
 
+		resultCollectionExtender.AddSeries(std::move(metadataSeries));
 
-		for (auto field : *quantityData.getFields())
+		std::list<std::list<ot::Variable>::const_iterator> allParameterValueIt;
+		std::list<std::string> parameterNames;
+		for (auto& parameterEntry : *parameterData.getFields())
 		{
-			if (notExistingQuantities.find(field.first) != notExistingQuantities.end())
+			allParameterValueIt.push_back(parameterEntry.second.begin());
+			parameterNames.push_back(parameterEntry.first);
+		}
+		uint32_t seriesMetadataIndex = seriesMetadata->getSeriesIndex();
+		for (const auto& quantityEntry : *quantityData.getFields())
+		{
+			const MetadataQuantity* quantityDescription = resultCollectionExtender.FindMetadataQuantity(quantityEntry.first);
+			for (auto& quantityValue : quantityEntry.second)
 			{
-				AddQuantityToMSMD(metadataBuffer, notExistingQuantities[field.first]->quantityAbbreviation, field.first, ot::TypeNames::getStringTypeName());
+				std::list<ot::Variable> parameterValues;
+				for (auto parameterValueIt : allParameterValueIt)
+				{
+					parameterValues.push_back(*parameterValueIt++);
+				}
+				resultCollectionExtender.AddQuantityContainer(seriesMetadataIndex, parameterNames, std::move(parameterValues), quantityDescription->quantityIndex, quantityValue);
 			}
-			auto valuePointer = field.second.begin();
-			int32_t quantityIndex = indexManager->GetQuantityIndex(field.first);
-			for (int32_t i = 0; i < field.second.size(); i++)
-			{
-				std::list<int32_t> parameterValueIndices = GetParameterValueIndices(*indexManager, parameterBundle, i);
-				qcCreator.AddToQuantityContainer(quantityIndex, parameterValueIndices, *valuePointer);
-				valuePointer++;
-			}
-			qcCreator.Flush(dataStorageAccess);
-			fieldCounter++;
 		}
-		allMetadata.push_back(metadataBuffer);
 	}
-	//Adding all new MSMD handle
-	std::list<ot::UID> entityIDs, entityVersions, dataEntities{};
-	std::list<bool> forceVisible;
-
-	for (auto metadata : allMetadata)
-	{
-		metadata->StoreToDataBase();
-		entityIDs.push_back(metadata->getEntityID());
-		entityVersions.push_back(metadata->getEntityStorageVersion());
-		forceVisible.push_back(false);
-	}
-	if (_rmdEntity != nullptr)
-	{
-		entityIDs.push_back(_rmdEntity->getEntityID());
-		entityVersions.push_back(_rmdEntity->getEntityStorageVersion());
-		forceVisible.push_back(false);
-	}
-
-	_modelComponent->addEntitiesToModel(entityIDs, entityVersions, forceVisible, dataEntities, dataEntities, dataEntities, "Created new n-dimensional parameterized data collection");
-	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 }
-
-std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExistingMetadata()
-{
-	std::list<std::string> allExistingMetadata = _modelComponent->getListOfFolderItems(_datasetFolder);
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(allExistingMetadata, entityInfos);
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactory classFactory;
-
-	EntityMetadataCampaign temp(-1, nullptr, nullptr, nullptr, nullptr, "");
-	
-	std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities;
-	for (auto& entityInfo : entityInfos)
-	{
-		auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-		if (entBase->getClassName() == temp.getClassName())
-		{
-			_rmdEntity.reset(dynamic_cast<EntityMetadataCampaign*>(entBase));
-		}
-		else
-		{
-			existingMetadataEntities.push_back(std::shared_ptr<EntityMetadataSeries>(dynamic_cast<EntityMetadataSeries*>(entBase)));
-		}
-	}
-	return std::shared_ptr<IndexManager>(new IndexManager(existingMetadataEntities, _nameField, _dataTypeField,_valueField));
-}
+//std::shared_ptr<IndexManager> DataCollectionCreationHandler::ConsiderAllExistingMetadata()
+//{
+//	std::list<std::string> allExistingMetadata = _modelComponent->getListOfFolderItems(_datasetFolder);
+//	std::list<ot::EntityInformation> entityInfos;
+//	_modelComponent->getEntityInformation(allExistingMetadata, entityInfos);
+//	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+//	ClassFactory classFactory;
+//
+//	EntityMetadataCampaign temp(-1, nullptr, nullptr, nullptr, nullptr, "");
+//	
+//	std::list<std::shared_ptr<EntityMetadataSeries>> existingMetadataEntities;
+//	for (auto& entityInfo : entityInfos)
+//	{
+//		auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+//		if (entBase->getClassName() == temp.getClassName())
+//		{
+//			_rmdEntity.reset(dynamic_cast<EntityMetadataCampaign*>(entBase));
+//		}
+//		else
+//		{
+//			existingMetadataEntities.push_back(std::shared_ptr<EntityMetadataSeries>(dynamic_cast<EntityMetadataSeries*>(entBase)));
+//		}
+//	}
+//	return std::shared_ptr<IndexManager>(new IndexManager(existingMetadataEntities, _nameField, _dataTypeField,_valueField));
+//}
 
 std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAllMetadataAssemblies()
 {
@@ -392,91 +387,89 @@ void DataCollectionCreationHandler::ExtractAllQuantities(std::map<std::string, M
 	}
 }
 
-void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMetadataSeries> msmd, const std::string& abbreviation, const std::string& name, const std::string& type)
+//void DataCollectionCreationHandler::AddQuantityToMSMD(std::shared_ptr<EntityMetadataSeries> msmd, const std::string& abbreviation, const std::string& name, const std::string& type)
+//{
+//	std::list<ot::Variable> quantityName{ ot::Variable(name.c_str()) };
+//	msmd->InsertToQuantityField("Name", quantityName, abbreviation);
+//	std::list<ot::Variable> dataType{ ot::Variable(type.c_str())};
+//	msmd->InsertToQuantityField("Datatype", dataType, abbreviation);
+//}
+
+std::list<std::shared_ptr<MetadataEntry>> DataCollectionCreationHandler::RangeData2MetadataEntries(MetadataAssemblyRangeData&& assembyRangeData)
 {
-	std::list<ot::Variable> quantityName{ ot::Variable(name.c_str()) };
-	msmd->InsertToQuantityField("Name", quantityName, abbreviation);
-	std::list<ot::Variable> dataType{ ot::Variable(type.c_str())};
-	msmd->InsertToQuantityField("Datatype", dataType, abbreviation);
-}
+	std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries;
+	auto field = assembyRangeData.getFields()->begin();
 
-void DataCollectionCreationHandler::UpdateRMDEntity(const MetadataAssemblyRangeData& rmdData)
-{
-	std::vector<std::string> allDocumentNames = _rmdEntity->getDocumentsNames();
-
-	bool allFieldsAreSame = true;
-	for (const std::string& documentName : allDocumentNames)
+	for (field; field != assembyRangeData.getFields()->end(); field++)
 	{
-		const GenericDocument* document = _rmdEntity->getDocument(documentName);
-		auto allFields = document->getFields();
-
-		allFieldsAreSame = FieldsAreAllSame(*document->getFields(), *rmdData.getFields());
-	}
-
-	if (!allFieldsAreSame)
-	{
-		_rmdEntity->ClearAllDocuments();
-		AddFieldsToBaseLevel(rmdData, _rmdEntity);
-		_rmdEntity->StoreToDataBase();
-	}
-	else
-	{
-		_rmdEntity = nullptr;
-	}
-}
-
-std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex)
-{
-	std::list<int32_t> paramValueIndices;
-	auto allParameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
-	for (const std::string abbrev : allParameterAbbreviations)
-	{
-		bool paramerterFound = false;
-		for (const auto& param : parameterBundle.getParameter())
+		const std::string& fieldName = field->first;
+		const std::list<ot::Variable>& values = field->second;
+		std::shared_ptr<MetadataEntry> metadata;
+		if (values.size() == 1)
 		{
-			if (param.parameterAbbreviation == abbrev)
-			{
-				int32_t parameterValueIndex = indexManager.GetParameterIndex(abbrev, param.selectedValues[quantityValueIndex]);
-				paramValueIndices.push_back(parameterValueIndex);
-				paramerterFound = true;
-				break;
-			}
+			metadata.reset(new MetadataEntrySingle(fieldName, *values.begin()));
 		}
-		assert(paramerterFound);
+		else if (values.size() > 1)
+		{
+			metadata.reset(new MetadataEntryArray(fieldName, values));
+		}
+		allMetadataEntries.push_back(metadata);
 	}
-
-	return paramValueIndices;
+	return allMetadataEntries;	
 }
 
-bool DataCollectionCreationHandler::FieldsAreAllSame(const std::map<std::string, std::list<ot::Variable>>& isStatus, const std::map<std::string, std::list<ot::Variable>>& mustStatus)
-{
-	if (isStatus.size() != mustStatus.size())
-	{
-		return false;
-	}
+//std::list<int32_t> DataCollectionCreationHandler::GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex)
+//{
+//	std::list<int32_t> paramValueIndices;
+//	auto allParameterAbbreviations = parameterBundle.GetAllParameterAbbreviations();
+//	for (const std::string abbrev : allParameterAbbreviations)
+//	{
+//		bool paramerterFound = false;
+//		for (const auto& param : parameterBundle.getParameter())
+//		{
+//			if (param.parameterAbbreviation == abbrev)
+//			{
+//				int32_t parameterValueIndex = indexManager.GetParameterIndex(abbrev, param.selectedValues[quantityValueIndex]);
+//				paramValueIndices.push_back(parameterValueIndex);
+//				paramerterFound = true;
+//				break;
+//			}
+//		}
+//		assert(paramerterFound);
+//	}
+//
+//	return paramValueIndices;
+//}
 
-	for (const auto& isField : isStatus)
-	{
-		std::string isFieldName = isField.first;
-		if (mustStatus.find(isFieldName) == mustStatus.end())
-		{
-			return false;
-		}
-		else
-		{
-			auto mustValue = mustStatus.find(isFieldName)->second.begin();
-			auto isValues = isField.second.begin();
-
-			if (*mustValue == *isValues)
-			{
-				return false;
-			}
-			
-		}
-	}
-
-	return true;
-}
+//bool DataCollectionCreationHandler::FieldsAreAllSame(const std::map<std::string, std::list<ot::Variable>>& isStatus, const std::map<std::string, std::list<ot::Variable>>& mustStatus)
+//{
+//	if (isStatus.size() != mustStatus.size())
+//	{
+//		return false;
+//	}
+//
+//	for (const auto& isField : isStatus)
+//	{
+//		std::string isFieldName = isField.first;
+//		if (mustStatus.find(isFieldName) == mustStatus.end())
+//		{
+//			return false;
+//		}
+//		else
+//		{
+//			auto mustValue = mustStatus.find(isFieldName)->second.begin();
+//			auto isValues = isField.second.begin();
+//
+//			if (*mustValue == *isValues)
+//			{
+//				return false;
+//			}
+//			
+//		}
+//	}
+//
+//	return true;
+//}
 
 void DataCollectionCreationHandler::AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
 {
@@ -562,24 +555,24 @@ void DataCollectionCreationHandler::LoadRequiredTables(std::list<string>& requir
 	}
 }
 
-void DataCollectionCreationHandler::AddFieldsToBaseLevel(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityWithDynamicFields> msmd)
-{
-	Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
-	for (const auto& field : *rangeData.getFields())
-	{
-		msmd->InsertInField(field.first, field.second);
-		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
-	}
-}
+//void DataCollectionCreationHandler::AddFieldsToBaseLevel(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityWithDynamicFields> msmd)
+//{
+//	Documentation::INSTANCE()->AddToDocumentation("Adding fields:\n");
+//	for (const auto& field : *rangeData.getFields())
+//	{
+//		msmd->InsertInField(field.first, field.second);
+//		Documentation::INSTANCE()->AddToDocumentation(field.first + "\n");
+//	}
+//}
 
-void DataCollectionCreationHandler::AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMetadataSeries> msmd)
-{
-	Documentation::INSTANCE()->AddToDocumentation("Adding parameter:\n");
-	for (const auto& field : parameterBundle.getParameter())
-	{
-		std::list<ot::Variable> parameterName{ ot::Variable(field.parameterName.c_str())};
-		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
-		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
-		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
-	}
-}
+//void DataCollectionCreationHandler::AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMetadataSeries> msmd)
+//{
+//	Documentation::INSTANCE()->AddToDocumentation("Adding parameter:\n");
+//	for (const auto& field : parameterBundle.getParameter())
+//	{
+//		std::list<ot::Variable> parameterName{ ot::Variable(field.parameterName.c_str())};
+//		msmd->InsertToParameterField("Name", parameterName, field.parameterAbbreviation);
+//		msmd->InsertToParameterField("Value", field.uniqueValues, field.parameterAbbreviation);
+//		Documentation::INSTANCE()->AddToDocumentation(field.parameterName + "\n");
+//	}
+//}

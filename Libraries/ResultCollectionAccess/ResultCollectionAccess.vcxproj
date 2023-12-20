@@ -21,27 +21,32 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\DigitalTwinAccessCrossCollection.h" />
-    <ClInclude Include="include\DigitalTwinExtender.h" />
+    <ClInclude Include="include\ResultCollectionExtender.h" />
     <ClInclude Include="include\MetadataCampaign.h" />
-    <ClInclude Include="include\MeasurementCampaignFactory.h" />
+    <ClInclude Include="include\MetadataEntityInterface.h" />
     <ClInclude Include="include\MetadataEntry.h" />
     <ClInclude Include="include\MetadataEntryArray.h" />
+    <ClInclude Include="include\MetadataEntryComperator.h" />
     <ClInclude Include="include\MetadataEntryObject.h" />
     <ClInclude Include="include\MetadataEntrySingle.h" />
     <ClInclude Include="include\MetadataParameter.h" />
     <ClInclude Include="include\MetadataQuantity.h" />
     <ClInclude Include="include\QuantityContainer.h" />
     <ClInclude Include="include\MetadataSeries.h" />
-    <ClInclude Include="include\DigitalTwinAccess.h" />
+    <ClInclude Include="include\ResultCollectionAccess.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\DigitalTwinAccessCrossCollection.cpp" />
-    <ClCompile Include="src\DigitalTwinExtender.cpp" />
+    <ClCompile Include="src\ResultCollectionExtender.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
-    <ClCompile Include="src\MeasurementCampaignFactory.cpp" />
+    <ClCompile Include="src\MetadataEntityInterface.cpp" />
+    <ClCompile Include="src\MetadataEntryArray.cpp" />
+    <ClCompile Include="src\MetadataEntryComperator.cpp" />
+    <ClCompile Include="src\MetadataEntryObject.cpp" />
+    <ClCompile Include="src\MetadataEntrySingle.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
-    <ClCompile Include="src\DigitalTwinAccess.cpp" />
+    <ClCompile Include="src\ResultCollectionAccess.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

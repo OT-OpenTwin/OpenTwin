@@ -12,9 +12,10 @@
 
 #include "BusinessLogicHandler.h"
 #include "MetadataAssemblyData.h"
+#include "MetadataAssemblyRangeData.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityMetadataCampaign.h"
-#include "IndexManager.h"
+#include "MetadataEntry.h"
 
 class DataCollectionCreationHandler : public BusinessLogicHandler
 {
@@ -31,27 +32,24 @@ private:
 	const std::string _dbURL;
 	
 	const std::string _rmdEntityName = "ResearchMetadata";
-	const std::string _nameField = "Name";
-	const std::string _valueField = "Value";
-	const std::string _dataTypeField = "Datatype";
 
-	std::shared_ptr<EntityMetadataCampaign> _rmdEntity;
+	//std::shared_ptr<EntityMetadataCampaign> _rmdEntity;
 
-	std::shared_ptr<IndexManager> ConsiderAllExistingMetadata();
+	//std::shared_ptr<IndexManager> ConsiderAllExistingMetadata();
 
 	std::map<std::string, MetadataAssemblyData> GetAllMetadataAssemblies();
 	void AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables);
 	void LoadRequiredTables(std::list<string>& requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& loadedTables);
-	void AddFieldsToBaseLevel(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityWithDynamicFields> msmd);
-	void AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMetadataSeries> msmd);
+	//void AddFieldsToBaseLevel(const MetadataAssemblyRangeData& rangeData, std::shared_ptr<EntityWithDynamicFields> msmd);
+	//void AddParameterFieldsToMSMD(MetadataParameterBundle& parameterBundle, std::shared_ptr<EntityMetadataSeries> msmd);
 
 	void ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 	void ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 	void ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
 
-	void AddQuantityToMSMD(std::shared_ptr<EntityMetadataSeries> msmd, const std::string& abbreviation, const std::string& name, const std::string& type);
-	void UpdateRMDEntity(const MetadataAssemblyRangeData& rmdData);
-	std::list<int32_t> GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex);
+	//void AddQuantityToMSMD(std::shared_ptr<EntityMetadataSeries> msmd, const std::string& abbreviation, const std::string& name, const std::string& type);
 
-	bool FieldsAreAllSame(const std::map<std::string,std::list<ot::Variable>>& isStatus, const std::map<std::string, std::list<ot::Variable>>& mustStatus);
+	//std::list<int32_t> GetParameterValueIndices(IndexManager& indexManager, MetadataParameterBundle& parameterBundle, int64_t quantityValueIndex);
+	std::list<std::shared_ptr<MetadataEntry>> RangeData2MetadataEntries(MetadataAssemblyRangeData&& assembyRangeData);
+	//bool FieldsAreAllSame(const std::map<std::string,std::list<ot::Variable>>& isStatus, const std::map<std::string, std::list<ot::Variable>>& mustStatus);
 };
