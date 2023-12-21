@@ -21,6 +21,7 @@
 #include "OTCore/Logger.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
 #include "OTCommunication/ActionTypes.h"	// action member and types definition
+#include "OTCommunication/ServiceLogNotifier.h"
 
 #include "SocketServer.h"
 
@@ -110,8 +111,13 @@ extern "C"
 	_declspec(dllexport) int init(const char * _localDirectoryServiceURL, const char * _ownIP, const char * _websocketIP, const char * _sessionServiceIP)
 	{
 		try {
-			// Initialize the logging service. This will enable logging to the file path base specified in OPEN_TWIN_LOGFILE
-			ot::LogDispatcher::instance().setServiceName(OT_INFO_SERVICE_TYPE_RelayService);
+			std::string logUrl = qgetenv("OPEN_TWIN_LOGGING_URL").toStdString();
+
+#ifdef _DEBUG
+			ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_RelayService, logUrl, true);
+#else
+			ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_RelayService, logUrl, false);
+#endif // _DEBUG
 
 			OT_LOG_I("Initializing application");
 
