@@ -22,7 +22,7 @@ ResultCollectionExtender::~ResultCollectionExtender()
 
 void ResultCollectionExtender::AddSeries(MetadataSeries&& series)
 {
-	uint32_t seriesIndex;
+	uint64_t seriesIndex;
 	const MetadataSeries* existingSeries = FindMetadataSeries(series.getName());
 	if (existingSeries != nullptr)
 	{
@@ -40,7 +40,6 @@ void ResultCollectionExtender::AddSeries(MetadataSeries&& series)
 		newSeries.AddMetadata(metadata.second);
 	}
 
-	uint32_t startIndex = FindNextFreeQuantityIndex();
 	for (auto& quantity : series.getQuantities())
 	{
 		const std::string newQuantityName = quantity.quantityName;
@@ -48,14 +47,13 @@ void ResultCollectionExtender::AddSeries(MetadataSeries&& series)
 		if (addedQuantityInExistingParameter == nullptr)
 		{
 			auto& quantityForEditing = const_cast<MetadataQuantity&>(quantity);
-			quantityForEditing.quantityIndex = startIndex++;
+			quantityForEditing.quantityIndex = FindNextFreeQuantityIndex();
 			quantityForEditing.quantityAbbreviation = _quantityAbbreviationBase + std::to_string(quantity.quantityIndex);
 			newSeries.AddQuantity(std::move(quantityForEditing));
 		}
 		//Assumes that the metadata and type of this quantity are the same as before. 
 	}
 
-	startIndex = FindNextFreeParameterIndex();
 	for (auto& parameter : series.getParameter())
 	{
 		const std::string newParameterName = parameter.parameterName;
@@ -79,7 +77,7 @@ void ResultCollectionExtender::AddSeries(MetadataSeries&& series)
 		}
 		else
 		{
-			parameterForEditing.parameterAbbreviation = _parameterAbbreviationBase + std::to_string(startIndex++);
+			parameterForEditing.parameterAbbreviation = _parameterAbbreviationBase + std::to_string(FindNextFreeParameterIndex());
 			newSeries.AddParameter(std::move(parameterForEditing));
 		}
 	}
@@ -157,21 +155,19 @@ void ResultCollectionExtender::AddQuantityContainer(uint32_t seriesIndex, std::l
 	}
 }
 
-const uint32_t ResultCollectionExtender::FindNextFreeSeriesIndex()
+const uint64_t ResultCollectionExtender::FindNextFreeSeriesIndex()
 {
-	return _metadataCampaign.getSeriesMetadata().size();
+	return _modelComponent.createEntityUID();
 }
 
-const uint32_t ResultCollectionExtender::FindNextFreeQuantityIndex()
+const uint64_t ResultCollectionExtender::FindNextFreeQuantityIndex()
 {
-	auto& quantitiesByName = _metadataCampaign.getMetadataQuantitiesByName();
-	return static_cast<uint32_t>(quantitiesByName.size());
+	return _modelComponent.createEntityUID();
 }
 
-const uint32_t ResultCollectionExtender::FindNextFreeParameterIndex()
+const uint64_t ResultCollectionExtender::FindNextFreeParameterIndex()
 {
-	auto& parameterByName = _metadataCampaign.getMetadataParameterByName();
-	return static_cast<uint32_t>(parameterByName.size());
+	return _modelComponent.createEntityUID();
 }
 
 void ResultCollectionExtender::FlushQuantityContainer()

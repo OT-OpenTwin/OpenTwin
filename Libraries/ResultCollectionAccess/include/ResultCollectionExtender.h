@@ -42,9 +42,9 @@ private:
 	const std::string _parameterAbbreviationBase = "P_";
 	const std::string _quantityAbbreviationBase = "Q_";
 
-	const uint32_t FindNextFreeSeriesIndex();
-	const uint32_t FindNextFreeQuantityIndex();
-	const uint32_t FindNextFreeParameterIndex();
-};
+	const uint64_t FindNextFreeSeriesIndex();
+	const uint64_t FindNextFreeQuantityIndex();
+	const uint64_t FindNextFreeParameterIndex();
+};			  
 
 

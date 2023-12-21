@@ -21,6 +21,11 @@ namespace DataStorageAPI
 		return documentAccess.InsertDocumentToDatabase(jsonData.extract(), allowQueueing);
 	}
 
+	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(std::string& queryJsonData, std::string& projectionJsonData, int limit)
+	{
+		return documentAccess.GetAllDocuments(queryJsonData, projectionJsonData, limit);
+	}
+
 	void ResultDataStorageAPI::FlushQueuedData()
 	{
 		docBase.FlushQueuedDocuments();

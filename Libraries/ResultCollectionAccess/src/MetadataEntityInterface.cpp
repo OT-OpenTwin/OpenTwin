@@ -39,7 +39,7 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 	for (auto& newSeriesMetadata : seriesMetadata)
 	{
 		const std::string name = newSeriesMetadata->getName();
-		EntityMetadataSeries entitySeries(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, "");
+		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, nullptr, "");
 		entitySeries.setName(name);
 		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())
 		{
@@ -175,7 +175,7 @@ void MetadataEntityInterface::ExtractSeriesMetadata(MetadataCampaign& measuremen
 			MetadataQuantity quantity;
 			quantity.quantityAbbreviation = quantityDocument->getDocumentName();
 			const std::string abbrev = quantity.quantityAbbreviation;
-			quantity.quantityIndex = std::stoi(abbrev.substr(abbrev.find("_") + 1, abbrev.size()));
+			quantity.quantityIndex = std::stoull(abbrev.substr(abbrev.find("_") + 1, abbrev.size()));
 			auto quantityFields = ExtractMetadataFields(*quantityDocument);
 			for (std::shared_ptr<MetadataEntry> entry : quantityFields)
 			{

@@ -23,6 +23,7 @@ namespace DataStorageAPI
 
 		__declspec(dllexport) ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName);
 		__declspec(dllexport) DataStorageResponse InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing);
+		__declspec(dllexport) DataStorageResponse SearchInResultCollection(std::string& queryJsonData, std::string& projectionJsonData, int limit);
 		__declspec(dllexport) void FlushQueuedData();
 
 	private:
