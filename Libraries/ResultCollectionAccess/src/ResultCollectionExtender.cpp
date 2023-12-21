@@ -167,11 +167,12 @@ void ResultCollectionExtender::FlushQuantityContainer()
 {
 	for (auto& qc : _quantityContainer)
 	{
-		DataStorageAPI::DataStorageResponse response = _dataStorageAccess.InsertDocumentToResultStorage(*qc.GetDocument(), false, true);
+		DataStorageAPI::DataStorageResponse response = _dataStorageAccess.InsertDocumentToResultStorage(qc.getMongoDocument(), false, true);
 		if (!response.getSuccess())
 		{
 			throw std::exception("Insertion of quantity container failed.");
 		}
 	}
+	_dataStorageAccess.FlushQueuedData();
 	_quantityContainer.clear();
 }

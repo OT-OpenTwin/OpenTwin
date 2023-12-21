@@ -62,6 +62,7 @@ void MetadataEntityInterface::ExtractCampaignMetadata(MetadataCampaign& measurem
 {
 	const GenericDocument* topLevel= rmd->getDocumentTopLevel();
 	auto fieldList = ExtractMetadataFields(*topLevel);
+	measurementCampaign.setCampaignName(rmd->getName());
 	for (auto& field : fieldList)
 	{
 		measurementCampaign.AddMetaInformation(field->getEntryName(), field);

@@ -4,8 +4,8 @@
 namespace DataStorageAPI
 {
 	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName)
-		:documentAccess(dataBaseURL,collectionName + ".results")
-	{}
+		:documentAccess(dataBaseURL, collectionName + ".results"), docBase(dataBaseURL, collectionName + ".results")
+	{	}
 
 	DataStorageResponse ResultDataStorageAPI::InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing)
 	{
@@ -21,4 +21,8 @@ namespace DataStorageAPI
 		return documentAccess.InsertDocumentToDatabase(jsonData.extract(), allowQueueing);
 	}
 
+	void ResultDataStorageAPI::FlushQueuedData()
+	{
+		docBase.FlushQueuedDocuments();
+	}
 }

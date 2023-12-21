@@ -40,7 +40,7 @@ void QuantityContainer::AddValue(const ot::Variable& value)
 	_values.push_back(value);
 }
 
-const bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
+bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 {
 	VariableToBSONConverter converter;
 	if (_values.size() == 1)

@@ -23,11 +23,9 @@ public:
 	QuantityContainer operator=(QuantityContainer&& other);
 	~QuantityContainer();
 
-	bsoncxx::builder::basic::document* GetDocument() { return &_mongoDocument; };
-
 	void AddValue(const ot::Variable& value);
 	int64_t GetValueArraySize() const { return _values.size(); };
-	const bsoncxx::builder::basic::document& getMongoDocument();
+	bsoncxx::builder::basic::document& getMongoDocument();
 	static const std::string getFieldName() { return "Values"; }
 
 private:

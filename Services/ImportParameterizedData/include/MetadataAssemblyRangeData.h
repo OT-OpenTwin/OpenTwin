@@ -29,7 +29,7 @@ public:
 	void LoadAllRangeSelectionInformation(const std::list< std::shared_ptr<EntityTableSelectedRanges>>& allRanges, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& allTables);
 
 
-	const std::map<std::string, std::list<ot::Variable>>* getFields() const { return &_fields; };
+	std::map<std::string, std::list<ot::Variable>>* getFields() { return &_fields; };
 
 	uint64_t getNumberOfFields() const;
 

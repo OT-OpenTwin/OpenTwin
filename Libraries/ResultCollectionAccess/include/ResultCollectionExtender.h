@@ -30,7 +30,6 @@ public:
 	void AddQuantityContainer(uint32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint32_t quantityIndex, const ot::Variable& quantityValue);
 
 private:
-	MetadataCampaign _metadataCampaign;
 	bool _requiresUpdateMetadataCampaign;
 	std::list<const MetadataSeries*> _seriesMetadataForStorage;
 	std::vector<QuantityContainer> _quantityContainer;

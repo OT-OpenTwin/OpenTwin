@@ -28,7 +28,8 @@ public:
 	
 	void UpdateMetadataOverview();
 	void UpdateMetadataOverviewFromLastAddedSeries();
-
+	void setCampaignName(const std::string name) { _campaignName = name; }
+	const std::string& getCampaignName()const { return _campaignName; }
 	void reset();
 private:
 	std::list<MetadataSeries> _seriesMetadata;
@@ -36,7 +37,7 @@ private:
 	std::map < std::string, MetadataQuantity > _quantityOverviewByName;
 	std::map < std::string, MetadataParameter > _parameterOverviewByName;
 	
-	const std::string _measurementCampaignName;
+	std::string _campaignName;
 	
 	std::map <std::string, std::shared_ptr<MetadataEntry>> _metaData;
 

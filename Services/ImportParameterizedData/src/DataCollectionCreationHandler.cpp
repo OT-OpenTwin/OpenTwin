@@ -26,9 +26,6 @@ DataCollectionCreationHandler::DataCollectionCreationHandler(const std::string& 
 
 void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbURL, const std::string& projectName)
 {
-
-	DataStorageAPI::ResultDataStorageAPI dataStorageAccess("Projects", projectName);
-
 	//To guarantee the uniqueness of parameter and quantity indices, a branch overreaching mutual exclusion has to be realized. 
 	//So far branching is not realized yet, thus this implementation is a place holder. Ultimately, a client-server mutual exclusion with (maybe) the modelservice needs to be implemented.
 	BranchSynchronizer branchSynchronizer;
@@ -146,7 +143,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		//Filling a new EntityMetadataSeries object with its fields.
 		MetadataAssemblyRangeData rangeData;
 		rangeData.LoadAllRangeSelectionInformation(metadataAssembly->allSelectionRanges, loadedTables);
-		msmdName += _datasetFolder + "/" + msmdName;
+		msmdName = _datasetFolder + "/" + msmdName;
 		MetadataSeries metadataSeries(msmdName);
 
 		auto allSeriesMetadataEntries = RangeData2MetadataEntries(std::move(rangeData));
@@ -176,11 +173,11 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			continue;
 		}
 
-		for (const auto& parameterEntry : *parameterData.getFields())
+		for (auto& parameterEntry : *parameterData.getFields())
 		{
 			MetadataParameter parameter;
-			parameter.parameterName = std::move(parameterEntry.first);
-			parameter.values = std::move(parameterEntry.second);
+			parameter.parameterName = parameterEntry.first;
+			parameter.values = parameterEntry.second;
 			parameter.typeName = parameter.values.begin()->getTypeName();
 
 			metadataSeries.AddParameter(std::move(parameter));
@@ -189,7 +186,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		for (const auto& quantityEntry : *quantityData.getFields())
 		{
 			MetadataQuantity quantity;
-			quantity.typeName = quantityEntry.first;
+			quantity.quantityName = quantityEntry.first;
 			quantity.typeName = quantityEntry.second.begin()->getTypeName();
 
 			metadataSeries.AddQuantity(std::move(quantity));
@@ -205,9 +202,11 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		for (auto& parameterEntry : *parameterData.getFields())
 		{
 			allParameterValueIt.push_back(parameterEntry.second.begin());
-			parameterNames.push_back(parameterEntry.first);
+			const std::string parameterAbbrev = resultCollectionExtender.FindMetadataParameter(parameterEntry.first)->parameterAbbreviation;
+			parameterNames.push_back(parameterAbbrev);
 		}
-		uint32_t seriesMetadataIndex = seriesMetadata->getSeriesIndex();
+
+		uint32_t seriesMetadataIndex = resultCollectionExtender.FindMetadataSeries(msmdName)->getSeriesIndex();
 		for (const auto& quantityEntry : *quantityData.getFields())
 		{
 			const MetadataQuantity* quantityDescription = resultCollectionExtender.FindMetadataQuantity(quantityEntry.first);
@@ -216,7 +215,8 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 				std::list<ot::Variable> parameterValues;
 				for (auto parameterValueIt : allParameterValueIt)
 				{
-					parameterValues.push_back(*parameterValueIt++);
+					parameterValues.push_back(std::move(*parameterValueIt));
+					parameterValueIt++;
 				}
 				resultCollectionExtender.AddQuantityContainer(seriesMetadataIndex, parameterNames, std::move(parameterValues), quantityDescription->quantityIndex, quantityValue);
 			}

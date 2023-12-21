@@ -5,7 +5,7 @@ MetadataCampaign::MetadataCampaign(MetadataCampaign&& other)
 	_quantityOverviewByName(std::move(other._quantityOverviewByName)),
 	_parameterOverviewByName(std::move(other._parameterOverviewByName)),
 	_metaData(std::move(other._metaData)),
-	_measurementCampaignName(other._measurementCampaignName)
+	_campaignName(other._campaignName)
 {}
 
 MetadataCampaign::MetadataCampaign(const MetadataCampaign& other)
@@ -13,7 +13,7 @@ MetadataCampaign::MetadataCampaign(const MetadataCampaign& other)
 	_quantityOverviewByName(other._quantityOverviewByName),
 	_parameterOverviewByName(other._parameterOverviewByName),
 	_metaData(other._metaData),
-	_measurementCampaignName(other._measurementCampaignName)
+	_campaignName(other._campaignName)
 {}
 
 MetadataCampaign MetadataCampaign::operator=(MetadataCampaign&& other)

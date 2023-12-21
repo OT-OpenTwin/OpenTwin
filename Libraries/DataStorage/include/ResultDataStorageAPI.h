@@ -6,6 +6,7 @@
 #include "bsoncxx/builder/basic/document.hpp"
 #include "bsoncxx/document/view_or_value.hpp"
 #include "../include/Document/DocumentAccess.h"
+#include "../include/Document/DocumentAccessBase.h"
 
 #pragma warning (disable:4996)
 
@@ -22,9 +23,11 @@ namespace DataStorageAPI
 
 		__declspec(dllexport) ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName);
 		__declspec(dllexport) DataStorageResponse InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing);
+		__declspec(dllexport) void FlushQueuedData();
 
 	private:
 		const int maxDocumentLength = 16776216;
 		DocumentAccess documentAccess;
+		DocumentAccessBase docBase;
 	};
 }
