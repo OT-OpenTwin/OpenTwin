@@ -30,6 +30,8 @@ public:
 	void AddQuantityContainer(uint32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint32_t quantityIndex, const ot::Variable& quantityValue);
 
 private:
+	friend class FixtureResultCollectionExtender;
+	
 	bool _requiresUpdateMetadataCampaign;
 	std::list<const MetadataSeries*> _seriesMetadataForStorage;
 	std::vector<QuantityContainer> _quantityContainer;
@@ -39,9 +41,6 @@ private:
 	const uint32_t _bufferSize = 50;
 	const std::string _parameterAbbreviationBase = "P_";
 	const std::string _quantityAbbreviationBase = "Q_";
-	/*const std::string _nameField;
-	const std::string _valueField;
-	const std::string _typeField;*/
 
 	const uint32_t FindNextFreeSeriesIndex();
 	const uint32_t FindNextFreeQuantityIndex();

@@ -3,6 +3,7 @@
 #include <set>
 #include <cassert>
 #include <algorithm>
+#include "MetadataEntityInterface.h"
 
 ResultCollectionExtender::ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent)
 	:ResultCollectionAccess(projectName,modelComponent), _requiresUpdateMetadataCampaign(false)
@@ -16,6 +17,7 @@ ResultCollectionExtender::~ResultCollectionExtender()
 	{
 		FlushQuantityContainer();
 	}
+	StoreCampaignChanges();
 }
 
 void ResultCollectionExtender::AddSeries(MetadataSeries&& series)
@@ -118,9 +120,18 @@ void ResultCollectionExtender::AddCampaignMetadata(std::shared_ptr<MetadataEntry
 
 void ResultCollectionExtender::StoreCampaignChanges()
 {
-	if (_requiresUpdateMetadataCampaign || _seriesMetadataForStorage.size() != 0)
+	MetadataEntityInterface entityCreator;
+	if (_requiresUpdateMetadataCampaign && _seriesMetadataForStorage.size() != 0)
 	{
-			
+		entityCreator.StoreCampaign(_modelComponent, _metadataCampaign, _seriesMetadataForStorage);
+	}
+	else if (_requiresUpdateMetadataCampaign)
+	{
+		entityCreator.StoreCampaign(_modelComponent, _metadataCampaign);
+	}
+	else if (_seriesMetadataForStorage.size() != 0)
+	{
+		entityCreator.StoreCampaign(_modelComponent, _seriesMetadataForStorage);
 	}
 }
 

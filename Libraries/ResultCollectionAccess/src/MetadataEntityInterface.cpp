@@ -15,23 +15,33 @@ MetadataCampaign MetadataEntityInterface::CreateCampaign(std::shared_ptr<EntityM
 	return measurementCampaign;
 }
 
-void MetadataEntityInterface::StoreCampaign(std::list<MetadataSeries>&& seriesMetadata, MetadataCampaign&& metaDataCampaign)
+void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign)
 {
+	EntityMetadataCampaign entityCampaign(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, "");
 	for (auto& metadata : metaDataCampaign.getMetaData())
 	{
 		//ToDo
 	}
-	StoreCampaign(std::move(seriesMetadata));
+	entityCampaign.StoreToDataBase();
+	_newEntityIDs.push_back(entityCampaign.getEntityID());
+	_newEntityVersions.push_back(entityCampaign.getEntityStorageVersion());
 }
 
-void MetadataEntityInterface::StoreCampaign(std::list<MetadataSeries>&& seriesMetadata)
+void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign, std::list<const MetadataSeries*>& seriesMetadata)
 {
+	StoreCampaign(modelComponent, metaDataCampaign);
+	StoreCampaign(modelComponent, seriesMetadata);
+}
+
+void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, std::list<const MetadataSeries*>& seriesMetadata)
+{
+	std::list< EntityMetadataSeries> entitiesMetadataSeries;
 	for (auto& newSeriesMetadata : seriesMetadata)
 	{
-		const std::string name = newSeriesMetadata.getName();
-		EntityMetadataSeries entitySeries(0, nullptr, nullptr, nullptr, nullptr, "");
+		const std::string name = newSeriesMetadata->getName();
+		EntityMetadataSeries entitySeries(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, "");
 		entitySeries.setName(name);
-		for (const MetadataParameter& parameter : newSeriesMetadata.getParameter())
+		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())
 		{
 			MetadataParameter& parameterForChange = const_cast<MetadataParameter&>(parameter);
 			entitySeries.InsertToParameterField(_nameField, { ot::Variable(parameter.parameterName) }, parameter.parameterAbbreviation);
@@ -41,7 +51,7 @@ void MetadataEntityInterface::StoreCampaign(std::list<MetadataSeries>&& seriesMe
 				//ToDo
 			}
 		}
-		for (const MetadataQuantity& quantity : newSeriesMetadata.getQuantities())
+		for (const MetadataQuantity& quantity : newSeriesMetadata->getQuantities())
 		{
 			entitySeries.InsertToQuantityField(_nameField, { ot::Variable(quantity.quantityName) }, quantity.quantityAbbreviation);
 			entitySeries.InsertToQuantityField(_datatypeField, { ot::Variable(quantity.typeName) }, quantity.quantityAbbreviation);
@@ -50,12 +60,17 @@ void MetadataEntityInterface::StoreCampaign(std::list<MetadataSeries>&& seriesMe
 				//ToDo
 			}
 		}
-		for (auto& metadata : newSeriesMetadata.getMetadata())
+		for (auto& metadata : newSeriesMetadata->getMetadata())
 		{
 			//ToDo
 		}
+		entitySeries.StoreToDataBase();
+		_newEntityIDs.push_back(entitySeries.getEntityID());
+		_newEntityVersions.push_back(entitySeries.getEntityStorageVersion());
 	}
 
+	std::list<bool> visibillity(false);
+	modelComponent.addEntitiesToModel(std::move(_newEntityIDs), std::move(_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection");
 }
 
 void MetadataEntityInterface::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityMetadataCampaign> rmd)
