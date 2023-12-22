@@ -458,76 +458,60 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	m_blockEntityHandler.AddBlockConnection(pckg.connections());
+
+	return "";
 	
-	for (auto c : pckg.connections())
-	{
-		Connection connection(c);
-		
-		
-		auto it = m_ngSpice.mapOfCircuits.find(pckg.name());
+	//for (auto c : pckg.connections())
+	//{
+	//	Connection connection(c);
+	//	
+	//	
+	//	auto it = m_ngSpice.mapOfCircuits.find(pckg.name());
 
-		//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
-		//the same nodeNumber
+	//	//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
+	//	//the same nodeNumber
 
-		if (it->second.findElement(connection.destUid()) == "Connector")
-		{
-			connection.setNodeNumber(std::to_string(0));
-		}
-		else if (it->second.findElement(connection.originUid()) == "Connector")
-		{
-			connection.setNodeNumber(std::to_string(0));
-		}
-		else
-		{
-			connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
-		}
+	//	if (it->second.findElement(connection.destUid()) == "Connector")
+	//	{
+	//		connection.setNodeNumber(std::to_string(0));
+	//	}
+	//	else if (it->second.findElement(connection.originUid()) == "Connector")
+	//	{
+	//		connection.setNodeNumber(std::to_string(0));
+	//	}
+	//	else
+	//	{
+	//		connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
+	//	}
 
-		if(it == m_ngSpice.mapOfCircuits.end())
-		{
-			OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
-		}
+	//	if(it == m_ngSpice.mapOfCircuits.end())
+	//	{
+	//		OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
+	//	}
 
-		else
-		{	
-			//Here I add the connection to the Origin Element
-			it->second.addConnection("1", connection);
+	//	else
+	//	{	
+	//		//Here I add the connection to the Origin Element
+	//		it->second.addConnection("1", connection);
 
-			
+	//		
 
 
-			//Some Tests
-			//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
-			
-			//Here I add the connection to the Destination Element
-			it->second.addConnection("2", connection);
+	//		//Some Tests
+	//		//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
+	//		
+	//		//Here I add the connection to the Destination Element
+	//		it->second.addConnection("2", connection);
 
-			//test of print
-			
-			
-			
-		}
-	}
-	
-	
-	
+	//		//test of print
+	//		
+	//		
+	//		
+	//	}
+	//
 
 	
-
-	// Here we would check and store the connection information
-	OT_LOG_D("Handling new graphics item connection request ( editor = \"" + pckg.name() + "\" )");
-
-	// Request UI to add connections
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-	ot::JsonObject pckgObj;
-	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
-	m_uiComponent->sendMessage(true, reqDoc);
-
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document)

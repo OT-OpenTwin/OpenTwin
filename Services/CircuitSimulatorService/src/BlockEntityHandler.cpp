@@ -56,6 +56,102 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc);
 }
 
+std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
+{
+	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
+	std::list<ot::EntityInformation> entityInfos;
+	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	ClassFactoryBlock classFactory;
+
+	std::map<std::string, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
+	for (auto& entityInfo : entityInfos)
+	{
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
+		{
+			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
+			assert(blockEntity != nullptr);
+			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
+		}
+	}
+	return blockEntitiesByBlockID;
+}
+
+bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName)
+{
+	auto allConnectors = blockEntity->getAllConnectorsByName();
+	const ot::ConnectorType connectorType = allConnectors[connectorName].getConnectorType();
+	if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS("Unset connectortype of connector: " + allConnectors[connectorName].getConnectorName()); }
+	if (connectorType == ot::ConnectorType::In || connectorType == ot::ConnectorType::InOptional)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections)
+{
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
+
+	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
+	for (auto& connection : connections)
+	{
+		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
+
+		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
+		{
+			auto& blockEntity = blockEntitiesByBlockID[connection.originUid()];
+
+			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
+		}
+		else
+		{
+			OT_LOG_EAS("Could not create connection since block " + connection.originUid() + " was not found");
+			continue;
+		}
+
+		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
+		{
+			auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
+			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
+		}
+		else
+		{
+			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
+			continue;
+		}
+
+		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
+		{
+			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
+			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
+		}
+		else
+		{
+			_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+		}
+	}
+
+	if (entitiesForUpdate.size() != 0)
+	{
+		ot::UIDList topoEntIDs, topoEntVers;
+
+		for (auto entityForUpdate : entitiesForUpdate)
+		{
+			entityForUpdate->StoreToDataBase();
+			topoEntIDs.push_back(entityForUpdate->getEntityID());
+			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
+		}
+		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
+	}
+}
+
 void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity)
 {
 	EntityBlockCircuitElement* CircuitElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());

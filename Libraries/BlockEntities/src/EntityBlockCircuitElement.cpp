@@ -17,7 +17,6 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 	_blockTitle = "Circuit Element";
 
 	const std::string connectorNameLeft = "Left";
-	
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
@@ -61,7 +60,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitElement::CreateBlockCfg()
 	myStack->addItemTop(myLayout, true, false);
 
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-	connection1->setName("Input2");
+	connection1->setName("Left");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection1->setBackgroundPainer(painter1);
@@ -70,7 +69,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitElement::CreateBlockCfg()
 	//connection1->setMargins(10.0, 0.0, 0.0, 0.0);
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-	connection2->setName("Ouput2");
+	connection2->setName("Right");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection2->setBackgroundPainer(painter2);
