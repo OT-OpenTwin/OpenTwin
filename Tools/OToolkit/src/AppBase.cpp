@@ -11,6 +11,7 @@
 #include "MenuManager.h"
 #include "StatusManager.h"
 #include "LogVisualization.h"
+#include "Randomizer.h"
 #include "Terminal.h"
 #include "FAR.h"
 
@@ -319,6 +320,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new Terminal);
 	m_toolManager->addTool(new FAR);
+	m_toolManager->addTool(new Randomizer);
 
 	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
 	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
@@ -327,7 +329,6 @@ void AppBase::slotInitializeTools(void) {
 	// Setup menu
 	//m_logger->createMenuBarEntries(m_menuBar);
 	//m_terminal->createMenuBarEntries(m_menuBar);
-
 
 	APPBASE_LOG("Welcome to OToolkit (Build: " __DATE__ " " __TIME__ ")");
 }

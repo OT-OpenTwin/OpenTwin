@@ -56,6 +56,9 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 void mainApplicationThread()
 {
 	try {
+		// Initialize seed
+		srand(time(0));
+
 		// First create Qt Application instance, we do not pass any arguments
 		int argc = 0;
 		QApplication application(argc, nullptr);

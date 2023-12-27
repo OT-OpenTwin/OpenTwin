@@ -90,6 +90,9 @@
     <ClCompile Include="src\FAR.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\Randomizer.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -131,6 +134,9 @@
       <Filter>Header Files\General</Filter>
     </QtMoc>
     <QtMoc Include="include\FAR.h">
+      <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\Randomizer.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>

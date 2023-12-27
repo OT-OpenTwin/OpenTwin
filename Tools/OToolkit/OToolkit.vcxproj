@@ -27,6 +27,7 @@
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
+    <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
     <ClCompile Include="src\TabManager.cpp" />
     <ClCompile Include="src\Terminal.cpp" />
@@ -39,6 +40,7 @@
     <QtMoc Include="include\TabManager.h" />
     <QtMoc Include="include\ToolMenuManager.h" />
     <QtMoc Include="include\FAR.h" />
+    <QtMoc Include="include\Randomizer.h" />
     <ClInclude Include="include\ToolRuntimeHandler.h" />
     <QtMoc Include="include\MenuManager.h" />
     <QtMoc Include="include\ToolManager.h" />
