@@ -17,6 +17,7 @@
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
 	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine)
 {
+	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 ot::GraphicsConnectionItem::~GraphicsConnectionItem() {

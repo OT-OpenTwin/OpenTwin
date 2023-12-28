@@ -62,6 +62,7 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/TextEditor.h"
 #include "DataBase.h"
 
@@ -2386,11 +2387,25 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, doc.GetAllocator()), doc.GetAllocator());
 
-	std::list<std::string> sel;
+	std::list<std::string> sel; // Selected items
+	std::list<ot::GraphicsConnectionCfg> csel; // Selected connections
+
 	for (auto s : scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
-		OTAssertNullptr(itm);
-		sel.push_back(itm->graphicsItemUid());
+		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
+
+		if (itm) {
+			// Item selected
+			sel.push_back(itm->graphicsItemUid());
+		}
+		else if (citm) {
+			// Connection selected
+			csel.push_back(citm->getConnectionInformation());
+		}
+		else {
+			// Unknown selected
+			OTAssert(0, "Unknown graphics item selected");
+		}
 	}
 	if (sel.size() != 0)
 	{
@@ -2423,6 +2438,9 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		catch (...) {
 			OT_LOG_EA("[FATAL] Unknown error");
 		}
+	}
+	else if (!csel.empty()) {
+		int x = 0;
 	}
 }
 
