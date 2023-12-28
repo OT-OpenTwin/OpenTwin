@@ -136,15 +136,11 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 
 		// Now load all geometry entities in the model
 		getApplication()->prefetchDocumentsFromStorage(geometryEntitiesID);
-		ClassFactory classFactory;
-		ClassFactoryCAD classFactoryCAD;
-		classFactory.SetNextHandler(&classFactoryCAD);
-		classFactoryCAD.SetChainRoot(&classFactory);
 
 		for (auto entityID : geometryEntitiesID)
 		{
 			ot::UID entityVersion = getApplication()->getPrefetchedEntityVersion(entityID);
-			EntityGeometry *geom = dynamic_cast<EntityGeometry *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
+			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
 
 			if (geom == nullptr)
 			{
@@ -188,8 +184,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 				ot::UID brepID = geomEntity->getBrepStorageObjectID();
 				ot::UID brepVersion = application->getPrefetchedEntityVersion(brepID);
 
-				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(facetID, facetVersion, classFactory));
-				EntityBrep *brep = dynamic_cast<EntityBrep *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(brepID, brepVersion, classFactory));
+				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(facetID, facetVersion, application->getClassFactory()));
+				EntityBrep *brep = dynamic_cast<EntityBrep *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
 
 				geomEntity->setFacetEntity(facet);
 				geomEntity->setBrepEntity(brep);
@@ -513,14 +509,9 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 
-	ClassFactory classFactory;
-	ClassFactoryCAD classFactoryCAD;
-	classFactory.SetNextHandler(&classFactoryCAD);
-	classFactoryCAD.SetChainRoot(&classFactory);
-
 	for (auto info : materialInfo)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), application->getClassFactory()));
 
 		if (material == nullptr)
 		{

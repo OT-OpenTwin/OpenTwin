@@ -14,6 +14,9 @@
 #include "OTServiceFoundation/EntityInformation.h"
 #include <Types.h>
 
+#include "ClassFactory.h"
+#include "ClassFactoryCAD.h"
+
 // C++ header
 #include <string>
 
@@ -122,10 +125,15 @@ public:
 	void mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityBase *> mesherMap);
 	void runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity);
 
+	ClassFactory& getClassFactory(void) { return classFactory; }
+
 private:
 	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
 
 	static std::string materialsFolder;
 	static ot::UID materialsFolderID;
+
+	ClassFactory classFactory;
+	ClassFactoryCAD classFactoryCAD;
 };
