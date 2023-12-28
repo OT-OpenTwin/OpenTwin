@@ -222,8 +222,6 @@ std::string ElmerFEMLauncher::getProblemType(EntityBase* solverEntity)
 
 std::string ElmerFEMLauncher::extractMesh(EntityBase* solverEntity, const std::string &tempDirPath, ot::UID &meshDataID, std::string &currentMeshDataName)
 {
-	ClassFactory classFactory;
-
 	// Get the name of the currently selected mesh
 	EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
 	assert(mesh != nullptr);
@@ -250,7 +248,7 @@ std::string ElmerFEMLauncher::extractMesh(EntityBase* solverEntity, const std::s
 	entityIDList.push_back(meshDataID);
 	application->prefetchDocumentsFromStorage(entityIDList);
 
-	EntityMeshTetData* entity = dynamic_cast<EntityMeshTetData*> (application->modelComponent()->readEntityFromEntityIDandVersion(meshDataID, application->getPrefetchedEntityVersion(meshDataID), classFactory));
+	EntityMeshTetData* entity = dynamic_cast<EntityMeshTetData*> (application->modelComponent()->readEntityFromEntityIDandVersion(meshDataID, application->getPrefetchedEntityVersion(meshDataID), application->getClassFactory()));
 	if (entity == nullptr) return "";
 
 	ot::UID gmshDataStorageID = entity->getGmshDataStorageId();
@@ -263,7 +261,7 @@ std::string ElmerFEMLauncher::extractMesh(EntityBase* solverEntity, const std::s
 	entityIDList.push_back(gmshDataStorageID);
 	application->prefetchDocumentsFromStorage(entityIDList);
 
-	EntityBinaryData* entityData = dynamic_cast<EntityBinaryData*> (application->modelComponent()->readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), classFactory));
+	EntityBinaryData* entityData = dynamic_cast<EntityBinaryData*> (application->modelComponent()->readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), application->getClassFactory()));
 	if (entityData == nullptr) return "";
 
 	std::vector<char> meshContent = entityData->getData();

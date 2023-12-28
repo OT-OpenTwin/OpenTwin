@@ -70,11 +70,10 @@ void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& se
 	{
 		bool hasACategorizationEntitySelected = false;
 		Application::instance()->prefetchDocumentsFromStorage(selectedEntities);
-		ClassFactory classFactory;
 
 		for (ot::UID entityID : selectedEntities)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID),classFactory);
+			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), Application::instance()->getClassFactory());
 			auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt);
 			if (categorizationEnt != nullptr)
 			{
@@ -147,8 +146,7 @@ void DataCategorizationHandler::AddNewCategorizationEntity(std::string name, Ent
 
 void DataCategorizationHandler::AddRMDEntries(ot::EntityInformation entityInfo)
 {
-	ClassFactory classFactory;
-	auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+	auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 	std::shared_ptr<EntityParameterizedDataCategorization> dataCatEntity(dynamic_cast<EntityParameterizedDataCategorization*>(baseEntity));
 	assert(dataCatEntity != nullptr);
 	assert(dataCatEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
@@ -158,10 +156,9 @@ void DataCategorizationHandler::AddRMDEntries(ot::EntityInformation entityInfo)
 
 void DataCategorizationHandler::AddMSMDEntries(std::list<ot::UID>& selectedEntities)
 {
-	ClassFactory classFactory;
 	for (ot::UID entityID : selectedEntities)
 	{
-		auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), classFactory);
+		auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityParameterizedDataCategorization> categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
 		if (categorizationEntity == nullptr)
 		{
@@ -185,13 +182,12 @@ void DataCategorizationHandler::AddMSMDEntries(std::list<ot::UID>& selectedEntit
 
 void DataCategorizationHandler::AddParamOrQuantityEntries(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
 {
-	ClassFactory classFactory;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> msmdEntities, quantityEntities; //or Parameterentity. Depeding on the parameter.
 
 	for (ot::UID entityID : selectedEntities)
 	{
 
-		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), classFactory);
+		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityParameterizedDataCategorization> categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
 		if (categorizationEntity == nullptr)
 		{
@@ -269,8 +265,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 		return;
 	}
 
-	ClassFactory classFactory;
-	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(tableEntityID, tableEntityVersion, classFactory);
+	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(tableEntityID, tableEntityVersion, Application::instance()->getClassFactory());
 	auto tableEntity = dynamic_cast<EntityParameterizedDataTable*>(tableBase);
 
 	if (tableEntity == nullptr)
@@ -386,8 +381,7 @@ std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInfo
 	std::list<std::pair<ot::UID, ot::UID>> existingRanges;
 	FindExistingRanges(containerName, existingRanges);
 
-	ClassFactory classFactory;
-	auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(selectedPreviewTable.getID(), selectedPreviewTable.getVersion(), classFactory);
+	auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(selectedPreviewTable.getID(), selectedPreviewTable.getVersion(), Application::instance()->getClassFactory());
 	std::shared_ptr<EntityParameterizedDataPreviewTable> currentPreview(dynamic_cast<EntityParameterizedDataPreviewTable*>(baseEnt));
 
 	if (currentPreview == nullptr)
@@ -403,7 +397,7 @@ std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInfo
 	{
 		std::pair<ot::UID, ot::UID> categorizationEntityIdentifier;
 		FindContainerEntity(containerName, categorizationEntityIdentifier);
-		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(categorizationEntityIdentifier.first, categorizationEntityIdentifier.second, classFactory);
+		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(categorizationEntityIdentifier.first, categorizationEntityIdentifier.second, Application::instance()->getClassFactory());
 		std::unique_ptr<EntityParameterizedDataCategorization> categoryEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
 		auto newTableIdentifier = CreateNewTable(tableName, categoryEnt->GetSelectedDataCategorie(), existingRanges);
 		return newTableIdentifier;
@@ -417,11 +411,10 @@ void DataCategorizationHandler::FindExistingRanges(std::string containerName, st
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(folderItems, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactory classFactory;
 
 	for (auto entityInfo : entityInfos)
 	{
-		EntityBase* base = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		EntityBase* base = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 		EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(base);
 		if (selectionRange != nullptr)
 		{
@@ -528,12 +521,11 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> DataCategorizationHandler:
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
 	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(_baseFolder, tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
-	ClassFactory classFactory;
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
 	for (ot::UID selectionRangeID : selectionRangeIDs)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
 		if (rangeEntity->getConsiderForBatchprocessing())
@@ -550,11 +542,10 @@ std::map<std::string, std::string> DataCategorizationHandler::LoadAllPythonScrip
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(scriptNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactory classFactory;
 	std::map<std::string, std::string> pythonScripts;
 	for (const ot::EntityInformation& entityInfo : entityInfos)
 	{
-		auto entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 		auto script = dynamic_cast<EntityFile*>(entityBase);
 		
 		const std::vector<char> scriptContentRaw = script->getData()->getData();
@@ -709,7 +700,6 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(entityList, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactory classFactory;
 
 	std::vector<ot::TableRange> rmdRanges;
 	std::vector<ot::TableRange> msmdRanges;
@@ -718,7 +708,7 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 
 	for (auto entityInfo : entityInfos)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 		std::unique_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		if (rangeEntity->getTableName() == selectedTableName)
 		{
@@ -783,12 +773,11 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 
 void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList versions)
 {
-	ClassFactory classFactory;
 	std::vector<ot::TableRange> ranges;
 	auto versionIt = versions.begin();
 	for (auto idIt = iDs.begin(); idIt != iDs.end(); ++idIt)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(*idIt, *versionIt,classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(*idIt, *versionIt, Application::instance()->getClassFactory());
 		versionIt++;
 
 		std::unique_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));

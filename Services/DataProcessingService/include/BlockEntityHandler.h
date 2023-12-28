@@ -9,6 +9,7 @@
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 
+class ClassFactory;
 
 class BlockEntityHandler  : public BusinessLogicHandler
 {
@@ -16,7 +17,7 @@ public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections);
 	void OrderUIToCreateBlockPicker();
-	void UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position);
+	void UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position, ClassFactory *classFactory);
 	std::map<std::string, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 
 private:

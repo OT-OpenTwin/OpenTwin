@@ -31,8 +31,8 @@ private:
 class SimplifyRemoveFaces : public ShapesBase
 {
 public:
-	SimplifyRemoveFaces(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) 
-		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache) {};
+	SimplifyRemoveFaces(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, ClassFactory *_classFactory) 
+		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, _classFactory) {};
 	virtual ~SimplifyRemoveFaces() {}
 
 	void setUpdateManager(UpdateManager *_updateManager) { updateManager = _updateManager; };

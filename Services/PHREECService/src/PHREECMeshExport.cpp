@@ -322,11 +322,9 @@ void PHREECMeshExport::processMaterialData(const std::string &meshName, std::lis
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 
-	ClassFactory classFactory;
-
 	for (auto info : materialInfo)
 	{
-		materialMap[info.getName()] = dynamic_cast<EntityMaterial *>(modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory));
+		materialMap[info.getName()] = dynamic_cast<EntityMaterial *>(modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), application->getClassFactory()));
 	}
 
 	// Finally process the list of sections and create the material

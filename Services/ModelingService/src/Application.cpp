@@ -55,6 +55,10 @@ Application::Application() :
 	removeFaces(nullptr),
 	stepReader(nullptr)
 {
+	getClassFactory().SetNextHandler(&classFactoryCAD);
+	classFactoryCAD.SetChainRoot(&(getClassFactory()));
+
+	entityCache.setApplication(this);
 }
 
 Application::~Application()
@@ -393,7 +397,7 @@ PrimitiveManager *Application::getPrimitiveManager(void)
 { 
 	if (primitiveManager == nullptr)
 	{
-		primitiveManager = new PrimitiveManager(m_uiComponent, m_modelComponent, serviceName(), serviceID(), &entityCache);
+		primitiveManager = new PrimitiveManager(m_uiComponent, m_modelComponent, serviceName(), serviceID(), &entityCache, &getClassFactory());
 	}
 
 	return primitiveManager; 
@@ -413,7 +417,7 @@ UpdateManager *Application::getUpdateManager(void)
 { 
 	if (updateManager == nullptr)
 	{
-		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations());
+		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations(), &getClassFactory());
 	}
 
 	return updateManager; 
@@ -423,7 +427,7 @@ Transformations *Application::getTransformationManager(void)
 { 
 	if (transformationManager == nullptr)
 	{
-		transformationManager = new Transformations(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache);
+		transformationManager = new Transformations(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
 		transformationManager->setUpdateManager(getUpdateManager());	
 	}
 
@@ -434,7 +438,7 @@ SimplifyRemoveFaces *Application::getRemoveFacesOperation(void)
 {
 	if (removeFaces == nullptr)
 	{
-		removeFaces = new SimplifyRemoveFaces(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache);
+		removeFaces = new SimplifyRemoveFaces(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
 		removeFaces->setUpdateManager(getUpdateManager());	
 	}
 

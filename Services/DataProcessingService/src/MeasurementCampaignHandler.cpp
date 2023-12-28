@@ -4,7 +4,7 @@
 #include "OTCore/FolderNames.h"
 #include "DataBase.h"
 
-void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName)
+void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName, ClassFactory *classFactory)
 {
 	std::list<ot::EntityInformation> allMeasurementMetadata = getMSMDEntityInformation(collectionName, projectName);
 
@@ -18,10 +18,9 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 		std::vector<std::shared_ptr<EntityMetadataSeries>> measurementMetadata;
 		measurementMetadata.reserve(allMeasurementMetadata.size());
 
-		ClassFactory classFactory;
 		for (auto& entityInfo : allMeasurementMetadata)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory);
 			auto metadata = dynamic_cast<EntityMetadataSeries*>(baseEnt);
 			assert(metadata != nullptr);
 			measurementMetadata.push_back(std::shared_ptr<EntityMetadataSeries>(metadata));

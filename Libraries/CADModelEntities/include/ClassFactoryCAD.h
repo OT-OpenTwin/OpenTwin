@@ -12,9 +12,11 @@
 class __declspec(dllexport) ClassFactoryCAD : public ClassFactoryHandlerAbstract
 {
 public:
-	ClassFactoryCAD() {};
+	//ClassFactoryCAD() {};
 	virtual ~ClassFactoryCAD() {};
 
 	virtual EntityBase *CreateEntity(const std::string &entityType) override;
+
+	//ClassFactoryCAD() = delete;
 };
 

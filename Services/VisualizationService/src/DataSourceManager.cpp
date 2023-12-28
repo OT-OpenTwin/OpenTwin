@@ -19,25 +19,24 @@ DataSourceManager::~DataSourceManager()
 	// We do not delete the data items here, since we keep them persistent until they are explicitly deleted.
 }
 
-DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID sourceVersion, ot::UID meshID, ot::UID meshVersion, ot::components::ModelComponent *modelComponent)
+DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID sourceVersion, ot::UID meshID, ot::UID meshVersion, ot::components::ModelComponent *modelComponent, ClassFactory *classFactory)
 {
 	if (!isDataItemLoaded(sourceID, sourceVersion))
 	{
 		// Now load the data item to determine its type
-		ClassFactory classFactory;
-		EntityBase *resultEntity = dynamic_cast<EntityBase*>(modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersion, classFactory));
+		EntityBase *resultEntity = dynamic_cast<EntityBase*>(modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersion, *classFactory));
 		EntityBase *meshEntity = nullptr;
 
 		if (meshID > 0)
 		{
-			meshEntity = dynamic_cast<EntityBase*>(modelComponent->readEntityFromEntityIDandVersion(meshID, meshVersion, classFactory));
+			meshEntity = dynamic_cast<EntityBase*>(modelComponent->readEntityFromEntityIDandVersion(meshID, meshVersion, *classFactory));
 		}
 
 		if (resultEntity != nullptr)
 		{
 			DataSourceManagerItem *newItem = DataSourceItemFactory::createSourceItem(resultEntity);
 
-			if (newItem->loadData(resultEntity, meshEntity))
+			if (newItem->loadData(resultEntity, meshEntity, classFactory))
 			{
 				dataItems[std::pair<ot::UID, ot::UID>(sourceID, sourceVersion)] = newItem;
 			}

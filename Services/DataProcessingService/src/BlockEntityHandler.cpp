@@ -112,7 +112,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc);
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position)
+void BlockEntityHandler::UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position, ClassFactory* classFactory)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 	if (blockEntitiesByBlockID.find(blockID) == blockEntitiesByBlockID.end())
@@ -123,8 +123,7 @@ void BlockEntityHandler::UpdateBlockPosition(const std::string& blockID, ot::Poi
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityList{ blockEntity->getCoordinateEntityID() };
 	_modelComponent->getEntityInformation(entityList, entityInfos);
-	ClassFactory classFactory;
-	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), classFactory);
+	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();

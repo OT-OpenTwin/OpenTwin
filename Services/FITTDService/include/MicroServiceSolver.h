@@ -15,7 +15,7 @@
 class MicroServiceSolver
 {
 public:
-	MicroServiceSolver(std::string solverName, int serviceID, int sessionCount);
+	MicroServiceSolver(std::string solverName, int serviceID, int sessionCount, ClassFactory& classFactory);
 	virtual ~MicroServiceSolver();
 
 	void setDataBaseURL(const std::string &dbURL);
@@ -75,6 +75,7 @@ private:
 	std::string projectName;
 	std::string modelStateVersion;
 	ot::UID solverEntityID;
+	ClassFactory* classFactory;
 
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;
@@ -83,7 +84,6 @@ private:
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	ClassFactory factory;
 	EntityUnits * _units = nullptr;
 };
 

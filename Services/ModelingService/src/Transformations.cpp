@@ -149,12 +149,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 
 	for (auto entity : geometryEntityInfo)
 	{
-		ClassFactoryCAD classFactory;
-		ClassFactory baseFactory;
-		classFactory.SetNextHandler(&baseFactory);
-		baseFactory.SetChainRoot(&classFactory);
-
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entity.getID(), entity.getVersion(), classFactory));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entity.getID(), entity.getVersion(), *classFactory));
 
 		if (geometryEntity != nullptr)
 		{

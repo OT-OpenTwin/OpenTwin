@@ -17,12 +17,13 @@
 
 #include "Application.h"
 
-UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations) :
+UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ClassFactory* _classFactory) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	entityCache(_entityCache),
 	primitiveManager(_primitiveManager),
-	booleanOperations(_booleanOperations)
+	booleanOperations(_booleanOperations),
+	classFactory(_classFactory)
 {
 
 }
@@ -107,13 +108,9 @@ std::list<ot::UID> UpdateManager::updateParents(std::list<ot::UID> &entityIDs, s
 
 void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, std::map<ot::UID, ot::UID> &entityVersionMap, std::list<ot::UID> &modifiedEntities)
 {
-	ClassFactoryCAD classFactory;
-	ClassFactory baseFactory;
-	classFactory.SetNextHandler(&baseFactory);
-	baseFactory.SetChainRoot(&classFactory);
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
 
 	if (geomEntity == nullptr)
 	{
@@ -237,11 +234,6 @@ bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEn
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchData);
 
 	// Load the base and tool breps
-	ClassFactoryCAD classFactory;
-	ClassFactory baseFactory;
-	classFactory.SetNextHandler(&baseFactory);
-	baseFactory.SetChainRoot(&classFactory);
-
 	EntityGeometry *baseShape = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseShapeID, baseShapeVersion));
 	assert(baseShape != nullptr);
 
@@ -359,13 +351,9 @@ std::list<ot::UID> UpdateManager::updateEntities(std::list<ot::UID> &entityIDs, 
 
 void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, ot::UID brepVersion, bool itemsVisible, std::list<ot::UID> &modifiedEntities)
 {
-	ClassFactoryCAD classFactory;
-	ClassFactory baseFactory;
-	classFactory.SetNextHandler(&baseFactory);
-	baseFactory.SetChainRoot(&classFactory);
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
 	if (geomEntity == nullptr)
 	{
 		// We cannot update this entity

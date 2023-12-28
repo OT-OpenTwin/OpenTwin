@@ -29,10 +29,12 @@
 
 #include <string>
 
+class ClassFactory;
+
 class MicroServiceInterfaceFITTDSolver : public MicroServiceSolver
 {
 public:
-	MicroServiceInterfaceFITTDSolver(std::string solverName, int serviceID, int sessionCount) :MicroServiceSolver(solverName, serviceID, sessionCount) {};
+	MicroServiceInterfaceFITTDSolver(std::string solverName, int serviceID, int sessionCount, ClassFactory &classFactory) :MicroServiceSolver(solverName, serviceID, sessionCount, classFactory) {};
 	virtual ~MicroServiceInterfaceFITTDSolver();
 
 	void CreateSolver();

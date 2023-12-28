@@ -17,7 +17,7 @@ DataSourceResult3D::~DataSourceResult3D()
 	FreeMemory();
 }
 
-bool DataSourceResult3D::loadData(EntityBase * resultEntity, EntityBase *meshEntity)
+bool DataSourceResult3D::loadData(EntityBase * resultEntity, EntityBase *meshEntity, ClassFactory* classFactory)
 {
 	FreeMemory();
 	auto resultData = dynamic_cast<EntityResult3DData *>(resultEntity);

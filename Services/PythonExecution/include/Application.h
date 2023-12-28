@@ -11,6 +11,8 @@
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
+#include "ClassFactoryBlock.h"
+
 // C++ header
 #include <string>
 
@@ -30,6 +32,9 @@ public:
 private:
 	Application();
 	virtual ~Application();
+
+	ClassFactoryBlock classFactoryBlock;
+
 public:
 
 	// ##################################################################################################################################################################################################################

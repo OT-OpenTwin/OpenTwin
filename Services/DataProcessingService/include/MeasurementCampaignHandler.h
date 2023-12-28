@@ -6,10 +6,12 @@
 #include "EntityMetadataSeries.h"
 #include "OTCore/Variable.h"
 
+class ClassFactory;
+
 class MeasurementCampaignHandler : public BusinessLogicHandler
 {
 public:
-	void ConnectToCollection(const std::string& collectionName, const std::string& projectName);
+	void ConnectToCollection(const std::string& collectionName, const std::string& projectName, ClassFactory* classFactory);
 	std::vector<std::string> GetParameterList();
 	std::vector<std::string> GetQuantityList();
 

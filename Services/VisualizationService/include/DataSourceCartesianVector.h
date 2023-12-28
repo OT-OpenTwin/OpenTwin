@@ -13,7 +13,7 @@ public:
 	DataSourceCartesianVector();
 	virtual ~DataSourceCartesianVector();
 
-	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) override;
+	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory* classFactory) override;
 
 	EntityCartesianVector *getResultData(void) { return resultData; }
 	EntityMeshCartesianData *getMeshData(void) { return meshData; }

@@ -2,9 +2,9 @@
 
 #include <string>
 
-class vtkRectilinearGrid;
-class vtkDataObject;
 class EntityBase;
+class ClassFactory;
+
 namespace ot
 {
 	namespace components
@@ -19,7 +19,7 @@ public:
 	DataSourceManagerItem();
 	virtual ~DataSourceManagerItem();
 
-	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) = 0;
+	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory *classFactory) = 0;
 
 private:
 };

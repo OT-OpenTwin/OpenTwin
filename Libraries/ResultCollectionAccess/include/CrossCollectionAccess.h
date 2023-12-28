@@ -15,12 +15,14 @@
 #include "EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
+class ClassFactory;
+
 class __declspec(dllexport) CrossCollectionAccess
 {
 public:
 	CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL);
-	std::list<std::shared_ptr<EntityMetadataSeries>> getMeasurementMetadata(ot::components::ModelComponent& modelComponent);
-	std::shared_ptr<EntityMetadataCampaign> getMeasurementCampaignMetadata(ot::components::ModelComponent& modelComponent);
+	std::list<std::shared_ptr<EntityMetadataSeries>> getMeasurementMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
+	std::shared_ptr<EntityMetadataCampaign> getMeasurementCampaignMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
 
 	bool ConnectedWithCollection() { return _collectionName != ""; }
 private:

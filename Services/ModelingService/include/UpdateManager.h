@@ -11,6 +11,7 @@ class TopoDS_Shape;
 class EntityCache;
 class PrimitiveManager;
 class BooleanOperations;
+class ClassFactory;
 
 namespace ot
 {
@@ -24,7 +25,7 @@ namespace ot
 class UpdateManager
 {
 public:
-	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations);
+	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ClassFactory *_classFactory);
 	~UpdateManager() {};
 
 	void checkParentUpdates(std::list<ot::UID> modifiedEntities);
@@ -49,4 +50,5 @@ private:
 	EntityCache *entityCache;
 	PrimitiveManager *primitiveManager;
 	BooleanOperations *booleanOperations;
+	ClassFactory* classFactory;
 };

@@ -19,6 +19,8 @@
 
 #include "Geometry.h"
 
+class ClassFactory;
+
 using connection = mongocxx::pool::entry;
 
 class __declspec(dllexport) DataBase
@@ -42,7 +44,7 @@ public:
 
 	bool GetDocumentFromObjectID(const std::string &storageID, bsoncxx::builder::basic::document &doc);
 	bool GetDocumentFromEntityIDandVersion(unsigned long long entityID, unsigned long long version, bsoncxx::builder::basic::document &doc);
-	EntityBase* GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version);
+	EntityBase* GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, ClassFactory* classFactory);
 
 
 	bool GetAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value> &filterPairs, std::vector<std::string> &columnNames, bsoncxx::builder::basic::document &doc);
@@ -84,7 +86,6 @@ public:
 	static void readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::Edge> &edges);
 	/** ************************************************************************************************************************************************/
 private:
-	ClassFactoryHandler* classFactory;
 	bool isConnected;
 	std::string projectName;
 	std::string databaseServerURL;

@@ -327,8 +327,7 @@ void Application::runPHREEC(void)
 	std::map<std::string, EntityBase *> solverMap;
 	for (auto info : solverInfo)
 	{
-		ClassFactory classFactory;
-		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory);
+		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
 		solverMap[info.getName()] = entity;
 	}
 

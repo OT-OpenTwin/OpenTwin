@@ -15,7 +15,7 @@ public:
 	DataSourceResult3D();
 	virtual ~DataSourceResult3D();
 
-	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) override;
+	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory* classFactory) override;
 
 	vtkRectilinearGrid * GetVtkGrid() { return vtkGrid.GetPointer(); };
 		

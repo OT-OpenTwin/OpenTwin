@@ -5,8 +5,8 @@
 #include <algorithm>
 #include "MetadataEntityInterface.h"
 
-ResultCollectionExtender::ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent)
-	:ResultCollectionAccess(projectName,modelComponent), _requiresUpdateMetadataCampaign(false)
+ResultCollectionExtender::ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory)
+	:ResultCollectionAccess(projectName,modelComponent,classFactory), _requiresUpdateMetadataCampaign(false)
 {
 	_quantityContainer.reserve(_bufferSize);
 }

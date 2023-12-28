@@ -9,19 +9,19 @@
 #include "EntityMetadataCampaign.h"
 #include "EntityMetadataSeries.h"
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& projectName, ot::components::ModelComponent& modelComponent)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory *classFactory)
 	:_dataStorageAccess("Projects",projectName), _modelComponent(modelComponent)
 {
-	LoadExistingCampaignData();
+	LoadExistingCampaignData(classFactory);
 }
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL, ClassFactory* classFactory)
 	:_dataStorageAccess("Projects", crossProjectName),_modelComponent(modelComponent)
 {
 	CrossCollectionAccess crossCollectionAccess(crossProjectName, sessionServiceURL, modelServiceURL);
 	crossCollectionAccess.ConnectedWithCollection();
-	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(_modelComponent);
-	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(_modelComponent);
+	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(_modelComponent, classFactory);
+	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(_modelComponent, classFactory);
 
 	MetadataEntityInterface campaignFactory;
 	_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
@@ -105,9 +105,9 @@ const MetadataQuantity* ResultCollectionAccess::FindMetadataQuantity(const std::
 	}
 }
 
-void ResultCollectionAccess::LoadExistingCampaignData()
+void ResultCollectionAccess::LoadExistingCampaignData(ClassFactory* classFactory)
 {
-	std::vector<EntityBase*> allExistingMetadata = FindAllExistingMetadata();
+	std::vector<EntityBase*> allExistingMetadata = FindAllExistingMetadata(classFactory);
 
 
 	EntityMetadataCampaign temp(-1, nullptr, nullptr, nullptr, nullptr, "");
@@ -130,7 +130,7 @@ void ResultCollectionAccess::LoadExistingCampaignData()
 	_metadataCampaign =	campaignFactory.CreateCampaign(metadataCampaignEntity, metadataSeriesEntities);
 }
 
-std::vector<EntityBase*> ResultCollectionAccess::FindAllExistingMetadata()
+std::vector<EntityBase*> ResultCollectionAccess::FindAllExistingMetadata(ClassFactory *classFactory)
 {
 	std::list<std::string> allExistingMetadataNames = _modelComponent.getListOfFolderItems(ot::FolderNames::DatasetFolder);
 	std::list<ot::EntityInformation> entityInfos;
@@ -142,13 +142,11 @@ std::vector<EntityBase*> ResultCollectionAccess::FindAllExistingMetadata()
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
 
-
-	ClassFactory classFactory;
 	std::vector<EntityBase*> allExistingMetadata;
 	allExistingMetadata.reserve(entityInfos.size());
 	for (auto& entityInfo : entityInfos)
 	{
-		allExistingMetadata.push_back(_modelComponent.readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory));
+		allExistingMetadata.push_back(_modelComponent.readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory));
 	}
 	
 	return allExistingMetadata;

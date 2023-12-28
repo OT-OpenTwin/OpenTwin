@@ -14,6 +14,8 @@
 
 #include "EntityCache.h"
 
+#include "ClassFactoryCAD.h"
+
 // OC header
 #include <TopoDS_Compound.hxx>
 
@@ -140,4 +142,6 @@ private:
 	Transformations     *transformationManager;
 	SimplifyRemoveFaces *removeFaces;
 	STEPReader			*stepReader;
+
+	ClassFactoryCAD classFactoryCAD;
 };

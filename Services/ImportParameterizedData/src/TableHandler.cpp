@@ -4,20 +4,21 @@
 #include "TableStatisticAnalyser.h"
 
 #include "ClassFactory.h"
+#include "Application.h"
 #include "EntityParameterizedDataTable.h"
 #include <chrono>
+
 TableHandler::TableHandler(const std::string tableFolder) : _tableFolder(tableFolder)
 {}
 
 void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 {	
-	ClassFactory classFactory;
-	auto sourceFile = dynamic_cast<EntityFile*>(_modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersionID, classFactory));
+	auto sourceFile = dynamic_cast<EntityFile*>(_modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersionID, Application::instance()->getClassFactory()));
 	if (sourceFile == nullptr)
 	{
 		assert(0); // Only EntityFile should reach here.
 	}
-	auto topoEnt = std::unique_ptr< EntityParameterizedDataTable>(new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	auto topoEnt = std::unique_ptr< EntityParameterizedDataTable>(new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	std::list<std::string> takenNames;
 	std::string fullName = CreateNewUniqueTopologyNamePlainPossible(_tableFolder, sourceFile->getFileName(), takenNames);
 	topoEnt->setName(fullName);
@@ -81,8 +82,7 @@ std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableDa
 		}
 	}
 	
-	ClassFactory classFactory;
-	auto tableData = std::make_shared<EntityResultTableData<std::string>>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	auto tableData = std::make_shared<EntityResultTableData<std::string>>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	uint64_t numberOfColumns = 0;
 	for (auto it = processedTableData.begin(); it != processedTableData.end();it++)
 	{

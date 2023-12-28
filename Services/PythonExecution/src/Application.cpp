@@ -30,7 +30,8 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase("PythonSubprocess", "PythonSubprocess", new UiNotifier(), new ModelNotifier())
 {
-	
+	getClassFactory().SetNextHandler(&classFactoryBlock);
+	classFactoryBlock.SetChainRoot(&(getClassFactory()));
 }
 
 Application::~Application()

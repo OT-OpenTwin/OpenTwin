@@ -19,6 +19,8 @@
 #include "OTServiceFoundation/EntityInformation.h"
 #include "OTServiceFoundation/ExternalServicesComponent.h"
 
+#include "ClassFactory.h"
+
 // std header
 #include <list>
 #include <map>
@@ -215,6 +217,10 @@ namespace ot {
 		//! @brief Will return true if a ui plugin with the specified Name exists
 		bool pluginExists(const std::string& _pluginName);
 
+		//! @brief Returns a handle to the global class factory for the service
+		ClassFactory& getClassFactory(void) { return classFactory; }
+
+
 		// ##########################################################################################################################################
 
 		// Modal Commands
@@ -327,6 +333,7 @@ namespace ot {
 		void __addUiPlugin(components::UiPluginComponent * _component);
 
 		std::string			m_DBuserCollection;
+		ClassFactory classFactory;
 
 		ApplicationBase() = delete;
 		ApplicationBase(ApplicationBase &) = delete;

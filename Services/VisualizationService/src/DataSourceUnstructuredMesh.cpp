@@ -30,17 +30,15 @@ DataSourceUnstructuredMesh::~DataSourceUnstructuredMesh()
 	FreeMemory();
 }
 
-bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity)
+bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity, ClassFactory* classFactory)
 {
 	FreeMemory();
 	auto meshData = dynamic_cast<EntityResultUnstructuredMesh*>(meshEntity);
 	assert(meshData != nullptr);
 
-	ClassFactory classFactory;
-
 	size_t numberPoints = 0;
 	double* pointsX = nullptr, * pointsY = nullptr, * pointsZ = nullptr;
-	meshData->GetPointCoordData(numberPoints, pointsX, pointsY, pointsZ, &classFactory);
+	meshData->GetPointCoordData(numberPoints, pointsX, pointsY, pointsZ, classFactory);
 
 	if (pointsX == nullptr || pointsY == nullptr || pointsZ == nullptr) return false;
 
@@ -59,7 +57,7 @@ bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity)
 	size_t numberCells = 0;
 	size_t sizeCellData = 0;
 	int* cellData = nullptr;
-	meshData->GetCellData(numberCells, sizeCellData, cellData, &classFactory);
+	meshData->GetCellData(numberCells, sizeCellData, cellData, classFactory);
 
 	if (cellData == nullptr) return false;
 
@@ -116,12 +114,10 @@ bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity)
 }
 
 
-bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
+bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity, ClassFactory* classFactory)
 {
 	auto resultData = dynamic_cast<EntityResultUnstructuredMeshData*>(resultEntity);
 	assert(resultData != nullptr);
-
-	ClassFactory classFactory;
 
 	size_t lenPointScalar = 0;
 	size_t lenPointVector = 0;
@@ -133,7 +129,7 @@ bool DataSourceUnstructuredMesh::loadResultData(EntityBase* resultEntity)
 	float* cellScalar  = nullptr;
 	float* cellVector  = nullptr;
 
-	resultData->getData(lenPointScalar, pointScalar, lenPointVector, pointVector, lenCellScalar, cellScalar, lenCellVector, cellVector, &classFactory);
+	resultData->getData(lenPointScalar, pointScalar, lenPointVector, pointVector, lenCellScalar, cellScalar, lenCellVector, cellVector, classFactory);
 
 	if (pointScalar == nullptr && pointVector == nullptr && cellScalar == nullptr && cellVector == nullptr) return false;
 
@@ -215,7 +211,7 @@ void DataSourceUnstructuredMesh::buildVectorArray(size_t length, float* data, vt
 	}
 }
 
-bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *meshEntity)
+bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory* classFactory)
 {
 	// First, load the mesh data
 	EntityResultUnstructuredMesh *meshData = dynamic_cast<EntityResultUnstructuredMesh*>(meshEntity);
@@ -227,7 +223,7 @@ bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *
 	}
 
 	// Now build the vtk grid from the mesh data
-	bool success = loadMeshData(meshEntity);
+	bool success = loadMeshData(meshEntity, classFactory);
 
 	delete meshData;
 	meshData = nullptr;
@@ -242,7 +238,7 @@ bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *
 		return false;
 	}
 
-	success = loadResultData(resultEntity);
+	success = loadResultData(resultEntity, classFactory);
 
 	delete resultData;
 	resultData = nullptr;

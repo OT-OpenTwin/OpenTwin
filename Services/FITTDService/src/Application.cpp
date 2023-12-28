@@ -182,8 +182,7 @@ void Application::addMonitor(void)
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getType() == "EntitySolverFITTD");
 	
-	ClassFactory factory;
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), factory));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 	
 	//Create new monitor
@@ -241,8 +240,7 @@ void Application::addPort(void)
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getType() == "EntitySolverFITTD");
 
-	ClassFactory factory;
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), factory));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 
 	//Create new monitor
@@ -312,8 +310,7 @@ void Application::addSignalType(void)
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getType() == "EntitySolverFITTD");
 
-	ClassFactory factory;
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), factory));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 
 	// Get a list of all items of this specific solver
@@ -493,7 +490,7 @@ void Application::SolverThread(std::list<std::string> solverRunList)
 		try
 		{
 			m_uiComponent->displayMessage("Start solver: "+ solverName +"\n");
-			MicroServiceInterfaceFITTDSolver newSolver(solverName, getServiceIDAsInt(), getSessionCount());
+			MicroServiceInterfaceFITTDSolver newSolver(solverName, getServiceIDAsInt(), getSessionCount(), getClassFactory());
 			SetupSolverService(newSolver);
 			newSolver.RemoveOldResults();
 			newSolver.CreateSolver();

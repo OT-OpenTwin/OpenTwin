@@ -6,7 +6,6 @@
 std::shared_ptr<EntityParameterizedDataPreviewTable> PreviewAssembler::AssembleTable(ot::UIDList& existingRanges)
 {
 	LoadSelectedRangesAndTableSources(existingRanges);
-	ClassFactory classFactory;
 	std::shared_ptr<EntityParameterizedDataPreviewTable> newPreviewTable(new EntityParameterizedDataPreviewTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	std::shared_ptr<EntityResultTableData<std::string>> newPreviewTableData(new EntityResultTableData<std::string>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	//CountPreviewFieldsFromSelectedRanges();
@@ -24,11 +23,10 @@ std::shared_ptr<EntityParameterizedDataPreviewTable> PreviewAssembler::AssembleT
 void PreviewAssembler::LoadSelectedRangesAndTableSources(ot::UIDList & existingRanges)
 {
 	Application::instance()->prefetchDocumentsFromStorage(existingRanges);
-	ClassFactory classFactory;
 	std::list<std::string> tableSources;
 	for (ot::UID existingRange : existingRanges)
 	{
-		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(existingRange, Application::instance()->getPrefetchedEntityVersion(existingRange), classFactory);
+		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(existingRange, Application::instance()->getPrefetchedEntityVersion(existingRange), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEnt));
 		if (rangeEntity == nullptr)
 		{
@@ -47,7 +45,6 @@ void PreviewAssembler::LoadTableSources(std::list<std::string>& tableNames)
 	std::list<std::string> tableSources = _modelComponent->getListOfFolderItems(_tableFolder);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(tableSources, entityInfos);
-	ClassFactory classFactory;
 	for (std::string tableName : tableNames)
 	{
 		bool referencedTableExists = false;
@@ -56,7 +53,7 @@ void PreviewAssembler::LoadTableSources(std::list<std::string>& tableNames)
 			
 			if (entityInfo.getName() == tableName)
 			{
-				auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+				auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 				std::shared_ptr<EntityParameterizedDataTable> sourceTable(dynamic_cast<EntityParameterizedDataTable*>(baseEnt));
 				if (sourceTable == nullptr)
 				{

@@ -27,8 +27,9 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include <cassert>
 #include "ClassFactory.h"
+
+#include <cassert>
 
 
 DataBase::DataBase() :
@@ -38,13 +39,10 @@ DataBase::DataBase() :
 {
 	// Please note that we must not use any mongodb operations in the constructor (the object will be initialzed statically and 
 	// therefore the application is not yet running)
-	classFactory = new ClassFactory();
 }
 
 DataBase::~DataBase()
 {
-	delete classFactory;
-	classFactory = nullptr;
 }
 
 DataBase* DataBase::GetDataBase()
@@ -168,7 +166,7 @@ bool DataBase::GetDocumentFromEntityIDandVersion(unsigned long long entityID, un
 	return true;
 }
 
-EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version)
+EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, ClassFactory *classFactory)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 

@@ -64,7 +64,7 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
 	const std::string projectName = dbAccessEntity->getSelectedProjectName();
-	ResultCollectionAccess access(projectName, *_modelComponent, sessionServiceURL, modelServiceURL);
+	ResultCollectionAccess access(projectName, *_modelComponent, sessionServiceURL, modelServiceURL, &Application::instance()->getClassFactory());
 
 	UpdateBuffer(dbAccessEntity, access.getMetadataCampaign());
 

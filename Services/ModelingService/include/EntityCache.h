@@ -20,11 +20,15 @@ namespace ot
 	class EntityInformation;
 }
 
+class Application;
+
 class EntityCache
 {
 public:
 	EntityCache();
 	~EntityCache();
+
+	void setApplication(Application* app) { application = app; }
 
 	void cacheEntity(EntityBase *entity);
 	EntityBase *getEntity(ot::UID entityID, ot::UID entityVersion);
@@ -46,5 +50,6 @@ private:
 	std::list<EntityBase*> entityList;
 
 	ot::components::ModelComponent *modelComponent;
+	Application* application;
 };
 

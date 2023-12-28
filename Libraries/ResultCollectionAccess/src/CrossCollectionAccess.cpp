@@ -7,6 +7,8 @@
 #include "ClassFactory.h"
 #include "OTCore/ReturnMessage.h"
 
+class ClassFactory;
+
 
 CrossCollectionAccess::CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 	:_projectName(projectName), _modelServiceURL(modelServiceURL)
@@ -15,7 +17,7 @@ CrossCollectionAccess::CrossCollectionAccess(const std::string& projectName, con
 	InquireProjectCollection(authorisationURL);
 }
 
-std::list<std::shared_ptr<EntityMetadataSeries>> CrossCollectionAccess::getMeasurementMetadata(ot::components::ModelComponent& modelComponent)
+std::list<std::shared_ptr<EntityMetadataSeries>> CrossCollectionAccess::getMeasurementMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory)
 {
 	EntityMetadataSeries temp(0, nullptr, nullptr, nullptr, nullptr, "");
 	std::pair<ot::UIDList, ot::UIDList> entityIdentifier = InquireMetadataEntityIdentifier(temp.getClassName());
@@ -24,13 +26,12 @@ std::list<std::shared_ptr<EntityMetadataSeries>> CrossCollectionAccess::getMeasu
 	ot::UIDList& entityVersions = entityIdentifier.second;
 
 	std::list<std::shared_ptr<EntityMetadataSeries>> measurementMetadata;
-	ClassFactory classFactory;
 	auto entityVersion = entityVersions.begin();
 	DataBaseWrapper wrapper(_collectionName);
 	
 	for(auto entityID= entityIDs.begin(); entityID != entityIDs.end(); entityID++)
 	{
-		auto baseEnt = modelComponent.readEntityFromEntityIDandVersion(*entityID, *entityVersion, classFactory);
+		auto baseEnt = modelComponent.readEntityFromEntityIDandVersion(*entityID, *entityVersion, *classFactory);
 		const std::shared_ptr<EntityMetadataSeries> metadata(dynamic_cast<EntityMetadataSeries*>(baseEnt));
 		assert(metadata != nullptr);
 		measurementMetadata.push_back(metadata);
@@ -40,7 +41,7 @@ std::list<std::shared_ptr<EntityMetadataSeries>> CrossCollectionAccess::getMeasu
 	return measurementMetadata;
 }
 
-std::shared_ptr<EntityMetadataCampaign>  CrossCollectionAccess::getMeasurementCampaignMetadata(ot::components::ModelComponent& modelComponent)
+std::shared_ptr<EntityMetadataCampaign>  CrossCollectionAccess::getMeasurementCampaignMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory)
 {
 	EntityMetadataCampaign temp(0, nullptr, nullptr, nullptr, nullptr, "");
 	std::pair<ot::UIDList, ot::UIDList> entityIdentifier = InquireMetadataEntityIdentifier(temp.getClassName());
@@ -49,9 +50,8 @@ std::shared_ptr<EntityMetadataCampaign>  CrossCollectionAccess::getMeasurementCa
 		DataBaseWrapper wrapper(_collectionName);
 		ot::UID& entityID = *entityIdentifier.first.begin();
 		ot::UID& entityVersion = *entityIdentifier.second.begin();
-		ClassFactory classFactory;
 
-		auto baseEnt = modelComponent.readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory);
+		auto baseEnt = modelComponent.readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory);
 		const std::shared_ptr<EntityMetadataCampaign> metadata(dynamic_cast<EntityMetadataCampaign*>(baseEnt));
 		assert(metadata != nullptr);
 		return metadata;

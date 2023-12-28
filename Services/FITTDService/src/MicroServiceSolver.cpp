@@ -11,12 +11,13 @@
 #include "FolderNames.h"
 #include "PhysicalQuantities.h"
 
-MicroServiceSolver::MicroServiceSolver(std::string solverName, int serviceID, int sessionCount) :
+MicroServiceSolver::MicroServiceSolver(std::string solverName, int serviceID, int sessionCount, ClassFactory& _classFactory) :
 	solverName(solverName),
 	modelComponent(nullptr), 
 	meshDataEntityID(0),
 	meshDataVersion(0),
-	solverEntityID(0)
+	solverEntityID(0),
+	classFactory(&_classFactory)
 {
 
 }
@@ -141,7 +142,7 @@ EntityBase * MicroServiceSolver::LoadEntityFromName(std::string name)
 {
 	ot::EntityInformation entityInformation;
 	modelComponent->getEntityInformation(name, entityInformation);
-	return modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), factory);
+	return modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), *classFactory);
 }
 
 

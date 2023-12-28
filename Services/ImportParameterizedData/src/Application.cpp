@@ -562,12 +562,11 @@ void Application::HandleSelectionChanged()
 			}
 		}
 		Application::instance()->prefetchDocumentsFromStorage(potentialRangesID);
-		ClassFactory classFactory;
 		auto version = potentialRangesVersions.begin();
 		ot::UIDList selectedRangesID, selectedRangesVersion;
 		for (const ot::UID& uid : potentialRangesID)
 		{
-			EntityBase* entBase = m_modelComponent->readEntityFromEntityIDandVersion(uid, *version, classFactory);
+			EntityBase* entBase = m_modelComponent->readEntityFromEntityIDandVersion(uid, *version, getClassFactory());
 			EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(entBase);
 			if (selectionRange != nullptr)
 			{

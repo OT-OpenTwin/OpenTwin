@@ -56,12 +56,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	std::list<ot::UID> requiredBreps;
 	for (auto shape : selectedGeometryEntities)
 	{
-		ClassFactoryCAD classFactory;
-		ClassFactory baseFactory;
-		classFactory.SetNextHandler(&baseFactory);
-		baseFactory.SetChainRoot(&classFactory);
-
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(application->modelComponent()->readEntityFromEntityIDandVersion(shape.getID(), shape.getVersion(), classFactory));
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(application->modelComponent()->readEntityFromEntityIDandVersion(shape.getID(), shape.getVersion(), application->getClassFactory()));
 
 		if (geometryEntity->getEditable())
 		{

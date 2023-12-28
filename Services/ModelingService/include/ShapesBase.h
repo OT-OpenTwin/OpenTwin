@@ -11,13 +11,14 @@
 
 class EntityGeometry;
 class EntityCache;
+class ClassFactory;
 
 class TopoDS_Shape;
 
 class ShapesBase
 {
 public:
-	ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache);
+	ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, ClassFactory *_classFactory);
 	~ShapesBase() {};
 
 	ShapesBase() = delete;
@@ -35,6 +36,7 @@ protected:
 	ot::serviceID_t serviceID;
 	std::string serviceName;
 	EntityCache *entityCache;
+	ClassFactory* classFactory;
 
 private:
 	static std::string materialsFolder;

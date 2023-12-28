@@ -13,7 +13,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityResultTable.h"
 #include "ClassFactory.h"
-#include "ClassFactoryBlock.h"
+
 
 class EntityBuffer
 {
@@ -36,8 +36,6 @@ public:
 private:
 	EntityBuffer();
 
-	ClassFactory _classFactory;
-	ClassFactoryBlock _classFactoryBlock;
 	std::map<std::string, std::shared_ptr<EntityBase>> _bufferedEntities;
 	std::map<std::string, std::shared_ptr<EntityResultTable<std::string>>> _bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> _bufferedEntityProperties;

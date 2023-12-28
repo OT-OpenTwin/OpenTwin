@@ -99,8 +99,7 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 void PythonAPI::LoadScipt(ot::EntityInformation& entityInformation)
 {
 	auto modelComponent = Application::instance()->modelComponent();
-	ClassFactory classFactory;
-	auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), classFactory);
+	auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), Application::instance()->getClassFactory());
 	std::unique_ptr<EntityFile> script(dynamic_cast<EntityFile*>(baseEntity));
 	auto plainData = script->getData()->getData();
 	std::string execution(plainData.begin(), plainData.end());

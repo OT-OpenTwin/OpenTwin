@@ -120,12 +120,8 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	for (auto shape : facesMap)
 	{
 		// Here we need to load the geometry entity, since we are going to modify it later. If we took it from the cache, it would be modified there.
-		ClassFactoryCAD classFactory;
-		ClassFactory baseFactory;
-		classFactory.SetNextHandler(&baseFactory);
-		baseFactory.SetChainRoot(&classFactory);
 
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(shape.first, entityVersionMap[shape.first], classFactory));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(shape.first, entityVersionMap[shape.first], *classFactory));
 
 		if (geometryEntity != nullptr)
 		{

@@ -6,6 +6,7 @@
 class EntityGeometry;
 class TopoDS_Shape;
 class EntityCache;
+class ClassFactory;
 
 class PrimitiveCone;
 class PrimitiveCuboid;
@@ -20,7 +21,7 @@ class PrimitiveTorus;
 class PrimitiveManager
 {
 public:
-	PrimitiveManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, ot::serviceID_t _serviceID, EntityCache *_entityCache);
+	PrimitiveManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, ot::serviceID_t _serviceID, EntityCache *_entityCache, ClassFactory* _classFactory);
 	~PrimitiveManager();
 
 	bool isPrimitiveShape(const std::string &type);
@@ -42,6 +43,7 @@ private:
 	ot::components::ModelComponent *modelComponent;
 	std::string serviceName;
 	EntityCache *entityCache;
+	ClassFactory* classFactory;
 
 	PrimitiveCone     *cone;
 	PrimitiveCuboid   *cuboid;

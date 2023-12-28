@@ -20,12 +20,13 @@
 std::string ShapesBase::materialsFolder;
 ot::UID ShapesBase::materialsFolderID = 0;
 
-ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) :
+ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, ClassFactory *_classFactory) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	serviceID(_serviceID),
 	serviceName(_serviceName),
-	entityCache(_entityCache)
+	entityCache(_entityCache),
+	classFactory(_classFactory)
 {
 
 }

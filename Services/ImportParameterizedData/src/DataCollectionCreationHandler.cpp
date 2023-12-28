@@ -51,7 +51,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
-	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent);
+	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory());
 	/*_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();*/
 
@@ -255,13 +255,12 @@ std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAl
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
 	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(_baseFolder, tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
-	ClassFactory classFactory;
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
 
 	for (ot::UID selectionRangeID : selectionRangeIDs)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
 		allRangeEntities.push_back(rangeEntity);
@@ -544,10 +543,9 @@ void DataCollectionCreationHandler::LoadRequiredTables(std::list<string>& requir
 		}
 
 		Application::instance()->prefetchDocumentsFromStorage(tableToLoadIDs);
-		ClassFactory classFactory;
 		for (ot::UID tableID : tableToLoadIDs)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), classFactory);
+			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), Application::instance()->getClassFactory());
 			auto tableEntity = std::shared_ptr<EntityParameterizedDataTable>(dynamic_cast<EntityParameterizedDataTable*>(baseEnt));
 			tableEntity->getTableData();
 			loadedTables.insert({ tableEntity->getName(), tableEntity });

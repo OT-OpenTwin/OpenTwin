@@ -6,10 +6,12 @@
 #include "MetadataSeries.h"
 #include "QuantityContainer.h"
 
+class ClassFactory;
+
 class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionAccess
 {
 public:
-	ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent);
+	ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
 	ResultCollectionExtender(const ResultCollectionExtender& other) = delete;
 	ResultCollectionExtender operator=(const ResultCollectionExtender& other) = delete;
 	~ResultCollectionExtender();

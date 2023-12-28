@@ -12,12 +12,14 @@
 #include "MetadataParameter.h"
 #include "MetadataSeries.h"
 
+class ClassFactory;
+
 
 class __declspec(dllexport) ResultCollectionAccess
 {
 public:
-	ResultCollectionAccess(const std::string& projectName, ot::components::ModelComponent& modelComponent);
-	ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	ResultCollectionAccess(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
+	ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL, ClassFactory* classFactory);
 	virtual ~ResultCollectionAccess() {};
 
 	const std::list<std::string> ListAllSeriesNames() const;
@@ -36,6 +38,6 @@ protected:
 	MetadataCampaign _metadataCampaign;
 
 private:
-	void LoadExistingCampaignData();
-	std::vector<EntityBase*> FindAllExistingMetadata();
+	void LoadExistingCampaignData(ClassFactory* classFactory);
+	std::vector<EntityBase*> FindAllExistingMetadata(ClassFactory* classFactory);
 };
