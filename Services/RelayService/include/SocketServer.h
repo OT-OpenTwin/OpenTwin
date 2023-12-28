@@ -22,8 +22,7 @@ public:
 	SocketServer(std::string socketIP, unsigned int socketPort);
 	~SocketServer();
 
-	std::string sendWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
-	static bool sendHttpRequest(const std::string &operation, const std::string &url, const std::string &jsonData, std::string &response);
+	static bool sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response);
 
 public slots:
 	QString performAction(const char *json, const char *senderIP);
@@ -42,6 +41,8 @@ private Q_SLOTS:
 private:
 	void processMessages(void);
 	void shutdown();
+	void sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
+	std::string sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
 
 	QWebSocketServer *m_pWebSocketServer;
 	QList<QWebSocket *> m_clients;

@@ -3,8 +3,8 @@
 #include "SocketServer.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"				// rapidjson wrapper
-#include "OTCore/Logger.h"		// Logger
+#include "OTCore/JSON.h"						// rapidjson wrapper
+#include "OTCore/Logger.h"						// Logger
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
 
@@ -18,7 +18,6 @@
 #include "curl/curl.h"
 
 extern std::string globalServiceIP;
-
 
 // SSL
 #include <QtCore/QDebug>
@@ -151,7 +150,7 @@ void SocketServer::processMessage(QString message)
 	}
 }
 
-std::string SocketServer::sendWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData)
+std::string SocketServer::sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData)
 {
 	responseReceived = false;
 
@@ -168,12 +167,29 @@ std::string SocketServer::sendWSMessage(const std::string operation, const std::
 	}
 	
 	// Now wait for the response
+	// NOTE: This function is problematic, since it will also process further queued actions. A message filter needs to be 
+	// set such that this type of messages is not processed here.
 	while (!responseReceived)
 	{
 		processMessages();
 	}
 
 	return responseText;
+}
+
+void SocketServer::sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData)
+{
+	// Build and send the message through the websocket connection
+
+	std::string message = operation + "\n" + senderIP + "\n" + jsonData;
+
+	OT_LOG_I("Relaying received message to websocket");
+
+	for (auto pClient : m_clients)
+	{
+		pClient->sendTextMessage(message.c_str());
+		pClient->flush();
+	}
 }
 
 void SocketServer::processMessages(void)
@@ -252,13 +268,15 @@ QString SocketServer::performAction(const char *json, const char *senderIP)
 
 		std::string action = ot::json::getString(doc, "action");
 
+		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
+
 		OT_LOG("Received HTTP execute message: " + action, ot::INBOUND_MESSAGE_LOG);
 
 		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
 			shutdown();
 		}
 
-		std::string response = sendWSMessage("execute", senderIP, json);
+		std::string response = sendProcessWSMessage("execute", senderIP, json);
 
 		QString retVal = response.c_str();
 
@@ -290,9 +308,7 @@ void SocketServer::queueAction(const char *json, const char *senderIP)
 			shutdown();
 		}
 		
-		std::string response = sendWSMessage("queue", senderIP, json);
-
-		OT_LOG_I("Returning received websocket answer to HTTP sender");
+		sendQueueWSMessage("queue", senderIP, json);
 
 		delete[] json;
 		json = nullptr;
