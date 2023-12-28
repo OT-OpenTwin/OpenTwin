@@ -221,11 +221,8 @@ bool FARFile::writeAll(void) {
 
 	bool first = true;
 	for (const QString& l : m_textLines) {
-		if (!first) {
-			file.write("\n", 1);
-		}
-		first = false;
 		file.write(QByteArray::fromStdString(l.toStdString()));
+		file.write("\n", 1);
 	}
 
 	file.close();
@@ -824,6 +821,7 @@ void FAR::workerFindTextLogic(const QString& _root, const QString& _text, FARFil
 
 void FAR::workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
 	this->workerReplaceTextLogic(_root, _text, _newText, _textFilter, _filter);
+	QMetaObject::invokeMethod(this, &FAR::slotUnlock, Qt::QueuedConnection);
 }
 
 void FAR::workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
