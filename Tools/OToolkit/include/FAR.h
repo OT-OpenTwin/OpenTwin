@@ -89,7 +89,11 @@ public:
 
 	bool readAll(void);
 
+	bool writeAll(void);
+
 	bool findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const;
+
+	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath);
 
 };
 
@@ -131,6 +135,8 @@ public:
 
 	bool findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true) const;
 
+	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true);
+
 private:
 };
 
@@ -157,6 +163,7 @@ public:
 private slots:
 	void slotBrowseRoot(void);
 	void slotFindText(void);
+	void slotReplaceText(void);
 	void slotLock(void);
 	void slotUnlock(void);
 
@@ -178,6 +185,9 @@ private:
 
 	void workerFindText(QString _root, QString _text, FARFilter::FilterFlag _textFilter, FARFilter _filter);
 	void workerFindTextLogic(const QString& _root, const QString& _text, FARFilter::FilterFlag _textFilter, const FARFilter& _filter);
+
+	void workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter);
+	void workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter);
 
 	FilterGroup createFilterGroup(const QString& _labelText, const QString& _settingsKey, QSettings& _settings, QGridLayout* _layout, int _row);
 	void saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);
@@ -221,6 +231,16 @@ private:
 	QCheckBox* m_findTextRegex;
 	QPushButton* m_findTextBtn;
 
+	QWidget* m_replaceTextLayoutW;
+	QVBoxLayout* m_replaceTextLayout;
+	QGridLayout* m_replaceTextTopLayout;
+	QHBoxLayout* m_replaceTextButtonLayout;
+	QLabel* m_replaceTextL;
+	QLineEdit* m_replaceText;
+	QCheckBox* m_replaceTextCaseSensitive;
+	QLabel* m_replaceWithTextL;
+	QLineEdit* m_replaceWithText;
+	QPushButton* m_replaceTextBtn;
 };
 
 OT_ADD_FLAG_FUNCTIONS(FARFilter::FilterFlag)

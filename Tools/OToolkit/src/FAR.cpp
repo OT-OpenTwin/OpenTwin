@@ -32,6 +32,7 @@
 #define FAR_LOGE(___message) OTOOLKIT_LOGE("FAR", ___message)
 
 #define FAR_SEARCHMODE_FindText "Find Text"
+#define FAR_SEARCHMODE_ReplaceText "Replace Text"
 
 FARFilter::FARFilter() 
 	: m_blacklistDirectoriesFlags(FARFilter::NoFlags), m_blacklistFilesFlags(FARFilter::NoFlags), m_whitelistDirectoriesFlags(FARFilter::NoFlags), m_whitelistFilesFlags(FARFilter::NoFlags)
@@ -209,7 +210,26 @@ bool FARFile::readAll(void) {
 		FAR_LOGE("File does not exist \"" + m_fullPath + "\"");
 		return false;
 	}
+}
 
+bool FARFile::writeAll(void) {
+	QFile file(m_fullPath);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		FAR_LOGE("Failed to open file for writing: \"" + m_fullPath + "\"");
+		return false;
+	}	
+
+	bool first = true;
+	for (const QString& l : m_textLines) {
+		if (!first) {
+			file.write("\n", 1);
+		}
+		first = false;
+		file.write(QByteArray::fromStdString(l.toStdString()));
+	}
+
+	file.close();
+	return true;
 }
 
 bool FARFile::exists(void) const {
@@ -258,6 +278,31 @@ bool FARFile::findText(const QString& _text, FARFilter::FilterFlag _textFilter, 
 		
 		lineCt++;
 	}
+	return true;
+}
+
+bool FARFile::replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) {
+	int lineCt = 1;
+	bool dataChanged = false;
+	Qt::CaseSensitivity sense = Qt::CaseInsensitive;
+	if (_textFilter & FARFilter::CheckCase) sense = Qt::CaseSensitive;
+
+	for (QString& line : m_textLines) {
+		if (line.contains(_text, sense)) {
+				_longestText = std::max((qsizetype)_longestText, line.length());
+				_longestPath = std::max((qsizetype)_longestPath, this->fullPath().length());
+				_matches.push_back(FARMatch(this->fullPath(), lineCt, line));
+				line.replace(_text, _newText, sense);
+				dataChanged = true;
+		}
+		lineCt++;
+	}
+
+	// Check if the file needs to be updated
+	if (dataChanged) {
+		return this->writeAll();
+	}
+
 	return true;
 }
 
@@ -389,6 +434,20 @@ bool FARDirectory::findText(const QString& _text, FARFilter::FilterFlag _textFil
 	return true;
 }
 
+bool FARDirectory::replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly) {
+	for (FARFile& f : m_files) {
+		if (!f.replaceText(_text, _newText, _textFilter, _matches, _longestText, _longestPath)) return false;
+	}
+
+	if (!_topLevelOnly) {
+		for (FARDirectory& d : m_directories) {
+			if (!d.replaceText(_text, _newText, _textFilter, _matches, _longestText, _longestPath, false)) return false;
+		}
+	}
+
+	return true;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -511,8 +570,37 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSe
 	this->connect(m_findTextBtn, &QPushButton::clicked, this, &FAR::slotFindText);
 	m_findModeTab->addTab(m_findTextLayoutW, FAR_SEARCHMODE_FindText);
 
+	// Replace mode
+	m_replaceTextLayoutW = new QWidget;
+	m_replaceTextLayout = new QVBoxLayout(m_replaceTextLayoutW);
+	m_replaceTextTopLayout = new QGridLayout;
+	m_replaceTextButtonLayout = new QHBoxLayout;
+	m_replaceTextL = new QLabel("Text:");
+	m_replaceText = new QLineEdit;
+	m_replaceTextCaseSensitive = new QCheckBox("Case Sensitive");
+	m_replaceWithTextL = new QLabel("Replace With:");
+	m_replaceWithText = new QLineEdit;
+	m_replaceTextBtn = new QPushButton(FAR_SEARCHMODE_ReplaceText);
+
+	m_replaceTextLayout->addLayout(m_replaceTextTopLayout);
+	m_replaceTextLayout->addStretch(1);
+	m_replaceTextLayout->addLayout(m_replaceTextButtonLayout);
+
+	m_replaceTextTopLayout->addWidget(m_replaceTextL, 0, 0);
+	m_replaceTextTopLayout->addWidget(m_replaceText, 0, 1);
+	m_replaceTextTopLayout->addWidget(m_replaceTextCaseSensitive, 1, 1);
+	m_replaceTextTopLayout->addWidget(m_replaceWithTextL, 2, 0);
+	m_replaceTextTopLayout->addWidget(m_replaceWithText, 2, 1);
+
+	m_replaceTextButtonLayout->addStretch(1);
+	m_replaceTextButtonLayout->addWidget(m_replaceTextBtn);
+
+	this->connect(m_replaceTextBtn, &QPushButton::clicked, this, &FAR::slotReplaceText);
+	m_findModeTab->addTab(m_replaceTextLayoutW, FAR_SEARCHMODE_ReplaceText);
+
 	// Restore settings
 	m_rootDir->setText(_settings.value("FAR.RootDir", QString()).toString());
+
 	m_findText->setText(_settings.value("FAR.FindTxt", QString()).toString());
 	m_findTextCaseSensitive->setChecked(_settings.value("FAR.FindTxt.C", false).toBool());
 	m_findTextStartsWith->setChecked(_settings.value("FAR.FindTxt.S", false).toBool());
@@ -520,17 +608,26 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSe
 	m_findTextEndsWith->setChecked(_settings.value("FAR.FindTxt.E", false).toBool());
 	m_findTextRegex->setChecked(_settings.value("FAR.FindTxt.R", false).toBool());
 
+	m_replaceText->setText(_settings.value("FAR.ReplaceTxt.Txt", QString()).toString());
+	m_replaceTextCaseSensitive->setChecked(_settings.value("FAR.ReplaceTxt.C", false).toBool());
+	m_replaceWithText->setText(_settings.value("FAR.ReplaceTxt.WTxt", QString()).toString());
+
 	return m_centralSplitter;
 }
 
 bool FAR::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("FAR.RootDir", m_rootDir->text());
+
 	_settings.setValue("FAR.FindTxt", m_findText->text());
 	_settings.setValue("FAR.FindTxt.C", m_findTextCaseSensitive->isChecked());
 	_settings.setValue("FAR.FindTxt.S", m_findTextStartsWith->isChecked());
 	_settings.setValue("FAR.FindTxt.H", m_findTextContains->isChecked());
 	_settings.setValue("FAR.FindTxt.E", m_findTextEndsWith->isChecked());
 	_settings.setValue("FAR.FindTxt.R", m_findTextRegex->isChecked());
+
+	_settings.setValue("FAR.ReplaceTxt.Txt", m_replaceText->text());
+	_settings.setValue("FAR.ReplaceTxt.C", m_replaceTextCaseSensitive->isChecked());
+	_settings.setValue("FAR.ReplaceTxt.WTxt", m_replaceWithText->text());
 
 	this->saveFilterGroup(m_whitelistFiles, "FAR.WLF", _settings);
 	this->saveFilterGroup(m_blacklistFiles, "FAR.BLF", _settings);
@@ -558,6 +655,19 @@ void FAR::slotFindText(void) {
 	if (m_findTextRegex->isChecked()) textFilter |= FARFilter::AsRegex;
 
 	std::thread t(&FAR::workerFindText, this, m_rootDir->text(), m_findText->text(), textFilter, filter);
+	t.detach();
+}
+
+void FAR::slotReplaceText(void) {
+	FARFilter filter;
+	this->setupFilter(filter);
+
+	this->slotLock();
+
+	FARFilter::FilterFlag textFilter = FARFilter::Contains;
+	if (m_replaceTextCaseSensitive->isChecked()) textFilter |= FARFilter::CheckCase;
+
+	std::thread t(&FAR::workerReplaceText, this, m_rootDir->text(), m_replaceText->text(), m_replaceWithText->text(), textFilter, filter);
 	t.detach();
 }
 
@@ -710,4 +820,76 @@ void FAR::workerFindTextLogic(const QString& _root, const QString& _text, FARFil
 
 	FAR_LOG("\"" FAR_SEARCHMODE_FindText "\" ended with " + QString::number(matches.size()) + " matches (took " + diff + msdiff + " seconds)");
 
+}
+
+void FAR::workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
+	this->workerReplaceTextLogic(_root, _text, _newText, _textFilter, _filter);
+}
+
+void FAR::workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
+	qint64 beginTime = QDateTime::currentMSecsSinceEpoch();
+
+	FAR_LOG("> Starting \"" FAR_SEARCHMODE_ReplaceText "\"");
+
+	FARDirectory root(_root);
+	if (!root.exists()) {
+		FAR_LOGE("Invalid root directory \"" + root.fullPath() + "\"");
+		return;
+	}
+
+	if (_text.isEmpty()) {
+		FAR_LOGE("No text to replace set");
+		return;
+	}
+
+	FAR_LOG("> Scanning root directory content (this may take a while)...");
+	int fileCt = 0;
+	int dirCt = 0;
+	if (!root.scanAll(_filter, fileCt, dirCt, false, true)) {
+		FAR_LOGE("> Search cancelled.");
+		return;
+	}
+
+	FAR_LOG("> Scan completed with " + QString::number(fileCt) + " files and " + QString::number(dirCt) + " directories");
+
+	int longestPath = 0;
+	int longestText = 0;
+	std::list<FARMatch> replaceMatches;
+	
+	// Replace text
+	if (!root.replaceText(_text, _newText, _textFilter, replaceMatches, longestText, longestPath, false)) {
+		FAR_LOGE("> Search cancelled.");
+		return;
+	}
+
+	QString pathSuffix(" @ line ");
+	longestPath = longestPath + pathSuffix.length() + 11;
+
+	// Create filler string
+	char* fillBufferC = new char[longestPath + 1];
+	for (int i = 0; i < longestPath; i++) fillBufferC[i] = ' ';
+	fillBufferC[longestPath] = 0;
+
+	QString msg("Replaced:\n");
+
+	int tmp = 0;
+	for (FARMatch& match : replaceMatches) {
+		msg.append(match.fullPath());
+		msg.append(pathSuffix);
+		msg.append(QString::number(match.line()));
+		msg.append(':');
+		msg.append(QString::fromLocal8Bit(fillBufferC, longestPath - (match.fullPath().length() + pathSuffix.length() + QString::number(match.line()).length() + 1)));
+		msg.append(QString(match.text()).trimmed());
+		msg.append('\n');
+	}
+
+	FAR_LOG(msg);
+
+	// Calculate time and print
+	qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+	QString diff = QString::number((endTime - beginTime) / 1000) + ".";
+	QString msdiff = QString::number((endTime - beginTime) % 1000);
+	while (msdiff.length() < 4) msdiff.push_front('0');
+
+	FAR_LOG("\"" FAR_SEARCHMODE_ReplaceText "\" ended with " + QString::number(replaceMatches.size()) + " replacements (took " + diff + msdiff + " seconds)");
 }
