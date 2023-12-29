@@ -27,6 +27,7 @@
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
+    <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\HandleArrow.cpp" />
     <ClCompile Include="src\HandlerBase.cpp" />
     <ClCompile Include="src\HandlerIntersector.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="include\AxisCross.h" />
     <ClInclude Include="include\CappingEffect.h" />
     <ClInclude Include="include\ClipPlaneManipulator.h" />
+    <ClInclude Include="include\Factory.h" />
     <ClInclude Include="include\HandleArrow.h" />
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />

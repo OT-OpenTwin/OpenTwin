@@ -11,6 +11,7 @@
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"
 #include "EntityBase.h"
+#include "Factory.h"
 
 #include "TableViewer.h"
 
@@ -794,7 +795,7 @@ bool ViewerAPI::setTable(ot::UID _viewerID, ot::UID entityID, ot::UID entityVers
 	if (v != nullptr) 
 	{
 		DataBase* temp = DataBase::GetDataBase();
-		auto entityBase = temp->GetEntityFromEntityIDandVersion(entityID, entityVersion);
+		auto entityBase = temp->GetEntityFromEntityIDandVersion(entityID, entityVersion, &Factory::getClassFactory());
 		std::shared_ptr<EntityParameterizedDataTable> tableTopoEnt((dynamic_cast<EntityParameterizedDataTable*>(entityBase)));
 		bool refresh = false;
 
