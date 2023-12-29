@@ -27,11 +27,17 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
+std::mutex performActionMutex;
+
 extern "C"{
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
-		return ot::foundation::performAction(_json, _senderIP);
+		std::lock_guard<std::mutex> guard(performActionMutex);
+
+		const char *result = ot::foundation::performAction(_json, _senderIP);
+
+		return result;
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
