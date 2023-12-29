@@ -138,7 +138,7 @@ std::string ElmerFEMLauncher::startSolver(std::string &logFileText, const std::s
 void ElmerFEMLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::EntityInformation>& meshItemInfo)
 {
 	std::list<ot::EntityInformation> info;
-	application->modelComponent()->getEntityChildInformation(meshDataID, info);
+	application->modelComponent()->getEntityChildInformation(meshDataID, info, true);
 
 	for (auto item : info)
 	{

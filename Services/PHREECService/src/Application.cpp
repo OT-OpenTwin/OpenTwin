@@ -332,7 +332,7 @@ void Application::runPHREEC(void)
 	}
 
 	std::list<ot::EntityInformation> meshInfo;
-	m_modelComponent->getEntityChildInformation("Meshes", meshInfo);
+	m_modelComponent->getEntityChildInformation("Meshes", meshInfo, false);
 
 	// Get the current model version
 	std::string modelVersion = m_modelComponent->getCurrentModelVersion();

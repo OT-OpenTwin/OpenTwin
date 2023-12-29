@@ -358,7 +358,7 @@ void Application::runSolver(void)
 	}
 
 	std::list<ot::EntityInformation> meshInfo;
-	m_modelComponent->getEntityChildInformation("Meshes", meshInfo);
+	m_modelComponent->getEntityChildInformation("Meshes", meshInfo, false);
 
 	// Finally start the worker thread to run the solvers
 	std::thread workerThread(&Application::solverThread, this, solverInfo, meshInfo, solverMap);

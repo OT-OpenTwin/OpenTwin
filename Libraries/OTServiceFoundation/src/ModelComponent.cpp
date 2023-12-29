@@ -230,7 +230,7 @@ void ot::components::ModelComponent::getAvailableMeshes(std::string & _meshFolde
 	_meshFolderID = meshFolderInfo.front().getID();
 
 	std::list<EntityInformation> meshInfo;
-	getEntityChildInformation(_meshFolderName, meshInfo);
+	getEntityChildInformation(_meshFolderName, meshInfo, false);
 
 	if (meshInfo.empty()) return;
 
@@ -531,11 +531,12 @@ void ot::components::ModelComponent::getSelectedEntityInformation(std::list<Enti
 	}
 }
 
-void ot::components::ModelComponent::getEntityChildInformation(const std::string & _entity, std::list<EntityInformation> & _entityInfo) {
+void ot::components::ModelComponent::getEntityChildInformation(const std::string & _entity, std::list<EntityInformation> & _entityInfo, bool recursive) {
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, JsonString(_entity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Recursive, recursive, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
@@ -585,11 +586,12 @@ void ot::components::ModelComponent::getEntityChildInformation(const std::string
 	}
 }
 
-void ot::components::ModelComponent::getEntityChildInformation(UID _entity, std::list<EntityInformation> & _entityInfo) {
+void ot::components::ModelComponent::getEntityChildInformation(UID _entity, std::list<EntityInformation> & _entityInfo, bool recursive) {
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, _entity, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Recursive, recursive, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;

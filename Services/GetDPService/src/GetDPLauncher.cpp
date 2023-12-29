@@ -138,7 +138,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::EntityInformation>& meshItemInfo)
 {
 	std::list<ot::EntityInformation> info;
-	application->modelComponent()->getEntityChildInformation(meshDataID, info);
+	application->modelComponent()->getEntityChildInformation(meshDataID, info, true);
 
 	for (auto item : info)
 	{

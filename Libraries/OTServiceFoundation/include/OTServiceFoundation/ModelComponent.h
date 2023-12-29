@@ -71,8 +71,8 @@ namespace ot {
 			void getEntityInformation(const std::list<UID> & _entities, std::list<EntityInformation> & _entityInfo);
 			void getEntityInformation(const std::list<std::string> & _entities, std::list<EntityInformation> & _entityInfo);
 			void getEntityInformation(const std::string & _entity, EntityInformation & _entityInfo);
-			void getEntityChildInformation(const std::string & _entity, std::list<EntityInformation> & _entityInfo);
-			void getEntityChildInformation(UID _entity, std::list<EntityInformation> & _entityInfo);
+			void getEntityChildInformation(const std::string & _entity, std::list<EntityInformation> & _entityInfo, bool recursive);
+			void getEntityChildInformation(UID _entity, std::list<EntityInformation> & _entityInfo, bool recursive);
 			void getSelectedEntityInformation(std::list<EntityInformation> & _entityInfo, const std::string& typeFilter);
 			void addPropertiesToEntities(std::list<UID>& _entityList, const std::string& _propertiesJson);
 			void getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);

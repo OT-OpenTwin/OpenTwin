@@ -796,14 +796,29 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
 			std::string entityName = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ITM_Name);
-			std::list<ot::UID> entityIDList;
+			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
 
+			std::list<ot::UID> entityIDList;
 			EntityContainer *entity = dynamic_cast<EntityContainer*>(globalModel->findEntityFromName(entityName));
+
 			if (entity != nullptr)
 			{
-				for (auto child : entity->getChildrenList())
+				if (recursive)
 				{
-					entityIDList.push_back(child->getEntityID());
+					std::list<std::pair<ot::UID, ot::UID>> childrenEntities;
+					globalModel->getListOfAllChildEntities(entity, childrenEntities);
+
+					for (auto item : childrenEntities)
+					{
+						entityIDList.push_back(item.first);
+					}
+				}
+				else
+				{
+					for (auto child : entity->getChildrenList())
+					{
+						entityIDList.push_back(child->getEntityID());
+					}
 				}
 			}
 
@@ -814,14 +829,30 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
 			ot::UID entityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_ITM_ID);
+			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
+
 			std::list<ot::UID> entityIDList;
 
 			EntityContainer *entity = dynamic_cast<EntityContainer*>(globalModel->getEntity(entityID));
+
 			if (entity != nullptr)
 			{
-				for (auto child : entity->getChildrenList())
+				if (recursive)
 				{
-					entityIDList.push_back(child->getEntityID());
+					std::list<std::pair<ot::UID, ot::UID>> childrenEntities;
+					globalModel->getListOfAllChildEntities(entity, childrenEntities);
+
+					for (auto item : childrenEntities)
+					{
+						entityIDList.push_back(item.first);
+					}
+				}
+				else
+				{
+					for (auto child : entity->getChildrenList())
+					{
+						entityIDList.push_back(child->getEntityID());
+					}
 				}
 			}
 

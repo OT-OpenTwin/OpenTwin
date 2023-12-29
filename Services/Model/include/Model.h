@@ -171,7 +171,7 @@ public:
 	std::list<EntityBase*> getListOfSelectedEntities(const std::string &typeFilter);
 	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);
 	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);
-
+	void getListOfAllChildEntities(EntityBase* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
 
 	void getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions);
 	void getEntityNames(std::list<ot::UID> &entityIDList, std::list<std::string> &entityNames);
@@ -257,8 +257,8 @@ private:
 	void importTableFile(const std::string &fileName, bool removeFile);
 	void loadDefaultMaterials(void);
 	void findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, const TopoDS_Shape *shape);
-	void addChildrenEntitiesToList(EntityGeometry *entity, std::list<std::pair<ot::UID, ot::UID>> &childrenEntities);
 	void recursiveReplaceEntityName(EntityBase *entity, const std::string &oldName, const std::string &newName, std::list<EntityBase*> &entityList);
+	void addChildrenEntitiesToList(EntityGeometry* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
 	void recursivelyAddEntityInfo(EntityBase *entity, std::map<ot::UID, ot::UID> &entityVersionMap);
 	void determineIDandVersionForEntityWithChildren(EntityBase *entity, std::list<ot::UID> &entityInfoIDList, std::list<ot::UID> &entityInfoVersionList);
 	void otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible);

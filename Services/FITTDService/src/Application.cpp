@@ -267,7 +267,7 @@ void Application::addPort(void)
 	ot::EntityInformation entityInfos;
 	m_modelComponent->getEntityInformation(signalTypeFolderName, entityInfos);
 	std::list<ot::EntityInformation> childInfos;
-	m_modelComponent->getEntityChildInformation(entityInfos.getID(), childInfos);
+	m_modelComponent->getEntityChildInformation(entityInfos.getID(), childInfos, false);
 	std::string firstSignalName;
 	ot::UID firstSignalID;
 	childInfos.size() != 0 ? firstSignalName = childInfos.front().getName() : firstSignalName = "";

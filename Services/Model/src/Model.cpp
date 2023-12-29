@@ -3989,6 +3989,21 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 	}
 }
 
+void Model::getListOfAllChildEntities(EntityBase* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(entity);
+
+	if (container != nullptr)
+	{
+		for (auto child : container->getChildrenList())
+		{
+			childrenEntities.push_back(std::pair<ot::UID, ot::UID>(child->getEntityID(), child->getEntityStorageVersion()));
+
+			getListOfAllChildEntities(child, childrenEntities);
+		}
+	}
+}
+
 void Model::addChildrenEntitiesToList(EntityGeometry *entity, std::list<std::pair<ot::UID, ot::UID>> &childrenEntities)
 {
 	childrenEntities.push_back(std::pair<ot::UID, ot::UID>(entity->getEntityID(), entity->getEntityStorageVersion()));
