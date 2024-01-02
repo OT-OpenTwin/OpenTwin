@@ -20,7 +20,7 @@
 class MetadataAssemblyRangeData
 {
 public:
-	MetadataAssemblyRangeData() {};
+	MetadataAssemblyRangeData();
 	MetadataAssemblyRangeData(const MetadataAssemblyRangeData& other) = delete;
 	MetadataAssemblyRangeData(const MetadataAssemblyRangeData&& other) = delete;
 	MetadataAssemblyRangeData& operator=(const MetadataAssemblyRangeData& other) = delete;
@@ -53,7 +53,8 @@ private:
 	void TransformSelectedDataIntoSelectedDataType(std::map<std::string, std::list<std::string>>& allFields, std::map<std::string, std::string>& rangeTypesByRangeNames);
 	
 	std::map<std::string,std::list<ot::Variable>> _fields;
-	
+	char _decimalDelimmiter;
+
 };
 
 

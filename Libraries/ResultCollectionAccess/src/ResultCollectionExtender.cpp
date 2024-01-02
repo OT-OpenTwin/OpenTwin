@@ -133,25 +133,32 @@ void ResultCollectionExtender::StoreCampaignChanges()
 	}
 }
 
-void ResultCollectionExtender::AddQuantityContainer(uint32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint32_t quantityIndex,const  ot::Variable& quantityValue)
+void ResultCollectionExtender::AddQuantityContainer(uint64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint64_t quantityIndex,const  ot::Variable& quantityValue)
 {
 	if (_quantityContainer.size() == 0)
 	{
-		_quantityContainer.push_back(QuantityContainer(seriesIndex, parameterAbbreviations,std::move(parameterValues), quantityIndex));
+		QuantityContainer newContainer(seriesIndex, parameterAbbreviations, std::move(parameterValues), quantityIndex);
+		newContainer.AddValue(quantityValue);
+		_quantityContainer.push_back(std::move(newContainer));
 	}
-	QuantityContainer* quantityContainer = &_quantityContainer.back();
-	const uint64_t storedValues = quantityContainer->GetValueArraySize();
-	
-	if (storedValues == _bucketSize)
+	else
 	{
-		_quantityContainer.push_back(QuantityContainer(seriesIndex, parameterAbbreviations, std::move(parameterValues), quantityIndex));
-		quantityContainer = &_quantityContainer.back();
-	}
-	quantityContainer->AddValue(quantityValue);
-
-	if (_quantityContainer.size() == _bufferSize)
-	{
-		FlushQuantityContainer();
+		QuantityContainer* lastAddedQuantityContainer = &_quantityContainer.back();
+		const uint64_t lastAddedQuantityContainerStoredValues = lastAddedQuantityContainer->GetValueArraySize();
+		if (lastAddedQuantityContainerStoredValues == _bucketSize)
+		{
+			if (_quantityContainer.size() == _bufferSize)
+			{
+				FlushQuantityContainer();
+			}
+			QuantityContainer newContainer(seriesIndex, parameterAbbreviations, std::move(parameterValues), quantityIndex);
+			newContainer.AddValue(quantityValue);
+			_quantityContainer.push_back(std::move(newContainer));
+		}
+		else
+		{
+			lastAddedQuantityContainer->AddValue(quantityValue);
+		}
 	}
 }
 

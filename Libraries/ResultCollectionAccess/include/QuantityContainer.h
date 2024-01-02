@@ -16,7 +16,7 @@
 class __declspec(dllexport) QuantityContainer
 {
 public:
-	QuantityContainer(int32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, int32_t quantityIndex);
+	QuantityContainer(int64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, int64_t quantityIndex);
 	QuantityContainer(QuantityContainer&& other);
 	QuantityContainer(const QuantityContainer& other) = delete;
 	QuantityContainer operator=(const QuantityContainer& other) = delete;

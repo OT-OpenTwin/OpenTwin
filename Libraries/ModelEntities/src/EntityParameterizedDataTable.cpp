@@ -20,6 +20,7 @@ void EntityParameterizedDataTable::SetSourceFile(std::string sourceFileName, std
 
 void EntityParameterizedDataTable::createProperties(HeaderOrientation defaultOrientation)
 {
+
 	auto numberOfRowsProperty = new EntityPropertiesInteger("Number of rows", _numberOfRows);
 	numberOfRowsProperty->setReadOnly(true);
 	getProperties().createProperty(numberOfRowsProperty,"Table properties");
@@ -44,6 +45,17 @@ void EntityParameterizedDataTable::createProperties(HeaderOrientation defaultOri
 
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { _headerSettingHorizontal,_headerSettingVertical }, GetHeaderOrientation(defaultOrientation) , _defaulCategory, getProperties());
 
+	std::locale mylocale("");
+	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
+
+	EntityPropertiesSelection::createProperty("Text Properties", "Decimal point character",
+		{
+			".",
+			","
+		}
+		, std::string(1, defaulDecimalSeparator),
+		"default", getProperties());
+
 	EntityResultTable<std::string>::createProperties();
 }
 
@@ -65,6 +77,13 @@ EntityParameterizedDataTable::HeaderOrientation EntityParameterizedDataTable::ge
 		return HeaderOrientation::vertical;
 	}
 
+}
+
+char EntityParameterizedDataTable::getSelectedDecimalSeparator()
+{
+	auto selection = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Decimal point character"));
+	const char separator = selection->getValue()[0];
+	return separator;
 }
 
 void EntityParameterizedDataTable::AddStorageData(bsoncxx::builder::basic::document & storage)

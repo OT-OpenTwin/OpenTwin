@@ -178,6 +178,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			MetadataParameter parameter;
 			parameter.parameterName = parameterEntry.first;
 			parameter.values = parameterEntry.second;
+			parameter.values.unique();
 			parameter.typeName = parameter.values.begin()->getTypeName();
 
 			metadataSeries.AddParameter(std::move(parameter));
@@ -206,7 +207,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			parameterNames.push_back(parameterAbbrev);
 		}
 
-		uint32_t seriesMetadataIndex = resultCollectionExtender.FindMetadataSeries(msmdName)->getSeriesIndex();
+		uint64_t seriesMetadataIndex = resultCollectionExtender.FindMetadataSeries(msmdName)->getSeriesIndex();
 		for (const auto& quantityEntry : *quantityData.getFields())
 		{
 			const MetadataQuantity* quantityDescription = resultCollectionExtender.FindMetadataQuantity(quantityEntry.first);
@@ -215,7 +216,8 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 				std::list<ot::Variable> parameterValues;
 				for (auto parameterValueIt : allParameterValueIt)
 				{
-					parameterValues.push_back(std::move(*parameterValueIt));
+					ot::Variable& parameterValue = const_cast<ot::Variable&>(*parameterValueIt);
+					parameterValues.push_back(std::move(parameterValue));
 					parameterValueIt++;
 				}
 				resultCollectionExtender.AddQuantityContainer(seriesMetadataIndex, parameterNames, std::move(parameterValues), quantityDescription->quantityIndex, quantityValue);

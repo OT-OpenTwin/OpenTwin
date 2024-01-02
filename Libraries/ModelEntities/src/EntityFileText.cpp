@@ -1,5 +1,5 @@
 #include "EntityFileText.h"
-
+#include <locale>
 EntityFileText::EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	: EntityFile(ID,parent,obs,ms,factory,owner)
 {

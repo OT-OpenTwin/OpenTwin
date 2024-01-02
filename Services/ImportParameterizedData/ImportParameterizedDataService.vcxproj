@@ -225,6 +225,7 @@
     <ClInclude Include="include\Documentation.h" />
     <ClInclude Include="include\FileToTableExtractorFactory.h" />
     <ClInclude Include="include\FileToTableExtractorRegistrar.h" />
+    <ClInclude Include="include\LocaleSettingsSwitch.h" />
     <ClInclude Include="include\MetadataAssemblyData.h" />
     <ClInclude Include="include\MetadataAssemblyRangeData.h" />
     <ClInclude Include="include\DataCategorizationHandler.h" />

@@ -3,7 +3,7 @@
 #include "MetadataQuantity.h"
 #include "MetadataSeries.h"
 
-QuantityContainer::QuantityContainer(int32_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, int32_t quantityIndex)
+QuantityContainer::QuantityContainer(int64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, int64_t quantityIndex)
 {
 	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaType", "QuantityContainer"));
 	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaVersion", 1));

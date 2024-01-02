@@ -147,6 +147,9 @@
     <ClInclude Include="include\ProgressUpdater.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\LocaleSettingsSwitch.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

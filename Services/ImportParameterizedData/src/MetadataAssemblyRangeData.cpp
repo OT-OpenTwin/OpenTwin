@@ -1,33 +1,61 @@
 #include "MetadataAssemblyRangeData.h"
+#include "LocaleSettingsSwitch.h"
+
+MetadataAssemblyRangeData::MetadataAssemblyRangeData()
+	: _decimalDelimmiter(*std::localeconv()->decimal_point)
+{
+}
 
 void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRanges, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& allTables)
 {
-	std::map<std::string, std::list<std::string>> allFields;
-	std::map<std::string, std::string> rangeTypesByRangeNames;
-
-	std::map<std::string, std::map<std::uint32_t, std::string>> allFieldsSorted;
-	for (const auto& range : allRanges)
+	for (auto tableByName : allTables)
 	{
-		auto table = allTables[range->getTableName()];
-		const std::vector<std::string> fieldKeys = ExtractFieldsFromRange(range, table, allFieldsSorted);
-		const std::string& type = range->getSelectedType();
-		for (const std::string fieldKey : fieldKeys)
+		const std::string& tableName = tableByName.first;
+		const std::shared_ptr<EntityParameterizedDataTable> table = tableByName.second;
+		
+		//Sort out all ranges associated with the this table
+		std::list<std::shared_ptr<EntityTableSelectedRanges>> relevantSelections;
+		for (const auto& range : allRanges)
 		{
-			rangeTypesByRangeNames[fieldKey] = type;
+			if (range->getTableName() == tableName)
+			{
+				relevantSelections.push_back(range);
+			}
 		}
+		
+		//Extract content that is refered by the ranges
+		std::map<std::string, std::map<std::uint32_t, std::string>> allFieldsSorted;
+		std::map<std::string, std::string> rangeTypesByRangeNames;
+
+		for (const auto& range : relevantSelections)
+		{
+			const std::vector<std::string> fieldKeys = ExtractFieldsFromRange(range, table, allFieldsSorted);
+			const std::string& type = range->getSelectedType();
+			for (const std::string fieldKey : fieldKeys)
+			{
+				rangeTypesByRangeNames[fieldKey] = type;
+			}
+		}
+		
+		//The values of all selection ranges are now sorted by their index (column or row, depending on header orientation). Now we drop the index information, since only the values are needed.
+		std::map<std::string, std::list<std::string>> allFields;
+		for (auto& newField : allFieldsSorted)
+		{
+			const std::string& fieldKey = newField.first;
+			std::map<std::uint32_t, std::string>& fieldValues = newField.second;
+			for (auto& fieldValue : fieldValues)
+			{
+				allFields[fieldKey].push_back(std::move(fieldValue.second));
+			}
+		}
+
+		//For floating numbers it is essential to choose the correct decimal delimiter.
+		const char selectedSeparator = table->getSelectedDecimalSeparator();
+		LocaleSettingsSwitch decimalSeparatorSetting(selectedSeparator);
+
+		TransformSelectedDataIntoSelectedDataType(allFields, rangeTypesByRangeNames);
 	}
 
-	for (auto newField : allFieldsSorted)
-	{
-		const std::string& fieldKey = newField.first;
-		std::map<std::uint32_t, std::string>& fieldValues = newField.second;
-		for (auto& fieldValue : fieldValues)
-		{
-			allFields[fieldKey].push_back(std::move(fieldValue.second));
-		}
-	}
-
-	TransformSelectedDataIntoSelectedDataType(allFields, rangeTypesByRangeNames);
 }
 
 uint64_t MetadataAssemblyRangeData::getNumberOfFields() const
@@ -100,15 +128,18 @@ void MetadataAssemblyRangeData::TransformSelectedDataIntoSelectedDataType(std::m
 
 				if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
 				{
-					values.push_back(ot::Variable(std::stod(fieldValueStringFixed)));
+					const double valueOfCastedType = std::stod(fieldValueStringFixed);
+					values.push_back(ot::Variable(valueOfCastedType));
 				}
 				else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
 				{
-					values.push_back(ot::Variable(std::stoi(fieldValueStringFixed)));
+					const int32_t valueOfCastedType = std::stoi(fieldValueStringFixed);
+					values.push_back(ot::Variable(valueOfCastedType));
 				}
 				else if (rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
 				{
-					values.push_back(ot::Variable(std::stoll(fieldValueStringFixed)));
+					const int64_t valueOfCastedType = std::stoll(fieldValueStringFixed);
+					values.push_back(ot::Variable(valueOfCastedType));
 				}
 			}
 		}
