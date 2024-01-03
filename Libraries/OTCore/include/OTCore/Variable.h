@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   VariableType.h
- * \brief  Classes that convert from the JSON format that is being used for the inter service communication to the internally used variant and vice versa.
+ * \brief  Container for the usual data types.
  * 
  * \author Wagner
  * \date   July 2023
@@ -10,6 +10,9 @@
 #include <stdint.h>
 #include "OTCore/CoreAPIExport.h"
 #include "OTCore/TypeNames.h"
+#include <limits>
+#include <algorithm>
+#include <math.h>
 
 #pragma warning(disable:4251)
 namespace ot
@@ -139,6 +142,29 @@ namespace ot
 
 	private:
 		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,StringWrapper>;
+		
+
+		inline bool DoubleCompare(const double& a, const double& b) const
+		{
+			constexpr const double epsilon = 1.0e-12; //std::numeric_limits<double>::epsilon()
+			//Adaptive eps. Source: https://embeddeduse.com/2019/08/26/qt-compare-two-floats/
+			if (abs(a - b) <= epsilon)
+			{
+				return true;
+			}
+			return abs(a - b) <= epsilon * (std::max)(abs(a), abs(b));
+		}
+		
+		inline const bool FloatCompare(const float& a, const float& b) const
+		{
+			constexpr const float epsilon = 1.0e-6f; //std::numeric_limits<float>::epsilon()
+			//Adaptive eps. Source: https://embeddeduse.com/2019/08/26/qt-compare-two-floats/
+			if (abs(a - b) <= epsilon)
+			{
+				return true;
+			}
+			return abs(a - b) <= epsilon * (std::max)(abs(a), abs(b));
+		}
 		variable_t _value;
 	};
 	

@@ -38,6 +38,64 @@ TEST(VariableTest, JSONToVariableNotSupportedType)
 	EXPECT_ANY_THROW(converter(var));
 }
 
+double calculate(double start, double decrement, int count)
+{
+	for (int i = 0; i < count; ++i)
+		start -= decrement;
+	return start;
+}
+
+//float calculate(float start, float decrement, int count)
+//{
+//	for (int i = 0; i < count; ++i)
+//		start -= decrement;
+//	return start;
+//}
+
+TEST(VariableTest, DoubleComparision)
+{
+	const int total = 10000;
+	int count = 0;
+	for (auto i = 0; i < total; ++i)
+	{
+		double expected = (i / 10.0);
+		double actual = calculate(9.0 + expected, 0.1, 90);
+		if(ot::Variable(actual) == ot::Variable(expected))
+		{
+			++count;
+		}
+	}
+	EXPECT_EQ(count, total);
+}
+
+TEST_F(FixtureVariable, UniqueList)
+{
+	std::list< ot::Variable> list = GetSMA8_333_FA_Amplitudes();
+	list.sort();
+	list.unique();
+
+	const size_t expectedNumberOfEntries = 327;
+	const size_t actualNumberOfEntries = list.size();
+
+	EXPECT_EQ(expectedNumberOfEntries,actualNumberOfEntries);
+}
+
+TEST(VariableTest, FloatComparision)
+{
+	const int total = 10000;
+	int count = 0;
+	for (auto i = 0; i < total; ++i)
+	{
+		float expected = (i / 10.0f);
+		float actual = calculate(9.0f + expected, 0.01f, 900);
+		if (ot::Variable(actual) == ot::Variable(expected))
+		{
+			++count;
+		}
+	}
+	EXPECT_EQ(count, total);
+}
+
 TEST_P(FixtureVariable, Equal)
 {
 	ot::Variable isValue = GetParam();

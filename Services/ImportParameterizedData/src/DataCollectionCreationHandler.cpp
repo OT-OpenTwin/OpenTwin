@@ -178,6 +178,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			MetadataParameter parameter;
 			parameter.parameterName = parameterEntry.first;
 			parameter.values = parameterEntry.second;
+			parameter.values.sort();
 			parameter.values.unique();
 			parameter.typeName = parameter.values.begin()->getTypeName();
 
