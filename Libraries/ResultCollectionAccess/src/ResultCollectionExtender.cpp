@@ -133,7 +133,7 @@ void ResultCollectionExtender::StoreCampaignChanges()
 	}
 }
 
-void ResultCollectionExtender::AddQuantityContainer(uint64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint64_t quantityIndex,const  ot::Variable& quantityValue)
+void ResultCollectionExtender::AddQuantityContainer(uint64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint64_t quantityIndex, const  ot::Variable& quantityValue)
 {
 	if (_quantityContainer.size() == 0)
 	{
