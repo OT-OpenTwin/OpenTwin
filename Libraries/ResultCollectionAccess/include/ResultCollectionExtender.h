@@ -6,12 +6,14 @@
 #include "MetadataSeries.h"
 #include "QuantityContainer.h"
 
+#include <string>
+
 class ClassFactory;
 
 class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionAccess
 {
 public:
-	ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
+	ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& ownerServiceName);
 	ResultCollectionExtender(const ResultCollectionExtender& other) = delete;
 	ResultCollectionExtender operator=(const ResultCollectionExtender& other) = delete;
 	~ResultCollectionExtender();
@@ -43,6 +45,7 @@ private:
 	const uint32_t _bufferSize = 50;
 	const std::string _parameterAbbreviationBase = "P_";
 	const std::string _quantityAbbreviationBase = "Q_";
+	const std::string _ownerServiceName;
 
 	const uint64_t FindNextFreeSeriesIndex();
 	const uint64_t FindNextFreeQuantityIndex();

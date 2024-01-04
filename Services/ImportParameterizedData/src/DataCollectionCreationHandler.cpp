@@ -51,7 +51,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
-	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory());
+	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory(),OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	/*_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();*/
 
@@ -222,7 +222,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		std::list<std::string> parameterNames;
 
 		const auto& firstParameter = *parameterData.getFields()->begin();
-		const int numberOfFields = firstParameter.second.size();
+		const uint32_t numberOfFields = static_cast<uint32_t>(firstParameter.second.size());
 		
 		uint64_t seriesMetadataIndex = resultCollectionExtender.FindMetadataSeries(msmdName)->getSeriesIndex();
 		
@@ -247,7 +247,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 			allParameterValueIt.push_back(parameterEntry.second.begin());
 		}
 		std::vector<std::list<ot::Variable>> parameterValuesPerField(numberOfFields);
-		for (int i = 0; i < numberOfFields; i++)
+		for (uint32_t i = 0; i < numberOfFields; i++)
 		{
 			std::list<ot::Variable> parameterValues;
 			for (std::list<ot::Variable>::const_iterator& parameterValueIt : allParameterValueIt)
@@ -264,7 +264,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 		for (auto quantityValueIt : allQuantityValueIt)
 		{
 			//For current quantity store all values
-			for (int i = 0; i < numberOfFields; i++)
+			for (uint32_t i = 0; i < numberOfFields; i++)
 			{				
 				//push data set into buffer
 				resultCollectionExtender.AddQuantityContainer(seriesMetadataIndex, parameterNames, std::move(parameterValuesPerField[i]), *quantityIndex, *quantityValueIt);

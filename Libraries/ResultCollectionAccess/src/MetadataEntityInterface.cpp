@@ -6,6 +6,15 @@
 
 #include <vector>
 
+MetadataEntityInterface::MetadataEntityInterface(const std::string& ownerServiceName):_ownerServiceName(ownerServiceName)
+{
+}
+
+MetadataEntityInterface::MetadataEntityInterface()
+	:_ownerServiceName("")
+{
+}
+
 MetadataCampaign MetadataEntityInterface::CreateCampaign(std::shared_ptr<EntityMetadataCampaign> rmd, std::list<std::shared_ptr<EntityMetadataSeries>> msmds)
 {
 	MetadataCampaign measurementCampaign;
@@ -17,7 +26,7 @@ MetadataCampaign MetadataEntityInterface::CreateCampaign(std::shared_ptr<EntityM
 
 void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign)
 {
-	EntityMetadataCampaign entityCampaign(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, "");
+	EntityMetadataCampaign entityCampaign(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, _ownerServiceName);
 	for (auto& metadata : metaDataCampaign.getMetaData())
 	{
 		//ToDo
@@ -39,7 +48,7 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 	for (auto& newSeriesMetadata : seriesMetadata)
 	{
 		const std::string name = newSeriesMetadata->getName();
-		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, nullptr, "");
+		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, nullptr, _ownerServiceName);
 		entitySeries.setName(name);
 		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())
 		{

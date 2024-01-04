@@ -5,8 +5,8 @@
 #include <algorithm>
 #include "MetadataEntityInterface.h"
 
-ResultCollectionExtender::ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory)
-	:ResultCollectionAccess(projectName,modelComponent,classFactory), _requiresUpdateMetadataCampaign(false)
+ResultCollectionExtender::ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& ownerServiceName)
+	:ResultCollectionAccess(projectName,modelComponent,classFactory), _requiresUpdateMetadataCampaign(false), _ownerServiceName(ownerServiceName)
 {
 	_quantityContainer.reserve(_bufferSize);
 }
@@ -118,7 +118,7 @@ void ResultCollectionExtender::AddCampaignMetadata(std::shared_ptr<MetadataEntry
 
 void ResultCollectionExtender::StoreCampaignChanges()
 {
-	MetadataEntityInterface entityCreator;
+	MetadataEntityInterface entityCreator(_ownerServiceName);
 	if (_requiresUpdateMetadataCampaign && _seriesMetadataForStorage.size() != 0)
 	{
 		entityCreator.StoreCampaign(_modelComponent, _metadataCampaign, _seriesMetadataForStorage);
