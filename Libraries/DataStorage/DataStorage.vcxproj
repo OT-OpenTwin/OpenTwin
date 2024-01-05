@@ -193,7 +193,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;DATASTORAGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(ProjectDir)$(OT_INC);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild />
@@ -214,7 +214,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;DATASTORAGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(ProjectDir)$(OT_INC);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild>
@@ -275,7 +275,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;DATASTORAGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(ProjectDir)$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
@@ -298,7 +298,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;DATASTORAGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(ProjectDir)$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(ProjectDir)$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(ProjectDir)$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
@@ -331,6 +331,8 @@
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Helper\UniqueFileName.h" />
     <ClInclude Include="include\UniqueUIDGenerator.h" />
+    <ClInclude Include="include\Unittest\UnittestDocumentAccess.h" />
+    <ClInclude Include="include\Unittest\UnittestDocumentAccessBase.h" />
     <ClInclude Include="include\UserAPI.h" />
     <ClInclude Include="include\Enums\InsertTypeEnum.h" />
   </ItemGroup>
@@ -361,6 +363,8 @@
     <ClCompile Include="src\SystemDataAccess.cpp" />
     <ClCompile Include="src\UniqueFileName.cpp" />
     <ClCompile Include="src\UniqueUIDGenerator.cpp" />
+    <ClCompile Include="src\UnittestDocumentAccess.cpp" />
+    <ClCompile Include="src\UnittestDocumentAccessBase.cpp" />
     <ClCompile Include="src\UserAPI.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

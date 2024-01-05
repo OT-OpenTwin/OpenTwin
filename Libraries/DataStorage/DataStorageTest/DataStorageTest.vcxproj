@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\test.cpp" />
+    <ClCompile Include="src\QueryTests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6b235d0f-4765-4dc3-a4e2-fd9d67418c81}</ProjectGuid>
@@ -58,19 +58,20 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <MinimalRebuild>
       </MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCD);$(MONGO_C_INCD);$(MONGO_BOOST_ROOT);$(R_JSON_INCD);$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DataStorage.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);DataStorage.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,20 +90,21 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(MONGO_CXX_INCR);$(MONGO_C_INCR);$(MONGO_BOOST_ROOT);$(R_JSON_INCR);$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DataStorage.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(SolutionDir)$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);DataStorage.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
     </Link>

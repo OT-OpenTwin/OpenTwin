@@ -78,6 +78,12 @@
     <ClInclude Include="include\ResultDataStorageAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Unittest\UnittestDocumentAccess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unittest\UnittestDocumentAccessBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DataStorageAPI.cpp">
@@ -132,6 +138,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ResultDataStorageAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnittestDocumentAccessBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnittestDocumentAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

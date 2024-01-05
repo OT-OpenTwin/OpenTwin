@@ -9,7 +9,7 @@
 namespace DataStorageAPI
 {
 	DocumentAccess::DocumentAccess(string databaseName, string collectionName) :
-		docBase(databaseName, collectionName)
+		docBase(new DocumentAccessBase(databaseName, collectionName))
 	{
 	}
 
@@ -24,7 +24,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto result = docBase.InsertDocument(bsonData, allowQueueing);
+			auto result = docBase->InsertDocument(bsonData, allowQueueing);
 			if (!result.empty())
 			{
 				response.UpdateDataStorageResponse(result, true, "");
@@ -48,7 +48,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto result = docBase.InsertMultipleDocument(jsonData);
+			auto result = docBase->InsertMultipleDocument(jsonData);
 			if (result)
 			{
 				auto count = result.get().inserted_count();
@@ -74,7 +74,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto result = docBase.GetDocument(jsonQuery, jsonProjectionQuery);
+			auto result = docBase->GetDocument(jsonQuery, jsonProjectionQuery);
 			if (result)
 			{
 				response.setBsonResult(result);
@@ -99,7 +99,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto result = docBase.GetDocument(queryFilter, projectionQuery);
+			auto result = docBase->GetDocument(queryFilter, projectionQuery);
 			if (result)
 			{
 				response.setBsonResult(result);
@@ -124,7 +124,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto result = docBase.DeleteDocument(queryFilter);
+			auto result = docBase->DeleteDocument(queryFilter);
 			if (result)
 			{
 				response.setSuccess(true);
@@ -148,7 +148,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto results = docBase.GetAllDocument(jsonQuery, jsonProjectionQuery, limit);
+			auto results = docBase->GetAllDocument(jsonQuery, jsonProjectionQuery, limit);
 			std::string responseData = "{ \"Documents\": [";
 			bool isFirst = true;
 			for (auto result : results) 
@@ -177,7 +177,7 @@ namespace DataStorageAPI
 		DataStorageResponse response;
 		try
 		{
-			auto results = docBase.GetAllDocument(std::move(queryFilter), std::move(projectionQuery), limit);
+			auto results = docBase->GetAllDocument(std::move(queryFilter), std::move(projectionQuery), limit);
 			std::string responseData = "{ \"Documents\": [";
 			bool isFirst = true;
 			for (auto result : results)
@@ -203,6 +203,7 @@ namespace DataStorageAPI
 
 	DocumentAccess::~DocumentAccess()
 	{
-
+		delete docBase;
+		docBase = nullptr;
 	}
 }

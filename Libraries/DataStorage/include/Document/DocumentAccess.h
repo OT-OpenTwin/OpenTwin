@@ -4,6 +4,8 @@
 
 #include "../Response/DataStorageResponse.h"
 #include "DocumentAccessBase.h"
+#include "Unittest/UnittestDocumentAccessBase.h"
+
 #include <mongocxx/collection.hpp>
 #include "bsoncxx/document/view_or_value.hpp"
 
@@ -16,7 +18,6 @@ namespace DataStorageAPI
 	{
 	public: 
 		__declspec(dllexport) DocumentAccess(string databaseName, string collectionName);
-
 		__declspec(dllexport) DataStorageResponse InsertDocumentToDatabase(string jsonData, bool allowQueueing);
 		__declspec(dllexport) DataStorageResponse InsertDocumentToDatabase(BsonViewOrValue bsonData, bool allowQueueing);
 
@@ -32,10 +33,13 @@ namespace DataStorageAPI
 
 		__declspec(dllexport) ~DocumentAccess();
 
+	protected:
+		DocumentAccess(const std::string& collectionName) : docBase(new UnittestDocumentAccessBase(collectionName)) {};
+
 	private:
+		DocumentAccessBase* docBase = nullptr;
 		string mongoDbName;
 		string mongoCollectionName;
-		DocumentAccessBase docBase;
 	};
 }
 

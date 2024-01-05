@@ -19,6 +19,7 @@ namespace DataStorageAPI
 	{
 	public:
 		__declspec(dllexport) DocumentAccessBase(String databaseName, String collectionName);
+		DocumentAccessBase() {};
 
 		__declspec(dllexport) std::string InsertDocument(String jsonInsertValue, bool allowQueueing);
 		__declspec(dllexport) std::string InsertDocument(BsonViewOrValue jsonInsertValue, bool allowQueueing);
@@ -44,8 +45,10 @@ namespace DataStorageAPI
 		__declspec(dllexport) bsoncxx::stdx::optional<mongocxx::result::delete_result> DeleteMultipleDocument(String deleteQuery);
 		__declspec(dllexport) bsoncxx::stdx::optional<mongocxx::result::delete_result> DeleteMultipleDocument(BsonViewOrValue deleteQuery);
 
-	private:
+	protected:
 		mongocxx::collection mongoCollection;
+
+	private:
 		std::string mongoDbName;
 		std::string mongoCollectionName;
 	};
