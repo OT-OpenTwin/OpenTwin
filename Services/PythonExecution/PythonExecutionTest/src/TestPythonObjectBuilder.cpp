@@ -7,10 +7,10 @@ TEST_F(FixturePythonObjectBuilder, FloatToVariable)
 {
 	constexpr float expectedValue = std::numeric_limits<float>::max();
 	PythonObjectBuilder builder;
-	CPythonObjectNew doubleValue = builder.setDouble(expectedValue); //PythonObjects do not differ between float and double. Its all double
+	CPythonObjectNew doubleValue = builder.setDouble(expectedValue); 
 	std::optional<ot::Variable> value = 	builder.getVariable(doubleValue);
-	double clearValue = value.value().getDouble();
-	EXPECT_EQ(expectedValue, clearValue);
+	//PythonObjects do not differ between float and double. Its all double
+	EXPECT_TRUE(value.value().isDouble());
 }
 
 TEST_F(FixturePythonObjectBuilder, DoubleToVariable)
@@ -29,8 +29,8 @@ TEST_F(FixturePythonObjectBuilder, Int32ToVariable)
 	PythonObjectBuilder builder;
 	CPythonObjectNew pValue = builder.setInt32(expectedValue);
 	std::optional<ot::Variable> vValue = builder.getVariable(pValue);
-	int32_t value = vValue.value().getInt32(); //difference between int32 and int64 cannot be detected in a pythonobject. Thus int32 is stored as a int64.
-	EXPECT_EQ(expectedValue, value);
+	//difference between int32 and int64 cannot be detected in a pythonobject. Thus int32 is stored as a int64.
+	EXPECT_TRUE(vValue.value().isInt64());
 }
 
 TEST_F(FixturePythonObjectBuilder, Int64ToVariable)

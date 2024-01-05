@@ -73,6 +73,12 @@
     <ClCompile Include="src\ReturnValues.cpp">
       <Filter>src\ServiceReturnMessages</Filter>
     </ClCompile>
+    <ClCompile Include="src\VariableToBSONStringConverter.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringToVariableConverter.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -191,6 +197,12 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\ReturnValues.h">
       <Filter>include\ServiceReturnMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\VariableToBSONStringConverter.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\StringToVariableConverter.h">
+      <Filter>include\VariableType</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

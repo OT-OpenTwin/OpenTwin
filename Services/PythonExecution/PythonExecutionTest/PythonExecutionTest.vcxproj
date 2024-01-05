@@ -15,6 +15,7 @@
     <ClCompile Include="src\FixturePythonAPI.cpp" />
     <ClCompile Include="src\FixturePythonObjectBuilder.cpp" />
     <ClCompile Include="src\FixturePythonWrapper.cpp" />
+    <ClCompile Include="src\TestEnvironment.cpp" />
     <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp" />
     <ClCompile Include="src\TestPythonAPI.cpp" />
     <ClCompile Include="src\TestPythonObjectBuilder.cpp" />
@@ -60,8 +61,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHR);$(PYTHON310_ROOT)\libs</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python310.lib;PythonExecution.lib;$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHR);$(PYTHON310_ROOT)\libs;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python310.lib;PythonExecution.lib;$(GOOGLE_TEST_LIB);BlockEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

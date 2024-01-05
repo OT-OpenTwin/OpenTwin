@@ -89,7 +89,7 @@ private:
 	const std::string _propertyComparatorP3 = "P3 comparator";
 	const std::string _propertyValueP3 = "P3 query value";
 
-	std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", " " };
+	std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", "!="," " };
 
 	ot::Connector _connectorQuantity;
 	ot::Connector _connectorParameter1;

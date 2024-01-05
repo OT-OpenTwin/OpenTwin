@@ -206,6 +206,9 @@
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(PYTHON310_ROOT)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python310.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>echo SolutionPath=$(SolutionPath)::GTA::SolutionDir=$(SolutionDir)::GTA::PlatformName=$(PlatformName)::GTA::ConfigurationName=$(ConfigurationName)::GTA::TheTarget=$(TargetFileName) &gt; $(TargetPath).gta_settings_helper</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <ClCompile>

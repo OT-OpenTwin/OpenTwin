@@ -122,11 +122,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonTableReset.SetDescription(pageName, groupNameTableHandling, "Revert Changes", "", subgroupNameTableHandlingState);;
 	_buttonTableResetToSelection.SetDescription(pageName, groupNameTableHandling, "Reset To Selection", "", subgroupNameTableHandlingState);;
 
-	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Add RMD Entry");
-	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add MSMD Entry");
-	_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Parameter Entry");
-	_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Quantity Entry");
-	_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Create next MSMD");
+	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Campaign Metadata");
+	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Series Metadata");
+	_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Parameter");
+	_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
+	_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Auto Create Series Metadata");
 
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 

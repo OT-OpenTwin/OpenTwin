@@ -3,9 +3,12 @@
 #include "OTCore/Variable.h"
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/StringToVariableConverter.h"
+
 #include "FixtureVariable.h"
 
 #include <string>
+#include <limits>
 
 TEST(VariableTest, VariableToJSON)
 {
@@ -162,4 +165,65 @@ TEST_P(FixtureVariable, Smaller)
 		EXPECT_EQ(count, 1) << "Failed with type: " + isValue.getTypeName();
 		EXPECT_TRUE(larger) << "Failed with type: " + isValue.getTypeName();
 	}
+}
+
+TEST(StringToVariable, StringToInt32Variable)
+{	
+	constexpr const int32_t expectedValue = std::numeric_limits<int32_t>::max();
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+	
+	EXPECT_TRUE(actualValue.isInt32());
+	EXPECT_EQ(actualValue.getInt32(), expectedValue);
+}
+
+TEST(StringToVariable, StringToInt64Variable)
+{
+	//const int64_t expectedValue = std::numeric_limits<int64_t>::max();
+	constexpr const long long expectedValue = std::numeric_limits<long long>::max();
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+	
+	EXPECT_TRUE(actualValue.isInt64());
+	EXPECT_EQ(actualValue.getInt64(), expectedValue);
+}
+
+TEST(StringToVariable, StringToFloatVariable)
+{
+	const float expectedValue = 4.f;
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+
+	EXPECT_TRUE(actualValue.isFloat());
+	EXPECT_TRUE(actualValue.getFloat() == expectedValue);
+}
+
+TEST(StringToVariable, StringToDoubleVariable)
+{
+	constexpr const double expectedValue = std::numeric_limits<double>::max();
+	ot::Variable expectedVariable(expectedValue);
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+
+	EXPECT_TRUE(actualValue.isDouble());
+	EXPECT_TRUE(actualValue == expectedVariable);
+}
+
+TEST(StringToVariable, StringToStringVariable)
+{
+	const std::string expectedValue = "4";
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("\""+expectedValue+"\"");
+
+	EXPECT_TRUE(actualValue.isConstCharPtr());
+	EXPECT_EQ(actualValue.getConstCharPtr(), expectedValue);
+}
+TEST(StringToVariable, StringToBoolVariable)
+{
+	const bool expectedValue = true;
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("true");
+
+	EXPECT_TRUE(actualValue.isBool());
+	EXPECT_EQ(actualValue.getBool(), expectedValue);
 }

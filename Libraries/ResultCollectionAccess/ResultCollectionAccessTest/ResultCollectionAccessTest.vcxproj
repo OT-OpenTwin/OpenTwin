@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixtureQueryBuilder.cpp" />
     <ClCompile Include="src\FixtureResultCollectionExtender.cpp" />
-    <ClCompile Include="src\Test.cpp" />
+    <ClCompile Include="src\TestsQueries.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\FixtureQueryBuilder.h" />
     <ClInclude Include="include\FixtureResultCollectionExtender.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -54,15 +56,18 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(OT_INC);$(ProjectDir)$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(OT_INC);$(ProjectDir)$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_C_INCD);$(BOOST_INCD)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(GOOGLE_TEST_LIBPATHD);$(OT_RESULT_COLLECTION_ACCESS_ROOT)$(OT_LIBTESTD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultCollectionAccess.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_RESULT_COLLECTION_ACCESS_ROOT)$(OT_LIBTESTD);$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultCollectionAccess.lib;$(MONGO_CXX_LIBD);$(OT_DEFAULT_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -71,17 +76,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(OT_INC);$(ProjectDir)$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(OT_INC);$(ProjectDir)$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_C_INCD);$(BOOST_INCD)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(GOOGLE_TEST_LIBPATHR);$(OT_RESULT_COLLECTION_ACCESS_ROOT)$(OT_LIBTESTR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultCollectionAccess.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_RESULT_COLLECTION_ACCESS_ROOT)$(OT_LIBTESTR);$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultCollectionAccess.lib;$(MONGO_CXX_LIBR);$(OT_DEFAULT_SERVICE_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

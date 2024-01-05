@@ -33,6 +33,9 @@
     <ClCompile Include="src\TestsPythonWrapper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestEnvironment.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePropertyPythonObjectInterface.h">

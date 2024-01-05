@@ -10,6 +10,14 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	{
 		return ot::Variable(value.GetInt());
 	}
+	else if (value.IsInt64())
+	{
+		return ot::Variable(value.GetInt64());
+	}
+	else if (value.IsFloat())
+	{
+		return ot::Variable(value.GetFloat());
+	}
 	else if (value.IsDouble())
 	{
 		return ot::Variable(value.GetDouble());

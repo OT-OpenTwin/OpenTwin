@@ -15,15 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Test.cpp">
+    <ClCompile Include="src\TestsQueries.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\FixtureResultCollectionExtender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FixtureQueryBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureResultCollectionExtender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureQueryBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

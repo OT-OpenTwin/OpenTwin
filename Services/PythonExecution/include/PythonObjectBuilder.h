@@ -19,6 +19,9 @@
 #include "OTCore/Variable.h"
 #include <optional>
 
+/// <summary>
+/// PyObjects don't distingiush between float and double and int32 and int64. All floating point values are handled as double and all integer values are handled as int64
+/// </summary>
 class PythonObjectBuilder
 {
 public:

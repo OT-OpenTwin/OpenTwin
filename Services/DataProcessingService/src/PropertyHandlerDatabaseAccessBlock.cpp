@@ -11,7 +11,6 @@
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-
 	dbAccessEntity->getProperties();
 	if (_bufferedInformation.find(dbAccessEntity->getEntityID()) != _bufferedInformation.end())
 	{

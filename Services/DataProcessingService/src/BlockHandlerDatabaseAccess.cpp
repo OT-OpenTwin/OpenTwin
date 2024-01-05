@@ -2,6 +2,11 @@
 #include "ResultCollectionHandler.h"
 
 #include "Application.h"
+
+#include "AdvancedQueryBuilder.h"
+#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/StringToVariableConverter.h"
+
 //#include "OpenTwinCore/JSONToVariableConverter.h"
 //#include "PropertyHandlerDatabaseAccessBlock.h"
 
@@ -21,10 +26,39 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		const std::string dbURL = "Projects";
 		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
 		
-		ot::JsonDocument query;
-		ot::JsonDocument projection;
 				
-		projection.AddMember("_id", 0, projection.GetAllocator());
+		const std::string& quantityComparator = blockEntity->getQuantityQueryComparator();
+		if (quantityComparator != " ")
+		{
+			const std::string& quantityName = blockEntity->getSelectedQuantityName();
+			const std::string& quantityValue = blockEntity->getQuantityQueryValue();
+
+			ot::StringToVariableConverter converter;
+			ot::Variable value = converter(quantityValue);
+
+			AdvancedQueryBuilder queryBuilder;
+			auto query = queryBuilder.CreateComparision(quantityComparator, value);
+			
+			const std::string& parameterComparator = blockEntity->getParameter1QueryComparator();
+
+			if (parameterComparator != " ")
+			{
+				const std::string& parameterName = blockEntity->getSelectedParameter1Name();
+				const std::string& parameterValue = blockEntity->getParameter1QueryValue();
+				ot::Variable pValue = converter(parameterValue);
+				auto pQuery = queryBuilder.CreateComparision(parameterComparator, pValue);
+
+			}
+		}
+
+		
+		/*
+		blockEntity->getParameter1QueryComparator();
+		blockEntity->getParameter1QueryValue();
+
+		projection.AddMember("_id", 0, projection.GetAllocator());*/
+
+		
 	}
 }
 
