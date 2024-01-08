@@ -28,7 +28,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		
 				
 		const std::string& quantityComparator = blockEntity->getQuantityQueryComparator();
-		if (quantityComparator != " ")
+		/*if (quantityComparator != " ")
 		{
 			const std::string& quantityName = blockEntity->getSelectedQuantityName();
 			const std::string& quantityValue = blockEntity->getQuantityQueryValue();
@@ -49,7 +49,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 				auto pQuery = queryBuilder.CreateComparision(parameterComparator, pValue);
 
 			}
-		}
+		}*/
 
 		
 		/*

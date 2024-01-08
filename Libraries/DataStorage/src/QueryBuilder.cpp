@@ -11,7 +11,7 @@
 using bsoncxx::builder::basic::kvp;
 namespace DataStorageAPI
 {
-	bsoncxx::document::view_or_value QueryBuilder::GenerateFilterQuery(std::map<std::string, value> filterPairs)
+	BsonViewOrValue QueryBuilder::GenerateFilterQuery(std::map<std::string, value> filterPairs)
 	{
 		auto builder = bsoncxx::builder::basic::document{};
 
@@ -22,7 +22,7 @@ namespace DataStorageAPI
 		return builder.extract();
 	}
 
-	bsoncxx::document::view_or_value QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const ot::Variable& variable)
+	BsonViewOrValue QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const ot::Variable& variable)
 	{
 		auto builder = bsoncxx::builder::basic::document{};
 		if (variable.isConstCharPtr())
@@ -58,7 +58,7 @@ namespace DataStorageAPI
 		return builder.extract();
 	}
 
-	bsoncxx::document::view_or_value QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const std::list<ot::Variable>& variables)
+	BsonViewOrValue QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const std::list<ot::Variable>& variables)
 	{
 		auto arrBuilder = bsoncxx::builder::basic::array{};
 		for (const ot::Variable& variable : variables)
@@ -100,14 +100,26 @@ namespace DataStorageAPI
 		return docBuilder.extract();
 	}
 
-	bsoncxx::document::view_or_value QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const bsoncxx::document::view_or_value& queryEntry)
+	BsonViewOrValue QueryBuilder::BuildBsonArray(const std::string& fieldName, std::list<BsonViewOrValue>&& variables)
+	{
+		auto arrBuilder = bsoncxx::builder::basic::array{};
+		for (auto& value : variables)
+		{
+			arrBuilder.append(value);
+		}
+		auto docBuilder = bsoncxx::builder::basic::document{};
+		docBuilder.append(bsoncxx::builder::basic::kvp(fieldName, arrBuilder.extract()));
+		return docBuilder.extract();
+	}
+
+	BsonViewOrValue QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const BsonViewOrValue& queryEntry)
 	{
 		auto docBuilder = bsoncxx::builder::basic::document{};
 		docBuilder.append(kvp(fieldName, queryEntry));
 		return docBuilder.extract();
 	}
 	
-	bsoncxx::document::view_or_value QueryBuilder::GenerateSelectQuery(std::vector<std::string> columnNames, bool incudeId)
+	BsonViewOrValue QueryBuilder::GenerateSelectQuery(std::vector<std::string> columnNames, bool incudeId)
 	{
 		auto builder = bsoncxx::builder::basic::document{};
 		if (columnNames.size() == 0)
@@ -126,7 +138,7 @@ namespace DataStorageAPI
 	}
 
 	// The bson is immutable. So, we need to create a new bson from existing bson values
-	bsoncxx::document::view_or_value QueryBuilder::AppendElementToQuery(bsoncxx::document::view existingQuery, std::map<std::string, value> newKvps)
+	BsonViewOrValue QueryBuilder::AppendElementToQuery(BsonView existingQuery, std::map<std::string, BsonValueType> newKvps)
 	{
 		auto doc = bsoncxx::builder::basic::document{};
 		for (auto oldKvp : existingQuery)

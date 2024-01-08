@@ -7,31 +7,32 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <list>
 
 #include "bsoncxx/types/value.hpp"
 #include "bsoncxx/document/view_or_value.hpp"
 #include "OTCore/Variable.h"
 
+using BsonViewOrValue = bsoncxx::document::view_or_value;
+using BsonView = bsoncxx::document::view;
+using BsonValueType = bsoncxx::types::value;
 
 namespace DataStorageAPI
 {
-	//using BsonViewOrValue = bsoncxx::document::view_or_value;
-	//using BsonView = bsoncxx::document::view;
-	//using value = bsoncxx::types::value;
-	//using string = std::string;
 	
 	class __declspec(dllexport) QueryBuilder
 	{
 	public:
-		bsoncxx::document::view_or_value GenerateFilterQuery(std::map<std::string, bsoncxx::types::value> filterPairs);
+		BsonViewOrValue GenerateFilterQuery(std::map<std::string, bsoncxx::types::value> filterPairs);
 
-		bsoncxx::document::view_or_value GenerateFilterQuery(const std::string& fieldName, const ot::Variable& variable);
-		bsoncxx::document::view_or_value GenerateFilterQuery(const std::string& fieldName, const std::list<ot::Variable>& variables);
-		bsoncxx::document::view_or_value GenerateFilterQuery(const std::string& fieldName, const bsoncxx::document::view_or_value& queryEntry);
+		BsonViewOrValue GenerateFilterQuery(const std::string& fieldName, const ot::Variable& variable);
+		BsonViewOrValue GenerateFilterQuery(const std::string& fieldName, const std::list<ot::Variable>& variables);
+		BsonViewOrValue GenerateFilterQuery(const std::string& fieldName, const BsonViewOrValue& queryEntry);
+		BsonViewOrValue BuildBsonArray(const std::string& fieldName, std::list<BsonViewOrValue>&& variables);
 		
-		bsoncxx::document::view_or_value GenerateSelectQuery(std::vector<std::string> columnNames, bool incudeId);
+		BsonViewOrValue GenerateSelectQuery(std::vector<std::string> columnNames, bool incudeId);
 
-		bsoncxx::document::view_or_value AppendElementToQuery(bsoncxx::document::view existingQuery, std::map<std::string, bsoncxx::types::value> newKvps);
+		BsonViewOrValue AppendElementToQuery(BsonView existingQuery, std::map<std::string, BsonValueType> newKvps);
 	};
 }
 

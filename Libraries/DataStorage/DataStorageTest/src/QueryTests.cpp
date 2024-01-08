@@ -3,6 +3,7 @@
 
 #include "Unittest/UnittestDocumentAccess.h"
 #include "Helper/QueryBuilder.h"
+#include "OTCore/JSON.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ TEST(DBAccess, SimpleQuerySuccess) {
 	DataStorageAPI::QueryBuilder queryBuilder;
 	auto query = queryBuilder.GenerateFilterQuery(fieldName, queryValueGeneric);
 
-	std::vector<std::string> filter(0);
+	std::vector<std::string> filter{"Quantity"};
 	auto select = queryBuilder.GenerateSelectQuery(filter, true);
 	
 	auto response = dbAccess.GetAllDocuments(query, select,1);
@@ -38,7 +39,7 @@ TEST(DBAccess, SimpleQueryCorrectResult) {
 	DataStorageAPI::QueryBuilder queryBuilder;
 	auto query = queryBuilder.GenerateFilterQuery(fieldName, queryValueGeneric);
 
-	std::vector<std::string> filter(0);
+	std::vector<std::string> filter{"Quantity"};
 	auto select = queryBuilder.GenerateSelectQuery(filter, true);
 
 	auto response = dbAccess.GetAllDocuments(query, select, 0);

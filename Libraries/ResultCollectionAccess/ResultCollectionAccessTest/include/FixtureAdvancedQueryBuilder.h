@@ -5,11 +5,11 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-class FixtureQueryBuilder : public testing::Test
+class FixtureAdvancedQueryBuilder : public testing::Test
 {
 public:
-	FixtureQueryBuilder();
-	~FixtureQueryBuilder();
+	FixtureAdvancedQueryBuilder();
+	~FixtureAdvancedQueryBuilder();
 	DataStorageAPI::DataStorageResponse ExecuteQuery(BsonViewOrValue& query, BsonViewOrValue& select);
 
 private:

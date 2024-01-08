@@ -7,15 +7,26 @@
 class __declspec(dllexport) AdvancedQueryBuilder : public DataStorageAPI::QueryBuilder
 {
 public:
-	const std::list<std::string>& getComparators() { return _comparators; }
+	static const std::list<std::string>& getComparators() { return _comparators; }
+	static std::string getAnyOfComparator() { return _anyOfComparator; }
+	static std::string getNoneOfComparator() { return _noneOfComparator; }
 
-	bsoncxx::document::view_or_value CreateComparision(const std::string& comparator, const ot::Variable& variable);
-	//bsoncxx::document::view_or_value ConnectWithAND (bsoncxx::document::view_or_value&, ... );
-//	DataStorageAPI::BsonViewOrValue CreateComparisionEqualNoneOf(const std::list<ot::Variable>& values);
-//	DataStorageAPI::BsonViewOrValue CreateComparisionEqualToAnyOf(const std::list<ot::Variable>& values);
-//	
+	BsonViewOrValue CreateComparison(const std::string& comparator, const ot::Variable& variable);
+
+	/// <summary>
+	/// Also returns documents that do not have the queried field.
+	/// </summary>
+	/// <param name="values"></param>
+	/// <returns></returns>
+	BsonViewOrValue CreateComparisionEqualNoneOf(const std::list<ot::Variable>& values);
+	BsonViewOrValue CreateComparisionEqualToAnyOf(const std::list<ot::Variable>& values);
+	BsonViewOrValue ConnectWithAND (std::list<BsonViewOrValue>&& values);
+	BsonViewOrValue ConnectWithOR (std::list<BsonViewOrValue>&& values);
+
 private:
-	const std::list<std::string> _comparators{ "<", "<=", "=", ">", ">=", "!=","any of", "not any of" };
-	const std::map<std::string, std::string> _mongoDBComparators{ {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"==","$eq"}, {"!=", "$ne"}, {"any of","$in"}, {"not any of","$nin"}};
+	inline static const std::string _anyOfComparator = "not any of";
+	inline static const std::string _noneOfComparator = "any of";
+	inline static const std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", "!=", _anyOfComparator, _noneOfComparator };;
+	inline static const std::map<std::string, std::string> _mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"==","$eq"}, {"!=", "$ne"}, {_anyOfComparator,"$in"}, {_noneOfComparator,"$nin"} };;
 
 };

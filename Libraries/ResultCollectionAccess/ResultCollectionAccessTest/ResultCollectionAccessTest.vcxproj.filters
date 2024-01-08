@@ -21,7 +21,7 @@
     <ClCompile Include="src\FixtureResultCollectionExtender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FixtureQueryBuilder.cpp">
+    <ClCompile Include="src\FixtureAdvancedQueryBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="include\FixtureResultCollectionExtender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FixtureQueryBuilder.h">
+    <ClInclude Include="include\FixtureAdvancedQueryBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
