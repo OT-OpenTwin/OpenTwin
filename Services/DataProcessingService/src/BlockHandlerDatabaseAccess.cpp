@@ -7,58 +7,72 @@
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/StringToVariableConverter.h"
 
-//#include "OpenTwinCore/JSONToVariableConverter.h"
-//#include "PropertyHandlerDatabaseAccessBlock.h"
+#include "ValueComparisionDefinition.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
+
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(handlerMap)
 {
+	//First check if the selected project has a corresponding result collection.
 	const std::string projectName =	blockEntity->getSelectedProjectName();
-
 	ResultCollectionHandler resultCollectionHandler;
-	std::string resultCollectionName = resultCollectionHandler.getProjectCollection(projectName) + ".results";
+	const std::string collectionName = resultCollectionHandler.getProjectCollection(projectName);
+	const std::string resultCollectionName = collectionName + ".results";
 	_isValid  = resultCollectionHandler.CollectionExists(resultCollectionName);
+
+	
 	if (_isValid)
 	{
-		_quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
-		_parameterConnectorName =  blockEntity->getConnectorParameter1().getConnectorName();
-		
+		const auto& buffer = PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
+		const auto& parameterByName = buffer.parameterByName;
+		const auto& quantityByName = buffer.quantitiesByName;
+
 		const std::string dbURL = "Projects";
 		_dataStorageAccess = new DataStorageAPI::DocumentAccess(dbURL, resultCollectionName);
 		
-				
-		const std::string& quantityComparator = blockEntity->getQuantityQueryComparator();
-		/*if (quantityComparator != " ")
+		AdvancedQueryBuilder builder;
+		ot::StringToVariableConverter converter;
+		_projectionNames.reserve(4);
+		_connectorNames.reserve(4);
+		
+		//Now build a query depending on the selections made in the BlockEntity
+		ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
+		//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
+		const auto& selectedQuantity = quantityByName.find(quantityDef.getName())->second;
+		quantityDef.setName(selectedQuantity.quantityAbbreviation);
+		_projectionNames.push_back(quantityDef.getName());
+		
+		//The data pipeline works on the connector names. Thus we do here mapping from the document field name to the connector name.
+		const std::string quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
+		_connectorNames.push_back(quantityConnectorName);
+		
+		const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
+		ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
+		AddParameter(param1Def, parameterByName.find(param1Def.getName())->second, parameterConnectorName);
+		AddComparision(param1Def);
+
+		const bool queryDimensionIs3D = blockEntity->isQueryDimension3D();
+		const bool queryDimensionIs2D = blockEntity->isQueryDimension2D();
+
+		if (queryDimensionIs2D|| queryDimensionIs3D)
 		{
-			const std::string& quantityName = blockEntity->getSelectedQuantityName();
-			const std::string& quantityValue = blockEntity->getQuantityQueryValue();
-
-			ot::StringToVariableConverter converter;
-			ot::Variable value = converter(quantityValue);
-
-			AdvancedQueryBuilder queryBuilder;
-			auto query = queryBuilder.CreateComparision(quantityComparator, value);
-			
-			const std::string& parameterComparator = blockEntity->getParameter1QueryComparator();
-
-			if (parameterComparator != " ")
-			{
-				const std::string& parameterName = blockEntity->getSelectedParameter1Name();
-				const std::string& parameterValue = blockEntity->getParameter1QueryValue();
-				ot::Variable pValue = converter(parameterValue);
-				auto pQuery = queryBuilder.CreateComparision(parameterComparator, pValue);
-
-			}
-		}*/
-
-		
-		/*
-		blockEntity->getParameter1QueryComparator();
-		blockEntity->getParameter1QueryValue();
-
-		projection.AddMember("_id", 0, projection.GetAllocator());*/
-
-		
+			auto param2Def = blockEntity->getSelectedParameter2Definition();
+			const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
+			AddParameter(param2Def, parameterByName.find(param2Def.getName())->second, param2ConnectorName);
+			AddComparision(param2Def);
+		}
+		if (queryDimensionIs3D)
+		{	
+			auto param3Def = blockEntity->getSelectedParameter3Definition();
+			const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
+			AddParameter(param3Def, parameterByName.find(param3Def.getName())->second, param3ConnectorName);
+			AddComparision(param3Def);
+		}
+		_projectionNames.shrink_to_fit();
+		_connectorNames.shrink_to_fit();
+		_query = builder.ConnectWithAND(std::move(_comparisons));
+		_projection = builder.GenerateSelectQuery(_projectionNames, false);
 	}
 }
 
@@ -73,53 +87,49 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
-	genericDataBlock quantity{0,2,4,8,16,32,64,128,256,512,1024};
-	genericDataBlock parameter{ 0,1,2,3,4,5,6,7,8,9,10 };
 
-	_dataPerPort[_quantityConnectorName] = quantity;
-	_dataPerPort[_parameterConnectorName] = parameter;
+	auto dbResponse = _dataStorageAccess->GetAllDocuments(_query, _projection, 0);
+	ot::JSONToVariableConverter converter;
+
+	if (dbResponse.getSuccess())
+	{
+		const std::string queryResponse =	dbResponse.getResult();
+		ot::JsonDocument doc;
+		doc.fromJson(queryResponse);
+		auto allEntries = doc["Documents"].GetArray();
+		for (uint64_t i = 0; i< allEntries.Size();i++)
+		{
+			auto projectedValues = allEntries[i].GetArray();
+			for (uint64_t j = 0; j < projectedValues.Size(); j++)
+			{
+				ot::Variable value = converter(projectedValues[j]);
+				const std::string connectorName = _connectorNames[j];
+				_dataPerPort[connectorName].push_back(value);
+			}
+		}
+	}
 
 	return true;
 }
 
-const MetadataCampaign BlockHandlerDatabaseAccess::getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
+
+void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition& definition)
 {
-	return MetadataCampaign();
+	AdvancedQueryBuilder builder;
+	ot::StringToVariableConverter converter;
+	const std::string& name = definition.getName();
+	const std::string& valueStr = definition.getValue();
+	const std::string& comparator = definition.getComparator();
+
+	ot::Variable value = converter(valueStr);
+
+	auto compare = builder.CreateComparison(comparator, value);
+	_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
 }
 
-//BlockHandler::genericDataBlock BlockHandlerDatabaseAccess::Execute(BlockHandler::genericDataBlock& inputData)
-//{
-//	if (_output.size() == 0)
-//	{
-//		auto selectedParameter = _collectionInfos->parameters[_collectionInfos->SelectedParameter1];
-//		auto& temp = selectedParameter.values;
-//		std::vector<ot::Variable> parameterValues(temp.begin(), temp.end());
-//
-//		auto dbResponse = _dataStorageAccess->GetAllDocuments(_queryString, _projectionString, 0);
-//		bool success = dbResponse.getSuccess();
-//
-//		auto resultDoc = ot::rJSON::fromJSON(dbResponse.getResult());
-//		auto allEntries = resultDoc["Documents"].GetArray();
-//
-//		BlockHandler::genericDataBlock result;
-//		ot::JSONToVariableConverter converter;
-//
-//		for (uint32_t i = 0; i < allEntries.Size(); i++)
-//		{
-//			if (!allEntries[i].IsNull())
-//			{
-//				auto arrayEntry = allEntries[i].GetObject();
-//				result[_dataConnectorName].push_back(converter(arrayEntry["Value"]));
-//				int32_t parameterIndexZeroBased = arrayEntry["P_1"].GetInt() - 1;
-//				result[_parameterConnectorName].push_back(parameterValues[parameterIndexZeroBased]);
-//			}
-//		}
-//		_output = std::move(result);
-//
-//		return _output;
-//	}
-//	else
-//	{
-//		return _output;
-//	}
-//}
+void BlockHandlerDatabaseAccess::AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)
+{
+	definition.setName(parameter.parameterAbbreviation);
+	_projectionNames.push_back(definition.getName());
+	_connectorNames.push_back(connectorName);
+}

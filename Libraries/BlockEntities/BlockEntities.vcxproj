@@ -169,6 +169,7 @@
     <ClInclude Include="include\EntityBlockPlot1D.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\PythonHeaderInterpreter.h" />
+    <ClInclude Include="include\ValueComparisionDefinition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BlockConnectionBSON.cpp" />

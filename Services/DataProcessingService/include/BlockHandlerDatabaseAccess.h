@@ -3,7 +3,8 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "Document/DocumentAccess.h"
 #include "MetadataCampaign.h"
-
+#include "MetadataParameter.h"
+#include "AdvancedQueryBuilder.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
@@ -14,14 +15,17 @@ public:
 	bool executeSpecialized() override;	
 
 private:
+	MetadataCampaign _campaignMetadata;
 	DataStorageAPI::DocumentAccess* _dataStorageAccess = nullptr;
-	genericDataBlock _output;
+	std::list< BsonViewOrValue> _comparisons;
+	std::vector<std::string> _projectionNames;
+
+	BsonViewOrValue _query;
+	BsonViewOrValue _projection;
+
 	bool _isValid = true;
-	std::string _quantityConnectorName;
-	std::string _parameterConnectorName;
+	std::vector<std::string> _connectorNames;
 
-	std::string _queryString;
-	std::string _projectionString;
-
-	const MetadataCampaign getMeasurementCampaign(EntityBlockDatabaseAccess* dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	void AddComparision(const ValueComparisionDefinition& definition);
+	void AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
 };

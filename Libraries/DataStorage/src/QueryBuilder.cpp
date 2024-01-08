@@ -105,17 +105,17 @@ namespace DataStorageAPI
 		auto arrBuilder = bsoncxx::builder::basic::array{};
 		for (auto& value : variables)
 		{
-			arrBuilder.append(value);
+			arrBuilder.append(std::move(value));
 		}
 		auto docBuilder = bsoncxx::builder::basic::document{};
 		docBuilder.append(bsoncxx::builder::basic::kvp(fieldName, arrBuilder.extract()));
 		return docBuilder.extract();
 	}
 
-	BsonViewOrValue QueryBuilder::GenerateFilterQuery(const std::string& fieldName, const BsonViewOrValue& queryEntry)
+	BsonViewOrValue QueryBuilder::GenerateFilterQuery(const std::string& fieldName, BsonViewOrValue&& queryEntry)
 	{
 		auto docBuilder = bsoncxx::builder::basic::document{};
-		docBuilder.append(kvp(fieldName, queryEntry));
+		docBuilder.append(kvp(fieldName, std::move(queryEntry)));
 		return docBuilder.extract();
 	}
 	

@@ -28,7 +28,7 @@ struct BufferBlockDatabaseAccess
 	std::list<std::string> MeasurementMetadataNames;
 	std::map<std::string, std::string> dataTypesByName;
 
-	std::map <std::string, MetadataParameter> parameters;
-	std::map <std::string, MetadataQuantity> quantities	;
+	std::map <std::string, MetadataParameter> parameterByName;
+	std::map <std::string, MetadataQuantity> quantitiesByName	;
 
 };

@@ -236,7 +236,6 @@
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
     <ClInclude Include="include\IndexManager.h" />
     <ClInclude Include="include\ProgressUpdater.h" />
-    <ClInclude Include="include\QuantityDataStorageAccess.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />
     <ClInclude Include="include\ModelNotifier.h" />

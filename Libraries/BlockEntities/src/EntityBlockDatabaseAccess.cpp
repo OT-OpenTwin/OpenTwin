@@ -1,5 +1,6 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "OTCommunication/ActionTypes.h"
+#include "EntityBlockDatabaseAccess.h"
 
 
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
@@ -29,14 +30,13 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 	_connectorsByName[connectorNameParameter1] = _connectorParameter1;
 }
 
-void EntityBlockDatabaseAccess::createProperties()
+void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& comparators)
 {
 	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList("Projectname");
 	getProperties().createProperty(projectList, "Database");
 
 	//Basic properties:
 	EntityPropertiesSelection::createProperty(_groupQuerySettings, _propertyNameDimension, { _propertyValueDimension1,_propertyValueDimension2, _propertyValueDimension3, _propertyValueDimensionCustom }, _propertyValueDimension1, "default", getProperties());
-	//EntityPropertiesSelection::createProperty(_groupQuerySettings, _msmdPropertyName, {}, "", "default", getProperties());
 
 	//Quantity Settings
 	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyNameQuantity, {}, "", "default", getProperties());
@@ -47,7 +47,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	typeLabelQuantity->setValue("");
 	getProperties().createProperty(typeLabelQuantity, _groupQuantitySetttings);
 
-	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyComparator, _comparators, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyComparator, comparators, comparators.front(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupQuantitySetttings, _propertyValueQuantity, "", "default", getProperties());
 
 	//Parameter 1 settings
@@ -58,7 +58,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	typeLabelP1->setGroup(_groupParamSettings1);
 	typeLabelP1->setValue("");
 	getProperties().createProperty(typeLabelP1, _groupParamSettings1);
-	EntityPropertiesSelection::createProperty(_groupParamSettings1, _propertyComparatorP1, _comparators, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings1, _propertyComparatorP1, comparators, comparators.front(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings1, _propertyValueP1, "", "default", getProperties());
 
 	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyNameP2, {}, "", "default", getProperties());
@@ -68,7 +68,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	typeLabelP2->setGroup(_groupParamSettings2);
 	typeLabelP2->setValue("");
 	getProperties().createProperty(typeLabelP2, _groupParamSettings2);
-	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyComparatorP2, _comparators, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyComparatorP2, comparators, comparators.front(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings2, _propertyValueP2, "", "default", getProperties());
 
 	EntityPropertiesSelection::createProperty(_groupParamSettings3, _propertyNameP3, {}, "", "default", getProperties());
@@ -78,7 +78,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	typeLabelP3->setGroup(_groupParamSettings3);
 	typeLabelP3->setValue("");
 	getProperties().createProperty(typeLabelP3, _groupParamSettings3);
-	EntityPropertiesSelection::createProperty(_groupParamSettings3, _propertyComparatorP3, _comparators, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings3, _propertyComparatorP3, comparators, comparators.front(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings3, _propertyValueP3, "", "default", getProperties());
 
 	SetVisibleParameter2(false);
@@ -101,6 +101,24 @@ std::string EntityBlockDatabaseAccess::getQueryDimension()
 	assert(outcome != nullptr);
 
 	return outcome->getValue();
+}
+
+const bool EntityBlockDatabaseAccess::isQueryDimension1D()
+{
+	std::string selectedValue = getQueryDimension();
+	return selectedValue == _propertyValueDimension1;
+}
+
+const bool EntityBlockDatabaseAccess::isQueryDimension2D()
+{
+	std::string selectedValue = getQueryDimension();
+	return selectedValue == _propertyValueDimension2;
+}
+
+const bool EntityBlockDatabaseAccess::isQueryDimension3D()
+{
+	std::string selectedValue = getQueryDimension();
+	return selectedValue == _propertyValueDimension3;
 }
 
 bool EntityBlockDatabaseAccess::SetVisibleParameter2(bool visible)
@@ -318,74 +336,66 @@ void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(bsoncxx::document::
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }
 
-const std::string& EntityBlockDatabaseAccess::getSelectedQuantityName()
+const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
 {
 	auto baseProp = getProperties().getProperty(_propertyNameQuantity);
-	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	return selectProp->getValue();
-}
+	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string name = nameProp->getValue();
 
-const std::string& EntityBlockDatabaseAccess::getQuantityQueryValue()
-{
-	auto baseProp = getProperties().getProperty(_propertyValueQuantity);
+	baseProp = getProperties().getProperty(_propertyValueQuantity);
 	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	return valueProp->getValue();
+	const std::string value = valueProp->getValue();
 
+	baseProp = getProperties().getProperty(_propertyComparator);
+	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string comparator = comparatorProp->getValue();
+	return ValueComparisionDefinition(name, comparator, value);
 }
 
-const std::string& EntityBlockDatabaseAccess::getQuantityQueryComparator()
-{
-	auto baseProp = getProperties().getProperty(_propertyComparator);
-	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	return selectProp->getValue();
-}
-
-const std::string& EntityBlockDatabaseAccess::getSelectedParameter1Name()
+const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter1Definition()
 {
 	auto baseProp = getProperties().getProperty(_propertyNameP1);
-	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	return selectProp->getValue();
-}
+	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string name = nameProp->getValue();
 
-const std::string& EntityBlockDatabaseAccess::getParameter1QueryValue()
-{
-	auto baseProp = getProperties().getProperty(_propertyValueP1);
+	baseProp = getProperties().getProperty(_propertyValueP1);
 	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	return valueProp->getValue();
+	const std::string value = valueProp->getValue();
+
+	baseProp = getProperties().getProperty(_propertyComparatorP1);
+	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string comparator = comparatorProp->getValue();
+	return ValueComparisionDefinition(name, comparator, value);
 }
 
-const std::string& EntityBlockDatabaseAccess::getParameter1QueryComparator()
+const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter2Definition()
 {
-	auto baseProp = getProperties().getProperty(_propertyComparatorP1);
-	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	return selectProp->getValue();
-}
+	auto baseProp = getProperties().getProperty(_propertyNameP2);
+	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string name = nameProp->getValue();
 
-const std::string& EntityBlockDatabaseAccess::getParameter2QueryValue()
-{
-
-	auto baseProp = getProperties().getProperty(_propertyValueP2);
+	baseProp = getProperties().getProperty(_propertyValueP2);
 	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	return valueProp->getValue();
+	const std::string value = valueProp->getValue();
+
+	baseProp = getProperties().getProperty(_propertyComparatorP2);
+	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string comparator = comparatorProp->getValue();
+	return ValueComparisionDefinition(name, comparator, value);
 }
 
-const std::string& EntityBlockDatabaseAccess::getParameter2QueryComparator()
+const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter3Definition()
 {
-	auto baseProp = getProperties().getProperty(_propertyComparatorP2);
-	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	return selectProp->getValue();
-}
+	auto baseProp = getProperties().getProperty(_propertyNameP3);
+	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string name = nameProp->getValue();
 
-const std::string& EntityBlockDatabaseAccess::getParameter3QueryValue()
-{
-	auto baseProp = getProperties().getProperty(_propertyValueP3);
+	baseProp = getProperties().getProperty(_propertyValueP3);
 	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	return valueProp->getValue();
-}
+	const std::string value = valueProp->getValue();
 
-const std::string& EntityBlockDatabaseAccess::getParameter3QueryComparator()
-{
-	auto baseProp = getProperties().getProperty(_propertyComparatorP3);
-	auto selectProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	return selectProp->getValue();
+	baseProp = getProperties().getProperty(_propertyComparatorP3);
+	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
+	const std::string comparator = comparatorProp->getValue();
+	return ValueComparisionDefinition(name, comparator, value);
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "EntityBlock.h"
-
+#include "ValueComparisionDefinition.h"
 
 class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 {
@@ -8,10 +8,18 @@ public:
 	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
 
-	void createProperties();
+	void createProperties(std::list<std::string>& comparators);
 	std::string getSelectedProjectName();
 	std::string getQueryDimension();
+
+	const bool isQueryDimension1D();
+	const bool isQueryDimension2D();
+	const bool isQueryDimension3D();
+
 	const std::string& getPropertyNameMeasurementSeries() { return _msmdPropertyName; }
+	const std::string& getPropertyValueDimension1() { return _propertyValueDimension1; }
+	const std::string& getPropertyValueDimension2() { return _propertyValueDimension2; }
+	const std::string& getPropertyValueDimension3() { return _propertyValueDimension3; }
 
 	const std::string& getPropertyNameQuantity() { return _propertyNameQuantity; }
 	const std::string& getPropertyNameParameter1() { return _propertyNameP1; }
@@ -28,22 +36,17 @@ public:
 	const std::string& getGroupParameter2() { return _groupParamSettings2; }
 	const std::string& getGroupParameter3() { return _groupParamSettings3; }
 
-	const std::string& getSelectedQuantityName();
-	const std::string& getQuantityQueryValue();
-	const std::string& getQuantityQueryComparator();
 
-	const std::string& getSelectedParameter1Name();
-	const std::string& getParameter1QueryValue();
-	const std::string& getParameter1QueryComparator();
+	const ValueComparisionDefinition getSelectedQuantityDefinition();
+	const ValueComparisionDefinition getSelectedParameter1Definition();
+	const ValueComparisionDefinition getSelectedParameter2Definition();
+	const ValueComparisionDefinition getSelectedParameter3Definition();
 
-	const std::string& getParameter2QueryValue();
-	const std::string& getParameter2QueryComparator();
-
-	const std::string& getParameter3QueryValue();
-	const std::string& getParameter3QueryComparator();
 
 	const ot::Connector getConnectorQuantity() const { return _connectorQuantity; }
 	const ot::Connector getConnectorParameter1() const { return _connectorParameter1; }
+	const ot::Connector getConnectorParameter2() const { return _connectorParameter2; }
+	const ot::Connector getConnectorParameter3() const { return _connectorParameter3; }
 
 	virtual bool updateFromProperties() override;
 
@@ -88,8 +91,6 @@ private:
 	const std::string _propertyDataTypeP3 = "P3 data type";
 	const std::string _propertyComparatorP3 = "P3 comparator";
 	const std::string _propertyValueP3 = "P3 query value";
-
-	std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", "!="," " };
 
 	ot::Connector _connectorQuantity;
 	ot::Connector _connectorParameter1;

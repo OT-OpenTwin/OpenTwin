@@ -9,7 +9,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
-
+#include "AdvancedQueryBuilder.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -148,7 +148,8 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	EntityBlockDatabaseAccess* dbaBlock = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
 	if (dbaBlock != nullptr)
 	{
-		dbaBlock->createProperties();
+		auto comparators = AdvancedQueryBuilder::getComparators();
+		dbaBlock->createProperties(comparators);
 	}
 }
 

@@ -138,9 +138,6 @@
     <ClInclude Include="include\Documentation.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\QuantityDataStorageAccess.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>

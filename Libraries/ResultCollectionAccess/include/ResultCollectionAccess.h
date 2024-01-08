@@ -18,8 +18,8 @@ class ClassFactory;
 class __declspec(dllexport) ResultCollectionAccess
 {
 public:
-	ResultCollectionAccess(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
-	ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL, ClassFactory* classFactory);
+	ResultCollectionAccess(const std::string& collectionName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
+	ResultCollectionAccess(const std::string& crossCollectionName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL, ClassFactory* classFactory);
 	virtual ~ResultCollectionAccess() {};
 
 	const std::list<std::string> ListAllSeriesNames() const;

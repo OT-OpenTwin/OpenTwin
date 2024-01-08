@@ -11,7 +11,7 @@ TEST_F(FixtureAdvancedQueryBuilder, ComparisionGreaterThan)
 	ot::Variable value(0);
 	std::string comparator = ">";
 	auto comparision = builder.CreateComparison(comparator, value);
-	auto query = builder.GenerateFilterQuery(fieldName, comparision);
+	auto query = builder.GenerateFilterQuery(fieldName, std::move(comparision));
 
 	std::vector<std::string> filter{fieldName};
 	auto select = builder.GenerateSelectQuery(filter, true);
@@ -32,7 +32,7 @@ TEST_F(FixtureAdvancedQueryBuilder, ComparisionEqual)
 	ot::Variable value(1000);
 	std::string comparator = "==";
 	auto comparision = builder.CreateComparison(comparator, value);
-	auto query = builder.GenerateFilterQuery(fieldName, comparision);
+	auto query = builder.GenerateFilterQuery(fieldName, std::move(comparision));
 
 	std::vector<std::string> filter{ fieldName };
 	auto select = builder.GenerateSelectQuery(filter, true);
@@ -54,7 +54,7 @@ TEST_F(FixtureAdvancedQueryBuilder, ComparisionNotEqual)
 	ot::Variable value(1000);
 	std::string comparator = "!=";
 	auto comparision = builder.CreateComparison(comparator, value);
-	auto query = builder.GenerateFilterQuery(fieldName, comparision);
+	auto query = builder.GenerateFilterQuery(fieldName, std::move(comparision));
 
 	std::vector<std::string> filter{ fieldName };
 	auto select = builder.GenerateSelectQuery(filter, true);
@@ -75,7 +75,7 @@ TEST_F(FixtureAdvancedQueryBuilder, ComparisionAnyOf)
 	AdvancedQueryBuilder builder;
 	std::list<ot::Variable> values{ ot::Variable(33964739625369600),ot::Variable(33964739625369604) };
 	auto comparision = builder.CreateComparisionEqualToAnyOf(values);
-	auto query = builder.GenerateFilterQuery(fieldName, comparision);
+	auto query = builder.GenerateFilterQuery(fieldName, std::move(comparision));
 
 	std::vector<std::string> filter{ fieldName };
 	auto select = builder.GenerateSelectQuery(filter, true);
@@ -95,7 +95,7 @@ TEST_F(FixtureAdvancedQueryBuilder, ComparisionNotAnyOf)
 	AdvancedQueryBuilder builder;
 	std::list<ot::Variable> values{ ot::Variable(33964739625369600),ot::Variable(33964739625369604) };
 	auto comparision = builder.CreateComparisionEqualNoneOf(values);
-	auto query = builder.GenerateFilterQuery(fieldName, comparision);
+	auto query = builder.GenerateFilterQuery(fieldName, std::move(comparision));
 
 	std::vector<std::string> filter{ fieldName };
 	auto select = builder.GenerateSelectQuery(filter, true);
