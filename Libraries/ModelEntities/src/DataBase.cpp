@@ -260,7 +260,7 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	for (auto result : results)
 	{
 		auto insertType = result["InsertType"].get_int32().value;
-		if (insertType == InsertType::Database)
+		if (InsertType(insertType) == InsertType::Database)
 		{
 			bsoncxx::builder::basic::document *doc = new bsoncxx::builder::basic::document{};
 			doc->append(bsoncxx::builder::concatenate(result));

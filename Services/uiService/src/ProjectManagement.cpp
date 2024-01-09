@@ -520,7 +520,7 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 			{
 				auto insertType = doc["InsertType"].get_int32().value;
 
-				if (insertType == InsertType::GridFS)
+				if (InsertType(insertType) == InsertType::GridFS)
 				{
 					// The data is stored in the grid fs
 
@@ -546,7 +546,7 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 					exportFile.write((const char *)&size, sizeof(size_t));
 					exportFile.write((const char *)buffer, size);
 				}
-				else if (insertType == InsertType::GridFSAsc)
+				else if (InsertType(insertType) == InsertType::GridFSAsc)
 				{
 					// The data is stored in the grid fs
 
@@ -714,7 +714,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 					bsoncxx::builder::basic::kvp("_id", objectID),
 					bsoncxx::builder::basic::kvp("EntityID", (long long)entityID),
 					bsoncxx::builder::basic::kvp("Version", (long long)entityVersion),
-					bsoncxx::builder::basic::kvp("InsertType", InsertType::GridFS),
+					bsoncxx::builder::basic::kvp("InsertType", static_cast<int32_t>(InsertType::GridFS)),
 					bsoncxx::builder::basic::kvp("FileId", result.get_oid()));
 
 				// Finally, store the document
@@ -768,7 +768,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 					bsoncxx::builder::basic::kvp("_id", objectID),
 					bsoncxx::builder::basic::kvp("EntityID", (long long)entityID),
 					bsoncxx::builder::basic::kvp("Version", (long long)entityVersion),
-					bsoncxx::builder::basic::kvp("InsertType", InsertType::GridFSAsc),
+					bsoncxx::builder::basic::kvp("InsertType", static_cast<int32_t>(InsertType::GridFSAsc)),
 					bsoncxx::builder::basic::kvp("FileId", result.get_oid()));
 
 				// Finally, store the document
