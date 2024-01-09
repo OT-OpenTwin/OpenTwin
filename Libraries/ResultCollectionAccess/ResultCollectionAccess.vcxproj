@@ -22,6 +22,7 @@
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\DigitalTwinAccessCrossCollection.h" />
     <ClInclude Include="include\AdvancedQueryBuilder.h" />
+    <ClInclude Include="include\ProjectToCollectionConverter.h" />
     <ClInclude Include="include\ResultCollectionExtender.h" />
     <ClInclude Include="include\MetadataCampaign.h" />
     <ClInclude Include="include\MetadataEntityInterface.h" />
@@ -40,6 +41,7 @@
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\DigitalTwinAccessCrossCollection.cpp" />
     <ClCompile Include="src\AdvancedQueryBuilder.cpp" />
+    <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
     <ClCompile Include="src\ResultCollectionExtender.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
     <ClCompile Include="src\MetadataEntityInterface.cpp" />

@@ -71,6 +71,9 @@
     <ClInclude Include="include\AdvancedQueryBuilder.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
+    <ClInclude Include="include\ProjectToCollectionConverter.h">
+      <Filter>include\CollectionAccess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -107,6 +110,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\AdvancedQueryBuilder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectToCollectionConverter.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

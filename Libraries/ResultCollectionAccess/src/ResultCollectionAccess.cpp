@@ -15,16 +15,25 @@ ResultCollectionAccess::ResultCollectionAccess(const std::string& projectName, o
 	LoadExistingCampaignData(classFactory);
 }
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL, ClassFactory* classFactory)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL)
 	:_dataStorageAccess("Projects", crossProjectName),_modelComponent(modelComponent)
 {
-	CrossCollectionAccess crossCollectionAccess(crossProjectName, sessionServiceURL, modelServiceURL);
+	CrossCollectionAccess crossCollectionAccess(crossProjectName, sessionServiceURL, modelComponent.serviceURL());
 	crossCollectionAccess.ConnectedWithCollection();
 	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(_modelComponent, classFactory);
 	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(_modelComponent, classFactory);
 
 	MetadataEntityInterface campaignFactory;
 	_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
+}
+
+ResultCollectionAccess::ResultCollectionAccess(ResultCollectionAccess&& other)
+	:_dataStorageAccess(std::move(other._dataStorageAccess)),_modelComponent(other._modelComponent), _metadataCampaign(std::move(other._metadataCampaign))
+{}
+
+ResultCollectionAccess ResultCollectionAccess::operator=(ResultCollectionAccess&& other)
+{
+	return ResultCollectionAccess(std::move(other));
 }
 
 const std::list<std::string> ResultCollectionAccess::ListAllSeriesNames() const

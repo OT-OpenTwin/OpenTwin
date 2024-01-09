@@ -12,6 +12,7 @@ class BlockHandler : public BusinessLogicHandler
 public:
 	using HandlerMap = std::map<std::shared_ptr<GraphNode>, std::shared_ptr<BlockHandler>>;
 	BlockHandler(const HandlerMap& allHandler);
+	virtual ~BlockHandler() {};
 	void executeOwnNode(std::shared_ptr<GraphNode> ownNode);
 	virtual void setData(genericDataBlock& data, const std::string& targetPort);	
 

@@ -19,7 +19,10 @@ class __declspec(dllexport) ResultCollectionAccess
 {
 public:
 	ResultCollectionAccess(const std::string& collectionName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
-	ResultCollectionAccess(const std::string& crossCollectionName, ot::components::ModelComponent& modelComponent, const std::string& sessionServiceURL, const std::string& modelServiceURL, ClassFactory* classFactory);
+	ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
+	ResultCollectionAccess(ResultCollectionAccess&& other);
+	ResultCollectionAccess operator=(ResultCollectionAccess&& other);
+
 	virtual ~ResultCollectionAccess() {};
 
 	const std::list<std::string> ListAllSeriesNames() const;

@@ -17,7 +17,7 @@ public:
 	MetadataCampaign operator=(const MetadataCampaign& other);
 	MetadataCampaign(MetadataCampaign&& other);
 	MetadataCampaign operator=(MetadataCampaign&& other);
-
+	~MetadataCampaign() {};
 	void AddSeriesMetadata(MetadataSeries&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
 	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadata) { _metaData[key] = metadata; }
 	const std::list<MetadataSeries>& getSeriesMetadata() const { return _seriesMetadata; };

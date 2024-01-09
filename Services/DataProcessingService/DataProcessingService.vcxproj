@@ -197,7 +197,6 @@
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\PipelineHandler.cpp" />
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
-    <ClCompile Include="src\ResultCollectionHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\ValidityHandler.cpp" />
   </ItemGroup>
@@ -216,7 +215,6 @@
     <ClInclude Include="include\GraphNode.h" />
     <ClInclude Include="include\PipelineHandler.h" />
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />
-    <ClInclude Include="include\ResultCollectionHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\ValidityHandler.h" />
   </ItemGroup>

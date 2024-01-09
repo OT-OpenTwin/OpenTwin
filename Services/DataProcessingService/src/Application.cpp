@@ -59,7 +59,6 @@ Application::~Application()
 
 // Required functions
 #include "TemplateDefaultManager.h"
-#include "ResultCollectionHandler.h"
 
 void Application::run(void)
 {
