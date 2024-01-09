@@ -23,6 +23,7 @@ namespace DataStorageAPI
 	class __declspec(dllexport) QueryBuilder
 	{
 	public:
+		virtual ~QueryBuilder() {};
 		BsonViewOrValue GenerateFilterQuery(std::map<std::string, bsoncxx::types::value> filterPairs);
 
 		BsonViewOrValue GenerateFilterQuery(const std::string& fieldName, const ot::Variable& variable);

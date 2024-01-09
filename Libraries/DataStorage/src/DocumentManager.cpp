@@ -43,7 +43,7 @@ namespace DataStorageAPI
 		else
 		{
 			DocumentAccess docAccess("Projects", collectionName);
-			jsonData.append(kvp("InsertType", InsertType::Database));
+			jsonData.append(kvp("InsertType", static_cast<int32_t>(InsertType::Database)));
 			return docAccess.InsertDocumentToDatabase(jsonData.extract(), allowQueueing);
 		}
 	}
@@ -75,7 +75,7 @@ namespace DataStorageAPI
 			/*1. Insert File Meta information.
 		    2. Insert path information into different collection*/
 			DocumentAccess projectAccess("Projects", collectionName);
-			fileMetaData.append(kvp("InsertType", InsertType::FileStorage));
+			fileMetaData.append(kvp("InsertType", static_cast<int32_t>(InsertType::FileStorage)));
 			auto metaInsertResult = projectAccess.InsertDocumentToDatabase(fileMetaData.extract(), allowQueueing);
 			if (!metaInsertResult.getSuccess())
 			{
@@ -119,7 +119,7 @@ namespace DataStorageAPI
 			auto filePath = SaveDocumentToFileStorage(source);
 
 			DocumentAccess projectAccess("Projects", collectionName);
-			fileMetaData.append(kvp("InsertType", InsertType::FileStorage));
+			fileMetaData.append(kvp("InsertType", static_cast<int32_t>(InsertType::FileStorage)));
 			auto metaInsertResult = projectAccess.InsertDocumentToDatabase(fileMetaData.extract(), allowQueueing);
 			if (!metaInsertResult.getSuccess())
 			{
@@ -184,7 +184,7 @@ namespace DataStorageAPI
 					fileMetaData.append(
 						kvp("EntityID", (long long) entityId),
 						kvp("Version", (long long) version),
-						kvp("InsertType", InsertType::GridFSAsc),
+						kvp("InsertType", static_cast<int32_t>(InsertType::GridFSAsc)),
 						kvp("FileId", result.get_oid()));
 
 					// Do not use queueing for documents which are stored outside the database
@@ -220,7 +220,7 @@ namespace DataStorageAPI
 				fileMetaData.append(
 					kvp("EntityID", (long long) entityId),
 					kvp("Version", (long long) version),
-					kvp("InsertType", InsertType::GridFS),
+					kvp("InsertType", static_cast<int32_t>(InsertType::GridFS)),
 					kvp("FileId", result.get_oid()));
 
 				// Do not use queueing for documents which are stored outside the database
@@ -266,7 +266,7 @@ namespace DataStorageAPI
 			}
 		}
 
-		jsonData.append(kvp("InsertType", InsertType::Database));
+		jsonData.append(kvp("InsertType", static_cast<int32_t>(InsertType::Database)));
 		return projectAccess.InsertDocumentToDatabase(jsonData.extract(), allowQueueing);
 
 	}
@@ -312,14 +312,14 @@ namespace DataStorageAPI
 
 			auto insertType = docView["InsertType"].get_int32().value;
 			response.setInsertType(insertType);
-			if (insertType == InsertType::Database) {
+			if (InsertType(insertType) == InsertType::Database) {
 				//std::cout << "Data Stored in Database" << std::endl;
 			}
-			else if(insertType == InsertType::FileStorage)
+			else if(InsertType(insertType) == InsertType::FileStorage)
 			{
 				assert(0); // This storage is no longer supported (and was never really supported)
 			}
-			else if (insertType == InsertType::GridFS)
+			else if (InsertType(insertType) == InsertType::GridFS)
 			{
 				// Now we need to get the document from gridFS
 
@@ -334,7 +334,7 @@ namespace DataStorageAPI
 				bsoncxx::document::value value(data, length, deleteData);
 				response.setBsonResult(value);
 			}
-			else if (insertType == InsertType::GridFSAsc)
+			else if (InsertType(insertType) == InsertType::GridFSAsc)
 			{
 				// Now we need to get the document from gridFS
 

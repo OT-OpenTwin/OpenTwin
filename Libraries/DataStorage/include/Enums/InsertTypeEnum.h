@@ -1,9 +1,11 @@
 #pragma once
-enum InsertType
+#include <stdint.h>
+
+enum class InsertType : int32_t
 {
-	FileStorage,
-	Database,
-	JsonFileStorage,
-	GridFS,
-	GridFSAsc
+	FileStorage =0,
+	Database =1,
+	JsonFileStorage = 2,
+	GridFS = 3,
+	GridFSAsc = 4
 };
