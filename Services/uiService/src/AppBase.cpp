@@ -533,6 +533,9 @@ bool AppBase::closeEvent() {
 		if (result == dialogResult::resultCancel) { return false; }
 		else if (result == dialogResult::resultYes) { m_ExternalServicesComponent->saveProject(); }
 	}
+
+	m_ExternalServicesComponent->closeProject(false);
+
 	return true;
 }
 
