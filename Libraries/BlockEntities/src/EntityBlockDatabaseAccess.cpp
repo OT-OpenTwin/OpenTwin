@@ -349,7 +349,12 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedQuantityD
 	baseProp = getProperties().getProperty(_propertyComparator);
 	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	const std::string comparator = comparatorProp->getValue();
-	return ValueComparisionDefinition(name, comparator, value);
+
+	baseProp = getProperties().getProperty(_propertyDataTypeQuantity);
+	auto typeProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	const std::string type = typeProp->getValue();
+
+	return ValueComparisionDefinition(name, comparator, value,type);
 }
 
 const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter1Definition()
@@ -365,7 +370,12 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter
 	baseProp = getProperties().getProperty(_propertyComparatorP1);
 	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	const std::string comparator = comparatorProp->getValue();
-	return ValueComparisionDefinition(name, comparator, value);
+
+	baseProp = getProperties().getProperty(_propertyDataTypeP1);
+	auto typeProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	const std::string type = typeProp->getValue();
+
+	return ValueComparisionDefinition(name, comparator, value,type);
 }
 
 const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter2Definition()
@@ -381,7 +391,12 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter
 	baseProp = getProperties().getProperty(_propertyComparatorP2);
 	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	const std::string comparator = comparatorProp->getValue();
-	return ValueComparisionDefinition(name, comparator, value);
+
+	baseProp = getProperties().getProperty(_propertyDataTypeP2);
+	auto typeProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	const std::string type = typeProp->getValue();
+
+	return ValueComparisionDefinition(name, comparator, value, type);
 }
 
 const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter3Definition()
@@ -397,5 +412,10 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter
 	baseProp = getProperties().getProperty(_propertyComparatorP3);
 	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
 	const std::string comparator = comparatorProp->getValue();
-	return ValueComparisionDefinition(name, comparator, value);
+
+	baseProp = getProperties().getProperty(_propertyDataTypeP3);
+	auto typeProp = dynamic_cast<EntityPropertiesString*>(baseProp);
+	const std::string type = typeProp->getValue();
+
+	return ValueComparisionDefinition(name, comparator, value,type);
 }

@@ -14,6 +14,8 @@
 #include "BufferResultCollectionAccess.h"
 #include "ResultDataStorageAPI.h"
 #include "QuantityContainer.h"
+#include <cctype>
+#include <algorithm>
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(handlerMap)
@@ -37,7 +39,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
 	const auto selectedQuantity = resultCollectionAccess->FindMetadataQuantity(quantityDef.getName());
 	
-	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(selectedQuantity->quantityIndex));
+	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(selectedQuantity->quantityIndex),ot::TypeNames::getInt64TypeName());
 	AddComparision(selectedQuantityDef);
 	
 	//Now we add a comparision for the searched quantity value.
@@ -127,10 +129,50 @@ void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition
 	const std::string& name = definition.getName();
 	const std::string& valueStr = definition.getValue();
 	const std::string& comparator = definition.getComparator();
+	const std::string& type = definition.getType();
 
-	ot::Variable value = converter(valueStr);
 
-	auto compare = builder.CreateComparison(comparator, value);
+	std::unique_ptr<ot::Variable> value;
+	if (type == ot::TypeNames::getBoolTypeName())
+	{
+		std::string boolString = valueStr;
+		std::transform(boolString.begin(), boolString.end(), boolString.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+		if (boolString == "true")
+		{
+			value.reset(new ot::Variable(true));
+		}
+		else if (boolString == "false")
+		{
+			value.reset(new ot::Variable(false));
+		}
+		else
+		{
+			throw std::invalid_argument("Boolean value expected (true or false).");
+		}
+	}
+	else if (type == ot::TypeNames::getStringTypeName())
+	{
+		value.reset(new ot::Variable(valueStr));
+	}
+	else if (type == ot::TypeNames::getDoubleTypeName())
+	{
+		value.reset(new ot::Variable(std::stod(valueStr)));
+	}
+	else if (type == ot::TypeNames::getFloatTypeName())
+	{
+		value.reset(new ot::Variable(std::stof(valueStr)));
+	}
+	else if (type == ot::TypeNames::getInt32TypeName())
+	{
+		value.reset(new ot::Variable(std::stoi(valueStr)));
+	}
+	else if (type == ot::TypeNames::getInt64TypeName())
+	{
+		value.reset(new ot::Variable(std::stoll(valueStr)));
+	}
+	
+	auto compare = builder.CreateComparison(comparator, *value);
 	_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
 }
 
