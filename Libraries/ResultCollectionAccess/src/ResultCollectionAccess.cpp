@@ -9,18 +9,18 @@
 #include "EntityMetadataCampaign.h"
 #include "EntityMetadataSeries.h"
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& collectionName, ot::components::ModelComponent& modelComponent, ClassFactory *classFactory)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory *classFactory)
 	:_dataStorageAccess("Projects", collectionName), _modelComponent(modelComponent), _collectionName(collectionName)
 {
 	LoadExistingCampaignData(classFactory);
 }
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& crossCollectionName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL)
 	:_dataStorageAccess("Projects", crossCollectionName),_modelComponent(modelComponent), _collectionName(crossCollectionName)
 {
-	CrossCollectionAccess crossCollectionAccess(crossCollectionName, sessionServiceURL, modelComponent.serviceURL());
-	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(_modelComponent, classFactory);
-	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(_modelComponent, classFactory);
+	CrossCollectionAccess crossCollectionAccess(crossCollectionName, sessionServiceURL, modelComponent->serviceURL());
+	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent, classFactory);
+	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent, classFactory);
 
 	MetadataEntityInterface campaignFactory;
 	_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
@@ -31,9 +31,13 @@ ResultCollectionAccess::ResultCollectionAccess(ResultCollectionAccess&& other)
 	:_dataStorageAccess(std::move(other._dataStorageAccess)),_modelComponent(other._modelComponent), _metadataCampaign(std::move(other._metadataCampaign)), _collectionName(other._collectionName)
 {}
 
-ResultCollectionAccess ResultCollectionAccess::operator=(ResultCollectionAccess&& other)
+ResultCollectionAccess& ResultCollectionAccess::operator=(ResultCollectionAccess&& other) noexcept
 {
-	return ResultCollectionAccess(std::move(other));
+	_collectionName = std::move(other._collectionName);
+	_dataStorageAccess = std::move(other._dataStorageAccess);
+	_modelComponent = std::move(other._modelComponent);
+	_metadataCampaign = (std::move(other._metadataCampaign));
+	return *this;
 }
 
 const std::list<std::string> ResultCollectionAccess::ListAllSeriesNames() const
@@ -141,9 +145,9 @@ void ResultCollectionAccess::LoadExistingCampaignData(ClassFactory* classFactory
 
 std::vector<EntityBase*> ResultCollectionAccess::FindAllExistingMetadata(ClassFactory *classFactory)
 {
-	std::list<std::string> allExistingMetadataNames = _modelComponent.getListOfFolderItems(ot::FolderNames::DatasetFolder);
+	std::list<std::string> allExistingMetadataNames = _modelComponent->getListOfFolderItems(ot::FolderNames::DatasetFolder);
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent.getEntityInformation(allExistingMetadataNames, entityInfos);
+	_modelComponent->getEntityInformation(allExistingMetadataNames, entityInfos);
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
 	for (auto& entityInfo : entityInfos)
 	{
@@ -155,7 +159,7 @@ std::vector<EntityBase*> ResultCollectionAccess::FindAllExistingMetadata(ClassFa
 	allExistingMetadata.reserve(entityInfos.size());
 	for (auto& entityInfo : entityInfos)
 	{
-		allExistingMetadata.push_back(_modelComponent.readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory));
+		allExistingMetadata.push_back(_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory));
 	}
 	
 	return allExistingMetadata;

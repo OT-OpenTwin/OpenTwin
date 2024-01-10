@@ -19,16 +19,19 @@ QuantityContainer::QuantityContainer(int64_t seriesIndex, std::list<std::string>
 
 }
 
-QuantityContainer::QuantityContainer(QuantityContainer&& other)
+QuantityContainer::QuantityContainer(QuantityContainer&& other) noexcept
+: _values(std::move(other._values)), _mongoDocument (std::move(other._mongoDocument))
 {
-	_values = std::move(other._values);
-	_mongoDocument = std::move(other._mongoDocument);
+	
+	
 }
 
 
-QuantityContainer QuantityContainer::operator=(QuantityContainer&& other)
+QuantityContainer& QuantityContainer::operator=(QuantityContainer&& other)
 {
-	return QuantityContainer(std::move(other));
+	_values = std::move(other._values);
+	_mongoDocument = std::move(other._mongoDocument);
+	return *this;
 }
 
 QuantityContainer::~QuantityContainer()

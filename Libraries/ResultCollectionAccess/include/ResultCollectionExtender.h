@@ -15,7 +15,7 @@ class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionAc
 public:
 	ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& ownerServiceName);
 	ResultCollectionExtender(const ResultCollectionExtender& other) = delete;
-	ResultCollectionExtender operator=(const ResultCollectionExtender& other) = delete;
+	ResultCollectionExtender& operator=(const ResultCollectionExtender& other) = delete;
 	~ResultCollectionExtender();
 	
 	void AddSeries(MetadataSeries&& series);

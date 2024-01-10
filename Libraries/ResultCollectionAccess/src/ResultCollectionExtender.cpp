@@ -6,7 +6,7 @@
 #include "MetadataEntityInterface.h"
 
 ResultCollectionExtender::ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& ownerServiceName)
-	:ResultCollectionAccess(projectName,modelComponent,classFactory), _requiresUpdateMetadataCampaign(false), _ownerServiceName(ownerServiceName)
+	:ResultCollectionAccess(projectName,&modelComponent,classFactory), _requiresUpdateMetadataCampaign(false), _ownerServiceName(ownerServiceName)
 {
 	_quantityContainer.reserve(_bufferSize);
 }
@@ -121,15 +121,15 @@ void ResultCollectionExtender::StoreCampaignChanges()
 	MetadataEntityInterface entityCreator(_ownerServiceName);
 	if (_requiresUpdateMetadataCampaign && _seriesMetadataForStorage.size() != 0)
 	{
-		entityCreator.StoreCampaign(_modelComponent, _metadataCampaign, _seriesMetadataForStorage);
+		entityCreator.StoreCampaign(*_modelComponent, _metadataCampaign, _seriesMetadataForStorage);
 	}
 	else if (_requiresUpdateMetadataCampaign)
 	{
-		entityCreator.StoreCampaign(_modelComponent, _metadataCampaign);
+		entityCreator.StoreCampaign(*_modelComponent, _metadataCampaign);
 	}
 	else if (_seriesMetadataForStorage.size() != 0)
 	{
-		entityCreator.StoreCampaign(_modelComponent, _seriesMetadataForStorage);
+		entityCreator.StoreCampaign(*_modelComponent, _seriesMetadataForStorage);
 	}
 }
 
@@ -164,17 +164,17 @@ void ResultCollectionExtender::AddQuantityContainer(uint64_t seriesIndex, std::l
 
 const uint64_t ResultCollectionExtender::FindNextFreeSeriesIndex()
 {
-	return _modelComponent.createEntityUID();
+	return _modelComponent->createEntityUID();
 }
 
 const uint64_t ResultCollectionExtender::FindNextFreeQuantityIndex()
 {
-	return _modelComponent.createEntityUID();
+	return _modelComponent->createEntityUID();
 }
 
 const uint64_t ResultCollectionExtender::FindNextFreeParameterIndex()
 {
-	return _modelComponent.createEntityUID();
+	return _modelComponent->createEntityUID();
 }
 
 void ResultCollectionExtender::FlushQuantityContainer()

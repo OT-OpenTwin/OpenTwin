@@ -24,11 +24,11 @@ const std::shared_ptr<ResultCollectionAccess> BufferResultCollectionAccess::getR
 		std::shared_ptr<ResultCollectionAccess> newResultCollectionAccess;
 		if (thisProjectsName == projectName)
 		{
-			newResultCollectionAccess.reset(new ResultCollectionAccess(collectionName, *_modelComponent, &classFactory));
+			newResultCollectionAccess.reset(new ResultCollectionAccess(collectionName, _modelComponent, &classFactory));
 		}
 		else //Crosscollection access
 		{
-			newResultCollectionAccess.reset(new ResultCollectionAccess(collectionName, *_modelComponent, &classFactory, sessionServiceURL));
+			newResultCollectionAccess.reset(new ResultCollectionAccess(collectionName, _modelComponent, &classFactory, sessionServiceURL));
 		}
 		const auto temp = std::make_pair<>(projectName,newResultCollectionAccess);
 		_resultCollectionAccessByProjectName.insert(temp);
