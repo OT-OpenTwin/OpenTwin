@@ -27,6 +27,6 @@ private:
 	inline static const std::string _anyOfComparator = "not any of";
 	inline static const std::string _noneOfComparator = "any of";
 	inline static const std::list<std::string> _comparators = { "<", "<=", "=", ">", ">=", "!=", _anyOfComparator, _noneOfComparator };;
-	inline static const std::map<std::string, std::string> _mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"==","$eq"}, {"!=", "$ne"}, {_anyOfComparator,"$in"}, {_noneOfComparator,"$nin"} };;
+	inline static const std::map<std::string, std::string> _mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"=","$eq"}, {"!=", "$ne"}, {_anyOfComparator,"$in"}, {_noneOfComparator,"$nin"} };;
 
 };

@@ -7,22 +7,21 @@
 #include "OTCore/StringToVariableConverter.h"
 
 #include "ValueComparisionDefinition.h"
-#include "PropertyHandlerDatabaseAccessBlock.h"
+
 #include "ResultCollectionAccess.h"
 #include "ProjectToCollectionConverter.h"
 #include "DataBase.h"
 #include "BufferResultCollectionAccess.h"
 #include "ResultDataStorageAPI.h"
+#include "QuantityContainer.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(handlerMap)
 {
 	//First get a handle of the selected project.
 	std::shared_ptr<ResultCollectionAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
+	
 
-	const auto& buffer = PropertyHandlerDatabaseAccessBlock::instance().getBuffer(blockEntity->getEntityID());
-	const auto& parameterByName = buffer.parameterByName;
-	const auto& quantityByName = buffer.quantitiesByName;
 
 	const std::string dbURL = "Projects";
 	_dataStorageAccess = new DataStorageAPI::ResultDataStorageAPI(dbURL, resultCollectionAccess->getCollectionName());
@@ -33,19 +32,27 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	_connectorNames.reserve(4);
 		
 	//Now build a query depending on the selections made in the BlockEntity
+	//First the quantity is selected. Its value is not projected.
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
-	const auto& selectedQuantity = quantityByName.find(quantityDef.getName())->second;
-	quantityDef.setName(selectedQuantity.quantityAbbreviation);
+	const auto selectedQuantity = resultCollectionAccess->FindMetadataQuantity(quantityDef.getName());
+	
+	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(selectedQuantity->quantityIndex));
+	AddComparision(selectedQuantityDef);
+	
+	//Now we add a comparision for the searched quantity value.
+	quantityDef.setName(QuantityContainer::getFieldName());
 	_projectionNames.push_back(quantityDef.getName());
-		
-	//The data pipeline works on the connector names. Thus we do here mapping from the document field name to the connector name.
+	AddComparision(quantityDef);
+
+	//Next are the parameter. A 2D plot requires two variables, thus at least one parameter has to be defined.
 	const std::string quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
 	_connectorNames.push_back(quantityConnectorName);
 		
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
-	AddParameter(param1Def, parameterByName.find(param1Def.getName())->second, parameterConnectorName);
+	const auto parameter1 =	resultCollectionAccess->FindMetadataParameter(param1Def.getName());
+	AddParameter(param1Def, *parameter1, parameterConnectorName);
 	AddComparision(param1Def);
 
 	const bool queryDimensionIs3D = blockEntity->isQueryDimension3D();
@@ -55,14 +62,16 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
-		AddParameter(param2Def, parameterByName.find(param2Def.getName())->second, param2ConnectorName);
+		const auto parameter = resultCollectionAccess->FindMetadataParameter(param2Def.getName());
+		AddParameter(param2Def, *parameter, param2ConnectorName);
 		AddComparision(param2Def);
 	}
 	if (queryDimensionIs3D)
 	{	
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
-		AddParameter(param3Def, parameterByName.find(param3Def.getName())->second, param3ConnectorName);
+		const auto parameter = resultCollectionAccess->FindMetadataParameter(param3Def.getName());
+		AddParameter(param3Def, *parameter, param3ConnectorName);
 		AddComparision(param3Def);
 	}
 	_projectionNames.shrink_to_fit();
@@ -92,13 +101,16 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		ot::JsonDocument doc;
 		doc.fromJson(queryResponse);
 		auto allEntries = doc["Documents"].GetArray();
-		for (uint32_t i = 0; i< allEntries.Size();i++)
+		const uint32_t numberOfDocuments = allEntries.Size();
+		for (uint32_t i = 0; i< numberOfDocuments;i++)
 		{
-			auto projectedValues = allEntries[i].GetArray();
-			for (uint32_t j = 0; j < projectedValues.Size(); j++)
-			{
-				ot::Variable value = converter(projectedValues[j]);
-				const std::string connectorName = _connectorNames[j];
+			auto projectedValues = allEntries[i].GetObject();
+			uint32_t count(0);
+			for (std::string projectionName : _projectionNames)
+			{			
+				ot::Variable value = converter(projectedValues[projectionName.c_str()]);
+				const std::string connectorName = _connectorNames[count];
+				count++;
 				_dataPerPort[connectorName].push_back(value);
 			}
 		}
