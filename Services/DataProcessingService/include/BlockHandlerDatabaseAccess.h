@@ -5,6 +5,7 @@
 #include "MetadataCampaign.h"
 #include "MetadataParameter.h"
 #include "AdvancedQueryBuilder.h"
+#include "ResultDataStorageAPI.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
@@ -16,7 +17,7 @@ public:
 
 private:
 	MetadataCampaign _campaignMetadata;
-	DataStorageAPI::DocumentAccess* _dataStorageAccess = nullptr;
+	DataStorageAPI::ResultDataStorageAPI* _dataStorageAccess = nullptr;
 	std::list< BsonViewOrValue> _comparisons;
 	std::vector<std::string> _projectionNames;
 

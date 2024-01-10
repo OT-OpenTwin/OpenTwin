@@ -77,6 +77,7 @@ void Application::run(void)
 #include "EntityCoordinates2D.h"
 #include "DataBase.h"
 #include "ResultCollectionAccess.h"
+#include "BufferResultCollectionAccess.h"
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
@@ -191,7 +192,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	_blockEntityHandler.setModelComponent(_model);
 	_pipelineHandler.setModelComponent(_model);
-	
+	BufferResultCollectionAccess::INSTANCE().setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

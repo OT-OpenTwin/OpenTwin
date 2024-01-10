@@ -1126,7 +1126,6 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION)
 		{
-			std::string projectName = ot::json::getString(doc, OT_ACTION_PARAM_PROJECT_NAME);
 			std::string	collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
 			std::string folder = ot::json::getString(doc, OT_ACTION_PARAM_Folder);
 			std::string className = ot::json::getString(doc, OT_ACTION_PARAM_Type);

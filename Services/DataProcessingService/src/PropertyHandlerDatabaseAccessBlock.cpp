@@ -7,6 +7,9 @@
 #include "ClassFactory.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "Application.h"
+#include "DataBase.h"
+
+#include "BufferResultCollectionAccess.h"
 #include "ResultCollectionAccess.h"
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
@@ -60,12 +63,13 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 	}
 }
 
+
+
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-	const std::string projectName = dbAccessEntity->getSelectedProjectName();
-	//ResultCollectionAccess access(projectName, *_modelComponent, sessionServiceURL, modelServiceURL, &Application::instance()->getClassFactory());
-	MetadataCampaign campaign;
-	UpdateBuffer(dbAccessEntity, campaign);
+	std::shared_ptr<ResultCollectionAccess>resultCollectionAccess =	BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(dbAccessEntity.get());
+	
+	UpdateBuffer(dbAccessEntity, resultCollectionAccess->getMetadataCampaign());
 
 	const std::string propertyNameMSMD = dbAccessEntity->getPropertyNameMeasurementSeries();
 	

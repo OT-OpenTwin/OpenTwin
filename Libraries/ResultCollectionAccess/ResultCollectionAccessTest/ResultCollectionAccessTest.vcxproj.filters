@@ -24,6 +24,9 @@
     <ClCompile Include="src\FixtureAdvancedQueryBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestResultCollectionAccess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureResultCollectionExtender.h">

@@ -18,11 +18,14 @@ public:
 		return INSTANCE;
 	}
 
-	BufferBlockDatabaseAccess& getBuffer(ot::UID id) { return _bufferedInformation[id];}
+	BufferBlockDatabaseAccess& getBuffer(ot::UID blockEntityID) { return _bufferedInformation[blockEntityID];}
 	void PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity,const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	
+
 private:
 	std::map<ot::UID, BufferBlockDatabaseAccess> _bufferedInformation;
 	
+
 	EntityProperties UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
 	EntityProperties UpdateSelectionProperties(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity);
 

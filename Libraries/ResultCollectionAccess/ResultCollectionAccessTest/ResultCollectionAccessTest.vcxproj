@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="src\FixtureAdvancedQueryBuilder.cpp" />
     <ClCompile Include="src\FixtureResultCollectionExtender.cpp" />
+    <ClCompile Include="src\TestResultCollectionAccess.cpp" />
     <ClCompile Include="src\TestsQueries.cpp" />
   </ItemGroup>
   <ItemGroup>

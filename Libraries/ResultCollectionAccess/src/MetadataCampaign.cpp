@@ -16,15 +16,25 @@ MetadataCampaign::MetadataCampaign(const MetadataCampaign& other)
 	_campaignName(other._campaignName)
 {}
 
-MetadataCampaign MetadataCampaign::operator=(MetadataCampaign&& other)
+MetadataCampaign& MetadataCampaign::operator=(MetadataCampaign&& other)
 {
-	return MetadataCampaign(std::move(other));
+	_seriesMetadata = std::move(other._seriesMetadata);
+	_quantityOverviewByName = std::move(other._quantityOverviewByName);
+	_parameterOverviewByName = std::move(other._parameterOverviewByName);
+	_metaData = std::move(other._metaData);
+	_campaignName = std::move(other._campaignName);
+	return *this;
 }
 
-MetadataCampaign MetadataCampaign::operator=(const MetadataCampaign& other)
-{
-	return MetadataCampaign(other);
-}
+//MetadataCampaign& MetadataCampaign::operator=(const MetadataCampaign& other)
+//{
+//	_seriesMetadata = other._seriesMetadata;
+//	_quantityOverviewByName = other._quantityOverviewByName;
+//	_parameterOverviewByName = other._parameterOverviewByName;
+//	_metaData = other._metaData;
+//	_campaignName = other._campaignName;
+//	return *this;
+//}
 
 
 void MetadataCampaign::UpdateMetadataOverview()

@@ -20,19 +20,14 @@ class ClassFactory;
 class __declspec(dllexport) CrossCollectionAccess
 {
 public:
-	CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	CrossCollectionAccess(const std::string& collectionName, const std::string& sessionServiceURL, const std::string& modelServiceURL);
 	std::list<std::shared_ptr<EntityMetadataSeries>> getMeasurementMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
 	std::shared_ptr<EntityMetadataCampaign> getMeasurementCampaignMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory);
 
-	bool ConnectedWithCollection() { return _collectionName != ""; }
 private:
-	std::string _projectName = "";
-	std::string _collectionName = "";
-	std::string _modelServiceURL = "";
-	std::string InquireAuthorisationURL(const std::string& sessionServiceURL);
-	void InquireProjectCollection(const std::string& authorisationURL);
+	std::string _collectionName;
+	std::string _modelServiceURL;
 	std::pair<ot::UIDList,ot::UIDList> InquireMetadataEntityIdentifier(const std::string& className);
-
 };
 
 class DataBaseWrapper

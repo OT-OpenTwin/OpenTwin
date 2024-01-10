@@ -9,26 +9,26 @@
 #include "EntityMetadataCampaign.h"
 #include "EntityMetadataSeries.h"
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory *classFactory)
-	:_dataStorageAccess("Projects",projectName), _modelComponent(modelComponent)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& collectionName, ot::components::ModelComponent& modelComponent, ClassFactory *classFactory)
+	:_dataStorageAccess("Projects", collectionName), _modelComponent(modelComponent), _collectionName(collectionName)
 {
 	LoadExistingCampaignData(classFactory);
 }
 
-ResultCollectionAccess::ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL)
-	:_dataStorageAccess("Projects", crossProjectName),_modelComponent(modelComponent)
+ResultCollectionAccess::ResultCollectionAccess(const std::string& crossCollectionName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL)
+	:_dataStorageAccess("Projects", crossCollectionName),_modelComponent(modelComponent), _collectionName(crossCollectionName)
 {
-	CrossCollectionAccess crossCollectionAccess(crossProjectName, sessionServiceURL, modelComponent.serviceURL());
-	crossCollectionAccess.ConnectedWithCollection();
+	CrossCollectionAccess crossCollectionAccess(crossCollectionName, sessionServiceURL, modelComponent.serviceURL());
 	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(_modelComponent, classFactory);
 	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(_modelComponent, classFactory);
 
 	MetadataEntityInterface campaignFactory;
 	_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
+	
 }
 
 ResultCollectionAccess::ResultCollectionAccess(ResultCollectionAccess&& other)
-	:_dataStorageAccess(std::move(other._dataStorageAccess)),_modelComponent(other._modelComponent), _metadataCampaign(std::move(other._metadataCampaign))
+	:_dataStorageAccess(std::move(other._dataStorageAccess)),_modelComponent(other._modelComponent), _metadataCampaign(std::move(other._metadataCampaign)), _collectionName(other._collectionName)
 {}
 
 ResultCollectionAccess ResultCollectionAccess::operator=(ResultCollectionAccess&& other)

@@ -10,12 +10,9 @@
 class ClassFactory;
 
 
-CrossCollectionAccess::CrossCollectionAccess(const std::string& projectName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
-	:_projectName(projectName), _modelServiceURL(modelServiceURL)
-{
-	std::string authorisationURL =	InquireAuthorisationURL(sessionServiceURL);
-	InquireProjectCollection(authorisationURL);
-}
+CrossCollectionAccess::CrossCollectionAccess(const std::string& collectionName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
+	:_collectionName(collectionName), _modelServiceURL(modelServiceURL)
+{}
 
 std::list<std::shared_ptr<EntityMetadataSeries>> CrossCollectionAccess::getMeasurementMetadata(ot::components::ModelComponent& modelComponent, ClassFactory* classFactory)
 {
@@ -62,50 +59,10 @@ std::shared_ptr<EntityMetadataCampaign>  CrossCollectionAccess::getMeasurementCa
 	}
 }
 
-std::string CrossCollectionAccess::InquireAuthorisationURL(const std::string& sessionServiceURL)
-{
-	ot::JsonDocument docLSS;
-	docLSS.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetAuthorisationServerUrl, docLSS.GetAllocator()), docLSS.GetAllocator());
-	std::string autorisationURL;
-	if (!ot::msg::send("", sessionServiceURL, ot::EXECUTE, docLSS.toJson(), autorisationURL))
-	{
-		throw std::exception("Timeout for requesting the session service.");
-	}
-	return autorisationURL;
-}
-
-void CrossCollectionAccess::InquireProjectCollection(const std::string& authorisationURL)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(_projectName, doc.GetAllocator()), doc.GetAllocator());
-	
-	std::string response;
-	if (!ot::msg::send("", authorisationURL, ot::EXECUTE, doc.toJson(), response))
-	{
-		throw std::exception("Timeout for requesting the authorisation service.");
-	}
-	
-	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (responseMessage == ot::ReturnMessage::Failed)
-	{
-		_collectionName = "";
-	}
-	else
-	{
-		ot::JsonDocument responseDoc;
-		responseDoc.fromJson(responseMessage.getWhat());
-		_collectionName = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
-	}
-}
-
 std::pair<ot::UIDList, ot::UIDList> CrossCollectionAccess::InquireMetadataEntityIdentifier(const std::string& className)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(_projectName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(_collectionName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(ot::FolderNames::DatasetFolder, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString(className, doc.GetAllocator()), doc.GetAllocator());

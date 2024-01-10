@@ -15,9 +15,6 @@
     <Filter Include="Header Files\BlockFunctionality">
       <UniqueIdentifier>{89e29ce9-6af8-450f-8a78-e27680275438}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Blocks">
-      <UniqueIdentifier>{bf16a846-2f75-44b8-9ca9-c6a41bf17c4f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -27,6 +24,9 @@
     </Filter>
     <Filter Include="Source Files\GraphHandling">
       <UniqueIdentifier>{c098a613-e070-4648-b5cf-0856a45e3436}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Buffer">
+      <UniqueIdentifier>{6f7eba01-17fb-4ea8-9fc6-58a19a1fbb3a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +78,9 @@
     <ClCompile Include="src\BlockHandlerPython.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BufferResultCollectionAccess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -107,9 +110,6 @@
     <ClInclude Include="include\ExternalDependencies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\BufferBlockDatabaseAccess.h">
-      <Filter>Header Files\Blocks</Filter>
-    </ClInclude>
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -127,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="include\BlockHandlerPython.h">
       <Filter>Header Files\BlockFunctionality</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BufferBlockDatabaseAccess.h">
+      <Filter>Header Files\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BufferResultCollectionAccess.h">
+      <Filter>Header Files\Buffer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

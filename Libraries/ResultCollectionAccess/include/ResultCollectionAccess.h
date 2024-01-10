@@ -34,8 +34,10 @@ public:
 	const MetadataQuantity* FindMetadataQuantity(const std::string& name);
 
 	const MetadataCampaign& getMetadataCampaign() const { return _metadataCampaign; }
-	//ToDo: Query Methode
+
+	const std::string& getCollectionName() const { return _collectionName; }
 protected:
+	const std::string _collectionName;
 	ot::components::ModelComponent& _modelComponent;
 	DataStorageAPI::ResultDataStorageAPI _dataStorageAccess;
 	MetadataCampaign _metadataCampaign;
