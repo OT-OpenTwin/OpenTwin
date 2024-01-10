@@ -541,9 +541,17 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 		return "Unable to open the export file for writing (" + std::string(e.what()) + ")";
 	}
 
-	size_t fileVersion = 1;
+	size_t fileVersion = 2;
 	exportFile.write((const char *)&fileVersion, sizeof(size_t));
 
+	// In export file version 2, we also export the project type
+	std::string projectType = getProjectType(projectName);
+
+	size_t numberCharacters = projectType.size();
+	exportFile.write((const char*) &numberCharacters, sizeof(size_t));
+	exportFile.write((const char*)projectType.c_str(), numberCharacters);
+
+	// Write the number of data documents
 	size_t numberDocuments = collection.count_documents({});
 	exportFile.write((const char *)&numberDocuments, sizeof(size_t));
 
@@ -655,17 +663,6 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 
 std::string ProjectManagement::importProject(const std::string &projectName, const std::string &userName, const std::string &importFileName, AppBase *parent)
 {
-	std::string projectType = "Development";
-
-	if (!createProject(projectName, projectType, userName, std::string(""))) return "Unable to create the new project: " + projectName;
-
-	// Now get the collection
-	// Get the project collection
-	std::string collectionName = getProjectCollection(projectName);
-	if (collectionName.empty()) return "Unable to determine the project data location for import";  // The collection name could not be found, so we cannot continue
-
-	auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName);
-
 	// Open the import file
 	std::ifstream importFile;
 
@@ -682,7 +679,33 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 	{
 		size_t fileVersion = 0;
 		importFile.read((char *)&fileVersion, sizeof(size_t));
-		if (fileVersion != 1) return "Wrong file version of the import data file: " + std::to_string(fileVersion) + " (only supported up to 1)";
+		if (fileVersion > 2) return "Wrong file version of the import data file: " + std::to_string(fileVersion) + " (only supported up to 1)";
+
+		std::string projectType = OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT;
+
+		if (fileVersion >= 2)
+		{
+			// Read the project type from the data file
+			size_t numberCharacters = 0;
+			importFile.read((char*)&numberCharacters, sizeof(size_t));
+
+			char* buffer = new char[numberCharacters + 1];
+			importFile.read(buffer, numberCharacters);
+			buffer[numberCharacters] = 0;
+
+			projectType = buffer;
+		}
+
+		if (!createProject(projectName, projectType, userName, std::string(""))) return "Unable to create the new project: " + projectName;
+
+		// Now get the collection
+		// Get the project collection
+		std::string collectionName = getProjectCollection(projectName);
+		if (collectionName.empty()) return "Unable to determine the project data location for import";  // The collection name could not be found, so we cannot continue
+
+		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName);
+	
+		// Import the data from the file
 
 		size_t numberDocuments = collection.count_documents({});
 		importFile.read((char *)&numberDocuments, sizeof(size_t));
