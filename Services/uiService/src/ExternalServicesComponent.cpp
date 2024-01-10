@@ -3311,7 +3311,81 @@ void ExternalServicesComponent::activateVersion(const std::string &version)
 
 // Project handling
 
-void ExternalServicesComponent::openProject(const std::string & projectName, const std::string & collectionName) {
+std::list<std::string> ExternalServicesComponent::getListOfProjectTypes(void)
+{
+	std::list<std::string> projectTypes;
+
+	AppBase* app{ AppBase::instance() };
+	std::string response;
+
+#ifdef OT_USE_GSS
+	// Request a session service from the global session service
+	ot::JsonDocument gssDoc;
+	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
+
+	if (!sendHttpRequest(EXECUTE, m_globalSessionServiceURL, gssDoc.toJson(), response)) {
+		assert(0); // Failed to send
+		OT_LOG_E("Failed to send \"Create new session\" request to the global session service");
+		app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
+		return projectTypes;
+	}
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		assert(0); // ERROR
+		OT_LOG_E(response);
+		app->showErrorPrompt(response.c_str(), "Error");
+		return projectTypes;
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		assert(0); // WARNING
+		OT_LOG_W(response);
+		app->showWarningPrompt(response.c_str(), "Warning");
+		return projectTypes;
+	}
+	m_sessionServiceURL = response;
+
+	OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
+#endif
+
+	ot::JsonDocument sessionDoc;
+	sessionDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetListOfProjectTypes, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+
+	// Add user credentials
+	sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+	sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+
+	response.clear();
+
+	if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {
+		assert(0); // Failed to send
+		OT_LOG_E("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
+		app->showErrorPrompt("Failed to send http request to Local Session Service", "Connection Error");
+		return projectTypes;
+	}
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		assert(0); // ERROR
+		OT_LOG_E("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
+		app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+		return projectTypes;
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		assert(0); // WARNING
+		OT_LOG_W("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
+		app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+		return projectTypes;
+	}
+
+	// Check response
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+
+	projectTypes = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_SESSION_TYPE_LIST);
+
+	return projectTypes;
+}
+
+void ExternalServicesComponent::openProject(const std::string & projectName, const std::string& projectType, const std::string & collectionName) {
 
 	AppBase * app{ AppBase::instance() };
 
@@ -3373,7 +3447,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 		// Add session information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString("Default", sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(projectType, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add service information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());

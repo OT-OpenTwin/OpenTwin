@@ -152,6 +152,7 @@ private:
 	OT_HANDLER(handleGetDBURL, SessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES);
 	OT_HANDLER(handleGetAuthURL, SessionService, OT_ACTION_CMD_GetAuthorisationServerUrl, ot::ALL_MESSAGE_TYPES);
 	OT_HANDLER(handleGetDBAndAuthURL, SessionService, OT_ACTION_CMD_GetDBandAuthServerUrl, ot::ALL_MESSAGE_TYPES);
+	OT_HANDLER(handleGetProjectTypes, SessionService, OT_ACTION_CMD_GetListOfProjectTypes, ot::ALL_MESSAGE_TYPES);
 
 	OT_HANDLER(handleGetMandatoryServices, SessionService, OT_ACTION_CMD_GetMandatoryServices, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleSessionDebugLogOn, SessionService, OT_ACTION_CMD_SessionDebugLogOn, ot::SECURE_MESSAGE_TYPES);

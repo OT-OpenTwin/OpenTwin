@@ -28,6 +28,7 @@
 #define OT_ACTION_CMD_StartNewServices "Service.Start.Multiple"
 #define OT_ACTION_CMD_StartNewRelayService "Service.Start.Relay"
 #define OT_ACTION_CMD_CreateNewSession "Session.New"
+#define OT_ACTION_CMD_GetListOfProjectTypes "Session.GetTypes"
 #define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
 #define OT_ACTION_CMD_SendBroadcastMessage "Broadcast"
 #define OT_ACTION_CMD_RegisterNewSessionService "SessionService.New"
@@ -318,8 +319,13 @@
 
 #define OT_ACTION_PARAM_SESSION_ID "Session.ID"
 #define OT_ACTION_PARAM_SESSION_TYPE "Session.Type"
+#define OT_ACTION_PARAM_SESSION_TYPE_LIST "Session.TypeList"
 #define OT_ACTION_PARAM_SESSION_SERVICES "Session.Services"
 #define OT_ACTION_PARAM_SESSION_EXISTS "Session.Exists"
+
+#define OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "Development"
+#define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"
+#define OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE "Data Pipeline"
 
 #define OT_ACTION_PARAM_SITE_ID "Site.ID"
 #define OT_ACTION_PARAM_SESSION_SERVICE_URL "SessionService.URL"
@@ -668,6 +674,7 @@
 #define OT_PARAM_AUTH_PROJECT_FILTER "ProjectFilter"
 #define OT_PARAM_AUTH_PROJECT_LIMIT "ProjectLimit"
 #define OT_PARAM_AUTH_PROJECT_COLLECTION "collectionName"
+#define OT_PARAM_AUTH_PROJECT_TYPE "ProjectType"
 #define OT_PARAM_AUTH_NAME "name"
 #define OT_PARAM_AUTH_OWNER "creatingUser"
 #define OT_PARAM_AUTH_GROUP "groupName"

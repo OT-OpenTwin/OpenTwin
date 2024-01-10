@@ -14,6 +14,8 @@
 #include "AppBase.h"
 #include "ExternalServicesComponent.h"
 
+#include "OTCommunication/ActionTypes.h"
+
 // AK header
 #include <akAPI/uiAPI.h>
 #include <akGui/aColorStyle.h>
@@ -1191,6 +1193,10 @@ createNewProjectDialog::createNewProjectDialog(ak::aColorStyle * _colorStyle)
 	my_label = new QLabel("New project name");
 	my_label->setBuddy(my_input);
 
+	my_types = new QComboBox;
+	my_label3 = new QLabel("Project type");
+	my_label3->setBuddy(my_types);
+
 	my_template = new QComboBox;
 	my_label2 = new QLabel("Default settings template");
 	my_label2->setBuddy(my_template);
@@ -1201,6 +1207,10 @@ createNewProjectDialog::createNewProjectDialog(ak::aColorStyle * _colorStyle)
 	// Create input layout
 	my_layout->addWidget(my_label);
 	my_layout->addWidget(my_input);
+
+	// Create template selection layout
+	my_layout->addWidget(my_label3);
+	my_layout->addWidget(my_types);
 
 	// Create template selection layout
 	my_layout->addWidget(my_label2);
@@ -1243,6 +1253,18 @@ void createNewProjectDialog::setTemplateList(std::vector<std::string> templates)
 	my_template->setEditText("<None>");
 }
 
+void createNewProjectDialog::setListOfProjectTypes(std::list<std::string>& projectTypes)
+{
+	my_types->addItem("Select project type...");
+
+	for (auto item : projectTypes)
+	{
+		my_types->addItem(item.c_str());
+	}
+
+	my_types->setEditText("Select project type...");
+}
+
 std::string createNewProjectDialog::getTemplateName(void)
 {
 	std::string templateName = my_template->currentText().toStdString();
@@ -1252,11 +1274,21 @@ std::string createNewProjectDialog::getTemplateName(void)
 	return templateName;
 }
 
+std::string createNewProjectDialog::getProjectType(void)
+{
+	std::string projectType = my_types->currentText().toStdString();
+
+	if (projectType == "Select project type...") projectType = OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT;
+
+	return projectType;
+}
+
 createNewProjectDialog::~createNewProjectDialog() {
 	delete my_buttonCancel;
 	delete my_buttonConfirm;
 	delete my_input;
 	delete my_template;
+	delete my_types;
 
 	delete my_layoutButtons;
 	delete my_widgetButtons;
@@ -1272,7 +1304,9 @@ void createNewProjectDialog::setColorStyle(ak::aColorStyle * _colorStyle) {
 		my_buttonConfirm->setStyleSheet("");
 		my_label->setStyleSheet("");
 		my_label2->setStyleSheet("");
+		my_label3->setStyleSheet("");
 		my_template->setStyleSheet("");
+		my_types->setStyleSheet("");
 	}
 	else {
 		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
@@ -1293,8 +1327,12 @@ void createNewProjectDialog::setColorStyle(ak::aColorStyle * _colorStyle) {
 		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
 			ak::cafBackgroundColorTransparent));
 		my_label2->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
+			ak::cafBackgroundColorTransparent));		
+		my_label3->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
 			ak::cafBackgroundColorTransparent));
 		my_template->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
+			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QComboBox{", "border: 1px solid #" + Color + ";}"));
+		my_types->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
 			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QComboBox{", "border: 1px solid #" + Color + ";}"));
 	}
 }
@@ -1307,6 +1345,13 @@ void createNewProjectDialog::slotReturnPressed() { my_confirmed = true; Close();
 
 void createNewProjectDialog::Close(void) {
 	if (my_input->text().length() == 0) { return; }
+
+	std::string projectType = my_types->currentText().toStdString();
+	if (projectType == "Select project type...") 
+	{ 
+		ak::uiAPI::promptDialog::show("Please specify a type for the new project.", "Create New Project", ak::promptOkIconLeft, "DialogError", "Default", this);
+		return; 
+	}
 
 	my_cancelClose = false;
 	emit isClosing();

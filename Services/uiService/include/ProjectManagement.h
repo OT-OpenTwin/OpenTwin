@@ -28,7 +28,7 @@ public:
 
 	bool InitializeConnection(void);
 
-	bool createProject(const std::string &projectName, const std::string &userName, const std::string &defaultSettingTemplate);
+	bool createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate);
 	bool deleteProject(const std::string &projectName);
 	std::string exportProject(const std::string &projectName, const std::string &exportFileName, AppBase *parent);
 	std::string importProject(const std::string &projectName, const std::string &userName, const std::string &importFileName, AppBase *parent);
@@ -41,6 +41,9 @@ public:
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
 	std::vector<std::string> getDefaultTemplateList(void);
 	bool canAccessProject(const std::string &projectCollection);
+
+	void setProjectType(const std::string& projectName, const std::string& projectType);
+	std::string getProjectType(const std::string& projectName);
 
 private:
 	bool createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate);

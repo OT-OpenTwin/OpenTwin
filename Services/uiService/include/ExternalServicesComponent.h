@@ -240,7 +240,8 @@ public:
 
 	// Project handling
 
-	void openProject(const std::string & projectName, const std::string & collectionName);
+	std::list<std::string> getListOfProjectTypes(void);
+	void openProject(const std::string & projectName, const std::string& projectType, const std::string & collectionName);
 	void closeProject(bool saveChanges);
 	void saveProject();
 	bool projectIsOpened(const std::string &projectName, std::string &projectUser);

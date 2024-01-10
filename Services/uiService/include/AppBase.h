@@ -190,7 +190,8 @@ public:
 	virtual bool closeEvent(void) override;
 
 	bool createNewProjectInDatabase(
-		const QString &					_projectName
+		const QString &					_projectName,
+		const QString &					_projectType
 	);
 
 	void welcomeScreenEventCallback(

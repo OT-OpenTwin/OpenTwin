@@ -33,7 +33,7 @@ using bsoncxx::document::element;
 namespace MongoProjectFunctions
 {
 
-	Project createProject(std::string projectName, User& creatingUser, mongocxx::client& adminClient);
+	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient);
 
 	std::string generateProjectCollectionName(mongocxx::client& adminClient);
 

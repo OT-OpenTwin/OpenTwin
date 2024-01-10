@@ -441,6 +441,8 @@ public:
 	virtual ~createNewProjectDialog();
 
 	void setProjectName(const QString &name);
+	void setListOfProjectTypes(std::list<std::string> &projectTypes);
+
 	void setTemplateList(std::vector<std::string> templates);
 
 	bool wasConfirmed(void) const { return my_confirmed; }
@@ -452,6 +454,7 @@ public:
 	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 	std::string getTemplateName(void);
+	std::string getProjectType(void);
 
 signals:
 	void isClosing(void);
@@ -472,9 +475,11 @@ private:
 	QPushButton *	my_buttonCancel;
 	lineEdit *		my_input;
 	QLabel *		my_label;
-	QLabel *		my_label2;
+	QLabel*			my_label2;
+	QLabel*			my_label3;
 	QVBoxLayout *	my_layout;
-	QComboBox *		my_template;
+	QComboBox*		my_types;
+	QComboBox*		my_template;
 
 	QHBoxLayout *	my_layoutButtons;
 	QWidget *		my_widgetButtons;

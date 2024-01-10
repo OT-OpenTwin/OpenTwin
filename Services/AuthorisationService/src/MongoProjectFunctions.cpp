@@ -17,24 +17,19 @@
 namespace MongoProjectFunctions
 {
 
-	Project createProject(std::string projectName, User& creatingUser, mongocxx::client& adminClient)
+	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient)
 	{
-
 		mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
 
 		// Create the Collection for the project data
 		std::string collectionName = generateProjectCollectionName(adminClient);
 		std::string roleName = collectionName + "_role";
 
-
-
-
-
 		// Step one creating the Project Document and inserting it in the Projects collection
 		value new_project_document = document{}
 			<< "project_name" << projectName
+			<< "project_type" << projectType
 			<< "created_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
 			<< "created_by" << creatingUser.getUserId()
 			<< "collection_name" << collectionName
@@ -115,6 +110,16 @@ namespace MongoProjectFunctions
 
 		tmpProject._id = projectValue.view()["_id"].get_oid().value;
 		tmpProject.name = projectValue.view()["project_name"].get_utf8().value.to_string();
+
+		try
+		{
+			tmpProject.type = projectValue.view()["project_type"].get_utf8().value.to_string();
+		}
+		catch (std::exception)
+		{
+			tmpProject.type = "Development"; // Earlier projects do not have a project type
+		}
+
 		tmpProject.roleName = projectValue.view()["project_role_name"].get_utf8().value.to_string();
 		tmpProject.collectionName = projectValue.view()["collection_name"].get_utf8().value.to_string();
 		tmpProject.createdOn = projectValue.view()["created_on"].get_date();
@@ -162,6 +167,16 @@ namespace MongoProjectFunctions
 
 		tmpProject._id = projectValue.view()["_id"].get_oid().value;
 		tmpProject.name = projectValue.view()["project_name"].get_utf8().value.to_string();
+
+		try
+		{
+			tmpProject.type = projectValue.view()["project_type"].get_utf8().value.to_string();
+		}
+		catch (std::exception)
+		{
+			tmpProject.type = "Development"; // Earlier projects do not have a project type
+		}
+
 		tmpProject.roleName = projectValue.view()["project_role_name"].get_utf8().value.to_string();
 		tmpProject.collectionName = projectValue.view()["collection_name"].get_utf8().value.to_string();
 		tmpProject.createdOn = projectValue.view()["created_on"].get_date();
@@ -673,9 +688,11 @@ namespace MongoProjectFunctions
 		ot::JsonDocument json;
 		json.AddMember("id", ot::JsonString(project._id.to_string(), json.GetAllocator()), json.GetAllocator());
 		json.AddMember("name", ot::JsonString(project.name, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("ProjectType", ot::JsonString(project.type, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("collectionName", ot::JsonString(project.collectionName, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
-		
+		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
+
 		std::list<std::string> groups;
 
 		for (auto group : project.groups)

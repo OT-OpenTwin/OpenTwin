@@ -641,8 +641,9 @@ std::string ServiceBase::handleRemoveGroup(const ot::ConstJsonObject& _actionDoc
 
 std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
+	std::string projectType = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_TYPE);
 
-	Project createdProject = MongoProjectFunctions::createProject(projectName, _loggedInUser, adminClient);
+	Project createdProject = MongoProjectFunctions::createProject(projectName, projectType, _loggedInUser, adminClient);
 
 	return MongoProjectFunctions::projectToJson(createdProject);
 }

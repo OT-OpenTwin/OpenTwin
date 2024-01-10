@@ -54,7 +54,7 @@ void ProjectManagement::setAuthServerURL(const std::string &url)
 	authServerURL = url;
 }
 
-bool ProjectManagement::createProject(const std::string &projectName, const std::string &userName, const std::string &defaultSettingTemplate)
+bool ProjectManagement::createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate)
 {
 	assert(!authServerURL.empty());
 
@@ -65,6 +65,7 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(projectType, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -244,6 +245,46 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 	}
 
 	return collectionName;
+}
+
+std::string ProjectManagement::getProjectType(const std::string& projectName)
+{
+	assert(!authServerURL.empty());
+
+	AppBase* app{ AppBase::instance() };
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	{
+		return "";
+	}
+
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+	if (responseMessage == ot::ReturnMessage::Failed)
+	{
+		return "";
+	}
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(responseMessage.getWhat());
+
+	std::string projectType;
+
+	try
+	{
+		projectType = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_TYPE);
+	}
+	catch (std::exception)
+	{
+	}
+
+	return projectType;
 }
 
 bool ProjectManagement::findProjectNames(const std::string &projectNameFilter, int maxNumberOfResults, std::list<std::string> &projectsFound, bool &maxLengthExceeded)
@@ -432,8 +473,10 @@ bool ProjectManagement::copyProject(const std::string &sourceProjectName, const 
 {
 	assert(sourceProjectName != destinationProjectName);
 
-	// Create a new project with the given name
-	if (!createProject(destinationProjectName, userName, "")) return false;
+	std::string sourceProjectType = getProjectType(sourceProjectName);
+
+	// Create a new project with the given name and the same type as the source project
+	if (!createProject(destinationProjectName, sourceProjectType, userName, "")) return false;
 
 	// Now get the collection names of the source and destination projects
 	std::string sourceProjectCollection = getProjectCollection(sourceProjectName);
@@ -612,7 +655,9 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 
 std::string ProjectManagement::importProject(const std::string &projectName, const std::string &userName, const std::string &importFileName, AppBase *parent)
 {
-	if (!createProject(projectName, userName, std::string(""))) return "Unable to create the new project: " + projectName;
+	std::string projectType = "Development";
+
+	if (!createProject(projectName, projectType, userName, std::string(""))) return "Unable to create the new project: " + projectName;
 
 	// Now get the collection
 	// Get the project collection

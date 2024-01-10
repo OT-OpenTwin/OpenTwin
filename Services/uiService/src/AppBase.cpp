@@ -537,14 +537,15 @@ bool AppBase::closeEvent() {
 }
 
 bool AppBase::createNewProjectInDatabase(
-	const QString &					_projectName
+	const QString& _projectName,
+	const QString& _projectType
 ) {
 	ProjectManagement pManager;
 	pManager.setDataBaseURL(m_dataBaseURL);
 	pManager.setAuthServerURL(m_authorizationServiceURL);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
-	return pManager.createProject(_projectName.toStdString(), m_currentUser, "");
+	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_currentUser, "");
 }
 
 void AppBase::lockSelectionAndModification(bool flag)
@@ -658,7 +659,12 @@ void AppBase::welcomeScreenEventCallback(
 				projectExists = true;
 			}
 
+			// get List of available project types
+			std::list<std::string> projectTypes = m_ExternalServicesComponent->getListOfProjectTypes();
+
 			createNewProjectDialog newProject(uiAPI::getCurrentColorStyle());
+
+			newProject.setListOfProjectTypes(projectTypes);
 			newProject.setProjectName(m_welcomeScreen->getProjectName());
 			newProject.setTemplateList(pManager.getDefaultTemplateList());
 			newProject.exec();
@@ -668,6 +674,7 @@ void AppBase::welcomeScreenEventCallback(
 				return;
 			}
 
+			std::string projectType = newProject.getProjectType();
 			std::string templateName = newProject.getTemplateName();
 
 			if (projectExists) 
@@ -680,7 +687,7 @@ void AppBase::welcomeScreenEventCallback(
 				m_welcomeScreen->refreshList();
 			}
 
-			pManager.createProject(currentName, m_currentUser, templateName);
+			pManager.createProject(currentName, projectType, m_currentUser, templateName);
 
 			UserManagement manager;
 			manager.setAuthServerURL(m_authorizationServiceURL);
@@ -693,7 +700,7 @@ void AppBase::welcomeScreenEventCallback(
 				m_ExternalServicesComponent->closeProject(false);
 			}
 
-			m_ExternalServicesComponent->openProject(currentName, pManager.getProjectCollection(currentName));
+			m_ExternalServicesComponent->openProject(currentName, projectType, pManager.getProjectCollection(currentName));
 		}
 	}
 	break;
@@ -739,6 +746,7 @@ void AppBase::welcomeScreenEventCallback(
 			{
 				// Now we need to check whether we are able to open this project
 				std::string projectCollection = pManager.getProjectCollection(selectedProjectName);
+				std::string projectType       = pManager.getProjectType(selectedProjectName);
 
 				UserManagement manager;
 				manager.setAuthServerURL(m_authorizationServiceURL);
@@ -761,7 +769,7 @@ void AppBase::welcomeScreenEventCallback(
 					if (m_currentProjectName.length() > 0) {
 						m_ExternalServicesComponent->closeProject(false);
 					}
-					m_ExternalServicesComponent->openProject(selectedProjectName, projectCollection);
+					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
 				}
 			}
 		}
@@ -848,7 +856,7 @@ void AppBase::welcomeScreenEventCallback(
 			// Reopen the project if needed
 			if (reopenProject)
 			{
-				m_ExternalServicesComponent->openProject(newProjectName, pManager.getProjectCollection(newProjectName));
+				m_ExternalServicesComponent->openProject(newProjectName, pManager.getProjectType(newProjectName), pManager.getProjectCollection(newProjectName));
 			}
 
 			// And refresh the view
@@ -986,6 +994,7 @@ void AppBase::welcomeScreenEventCallback(
 			{
 				// Now we need to check whether we are able to open this project
 				std::string projectCollection = pManager.getProjectCollection(selectedProjectName);
+				std::string projectType       = pManager.getProjectType(selectedProjectName);
 
 				UserManagement manager;
 				manager.setAuthServerURL(m_authorizationServiceURL);
@@ -1007,7 +1016,7 @@ void AppBase::welcomeScreenEventCallback(
 					if (m_currentProjectName.length() > 0) {
 						m_ExternalServicesComponent->closeProject(false);
 					}
-					m_ExternalServicesComponent->openProject(selectedProjectName, pManager.getProjectCollection(selectedProjectName));
+					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
 				}
 			}
 		}
