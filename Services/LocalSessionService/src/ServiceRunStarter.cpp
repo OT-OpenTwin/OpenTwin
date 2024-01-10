@@ -30,6 +30,7 @@ void ServiceRunStarter::addService(Session * _session, Service * _service) {
 	info.credentialsUserPassword = _session->getCredentialsPassword();
 
 	info.userCollection = _session->getUserCollection();
+	info.sessionType    = _session->getType();
 
 	m_queue.push_back(info);
 
@@ -89,7 +90,8 @@ void ServiceRunStarter::worker(void) {
 			doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(info.credentialsUserName, doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(info.credentialsUserPassword, doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(info.userCollection, doc.GetAllocator()), doc.GetAllocator());
-			
+			doc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(info.sessionType, doc.GetAllocator()), doc.GetAllocator());
+
 			// Get session
 			Session * session = SessionService::instance()->getSession(info.sessionId, false);
 			if (session == nullptr) {

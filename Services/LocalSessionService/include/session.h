@@ -159,6 +159,7 @@ public:
 	std::string getCredentialsUsername(void) { return m_userCredentials.getUserName(); }
 	std::string getCredentialsPassword(void) { return m_userCredentials.getEncryptedPassword(); }
 	std::string getUserCollection(void) { return m_userCollection; }
+	std::string getType(void) { return m_type; }
 
 	ot::serviceID_t generateNextServiceId(void);
 

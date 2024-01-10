@@ -455,6 +455,8 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			std::string credentialsUsername = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
 			std::string credentialsPassword = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
 
+			std::string projectType = ot::json::getString(doc, OT_ACTION_PARAM_SESSION_TYPE);
+
 			DataBase::GetDataBase()->setUserCredentials(credentialsUsername, credentialsPassword);
 			DataBase::GetDataBase()->InitializeConnection(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString());
 
@@ -491,7 +493,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			if (index < 0) { return OT_ACTION_RETURN_INDICATOR_Error "Session ID invalid syntax"; }
 
 			assert(globalModel == nullptr);
-			globalModel = new Model(projectName, collectionName);
+			globalModel = new Model(projectName, projectType, collectionName);
 
 			// Create a model in the UI
 			if (globalUIserviceURL.length() > 0) {

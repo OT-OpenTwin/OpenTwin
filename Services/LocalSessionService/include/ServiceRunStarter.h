@@ -36,6 +36,7 @@ private:
 		std::string credentialsUserPassword;
 		
 		std::string userCollection;
+		std::string sessionType;
 	};
 
 	std::mutex						m_mutex;

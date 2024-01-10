@@ -37,7 +37,7 @@ public:
 	virtual void entityModified(EntityBase *entity) override;
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 
-	Model(const std::string &_projectName, const std::string &_collectionName);
+	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
 	virtual ~Model();
 
 	ot::UID				createEntityUID(void);
@@ -305,6 +305,7 @@ private:
 	ot::UID							   visualizationModelID;
 	bool						   isModified;
 	std::string					   projectName;
+	std::string					   projectType;
 	std::string					   collectionName;
 	std::map<std::string, bool>    uiMenuMap;
 	std::map<std::string, bool>    uiGroupMap;

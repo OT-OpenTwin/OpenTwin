@@ -25,6 +25,7 @@
 #include "TemplateDefaultManager.h"
 #include "TableReader.h"
 #include "ProgressReport.h"
+#include "ProjectTypeManager.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
@@ -89,13 +90,14 @@ void Model::entityModified(EntityBase *entity)
 
 // Model class
 
-Model::Model(const std::string &_projectName, const std::string &_collectionName) :
+Model::Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName) :
 	entityRoot(nullptr),
 	modelStorageVersion(0),
 	anyDataChangeSinceLastWrite(true),
 	visualizationModelID(0),
 	isModified(true),
 	projectName(_projectName),
+	projectType(_projectType),
 	collectionName(_collectionName),
 	shutdown(false),
 	clearUiOnDelete(true),
@@ -163,64 +165,95 @@ void Model::resetToNew(void)
 {
 	clearAll();
 
+	ProjectTypeManager typeManager(projectType);
+
 	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
 	entityMap[entityRoot->getEntityID()] = entityRoot;
 
-	// Create the various root items
-	EntityBase *entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityGeometryRoot->setName(getGeometryRootName());
-
-	EntityBase *entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityMaterialRoot->setName(getMaterialRootName());
-
-	EntityBase *entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityMeshRoot->setName(getMeshRootName());
-
-	EntityContainer *entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entitySolverRoot->setName(getSolverRootName());
-
-	EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityScriptRoot->setName(getScriptsRootName());
-
-	auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityUnits->setName(getUnitRootName());
-	entityUnits->createProperties();
-	//entityUnits->StoreToDataBase();
-
-	EntityBase *entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityRMDCategorizationRoot->setName(getDataCategorizationRootName());
-
-	auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
-	newDataCatEntity->setName(getRMDCategorizationName());
-	newDataCatEntity->setEditable(false);
-
-	auto rmdCategorizationPreview = new EntityParameterizedDataPreviewTable(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-	rmdCategorizationPreview->setName(getRMDCategorizationName() + "/Preview");
-
-	EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-	entityDatasetRoot->setName(getDatasetRootName());
-
-	EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager(), &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	rmd->setName(getDatasetRMD());
-	
-
-	// add the root items to the tree node root
 	GeometryOperations::EntityList allNewEntities;
-	addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(entityUnits->getName(), entityUnits, entityRoot, true, allNewEntities);
-	addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);
-	addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, entityRoot, true, allNewEntities);
 
-	addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
-	addEntityToModel(rmd->getName(),rmd, entityRoot, true,allNewEntities);
+	// Create the various root items
+	if (typeManager.hasGeometryRoot())
+	{
+		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityGeometryRoot->setName(getGeometryRootName());
+		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasMaterialRoot())
+	{
+		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityMaterialRoot->setName(getMaterialRootName());
+		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasMeshRoot())
+	{
+		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityMeshRoot->setName(getMeshRootName());
+		addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasSolverRoot())
+	{
+		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entitySolverRoot->setName(getSolverRootName());
+		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasScriptsRoot())
+	{
+		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityScriptRoot->setName(getScriptsRootName());
+		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasUnitRoot())
+	{
+		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityUnits->setName(getUnitRootName());
+		entityUnits->createProperties();
+		//entityUnits->StoreToDataBase();
+		addEntityToModel(entityUnits->getName(), entityUnits, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasDataCategorizationRoot())
+	{
+		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityRMDCategorizationRoot->setName(getDataCategorizationRootName());
+		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasRMDCategorization())
+	{
+		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
+		newDataCatEntity->setName(getRMDCategorizationName());
+		newDataCatEntity->setEditable(false);
+		addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasRMDCategorizationPreview())
+	{
+		auto rmdCategorizationPreview = new EntityParameterizedDataPreviewTable(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		rmdCategorizationPreview->setName(getRMDCategorizationName() + "/Preview");
+		addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasDatasetRoot())
+	{
+		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityDatasetRoot->setName(getDatasetRootName());
+		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasDatasetRMD())
+	{
+		EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager(), &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		rmd->setName(getDatasetRMD());
+		addEntityToModel(rmd->getName(), rmd, entityRoot, true, allNewEntities);
+	}
 	
-
 	// Now we load the default materials from the template definition
 	if (!DataBase::GetDataBase()->getProjectName().empty())
 	{
