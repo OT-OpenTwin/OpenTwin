@@ -81,7 +81,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTWidgets.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\open_twin.exe"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitSimulatorService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll"
-DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultCollectionAccess.dll"
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll"
 
 ECHO Delete Admin Panel 
 
@@ -111,7 +111,7 @@ COPY "%OT_GUI_ROOT%\%OT_DLLR%\OTGui.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_SCI_ROOT%\%OT_DLLR%\OTsci.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_WIDGETS_ROOT%\%OT_DLLR%\OTWidgets.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_BLOCKENTITIES_ROOT%\%OT_DLLR%\BlockEntities.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OT_RESULT_COLLECTION_ACCESS_ROOT%\%OT_DLLR%\ResultCollectionAccess.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_RESULT_DATA_ACCESS_ROOT%\%OT_DLLR%\ResultDataAccess.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
 REM ====================================================================
 REM  Copy Services

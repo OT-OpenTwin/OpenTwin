@@ -29,6 +29,6 @@ struct BufferBlockDatabaseAccess
 	std::map<std::string, std::string> dataTypesByName;
 
 	std::map <std::string, MetadataParameter> parameterByName;
-	std::map <std::string, MetadataQuantity> quantitiesByName	;
+	std::map <std::string, MetadataQuantity> quantitiesByName;
 
 };

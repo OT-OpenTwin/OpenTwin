@@ -51,8 +51,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_DLLD);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_DLLD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(GOOGLE_TEST_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;ResultCollectionAccess.lib;BlockEntities.lib;DataProcessingService.lib;$(GOOGLE_TEST_LIB);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_DLLD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(GOOGLE_TEST_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;ResultDataAccess.lib;BlockEntities.lib;DataProcessingService.lib;$(GOOGLE_TEST_LIB);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -70,8 +70,8 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)\$(OT_DLLR);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_DLLR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(GOOGLE_TEST_LIBPATHR);$(SolutionDir)$(OT_LIBTESTR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;ResultCollectionAccess.lib;BlockEntities.lib;DataProcessingService.lib;$(GOOGLE_TEST_LIB);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)\$(OT_DLLR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(GOOGLE_TEST_LIBPATHR);$(SolutionDir)$(OT_LIBTESTR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;ResultDataAccess.lib;BlockEntities.lib;DataProcessingService.lib;$(GOOGLE_TEST_LIB);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

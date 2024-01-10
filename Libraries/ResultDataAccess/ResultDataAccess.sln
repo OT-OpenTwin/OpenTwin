@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResultCollectionAccess", "ResultCollectionAccess.vcxproj", "{BD0DC06C-9401-42BB-9A0B-B23FBE8B65A1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResultDataAccess", "ResultDataAccess.vcxproj", "{BD0DC06C-9401-42BB-9A0B-B23FBE8B65A1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResultCollectionAccessTest", "ResultCollectionAccessTest\ResultCollectionAccessTest.vcxproj", "{0820E82C-C0C8-40C0-A6CD-71A267E7B660}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResultDataAccessTest", "ResultDataAccessTest\ResultDataAccessTest.vcxproj", "{0820E82C-C0C8-40C0-A6CD-71A267E7B660}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BD0DC06C-9401-42BB-9A0B-B23FBE8B65A1} = {BD0DC06C-9401-42BB-9A0B-B23FBE8B65A1}
 	EndProjectSection

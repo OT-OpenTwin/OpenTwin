@@ -1,5 +1,5 @@
 #pragma once
-#include "ResultCollectionAccess.h"
+#include "ResultMetadataAccess.h"
 #include "MetadataCampaign.h"
 #include "MetadataQuantity.h"
 #include "MetadataParameter.h"
@@ -10,10 +10,10 @@
 
 class ClassFactory;
 
-class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionAccess
+class __declspec(dllexport) ResultCollectionExtender : public ResultMetadataAccess
 {
 public:
-	ResultCollectionExtender(const std::string& projectName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& ownerServiceName);
+	ResultCollectionExtender(const std::string& collectionName, ot::components::ModelComponent& modelComponent, ClassFactory* classFactory, const std::string& ownerServiceName);
 	ResultCollectionExtender(const ResultCollectionExtender& other) = delete;
 	ResultCollectionExtender& operator=(const ResultCollectionExtender& other) = delete;
 	~ResultCollectionExtender();
@@ -35,7 +35,8 @@ public:
 
 private:
 	friend class FixtureResultCollectionExtender;
-	
+	DataStorageAPI::ResultDataStorageAPI _dataStorageAccess;
+
 	bool _requiresUpdateMetadataCampaign;
 	std::list<const MetadataSeries*> _seriesMetadataForStorage;
 	std::vector<QuantityContainer> _quantityContainer;

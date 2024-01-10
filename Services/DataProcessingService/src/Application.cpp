@@ -21,7 +21,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
-
+#include "BufferResultCollectionAccess.h"
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
 #include "ClassFactoryBlock.h"
@@ -58,7 +58,7 @@ Application::~Application()
 // ##################################################################################################################################################################################################################
 
 // Required functions
-#include "TemplateDefaultManager.h"
+
 
 void Application::run(void)
 {
@@ -69,15 +69,6 @@ void Application::run(void)
 
 	// Add code that should be executed when the service is started and may start its work
 }
-
-#include "BlockEntityHandler.h"
-#include "BlockHandlerDatabaseAccess.h"
-#include "BlockHandlerPlot1D.h"
-#include "MeasurementCampaignHandler.h"
-#include "EntityCoordinates2D.h"
-#include "DataBase.h"
-#include "ResultCollectionAccess.h"
-#include "BufferResultCollectionAccess.h"
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {

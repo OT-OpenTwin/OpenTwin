@@ -96,7 +96,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;CIRCUITSIMULATORSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;$(ProjectDir)include;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(MONGO_BOOST_ROOT);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;$(ProjectDir)include;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(MONGO_BOOST_ROOT);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -105,8 +105,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Debug.x64;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;ngspice.lib;ResultCollectionAccess.lib;BlockEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Debug.x64;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;CIRCUITSIMULATORSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;$(ProjectDir)include;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(MONGO_BOOST_ROOT);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)/$(OT_INC);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\src\include;$(ProjectDir)include;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(MONGO_BOOST_ROOT);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -151,8 +151,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)/$(OT_LIBR);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Release.x64;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;ngspice.lib;ResultCollectionAccess.lib;BlockEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)/$(OT_LIBR);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Release.x64;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

@@ -26,6 +26,7 @@
     <ProjectGuid>{0820e82c-c0c8-40c0-a6cd-71a267e7b660}</ProjectGuid>
     <RootNamespace>ResultDataCollectionAccessTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ResultDataAccessTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -67,8 +68,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_RESULT_COLLECTION_ACCESS_ROOT)$(OT_LIBTESTD);$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultCollectionAccess.lib;$(MONGO_CXX_LIBD);$(OT_DEFAULT_SERVICE_LIBD)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_RESULT_DATA_ACCESS_ROOT)$(OT_LIBTESTD);$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultDataAccess.lib;$(MONGO_CXX_LIBD);$(OT_DEFAULT_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -89,8 +90,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_RESULT_COLLECTION_ACCESS_ROOT)$(OT_LIBTESTR);$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultCollectionAccess.lib;$(MONGO_CXX_LIBR);$(OT_DEFAULT_SERVICE_LIBR)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(GOOGLE_TEST_LIBPATHR);$(OT_RESULT_DATA_ACCESS_ROOT)$(OT_LIBTESTR);$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultDataAccess.lib;$(MONGO_CXX_LIBR);$(OT_DEFAULT_SERVICE_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

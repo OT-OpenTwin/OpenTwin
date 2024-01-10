@@ -10,7 +10,7 @@
 #include "DataBase.h"
 
 #include "BufferResultCollectionAccess.h"
-#include "ResultCollectionAccess.h"
+#include "ResultMetadataAccess.h"
 
 void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
@@ -67,7 +67,7 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 
 EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 {
-	std::shared_ptr<ResultCollectionAccess>resultCollectionAccess =	BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(dbAccessEntity.get());
+	std::shared_ptr<ResultMetadataAccess>resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(dbAccessEntity.get());
 	
 	UpdateBuffer(dbAccessEntity, resultCollectionAccess->getMetadataCampaign());
 

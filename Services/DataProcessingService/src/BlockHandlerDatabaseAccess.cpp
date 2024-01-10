@@ -8,7 +8,7 @@
 
 #include "ValueComparisionDefinition.h"
 
-#include "ResultCollectionAccess.h"
+#include "ResultMetadataAccess.h"
 #include "ProjectToCollectionConverter.h"
 #include "DataBase.h"
 #include "BufferResultCollectionAccess.h"
@@ -19,7 +19,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	:BlockHandler(handlerMap)
 {
 	//First get a handle of the selected project.
-	std::shared_ptr<ResultCollectionAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
+	std::shared_ptr<ResultMetadataAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
 	
 
 

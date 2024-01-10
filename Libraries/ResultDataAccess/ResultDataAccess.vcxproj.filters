@@ -53,13 +53,10 @@
     <ClInclude Include="include\MetadataEntrySingle.h">
       <Filter>include\MetadataEntries</Filter>
     </ClInclude>
-    <ClInclude Include="include\ResultCollectionAccess.h">
+    <ClInclude Include="include\ResultMetadataAccess.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
     <ClInclude Include="include\CrossCollectionAccess.h">
-      <Filter>include\CollectionAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DigitalTwinAccessCrossCollection.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
     <ClInclude Include="include\ResultCollectionExtender.h">
@@ -88,10 +85,7 @@
     <ClCompile Include="src\CrossCollectionAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ResultCollectionAccess.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DigitalTwinAccessCrossCollection.cpp">
+    <ClCompile Include="src\ResultMetadataAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ResultCollectionExtender.cpp">

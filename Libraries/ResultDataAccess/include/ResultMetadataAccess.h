@@ -15,15 +15,15 @@
 class ClassFactory;
 
 
-class __declspec(dllexport) ResultCollectionAccess
+class __declspec(dllexport) ResultMetadataAccess
 {
 public:
-	ResultCollectionAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory);
-	ResultCollectionAccess(const std::string& crossProjectName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
-	ResultCollectionAccess(ResultCollectionAccess&& other);
-	ResultCollectionAccess& operator=(ResultCollectionAccess&& other) noexcept;
+	ResultMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory);
+	ResultMetadataAccess(const std::string& crossProjectName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
+	ResultMetadataAccess(ResultMetadataAccess&& other);
+	ResultMetadataAccess& operator=(ResultMetadataAccess&& other) noexcept;
 
-	virtual ~ResultCollectionAccess() {};
+	virtual ~ResultMetadataAccess() {};
 
 	const std::list<std::string> ListAllSeriesNames() const;
 	const std::list<std::string> ListAllParameterNames() const;
@@ -39,7 +39,6 @@ public:
 protected:
 	std::string _collectionName;
 	ot::components::ModelComponent* _modelComponent;
-	DataStorageAPI::ResultDataStorageAPI _dataStorageAccess;
 	MetadataCampaign _metadataCampaign;
 
 private:
