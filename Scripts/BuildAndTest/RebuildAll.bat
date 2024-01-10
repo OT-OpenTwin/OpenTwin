@@ -169,7 +169,7 @@ ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: Result Collection Access
+ECHO Build Library: Result Data Access
 ECHO ===============================================================
 CALL "%OT_RESULT_DATA_ACCESS_ROOT%\build.bat" %1 %2
 
