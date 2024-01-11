@@ -13,6 +13,7 @@ public:
 			_extractor = nullptr;
 		}
 	}
+	
 	const std::string GetFilePath() { return filePath; }
 	void LoadFileContent(std::string fullPath);
 	void LoadFileWithSemicolonRowDelimiter(std::string name);

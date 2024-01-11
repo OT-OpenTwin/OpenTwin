@@ -42,6 +42,9 @@
     <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -62,6 +65,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FixtureCategorizationConsistencyChecker.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileHelper.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,7 @@
+#include <fstream>
 #include "FixtureTableExtractorCSV.h"
 #include "DataSourceHandler.h"
-
+#include "FileHelper.h"
 
 void FixtureTableExtractorCSV::LoadFileWithSemicolonRowDelimiter(std::string name)
 {
@@ -8,10 +9,11 @@ void FixtureTableExtractorCSV::LoadFileWithSemicolonRowDelimiter(std::string nam
 	_extractor->SetRowDelimiter(';');
 }
 
+
+
 void FixtureTableExtractorCSV::LoadFileContent(std::string fullPath)
 {
-	DataSourceHandler sourceHandler;
-	auto fileContent = sourceHandler.ExtractFileContentAsBinary(fullPath);
+	auto fileContent = FileHelper::ExtractFileContentAsBinary(fullPath);
 	auto extractorCSV = new TableExtractorCSV();
 	extractorCSV->SetFileContent(fileContent);
 	_extractor = extractorCSV;

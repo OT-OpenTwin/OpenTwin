@@ -1,5 +1,7 @@
 #include "FixtureTableStatisticAnalyser.h"
 #include "DataSourceHandler.h"
+#include "FileHelper.h"
+
 FixtureTableStatisticAnalyser::FixtureTableStatisticAnalyser()
 {
 	std::string fullPath = filePath + "WorkingTestTableForAnalytics.csv";
@@ -37,8 +39,8 @@ std::vector<size_t> FixtureTableStatisticAnalyser::CountUniquesInAllColumns()
 
 void FixtureTableStatisticAnalyser::LoadFileContent(std::string fullPath)
 {
-	DataSourceHandler sourceHandler("");
-	auto fileContent = sourceHandler.ExtractFileContentAsBinary(fullPath);
+	
+	auto fileContent = FileHelper::ExtractFileContentAsBinary(fullPath);
 	auto extractorCSV = new TableExtractorCSV();
 	extractorCSV->SetFileContent(fileContent);
 	_extractor = extractorCSV;
