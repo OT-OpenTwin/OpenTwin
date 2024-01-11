@@ -122,6 +122,7 @@ private:
 	
 	ot::MenuButtonDescription _buttonImportCSV;
 	ot::MenuButtonDescription _buttonImportPythonScript;
+	ot::MenuButtonDescription _buttonImportSParameter;
 	ot::MenuButtonDescription _buttonCreateTable;
 	
 	ot::MenuButtonDescription _buttonTableDeleteRow;

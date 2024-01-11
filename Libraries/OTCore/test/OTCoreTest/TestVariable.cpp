@@ -10,6 +10,13 @@
 #include <string>
 #include <limits>
 
+TEST(VariableTest, CopyAssignOperator)
+{
+	ot::Variable first(5);
+	ot::Variable second(0);
+	second = first;
+	EXPECT_EQ(first, second);
+}
 TEST(VariableTest, VariableToJSON)
 {
 	ot::JsonDocument (doc);

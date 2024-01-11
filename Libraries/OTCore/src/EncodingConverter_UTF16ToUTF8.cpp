@@ -57,9 +57,15 @@ void ot::EncodingConverter_UTF16ToUTF8::setNextUTF8Character(byte&& character)
 
 std::string ot::EncodingConverter_UTF16ToUTF8::operator()(ot::TextEncoding::EncodingStandard utf16Flavour, const std::vector<char>& fileContent)
 {
+	std::string fileContentString(fileContent.begin(), fileContent.end());
+	return this->operator()(utf16Flavour,fileContentString);
+}
+
+std::string ot::EncodingConverter_UTF16ToUTF8::operator()(ot::TextEncoding::EncodingStandard utf16Flavour, const std::string& fileContent)
+{
 	_currentByte = (unsigned char*)&fileContent[0];
 	_utf16Flavour = utf16Flavour;
-	byte* lastByte = (unsigned char*)&fileContent[fileContent.size() - 1];
+	byte* lastByte = (unsigned char*)(&fileContent.back());
 
 	while (std::distance(_currentByte, lastByte) >= 1)
 	{

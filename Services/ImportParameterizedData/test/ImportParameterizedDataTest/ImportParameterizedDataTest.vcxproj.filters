@@ -45,6 +45,12 @@
     <ClCompile Include="src\FileHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestSParameterOptionHandling.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSParameterOptionSettings.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -68,6 +74,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FileHelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureSParameterHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

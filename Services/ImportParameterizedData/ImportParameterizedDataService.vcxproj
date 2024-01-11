@@ -134,8 +134,10 @@
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -207,8 +209,10 @@
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\FileToTableExtractorFactory.cpp" />
     <ClCompile Include="src\DataCategorizationHandler.cpp" />
+    <ClCompile Include="src\OptionSettings.cpp" />
     <ClCompile Include="src\PreviewAssembler.cpp" />
     <ClCompile Include="src\PreviewAssemblerRMD.cpp" />
+    <ClCompile Include="src\SParameterHandler.cpp" />
     <ClCompile Include="src\TableExtractorCSV.cpp" />
     <ClCompile Include="src\TableHandler.cpp" />
     <ClCompile Include="src\TableStatisticAnalyser.cpp" />
@@ -232,10 +236,18 @@
     <ClInclude Include="include\MetadataParameter.h" />
     <ClInclude Include="include\MetadataParameterBundle.h" />
     <ClInclude Include="include\MetadataQuantity.h" />
+    <ClInclude Include="include\Options.h" />
+    <ClInclude Include="include\OptionSettings.h" />
+    <ClInclude Include="include\OptionsParameterHandlerFormat.h" />
+    <ClInclude Include="include\OptionsParameterHandlerFrequency.h" />
+    <ClInclude Include="include\OptionsParameterHandler.h" />
+    <ClInclude Include="include\OptionsParameterHandlerParameter.h" />
+    <ClInclude Include="include\OptionsParameterHandlerReference.h" />
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
     <ClInclude Include="include\IndexManager.h" />
     <ClInclude Include="include\ProgressUpdater.h" />
+    <ClInclude Include="include\SParameterHandler.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />
     <ClInclude Include="include\ModelNotifier.h" />

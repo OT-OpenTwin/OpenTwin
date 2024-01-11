@@ -40,7 +40,7 @@ ot::Variable::Variable(std::string&& value)
 
 ot::Variable& ot::Variable::operator=(const Variable& other)
 {
-	
+	_value = other._value;
 	return *this;
 }
 

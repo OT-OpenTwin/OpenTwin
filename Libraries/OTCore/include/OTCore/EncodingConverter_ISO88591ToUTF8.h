@@ -16,5 +16,6 @@ namespace ot
 	{
 	public:
 		std::string operator()(const std::vector<char>& fileContent);
+		std::string operator()(const std::string& fileContent);
 	};
 }

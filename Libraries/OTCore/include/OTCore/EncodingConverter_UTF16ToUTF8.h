@@ -17,6 +17,7 @@ namespace ot
 	{
 	public:
 		std::string operator()(ot::TextEncoding::EncodingStandard utf16Flavour, const std::vector<char>& fileContent);
+		std::string operator()(ot::TextEncoding::EncodingStandard utf16Flavour, const std::string& fileContent);
 
 	private:
 		using byte = unsigned char;

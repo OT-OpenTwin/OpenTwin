@@ -109,7 +109,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonImportCSV.SetDescription(pageName, groupNameImport, "Import File");
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
 	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
-	
+	_buttonImportSParameter.SetDescription(pageName, groupNameImport, "Import S-Parameter");
+
 	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row", "", subgroupNameTableHandlingRow);
 	_buttonTableAddRowBelow.SetDescription(pageName, groupNameTableHandling, "Insert Row Below", "", subgroupNameTableHandlingRow);
 	_buttonTableAddRowAbove.SetDescription(pageName, groupNameTableHandling, "Insert Row Above", "", subgroupNameTableHandlingRow);
@@ -130,8 +131,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 
-
 	_ui->addMenuButton(_buttonImportCSV, modelWrite, "TextVisible");
+	_ui->addMenuButton(_buttonImportSParameter, modelWrite, "Icon");
 	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
 	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
 	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
@@ -257,6 +258,10 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
+			}
+			else if (action == _buttonImportSParameter.GetFullDescription())
+			{
+
 			}
 			else if (action == _buttonImportPythonScript.GetFullDescription())
 			{

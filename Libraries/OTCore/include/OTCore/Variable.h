@@ -45,7 +45,7 @@ namespace ot
 			memmove_s(_ptr, length, other._ptr, length);
 			other._ptr = nullptr;
 		}
-		StringWrapper& operator=(StringWrapper& other)
+		StringWrapper& operator=(const StringWrapper& other)
 		{
 			if (_ptr != nullptr)
 			{
@@ -117,8 +117,6 @@ namespace ot
 		Variable(Variable&& other) = default;
 		Variable& operator=(const Variable& other);
 		Variable& operator=(Variable&& other);
-
-
 
 		bool isFloat() const;
 		bool isDouble() const;
