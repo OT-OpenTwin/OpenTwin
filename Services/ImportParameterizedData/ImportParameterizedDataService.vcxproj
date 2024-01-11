@@ -210,6 +210,7 @@
     <ClCompile Include="src\FileToTableExtractorFactory.cpp" />
     <ClCompile Include="src\DataCategorizationHandler.cpp" />
     <ClCompile Include="src\OptionSettings.cpp" />
+    <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\PreviewAssembler.cpp" />
     <ClCompile Include="src\PreviewAssemblerRMD.cpp" />
     <ClCompile Include="src\SParameterHandler.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="include\OptionsParameterHandler.h" />
     <ClInclude Include="include\OptionsParameterHandlerParameter.h" />
     <ClInclude Include="include\OptionsParameterHandlerReference.h" />
+    <ClInclude Include="include\PortData.h" />
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
     <ClInclude Include="include\IndexManager.h" />

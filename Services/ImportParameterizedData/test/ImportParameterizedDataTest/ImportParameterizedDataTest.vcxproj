@@ -38,6 +38,7 @@
     <ClCompile Include="src\FixtureTableExtractorCSV.cpp" />
     <ClCompile Include="src\FixtureTableStatisticAnalyser.cpp" />
     <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp" />
+    <ClCompile Include="src\TestPortData.cpp" />
     <ClCompile Include="src\TestSParameterOptionHandling.cpp" />
     <ClCompile Include="src\TestSParameterOptionSettings.cpp" />
     <ClCompile Include="src\TestTableStatisticAnalyser.cpp" />

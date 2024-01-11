@@ -141,3 +141,21 @@ TEST_F(FixtureSParameterHandler, CommentsDetected)
 
 	EXPECT_TRUE(actualComments == expectedComments);
 }
+
+TEST_F(FixtureSParameterHandler, FreeDataLineOfComment)
+{
+	const std::string expectedLine = " This is no comment.";
+	const std::string line = " This is no comment.!But this is";
+	const std::string actualLine = CleansLineOfComments(line);
+
+	EXPECT_EQ(expectedLine, actualLine);	
+}
+
+TEST_F(FixtureSParameterHandler, V1_Example1Port)
+{
+	std::string line = "2.000 0.894 -12.136\n";
+	SetNumberOfPorts(1);
+	AnalyseLine(line);
+	auto& portData =	GetPortData();
+	EXPECT_EQ(portData.size(), 1);
+}

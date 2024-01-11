@@ -70,6 +70,9 @@
     <ClCompile Include="src\OptionSettings.cpp">
       <Filter>src\SParameter</Filter>
     </ClCompile>
+    <ClCompile Include="src\PortData.cpp">
+      <Filter>src\SParameter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -175,6 +178,9 @@
       <Filter>include\SParameter</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionSettings.h">
+      <Filter>include\SParameter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PortData.h">
       <Filter>include\SParameter</Filter>
     </ClInclude>
   </ItemGroup>

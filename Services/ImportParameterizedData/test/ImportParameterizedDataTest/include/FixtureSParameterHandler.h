@@ -27,6 +27,21 @@ public:
 	{
 		return _handler.getComments();
 	}
+
+	const std::string CleansLineOfComments(const std::string& line)
+	{
+		return _handler.CleansOfComments(line);
+	}
+
+	void SetNumberOfPorts(uint32_t portNumber)
+	{
+		_handler._portNumber = portNumber;
+	}
+
+	const std::list<sp::PortData>& GetPortData()
+	{
+		return _handler.getPortData();
+	}
 private:
 	SParameterHandler _handler;
 };

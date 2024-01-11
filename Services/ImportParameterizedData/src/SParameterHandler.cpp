@@ -64,8 +64,57 @@ void SParameterHandler::AnalyseLine(const std::string& content)
 	}
 	else //Data section
 	{
+		AnalyseDataLine(content);
 	}
 		
+}
+
+void SParameterHandler::AnalyseDataLine(const std::string& content)
+{
+
+	std::string cleansedContent = CleansOfComments(content);
+	if (cleansedContent.back() == '\n')
+	{
+		cleansedContent = cleansedContent.substr(0, cleansedContent.size() - 1);
+	}
+	if (_touchstoneVersion == 1)
+	{
+		std::stringstream stream(cleansedContent);
+		std::string segment;
+		
+		while (getline(stream, segment, ' '))
+		{
+			if (segment == "")
+			{
+				continue;
+			}
+			else
+			{
+				if (_portData.size() == 0 || _portData.back().isFilled())
+				{
+					_portData.push_back(sp::PortData(_portNumber));
+				}
+				_portData.back().AddValue(segment);
+			}
+		}
+	}
+	else
+	{
+
+	}
+}
+
+const std::string SParameterHandler::CleansOfComments(const std::string& content)
+{
+	auto commentCharacterPos = content.find('!');
+	if (commentCharacterPos != std::string::npos)
+	{
+		return content.substr(0, commentCharacterPos);
+	}
+	else
+	{
+		return content;
+	}
 }
 
 void SParameterHandler::AnalyseVersionTwoLine(const std::string& content)
@@ -85,6 +134,8 @@ void SParameterHandler::AnalyseVersionTwoLine(const std::string& content)
 	const std::string endInformation = "[End Information]";
 
 }
+
+
 
 void SParameterHandler::AnalyseOptionsLine(const std::string& line)
 {
