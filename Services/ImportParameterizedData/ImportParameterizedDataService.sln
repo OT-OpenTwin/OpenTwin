@@ -1,14 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1267
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImportParameterizedDataService", "ImportParameterizedDataService.vcxproj", "{36E113AE-6F93-42FC-AB88-97721543A1DF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImportParameterizedDataTest", "test\ImportParameterizedDataTest\ImportParameterizedDataTest.vcxproj", "{72EA5528-6E0C-43D5-89F1-41329D20878D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{36E113AE-6F93-42FC-AB88-97721543A1DF} = {36E113AE-6F93-42FC-AB88-97721543A1DF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImportParameterizedDataTest", "ImportParameterizedDataTest\ImportParameterizedDataTest.vcxproj", "{72EA5528-6E0C-43D5-89F1-41329D20878D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
