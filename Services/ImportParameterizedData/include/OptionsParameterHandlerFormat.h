@@ -7,7 +7,7 @@ class OptionsParameterHandlerFormat : public OptionsParameterHandler
 public:
 
 private:
-	const std::map<std::string, ts::option::Format> _stringToFormat = { {"DB",ts::option::Format::Decibel_angle}, {"MA", ts::option::Format::magnitude_angle}, {"RI", ts::option::Format::real_imaginary}};
+	const std::map<std::string, ts::option::Format> _stringToFormat = { {"db",ts::option::Format::Decibel_angle}, {"ma", ts::option::Format::magnitude_angle}, {"ri", ts::option::Format::real_imaginary}};
 	
 	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 };

@@ -6,14 +6,18 @@
 class FixtureTouchstoneHandler : public testing::Test
 {
 public:
-		
-	const ts::OptionSettings& AnalyseOptionSettings(const std::string& text) 
+	FixtureTouchstoneHandler()
+		:_handler("testFile.s2p")
+	{
+
+	}
+	const ts::OptionSettings& AnalyseOptionSettings(std::string& text) 
 	{ 
 		_handler.AnalyseLine(text);
 		return _handler.getOptionSettings(); 
 	}
 	
-	void AnalyseLine(const std::string& text)
+	void AnalyseLine(std::string& text)
 	{
 		_handler.AnalyseLine(text);
 	}
@@ -28,9 +32,9 @@ public:
 		return _handler.getComments();
 	}
 
-	const std::string CleansLineOfComments(const std::string& line)
+	void CleansLineOfComments(std::string& line)
 	{
-		return _handler.CleansOfComments(line);
+		_handler.CleansOfComments(line);
 	}
 
 	void SetNumberOfPorts(uint32_t portNumber)

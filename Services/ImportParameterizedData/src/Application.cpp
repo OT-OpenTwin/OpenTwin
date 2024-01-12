@@ -17,6 +17,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "OTServiceFoundation/TableRange.h"
+#include "TouchstoneHandler.h"
 
 //Application specific includes
 #include "TemplateDefaultManager.h"
@@ -27,6 +28,7 @@
 
 #include <base64.h>
 #include <zlib.h>
+
 
 Application * g_instance{ nullptr };
 
@@ -446,6 +448,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				decodedCompressedString = nullptr;
 
 				std::string unpackedFileContent(decodedString, uncompressedDataLength);
+				TouchstoneHandler handler(originalName);
+				handler.AnalyseFile(unpackedFileContent);
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{

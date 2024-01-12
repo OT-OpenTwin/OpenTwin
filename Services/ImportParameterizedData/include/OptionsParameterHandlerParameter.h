@@ -10,7 +10,7 @@ class OptionsParameterHandlerParameter : public OptionsParameterHandler
 public:
 
 private:
-	const std::map<std::string, ts::option::Parameter> _stringToParameter = { {"S",ts::option::Parameter::Scattering},{"Y",ts::option::Parameter::Admittance},{"Z",ts::option::Parameter::Impedance},{"H",ts::option::Parameter::Hybrid_h},{"G",ts::option::Parameter::Hybrid_g} };
+	const std::map<std::string, ts::option::Parameter> _stringToParameter = { {"s",ts::option::Parameter::Scattering},{"y",ts::option::Parameter::Admittance},{"z",ts::option::Parameter::Impedance},{"h",ts::option::Parameter::Hybrid_h},{"g",ts::option::Parameter::Hybrid_g} };
 	
 	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 	

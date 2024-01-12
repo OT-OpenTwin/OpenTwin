@@ -145,8 +145,8 @@ TEST_F(FixtureTouchstoneHandler, CommentsDetected)
 TEST_F(FixtureTouchstoneHandler, FreeDataLineOfComment)
 {
 	const std::string expectedLine = " This is no comment.";
-	const std::string line = " This is no comment.!But this is";
-	const std::string actualLine = CleansLineOfComments(line);
+	std::string actualLine = " This is no comment.!But this is";
+	CleansLineOfComments(actualLine);
 
 	EXPECT_EQ(expectedLine, actualLine);	
 }

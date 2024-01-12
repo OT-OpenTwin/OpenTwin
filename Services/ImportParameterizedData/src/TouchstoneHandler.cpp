@@ -14,6 +14,14 @@
 #include <cassert>
 #include <vector>
 
+TouchstoneHandler::TouchstoneHandler(const std::string& fileName)
+{
+	auto posOfFileExtension = fileName.find_last_of(".") +1;
+	const std::string extension = fileName.substr(posOfFileExtension, fileName.size());
+	const std::string numberOfPortsAsString = extension.substr(1, extension.size() - 2);
+	_portNumber = std::stoi(numberOfPortsAsString);
+}
+
 void TouchstoneHandler::AnalyseFile(const std::string& fileContent)
 {
 	std::stringstream stream;
@@ -41,7 +49,7 @@ void TouchstoneHandler::AnalyseFile(const std::string& fileContent)
 	}
 }
 
-void TouchstoneHandler::AnalyseLine(const std::string& content)
+void TouchstoneHandler::AnalyseLine(std::string& content)
 {
 	std::string lineWithoutWhitespaces = content;
 	lineWithoutWhitespaces.erase(std::remove_if(lineWithoutWhitespaces.begin(), lineWithoutWhitespaces.end(), isspace), lineWithoutWhitespaces.end());
@@ -69,17 +77,14 @@ void TouchstoneHandler::AnalyseLine(const std::string& content)
 		
 }
 
-void TouchstoneHandler::AnalyseDataLine(const std::string& content)
+void TouchstoneHandler::AnalyseDataLine(std::string& content)
 {
+	CleansOfComments(content);
+	CleansOfSpecialCharacter(content);
 
-	std::string cleansedContent = CleansOfComments(content);
-	if (cleansedContent.back() == '\n')
-	{
-		cleansedContent = cleansedContent.substr(0, cleansedContent.size() - 1);
-	}
 	if (_touchstoneVersion == 1)
 	{
-		std::stringstream stream(cleansedContent);
+		std::stringstream stream(content);
 		std::string segment;
 		
 		while (getline(stream, segment, ' '))
@@ -104,20 +109,26 @@ void TouchstoneHandler::AnalyseDataLine(const std::string& content)
 	}
 }
 
-const std::string TouchstoneHandler::CleansOfComments(const std::string& content)
+void TouchstoneHandler::CleansOfComments(std::string& content)
 {
 	auto commentCharacterPos = content.find('!');
 	if (commentCharacterPos != std::string::npos)
 	{
-		return content.substr(0, commentCharacterPos);
-	}
-	else
-	{
-		return content;
+		content = content.substr(0, commentCharacterPos);
 	}
 }
 
-void TouchstoneHandler::AnalyseVersionTwoLine(const std::string& content)
+void TouchstoneHandler::CleansOfSpecialCharacter(std::string& content)
+{
+	content.erase(std::remove(content.begin(), content.end(), '\n'), content.end());
+	content.erase(std::remove(content.begin(), content.end(), '\t'), content.end());
+	content.erase(std::remove(content.begin(), content.end(), '\v'), content.end());
+	content.erase(std::remove(content.begin(), content.end(), '\b'), content.end());
+	content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
+	content.erase(std::remove(content.begin(), content.end(), '\f'), content.end());
+}
+
+void TouchstoneHandler::AnalyseVersionTwoLine(std::string& content)
 {
 	const std::string version = "[Version]";
 	const std::string numberOfPorts = "[Number of Ports]";
@@ -135,9 +146,7 @@ void TouchstoneHandler::AnalyseVersionTwoLine(const std::string& content)
 
 }
 
-
-
-void TouchstoneHandler::AnalyseOptionsLine(const std::string& line)
+void TouchstoneHandler::AnalyseOptionsLine(std::string& line)
 {
 	assert(line[0] == '#');
 	OptionsParameterHandlerFormat handlerFormat;
@@ -146,6 +155,9 @@ void TouchstoneHandler::AnalyseOptionsLine(const std::string& line)
 	OptionsParameterHandlerReference handlerReference;
 
 	handlerFormat.SetNextHandler(handlerFrequency.SetNextHandler(handlerParameter.SetNextHandler(&handlerReference)));
+
+	CleansOfComments(line);
+	CleansOfSpecialCharacter(line);
 
 	std::stringstream ss(line.substr(1,line.size()));
 	std::string segment;
@@ -167,6 +179,8 @@ void TouchstoneHandler::AnalyseOptionsLine(const std::string& line)
 		}
 		else
 		{
+			std::transform(segment.begin(), segment.end(), segment.begin(),
+				[](unsigned char c) { return std::tolower(c); });
 			handlerFormat.InterpreteOptionsParameter(segment, _optionSettings);
 		}
 	}

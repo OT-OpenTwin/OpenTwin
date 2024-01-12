@@ -7,6 +7,7 @@
 class TouchstoneHandler
 {
 public:
+	TouchstoneHandler(const std::string& fileName);
 	void AnalyseFile(const std::string& fileContent);
 	const ts::OptionSettings& getOptionSettings() const { return _optionSettings; }
 	const std::string& getComments() const { return _comments; }
@@ -21,10 +22,14 @@ private:
 	uint32_t _touchstoneVersion = 1;
 	uint32_t _portNumber;
 
-	void AnalyseLine(const std::string& content);
-	void AnalyseDataLine(const std::string& content);
-	void AnalyseOptionsLine(const std::string& line);
-	void AnalyseVersionTwoLine(const std::string& content);
+	void AnalyseLine(std::string& content);
+	void AnalyseDataLine(std::string& content);
+	void AnalyseOptionsLine(std::string& line);
+	void AnalyseVersionTwoLine(std::string& content);
 
-	const std::string CleansOfComments(const std::string& content);
+	void CleansOfComments(std::string& content);
+	void CleansOfSpecialCharacter(std::string& content);
+
+
 };
+

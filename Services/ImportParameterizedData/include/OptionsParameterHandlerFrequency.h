@@ -10,7 +10,7 @@ class OptionsParameterHandlerFrequency : public OptionsParameterHandler
 public:
 
 private:
-	const std::map<std::string, ts::option::Frequency> _stringToFrequencyParameter = { {"Hz", ts::option::Frequency::Hz },{"kHz",ts::option::Frequency::kHz}, {"MHz", ts::option::Frequency::MHz},{"GHz", ts::option::Frequency::GHz}};
+	const std::map<std::string, ts::option::Frequency> _stringToFrequencyParameter = { {"hz", ts::option::Frequency::Hz },{"khz",ts::option::Frequency::kHz}, {"mhz", ts::option::Frequency::MHz},{"ghz", ts::option::Frequency::GHz}};
 	
 	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 };
