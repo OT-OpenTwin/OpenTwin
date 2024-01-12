@@ -40,20 +40,8 @@
     <ClCompile Include="src\PreviewAssemblerRMD.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
-    <ClCompile Include="src\MetadataAssemblyRangeData.cpp">
-      <Filter>src\ParameterizedDataHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DataCollectionCreationHandler.cpp">
-      <Filter>src\ParameterizedDataHandler</Filter>
-    </ClCompile>
     <ClCompile Include="src\Documentation.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MetadataParameterBundle.cpp">
-      <Filter>src\ParameterizedDataHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp">
-      <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
     <ClCompile Include="include\ProgressUpdater.cpp">
       <Filter>src</Filter>
@@ -69,6 +57,33 @@
     </ClCompile>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
       <Filter>include\ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataAssemblyRangeData.cpp">
+      <Filter>src\ResultdataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MetadataParameterBundle.cpp">
+      <Filter>src\ResultdataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabledataToResultdataHandler.cpp">
+      <Filter>src\ResultdataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp">
+      <Filter>src\ResultdataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TouchstoneToResultdata.cpp">
+      <Filter>src\ResultdataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionsParameterHandlerFrequency.cpp">
+      <Filter>src\Touchstone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionsParameterHandlerParameter.cpp">
+      <Filter>src\Touchstone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionsParameterHandlerReference.cpp">
+      <Filter>src\Touchstone</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionsParameterHandlerFormat.cpp">
+      <Filter>src\Touchstone</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +168,7 @@
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
       <Filter>include\ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="include\DataCollectionCreationHandler.h">
+    <ClInclude Include="include\TabledataToResultdataHandler.h">
       <Filter>include\ResultdataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataParameterBundle.h">
@@ -169,6 +184,9 @@
       <Filter>include\ResultdataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\BranchSynchronizer.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TouchstoneToResultdata.h">
       <Filter>include\ResultdataHandler</Filter>
     </ClInclude>
   </ItemGroup>
@@ -208,6 +226,9 @@
     </Filter>
     <Filter Include="include\ResultdataHandler">
       <UniqueIdentifier>{ffd89152-30b7-4194-97d2-4b4cafc88def}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ResultdataHandler">
+      <UniqueIdentifier>{400364fb-a6d1-4878-8534-6e0a0f36d19a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -29,6 +29,12 @@ public:
 		}
 	}
 protected:
+	/// <summary>
+	/// Requires a string in lower cases.
+	/// </summary>
+	/// <param name="entry"></param>
+	/// <param name="options"></param>
+	/// <returns></returns>
 	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) = 0;
 
 private:

@@ -54,13 +54,13 @@ bool ts::PortData::AddValue(const std::string& value)
 	{
 		if (_frequency == nullptr)
 		{
-			_frequency = new PortDataSingleEntry(StringToPortDataSingleEntry(value));
+			_frequency = new ot::Variable(StringToPortDataSingleEntry(value));
 		}
 		else
 		{
 			if (_buffer == nullptr)
 			{
-				_buffer = new PortDataSingleEntry(StringToPortDataSingleEntry(value));
+				_buffer = new ot::Variable(StringToPortDataSingleEntry(value));
 			}
 			else
 			{
@@ -73,30 +73,29 @@ bool ts::PortData::AddValue(const std::string& value)
 	}
 }
 
-ts::PortDataSingleEntry ts::PortData::StringToPortDataSingleEntry(const std::string& value)
+ot::Variable ts::PortData::StringToPortDataSingleEntry(const std::string& value)
 {
 	const std::string valueString = "{\"value\":" + value + "}";
 	ot::JsonDocument doc;
 	doc.fromJson(valueString);
 	if (doc["value"].IsFloat())
 	{
-		return ts::PortDataSingleEntry(doc["value"].GetFloat());
+		return ot::Variable(doc["value"].GetFloat());
 	}
 	else if (doc["value"].IsDouble())
 	{
-		return ts::PortDataSingleEntry(doc["value"].GetDouble());
+		return ot::Variable(doc["value"].GetDouble());
 	}
 	else if (doc["value"].IsInt())
 	{
-		return ts::PortDataSingleEntry(doc["value"].GetInt());
+		return ot::Variable(doc["value"].GetInt());
 	}
 	else if (doc["value"].IsInt64())
 	{
-		return ts::PortDataSingleEntry(doc["value"].GetInt64());
+		return ot::Variable(doc["value"].GetInt64());
 	}
 	else
 	{
 		throw std::exception(std::string("Failed to convert \"" + value + "\" into a floating point or integer value.").c_str());
 	}
-	return PortDataSingleEntry();
 }

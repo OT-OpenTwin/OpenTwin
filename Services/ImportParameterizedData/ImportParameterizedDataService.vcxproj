@@ -164,7 +164,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ResultDataAccess.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ResultDataAccess.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -200,7 +200,11 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp" />
-    <ClCompile Include="src\DataCollectionCreationHandler.cpp" />
+    <ClCompile Include="src\OptionsParameterHandlerFormat.cpp" />
+    <ClCompile Include="src\OptionsParameterHandlerFrequency.cpp" />
+    <ClCompile Include="src\OptionsParameterHandlerParameter.cpp" />
+    <ClCompile Include="src\OptionsParameterHandlerReference.cpp" />
+    <ClCompile Include="src\TabledataToResultdataHandler.cpp" />
     <ClCompile Include="src\DataSourceHandler.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Documentation.cpp" />
@@ -217,6 +221,7 @@
     <ClCompile Include="src\TableExtractorCSV.cpp" />
     <ClCompile Include="src\TableHandler.cpp" />
     <ClCompile Include="src\TableStatisticAnalyser.cpp" />
+    <ClCompile Include="src\TouchstoneToResultdata.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -225,7 +230,7 @@
     <ClInclude Include="include\BranchSynchronizer.h" />
     <ClInclude Include="include\BusinessLogicHandler.h" />
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
-    <ClInclude Include="include\DataCollectionCreationHandler.h" />
+    <ClInclude Include="include\TabledataToResultdataHandler.h" />
     <ClInclude Include="include\DataSourceHandler.h" />
     <ClInclude Include="include\Documentation.h" />
     <ClInclude Include="include\FileToTableExtractorFactory.h" />
@@ -252,6 +257,7 @@
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\TableHandler.h" />
     <ClInclude Include="include\TableStatisticAnalyser.h" />
+    <ClInclude Include="include\TouchstoneToResultdata.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

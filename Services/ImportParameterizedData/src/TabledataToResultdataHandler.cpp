@@ -1,4 +1,4 @@
-#include "DataCollectionCreationHandler.h"
+#include "TabledataToResultdataHandler.h"
 #include "Application.h"
 #include "ClassFactory.h"
 
@@ -19,12 +19,12 @@
 #include "MetadataEntryObject.h"
 #include "MetadataEntrySingle.h"
 
-DataCollectionCreationHandler::DataCollectionCreationHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder)
+TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder)
 	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
 {
 }
 
-void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbURL, const std::string& projectName)
+void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL, const std::string& projectName)
 {
 	//To guarantee the uniqueness of parameter and quantity indices, a branch overreaching mutual exclusion has to be realized. 
 	//So far branching is not realized yet, thus this implementation is a place holder. Ultimately, a client-server mutual exclusion with (maybe) the modelservice needs to be implemented.
@@ -279,7 +279,7 @@ void DataCollectionCreationHandler::CreateDataCollection(const std::string& dbUR
 }
 
 
-std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAllMetadataAssemblies()
+std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::GetAllMetadataAssemblies()
 {
 	//Load all selection ranges
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
@@ -308,7 +308,7 @@ std::map<std::string, MetadataAssemblyData> DataCollectionCreationHandler::GetAl
 	return allMetadataAssembliesByName;
 }
 
-void DataCollectionCreationHandler::ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
+void TabledataToResultdataHandler::ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
 {
 	auto it = allRangeEntities.begin();
 	bool rmdHasSelections = false;
@@ -349,7 +349,7 @@ void DataCollectionCreationHandler::ExtractRMDAndAllMSMD(std::map<std::string, M
 	}
 }
 
-void DataCollectionCreationHandler::ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
+void TabledataToResultdataHandler::ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
 {
 	auto it = allRangeEntities.begin();
 	while (it != allRangeEntities.end())
@@ -380,7 +380,7 @@ void DataCollectionCreationHandler::ExtractAllParameter(std::map<std::string, Me
 	}
 }
 
-void DataCollectionCreationHandler::ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
+void TabledataToResultdataHandler::ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
 {
 	auto it = allRangeEntities.begin();
 	while (it != allRangeEntities.end())
@@ -416,7 +416,7 @@ void DataCollectionCreationHandler::ExtractAllQuantities(std::map<std::string, M
 	}
 }
 
-std::list<std::shared_ptr<MetadataEntry>> DataCollectionCreationHandler::RangeData2MetadataEntries(MetadataAssemblyRangeData&& assembyRangeData)
+std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::RangeData2MetadataEntries(MetadataAssemblyRangeData&& assembyRangeData)
 {
 	std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries;
 	auto field = assembyRangeData.getFields()->begin();
@@ -439,7 +439,7 @@ std::list<std::shared_ptr<MetadataEntry>> DataCollectionCreationHandler::RangeDa
 	return allMetadataEntries;	
 }
 
-void DataCollectionCreationHandler::AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
+void TabledataToResultdataHandler::AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
 {
 	for (auto range : dataAssembly.allSelectionRanges)
 	{
@@ -447,7 +447,7 @@ void DataCollectionCreationHandler::AddRequiredTables(const MetadataAssemblyData
 	}
 }
 
-void DataCollectionCreationHandler::LoadRequiredTables(std::list<string>& requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& loadedTables)
+void TabledataToResultdataHandler::LoadRequiredTables(std::list<string>& requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& loadedTables)
 {
 	//Deleting all loaded tables that are not needed anymore
 	auto it = loadedTables.begin();

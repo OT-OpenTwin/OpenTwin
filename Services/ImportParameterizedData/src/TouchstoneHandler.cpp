@@ -22,6 +22,21 @@ TouchstoneHandler::TouchstoneHandler(const std::string& fileName)
 	_portNumber = std::stoi(numberOfPortsAsString);
 }
 
+TouchstoneHandler::TouchstoneHandler(TouchstoneHandler&& other) noexcept
+	:_comments(std::move(other._comments)), _optionSettings(std::move(other._optionSettings)), _portData(std::move(other._portData)), _touchstoneVersion(std::move(other._touchstoneVersion)), _portNumber(std::move(other._portNumber))
+{
+}
+
+TouchstoneHandler& TouchstoneHandler::operator=(TouchstoneHandler&& other) noexcept
+{
+	_comments = (std::move(other._comments));
+	_optionSettings = (std::move(other._optionSettings));
+	_portData = (std::move(other._portData));
+	_touchstoneVersion = (std::move(other._touchstoneVersion));
+	_portNumber = (std::move(other._portNumber));
+	return *this;
+}
+
 void TouchstoneHandler::AnalyseFile(const std::string& fileContent)
 {
 	std::stringstream stream;

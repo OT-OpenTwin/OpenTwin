@@ -18,6 +18,8 @@ public:
 	ResultCollectionExtender& operator=(const ResultCollectionExtender& other) = delete;
 	~ResultCollectionExtender();
 	
+	void setBucketSize(const uint64_t bucketSize) { _bucketSize = bucketSize; }
+
 	void AddSeries(MetadataSeries&& series);
 	bool CampaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> metadata);
 	bool CampaignMetadataWithSameValueExists(std::shared_ptr<MetadataEntry> metadata);
@@ -42,7 +44,7 @@ private:
 	std::vector<QuantityContainer> _quantityContainer;
 
 	std::map<std::string,uint32_t> _parameterBuckets;
-	const uint64_t _bucketSize = 1;
+	uint64_t _bucketSize = 1;
 	const uint32_t _bufferSize = 50;
 	const std::string _parameterAbbreviationBase = "P_";
 	const std::string _quantityAbbreviationBase = "Q_";

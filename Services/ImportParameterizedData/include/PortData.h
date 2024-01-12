@@ -3,12 +3,11 @@
 
 #include <stdint.h>
 #include <vector>
-#include <tuple>
+#include "OTCore/Variable.h"
 
 namespace ts
 {
-	typedef std::variant<int32_t, int64_t, float, double> PortDataSingleEntry;
-	typedef std::tuple<PortDataSingleEntry, PortDataSingleEntry> PortDataEntry;
+	typedef std::tuple<ot::Variable, ot::Variable> PortDataEntry;
 
 	class PortData
 	{
@@ -23,15 +22,15 @@ namespace ts
 		~PortData();
 		bool AddValue(const std::string& value);
 		const std::vector<PortDataEntry>& getPortDataEntries() const { return _portData; }
-		const PortDataSingleEntry& getFrequency() const { return *_frequency; }
+		const ot::Variable& getFrequency() const { return *_frequency; }
 		const bool isFilled() { return static_cast<uint32_t>(_portData.size()) == _numberOfEntries;}
 	
 	private:	
 		uint32_t _numberOfEntries;
-		PortDataSingleEntry* _frequency = nullptr;
+		ot::Variable* _frequency = nullptr;
 		std::vector<PortDataEntry> _portData;
-		PortDataSingleEntry* _buffer = nullptr;
+		ot::Variable* _buffer = nullptr;
 
-		PortDataSingleEntry StringToPortDataSingleEntry(const std::string& value);
+		ot::Variable StringToPortDataSingleEntry(const std::string& value);
 	};
 }

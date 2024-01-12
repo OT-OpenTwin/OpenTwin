@@ -17,10 +17,10 @@
 #include "EntityMetadataCampaign.h"
 #include "MetadataEntry.h"
 
-class DataCollectionCreationHandler : public BusinessLogicHandler
+class TabledataToResultdataHandler : public BusinessLogicHandler
 {
 public:
-	DataCollectionCreationHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder);
+	TabledataToResultdataHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder);
 	void CreateDataCollection(const std::string& dbURL, const std::string& projectName);
 
 private:

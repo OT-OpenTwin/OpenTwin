@@ -17,7 +17,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "OTServiceFoundation/TableRange.h"
-#include "TouchstoneHandler.h"
+
 
 //Application specific includes
 #include "TemplateDefaultManager.h"
@@ -26,8 +26,6 @@
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 
-#include <base64.h>
-#include <zlib.h>
 
 
 Application * g_instance{ nullptr };
@@ -48,7 +46,8 @@ Application::Application()
 	_dataSourceHandler = new DataSourceHandler();
 	_tableHandler = new TableHandler( _tableFolder);
 	_parametrizedDataHandler = new DataCategorizationHandler( _dataCategorizationFolder, _parameterFolder, _quantityFolder, _tableFolder, _previewTableNAme);
-	_collectionCreationHandler = new DataCollectionCreationHandler(_dataCategorizationFolder,_datasetFolder, _parameterFolder, _quantityFolder, _tableFolder);
+	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_dataCategorizationFolder,_datasetFolder, _parameterFolder, _quantityFolder, _tableFolder);
+	_touchstoneToResultdata = new TouchstoneToResultdata();
 }
 
 Application::~Application()
@@ -91,7 +90,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_dataSourceHandler->setUIComponent(_ui);
 	_tableHandler->setUIComponent(_ui);
 	_parametrizedDataHandler->setUIComponent(_ui);
-	_collectionCreationHandler->setUIComponent(_ui);
+	_tabledataToResultdataHandler->setUIComponent(_ui);
+	_touchstoneToResultdata->setUIComponent(_ui);
 
 	_ui->addMenuPage(pageName);
 
@@ -186,7 +186,8 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_dataSourceHandler->setModelComponent(_model);
 	_tableHandler->setModelComponent(_model);
 	_parametrizedDataHandler->setModelComponent(_model);
-	_collectionCreationHandler->setModelComponent(_model);
+	_tabledataToResultdataHandler->setModelComponent(_model);
+	_touchstoneToResultdata->setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)
@@ -332,7 +333,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				m_uiComponent->displayMessage("===========================================================================\n");
 				m_uiComponent->displayMessage("Start creation of dataset\n");
-				_collectionCreationHandler->CreateDataCollection(dataBaseURL(), m_collectionName);
+				_tabledataToResultdataHandler->CreateDataCollection(dataBaseURL(), m_collectionName);
 				m_uiComponent->displayMessage("Creation of dataset finished\n");
 				m_uiComponent->displayMessage("===========================================================================\n\n");
 			}
@@ -432,24 +433,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 
-				// Decode the encoded string into binary data
-				int decoded_compressed_data_length = Base64decode_len(fileContent.c_str());
-				char* decodedCompressedString = new char[decoded_compressed_data_length];
-
-				Base64decode(decodedCompressedString, fileContent.c_str());
-
-				// Decompress the data
-				char* decodedString = new char[uncompressedDataLength];
-				uLongf destLen = (uLongf)uncompressedDataLength;
-				uLong  sourceLen = decoded_compressed_data_length;
-				uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
-
-				delete[] decodedCompressedString;
-				decodedCompressedString = nullptr;
-
-				std::string unpackedFileContent(decodedString, uncompressedDataLength);
-				TouchstoneHandler handler(originalName);
-				handler.AnalyseFile(unpackedFileContent);
+				_touchstoneToResultdata->CreateResultdata(originalName, fileContent, uncompressedDataLength);
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{

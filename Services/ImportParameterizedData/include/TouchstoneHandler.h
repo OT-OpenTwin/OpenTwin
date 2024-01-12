@@ -8,6 +8,13 @@ class TouchstoneHandler
 {
 public:
 	TouchstoneHandler(const std::string& fileName);
+	TouchstoneHandler(const TouchstoneHandler& other) = delete;
+	TouchstoneHandler(TouchstoneHandler&& other) noexcept;
+	TouchstoneHandler& operator=(const TouchstoneHandler& other) = delete;
+	TouchstoneHandler& operator=(TouchstoneHandler&& other) noexcept;
+
+	const uint32_t getNumberOfPorts() const { return _portNumber; }
+	
 	void AnalyseFile(const std::string& fileContent);
 	const ts::OptionSettings& getOptionSettings() const { return _optionSettings; }
 	const std::string& getComments() const { return _comments; }

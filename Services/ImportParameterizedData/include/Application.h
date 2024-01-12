@@ -17,7 +17,8 @@
 #include "DataSourceHandler.h"
 #include "TableHandler.h"
 #include "DataCategorizationHandler.h"
-#include "DataCollectionCreationHandler.h"
+#include "TabledataToResultdataHandler.h"
+#include "TouchstoneToResultdata.h"
 
 #include "OTCore/FolderNames.h"
 
@@ -160,7 +161,9 @@ private:
 	DataSourceHandler * _dataSourceHandler = nullptr;
 	TableHandler* _tableHandler = nullptr;
 	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
-	DataCollectionCreationHandler* _collectionCreationHandler = nullptr;
+	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
+	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
+
 
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
