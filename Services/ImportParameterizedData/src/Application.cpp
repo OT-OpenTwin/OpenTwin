@@ -25,6 +25,9 @@
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 
+#include <base64.h>
+#include <zlib.h>
+
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -109,7 +112,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonImportCSV.SetDescription(pageName, groupNameImport, "Import File");
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
 	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
-	_buttonImportSParameter.SetDescription(pageName, groupNameImport, "Import S-Parameter");
+	_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
 
 	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row", "", subgroupNameTableHandlingRow);
 	_buttonTableAddRowBelow.SetDescription(pageName, groupNameTableHandling, "Insert Row Below", "", subgroupNameTableHandlingRow);
@@ -132,7 +135,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 
 	_ui->addMenuButton(_buttonImportCSV, modelWrite, "TextVisible");
-	_ui->addMenuButton(_buttonImportSParameter, modelWrite, "Icon");
+	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "Icon");
 	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
 	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
 	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
@@ -259,9 +262,16 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 				uiComponent()->sendMessage(true, doc);
 			}
-			else if (action == _buttonImportSParameter.GetFullDescription())
+			else if (action == _buttonImportTouchstone.GetFullDescription())
 			{
-
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Touchstone File", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("Touchstone files (*.s*p)", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importTouchstoneData", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent,ot::JsonValue(true),doc.GetAllocator());
+				uiComponent()->sendMessage(true, doc);
 			}
 			else if (action == _buttonImportPythonScript.GetFullDescription())
 			{
@@ -412,6 +422,30 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				ot::UIDList dataVers = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
 				_dataSourceHandler->AddNewFilesToModel(topoIDs, topoVers, dataIDs, dataVers, fileNames);
 				m_modelComponent->updatePropertyGrid();
+			}
+			else if (subsequentFunction == "importTouchstoneData")
+			{
+				std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+
+				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+
+				// Decode the encoded string into binary data
+				int decoded_compressed_data_length = Base64decode_len(fileContent.c_str());
+				char* decodedCompressedString = new char[decoded_compressed_data_length];
+
+				Base64decode(decodedCompressedString, fileContent.c_str());
+
+				// Decompress the data
+				char* decodedString = new char[uncompressedDataLength];
+				uLongf destLen = (uLongf)uncompressedDataLength;
+				uLong  sourceLen = decoded_compressed_data_length;
+				uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
+
+				delete[] decodedCompressedString;
+				decodedCompressedString = nullptr;
+
+				std::string unpackedFileContent(decodedString, uncompressedDataLength);
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{

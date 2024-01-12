@@ -10,13 +10,13 @@ class OptionsParameterHandlerParameter : public OptionsParameterHandler
 public:
 
 private:
-	const std::map<std::string, sp::option::Parameter> _stringToParameter = { {"S",sp::option::Parameter::Scattering},{"Y",sp::option::Parameter::Admittance},{"Z",sp::option::Parameter::Impedance},{"H",sp::option::Parameter::Hybrid_h},{"G",sp::option::Parameter::Hybrid_g} };
+	const std::map<std::string, ts::option::Parameter> _stringToParameter = { {"S",ts::option::Parameter::Scattering},{"Y",ts::option::Parameter::Admittance},{"Z",ts::option::Parameter::Impedance},{"H",ts::option::Parameter::Hybrid_h},{"G",ts::option::Parameter::Hybrid_g} };
 	
-	virtual bool IndividualInterpretation(const std::string& entry, sp::OptionSettings& options) override;
+	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 	
 };
 
-bool OptionsParameterHandlerParameter::IndividualInterpretation(const std::string& entry, sp::OptionSettings& options)
+bool OptionsParameterHandlerParameter::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)
 {
 	auto searchResult = _stringToParameter.find(entry);
 	if (searchResult != _stringToParameter.end())

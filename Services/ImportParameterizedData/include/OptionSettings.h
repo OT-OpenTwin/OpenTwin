@@ -1,7 +1,7 @@
 #pragma once
 #include "Options.h"
 
-namespace sp
+namespace ts
 {
 	class OptionSettings
 	{

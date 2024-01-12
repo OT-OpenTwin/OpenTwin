@@ -6,9 +6,9 @@ TEST(PortData, ValueTransformationInt32)
 {
 	std::string value0 = std::to_string(std::numeric_limits<int32_t>::max());
 		
-	sp::PortData portData(1);
+	ts::PortData portData(1);
 	portData.AddValue(value0);
-	const sp::PortDataSingleEntry& frequency = portData.getFrequency();
+	const ts::PortDataSingleEntry& frequency = portData.getFrequency();
 	EXPECT_TRUE(std::holds_alternative<int32_t>(frequency));
 }
 
@@ -16,9 +16,9 @@ TEST(PortData, ValueTransformationInt64)
 {
 	std::string value0 = std::to_string(std::numeric_limits<int64_t>::max());
 
-	sp::PortData portData(1);
+	ts::PortData portData(1);
 	portData.AddValue(value0);
-	const sp::PortDataSingleEntry& frequency = portData.getFrequency();
+	const ts::PortDataSingleEntry& frequency = portData.getFrequency();
 	EXPECT_TRUE(std::holds_alternative<int64_t>(frequency));
 }
 
@@ -27,9 +27,9 @@ TEST(PortData, ValueTransformationFloat)
 	const float expected = 4.f;
 	const std::string value0 = std::to_string(expected);
 
-	sp::PortData portData(1);
+	ts::PortData portData(1);
 	portData.AddValue(value0);
-	const sp::PortDataSingleEntry& frequency = portData.getFrequency();
+	const ts::PortDataSingleEntry& frequency = portData.getFrequency();
 	EXPECT_TRUE(std::holds_alternative<float>(frequency));
 }
 
@@ -37,9 +37,9 @@ TEST(PortData, ValueTransformationDouble)
 {
 	std::string value0 = std::to_string(std::numeric_limits<double>::max());
 
-	sp::PortData portData(1);
+	ts::PortData portData(1);
 	portData.AddValue(value0);
-	const sp::PortDataSingleEntry& frequency = portData.getFrequency();
+	const ts::PortDataSingleEntry& frequency = portData.getFrequency();
 	EXPECT_TRUE(std::holds_alternative<double>(frequency));
 }
 
@@ -51,7 +51,7 @@ TEST(PortData, Example1Port)
 	values[2] = "2";
 	values[3] = "3";
 
-	sp::PortData portData(1);
+	ts::PortData portData(1);
 	for (std::string& value : values)
 	{
 		portData.AddValue(value);

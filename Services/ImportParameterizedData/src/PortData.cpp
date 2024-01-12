@@ -1,20 +1,20 @@
 #include "PortData.h"
 #include "OTCore/JSON.h"
 
-sp::PortData::PortData(const uint32_t portNumber)
+ts::PortData::PortData(const uint32_t portNumber)
 	:_numberOfEntries(portNumber*portNumber)
 {
 	_portData.reserve(_numberOfEntries);
 }
 
-sp::PortData::PortData(PortData&& other)
+ts::PortData::PortData(PortData&& other)
 	:_numberOfEntries(other._numberOfEntries),_frequency(other._frequency), _portData(std::move(other._portData)), _buffer(other._buffer)
 {
 	other._frequency = nullptr;
 	other._buffer = nullptr;
 }
 
-sp::PortData& sp::PortData::operator=(PortData&& other)
+ts::PortData& ts::PortData::operator=(PortData&& other)
 {
 	_numberOfEntries = other._numberOfEntries;
 	
@@ -27,10 +27,9 @@ sp::PortData& sp::PortData::operator=(PortData&& other)
 	_buffer = nullptr;
 
 	return *this;
-	// TODO: insert return statement here
 }
 
-sp::PortData::~PortData()
+ts::PortData::~PortData()
 {
 	if (_frequency != nullptr)
 	{
@@ -45,7 +44,7 @@ sp::PortData::~PortData()
 }
 
 
-bool sp::PortData::AddValue(const std::string& value)
+bool ts::PortData::AddValue(const std::string& value)
 {
 	if (isFilled())
 	{
@@ -74,26 +73,26 @@ bool sp::PortData::AddValue(const std::string& value)
 	}
 }
 
-sp::PortDataSingleEntry sp::PortData::StringToPortDataSingleEntry(const std::string& value)
+ts::PortDataSingleEntry ts::PortData::StringToPortDataSingleEntry(const std::string& value)
 {
 	const std::string valueString = "{\"value\":" + value + "}";
 	ot::JsonDocument doc;
 	doc.fromJson(valueString);
 	if (doc["value"].IsFloat())
 	{
-		return sp::PortDataSingleEntry(doc["value"].GetFloat());
+		return ts::PortDataSingleEntry(doc["value"].GetFloat());
 	}
 	else if (doc["value"].IsDouble())
 	{
-		return sp::PortDataSingleEntry(doc["value"].GetDouble());
+		return ts::PortDataSingleEntry(doc["value"].GetDouble());
 	}
 	else if (doc["value"].IsInt())
 	{
-		return sp::PortDataSingleEntry(doc["value"].GetInt());
+		return ts::PortDataSingleEntry(doc["value"].GetInt());
 	}
 	else if (doc["value"].IsInt64())
 	{
-		return sp::PortDataSingleEntry(doc["value"].GetInt64());
+		return ts::PortDataSingleEntry(doc["value"].GetInt64());
 	}
 	else
 	{

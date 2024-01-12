@@ -9,11 +9,11 @@ public:
 private:
 	const char _initialCharacter = 'R';
 	
-	virtual bool IndividualInterpretation(const std::string& entry, sp::OptionSettings& options) override;
+	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 
 };
 
-bool OptionsParameterHandlerReference::IndividualInterpretation(const std::string& entry, sp::OptionSettings& options)
+bool OptionsParameterHandlerReference::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)
 {
 	if (entry[0] == _initialCharacter)
 	{

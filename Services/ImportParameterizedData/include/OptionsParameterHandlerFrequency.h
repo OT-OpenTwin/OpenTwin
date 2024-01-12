@@ -10,13 +10,13 @@ class OptionsParameterHandlerFrequency : public OptionsParameterHandler
 public:
 
 private:
-	const std::map<std::string, sp::option::Frequency> _stringToFrequencyParameter = { {"Hz", sp::option::Frequency::Hz },{"kHz",sp::option::Frequency::kHz}, {"MHz", sp::option::Frequency::MHz},{"GHz", sp::option::Frequency::GHz}};
+	const std::map<std::string, ts::option::Frequency> _stringToFrequencyParameter = { {"Hz", ts::option::Frequency::Hz },{"kHz",ts::option::Frequency::kHz}, {"MHz", ts::option::Frequency::MHz},{"GHz", ts::option::Frequency::GHz}};
 	
-	virtual bool IndividualInterpretation(const std::string& entry, sp::OptionSettings& options) override;
+	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 };
 
 
-bool OptionsParameterHandlerFrequency::IndividualInterpretation(const std::string& entry, sp::OptionSettings& options)
+bool OptionsParameterHandlerFrequency::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)
 {
 	auto searchResult = _stringToFrequencyParameter.find(entry);
 	if (searchResult != _stringToFrequencyParameter.end())

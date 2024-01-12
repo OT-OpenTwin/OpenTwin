@@ -1,133 +1,133 @@
-#include "FixtureSParameterHandler.h"
+#include "FixtureTouchstoneHandler.h"
 #include "OptionSettings.h"
 #include "Options.h"
 #include <sstream>
 
-TEST_F(FixtureSParameterHandler, OptionDetectionSuccess)
+TEST_F(FixtureTouchstoneHandler, OptionDetectionSuccess)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::real_imaginary, sp::option::Parameter::Admittance, ot::Variable(100));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::real_imaginary, ts::option::Parameter::Admittance, ot::Variable(100));
 	
 	std::string setting = "# kHz Y RI R 100";
-	const sp::OptionSettings actualSettings	= AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings	= AnalyseOptionSettings(setting);
 	
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionFrequencyOmitted)
+TEST_F(FixtureTouchstoneHandler, OptionFrequencyOmitted)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::GHz, sp::option::Format::real_imaginary, sp::option::Parameter::Admittance, ot::Variable(100));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::GHz, ts::option::Format::real_imaginary, ts::option::Parameter::Admittance, ot::Variable(100));
 
 	std::string setting = "# Y RI R 100";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionFormatOmitted)
+TEST_F(FixtureTouchstoneHandler, OptionFormatOmitted)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::magnitude_angle, sp::option::Parameter::Admittance, ot::Variable(100));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::magnitude_angle, ts::option::Parameter::Admittance, ot::Variable(100));
 
 	std::string setting = "# kHz Y R 100";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionParameterOmitted)
+TEST_F(FixtureTouchstoneHandler, OptionParameterOmitted)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::real_imaginary, sp::option::Parameter::Scattering, ot::Variable(100));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::real_imaginary, ts::option::Parameter::Scattering, ot::Variable(100));
 
 	std::string setting = "# kHz S RI R 100";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionResistanceOmitted)
+TEST_F(FixtureTouchstoneHandler, OptionResistanceOmitted)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::real_imaginary, sp::option::Parameter::Admittance, ot::Variable(50));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::real_imaginary, ts::option::Parameter::Admittance, ot::Variable(50));
 
 	std::string setting = "# kHz Y RI";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, BlankOptionLine)
+TEST_F(FixtureTouchstoneHandler, BlankOptionLine)
 {
-	const sp::OptionSettings expectedOptionSettings;
+	const ts::OptionSettings expectedOptionSettings;
 
 	std::string setting = "#";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionTwoEntries)
+TEST_F(FixtureTouchstoneHandler, OptionTwoEntries)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::real_imaginary, sp::option::Parameter::Scattering, ot::Variable(50));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::real_imaginary, ts::option::Parameter::Scattering, ot::Variable(50));
 
 	std::string setting = "# kHz RI";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionOnlyResistance)
+TEST_F(FixtureTouchstoneHandler, OptionOnlyResistance)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::GHz, sp::option::Format::magnitude_angle, sp::option::Parameter::Scattering, ot::Variable(80));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::GHz, ts::option::Format::magnitude_angle, ts::option::Parameter::Scattering, ot::Variable(80));
 
 	std::string setting = "#R 80";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionUnevenNumberOfWhitespaces)
+TEST_F(FixtureTouchstoneHandler, OptionUnevenNumberOfWhitespaces)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::real_imaginary, sp::option::Parameter::Scattering, ot::Variable(50));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::real_imaginary, ts::option::Parameter::Scattering, ot::Variable(50));
 
 	std::string setting = "#          kHz      RI";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, OptionChangedOrder)
+TEST_F(FixtureTouchstoneHandler, OptionChangedOrder)
 {
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::kHz, sp::option::Format::real_imaginary, sp::option::Parameter::Scattering, ot::Variable(50));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::kHz, ts::option::Format::real_imaginary, ts::option::Parameter::Scattering, ot::Variable(50));
 
 	std::string setting = "# RI kHz";
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
 
-TEST_F(FixtureSParameterHandler, OptionDetectedAfterComments)
+TEST_F(FixtureTouchstoneHandler, OptionDetectedAfterComments)
 {
-	const sp::OptionSettings expectedOptionSettings;
+	const ts::OptionSettings expectedOptionSettings;
 
 	std::string setting = "! This is a first comment.\n"
 		"!And a second\n"
 		"#";
 	AnalyseFile(setting);
-	const sp::OptionSettings actualSettings = AnalyseOptionSettings(setting);
+	const ts::OptionSettings actualSettings = AnalyseOptionSettings(setting);
 
 	EXPECT_TRUE(expectedOptionSettings == actualSettings);
 }
 
-TEST_F(FixtureSParameterHandler, CommentsDetected)
+TEST_F(FixtureTouchstoneHandler, CommentsDetected)
 {
 	const std::string expectedComments = " This is a first comment.\nAnd a second\nOne more\n";
 
@@ -142,7 +142,7 @@ TEST_F(FixtureSParameterHandler, CommentsDetected)
 	EXPECT_TRUE(actualComments == expectedComments);
 }
 
-TEST_F(FixtureSParameterHandler, FreeDataLineOfComment)
+TEST_F(FixtureTouchstoneHandler, FreeDataLineOfComment)
 {
 	const std::string expectedLine = " This is no comment.";
 	const std::string line = " This is no comment.!But this is";
@@ -151,7 +151,7 @@ TEST_F(FixtureSParameterHandler, FreeDataLineOfComment)
 	EXPECT_EQ(expectedLine, actualLine);	
 }
 
-TEST_F(FixtureSParameterHandler, V1_Example1Port)
+TEST_F(FixtureTouchstoneHandler, V1_Example1Port)
 {
 	std::string line = "2.000 0.894 -12.136\n";
 	SetNumberOfPorts(1);
@@ -160,7 +160,7 @@ TEST_F(FixtureSParameterHandler, V1_Example1Port)
 	EXPECT_EQ(portData.size(), 1);
 }
 
-TEST_F(FixtureSParameterHandler, V1_Example4Ports_Comments)
+TEST_F(FixtureTouchstoneHandler, V1_Example4Ports_Comments)
 {
 	const int numberOfPorts = 4;
 	const std::string expectedComments =	"4 - port S - parameter data, taken at three frequency points\n"
@@ -175,22 +175,22 @@ TEST_F(FixtureSParameterHandler, V1_Example4Ports_Comments)
 	EXPECT_EQ(expectedComments, actualComments);
 }
 
-TEST_F(FixtureSParameterHandler, V1_Example4Ports_Options)
+TEST_F(FixtureTouchstoneHandler, V1_Example4Ports_Options)
 {
 	const int numberOfPorts = 4;
 
-	const sp::OptionSettings expectedOptionSettings(sp::option::Frequency::Hz, sp::option::Format::real_imaginary, sp::option::Parameter::Admittance, ot::Variable(90));
+	const ts::OptionSettings expectedOptionSettings(ts::option::Frequency::Hz, ts::option::Format::real_imaginary, ts::option::Parameter::Admittance, ot::Variable(90));
 
 	const std::string& file = GetFullExampleFourPorts();
 	SetNumberOfPorts(numberOfPorts);
 	AnalyseFile(file);
 
-	const sp::OptionSettings& actualOptionSettings = GetOptionSettings();
+	const ts::OptionSettings& actualOptionSettings = GetOptionSettings();
 
 	EXPECT_EQ(expectedOptionSettings, actualOptionSettings);
 }
 
-TEST_F(FixtureSParameterHandler, V1_Example4Ports_Data_Sizes)
+TEST_F(FixtureTouchstoneHandler, V1_Example4Ports_Data_Sizes)
 {
 	const int numberOfPorts = 4;
 	
@@ -205,7 +205,7 @@ TEST_F(FixtureSParameterHandler, V1_Example4Ports_Data_Sizes)
 
 	EXPECT_EQ(actualPortData.size(), expectedNumberOfEntries);
 	int counter(0);
-	for (const sp::PortData& portData : actualPortData)
+	for (const ts::PortData& portData : actualPortData)
 	{
 		counter++;
 		const auto& actualPortDataEntries = actualPortData.back().getPortDataEntries();
@@ -213,12 +213,12 @@ TEST_F(FixtureSParameterHandler, V1_Example4Ports_Data_Sizes)
 	}
 }
 
-TEST_F(FixtureSParameterHandler, V1_Example4Ports_Data_Values)
+TEST_F(FixtureTouchstoneHandler, V1_Example4Ports_Data_Values)
 {
 	const int numberOfPorts = 4;
 
 	const std::vector<float> expectedFrequencyValues{ 5.00000f,6.00000f,7.00000f };
-	const sp::PortDataEntry lastDataEntry = { sp::PortDataEntry(sp::PortDataSingleEntry {0.50f},sp::PortDataSingleEntry {136.69f}) };
+	const ts::PortDataEntry lastDataEntry = { ts::PortDataEntry(ts::PortDataSingleEntry {0.50f},ts::PortDataSingleEntry {136.69f}) };
 
 	const std::string& file = GetFullExampleFourPorts();
 	SetNumberOfPorts(numberOfPorts);
@@ -227,7 +227,7 @@ TEST_F(FixtureSParameterHandler, V1_Example4Ports_Data_Values)
 	const auto& actualPortData = GetPortData();
 
 	int counter(0);
-	for (const sp::PortData& portData : actualPortData)
+	for (const ts::PortData& portData : actualPortData)
 	{
 		bool typeFound = std::holds_alternative <float>(portData.getFrequency());
 		EXPECT_TRUE(typeFound);

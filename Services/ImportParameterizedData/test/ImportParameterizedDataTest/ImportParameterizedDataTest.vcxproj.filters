@@ -45,10 +45,10 @@
     <ClCompile Include="src\FileHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestSParameterOptionHandling.cpp">
+    <ClCompile Include="src\TestTouchstoneOptionHandling.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestSParameterOptionSettings.cpp">
+    <ClCompile Include="src\TestTouchstoneOptionSettings.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TestPortData.cpp">
@@ -79,7 +79,7 @@
     <ClInclude Include="include\FileHelper.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\FixtureSParameterHandler.h">
+    <ClInclude Include="include\FixtureTouchstoneHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

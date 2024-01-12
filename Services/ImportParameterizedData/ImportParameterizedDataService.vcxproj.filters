@@ -64,14 +64,17 @@
     <ClCompile Include="include\ProgressUpdater.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SParameterHandler.cpp">
+    <ClCompile Include="src\TouchstoneHandler.cpp">
       <Filter>src\DataSources</Filter>
     </ClCompile>
     <ClCompile Include="src\OptionSettings.cpp">
-      <Filter>src\SParameter</Filter>
+      <Filter>src\Touchstone</Filter>
     </ClCompile>
     <ClCompile Include="src\PortData.cpp">
-      <Filter>src\SParameter</Filter>
+      <Filter>src\Touchstone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+      <Filter>include\ThirdParty</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,32 +159,35 @@
     <ClInclude Include="include\LocaleSettingsSwitch.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
-    <ClInclude Include="include\SParameterHandler.h">
+    <ClInclude Include="include\TouchstoneHandler.h">
       <Filter>include\DataSources</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionsParameterHandler.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionsParameterHandlerFrequency.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionsParameterHandlerFormat.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionsParameterHandlerParameter.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionsParameterHandlerReference.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\Options.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionSettings.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\PortData.h">
-      <Filter>include\SParameter</Filter>
+      <Filter>include\Touchstone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
+      <Filter>include\ThirdParty</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,10 +215,13 @@
     <Filter Include="src\ParameterizedDataHandler">
       <UniqueIdentifier>{59d579b6-6a8b-4fc2-86c4-194da20c19a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\SParameter">
+    <Filter Include="include\ThirdParty">
+      <UniqueIdentifier>{44c4b1e8-db36-4e89-b2c3-2b7a49404d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Touchstone">
       <UniqueIdentifier>{710db2c5-e42e-4a52-acf4-debe3d467e28}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\SParameter">
+    <Filter Include="src\Touchstone">
       <UniqueIdentifier>{999de5ac-1cf1-406e-bab9-5886472c9e45}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

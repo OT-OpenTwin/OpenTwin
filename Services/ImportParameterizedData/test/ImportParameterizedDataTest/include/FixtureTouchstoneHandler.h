@@ -1,13 +1,13 @@
 #pragma once
 #include <gtest/gtest.h>
 
-#include "SParameterHandler.h"
+#include "TouchstoneHandler.h"
 
-class FixtureSParameterHandler: public testing::Test
+class FixtureTouchstoneHandler : public testing::Test
 {
 public:
 		
-	const sp::OptionSettings& AnalyseOptionSettings(const std::string& text) 
+	const ts::OptionSettings& AnalyseOptionSettings(const std::string& text) 
 	{ 
 		_handler.AnalyseLine(text);
 		return _handler.getOptionSettings(); 
@@ -38,19 +38,19 @@ public:
 		_handler._portNumber = portNumber;
 	}
 
-	const std::list<sp::PortData>& GetPortData()
+	const std::list<ts::PortData>& GetPortData()
 	{
 		return _handler.getPortData();
 	}
 
-	const sp::OptionSettings& GetOptionSettings()
+	const ts::OptionSettings& GetOptionSettings()
 	{
 		return _handler.getOptionSettings();
 	}
 
 	const std::string& GetFullExampleFourPorts() const { return _exampleFourPorts; };
 private:
-	SParameterHandler _handler;
+	TouchstoneHandler _handler;
 
 	const std::string _exampleFourPorts =
 		"!4 - port S - parameter data, taken at three frequency points\n"

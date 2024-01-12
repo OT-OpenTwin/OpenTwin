@@ -13,7 +13,7 @@ public:
 		return this;
 	}
 
-	void InterpreteOptionsParameter(const std::string& entry, sp::OptionSettings& options)
+	void InterpreteOptionsParameter(const std::string& entry, ts::OptionSettings& options)
 	{
 		const bool suitableHandlerFound = IndividualInterpretation(entry, options);
 		if (!suitableHandlerFound)
@@ -29,7 +29,7 @@ public:
 		}
 	}
 protected:
-	virtual bool IndividualInterpretation(const std::string& entry, sp::OptionSettings& options) = 0;
+	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) = 0;
 
 private:
 

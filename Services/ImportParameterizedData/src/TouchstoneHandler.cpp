@@ -1,4 +1,4 @@
-#include "SParameterHandler.h"
+#include "TouchstoneHandler.h"
 #include "OptionsParameterHandler.h"
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"
@@ -14,7 +14,7 @@
 #include <cassert>
 #include <vector>
 
-void SParameterHandler::AnalyseFile(const std::string& fileContent)
+void TouchstoneHandler::AnalyseFile(const std::string& fileContent)
 {
 	std::stringstream stream;
 	ot::EncodingGuesser encodingGuesser;
@@ -41,7 +41,7 @@ void SParameterHandler::AnalyseFile(const std::string& fileContent)
 	}
 }
 
-void SParameterHandler::AnalyseLine(const std::string& content)
+void TouchstoneHandler::AnalyseLine(const std::string& content)
 {
 	std::string lineWithoutWhitespaces = content;
 	lineWithoutWhitespaces.erase(std::remove_if(lineWithoutWhitespaces.begin(), lineWithoutWhitespaces.end(), isspace), lineWithoutWhitespaces.end());
@@ -69,7 +69,7 @@ void SParameterHandler::AnalyseLine(const std::string& content)
 		
 }
 
-void SParameterHandler::AnalyseDataLine(const std::string& content)
+void TouchstoneHandler::AnalyseDataLine(const std::string& content)
 {
 
 	std::string cleansedContent = CleansOfComments(content);
@@ -92,7 +92,7 @@ void SParameterHandler::AnalyseDataLine(const std::string& content)
 			{
 				if (_portData.size() == 0 || _portData.back().isFilled())
 				{
-					_portData.push_back(sp::PortData(_portNumber));
+					_portData.push_back(ts::PortData(_portNumber));
 				}
 				_portData.back().AddValue(segment);
 			}
@@ -104,7 +104,7 @@ void SParameterHandler::AnalyseDataLine(const std::string& content)
 	}
 }
 
-const std::string SParameterHandler::CleansOfComments(const std::string& content)
+const std::string TouchstoneHandler::CleansOfComments(const std::string& content)
 {
 	auto commentCharacterPos = content.find('!');
 	if (commentCharacterPos != std::string::npos)
@@ -117,7 +117,7 @@ const std::string SParameterHandler::CleansOfComments(const std::string& content
 	}
 }
 
-void SParameterHandler::AnalyseVersionTwoLine(const std::string& content)
+void TouchstoneHandler::AnalyseVersionTwoLine(const std::string& content)
 {
 	const std::string version = "[Version]";
 	const std::string numberOfPorts = "[Number of Ports]";
@@ -137,7 +137,7 @@ void SParameterHandler::AnalyseVersionTwoLine(const std::string& content)
 
 
 
-void SParameterHandler::AnalyseOptionsLine(const std::string& line)
+void TouchstoneHandler::AnalyseOptionsLine(const std::string& line)
 {
 	assert(line[0] == '#');
 	OptionsParameterHandlerFormat handlerFormat;

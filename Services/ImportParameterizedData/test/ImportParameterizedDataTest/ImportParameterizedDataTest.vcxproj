@@ -39,8 +39,8 @@
     <ClCompile Include="src\FixtureTableStatisticAnalyser.cpp" />
     <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\TestPortData.cpp" />
-    <ClCompile Include="src\TestSParameterOptionHandling.cpp" />
-    <ClCompile Include="src\TestSParameterOptionSettings.cpp" />
+    <ClCompile Include="src\TestTouchstoneOptionHandling.cpp" />
+    <ClCompile Include="src\TestTouchstoneOptionSettings.cpp" />
     <ClCompile Include="src\TestTableStatisticAnalyser.cpp" />
     <ClCompile Include="src\TestParameterInitialization.cpp" />
     <ClCompile Include="src\TestTableExtractorCSV.cpp" />
@@ -56,7 +56,7 @@
   <ItemGroup>
     <ClInclude Include="include\FileHelper.h" />
     <ClInclude Include="include\FixtureCategorizationConsistencyChecker.h" />
-    <ClInclude Include="include\FixtureSParameterHandler.h" />
+    <ClInclude Include="include\FixtureTouchstoneHandler.h" />
     <ClInclude Include="include\FixtureTableExtractorCSV.h" />
     <ClInclude Include="include\FixtureTableStatisticAnalyser.h" />
   </ItemGroup>

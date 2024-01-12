@@ -7,13 +7,13 @@ class OptionsParameterHandlerFormat : public OptionsParameterHandler
 public:
 
 private:
-	const std::map<std::string, sp::option::Format> _stringToFormat = { {"DB",sp::option::Format::Decibel_angle}, {"MA", sp::option::Format::magnitude_angle}, {"RI", sp::option::Format::real_imaginary}};
+	const std::map<std::string, ts::option::Format> _stringToFormat = { {"DB",ts::option::Format::Decibel_angle}, {"MA", ts::option::Format::magnitude_angle}, {"RI", ts::option::Format::real_imaginary}};
 	
-	virtual bool IndividualInterpretation(const std::string& entry, sp::OptionSettings& options) override;
+	virtual bool IndividualInterpretation(const std::string& entry, ts::OptionSettings& options) override;
 };
 
 
-bool OptionsParameterHandlerFormat::IndividualInterpretation(const std::string& entry, sp::OptionSettings& options)
+bool OptionsParameterHandlerFormat::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)
 {
 	auto searchResult = _stringToFormat.find(entry);
 	if (searchResult != _stringToFormat.end())

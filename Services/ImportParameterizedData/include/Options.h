@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "OTCore/Variable.h"
 
-namespace sp
+namespace ts
 {
 	namespace option
 	{
