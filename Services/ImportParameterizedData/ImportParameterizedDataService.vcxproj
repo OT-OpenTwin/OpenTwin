@@ -199,13 +199,11 @@
     <ClCompile Include="include\ProgressUpdater.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
-    <ClCompile Include="src\CollectionAssembler.cpp" />
     <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\DataCollectionCreationHandler.cpp" />
     <ClCompile Include="src\DataSourceHandler.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Documentation.cpp" />
-    <ClCompile Include="src\IndexManager.cpp" />
     <ClCompile Include="src\MetadataAssemblyRangeData.cpp" />
     <ClCompile Include="src\MetadataParameterBundle.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
@@ -226,7 +224,6 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\BranchSynchronizer.h" />
     <ClInclude Include="include\BusinessLogicHandler.h" />
-    <ClInclude Include="include\CollectionAssembler.h" />
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
     <ClInclude Include="include\DataCollectionCreationHandler.h" />
     <ClInclude Include="include\DataSourceHandler.h" />
@@ -237,9 +234,7 @@
     <ClInclude Include="include\MetadataAssemblyData.h" />
     <ClInclude Include="include\MetadataAssemblyRangeData.h" />
     <ClInclude Include="include\DataCategorizationHandler.h" />
-    <ClInclude Include="include\MetadataParameter.h" />
     <ClInclude Include="include\MetadataParameterBundle.h" />
-    <ClInclude Include="include\MetadataQuantity.h" />
     <ClInclude Include="include\Options.h" />
     <ClInclude Include="include\OptionSettings.h" />
     <ClInclude Include="include\OptionsParameterHandlerFormat.h" />
@@ -250,7 +245,6 @@
     <ClInclude Include="include\PortData.h" />
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
-    <ClInclude Include="include\IndexManager.h" />
     <ClInclude Include="include\ProgressUpdater.h" />
     <ClInclude Include="include\TouchstoneHandler.h" />
     <ClInclude Include="include\TableExtractor.h" />

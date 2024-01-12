@@ -40,16 +40,10 @@
     <ClCompile Include="src\PreviewAssemblerRMD.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
-    <ClCompile Include="src\CollectionAssembler.cpp">
-      <Filter>src\ParameterizedDataHandler</Filter>
-    </ClCompile>
     <ClCompile Include="src\MetadataAssemblyRangeData.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
     <ClCompile Include="src\DataCollectionCreationHandler.cpp">
-      <Filter>src\ParameterizedDataHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IndexManager.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
     <ClCompile Include="src\Documentation.cpp">
@@ -120,38 +114,8 @@
     <ClInclude Include="include\PreviewAssemblerRMD.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
-    <ClInclude Include="include\CollectionAssembler.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataAssemblyData.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataAssemblyRangeData.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DataCollectionCreationHandler.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IndexManager.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataParameter.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataParameterBundle.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BranchSynchronizer.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MetadataQuantity.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
-    </ClInclude>
     <ClInclude Include="include\Documentation.h">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DataCategorizationConsistencyChecker.h">
-      <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\ProgressUpdater.h">
       <Filter>include</Filter>
@@ -189,6 +153,24 @@
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
       <Filter>include\ThirdParty</Filter>
     </ClInclude>
+    <ClInclude Include="include\DataCollectionCreationHandler.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataParameterBundle.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataAssemblyRangeData.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataAssemblyData.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataCategorizationConsistencyChecker.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BranchSynchronizer.h">
+      <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -223,6 +205,9 @@
     </Filter>
     <Filter Include="src\Touchstone">
       <UniqueIdentifier>{999de5ac-1cf1-406e-bab9-5886472c9e45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ResultdataHandler">
+      <UniqueIdentifier>{ffd89152-30b7-4194-97d2-4b4cafc88def}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
