@@ -2,6 +2,7 @@
 
 #include "MicroserviceAPI.h"
 #include "MicroserviceNotifier.h"
+#include "ProjectTypeManager.h"
 #include "Model.h"
 #include "Types.h"
 #include "curl/curl.h"
@@ -1174,6 +1175,12 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersionList, newDoc.GetAllocator()), newDoc.GetAllocator());
 			
 			return newDoc.toJson();
+		}
+		else if (action == OT_ACTION_PARAM_MODEL_ViewsForProjectType)
+		{
+			ProjectTypeManager typeManager(globalModel->getProjectType());
+
+			return typeManager.getViews();
 		}
 
 		else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {

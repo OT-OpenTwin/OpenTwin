@@ -4,6 +4,7 @@
 #include "ProjectTypeManager.h"
 
 #include "OTCommunication/ActionTypes.h"
+#include "OTCore/JSON.h"
 
 ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {
@@ -39,6 +40,11 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	_hasRMDCategorizationPreview	= false;
 	_hasDatasetRoot					= false;
 	_hasDatasetRMD					= false;
+
+	_has3DView						= true;
+	_has1DView						= true;
+	_hasTableView					= false;
+	_hasBlockPicker					= false;
 }
 
 void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
@@ -54,4 +60,20 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	_hasRMDCategorizationPreview	= true;
 	_hasDatasetRoot					= true;
 	_hasDatasetRMD					= true;
+
+	_has3DView						= false;
+	_has1DView						= true;
+	_hasTableView					= true;
+	_hasBlockPicker					= true;
+}
+
+std::string ProjectTypeManager::getViews(void)
+{
+	ot::JsonDocument newDoc;
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible3D, _has3DView, newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible1D, _has1DView, newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleTable, _hasTableView, newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker, _hasBlockPicker, newDoc.GetAllocator());
+
+	return newDoc.toJson();
 }

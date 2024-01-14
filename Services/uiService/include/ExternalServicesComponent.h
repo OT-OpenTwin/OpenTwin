@@ -337,6 +337,8 @@ private:
 	ot::ServiceBase * getService(const ot::BasicServiceInformation& _serviceInfo);
 	ot::ServiceBase * getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
+	void determineViews(const std::string& modelServiceURL);
+
 	// #################################################################
 
 	std::string										m_globalSessionServiceURL;

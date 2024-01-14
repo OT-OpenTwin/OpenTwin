@@ -137,7 +137,11 @@ AppBase::AppBase()
 	m_contextMenuManager(nullptr),
 	m_logInManager(nullptr),
 	m_uiPluginManager(nullptr),
-	m_graphicsPickerDock(nullptr)
+	m_graphicsPickerDock(nullptr),
+	m_visible3D(false),
+	m_visible1D(false),
+	m_visibleTable(false),
+	m_visibleBlockPicker(false)
 {
 	m_tabViewWidget = invalidUID;
 
@@ -434,6 +438,8 @@ void AppBase::notify(
 			saveState();
 
 			uiAPI::dock::setVisible(m_docks.debug, m_isDebug);
+
+			m_graphicsPickerDock->setVisible(getVisibleBlockPicker());
 		}
 		/*// Debug
 		else if (_senderId == m_ttb.pFile.gDebug_aDebug && _eventType == etClicked) {
@@ -1620,14 +1626,37 @@ ViewerUIDtype AppBase::createView(
 	QString text1D = availableTabText("1D");
 	QString textVersion = availableTabText("Versions");
 	QString textBlock = availableTabText("BlockDiagram");
-	uiAPI::tabWidget::addTab(m_tabViewWidget, m_viewerComponent->getViewerWidget(viewID), text3D);
-	uiAPI::tabWidget::addTab(m_tabViewWidget, m_viewerComponent->getPlotWidget(viewID), text1D);
+
+	if (getVisible3D())
+	{
+		uiAPI::tabWidget::addTab(m_tabViewWidget, m_viewerComponent->getViewerWidget(viewID), text3D);
+	}
+	else
+	{
+		m_viewerComponent->getViewerWidget(viewID)->setVisible(false);
+	}
+	
+	if (getVisible1D())
+	{
+		uiAPI::tabWidget::addTab(m_tabViewWidget, m_viewerComponent->getPlotWidget(viewID), text1D);
+	}
+	else
+	{
+		m_viewerComponent->getPlotWidget(viewID)->setVisible(false);
+	}
 	
 	QWidget* temp = m_viewerComponent->getVersionGraphWidget(viewID);
 	uiAPI::tabWidget::addTab(m_tabViewWidget, temp, textVersion);
 		
 	temp = m_viewerComponent->getTableWidget(viewID);
-	uiAPI::tabWidget::addTab(m_tabViewWidget, temp, "Table");
+	if (getVisibleTable())
+	{	
+		uiAPI::tabWidget::addTab(m_tabViewWidget, temp, "Table");
+	}
+	else
+	{
+		temp->setVisible(false);
+	}
 
 	std::string s = cS->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow, "QwtPlotCanvas {", "}").toStdString();
 	if (s.length() == 0) {
@@ -1650,6 +1679,8 @@ ViewerUIDtype AppBase::createView(
 		cS->getSelectedBackgroundColor().toQColor(),
 		cS->getSelectedForegroundColor().toQColor()
 	);
+
+	m_graphicsPickerDock->setVisible(getVisibleBlockPicker());
 
 	// #######################################################################
 

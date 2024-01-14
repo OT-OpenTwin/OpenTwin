@@ -3573,6 +3573,11 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
 			ot::serviceID_t senderID = ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID);
 
+			if (senderType == OT_INFO_SERVICE_TYPE_MODEL)
+			{
+				determineViews(senderURL);
+			}
+
 			auto oldService = m_serviceIdMap.find(senderID);
 			if (oldService == m_serviceIdMap.end()) {
 				m_serviceIdMap.insert_or_assign(senderID, new ot::ServiceBase{ senderName, senderType, senderURL, senderID });
@@ -3600,6 +3605,38 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		app->lockWelcomeScreen(false);
 		app->showErrorPrompt("Unknown error occured while creating a new session", "Fatal Error");
 	}
+}
+
+void ExternalServicesComponent::determineViews(const std::string &modelServiceURL)
+{
+	ot::JsonDocument sendingDoc;
+
+	sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PARAM_MODEL_ViewsForProjectType, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+
+	std::string response;
+	sendHttpRequest(EXECUTE, modelServiceURL, sendingDoc, response);
+	// Check if response is an error or warning
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		assert(0); // ERROR
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		assert(0); // WARNING
+	}
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+
+	bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
+	bool visible1D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible1D].GetBool();
+	bool visibleTable = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleTable].GetBool();
+	bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
+
+	AppBase* app{ AppBase::instance() };
+
+	app->setVisible3D(visible3D);
+	app->setVisible1D(visible1D);
+	app->setVisibleTable(visibleTable);
+	app->setVisibleBlockPicker(visibleBlockPicker);
 }
 
 void ExternalServicesComponent::closeProject(bool _saveChanges) {

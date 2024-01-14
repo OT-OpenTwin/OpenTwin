@@ -289,6 +289,11 @@
 #define OT_ACTION_PARAM_UI_GRAPH_ACTIVE "UI.Graph.Active"
 #define OT_ACTION_PARAM_UI_GRAPH_BRANCH "UI.Graph.Branch"
 
+#define OT_ACTION_PARAM_UI_TREE_Visible3D "UI.View.3D"
+#define OT_ACTION_PARAM_UI_TREE_Visible1D "UI.View.1D"
+#define OT_ACTION_PARAM_UI_TREE_VisibleTable "UI.View.Table"
+#define OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker "UI.View.BlockPicker"
+
 #define OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER "UI.Plugin.Action"
 #define OT_ACTION_PARAM_UI_PLUGIN_NAME "UI.Plugin.Name"
 #define OT_ACTION_PARAM_UI_PLUGIN_PATH "UI.Plugin.Path"
@@ -435,6 +440,7 @@
 #define OT_ACTION_PARAM_MODEL_State "Model.Entity.State"
 #define OT_ACTION_PARAM_MODEL_Version "Model.Version"
 #define OT_ACTION_PARAM_MODEL_JSON "Model.JSON"
+#define OT_ACTION_PARAM_MODEL_ViewsForProjectType "Model.ViewsForType"
 
 #define OT_ACTION_PARAM_MESH_CartesianCoordX "Mesh.Cartesian.X"
 #define OT_ACTION_PARAM_MESH_CartesianCoordY "Mesh.Cartesian.Y"

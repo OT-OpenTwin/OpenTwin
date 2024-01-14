@@ -119,6 +119,8 @@ public:
 	void reportWarning(const std::string &message);
 	void reportInformation(const std::string &message);
 
+	std::string getProjectType(void) { return projectType; }
+
 	void entitiesSelected(const std::string &selectionAction, const std::string &selectionInfo, std::map<std::string, std::string> &options);
 
 	void         setModelStorageVersion(ot::UID version) { modelStorageVersion = version; };

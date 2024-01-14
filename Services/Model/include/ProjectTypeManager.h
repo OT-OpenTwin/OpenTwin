@@ -20,6 +20,8 @@ public:
 	bool hasDatasetRoot(void)				{ return _hasDatasetRoot; }
 	bool hasDatasetRMD(void)				{ return _hasDatasetRMD; }
 
+	std::string getViews(void);
+
 private:
 	void initializeProjectType3DSimulation(void);
 	void initializeProjectTypeDataPipeline(void);
@@ -35,6 +37,11 @@ private:
 	bool _hasRMDCategorizationPreview	= true;
 	bool _hasDatasetRoot				= true;
 	bool _hasDatasetRMD					= true;
+
+	bool _has3DView						= true;
+	bool _has1DView						= true;
+	bool _hasTableView					= true;
+	bool _hasBlockPicker				= true;
 };
 
 
