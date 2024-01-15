@@ -17,7 +17,7 @@ public:
 
 	void AddSubDocument(GenericDocument* subDocument) { _subDocuments.push_back(subDocument); };
 
-	void InsertInDocumentField(const std::string& fieldName, std::list<ot::Variable>& values);
+	void InsertInDocumentField(const std::string& fieldName, const std::list<ot::Variable>& values);
 	void InsertInDocumentField(const std::string& fieldName, std::list<ot::Variable>&& values);
 
 protected:

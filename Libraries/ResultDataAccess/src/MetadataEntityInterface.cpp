@@ -29,7 +29,7 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 	EntityMetadataCampaign entityCampaign(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, _ownerServiceName);
 	for (auto& metadata : metaDataCampaign.getMetaData())
 	{
-		//ToDo
+		InsertMetadata(&entityCampaign, metadata.second.get());
 	}
 	entityCampaign.StoreToDataBase();
 	_newEntityIDs.push_back(entityCampaign.getEntityID());
@@ -57,7 +57,7 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 			entitySeries.InsertToParameterField(_valuesField, std::move(parameterForChange.values), parameter.parameterAbbreviation);
 			for (auto& metadata : parameter.metaData)
 			{
-				//ToDo
+				InsertMetadata(&entitySeries,metadata.second.get());
 			}
 		}
 		for (const MetadataQuantity& quantity : newSeriesMetadata->getQuantities())
@@ -66,12 +66,12 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 			entitySeries.InsertToQuantityField(_datatypeField, { ot::Variable(quantity.typeName) }, quantity.quantityAbbreviation);
 			for (auto& metadata : quantity.metaData)
 			{
-				//ToDo
+				InsertMetadata(&entitySeries, metadata.second.get());
 			}
 		}
 		for (auto& metadata : newSeriesMetadata->getMetadata())
 		{
-			//ToDo
+			InsertMetadata(&entitySeries, metadata.second.get());
 		}
 		entitySeries.StoreToDataBase();
 		_newEntityIDs.push_back(entitySeries.getEntityID());
@@ -213,4 +213,35 @@ void MetadataEntityInterface::ExtractSeriesMetadata(MetadataCampaign& measuremen
 		}
 		measurementCampaign.AddSeriesMetadata(std::move(seriesMetadata));
 	}
+}
+
+void MetadataEntityInterface::InsertMetadata(EntityWithDynamicFields* entity, MetadataEntry* metadata, const std::string documentName)
+{
+	auto singleEntry = dynamic_cast<MetadataEntrySingle*>(metadata);
+	if(singleEntry != nullptr)
+	{
+		entity->InsertInField(singleEntry->getEntryName(), { singleEntry->getValue() }, documentName);
+	}
+	else
+	{
+		auto arrayEntry = dynamic_cast<MetadataEntryArray*>(metadata);
+		if (arrayEntry != nullptr)
+		{
+			entity->InsertInField(arrayEntry->getEntryName(), arrayEntry->getValues(), documentName);
+		}
+		else
+		{
+			auto objectEntry = dynamic_cast<MetadataEntryObject*>(metadata);
+			assert(objectEntry != nullptr);
+			const std::string& name = documentName + "/" + objectEntry->getEntryName();
+			for (auto entry : objectEntry->getEntries())
+			{
+				InsertMetadata(entity, entry.get(), name);
+			}
+		}
+
+	}
+
+
+	
 }

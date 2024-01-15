@@ -14,7 +14,24 @@ void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<ot:
 {
 	if (_bsonDocumentsByName.find(documentName) == _bsonDocumentsByName.end())
 	{
-		if (documentName[0] != '/')
+		if (documentName.size() == 0 || documentName[0] != '/')
+		{
+			documentName = "/" + documentName;
+		}
+		GenericBsonDocument newDocument;
+		newDocument.setDocumentName(documentName);
+		_bsonDocumentsByName.insert({ documentName, newDocument });
+	}
+	_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+
+	setModified();
+}
+
+void EntityWithDynamicFields::InsertInField(std::string fieldName, const std::list<ot::Variable>& values, std::string documentName)
+{
+	if (_bsonDocumentsByName.find(documentName) == _bsonDocumentsByName.end())
+	{
+		if (documentName.size() == 0 || documentName[0] != '/')
 		{
 			documentName = "/" + documentName;
 		}
