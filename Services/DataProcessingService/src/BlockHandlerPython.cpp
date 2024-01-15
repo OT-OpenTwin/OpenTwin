@@ -46,8 +46,15 @@ bool BlockHandlerPython::executeSpecialized()
         for (auto& dataPortEntry : _dataPerPort)
         {
             const std::string portName = dataPortEntry.first;
-            const genericDataBlock& portData = dataPortEntry.second;
-            _pythonServiceInterface->AddPortData(portName, portData);
+            const std::list<GenericDataBlock>& portData = dataPortEntry.second;
+            std::list<ot::Variable> portDataVector;
+            for (const GenericDataBlock& dataBlock : portData)
+            {
+                assert(dataBlock.getNumberOfEntries() == 1);
+                portDataVector.push_back(dataBlock.getValue(0, 0));
+            }
+            
+            _pythonServiceInterface->AddPortData(portName, portDataVector);
         }
         ot::ReturnMessage returnMessage = _pythonServiceInterface->SendExecutionOrder();
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
@@ -63,7 +70,14 @@ bool BlockHandlerPython::executeSpecialized()
                 }
                 else
                 {
-                    _dataPerPort[outputName] = valuesPointer->second;
+                    const std::list<ot::Variable>& returnValueList = valuesPointer->second;
+                    std::list<GenericDataBlock> genericDataBlocks;
+                    for (const ot::Variable& returnValueEntry: returnValueList)
+                    {
+                        genericDataBlocks.push_back(GenericDataBlock(1, 1));
+                        genericDataBlocks.back().setValue(0, 0, returnValueEntry);
+                    }
+                    _dataPerPort[outputName] = genericDataBlocks;
                 }
             }
         }

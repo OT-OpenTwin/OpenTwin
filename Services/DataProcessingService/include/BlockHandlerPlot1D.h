@@ -22,5 +22,5 @@ private:
 	std::string _ylabel;
 	std::string _yunit;
 
-	std::vector<double> transformDataToDouble(genericDataBlock& data);
+	std::vector<double> transformDataToDouble(std::list<GenericDataBlock>& data);
 };

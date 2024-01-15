@@ -20,6 +20,10 @@ private:
 	const std::string _nameField = "Name";
 	const std::string _datatypeField = "Datatype";
 	const std::string _valuesField = "Values";
+	const std::string _dataRowsField = "Rows";
+	const std::string _dataColumnsField = "Columns";
+
+
 	std::list<ot::UID> _newEntityIDs;
 	std::list<ot::UID> _newEntityVersions;
 

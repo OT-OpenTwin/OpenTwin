@@ -5,6 +5,7 @@
 #include "EntityBlockPython.h"
 #include "EntityBlockCircuitElement.h"
 #include "EntityBlockCircuitResistor.h"
+#include "EntityBlockDataDimensionReducer.h"
 #include <cassert>
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
@@ -28,6 +29,10 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	else if (entityType == "EntityBlockCircuitResistor")
 	{
 		return new EntityBlockCircuitResistor(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockDataDimensionReducer")
+	{
+		return new EntityBlockDataDimensionReducer(0, nullptr, nullptr, nullptr, this, "");
 	}
 	
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);

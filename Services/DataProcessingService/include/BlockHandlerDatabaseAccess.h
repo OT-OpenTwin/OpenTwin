@@ -16,12 +16,14 @@ public:
 	bool executeSpecialized() override;	
 
 private:
-	MetadataCampaign _campaignMetadata;
+	uint32_t _dataColumns;
+	uint32_t _dataRows;
+	
 	DataStorageAPI::ResultDataStorageAPI* _dataStorageAccess = nullptr;
 	std::list< BsonViewOrValue> _comparisons;
 	std::vector<std::string> _projectionNames;
 
-	BsonViewOrValue _query;
+		BsonViewOrValue _query;
 	BsonViewOrValue _projection;
 
 	bool _isValid = true;

@@ -64,6 +64,9 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 		{
 			entitySeries.InsertToQuantityField(_nameField, { ot::Variable(quantity.quantityName) }, quantity.quantityAbbreviation);
 			entitySeries.InsertToQuantityField(_datatypeField, { ot::Variable(quantity.typeName) }, quantity.quantityAbbreviation);
+			entitySeries.InsertToQuantityField(_dataRowsField, { ot::Variable(static_cast<int32_t>(quantity.dataRows)) }, quantity.quantityAbbreviation);
+			entitySeries.InsertToQuantityField(_dataColumnsField, { ot::Variable(static_cast<int32_t>(quantity.dataColumns)) }, quantity.quantityAbbreviation);
+
 			for (auto& metadata : quantity.metaData)
 			{
 				InsertMetadata(&entitySeries, metadata.second.get());
@@ -197,6 +200,16 @@ void MetadataEntityInterface::ExtractSeriesMetadata(MetadataCampaign& measuremen
 				{
 					auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
 					quantity.quantityName = nameEntry->getValue().getConstCharPtr();
+				}
+				else if (entry->getEntryName() == _dataRowsField)
+				{
+					auto dataRowsEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+					quantity.dataRows = static_cast<uint32_t>(dataRowsEntry->getValue().getInt32());
+				}
+				else if (entry->getEntryName() == _dataColumnsField)
+				{
+					auto dataColumnEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+					quantity.dataColumns = static_cast<uint32_t>(dataColumnEntry->getValue().getInt32());
 				}
 				else
 				{

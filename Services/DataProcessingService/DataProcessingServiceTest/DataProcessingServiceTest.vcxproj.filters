@@ -12,8 +12,15 @@
     <ClCompile Include="src\FixtureGraph.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestGraph.cpp" />
-    <ClCompile Include="src\TestGraphNode.cpp" />
+    <ClCompile Include="src\TestGraph.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestGraphNode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestGenericDataBlock.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureGraph.h">

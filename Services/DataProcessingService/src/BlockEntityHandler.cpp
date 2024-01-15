@@ -10,6 +10,7 @@
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
 #include "AdvancedQueryBuilder.h"
+#include "EntityBlockDataDimensionReducer.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -149,7 +150,14 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	if (dbaBlock != nullptr)
 	{
 		auto comparators = AdvancedQueryBuilder::getComparators();
+		comparators.push_back(" ");
 		dbaBlock->createProperties(comparators);
+	}
+
+	EntityBlockDataDimensionReducer* dataAR = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());
+	if (dataAR)
+	{
+		dataAR->createProperties();
 	}
 }
 
@@ -174,6 +182,9 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockPlot1D plotBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockVisualizationCollection->addItem(plotBlock.CreateBlockCfg());
+
+	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
+	controlBlockDatabaseCollection->addItem(dimensionReducer.CreateBlockCfg());
 
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);

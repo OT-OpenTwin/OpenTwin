@@ -2,10 +2,12 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
+#include "EntityBlockDataDimensionReducer.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPlot1D.h"
 #include "BlockHandlerPython.h"
+#include "BlockHandlerDataDimensionReducer.h"
 
 void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<std::string, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
@@ -48,6 +50,12 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 	if (pythonEntity != nullptr)
 	{
 		return std::shared_ptr<BlockHandler>(new BlockHandlerPython(pythonEntity, _blockHandlerByGraphNode));
+	}
+
+	EntityBlockDataDimensionReducer* dataDimensionReducer = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());
+	if (dataDimensionReducer != nullptr)
+	{
+		return std::shared_ptr<BlockHandler>(new BlockHandlerDataDimensionReducer(dataDimensionReducer,_blockHandlerByGraphNode));
 	}
 
 	throw std::exception("Not supported BlockEntity detected.");

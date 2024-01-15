@@ -104,6 +104,7 @@ namespace ot
 	class OT_CORE_API_EXPORT Variable
 	{
 	public:
+		Variable() {};
 		Variable(float value);
 		Variable(double value);
 		Variable(int32_t value);
@@ -117,6 +118,16 @@ namespace ot
 		Variable(Variable&& other) = default;
 		Variable& operator=(const Variable& other);
 		Variable& operator=(Variable&& other);
+
+		void setValue(float value);
+		void setValue(double value);
+		void setValue(int32_t value);
+		void setValue(int64_t value);
+		void setValue(bool value);
+		void setValue(const char* value);
+		void setValue(const std::string& value);
+		void setValue(const std::string&& value);
+
 
 		bool isFloat() const;
 		bool isDouble() const;

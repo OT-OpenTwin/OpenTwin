@@ -22,8 +22,6 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 {
 	//First get a handle of the selected project.
 	std::shared_ptr<ResultMetadataAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
-	
-
 
 	const std::string dbURL = "Projects";
 	_dataStorageAccess = new DataStorageAPI::ResultDataStorageAPI(dbURL, resultCollectionAccess->getCollectionName());
@@ -38,7 +36,9 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
 	const auto selectedQuantity = resultCollectionAccess->FindMetadataQuantity(quantityDef.getName());
-	
+	_dataRows= selectedQuantity->dataRows;
+	_dataColumns = selectedQuantity->dataColumns;
+
 	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(selectedQuantity->quantityIndex),ot::TypeNames::getInt64TypeName());
 	AddComparision(selectedQuantityDef);
 	
@@ -102,18 +102,54 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		const std::string queryResponse =	dbResponse.getResult();
 		ot::JsonDocument doc;
 		doc.fromJson(queryResponse);
-		auto allEntries = doc["Documents"].GetArray();
+		auto allEntries = ot::json::getArray(doc, "Documents");
+
 		const uint32_t numberOfDocuments = allEntries.Size();
 		for (uint32_t i = 0; i< numberOfDocuments;i++)
 		{
-			auto projectedValues = allEntries[i].GetObject();
+			auto projectedValues = ot::json::getObject(allEntries, i);
 			uint32_t count(0);
+			bool t = projectedValues.HasMember("P_34223386582466564");
 			for (std::string projectionName : _projectionNames)
-			{			
-				ot::Variable value = converter(projectedValues[projectionName.c_str()]);
-				const std::string connectorName = _connectorNames[count];
-				count++;
-				_dataPerPort[connectorName].push_back(value);
+			{	
+				assert(projectedValues.HasMember(projectionName.c_str()));
+
+				if (projectionName == QuantityContainer::getFieldName() && (_dataRows != 1 || _dataColumns != 1))
+				{
+					const std::string connectorName = _connectorNames[count];
+					count++;
+					uint32_t rowCounter(0), columnCounter(0);
+					//Could be that the value array is smaller then the data array because of the query.
+					auto jsValues = ot::json::getArray(projectedValues, projectionName.c_str());
+					std::list<ot::Variable> values = converter(jsValues);
+					auto currentValue = values.begin();
+					const uint32_t numberOfEntries = _dataColumns * _dataRows;
+					GenericDataBlock dataBlock(_dataColumns, _dataRows);
+					for (uint32_t j = 0; j < numberOfEntries; j++)
+					{
+						dataBlock.setValue(columnCounter, rowCounter, *currentValue);
+						currentValue++;
+						if (columnCounter < _dataColumns - 1)
+						{
+							columnCounter++;
+						}
+						else
+						{
+							columnCounter = 0;
+							rowCounter++;
+						}
+					}
+					_dataPerPort[connectorName].push_back(dataBlock);
+				}
+				else
+				{
+					ot::Variable value = converter(projectedValues[projectionName.c_str()]);
+					GenericDataBlock dataBlock(1,1);
+					dataBlock.setValue(0, 0, value);
+					const std::string connectorName = _connectorNames[count];
+					count++;
+					_dataPerPort[connectorName].push_back(dataBlock);
+				}
 			}
 		}
 	}
@@ -124,56 +160,59 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 
 void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition& definition)
 {
-	AdvancedQueryBuilder builder;
-	ot::StringToVariableConverter converter;
-	const std::string& name = definition.getName();
-	const std::string& valueStr = definition.getValue();
 	const std::string& comparator = definition.getComparator();
-	const std::string& type = definition.getType();
+	if (comparator != " ")
+	{
+		AdvancedQueryBuilder builder;
+		ot::StringToVariableConverter converter;
+		const std::string& name = definition.getName();
+		const std::string& valueStr = definition.getValue();
+		const std::string& type = definition.getType();
 
 
-	std::unique_ptr<ot::Variable> value;
-	if (type == ot::TypeNames::getBoolTypeName())
-	{
-		std::string boolString = valueStr;
-		std::transform(boolString.begin(), boolString.end(), boolString.begin(),
-			[](unsigned char c) { return std::tolower(c); });
-		if (boolString == "true")
+		std::unique_ptr<ot::Variable> value;
+		if (type == ot::TypeNames::getBoolTypeName())
 		{
-			value.reset(new ot::Variable(true));
+			std::string boolString = valueStr;
+			std::transform(boolString.begin(), boolString.end(), boolString.begin(),
+				[](unsigned char c) { return std::tolower(c); });
+			if (boolString == "true")
+			{
+				value.reset(new ot::Variable(true));
+			}
+			else if (boolString == "false")
+			{
+				value.reset(new ot::Variable(false));
+			}
+			else
+			{
+				throw std::invalid_argument("Boolean value expected (true or false).");
+			}
 		}
-		else if (boolString == "false")
+		else if (type == ot::TypeNames::getStringTypeName())
 		{
-			value.reset(new ot::Variable(false));
+			value.reset(new ot::Variable(valueStr));
 		}
-		else
+		else if (type == ot::TypeNames::getDoubleTypeName())
 		{
-			throw std::invalid_argument("Boolean value expected (true or false).");
+			value.reset(new ot::Variable(std::stod(valueStr)));
 		}
+		else if (type == ot::TypeNames::getFloatTypeName())
+		{
+			value.reset(new ot::Variable(std::stof(valueStr)));
+		}
+		else if (type == ot::TypeNames::getInt32TypeName())
+		{
+			value.reset(new ot::Variable(std::stoi(valueStr)));
+		}
+		else if (type == ot::TypeNames::getInt64TypeName())
+		{
+			value.reset(new ot::Variable(std::stoll(valueStr)));
+		}
+
+		auto compare = builder.CreateComparison(comparator, *value);
+		_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
 	}
-	else if (type == ot::TypeNames::getStringTypeName())
-	{
-		value.reset(new ot::Variable(valueStr));
-	}
-	else if (type == ot::TypeNames::getDoubleTypeName())
-	{
-		value.reset(new ot::Variable(std::stod(valueStr)));
-	}
-	else if (type == ot::TypeNames::getFloatTypeName())
-	{
-		value.reset(new ot::Variable(std::stof(valueStr)));
-	}
-	else if (type == ot::TypeNames::getInt32TypeName())
-	{
-		value.reset(new ot::Variable(std::stoi(valueStr)));
-	}
-	else if (type == ot::TypeNames::getInt64TypeName())
-	{
-		value.reset(new ot::Variable(std::stoll(valueStr)));
-	}
-	
-	auto compare = builder.CreateComparison(comparator, *value);
-	_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
 }
 
 void BlockHandlerDatabaseAccess::AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)

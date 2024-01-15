@@ -23,7 +23,7 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 	}
 }
 
-void BlockHandler::setData(genericDataBlock& data, const std::string& targetPort)
+void BlockHandler::setData(std::list<GenericDataBlock>& data, const std::string& targetPort)
 {
 	_dataPerPort[targetPort] = data;
 }

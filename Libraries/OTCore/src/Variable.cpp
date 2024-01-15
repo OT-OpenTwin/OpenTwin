@@ -50,6 +50,46 @@ ot::Variable& ot::Variable::operator=(Variable&& other)
 	return *this;
 }
 
+void ot::Variable::setValue(float value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(double value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(int32_t value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(int64_t value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(bool value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(const char* value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(const std::string& value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(const std::string&& value)
+{
+	_value = std::move(value);
+}
+
 
 bool ot::Variable::isFloat() const
 {

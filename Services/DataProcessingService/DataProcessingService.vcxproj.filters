@@ -81,6 +81,12 @@
     <ClCompile Include="src\BufferResultCollectionAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockHandlerDataDimensionReducer.cpp">
+      <Filter>Source Files\BlockHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GenericDataBlock.cpp">
+      <Filter>Source Files\BlockHandling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -133,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="include\BufferResultCollectionAccess.h">
       <Filter>Header Files\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandlerDataDimensionReducer.h">
+      <Filter>Header Files\BlockFunctionality</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GenericDataBlock.h">
+      <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

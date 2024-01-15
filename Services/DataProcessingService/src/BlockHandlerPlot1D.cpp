@@ -23,8 +23,8 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	bool allSet = (_dataPerPort.find(_xDataConnector) != _dataPerPort.end()) && (_dataPerPort.find(_yDataConnector) != _dataPerPort.end());
 	if (allSet)
 	{
-		std::list<ot::Variable> genericXValues(_dataPerPort[_xDataConnector]);
-		std::list<ot::Variable> genericYValues(_dataPerPort[_yDataConnector]);
+		std::list<GenericDataBlock>& genericXValues(_dataPerPort[_xDataConnector]);
+		std::list<GenericDataBlock>& genericYValues(_dataPerPort[_yDataConnector]);
 
 		std::vector<double> xValues = transformDataToDouble(genericXValues);
 		std::vector<double> yValues = transformDataToDouble(genericYValues);
@@ -46,27 +46,30 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	return allSet;
 }
 
-std::vector<double> BlockHandlerPlot1D::transformDataToDouble(genericDataBlock& genericValues)
+std::vector<double> BlockHandlerPlot1D::transformDataToDouble(std::list<GenericDataBlock>& genericDataBlocks)
 {
 	std::vector<double> doubleValues;
-	doubleValues.reserve(genericValues.size());
-	for (auto& values: genericValues)
+	doubleValues.reserve(genericDataBlocks.size());
+	for (auto& genericDataBlock: genericDataBlocks)
 	{
-		if (values.isInt32())
+		assert(genericDataBlock.getNumberOfEntries() == 1);
+		const ot::Variable& value = genericDataBlock.getValue(0, 0);
+		
+		if (value.isInt32())
 		{
-			doubleValues.push_back(static_cast<double>(values.getInt32()));
+			doubleValues.push_back(static_cast<double>(value.getInt32()));
 		}
-		else if (values.isInt64())
+		else if (value.isInt64())
 		{
-			doubleValues.push_back(static_cast<double>(values.getInt64()));
+			doubleValues.push_back(static_cast<double>(value.getInt64()));
 		}
-		else if (values.isFloat())
+		else if (value.isFloat())
 		{
-			doubleValues.push_back(static_cast<double>(values.getFloat()));
+			doubleValues.push_back(static_cast<double>(value.getFloat()));
 		}
-		else if (values.isDouble())
+		else if (value.isDouble())
 		{
-			doubleValues.push_back(values.getDouble());
+			doubleValues.push_back(value.getDouble());
 		}
 		else
 		{

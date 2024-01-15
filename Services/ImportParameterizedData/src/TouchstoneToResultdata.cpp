@@ -204,7 +204,12 @@ void TouchstoneToResultdata::BuildSeriesMetadataFromTouchstone(TouchstoneHandler
 	
 	parameter.typeName = "Numerical";
 	quantity1.typeName = "Numerical";
+	quantity1.dataRows = 4;
+	quantity1.dataColumns = 4;
+
 	quantity2.typeName = "Numerical";
+	quantity2.dataRows = 4;
+	quantity2.dataColumns = 4;
 
 	series.AddParameter(std::move(parameter));
 	series.AddQuantity(std::move(quantity1));

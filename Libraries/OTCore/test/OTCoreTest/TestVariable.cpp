@@ -17,6 +17,7 @@ TEST(VariableTest, CopyAssignOperator)
 	second = first;
 	EXPECT_EQ(first, second);
 }
+
 TEST(VariableTest, VariableToJSON)
 {
 	ot::JsonDocument (doc);

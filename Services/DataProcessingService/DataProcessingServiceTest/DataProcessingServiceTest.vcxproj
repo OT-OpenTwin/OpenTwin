@@ -26,6 +26,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClCompile Include="src\FixtureGraph.cpp" />
+    <ClCompile Include="src\TestGenericDataBlock.cpp" />
     <ClCompile Include="src\TestGraph.cpp" />
     <ClCompile Include="src\TestGraphNode.cpp" />
   </ItemGroup>
@@ -47,6 +48,7 @@
       <WarningLevel>Level3</WarningLevel>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC);$(MONGO_BOOST_ROOT);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_INC);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -64,6 +66,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(MONGO_BOOST_ROOT);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_INC);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
