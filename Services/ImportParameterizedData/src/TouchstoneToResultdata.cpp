@@ -70,8 +70,6 @@ void TouchstoneToResultdata::CreateResultdata(const std::string& fileName, const
 				resultCollectionExtender.AddQuantityContainer(seriesID, parameterAbbrev, { frequency }, currentQuantity->quantityIndex, std::get<1>(portDataEntry));
 			}
 		}
-
-
 	}
 	else
 	{
@@ -83,8 +81,8 @@ const std::string TouchstoneToResultdata::CreateSeriesName(const std::string& fi
 {
 	auto start = fileName.find_last_of("/")+1;
 	auto end = fileName.find_last_of(".")-1;
-
-	return fileName.substr(start,end-start);
+	const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + fileName.substr(start, end - start);
+	return seriesName;
 }
 
 bool TouchstoneToResultdata::SeriesAlreadyExists(const std::string& seriesName)
