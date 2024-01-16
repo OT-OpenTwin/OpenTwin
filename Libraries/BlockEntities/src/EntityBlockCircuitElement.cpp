@@ -28,7 +28,7 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 
 void EntityBlockCircuitElement::createProperties()
 {
-	EntityPropertiesDouble::createProperty("Element Property", "ElementType", 100.0, "default", getProperties());
+	EntityPropertiesString::createProperty("Element Property", "ElementType", "100", "default", getProperties());
 }
 
 std::string EntityBlockCircuitElement::getElementType()

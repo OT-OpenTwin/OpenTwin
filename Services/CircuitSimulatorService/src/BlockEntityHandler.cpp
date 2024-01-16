@@ -168,6 +168,8 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 	
 }
 
+
+
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
 	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
@@ -184,7 +186,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	Circuit circuit;
 	circuit.setEditorName(pckg->title());
 	circuit.setId(pckg->name());
-	Application::instance()->m_ngSpice.mapOfCircuits.insert_or_assign(pckg->name(), circuit);
+	Application::instance()->getNGSpice().mapOfCircuits.insert_or_assign(pckg->name(), circuit);
 
 	return pckg;
 }

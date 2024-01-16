@@ -32,13 +32,14 @@ class Application : public ot::ApplicationBase {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
-	BlockEntityHandler m_blockEntityHandler;
-	NGSpice m_ngSpice;
+	
+	
 private:
 	
 	Application();
 	virtual ~Application();
-
+	NGSpice m_ngSpice;
+	BlockEntityHandler m_blockEntityHandler;
 	
 public:
 
@@ -58,7 +59,9 @@ public:
 	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
 	
-
+	//Getter
+	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
+	NGSpice getNGSpice() { return m_ngSpice; }
 
 	// ##################################################################################################################################################################################################################
 

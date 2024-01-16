@@ -3,7 +3,7 @@
 #include <Circuit.h>
 
 //Open Twin Header
-
+#include "EntityBlock.h"
 
 
 //ThirdPartyHeader
@@ -19,8 +19,8 @@ class NGSpice
 public:
 	std::map<std::string, Circuit> mapOfCircuits;
 
-	std::string generateNetlist();
-	std::string ngSpice_Initialize();
+	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&);
+	std::string ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>&);
 
 	static int MySendCharFunction(char*, int, void*);
 	static int MySendStat(char*, int, void*);

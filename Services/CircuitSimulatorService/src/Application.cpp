@@ -69,115 +69,7 @@ namespace ottest
 		return cfg;
 	}
 
-	ot::GraphicsItemCfg* createResistor(const std::string _name)
-	{
-		//First I create a stack item;
-		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-		myStack->setName(_name);
-		myStack->setTitle(_name);
-		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
-		
-
-		//Second I create an Image
-		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-		image->setImagePath("CircuitElementImages/ResistorBG.png");
-		image->setSizePolicy(ot::SizePolicy::Dynamic);
-		image->setMaintainAspectRatio(true);
-
-		myStack->addItemBottom(image, false, true);
-
-		//Then I create a layout
-		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-		
-		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
-		myStack->addItemTop(myLayout, true, false);
-		
-
-		
-		
-
-		//Now i want connections on the item for this i need rectangle items
-		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-		connection1->setName("Input1");		
-		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
-		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
-		connection1->setBackgroundPainer(painter1);
-		connection1->setAlignment(ot::AlignCenter);
-		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
-
-		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-		connection2->setName("Output1");		
-		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
-		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
-		connection2->setBackgroundPainer(painter2);
-		connection2->setAlignment(ot::AlignCenter);
-		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
-
-		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		
-
-		//Here i add them to the Layout
-		myLayout->addChildItem(connection1);
-		myLayout->addStrech(1);
-		myLayout->addChildItem(connection2);
-		
-
-		
-		
-
-		return myStack;
-		
-	}
-
-	ot::GraphicsItemCfg* createVoltageSource(const std::string _name)
-	{
-		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-		myStack->setName(_name);
-		myStack->setTitle(_name);
-		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
-
-		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-		image->setImagePath("CircuitElementImages/VoltageSource.png");
-		image->setSizePolicy(ot::SizePolicy::Dynamic);
-		image->setMaintainAspectRatio(true);
-
-		myStack->addItemBottom(image, false, true);
-
-		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
-
-		myStack->addItemTop(myLayout, true, false);
-
-		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-		connection1->setName("Input2");
-		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
-		connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
-		connection1->setBackgroundPainer(painter1);
-		connection1->setAlignment(ot::AlignCenter);
-		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
-		//connection1->setMargins(10.0, 0.0, 0.0, 0.0);
-
-		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-		connection2->setName("Ouput2");
-		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
-		connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
-		connection2->setBackgroundPainer(painter2);
-		connection2->setAlignment(ot::AlignCenter);
-		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
-
-		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-		myLayout->addChildItem(connection1);
-		myLayout->addStrech(1);
-		myLayout->addChildItem(connection2);
-
-
-		return myStack;
-
-
-	}
+	
 
 	ot::GraphicsItemCfg* createDiode(const std::string _name)
 	{
@@ -329,7 +221,11 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	//if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
-	//if (action == "Circuit Simulator:Simulate:New Simulation") return m_ngSpice.ngSpice_Initialize();
+	if (action == "Circuit Simulator:Simulate:New Simulation")
+	{
+		auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
+		m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID);
+	}
 	//else {
 		//OT_LOG_W("Unknown model action");
 	//	assert(0);
@@ -349,7 +245,7 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 	//check and store information
 	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
 
-	CircuitElement element;
+	/*CircuitElement element;
 	element.setItemName(itemName);
 	element.setEditorName(editorName);
 	element.setUID(std::to_string(++ottest::currentBlockUid));
@@ -392,7 +288,7 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 	else
 	{
 		it->second.addElement(element.getUID(), element);
-	}
+	}*/
 
 	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
 	return "";
@@ -460,13 +356,13 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 
 	m_blockEntityHandler.AddBlockConnection(pckg.connections());
 
-	return "";
+	
 	
 	//for (auto c : pckg.connections())
 	//{
 	//	Connection connection(c);
-	//	
-	//	
+
+
 	//	auto it = m_ngSpice.mapOfCircuits.find(pckg.name());
 
 	//	//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
@@ -485,32 +381,33 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 	//		connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
 	//	}
 
-	//	if(it == m_ngSpice.mapOfCircuits.end())
+	//	if (it == m_ngSpice.mapOfCircuits.end())
 	//	{
 	//		OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
 	//	}
 
 	//	else
-	//	{	
+	//	{
 	//		//Here I add the connection to the Origin Element
-	//		it->second.addConnection("1", connection);
+	//		it->second.addConnection(connection.originUid(), connection);
 
-	//		
+
 
 
 	//		//Some Tests
 	//		//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
-	//		
+
 	//		//Here I add the connection to the Destination Element
-	//		it->second.addConnection("2", connection);
+	//		it->second.addConnection(connection.destUid(), connection);
 
 	//		//test of print
-	//		
-	//		
-	//		
-	//	}
-	//
 
+
+
+	//	}
+
+	//}
+	return "";
 	
 }
 

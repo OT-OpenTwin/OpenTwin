@@ -28,7 +28,7 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 
 void EntityBlockCircuitResistor::createProperties()
 {
-	EntityPropertiesDouble::createProperty("Element Property", "ElementType", 200.0, "default", getProperties());
+	EntityPropertiesString::createProperty("Element Property", "ElementType", "200", "default", getProperties());
 }
 
 std::string EntityBlockCircuitResistor::getElementType()
