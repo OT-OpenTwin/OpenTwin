@@ -16,7 +16,7 @@ BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const Han
 	_yDataConnector = blockEntity->getConnectorYAxis().getConnectorName();
 
 	const std::string fullName = blockEntity->getName();
-	_plotName = fullName.substr(fullName.find_first_of("/")+1, fullName.size());
+	_plotName = fullName.substr(fullName.find_last_of("/")+1, fullName.size());
 }
 bool BlockHandlerPlot1D::executeSpecialized()
 {
@@ -31,10 +31,11 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		
 			
 		const int colorID(0);
+		const std::string entityPath = _resultFolder + "1D/Plots";
+		const std::string fullPlotName = CreateNewUniqueTopologyName(entityPath, _plotName);
 
-		EntityResult1D* curve = _modelComponent->addResult1DEntity(_resultFolder + _curveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
+		EntityResult1D* curve = _modelComponent->addResult1DEntity(fullPlotName + "/" + _curveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
 		std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName) };
-		const std::string fullPlotName = CreateNewUniqueTopologyName(_resultFolder, _plotName);	
 		EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(fullPlotName, "Result Plot", curves);
 		ot::UIDList topoEnt{ plotID->getEntityID() },
 				topoVers{ plotID->getEntityStorageVersion() },
