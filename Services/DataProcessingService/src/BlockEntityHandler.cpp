@@ -11,6 +11,7 @@
 #include "EntityBlockPython.h"
 #include "AdvancedQueryBuilder.h"
 #include "EntityBlockDataDimensionReducer.h"
+#include "EntityBlockStorage.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -159,6 +160,12 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	{
 		dataAR->createProperties();
 	}
+
+	EntityBlockStorage* storage = dynamic_cast<EntityBlockStorage*>(blockEntity.get());
+	if (storage)
+	{
+		storage->createProperties();
+	}
 }
 
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
@@ -185,6 +192,9 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(dimensionReducer.CreateBlockCfg());
+
+	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
+	controlBlockDatabaseCollection->addItem(storage.CreateBlockCfg());
 
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);

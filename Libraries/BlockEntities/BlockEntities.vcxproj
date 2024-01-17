@@ -169,6 +169,7 @@
     <ClInclude Include="include\EntityBlockDataDimensionReducer.h" />
     <ClInclude Include="include\EntityBlockPlot1D.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
+    <ClInclude Include="include\EntityBlockStorage.h" />
     <ClInclude Include="include\PythonHeaderInterpreter.h" />
     <ClInclude Include="include\ValueComparisionDefinition.h" />
   </ItemGroup>
@@ -183,6 +184,7 @@
     <ClCompile Include="src\EntityBlockDataDimensionReducer.cpp" />
     <ClCompile Include="src\EntityBlockPlot1D.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />
+    <ClCompile Include="src\EntityBlockStorage.cpp" />
     <ClCompile Include="src\PythonHeaderInterpreter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
