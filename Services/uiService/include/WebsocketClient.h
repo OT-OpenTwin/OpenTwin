@@ -11,7 +11,8 @@ class WebsocketClient : public QObject
 {
 	Q_OBJECT
 public:
-	WebsocketClient(const std::string &socketUrl);
+	WebsocketClient(const std::string& socketUrl);
+	~WebsocketClient();
 
 	void sendMessage(const std::string &message, std::string &response);
 	void sendResponse(const std::string &message);

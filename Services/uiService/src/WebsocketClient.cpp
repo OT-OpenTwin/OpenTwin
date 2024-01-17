@@ -82,6 +82,14 @@ WebsocketClient::WebsocketClient(const std::string &socketUrl) :
 
 }
 
+WebsocketClient::~WebsocketClient()
+{
+	m_webSocket.close();
+
+	processMessages();
+}
+
+
 void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 {
 	//Q_UNUSED(errors);
@@ -108,6 +116,9 @@ void WebsocketClient::onConnected()
 
 void WebsocketClient::socketDisconnected()
 {
+	if (!isConnected) return; // This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready). In this case, we can 
+							  // safely ignore this message.
+
 	OT_LOG_D("Relay server disconnected on websocket");
 	isConnected = false;
 
