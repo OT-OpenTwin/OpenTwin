@@ -12,26 +12,41 @@ namespace Numbers
 	static unsigned long long currentNodeNumber = 0;
 }
 
-std::vector<Connection> ElementConnections;
-std::vector<Connection> ResistorConnections;
+void NGSpice::addElementConnection(const std::string& key, const Connection& con)
+{
+	ElementConnections[key] = con;
+}
+
+void NGSpice::addResistorConnection(const std::string& key, const Connection& con)
+{
+	ResistorConnections[key] = con;
+}
+
+
+void NGSpice::setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
+{
+	for (auto it : allEntitiesByBlockID)
+	{
+		std::shared_ptr<EntityBlock> blockEntity = it.second;
+		
+		if (blockEntity->getBlockTitle() == "Circuit Element")
+		{
+			for (auto conn : blockEntity->getAllConnections())
+			{
+				Connection connection(conn);
+				connection.setNodeNumber(std::to_string(Numbers::currentNodeNumber++));
+				addElementConnection(connection.getNodeNumber(), connection);
+				addResistorConnection(connection.getNodeNumber(), connection);
+
+			}
+		}
+	}
+}
+
+
 
 std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
 {
-
-	//1st Approach: One could sort based on the size of the node numbers, meaning that all nodes within a NetlistString would be sorted. 
-	//For example, instead of "2 1," it would be "1 2," ensuring that node 1 comes before node 2. However, for positive results concerning voltage sources, 
-	//the order would need to be reversed.
-
-	//2nd Approach: Another option is to sort the list of connections for each element in ascending order of node numbers using a function. 
-	//This way, the connections are already sorted when retrieved from the list.
-
-
-	// First I declare the path to the file
-
-	//std::ofstream outfile("C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/output.cir");
-	//Here i have two Vectors for incomging and putgoing Connections
-
-
 	/*std::string Title = "*Test";
 	outfile << Title << std::endl;
 
@@ -65,17 +80,15 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 			unsigned long long number = 1;
 			std::string elementNumber = std::to_string(number);
 			std::string netlistElement = elementName + elementNumber;
-			std::string connectionNumbers;
+			std::string connectionNumbers="";
 
-			auto list = myElement->getAllConnections();
-			for (auto it : list)
+			for (auto conn : ElementConnections)
 			{
-				Connection connection(it);
-				connection.setNodeNumber(std::to_string(Numbers::currentNodeNumber++));
-				connectionNumbers += connection.getNodeNumber();
+				connectionNumbers += conn.second.getNodeNumber();
 				connectionNumbers += " ";
-				//ElementConnections.push_back(connection);
 			}
+			
+
 
 			std::string netlistLine = "";
 			netlistLine = netlistElement + " " + connectionNumbers + " " + value + "\n";
@@ -92,17 +105,12 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 			unsigned long long number = 1;
 			std::string elementNumber = std::to_string(number);
 			std::string netlistElement = elementName + elementNumber;
+			std::string connectionNumbers = "";
 
-			std::string connectionNumbers;
-
-			auto list = myElement->getAllConnections();
-			for (auto it : list)
+			for (auto conn = ResistorConnections.rbegin(); conn != ResistorConnections.rend(); ++conn)
 			{
-				Connection connection(it);
-				connection.setNodeNumber(std::to_string(--Numbers::currentNodeNumber));
-				connectionNumbers += connection.getNodeNumber();
+				connectionNumbers += conn->second.getNodeNumber();
 				connectionNumbers += " ";
-				//ResistorConnections.push_back(connection);
 			}
 
 			std::string netlistLine = "";
@@ -123,116 +131,11 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
 
-	
-	
-	//ngSpice_Command(const_cast<char*>(netlist.c_str()));
+
 
 	return "succes";
 
-	/*auto map = Application::instance()->getNGSpice().mapOfCircuits.find("Circuit Simulator")->second.getMapOfElements();*/
 	
-	// Now i iterate through this Map of Elements and save the information
-	//for (auto it : map)
-	//{
-
-
-	//	std::string NodeNumbersString = "";
-	//	std::string elementName_temp = it.second.getItemName();
-	//	std::string netlistElementName = it.second.getNetlistElementName();
-	//	std::string value;
-	//	std::string elmentUID = it.second.getUID();
-
-	//	if (elementName_temp == "Connector")
-	//	{
-	//		continue;
-	//	}
-
-	//	//Here i get the Connection List
-	//	auto connectionList = it.second.getList();
-
-	//	if (elementName_temp == "EntityBlockCircuitElement")
-	//	{
-	//		for (auto c = connectionList.rbegin(); c != connectionList.rend(); c++)
-	//		{
-
-	//			NodeNumbersString += c->getNodeNumber();
-	//			NodeNumbersString += " ";
-	//		}
-	//	}
-
-	//	else
-	//	{
-
-	//		for (auto c : connectionList)
-	//		{
-	//			NodeNumbersString += c.getNodeNumber();
-	//			NodeNumbersString += " ";
-
-	//		}
-
-	//	}
-
-	//	//I set default values
-	//	if (elementName_temp == "VoltageSource")
-	//	{
-	//		value = "12V";
-
-
-	//	}
-	//	else if (elementName_temp == "Resistor")
-	//	{
-	//		value = "200";
-	//	}
-	//	else if (elementName_temp == "Diode")
-	//	{
-	//		value = "myDiode";
-	//		DiodeCounter++;
-	//	}
-	//	else
-	//	{
-	//		value = "BC546B";
-	//		TransistorCounter++;
-	//	}
-
-	//	//Create the end string 
-	//	std::string NetlistLine = netlistElementName + " " + NodeNumbersString + value;
-
-	//	outfile << NetlistLine << std::endl;
-	//}
-
-	//if (DiodeCounter > 0)
-	//{
-	//	std::string diodeModel = ".model myDiode D (IS=1n RS=0.1 N=1)";
-	//	outfile << diodeModel << std::endl;
-	//}
-
-	//if (TransistorCounter > 0)
-	//{
-	//	std::string tranModel = ".model BC546B npn (BF=200)";
-	//	outfile << tranModel << std::endl;
-	//}
-
-	//std::string Properties = ".dc V1 0V 12V 1V";
-	//outfile << Properties << std::endl;
-
-	//std::string control = ".Control";
-	//outfile << control << std::endl;;
-
-	//std::string run = "run";
-	//outfile << run << std::endl;
-
-	//std::string print = "print all";
-	//outfile << print << std::endl;
-
-	//std::string endc = ".endc";
-	//outfile << endc << std::endl;;
-
-	//std::string end = ".end";
-	//outfile << end << std::endl;
-
-
-	//std::string myString = "Succesfull";
-	//return myString;
 }
 
 std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
@@ -261,20 +164,15 @@ std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<En
 	}
 
 
-	// Some simulation
 
+	/* Some simulation*/
+	 setConnectionNodeNumbers(allEntitiesByBlockID);
 	 generateNetlist(allEntitiesByBlockID);
 	
-
-	
-
-	//const char* netlistPath = "C:\\Users\\Sebastian\\Desktop\\NGSpice_Dateien_Test\\SpannungsTeiler2.cir";
-
-	//char command[100];
-	//sprintf_s(command, "source %s", netlistPath);
-	//ngSpice_Command(command);
-
-
+	/*char command[1000];
+	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";
+	sprintf_s(command, sizeof(command), "source %s", netlist);
+	ngSpice_Command(command);*/
 
 	myString = std::to_string(status);
 
