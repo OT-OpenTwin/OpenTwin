@@ -16,6 +16,11 @@
 #include <qwt_polar_canvas.h>
 #include <qwt_symbol.h>
 
+#include "EntityHandler.h"
+#include "EntityResult1DCurve.h"
+#include "EntityResult1DCurveData.h"
+
+#include <memory>
 const double c_pi{ 3.14159265358979323846 };
 
 Plot::Plot(Viewer * _viewer)
@@ -411,47 +416,24 @@ void Plot::setFromDataBase(const std::string & _projectName, const std::list<Plo
 		unsigned long long entityID = item.getModelEntityID();
 		unsigned long long entityVersion = item.getModelEntityVersion();
 
+		EntityHandler handler;
+		EntityBase* baseEntity = handler.readEntityFromEntityIDandVersion(entityID, entityVersion);
+		std::unique_ptr<EntityResult1DCurve> curve(dynamic_cast<EntityResult1DCurve*>(baseEntity));
+
 		// Read the curve data item
-		auto doc = bsoncxx::builder::basic::document{};
-
-		if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
-		{
-			assert(0);
-			return;
-		}
-
-		auto doc_view = doc.view()["Found"].get_document().view();
-
-		std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
-
-		if (entityType != "EntityResult1D")
-		{
-			assert(0);
-			return;
-		}
-
-		int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityResult1D");
-		if (schemaVersion != 1)
-		{
-			assert(0);
-			return;
-		}
-
-		unsigned long long curveDataStorageId = doc_view["CurveDataID"].get_int64();
-		unsigned long long curveDataStorageVersion = doc_view["CurveDataVersion"].get_int64();
-
+		unsigned long long curveDataStorageId = curve->getCurveDataStorageId();
+		unsigned long long curveDataStorageVersion = curve->getCurveDataStorageVersion();
+		baseEntity = handler.readEntityFromEntityIDandVersion(curveDataStorageId, curveDataStorageVersion);
+		std::unique_ptr<EntityResult1DCurveData> curveData(dynamic_cast<EntityResult1DCurveData*>(baseEntity));
 		std::string curveLabel = item.getName();
 
-		int color[3];
-		color[0] = (int)(doc_view["colorR"].get_double() * 255.0 + 0.5);
-		color[1] = (int)(doc_view["colorG"].get_double() * 255.0 + 0.5);
-		color[2] = (int)(doc_view["colorB"].get_double() * 255.0 + 0.5);
+		ot::Color colour = curve->getColor();
+		
+		std::string xAxisLabel = curve->getAxisLabelX();
+		std::string yAxisLabel = curve->getAxisLabelY();
 
-		std::string xAxisLabel = doc_view["xAxisLabel"].get_utf8().value.data();
-		std::string yAxisLabel = doc_view["yAxisLabel"].get_utf8().value.data();
-
-		std::string xAxisUnit = doc_view["xAxisUnit"].get_utf8().value.data();
-		std::string yAxisUnit = doc_view["yAxisUnit"].get_utf8().value.data();
+		std::string xAxisUnit = curve->getUnitX();
+		std::string yAxisUnit = curve->getUnitY();
 
 		std::string axisTitleX = xAxisLabel + " [" + xAxisUnit + "]";
 		std::string axisTitleY = yAxisLabel + " [" + yAxisUnit + "]";
@@ -466,7 +448,8 @@ void Plot::setFromDataBase(const std::string & _projectName, const std::list<Plo
 		newDataset->setDimmed(item.isDimmed(), false);
 
 		newDataset->setCurvePointsVisible(false, false);
-		newDataset->setCurveColor(QColor(color[0], color[1], color[2]), false);
+		
+		newDataset->setCurveColor(QColor(colour.rInt(), colour.gInt(), colour.bInt()), false);
 		newDataset->setCurveTitle(curveLabel.c_str());
 		newDataset->setAxisTitleX(axisTitleX);
 		newDataset->setAxisTitleY(axisTitleY);
@@ -537,13 +520,15 @@ void Plot::setFromDataBase(const std::string & _projectName, const std::list<Plo
 
 		std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-		if (entityType != "EntityResult1DData")
+		EntityResult1DCurveData curveDataEntName(0, nullptr, nullptr, nullptr, nullptr, "");
+		if (entityType != curveDataEntName.getClassName())
 		{
 			assert(0);
 			return;
 		}
 
-		int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityResult1DData");
+		std::string schemaVersionField = "SchemaVersion_" + curveDataEntName.getClassName();
+		int schemaVersion = (int)DataBase::GetIntFromView(doc_view, schemaVersionField.c_str());
 		if (schemaVersion != 1)
 		{
 			assert(0);

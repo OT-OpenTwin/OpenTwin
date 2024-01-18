@@ -1,7 +1,7 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "EntityPlot1D.h"
+#include "EntityResult1DPlot.h"
 #include "DataBase.h"
 #include "Types.h"
 
@@ -9,27 +9,27 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityPlot1D::EntityPlot1D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
+EntityResult1DPlot::EntityResult1DPlot(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, factory, owner)
 {
 	
 }
 
-EntityPlot1D::~EntityPlot1D()
+EntityResult1DPlot::~EntityResult1DPlot()
 {
 }
 
-bool EntityPlot1D::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
+bool EntityResult1DPlot::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
 {
 	return false;
 }
 
-void EntityPlot1D::StoreToDataBase(void)
+void EntityResult1DPlot::StoreToDataBase(void)
 {
 	EntityBase::StoreToDataBase();
 }
 
-void EntityPlot1D::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
 	EntityBase::AddStorageData(storage);
@@ -50,7 +50,7 @@ void EntityPlot1D::AddStorageData(bsoncxx::builder::basic::document &storage)
 	);
 }
 
-void EntityPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -79,14 +79,14 @@ void EntityPlot1D::readSpecificDataFromDataBase(bsoncxx::document::view &doc_vie
 	resetModified();
 }
 
-void EntityPlot1D::addVisualizationNodes(void)
+void EntityResult1DPlot::addVisualizationNodes(void)
 {
 	addVisualizationItem(getInitiallyHidden());
 
 	EntityBase::addVisualizationNodes();
 }
 
-void EntityPlot1D::addVisualizationItem(bool isHidden)
+void EntityResult1DPlot::addVisualizationItem(bool isHidden)
 {
 	TreeIcon treeIcons;
 	treeIcons.size = 32;
@@ -116,7 +116,7 @@ void EntityPlot1D::addVisualizationItem(bool isHidden)
 	getObserver()->sendMessageToViewer(doc);
 }
 
-void EntityPlot1D::createProperties(void)
+void EntityResult1DPlot::createProperties(void)
 {
 	EntityPropertiesString::createProperty("General", "Title", "", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
@@ -140,7 +140,7 @@ void EntityPlot1D::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-bool EntityPlot1D::updateFromProperties(void)
+bool EntityResult1DPlot::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());
@@ -163,14 +163,14 @@ bool EntityPlot1D::updateFromProperties(void)
 	return updatePropertyVisibilities(); // Notify, whether property grid update is necessary
 }
 
-void EntityPlot1D::setPlotType(const std::string &type) { 
+void EntityResult1DPlot::setPlotType(const std::string &type) { 
 	if (!getProperties().propertyExists("Plot type")) {
 		assert(0);
 		return;
 	}
 	setSelectionPlotProperty("Plot type", type); 
 }
-std::string EntityPlot1D::getPlotType(void) { 
+std::string EntityResult1DPlot::getPlotType(void) { 
 	if (getProperties().propertyExists("Plot type")) {
 		return getSelectionPlotProperty("Plot type");
 	}
@@ -179,14 +179,14 @@ std::string EntityPlot1D::getPlotType(void) {
 	}
 }
 
-void EntityPlot1D::setPlotQuantity(const std::string &quantity) { 
+void EntityResult1DPlot::setPlotQuantity(const std::string &quantity) { 
 	if (!getProperties().propertyExists("Plot quantity")) {
 		assert(0);
 		return;
 	}
 	setSelectionPlotProperty("Plot quantity", quantity);
 }
-std::string EntityPlot1D::getPlotQuantity(void) { 
+std::string EntityResult1DPlot::getPlotQuantity(void) { 
 	if (getProperties().propertyExists("Plot quantity")) {
 		return getSelectionPlotProperty("Plot quantity");
 	}
@@ -195,7 +195,7 @@ std::string EntityPlot1D::getPlotQuantity(void) {
 	}
 }
 
-void EntityPlot1D::addPropertiesToDocument(ot::JsonDocument& doc)
+void EntityResult1DPlot::addPropertiesToDocument(ot::JsonDocument& doc)
 {
 	int gridColorR = 0, gridColorG = 0, gridColorB = 0;
 	getGridColor(gridColorR, gridColorG, gridColorB);
@@ -218,7 +218,7 @@ void EntityPlot1D::addPropertiesToDocument(ot::JsonDocument& doc)
 	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorB, gridColorB, doc.GetAllocator());
 }
 
-void EntityPlot1D::setStringPlotProperty(const std::string &name, const std::string &value)
+void EntityResult1DPlot::setStringPlotProperty(const std::string &name, const std::string &value)
 {
 	EntityPropertiesString *prop = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -230,7 +230,7 @@ void EntityPlot1D::setStringPlotProperty(const std::string &name, const std::str
 	}
 }
 
-void EntityPlot1D::setSelectionPlotProperty(const std::string &name, const std::string &value) {
+void EntityResult1DPlot::setSelectionPlotProperty(const std::string &name, const std::string &value) {
 	EntityPropertiesSelection *prop = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
 
@@ -241,7 +241,7 @@ void EntityPlot1D::setSelectionPlotProperty(const std::string &name, const std::
 	}
 }
 
-void EntityPlot1D::setBoolPlotProperty(const std::string &name, bool value)
+void EntityResult1DPlot::setBoolPlotProperty(const std::string &name, bool value)
 {
 	EntityPropertiesBoolean *prop = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -253,7 +253,7 @@ void EntityPlot1D::setBoolPlotProperty(const std::string &name, bool value)
 	}
 }
 
-void EntityPlot1D::setDoublePlotProperty(const std::string &name, double value)
+void EntityResult1DPlot::setDoublePlotProperty(const std::string &name, double value)
 {
 	EntityPropertiesDouble *prop = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -265,7 +265,7 @@ void EntityPlot1D::setDoublePlotProperty(const std::string &name, double value)
 	}
 }
 
-void EntityPlot1D::setGridColor(int colorR, int colorG, int colorB)
+void EntityResult1DPlot::setGridColor(int colorR, int colorG, int colorB)
 {
 	EntityPropertiesColor *prop = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Grid color"));
 	assert(prop != nullptr);
@@ -279,7 +279,7 @@ void EntityPlot1D::setGridColor(int colorR, int colorG, int colorB)
 	}
 }
 
-std::string EntityPlot1D::getStringPlotProperty(const std::string &name)
+std::string EntityResult1DPlot::getStringPlotProperty(const std::string &name)
 {
 	EntityPropertiesString *prop = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -287,14 +287,14 @@ std::string EntityPlot1D::getStringPlotProperty(const std::string &name)
 	return prop->getValue();
 }
 
-std::string EntityPlot1D::getSelectionPlotProperty(const std::string &name) {
+std::string EntityResult1DPlot::getSelectionPlotProperty(const std::string &name) {
 	EntityPropertiesSelection *prop = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
 
 	return prop->getValue();
 }
 
-bool EntityPlot1D::getBoolPlotProperty(const std::string &name)
+bool EntityResult1DPlot::getBoolPlotProperty(const std::string &name)
 {
 	EntityPropertiesBoolean *prop = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -302,7 +302,7 @@ bool EntityPlot1D::getBoolPlotProperty(const std::string &name)
 	return prop->getValue();
 }
 
-double EntityPlot1D::getDoublePlotProperty(const std::string &name)
+double EntityResult1DPlot::getDoublePlotProperty(const std::string &name)
 {
 	EntityPropertiesDouble *prop = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -310,7 +310,7 @@ double EntityPlot1D::getDoublePlotProperty(const std::string &name)
 	return prop->getValue();
 }
 
-void EntityPlot1D::getGridColor(int &colorR, int &colorG, int &colorB)
+void EntityResult1DPlot::getGridColor(int &colorR, int &colorG, int &colorB)
 {
 	EntityPropertiesColor *prop = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Grid color"));
 	assert(prop != nullptr);
@@ -323,25 +323,25 @@ void EntityPlot1D::getGridColor(int &colorR, int &colorG, int &colorB)
 	}
 }
 
-void EntityPlot1D::addCurve(ot::UID curveID, const std::string &name)
+void EntityResult1DPlot::addCurve(ot::UID curveID, const std::string &name)
 {
 	deleteCurve(curveID);
 	curves.push_back(curveID);
 	curveNames[curveID] = name;
 }
 
-void EntityPlot1D::deleteCurve(ot::UID curveID)
+void EntityResult1DPlot::deleteCurve(ot::UID curveID)
 {
 	curves.remove(curveID);
 	curveNames.erase(curveID);
 }
 
-std::list<ot::UID> EntityPlot1D::getCurves(void)
+std::list<ot::UID> EntityResult1DPlot::getCurves(void)
 {
 	return curves;
 }
 
-std::list<std::string> EntityPlot1D::getCurveNames(void)
+std::list<std::string> EntityResult1DPlot::getCurveNames(void)
 {
 	std::list<std::string> names;
 	for (auto curve : curves)
@@ -352,7 +352,7 @@ std::list<std::string> EntityPlot1D::getCurveNames(void)
 	return names;
 }
 
-bool EntityPlot1D::updatePropertyVisibilities(void)
+bool EntityResult1DPlot::updatePropertyVisibilities(void)
 {
 	bool updatePropertiesGrid = false;
 

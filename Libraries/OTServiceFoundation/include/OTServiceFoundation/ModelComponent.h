@@ -18,6 +18,9 @@
 
 #include "UniqueUIDGenerator.h"
 
+#include "EntityResult1DPlot.h"
+#include "EntityResult1DCurve.h"
+
 // C++ header
 #include <string>
 #include <list>
@@ -82,8 +85,8 @@ namespace ot {
 			void updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment);
 			
 			// Specific entity management helper functions
-			EntityPlot1D *addPlot1DEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID, std::string>> &curves);
-			EntityResult1D *addResult1DEntity(const std::string &name, const std::vector<double> &xdata, 
+			EntityResult1DPlot * addResult1DPlotEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID, std::string>> &curves);
+			EntityResult1DCurve * addResult1DCurveEntity(const std::string &name, const std::vector<double> &xdata,
 											  const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
 											  const std::string &xlabel, const std::string &xunit,
 											  const std::string &ylabel, const std::string &yunit, int colorID, bool visible);

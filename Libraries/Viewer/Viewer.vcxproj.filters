@@ -145,6 +145,9 @@
     <ClCompile Include="src\Factory.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\EntityHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -289,6 +292,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Factory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

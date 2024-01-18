@@ -7,17 +7,17 @@
 #include <list>
 #include <vector>
 
-class __declspec(dllexport) EntityResult1DData : public EntityBase
+class __declspec(dllexport) EntityResult1DCurveData : public EntityBase
 {
 public:
-	EntityResult1DData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
-	virtual ~EntityResult1DData();
+	EntityResult1DCurveData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	virtual ~EntityResult1DCurveData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
 	virtual void StoreToDataBase(void) override;
 
-	virtual std::string getClassName(void) { return "EntityResult1DData"; };
+	virtual std::string getClassName(void) { return "EntityResult1DCurveData"; };
 
 	virtual entityType getEntityType(void) override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;

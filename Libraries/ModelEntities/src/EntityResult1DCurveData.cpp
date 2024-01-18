@@ -1,34 +1,34 @@
 
-#include "EntityResult1DData.h"
+#include "EntityResult1DCurveData.h"
 #include "DataBase.h"
 #include "Types.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityResult1DData::EntityResult1DData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
+EntityResult1DCurveData::EntityResult1DCurveData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms,  factory, owner)
 {
 	
 }
 
-EntityResult1DData::~EntityResult1DData()
+EntityResult1DCurveData::~EntityResult1DCurveData()
 {
 	dataX.clear();
 	dataYre.clear();
 	dataYim.clear();
 }
 
-bool EntityResult1DData::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
+bool EntityResult1DCurveData::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
 {
 	return false;
 }
 
-void EntityResult1DData::StoreToDataBase(void)
+void EntityResult1DCurveData::StoreToDataBase(void)
 {
 	EntityBase::StoreToDataBase();
 }
 
-void EntityResult1DData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResult1DCurveData::AddStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
 	EntityBase::AddStorageData(storage);
@@ -61,7 +61,7 @@ void EntityResult1DData::AddStorageData(bsoncxx::builder::basic::document &stora
 	);
 }
 
-void EntityResult1DData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityResult1DCurveData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -112,50 +112,50 @@ void EntityResult1DData::readSpecificDataFromDataBase(bsoncxx::document::view &d
 	resetModified();
 }
 
-void EntityResult1DData::removeChild(EntityBase *child)
+void EntityResult1DCurveData::removeChild(EntityBase *child)
 {
 	EntityBase::removeChild(child);
 }
 
-void EntityResult1DData::setXData(const std::vector<double> &x)
+void EntityResult1DCurveData::setXData(const std::vector<double> &x)
 {
 	dataX = x;
 }
 
-void EntityResult1DData::setYData(const std::vector<double> &yre, const std::vector<double> &yim)
+void EntityResult1DCurveData::setYData(const std::vector<double> &yre, const std::vector<double> &yim)
 {
 	dataYre = yre;
 	dataYim = yim;
 }
 
-void EntityResult1DData::clearData(void)
+void EntityResult1DCurveData::clearData(void)
 {
 	clearXData();
 	clearYData();
 }
 
-void EntityResult1DData::clearXData(void)
+void EntityResult1DCurveData::clearXData(void)
 {
 	dataX.clear();
 }
 
-void EntityResult1DData::clearYData(void)
+void EntityResult1DCurveData::clearYData(void)
 {
 	dataYre.clear();
 	dataYim.clear();
 }
 
-const std::vector<double> &EntityResult1DData::getXData(void)
+const std::vector<double> &EntityResult1DCurveData::getXData(void)
 {
 	return dataX;
 }
 
-const std::vector<double> &EntityResult1DData::getYDataReal(void)
+const std::vector<double> &EntityResult1DCurveData::getYDataReal(void)
 {
 	return dataYre;
 }
 
-const std::vector<double> &EntityResult1DData::getYDataImag(void)
+const std::vector<double> &EntityResult1DCurveData::getYDataImag(void)
 {
 	return dataYim;
 }

@@ -24,9 +24,9 @@
 #include "EntityMeshCartesianItem.h"
 #include "EntityMeshCartesianNodes.h"
 #include "EntityMeshTetItem.h"
-#include "EntityResult1D.h"
-#include "EntityResult1DData.h"
-#include "EntityPlot1D.h"
+#include "EntityResult1DPlot.h"
+#include "EntityResult1DCurve.h"
+#include "EntityResult1DCurveData.h"
 #include "EntityResultText.h"
 #include "EntityResultTextData.h"
 #include "EntityResultTable.h"
@@ -130,17 +130,17 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	{
 		return new EntityMaterial(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityResult1D")
+	else if (entityType == "EntityResult1DCurve")
 	{
-		return new EntityResult1D(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityResult1DCurve(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityResult1DData")
+	else if (entityType == "EntityResult1DCurveData")
 	{
-		return new EntityResult1DData(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityResult1DCurveData(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityPlot1D")
+	else if (entityType == "EntityResult1DPlot")
 	{
-		return new EntityPlot1D(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityResult1DPlot(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else if (entityType == "EntityMeshCartesian")
 	{

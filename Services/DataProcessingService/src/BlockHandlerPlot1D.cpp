@@ -1,6 +1,6 @@
 #include "BlockHandlerPlot1D.h"
-#include "EntityPlot1D.h"
-#include "EntityResult1D.h"
+#include "EntityResult1DPlot.h"
+#include "EntityResult1DCurve.h"
 #include "GraphNode.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const HandlerMap& handlerMap)
@@ -29,14 +29,13 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		std::vector<double> xValues = transformDataToDouble(genericXValues);
 		std::vector<double> yValues = transformDataToDouble(genericYValues);
 		
-			
 		const int colorID(0);
 		const std::string entityPath = _resultFolder + "1D/Plots";
 		const std::string fullPlotName = CreateNewUniqueTopologyName(entityPath, _plotName);
 
-		EntityResult1D* curve = _modelComponent->addResult1DEntity(fullPlotName + "/" + _curveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
+		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullPlotName + "/" + _curveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
 		std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName) };
-		EntityPlot1D* plotID = _modelComponent->addPlot1DEntity(fullPlotName, "Result Plot", curves);
+		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
 		ot::UIDList topoEnt{ plotID->getEntityID() },
 				topoVers{ plotID->getEntityStorageVersion() },
 				dataEntID{ (ot::UID)curve->getCurveDataStorageId(),curve->getEntityID() }, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion(),curve->getEntityStorageVersion() },

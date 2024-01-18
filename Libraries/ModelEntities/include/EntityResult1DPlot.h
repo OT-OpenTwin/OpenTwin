@@ -6,11 +6,11 @@
 
 #include <list>
 
-class __declspec(dllexport) EntityPlot1D : public EntityBase
+class __declspec(dllexport) EntityResult1DPlot : public EntityBase
 {
 public:
-	EntityPlot1D(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
-	virtual ~EntityPlot1D();
+	EntityResult1DPlot(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	virtual ~EntityResult1DPlot();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
@@ -20,7 +20,7 @@ public:
 	virtual void StoreToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	
-	virtual std::string getClassName(void) { return "EntityPlot1D"; };
+	virtual std::string getClassName(void) { return "EntityResult1DPlot"; };
 
 	void addVisualizationItem(bool isHidden);
 

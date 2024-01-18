@@ -3,16 +3,17 @@
 
 #include "EntityContainer.h"
 #include "Types.h"
+#include "OTCore/Color.h"
 
-class EntityResult1DData;
+class EntityResult1DCurveData;
 
-class __declspec(dllexport) EntityResult1D : public EntityContainer
+class __declspec(dllexport) EntityResult1DCurve : public EntityContainer
 {
 public:
 	enum tDataType {EMPTY, REAL, IMAG, COMPLEX};
 
-	EntityResult1D(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
-	virtual ~EntityResult1D();
+	EntityResult1DCurve(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	virtual ~EntityResult1DCurve();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
@@ -22,9 +23,9 @@ public:
 	virtual void StoreToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	
-	virtual std::string getClassName(void) { return "EntityResult1D"; };
+	virtual std::string getClassName(void) { return "EntityResult1DCurve"; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
 	void createProperties(void);
@@ -52,6 +53,12 @@ public:
 
 	tDataType getDataType(void) { return dataType; }
 
+	ot::Color getColor();
+	std::string getAxisLabelX();
+	std::string getAxisLabelY();
+	std::string getUnitX();
+	std::string getUnitY();
+
 private:
 	void EnsureCurveDataLoaded(void);
 	virtual int getSchemaVersion(void) { return 1; };
@@ -59,9 +66,8 @@ private:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void setCurveProperty(const std::string &name, const std::string &value);
 	void syncSettingsFromProperties(void);
-	EntityResult1DData *getCurveData(void);
-
-	EntityResult1DData *curveData;
+	EntityResult1DCurveData *getCurveData(void);
+	EntityResult1DCurveData *curveData;
 	long long curveDataStorageId;
 	long long curveDataStorageVersion;
 

@@ -12,9 +12,9 @@
 #include "OTServiceFoundation/ApplicationBase.h"
 
 #include "EntityBase.h"
-#include "EntityPlot1D.h"
-#include "EntityResult1D.h"
-#include "EntityResult1DData.h"
+#include "EntityResult1DPlot.h"
+#include "EntityResult1DCurve.h"
+#include "EntityResult1DCurveData.h"
 #include "EntityResultText.h"
 #include "EntityGeometry.h"
 
@@ -803,9 +803,9 @@ void ot::components::ModelComponent::updateTopologyEntities(ot::UIDList& topolog
 
 // Entity management helper functions
 
-EntityPlot1D *ot::components::ModelComponent::addPlot1DEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID,std::string>> &curves)
+EntityResult1DPlot*ot::components::ModelComponent::addResult1DPlotEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID,std::string>> &curves)
 {
-	EntityPlot1D *plot = new EntityPlot1D(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
+	EntityResult1DPlot*plot = new EntityResult1DPlot(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
 
 	plot->setName(name);
 	plot->setEditable(true);
@@ -825,12 +825,12 @@ EntityPlot1D *ot::components::ModelComponent::addPlot1DEntity(const std::string 
 	return plot;
 }
 
-EntityResult1D *ot::components::ModelComponent::addResult1DEntity(const std::string &name, const std::vector<double> &xdata, 
+EntityResult1DCurve *ot::components::ModelComponent::addResult1DCurveEntity(const std::string &name, const std::vector<double> &xdata, 
 	const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
 	const std::string &xlabel, const std::string &xunit,
 	const std::string &ylabel, const std::string &yunit, int colorID, bool visible)
 {
-	EntityResult1D *curve = new EntityResult1D(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
+	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
 
 	curve->setName(name);
 	curve->setEditable(true);

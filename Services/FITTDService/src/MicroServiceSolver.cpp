@@ -1,8 +1,8 @@
 #include "MicroServiceSolver.h"
 
 #include "EntitySolverFITTD.h"
-#include "EntityPlot1D.h"
-#include "EntityResult1D.h"
+#include "EntityResult1DPlot.h"
+#include "EntityResult1DCurve.h"
 #include "EntityResult3D.h"
 #include "EntityResult3DData.h"
 #include "EntitySignalType.h"
@@ -323,7 +323,7 @@ std::pair<ot::UID, std::string> MicroServiceSolver::addResultCurve(const std::st
 {
 	std::string resultDataFolder = solverName + "/" + FolderNames::GetFolderNameRawResultBase() +"/";
 
-	EntityResult1D *curve = modelComponent->addResult1DEntity(resultDataFolder + name, xdata, ydataRe, ydataIm, xlabel, xunit, ylabel, yunit, colorID, visualize);
+	EntityResult1DCurve *curve = modelComponent->addResult1DCurveEntity(resultDataFolder + name, xdata, ydataRe, ydataIm, xlabel, xunit, ylabel, yunit, colorID, visualize);
 
 
 	dataEntityIDList.push_back(curve->getCurveDataStorageId());
@@ -338,7 +338,7 @@ std::pair<ot::UID, std::string> MicroServiceSolver::addResultCurve(const std::st
 
 void MicroServiceSolver::addPlot1D(std::string name, std::string title, const std::list<std::pair<ot::UID, std::string>> &curves)
 {
-	EntityPlot1D *plotID = modelComponent->addPlot1DEntity(name, title, curves);
+	EntityResult1DPlot *plotID = modelComponent->addResult1DPlotEntity(name, title, curves);
 
 	topologyEntityIDList.push_back(plotID->getEntityID());
 	topologyEntityVersionList.push_back(plotID->getEntityStorageVersion());

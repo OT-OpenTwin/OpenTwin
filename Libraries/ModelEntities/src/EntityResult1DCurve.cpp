@@ -1,8 +1,8 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "EntityResult1D.h"
-#include "EntityResult1DData.h"
+#include "EntityResult1DCurve.h"
+#include "EntityResult1DCurveData.h"
 #include "DataBase.h"
 #include "Types.h"
 
@@ -10,7 +10,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityResult1D::EntityResult1D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
+EntityResult1DCurve::EntityResult1DCurve(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, factory, owner),
 	curveData(nullptr),
 	curveDataStorageId(-1),
@@ -21,16 +21,16 @@ EntityResult1D::EntityResult1D(ot::UID ID, EntityBase *parent, EntityObserver *o
 	setCreateVisualizationItem(false);
 }
 
-EntityResult1D::~EntityResult1D()
+EntityResult1DCurve::~EntityResult1DCurve()
 {
 }
 
-bool EntityResult1D::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
+bool EntityResult1DCurve::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
 {
 	return false;
 }
 
-void EntityResult1D::StoreToDataBase(void)
+void EntityResult1DCurve::StoreToDataBase(void)
 {
 	syncSettingsFromProperties();
 
@@ -42,7 +42,7 @@ void EntityResult1D::StoreToDataBase(void)
 	EntityBase::StoreToDataBase();
 }
 
-void EntityResult1D::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResult1DCurve::AddStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
 	EntityContainer::AddStorageData(storage);
@@ -62,7 +62,7 @@ void EntityResult1D::AddStorageData(bsoncxx::builder::basic::document &storage)
 	);
 }
 
-void EntityResult1D::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -94,7 +94,7 @@ void EntityResult1D::readSpecificDataFromDataBase(bsoncxx::document::view &doc_v
 	resetModified();
 }
 
-void EntityResult1D::addVisualizationNodes(void)
+void EntityResult1DCurve::addVisualizationNodes(void)
 {
 	if (!getName().empty())
 	{
@@ -117,7 +117,7 @@ void EntityResult1D::addVisualizationNodes(void)
 	EntityBase::addVisualizationNodes();
 }
 
-void EntityResult1D::removeChild(EntityBase *child)
+void EntityResult1DCurve::removeChild(EntityBase *child)
 {
 	if (child == curveData)
 	{
@@ -127,7 +127,7 @@ void EntityResult1D::removeChild(EntityBase *child)
 	EntityContainer::removeChild(child);
 }
 
-void EntityResult1D::createProperties(void)
+void EntityResult1DCurve::createProperties(void)
 {
 	EntityPropertiesColor::createProperty("General", "Color", { 255, 0, 0 }, "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis label", "", "", getProperties());
@@ -145,7 +145,7 @@ void EntityResult1D::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-void EntityResult1D::syncSettingsFromProperties(void)
+void EntityResult1DCurve::syncSettingsFromProperties(void)
 {
 	color[0] = dynamic_cast<EntityPropertiesColor *>(getProperties().getProperty("Color"))->getColorR();
 	color[1] = dynamic_cast<EntityPropertiesColor *>(getProperties().getProperty("Color"))->getColorG();
@@ -158,7 +158,7 @@ void EntityResult1D::syncSettingsFromProperties(void)
 	yAxisUnit = dynamic_cast<EntityPropertiesString *>(getProperties().getProperty("Y axis unit"))->getValue();
 }
 
-bool EntityResult1D::updateFromProperties(void)
+bool EntityResult1DCurve::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());
@@ -184,7 +184,7 @@ bool EntityResult1D::updateFromProperties(void)
 	return false; // Notify, whether property grid update is necessary
 }
 
-EntityResult1DData *EntityResult1D::getCurveData(void)
+EntityResult1DCurveData *EntityResult1DCurve::getCurveData(void)
 {
 	EnsureCurveDataLoaded();
 	assert(curveData != nullptr);
@@ -192,7 +192,7 @@ EntityResult1DData *EntityResult1D::getCurveData(void)
 	return curveData;
 }
 
-void EntityResult1D::deleteCurveData(void)
+void EntityResult1DCurve::deleteCurveData(void)
 {
 	curveData = nullptr;
 	curveDataStorageId = -1;
@@ -201,7 +201,7 @@ void EntityResult1D::deleteCurveData(void)
 	setModified();
 }
 
-void EntityResult1D::storeCurveData(void)
+void EntityResult1DCurve::storeCurveData(void)
 {
 	if (curveData == nullptr) return;
 	assert(curveData != nullptr);
@@ -217,7 +217,7 @@ void EntityResult1D::storeCurveData(void)
 	curveDataStorageVersion = curveData->getEntityStorageVersion();
 }
 
-void EntityResult1D::releaseCurveData(void)
+void EntityResult1DCurve::releaseCurveData(void)
 {
 	if (curveData == nullptr) return;
 
@@ -227,18 +227,52 @@ void EntityResult1D::releaseCurveData(void)
 	curveData = nullptr;
 }
 
-void EntityResult1D::EnsureCurveDataLoaded(void)
+ot::Color EntityResult1DCurve::getColor()
+{
+	color[0] = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"))->getColorR();
+	color[1] = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"))->getColorG();
+	color[2] = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"))->getColorB();
+
+	ot::Color selectedColor(static_cast<float>(color[0]), static_cast<float>(color[1]), static_cast<float>(color[2]));
+	return selectedColor;
+}
+
+std::string EntityResult1DCurve::getAxisLabelX()
+{
+	xAxisLabel = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("X axis label"))->getValue();
+	return xAxisLabel;
+}
+
+std::string EntityResult1DCurve::getAxisLabelY()
+{
+	yAxisLabel = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Y axis label"))->getValue();	
+	return yAxisLabel;
+}
+
+std::string EntityResult1DCurve::getUnitX()
+{
+	xAxisUnit = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("X axis unit"))->getValue();
+	return xAxisUnit;
+}
+
+std::string EntityResult1DCurve::getUnitY()
+{
+	yAxisUnit = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Y axis unit"))->getValue();
+	return yAxisUnit;
+}
+
+void EntityResult1DCurve::EnsureCurveDataLoaded(void)
 {
 	if (curveData == nullptr)
 	{
 		if (curveDataStorageId == -1)
 		{
-			curveData = new EntityResult1DData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			curveData = new EntityResult1DCurveData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
 		}
 		else
 		{
 			std::map<ot::UID, EntityBase *> entityMap;
-			curveData = dynamic_cast<EntityResult1DData *>(readEntityFromEntityID(this, curveDataStorageId, entityMap));
+			curveData = dynamic_cast<EntityResult1DCurveData *>(readEntityFromEntityID(this, curveDataStorageId, entityMap));
 		}
 
 		assert(curveData != nullptr);
@@ -246,7 +280,7 @@ void EntityResult1D::EnsureCurveDataLoaded(void)
 	}
 }
 
-void EntityResult1D::setCurveProperty(const std::string &name, const std::string &value)
+void EntityResult1DCurve::setCurveProperty(const std::string &name, const std::string &value)
 {
 	EntityPropertiesString *prop = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty(name));
 	assert(prop != nullptr);
@@ -258,7 +292,7 @@ void EntityResult1D::setCurveProperty(const std::string &name, const std::string
 	}
 }
 
-void EntityResult1D::setColor(int colorR, int colorG, int colorB)
+void EntityResult1DCurve::setColor(int colorR, int colorG, int colorB)
 {
 	EntityPropertiesColor *prop = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
 	assert(prop != nullptr);
@@ -272,13 +306,13 @@ void EntityResult1D::setColor(int colorR, int colorG, int colorB)
 	}
 }
 
-void EntityResult1D::setCurveXData(const std::vector<double> &x)
+void EntityResult1DCurve::setCurveXData(const std::vector<double> &x)
 {
 	getCurveData()->setXData(x);
 	setModified();
 }
 
-void EntityResult1D::setCurveYData(const std::vector<double> &yre, const std::vector<double> &yim)
+void EntityResult1DCurve::setCurveYData(const std::vector<double> &yre, const std::vector<double> &yim)
 {
 	if (yre.empty() && yim.empty())
 	{
@@ -301,7 +335,7 @@ void EntityResult1D::setCurveYData(const std::vector<double> &yre, const std::ve
 	setModified();
 }
 
-void EntityResult1D::setColorFromID(int colorID)
+void EntityResult1DCurve::setColorFromID(int colorID)
 {
 	std::vector<int> predefColorsR = { 255,   0,   0, 255, 255, 128,   0,   0, 128, 128 };
 	std::vector<int> predefColorsG = {   0, 255,   0,   0, 170,   0, 128,   0,   0,  85 };

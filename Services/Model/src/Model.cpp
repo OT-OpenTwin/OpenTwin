@@ -11,8 +11,8 @@
 #include "EntityMaterial.h"
 #include "EntityParameter.h"
 #include "EntityMeshTetItem.h"
-#include "EntityResult1D.h"
-#include "EntityResult1DData.h"
+#include "EntityResult1DCurve.h"
+#include "EntityResult1DCurveData.h"
 #include "EntityFaceAnnotation.h"
 #include "EntityVis2D3D.h"
 #include "EntityUnits.h"
@@ -3079,7 +3079,7 @@ void Model::addResult1DEntity(const std::string &name, const std::vector<double>
 							  const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
 							  const std::string &ylabel, const std::string &yunit)
 {
-	EntityResult1D *curve = new EntityResult1D(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
 
 	curve->setName(name);
 	curve->setEditable(true);

@@ -118,13 +118,13 @@
     <ClInclude Include="include\EntityMeshTetNodes.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityResult1D.h">
+    <ClInclude Include="include\EntityResult1DCurve.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityResult1DData.h">
+    <ClInclude Include="include\EntityResult1DCurveData.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityPlot1D.h">
+    <ClInclude Include="include\EntityResult1DPlot.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityMeshCartesian.h">
@@ -438,13 +438,13 @@
     <ClCompile Include="src\EntityMeshTetNodes.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityResult1D.cpp">
+    <ClCompile Include="src\EntityResult1DCurve.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityResult1DData.cpp">
+    <ClCompile Include="src\EntityResult1DCurveData.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityPlot1D.cpp">
+    <ClCompile Include="src\EntityResult1DPlot.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityMeshCartesian.cpp">
