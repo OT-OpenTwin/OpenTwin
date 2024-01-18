@@ -36,9 +36,9 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullPlotName + "/" + _curveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
 		std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName) };
 		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
-		ot::UIDList topoEnt{ plotID->getEntityID() },
-				topoVers{ plotID->getEntityStorageVersion() },
-				dataEntID{ (ot::UID)curve->getCurveDataStorageId(),curve->getEntityID() }, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion(),curve->getEntityStorageVersion() },
+		ot::UIDList topoEnt{ curve->getEntityID(),plotID->getEntityID() },
+				topoVers{ curve->getEntityStorageVersion(),plotID->getEntityStorageVersion() },
+				dataEntID{ (ot::UID)curve->getCurveDataStorageId()}, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion()},
 		dataEntParent{ plotID->getEntityID() ,plotID->getEntityID() };
 			std::list<bool> forceVis{ false,false };
 			_modelComponent->addEntitiesToModel(topoEnt, topoVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");

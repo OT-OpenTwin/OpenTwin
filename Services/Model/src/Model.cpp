@@ -1955,7 +1955,11 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 		}
 
 		getStateManager()->storeEntity(entity->getEntityID(), parentID, entity->getEntityStorageVersion(), ModelStateEntity::tEntityType::TOPOLOGY);
-
+	}
+	
+	//Might be that the visualisation of a parent entity depends on a child entity. Thus the children have to be part of the state before the visualisation is taken care of.
+	for (EntityBase* entity : entities)
+	{
 		if (forceEntityVisible[entity] && entity->getInitiallyHidden())
 		{
 			assert(!entity->getModified());
