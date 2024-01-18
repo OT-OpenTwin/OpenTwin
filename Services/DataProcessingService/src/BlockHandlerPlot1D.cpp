@@ -34,7 +34,7 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		const std::string fullPlotName = CreateNewUniqueTopologyName(entityPath, _plotName);
 
 		const std::string curvePath = _resultFolder + "1D/Curves";
-		const std::string fullCurveName = fullPlotName + "/" + _curveName;//CreateNewUniqueTopologyName(fullPlotName, _curveName);
+		const std::string fullCurveName = curvePath + "/" + _curveName;//CreateNewUniqueTopologyName(fullPlotName, _curveName);
 		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
 		std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName) };
 		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
@@ -47,6 +47,7 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	}
 	return allSet;
 }
+
 
 std::vector<double> BlockHandlerPlot1D::transformDataToDouble(std::list<GenericDataBlock>& genericDataBlocks)
 {
