@@ -1,12 +1,12 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityBase.h"
+#include "EntityContainer.h"
 #include "Types.h"
 
 #include <list>
 
-class __declspec(dllexport) EntityResult1DPlot : public EntityBase
+class __declspec(dllexport) EntityResult1DPlot : public EntityContainer
 {
 public:
 	EntityResult1DPlot(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);

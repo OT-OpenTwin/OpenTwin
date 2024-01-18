@@ -33,13 +33,15 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		const std::string entityPath = _resultFolder + "1D/Plots";
 		const std::string fullPlotName = CreateNewUniqueTopologyName(entityPath, _plotName);
 
-		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullPlotName + "/" + _curveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
+		const std::string curvePath = _resultFolder + "1D/Curves";
+		const std::string fullCurveName = fullPlotName + "/" + _curveName;//CreateNewUniqueTopologyName(fullPlotName, _curveName);
+		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
 		std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName) };
 		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
 		ot::UIDList topoEnt{ curve->getEntityID(),plotID->getEntityID() },
 				topoVers{ curve->getEntityStorageVersion(),plotID->getEntityStorageVersion() },
 				dataEntID{ (ot::UID)curve->getCurveDataStorageId()}, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion()},
-		dataEntParent{ plotID->getEntityID() ,plotID->getEntityID() };
+		dataEntParent{ curve->getEntityID() };
 			std::list<bool> forceVis{ false,false };
 			_modelComponent->addEntitiesToModel(topoEnt, topoVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
 	}

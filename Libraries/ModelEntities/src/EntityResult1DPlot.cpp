@@ -10,7 +10,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner)
+	EntityContainer(ID, parent, obs, ms, factory, owner)
 {
 	
 }
@@ -26,13 +26,13 @@ bool EntityResult1DPlot::getEntityBox(double &xmin, double &xmax, double &ymin, 
 
 void EntityResult1DPlot::StoreToDataBase(void)
 {
-	EntityBase::StoreToDataBase();
+	EntityContainer::StoreToDataBase();
 }
 
 void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityContainer::AddStorageData(storage);
 
 	// Now we store the particular information about the current objec-t
 	auto curveID = bsoncxx::builder::basic::array();
@@ -53,7 +53,7 @@ void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document &stora
 void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
-	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
+	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	// Here we can load any special information about the entity
 	auto arrayCurveItems = doc_view["Curves"].get_array().value;
@@ -125,7 +125,7 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
 
-	EntityPropertiesBoolean::createProperty("X axis", "Logscale X", false, "", getProperties());
+	EntityPropertiesBoolean::createProperty("X axis", "Logscale X", true, "", getProperties());
 	EntityPropertiesBoolean::createProperty("X axis", "Autoscale X", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "X min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "X max", 0.0, "", getProperties());
