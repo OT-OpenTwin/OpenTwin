@@ -61,7 +61,7 @@ public:
 	
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
-	NGSpice getNGSpice() { return m_ngSpice; }
+	NGSpice& getNGSpice() { return m_ngSpice; }
 
 	// ##################################################################################################################################################################################################################
 

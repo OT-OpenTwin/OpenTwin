@@ -13,15 +13,17 @@
 #include <fstream>
 #include <filesystem>
 #include <string.h>
+#include <map>
 
 class NGSpice
 {
 public:
 	std::map<std::string, Circuit> mapOfCircuits;
 
-	void addElementConnection(const std::string&, const Connection&);
-	void addResistorConnection(const std::string&, const Connection&);
-	void setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>&);
+	
+	/*void setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>&);
+	std::string getBlockEntityTitleByUID(std::string UID, std::map<std::string, std::shared_ptr<EntityBlock>>&);*/
+
 
 	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&);
 	std::string ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>&);
@@ -31,15 +33,13 @@ public:
 	static int MyControlledExit(int, bool imidiate, bool quitexit, int, void*);
 
 	//Getter
-	std::map<std::string, Connection>& getElementConnections() { return ElementConnections; }
-	std::map<std::string, Connection>& getResistorConnections() { return ResistorConnections; }
-
+	/*std::multimap<std::string, Connection>& getMapOfConnections() { return mapOfConnections; }*/
+	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
 	//Setter
-	void setElementConnections(std::map<std::string, Connection>& a) { ElementConnections = a; }
-	void setResistorConnections(std::map<std::string, Connection>& a) { ResistorConnections = a; }
+	/*void addConnection(std::string key, const Connection& obj);*/
 
 
 private:
-	std::map<std::string , Connection> ElementConnections;
-	std::map<std::string, Connection> ResistorConnections;
+	
+	/*std::multimap<std::string,Connection> mapOfConnections;*/
 };

@@ -17,7 +17,7 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 	_blockTitle = "Circuit Element Resistor";
 
 	const std::string connectorNameLeft = "Left";
-	m_LeftConnector = { ot::ConnectorType::In,connectorNameLeft,connectorNameLeft };
+	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
 	const std::string connectorNameRight = "Right";

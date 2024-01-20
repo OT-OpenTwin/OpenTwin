@@ -17,7 +17,7 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 	_blockTitle = "Circuit Element";
 
 	const std::string connectorNameLeft = "Left";
-	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
+	m_LeftConnector = { ot::ConnectorType::In,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
 	const std::string connectorNameRight = "Right";

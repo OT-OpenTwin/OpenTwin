@@ -354,7 +354,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	m_blockEntityHandler.AddBlockConnection(pckg.connections());
+	m_blockEntityHandler.AddBlockConnection(pckg.connections(),pckg.name());
 
 	
 	

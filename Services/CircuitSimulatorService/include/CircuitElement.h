@@ -12,6 +12,7 @@
 #pragma once
 //OT Header
 #include "OTCore/Point2D.h"
+#include "ClassFactoryBlock.h"
 
 //C++ Header
 #include <string>
@@ -29,14 +30,14 @@ public:
 	std::string getItemName();
 	std::string getEditorName();
 	std::string getUID();
-	std::string getNetlistElementName();
+	std::string getValue();
 	std::list<Connection>& getList();
 
 	//Setter
 	void setItemName(std::string name);
 	void setEditorName(std::string name);
 	void setUID(std::string id);
-	void setNetlistElementName(std::string name);
+	void setValue(std::string name);
 
 	//Additional Functions
 	void addConnection(const Connection& obj);
@@ -51,7 +52,7 @@ private:
 	std::string m_itemName;
 	std::string m_editorName;
 	std::string Uid;
-	std::string netlistElementName;
+	std::string value;
 	std::list<Connection> listOfConnections;
 	
 

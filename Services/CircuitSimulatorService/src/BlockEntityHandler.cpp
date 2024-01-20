@@ -2,6 +2,9 @@
 #include "BlockEntityHandler.h"
 // Open twin header
 #include "OTCommunication/ActionTypes.h"
+#include "CircuitElement.h"
+#include "Connection.h"
+
 //#include "ExternalDependencies.h"
 #include "Application.h"
 #include "ClassFactoryBlock.h"
@@ -9,6 +12,11 @@
 #include "EntityBlockCircuitElement.h"
 #include "EntityBlockCircuitResistor.h"
 // Third Party Header
+
+namespace NodeNumbers
+{
+	static unsigned long long nodeNumber = 0;
+}
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position)
 {
@@ -33,7 +41,28 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
 	
 	InitSpecialisedCircuitElementEntity(blockEntity);
+	
+	
+	
 
+	CircuitElement element;
+	element.setEditorName(editorName);
+	element.setItemName(blockEntity->getBlockTitle());
+	element.setUID(blockEntity->getBlockID());
+
+	if (blockEntity->getBlockTitle() == "Circuit Element")
+	{
+		auto myElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+		element.setValue(myElement->getElementType());
+	}
+	else if (blockEntity->getBlockTitle() == "Circuit Element Resistor")
+	{
+		auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
+		element.setValue(myElement->getElementType());
+	}
+	
+	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
+	it->second.addElement(element.getUID(), element);
 	
 
 	blockEntity->StoreToDataBase();
@@ -93,7 +122,7 @@ bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockE
 	}
 }
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections)
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
@@ -131,6 +160,15 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
 			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
+
+			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(name);
+
+			Connection conn(connection);
+			conn.setNodeNumber(std::to_string(NodeNumbers::nodeNumber++));
+
+			it->second.addConnection(connection.originUid(),conn);
+			it->second.addConnection(connection.destUid(),conn);
+
 		}
 		else
 		{
@@ -186,7 +224,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	Circuit circuit;
 	circuit.setEditorName(pckg->title());
 	circuit.setId(pckg->name());
-	Application::instance()->getNGSpice().mapOfCircuits.insert_or_assign(pckg->name(), circuit);
+	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(pckg->name(), circuit);
 
 	return pckg;
 }
