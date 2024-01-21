@@ -10,11 +10,68 @@
 #include <string>
 namespace Numbers
 {
-
+	static unsigned long long nodeNumber = 0;
 	static unsigned long long voltageSourceNetlistNumber = 0;
 	static unsigned long long resistorNetlistNumber = 0;
+	static unsigned long long id = 0;
+	
 }
 
+void NGSpice::clearBufferStructure()
+{
+	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find("Circuit Simulator");
+	it->second.getMapOfElements().clear();
+
+	
+
+
+}
+
+void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+{
+	for (auto& blockEntityByID : allEntitiesByBlockID)
+	{
+		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
+		CircuitElement element;
+		element.setEditorName(editorname);
+		element.setItemName(blockEntity->getBlockTitle());
+		element.setUID(blockEntity->getBlockID());
+
+		if (blockEntity->getBlockTitle() == "Circuit Element")
+		{
+			auto myElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+			element.setValue(myElement->getElementType());
+		}
+		else if (blockEntity->getBlockTitle() == "Circuit Element Resistor")
+		{
+			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
+			element.setValue(myElement->getElementType());
+		}
+
+		auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
+		it->second.addElement(element.getUID(), element);
+	}
+	
+	for (auto& blockEntityByID : allEntitiesByBlockID)
+	{
+		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
+		auto connections = blockEntity->getAllConnections();
+		for (auto temp : connections)
+		{
+			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
+
+			Connection conn(temp);
+			conn.setID(std::to_string(++Numbers::id));
+			conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+
+			it->second.addConnection(temp.originUid(), conn);
+			it->second.addConnection(temp.destUid(), conn);
+		}
+	}
+
+		
+	
+}
 
 //
 //void NGSpice::setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
@@ -84,6 +141,7 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 
 	// Now I write the informations to the File
 	// Here i get the Circuit and the map of Elements
+	
 
 		std::string TitleLine = "circbyline *Test";
 		ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
@@ -188,7 +246,7 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
+std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -217,7 +275,11 @@ std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<En
 
 	/* Some simulation*/
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
+	 updateBufferClasses(allEntitiesByBlockID,editorname);
 	 generateNetlist(allEntitiesByBlockID);
+	 //clearBufferStructure(); // Must be corrected
+
+	 
 	
 	/*char command[1000];
 	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";

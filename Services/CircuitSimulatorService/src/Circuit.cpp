@@ -40,7 +40,7 @@ std::string Circuit::getId()
 	return this->id;
 }
 
-std::map<std::string, CircuitElement> Circuit::getMapOfElements()
+std::map<std::string, CircuitElement>& Circuit::getMapOfElements()
 {
 	return this->mapOfElements;
 }

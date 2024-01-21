@@ -31,6 +31,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->SetGraphicsScenePackageName(_packageName);
+	
 
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	blockCoordinates->setCoordinates(position);
@@ -45,7 +46,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	
 	
 
-	CircuitElement element;
+	/*CircuitElement element;
 	element.setEditorName(editorName);
 	element.setItemName(blockEntity->getBlockTitle());
 	element.setUID(blockEntity->getBlockID());
@@ -62,7 +63,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	}
 	
 	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
-	it->second.addElement(element.getUID(), element);
+	it->second.addElement(element.getUID(), element);*/
 	
 
 	blockEntity->StoreToDataBase();
@@ -161,13 +162,14 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
 
-			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(name);
+			/*auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(name);*/
 
-			Connection conn(connection);
+			/*Connection conn(connection);
+			
 			conn.setNodeNumber(std::to_string(NodeNumbers::nodeNumber++));
 
 			it->second.addConnection(connection.originUid(),conn);
-			it->second.addConnection(connection.destUid(),conn);
+			it->second.addConnection(connection.destUid(),conn);*/
 
 		}
 		else

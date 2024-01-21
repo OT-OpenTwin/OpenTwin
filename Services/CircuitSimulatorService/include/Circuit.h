@@ -17,7 +17,7 @@ public:
 	
 	std::string getEditorName();
 	std::string getId();
-	std::map<std::string, CircuitElement> getMapOfElements();
+	std::map<std::string, CircuitElement>& getMapOfElements();
 	void addElement(std::string key, const CircuitElement& obj);
 	void setEditorName(std::string name);
 	void setId(const std::string id);

@@ -223,8 +223,10 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 	//if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
 	if (action == "Circuit Simulator:Simulate:New Simulation")
 	{
+		std::string editorName = "Circuit Simulator";
 		auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
-		m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID);
+		m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID,editorName);
+		m_ngSpice.clearBufferStructure();
 	}
 	//else {
 		//OT_LOG_W("Unknown model action");

@@ -18,6 +18,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <set>
 
 class CircuitElement
 {
@@ -31,7 +32,7 @@ public:
 	std::string getEditorName();
 	std::string getUID();
 	std::string getValue();
-	std::list<Connection>& getList();
+	std::set<Connection>& getList();
 
 	//Setter
 	void setItemName(std::string name);
@@ -53,7 +54,7 @@ private:
 	std::string m_editorName;
 	std::string Uid;
 	std::string value;
-	std::list<Connection> listOfConnections;
+	std::set<Connection> listOfConnections;
 	
 
 	

@@ -36,7 +36,7 @@ std::string CircuitElement::getUID() { return this->Uid; }
 
 std::string CircuitElement::getValue() { return this->value; }
 
-std::list<Connection>& CircuitElement::getList() { return listOfConnections; }
+std::set<Connection>& CircuitElement::getList() { return listOfConnections; }
 
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
@@ -49,6 +49,6 @@ void CircuitElement::setValue(std::string name) { this->value = name; }
 
 //Additional Functions
 
-void CircuitElement::addConnection(const Connection &obj) { listOfConnections.push_back(obj);}
+void CircuitElement::addConnection(const Connection& obj) {  listOfConnections.insert(obj); }
 
 
