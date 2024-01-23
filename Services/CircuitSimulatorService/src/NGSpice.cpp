@@ -19,11 +19,7 @@ namespace Numbers
 
 void NGSpice::clearBufferStructure()
 {
-	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find("Circuit Simulator");
-	it->second.getMapOfElements().clear();
-
-	
-
+	this->getMapOfCircuits().find("Circuit Simulator")->second.getMapOfElements().clear();
 
 }
 
@@ -277,7 +273,12 @@ std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<En
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
 	 updateBufferClasses(allEntitiesByBlockID,editorname);
 	 generateNetlist(allEntitiesByBlockID);
-	 //clearBufferStructure(); // Must be corrected
+
+	 Numbers::nodeNumber = 0;
+	 Numbers::id = 0;
+	 Numbers::resistorNetlistNumber = 0;
+	 Numbers::voltageSourceNetlistNumber = 0;
+	// clearBufferStructure(); // Must be corrected
 
 	 
 	
