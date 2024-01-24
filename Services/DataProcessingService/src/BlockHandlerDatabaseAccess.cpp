@@ -5,6 +5,8 @@
 #include "AdvancedQueryBuilder.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/StringToVariableConverter.h"
+#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/GenericDataStructSingle.h"
 
 #include "ValueComparisionDefinition.h"
 
@@ -104,12 +106,13 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		doc.fromJson(queryResponse);
 		auto allEntries = ot::json::getArray(doc, "Documents");
 
+		
 		const uint32_t numberOfDocuments = allEntries.Size();
 		for (uint32_t i = 0; i< numberOfDocuments;i++)
 		{
 			auto projectedValues = ot::json::getObject(allEntries, i);
 			uint32_t count(0);
-			bool t = projectedValues.HasMember("P_34223386582466564");
+
 			for (std::string projectionName : _projectionNames)
 			{	
 				assert(projectedValues.HasMember(projectionName.c_str()));
@@ -117,6 +120,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 				if (projectionName == QuantityContainer::getFieldName() && (_dataRows != 1 || _dataColumns != 1))
 				{
 					const std::string connectorName = _connectorNames[count];
+					
 					count++;
 					uint32_t rowCounter(0), columnCounter(0);
 					//Could be that the value array is smaller then the data array because of the query.
@@ -124,10 +128,10 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 					std::list<ot::Variable> values = converter(jsValues);
 					auto currentValue = values.begin();
 					const uint32_t numberOfEntries = _dataColumns * _dataRows;
-					GenericDataBlock dataBlock(_dataColumns, _dataRows);
+					std::shared_ptr<ot::GenericDataStructMatrix> dataBlock(new ot::GenericDataStructMatrix(_dataColumns, _dataRows));
 					for (uint32_t j = 0; j < numberOfEntries; j++)
 					{
-						dataBlock.setValue(columnCounter, rowCounter, *currentValue);
+						dataBlock->setValue(columnCounter, rowCounter, *currentValue);
 						currentValue++;
 						if (columnCounter < _dataColumns - 1)
 						{
@@ -144,11 +148,11 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 				else
 				{
 					ot::Variable value = converter(projectedValues[projectionName.c_str()]);
-					GenericDataBlock dataBlock(1,1);
-					dataBlock.setValue(0, 0, value);
+					std::shared_ptr<ot::GenericDataStructSingle> dataBlock(new ot::GenericDataStructSingle());
+					dataBlock->setValue(value);
 					const std::string connectorName = _connectorNames[count];
-					count++;
 					_dataPerPort[connectorName].push_back(dataBlock);
+					count++;
 				}
 			}
 		}

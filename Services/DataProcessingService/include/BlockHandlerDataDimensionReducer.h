@@ -13,5 +13,6 @@ private:
 	std::string  _inputConnectorName;
 	std::string _outputConnectorName;
 
+	std::string _blockTypeName;
 	virtual bool executeSpecialized() override;
 };

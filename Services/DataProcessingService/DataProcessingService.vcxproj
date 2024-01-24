@@ -188,7 +188,6 @@
     <ClCompile Include="src\BlockHandlerDataDimensionReducer.cpp" />
     <ClCompile Include="src\BlockHandlerPython.cpp" />
     <ClCompile Include="src\BufferResultCollectionAccess.cpp" />
-    <ClCompile Include="src\GenericDataBlock.cpp" />
     <ClCompile Include="src\Graph.cpp" />
     <ClCompile Include="src\GraphNode.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />
@@ -214,7 +213,6 @@
     <ClInclude Include="include\BufferBlockDatabaseAccess.h" />
     <ClInclude Include="include\BufferResultCollectionAccess.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
-    <ClInclude Include="include\GenericDataBlock.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />

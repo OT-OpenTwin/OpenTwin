@@ -2,6 +2,7 @@
 #include "EntityResult1DPlot.h"
 #include "EntityResult1DCurve.h"
 #include "GraphNode.h"
+#include "OTCore/GenericDataStructSingle.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(handlerMap)
@@ -23,8 +24,8 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	bool allSet = (_dataPerPort.find(_xDataConnector) != _dataPerPort.end()) && (_dataPerPort.find(_yDataConnector) != _dataPerPort.end());
 	if (allSet)
 	{
-		std::list<GenericDataBlock>& genericXValues(_dataPerPort[_xDataConnector]);
-		std::list<GenericDataBlock>& genericYValues(_dataPerPort[_yDataConnector]);
+		GenericDataList& genericXValues(_dataPerPort[_xDataConnector]);
+		GenericDataList& genericYValues(_dataPerPort[_yDataConnector]);
 
 		std::vector<double> xValues = transformDataToDouble(genericXValues);
 		std::vector<double> yValues = transformDataToDouble(genericYValues);
@@ -49,14 +50,19 @@ bool BlockHandlerPlot1D::executeSpecialized()
 }
 
 
-std::vector<double> BlockHandlerPlot1D::transformDataToDouble(std::list<GenericDataBlock>& genericDataBlocks)
+std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& genericDataBlocks)
 {
 	std::vector<double> doubleValues;
 	doubleValues.reserve(genericDataBlocks.size());
 	for (auto& genericDataBlock: genericDataBlocks)
 	{
-		assert(genericDataBlock.getNumberOfEntries() == 1);
-		const ot::Variable& value = genericDataBlock.getValue(0, 0);
+		ot::GenericDataStructSingle* entry = dynamic_cast<ot::GenericDataStructSingle*>(genericDataBlock.get());
+		if (entry == nullptr)
+		{
+			throw std::exception("Datainput nopt matching format. Requried format: single entries");
+		}
+
+		const ot::Variable& value = entry->getValue();
 		
 		if (value.isInt32())
 		{

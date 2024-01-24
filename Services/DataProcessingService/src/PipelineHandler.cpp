@@ -11,11 +11,18 @@
 
 void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<std::string, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
-	initiate(graphNodesByBlockID,allBlockEntitiesByBlockID);
-	for (std::shared_ptr<GraphNode> rootNode : rootNodes)
+	try
 	{
-		std::shared_ptr<BlockHandler> handler =	_blockHandlerByGraphNode[rootNode];
-		handler->executeOwnNode(rootNode);
+		initiate(graphNodesByBlockID, allBlockEntitiesByBlockID);
+		for (std::shared_ptr<GraphNode> rootNode : rootNodes)
+		{
+			std::shared_ptr<BlockHandler> handler = _blockHandlerByGraphNode[rootNode];
+			handler->executeOwnNode(rootNode);
+		}
+	}
+	catch (const std::exception& ex)
+	{
+		_uiComponent->displayMessage(ex.what());
 	}
 }
 

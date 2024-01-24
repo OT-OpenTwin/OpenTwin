@@ -14,7 +14,7 @@ void ot::PythonServiceInterface::AddScriptWithParameter(const std::string& scrip
 	_scriptNamesWithParameter.push_back(std::make_tuple(scriptName, scriptParameter));
 }
 
-void ot::PythonServiceInterface::AddPortData(const std::string& portName, const std::list<ot::Variable>& data)
+void ot::PythonServiceInterface::AddPortData(const std::string& portName, const GenericDataList& data)
 {
 	assert(_portDataByPortName.find(portName) == _portDataByPortName.end());
 	_portDataByPortName[portName] = data;
@@ -66,15 +66,17 @@ ot::JsonDocument ot::PythonServiceInterface::AssembleMessage()
 		ot::JsonArray portDataNames;
 		for (auto& portDataByPortName : _portDataByPortName)
 		{
-			ot::JsonValue portName;
-			portName.SetString(portDataByPortName.first.c_str(), doc.GetAllocator());
+			ot::JsonString portName(portDataByPortName.first.c_str(), doc.GetAllocator());
 			portDataNames.PushBack(portName, doc.GetAllocator());
 
-			std::list<ot::Variable>& portData = portDataByPortName.second;
+			
 			ot::JsonArray portDataJSON;
-			for (ot::Variable& value : portData)
+			const auto& genericPortDataList = portDataByPortName.second;
+			for (std::shared_ptr<ot::GenericDataStruct> genericPortData : genericPortDataList)
 			{
-				portDataJSON.PushBack(converter(value, doc.GetAllocator()), doc.GetAllocator());
+				ot::JsonObject entry;
+				genericPortData->addToJsonObject(entry, doc.GetAllocator());
+				portDataJSON.PushBack(entry, doc.GetAllocator());
 			}
 			portDataEntries.PushBack(portDataJSON, doc.GetAllocator());
 		}

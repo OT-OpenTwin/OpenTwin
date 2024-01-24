@@ -1,4 +1,6 @@
 #include "BlockHandlerDataDimensionReducer.h"
+#include "OTCore/GenericDataStructSingle.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDataDimensionReducer* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(handlerMap)
@@ -11,14 +13,20 @@ BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDa
 
 bool BlockHandlerDataDimensionReducer::executeSpecialized()
 {
-	std::list<GenericDataBlock>& genericDataBlocks = _dataPerPort[_inputConnectorName];
+	GenericDataList& genericDataBlocks = _dataPerPort[_inputConnectorName];
 	
-	std::list<GenericDataBlock> filteredData;
-	for (GenericDataBlock& genericDataBlock : genericDataBlocks)
+	GenericDataList filteredData;
+	for (const auto& genericData : genericDataBlocks)
 	{
-		filteredData.push_back(GenericDataBlock(1, 1));
-		const ot::Variable& value =	genericDataBlock.getValue(_column, _row);
-		filteredData.back().setValue(0, 0, value);
+		auto matrixData = dynamic_cast<ot::GenericDataStructMatrix*>(genericData.get());
+		if (matrixData == nullptr)
+		{
+			throw std::exception((_errorMessageBase + _blockTypeName + " requires a matrix as input.").c_str());
+		}
+		const ot::Variable& value = matrixData->getValue(_column, _row);
+		std::shared_ptr<ot::GenericDataStructSingle> singleData(new ot::GenericDataStructSingle());
+		singleData->setValue(value);
+		filteredData.push_back(singleData);
 	}
 
 	_dataPerPort[_outputConnectorName] = filteredData;

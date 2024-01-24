@@ -26,7 +26,6 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClCompile Include="src\FixtureGraph.cpp" />
-    <ClCompile Include="src\TestGenericDataBlock.cpp" />
     <ClCompile Include="src\TestGraph.cpp" />
     <ClCompile Include="src\TestGraphNode.cpp" />
   </ItemGroup>

@@ -25,6 +25,10 @@
     <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
     <ClCompile Include="src\EncodingGuesser.cpp" />
+    <ClCompile Include="src\GenericDataStruct.cpp" />
+    <ClCompile Include="src\GenericDataStructMatrix.cpp" />
+    <ClCompile Include="src\GenericDataStructSingle.cpp" />
+    <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\OwnerServiceGlobal.cpp" />
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
@@ -57,6 +61,10 @@
     <ClInclude Include="include\OTCore\Flags.h" />
     <ClInclude Include="include\OTCore\FlagsHelper.h" />
     <ClInclude Include="include\OTCore\FolderNames.h" />
+    <ClInclude Include="include\OTCore\GenericDataStruct.h" />
+    <ClInclude Include="include\OTCore\GenericDataStructMatrix.h" />
+    <ClInclude Include="include\OTCore\GenericDataStructSingle.h" />
+    <ClInclude Include="include\OTCore\GenericDataStructVector.h" />
     <ClInclude Include="include\OTCore\JSON.h" />
     <ClInclude Include="include\OTCore\JSONToVariableConverter.h" />
     <ClInclude Include="include\OTCore\KeyMap.h" />

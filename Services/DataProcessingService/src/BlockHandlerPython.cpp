@@ -5,6 +5,7 @@
 #include "EntityFile.h"
 #include "OTCore/ReturnValues.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"
+#include "OTCore/GenericDataStructSingle.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const HandlerMap& handlerMap)
     : BlockHandler(handlerMap)
@@ -46,15 +47,9 @@ bool BlockHandlerPython::executeSpecialized()
         for (auto& dataPortEntry : _dataPerPort)
         {
             const std::string portName = dataPortEntry.first;
-            const std::list<GenericDataBlock>& portData = dataPortEntry.second;
-            std::list<ot::Variable> portDataVector;
-            for (const GenericDataBlock& dataBlock : portData)
-            {
-                assert(dataBlock.getNumberOfEntries() == 1);
-                portDataVector.push_back(dataBlock.getValue(0, 0));
-            }
+            const GenericDataList& portData = dataPortEntry.second;
             
-            _pythonServiceInterface->AddPortData(portName, portDataVector);
+            _pythonServiceInterface->AddPortData(portName, portData);
         }
         ot::ReturnMessage returnMessage = _pythonServiceInterface->SendExecutionOrder();
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
@@ -71,11 +66,12 @@ bool BlockHandlerPython::executeSpecialized()
                 else
                 {
                     const std::list<ot::Variable>& returnValueList = valuesPointer->second;
-                    std::list<GenericDataBlock> genericDataBlocks;
+                    GenericDataList genericDataBlocks;
                     for (const ot::Variable& returnValueEntry: returnValueList)
                     {
-                        genericDataBlocks.push_back(GenericDataBlock(1, 1));
-                        genericDataBlocks.back().setValue(0, 0, returnValueEntry);
+                        std::shared_ptr<ot::GenericDataStructSingle> singleValue(new ot::GenericDataStructSingle());
+                        singleValue->setValue(returnValueEntry);
+                        genericDataBlocks.push_back(singleValue);
                     }
                     _dataPerPort[outputName] = genericDataBlocks;
                 }

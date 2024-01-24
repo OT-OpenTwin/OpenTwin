@@ -2,6 +2,7 @@
 #include "BlockHandler.h"
 #include "EntityBlockPlot1D.h"
 #include "OTCore/FolderNames.h"
+#include "OTCore/GenericDataStructVector.h"
 
 class BlockHandlerPlot1D : public BlockHandler
 {
@@ -22,5 +23,5 @@ private:
 	std::string _ylabel;
 	std::string _yunit;
 
-	std::vector<double> transformDataToDouble(std::list<GenericDataBlock>& data);
+	std::vector<double> transformDataToDouble(GenericDataList& data);
 };
