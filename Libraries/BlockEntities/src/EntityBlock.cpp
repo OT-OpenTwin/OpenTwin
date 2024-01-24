@@ -151,6 +151,15 @@ void EntityBlock::CreateNavigationTreeEntry()
 
 		treeIcons.addToJsonDoc(doc);
 		getObserver()->sendMessageToViewer(doc);
+
+
+		ot::JsonDocument refDoc;
+		refDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, refDoc.GetAllocator()), refDoc.GetAllocator());
+		refDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString("Test/"+this->getName(), refDoc.GetAllocator()), refDoc.GetAllocator());
+		refDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), refDoc.GetAllocator());
+		refDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), refDoc.GetAllocator());
+		treeIcons.addToJsonDoc(refDoc);
+		getObserver()->sendMessageToViewer(refDoc);
 	}
 }
 

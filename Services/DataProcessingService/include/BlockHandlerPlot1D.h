@@ -12,12 +12,13 @@ public:
 
 private:
 	std::string _xDataConnector;
-	std::string _yDataConnector;
+	std::list<std::string> _yDataConnectors;
+	std::list<std::string> _curveNames;
 
 	std::string _resultFolder = ot::FolderNames::ResultFolder + "/";
 	std::string _plotName;
 	std::string _curveName = "Curve";
-
+	const std::string _curveFolderPath = _resultFolder + "1D/Curves";
 	std::string _xlabel;
 	std::string _xunit; 
 	std::string _ylabel;

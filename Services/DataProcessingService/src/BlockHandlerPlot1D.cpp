@@ -14,41 +14,87 @@ BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const Han
 	_yunit = blockEntity->getYUnit();
 
 	_xDataConnector = blockEntity->getConnectorXAxis().getConnectorName();
-	_yDataConnector = blockEntity->getConnectorYAxis().getConnectorName();
+	auto allYAxisConnectors = blockEntity->getConnectorsYAxis();
+	for (const auto yAxisConnector : allYAxisConnectors)
+	{
+		_yDataConnectors.push_back(yAxisConnector->getConnectorName());
+	}
+
+	_curveNames =	blockEntity->getCurveNames();
+	_curveNames.unique();
+	if (_curveNames.size() != _yDataConnectors.size())
+	{
+		throw std::exception("Plot Block detected non unique identifier amongst the curve names.");
+	}
+	for (const std::string& curveName : _curveNames)
+	{
+		if (curveName == "")
+		{
+			throw std::exception("Plot Block detected an empty curve name.");
+		}
+	}
 
 	const std::string fullName = blockEntity->getName();
 	_plotName = fullName.substr(fullName.find_last_of("/")+1, fullName.size());
 }
 bool BlockHandlerPlot1D::executeSpecialized()
 {
-	bool allSet = (_dataPerPort.find(_xDataConnector) != _dataPerPort.end()) && (_dataPerPort.find(_yDataConnector) != _dataPerPort.end());
+	bool allSet = (_dataPerPort.find(_xDataConnector) != _dataPerPort.end());
+	for (std::string& yDataConnector : _yDataConnectors)
+	{
+		if (_dataPerPort.find(yDataConnector) == _dataPerPort.end())
+		{
+			allSet = false;
+			break;
+		}
+	}
+	
 	if (allSet)
 	{
 		GenericDataList& genericXValues(_dataPerPort[_xDataConnector]);
-		GenericDataList& genericYValues(_dataPerPort[_yDataConnector]);
-
 		std::vector<double> xValues = transformDataToDouble(genericXValues);
-		std::vector<double> yValues = transformDataToDouble(genericYValues);
-		
 		const int colorID(0);
-		const std::string entityPath = _resultFolder + "1D/Plots";
-		const std::string fullPlotName = CreateNewUniqueTopologyName(entityPath, _plotName);
 
-		const std::string curvePath = _resultFolder + "1D/Curves";
-		const std::string fullCurveName = curvePath + "/" + _curveName;//CreateNewUniqueTopologyName(fullPlotName, _curveName);
-		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
-		std::list<std::pair<ot::UID, std::string>> curves{ std::pair<ot::UID, std::string>(curve->getEntityID(),_curveName) };
+		auto currentCurveName = _curveNames.begin();
+		
+		std::list<std::pair<ot::UID, std::string>> curves;
+		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+		std::list<bool> forceVis;
+		const std::string plotFolder = _resultFolder + "1D/Plots";
+		const std::string fullPlotName = CreateNewUniqueTopologyName(plotFolder, _plotName);
+
+		for (std::string& yAxisData : _yDataConnectors)
+		{
+			GenericDataList& genericYValues(_dataPerPort[yAxisData]);
+			std::vector<double> yValues = transformDataToDouble(genericYValues);
+			const std::string curveName = *currentCurveName;
+			currentCurveName++;
+			
+			const std::string fullCurveName = _curveFolderPath + "/" + curveName;
+			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
+			
+			//const std::string curveReferencePath =  fullPlotName + "/" + curveName;
+			curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(),curveName));
+			
+			topoEntID.push_back(curve->getEntityID());
+			topoEntVers.push_back(curve->getEntityStorageVersion());
+			dataEntID.push_back((ot::UID)curve->getCurveDataStorageId());
+			dataEntVers.push_back((ot::UID)curve->getCurveDataStorageId());
+			dataEntParent.push_back(curve->getEntityID());
+			forceVis.push_back(false);
+		}
+
+		
+
+
 		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
-		ot::UIDList topoEnt{ curve->getEntityID(),plotID->getEntityID() },
-				topoVers{ curve->getEntityStorageVersion(),plotID->getEntityStorageVersion() },
-				dataEntID{ (ot::UID)curve->getCurveDataStorageId()}, dataEntVers{ (ot::UID)curve->getCurveDataStorageVersion()},
-		dataEntParent{ curve->getEntityID() };
-			std::list<bool> forceVis{ false,false };
-			_modelComponent->addEntitiesToModel(topoEnt, topoVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
+		topoEntID.push_back(plotID->getEntityID());
+		topoEntVers.push_back(plotID->getEntityStorageVersion());
+		forceVis.push_back(false);
+		_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
 	}
 	return allSet;
 }
-
 
 std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& genericDataBlocks)
 {
@@ -87,3 +133,4 @@ std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& g
 	}
 	return doubleValues;
 }
+

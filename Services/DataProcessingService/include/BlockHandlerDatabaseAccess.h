@@ -23,7 +23,7 @@ private:
 	std::list< BsonViewOrValue> _comparisons;
 	std::vector<std::string> _projectionNames;
 
-		BsonViewOrValue _query;
+	BsonViewOrValue _query;
 	BsonViewOrValue _projection;
 
 	bool _isValid = true;

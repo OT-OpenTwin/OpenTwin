@@ -64,6 +64,9 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 	{
 		return std::shared_ptr<BlockHandler>(new BlockHandlerDataDimensionReducer(dataDimensionReducer,_blockHandlerByGraphNode));
 	}
-
-	throw std::exception("Not supported BlockEntity detected.");
+	else
+	{
+		assert(0);
+		throw std::exception("Not supported block type detected.");
+	}
 }

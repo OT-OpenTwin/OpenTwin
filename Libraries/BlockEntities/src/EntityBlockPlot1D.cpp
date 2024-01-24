@@ -8,15 +8,51 @@ EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObser
 	_navigationTreeIconNameHidden = "Plot1DVisible";
 	_blockTitle = "Plot 1D";
 
-	const std::string connectorNameYAxis = "YAxis";
-	const std::string connectorTitleYAxis = "Y-Axis";
-	_yAxisConnector = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
-	_connectorsByName[connectorNameYAxis] = _yAxisConnector;
+	const std::string index = "1";
+	const std::string connectorNameYAxis = _connectorYAxisNameBase + index;
+	const std::string connectorTitleYAxis = _connectorYAxisTitleBase + index;
+	_connectorsByName[connectorNameYAxis] = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
 
 	const std::string connectorNameXAxis = "XAxis";
 	const std::string connectorTitleXAxis = "X-Axis";
 	_xAxisConnector = { ot::ConnectorType::In ,connectorNameXAxis, connectorTitleXAxis };
 	_connectorsByName[connectorNameXAxis] = _xAxisConnector;
+}
+
+bool EntityBlockPlot1D::updateFromProperties()
+{
+	
+	int selectedNumberOfCurves = getNumberOfCurves();
+
+	bool refresh = false;
+
+	if (_connectorsByName.size() > selectedNumberOfCurves + _numberOfConnectorsUnrelatedToCurves) //Number of Curve connectors + one connector for the x - axis
+	{
+		//Remove curves connectors
+		for (size_t i = _connectorsByName.size() - _numberOfConnectorsUnrelatedToCurves; i > selectedNumberOfCurves ; i--)
+		{
+			std::string index = std::to_string(i);
+			const std::string connectorName = _connectorYAxisNameBase +index;
+			_connectorsByName.erase(connectorName);
+			const std::string propertyName = _propertyCurveNameBase + index;
+			getProperties().deleteProperty(propertyName);
+		}
+		refresh = true;
+	}
+	else if (_connectorsByName.size() < selectedNumberOfCurves + _numberOfConnectorsUnrelatedToCurves)
+	{
+		//Add curve connectors
+		AddDynamicNumberOfCurves(selectedNumberOfCurves);
+		refresh = true;
+	}
+	if(refresh)
+	{
+		getProperties().forceResetUpdateForAllProperties();
+		getProperties().setNeedsUpdate();
+		CreateBlockItem();
+		CreateConnections();
+	}
+	return refresh;
 }
 
 void EntityBlockPlot1D::createProperties()
@@ -25,6 +61,9 @@ void EntityBlockPlot1D::createProperties()
 	EntityPropertiesString::createProperty("Graph properties", "Y-Axis Label", "", "default", getProperties());
 	EntityPropertiesString::createProperty("Graph properties", "X-Axis Unit", "", "default", getProperties());
 	EntityPropertiesString::createProperty("Graph properties", "Y-Axis Unit", "", "default", getProperties());
+
+	EntityPropertiesInteger::createProperty("Data properties", "Number of Curves", 1, "default", getProperties());
+	EntityPropertiesString::createProperty(_propertyGroupYAxisDefinition,_propertyCurveNameBase + "1", "", "default", getProperties());
 }
 
 std::string EntityBlockPlot1D::getXLabel()
@@ -63,6 +102,19 @@ std::string EntityBlockPlot1D::getYUnit()
 	return yAxisUnit->getValue();
 }
 
+void EntityBlockPlot1D::AddDynamicNumberOfCurves(int numberOfCurves)
+{
+	for (size_t i = _connectorsByName.size() - _numberOfConnectorsUnrelatedToCurves; i <= numberOfCurves; i++)
+	{
+		const std::string index = std::to_string(i);
+		const std::string connectorNameYAxis = _connectorYAxisNameBase + index;
+		const std::string connectorTitleYAxis = _connectorYAxisTitleBase + index;
+		ot::Connector newCurveConnector = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
+		_connectorsByName[connectorNameYAxis] = newCurveConnector;
+		EntityPropertiesString::createProperty(_propertyGroupYAxisDefinition, _propertyCurveNameBase + index, "", "default", getProperties());
+	}
+}
+
 void EntityBlockPlot1D::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::AddStorageData(storage);
@@ -87,4 +139,50 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
+}
+
+const std::list<const ot::Connector*> EntityBlockPlot1D::getConnectorsYAxis()
+{
+	std::list<const ot::Connector*> allYAxisConnectors;
+	for (const auto& connector : _connectorsByName)
+	{
+		if (connector.first.find(_connectorYAxisNameBase) != std::string::npos)
+		{
+			allYAxisConnectors.push_back(&connector.second);
+		}
+	}
+	return allYAxisConnectors;
+}
+
+const std::list<std::string> EntityBlockPlot1D::getCurveNames()
+{
+	auto allProperties = getProperties().getListOfAllProperties();
+	
+	std::list<std::string> allCurveNames;
+	
+	for (auto property : allProperties)
+	{
+		if (property->getName().find(_propertyCurveNameBase) != std::string::npos)
+		{
+			EntityPropertiesString* strProperty = dynamic_cast<EntityPropertiesString*>(property);
+			assert(strProperty != nullptr);
+			allCurveNames.push_back(strProperty->getValue());
+		}
+	}
+	return allCurveNames;
+}
+
+const int EntityBlockPlot1D::getNumberOfCurves()
+{
+	const auto baseProperty = getProperties().getProperty("Number of Curves");
+	const auto intProperty = dynamic_cast<EntityPropertiesInteger*>(baseProperty);
+	const int selectedNumberOfCurves = intProperty->getValue();
+	if(selectedNumberOfCurves < 1) //At least one curve shall be displayed
+	{
+		return 1;
+	}
+	else
+	{
+		return selectedNumberOfCurves;
+	}
 }
