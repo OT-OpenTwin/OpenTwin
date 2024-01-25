@@ -61,7 +61,7 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;
 		const std::string plotFolder = _resultFolder + "1D/Plots";
-		const std::string fullPlotName = CreateNewUniqueTopologyName(plotFolder, _plotName);
+		const std::string fullPlotName = plotFolder + _plotName;
 
 		for (std::string& yAxisData : _yDataConnectors)
 		{

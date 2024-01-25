@@ -6,7 +6,7 @@
 
 #include<map>
 
-class ValidityHandler : public BusinessLogicHandler
+class GraphHandler : public BusinessLogicHandler
 {
 public:
 	bool blockDiagramIsValid(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID);

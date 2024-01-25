@@ -66,7 +66,7 @@
     <ClCompile Include="src\GraphNode.cpp">
       <Filter>Source Files\GraphHandling</Filter>
     </ClCompile>
-    <ClCompile Include="src\ValidityHandler.cpp">
+    <ClCompile Include="src\GraphHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandler.cpp">
@@ -122,7 +122,7 @@
     <ClInclude Include="include\GraphNode.h">
       <Filter>Header Files\GraphHandling</Filter>
     </ClInclude>
-    <ClInclude Include="include\ValidityHandler.h">
+    <ClInclude Include="include\GraphHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PipelineHandler.h">

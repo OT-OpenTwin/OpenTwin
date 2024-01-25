@@ -1,8 +1,8 @@
-#include "ValidityHandler.h"
+#include "GraphHandler.h"
 
 #include "GraphNode.h"
 
-bool ValidityHandler::blockDiagramIsValid(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+bool GraphHandler::blockDiagramIsValid(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	_rootNodes.clear();
 	_entityByGraphNode.clear();
@@ -10,7 +10,7 @@ bool ValidityHandler::blockDiagramIsValid(std::map<std::string, std::shared_ptr<
 }
 
 
-bool ValidityHandler::allRequiredConnectionsSet(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+bool GraphHandler::allRequiredConnectionsSet(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	std::string uiErrorMessage = "";
 	std::string uiInfoMessage = "";
@@ -52,14 +52,14 @@ bool ValidityHandler::allRequiredConnectionsSet(std::map<std::string, std::share
 }
 
 
-const std::string ValidityHandler::getNameWithoutRoot(std::shared_ptr<EntityBlock> blockEntity)
+const std::string GraphHandler::getNameWithoutRoot(std::shared_ptr<EntityBlock> blockEntity)
 {
 	const std::string fullEntityName = blockEntity->getName();
 	const std::string nameWithoutRoot = fullEntityName.substr(fullEntityName.find_first_of("/") + 1, fullEntityName.size());
 	return nameWithoutRoot;
 }
 
-bool ValidityHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlock>& blockEntity, std::string& uiMessage)
+bool GraphHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlock>& blockEntity, std::string& uiMessage)
 {
 	auto& allConnectorsByName = blockEntity->getAllConnectorsByName();
 	auto& allConnections = blockEntity->getAllConnections();
@@ -90,7 +90,7 @@ bool ValidityHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlo
 	return allIncommingConnectionsAreSet;
 }
 
-bool ValidityHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+bool GraphHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	const Graph graph = buildGraph(allBlockEntitiesByBlockID);
 	auto& allNodes = graph.getContainedNodes();
@@ -124,7 +124,7 @@ bool ValidityHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlo
 	return !anyCycleExists;
 }
 
-Graph ValidityHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+Graph GraphHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	Graph graph;
 	
@@ -165,20 +165,26 @@ Graph ValidityHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBl
 				pairedBlockID = &connection.destUid();
 			}
 
+			//Some blocks have dynamic connectors. We need to check if the connection entry is still valid.
 			auto connectorByName = connectorsByName.find(*thisConnectorName);
-			ot::Connector connector = connectorByName->second;
-			assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
-
-			std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
-			std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
-
-			if (connector.getConnectorType() == ot::ConnectorType::Out)
+			auto connectedBlock = allBlockEntitiesByBlockID.find(*pairedBlockID);
+			auto connectorsOfConnectedBlock = connectedBlock->second->getAllConnectorsByName();
+			if (connectorByName != connectorsByName.end() && connectorsOfConnectedBlock.find(*otherConnectorName) != connectorsOfConnectedBlock.end())
 			{
-				thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
-			}
-			else
-			{
-				thisNode->addPreviousNode(pairedNode);
+				ot::Connector connector = connectorByName->second;
+				assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
+
+				std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
+				std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
+
+				if (connector.getConnectorType() == ot::ConnectorType::Out)
+				{
+					thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
+				}
+				else
+				{
+					thisNode->addPreviousNode(pairedNode);
+				}
 			}
 		}
 	}

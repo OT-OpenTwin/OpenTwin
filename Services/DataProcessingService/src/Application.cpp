@@ -78,11 +78,11 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		if (action == _buttonRunPipeline.GetFullDescription())
 		{
 			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-			const bool isValid = _validityHandler.blockDiagramIsValid(allBlockEntities);
+			const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
 			if (isValid)
 			{
-				const std::list<std::shared_ptr<GraphNode>>& rootNodes= _validityHandler.getRootNodes();
-				const std::map<std::string, std::shared_ptr<GraphNode>> graphNodesByBlockID = _validityHandler.getgraphNodesByBlockID();
+				const std::list<std::shared_ptr<GraphNode>>& rootNodes= _graphHandler.getRootNodes();
+				const std::map<std::string, std::shared_ptr<GraphNode>> graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
 				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID,allBlockEntities);
 			}
 		}
@@ -166,7 +166,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
-	_validityHandler.setUIComponent(_ui);
+	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
 }
 

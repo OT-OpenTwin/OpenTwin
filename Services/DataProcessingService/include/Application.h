@@ -17,7 +17,7 @@
 #include "BlockEntityHandler.h"
 #include "PipelineHandler.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
-#include "ValidityHandler.h"
+#include "GraphHandler.h"
 
 // Forward declaration
 namespace ot {
@@ -122,5 +122,5 @@ private:
 	ot::MenuButtonDescription _buttonRunPipeline;
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
-	ValidityHandler _validityHandler;
+	GraphHandler _graphHandler;
 };
