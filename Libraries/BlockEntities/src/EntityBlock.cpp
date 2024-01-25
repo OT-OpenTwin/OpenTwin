@@ -216,7 +216,7 @@ void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 		const std::string connectorTitle = connector.getConnectorTitle();
 		if (connectorType == ot::ConnectorType::In)
 		{
-			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
+			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleLeft);
 		}
 		else if (connectorType == ot::ConnectorType::InOptional)
 		{
@@ -224,7 +224,7 @@ void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 		}
 		else if (connectorType == ot::ConnectorType::Out)
 		{
-			flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Square);
+			flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
 		}
 	}
 }
