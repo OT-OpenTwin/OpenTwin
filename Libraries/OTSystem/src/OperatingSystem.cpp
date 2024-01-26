@@ -96,6 +96,7 @@ char * ot::os::getEnvironmentVariable(const char * _variableName) {
 #if defined(OT_OS_WINDOWS)
 	char * ret = nullptr;
 	size_t ct = 0;
+	//_dupenv_s is return 0 on success
 	if (_dupenv_s(&ret, &ct, _variableName) != 0) {
 		if (ret) delete ret;
 		return nullptr;

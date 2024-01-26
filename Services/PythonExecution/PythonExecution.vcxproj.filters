@@ -7,12 +7,6 @@
     <Filter Include="include">
       <UniqueIdentifier>{f4917014-dbcd-43f9-b205-146a31995749}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\Backbone">
-      <UniqueIdentifier>{8236214a-815b-4f68-84d0-ff9b387a7dbf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Backbone">
-      <UniqueIdentifier>{4167f33b-5aa2-49d7-95a1-659034d8f24c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\DataHandling">
       <UniqueIdentifier>{da34591f-a274-44a4-8ee6-9ed1c0ef73d1}</UniqueIdentifier>
     </Filter>
@@ -21,24 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ModelNotifier.cpp">
-      <Filter>src\Backbone</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UiNotifier.cpp">
-      <Filter>src\Backbone</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ActionHandler.cpp">
-      <Filter>src\Backbone</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application.cpp">
-      <Filter>src\Backbone</Filter>
-    </ClCompile>
-    <ClCompile Include="src\dllmain.cpp">
-      <Filter>src\Backbone</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MinimalSubService.cpp">
-      <Filter>src\Backbone</Filter>
-    </ClCompile>
     <ClCompile Include="src\EntityBuffer.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -63,23 +39,14 @@
     <ClCompile Include="src\PortData.cpp">
       <Filter>src\DataHandling</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\UiNotifier.h">
-      <Filter>include\Backbone</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ActionHandler.h">
-      <Filter>include\Backbone</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Application.h">
-      <Filter>include\Backbone</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MinimalSubService.h">
-      <Filter>include\Backbone</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ModelNotifier.h">
-      <Filter>include\Backbone</Filter>
-    </ClInclude>
     <ClInclude Include="include\CPythonObject.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -121,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="include\PortData.h">
       <Filter>include\DataHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Application.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

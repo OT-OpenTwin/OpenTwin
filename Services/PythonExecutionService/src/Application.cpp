@@ -19,7 +19,7 @@
 #include "OTCore/Variable.h"
 #include "OTCore/TypeNames.h"
 #include "TemplateDefaultManager.h"
-#include "SubprocessDebugConfigurator.h"
+
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 #include "DataBase.h"
@@ -64,6 +64,8 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
+	char* arguments[2];
+	_subprocessHandler = new SubprocessHandler(sessionID(), 1, arguments);
 }
 
 
@@ -171,7 +173,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 		throw e;
 	}
 #else
-	
+
 #endif // DEBUG
 }
 

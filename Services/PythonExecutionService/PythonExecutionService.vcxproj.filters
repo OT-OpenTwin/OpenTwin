@@ -27,12 +27,6 @@
     <ClCompile Include="src\ModelNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SubprocessDebugConfigurator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SubprocessHandlerLegacy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SubprocessHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,12 +39,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ModelNotifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SubprocessDebugConfigurator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SubprocessHandlerLegacy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SubprocessHandler.h">
