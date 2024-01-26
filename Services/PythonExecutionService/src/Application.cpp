@@ -45,11 +45,7 @@ Application::Application()
 
 Application::~Application()
 {
-	if(_subprocessHandler != nullptr)
-	{
-		delete _subprocessHandler;
-		_subprocessHandler = nullptr;
-	}
+
 }
 
 // ##################################################################################################################################################################################################################
@@ -102,7 +98,7 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 							subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Names, portNames,subprocessDoc.GetAllocator());
 						}
 
-						return _subprocessHandler->SendExecutionOrder(subprocessDoc);					
+						return returnMessage;					//!
 					}
 					else
 					{
@@ -114,7 +110,7 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 			}
 			else if (action == OT_ACTION_CMD_PYTHON_Request_Initialization)
 			{
-				_subprocessHandler->setReceivedInitializationRequest();
+
 				auto modelService = m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
 				std::string urlModelservice = modelService.service->serviceURL();
 				std::string userName = DataBase::GetDataBase()->getUserName();
@@ -167,14 +163,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 #ifdef _DEBUG
 	try
 	{
-		SubprocessDebugConfigurator configurator;
-		auto modelService = m_serviceNameMap[OT_INFO_SERVICE_TYPE_MODEL];
-		std::string urlModelservice = modelService.service->serviceURL();
-		int startPort = SubprocessHandler::getStartPort();
-		std::string subserviceURL = m_serviceURL.substr(0, m_serviceURL.find(":") + 1) + std::to_string(startPort);
-		configurator.CreateConfiguration(m_serviceURL, subserviceURL, urlModelservice, m_databaseURL, m_serviceID, m_sessionID);
-		_subprocessHandler = new SubprocessHandler(m_serviceURL);
-		_subprocessHandler->setSubprocessURL(subserviceURL);
+		
 	}
 	catch (std::exception& e)
 	{
@@ -182,17 +171,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 		throw e;
 	}
 #else
-	try
-	{
-		_subprocessHandler = new SubprocessHandler(m_serviceURL);
-		std::thread workerThread(&SubprocessHandler::Create, _subprocessHandler, m_serviceURL);
-		workerThread.detach();
-	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		throw e;
-	}
+	
 #endif // DEBUG
 }
 

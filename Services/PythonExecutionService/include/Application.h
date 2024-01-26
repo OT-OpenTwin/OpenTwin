@@ -11,7 +11,7 @@
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
-#include "SubprocessHandler.h"
+#include "SubprocessHandlerLegacy.h"
 
 // C++ header
 #include <string>
@@ -116,5 +116,5 @@ public:
 	virtual bool settingChanged(ot::AbstractSettingsItem * _item);
 
 private:
-	SubprocessHandler* _subprocessHandler = nullptr;
+
 };

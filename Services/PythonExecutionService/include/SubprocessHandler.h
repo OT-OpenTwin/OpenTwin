@@ -1,54 +1,18 @@
 #pragma once
-#include <string>
-#include "OTSystem/SystemTypes.h"
-#include "OTCore/JSON.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
-#include <condition_variable>
-#include <atomic>
-#include <chrono>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qmainwindow.h>
 
-using namespace std::chrono_literals;
-class SubprocessHandler
+#include <QtNetwork/qlocalserver.h>
+#include <QtNetwork/qlocalsocket.h>
+#include <QtCore/qeventloop.h>
+#include <QtCore/qobject.h>
+#include <QtCore/qprocess.h>
+
+
+class SubprocessHandler : public BusinessLogicHandler
 {
-
 public:
-	SubprocessHandler(const std::string& urlThisService);
-	~SubprocessHandler();
-	SubprocessHandler& operator=(const SubprocessHandler& other) = delete;
-	SubprocessHandler& operator=(SubprocessHandler&& other) = delete;
-	SubprocessHandler(const SubprocessHandler& other) =  delete;
-	SubprocessHandler(SubprocessHandler&& other) =  delete;
-
-	void setReceivedInitializationRequest();
-	bool getReceivedInitializationRequest() { return _receivedInitializationRequest; };
-	static int getStartPort() { return _startPort; }
-	void setSubprocessURL(const std::string& urlSubprocess) { _urlSubprocess = urlSubprocess; };
-	
-	std::string SendExecutionOrder(ot::JsonDocument& scriptsAndParameter);
-	void Create(const std::string& urlThisProcess);
-	bool Close();
-
-private:
-	std::string _pingCommand = "";
-
-	std::string _launcherPath = "";
-	std::string _subprocessPath = "";
-	
-	std::string _urlSubprocess = "";
-	std::string _urlThisProcess = "";
-
-	OT_PROCESS_HANDLE _subprocess = nullptr;
-
-	static const int _startPort = 7800;
-	std::chrono::seconds _processCreationTimeOut = 2s; // sec
-	const int _maxPingAttempts = 3;
-
-	std::condition_variable _waitForInitializationRequest;
-	std::atomic<bool> _receivedInitializationRequest = false;
-
-	void RunWithNextFreeURL(const std::string& urlThisService);
-	
-	bool CheckAlive(OT_PROCESS_HANDLE& handle);
-	bool PingSubprocess();
-	bool CloseProcess(const std::string& url);
+	SubprocessHandler();
 };
