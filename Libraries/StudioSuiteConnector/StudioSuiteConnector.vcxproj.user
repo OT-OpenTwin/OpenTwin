@@ -12,30 +12,20 @@
     <LocalDebuggerEnvironment>PATH=$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'">
-    <LocalDebuggerEnvironment>PATH=$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <LocalDebuggerEnvironment>PATH=$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
-  <PropertyGroup>
-    <ShowAllFiles>false</ShowAllFiles>
-  </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-01-27T15:40:29.5554166Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-01-27T15:38:17.9200924Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-01-27T15:40:29.1242741Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-01-27T15:38:17.8337172Z</QtLastBackgroundBuild>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <QtLastBackgroundBuild>2024-01-27T15:38:17.7268982Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-01-27T15:40:29.7547670Z</QtLastBackgroundBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-01-27T15:40:30.0723599Z</QtLastBackgroundBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-01-27T15:40:28.7340467Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-01-27T15:38:18.0016173Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>
