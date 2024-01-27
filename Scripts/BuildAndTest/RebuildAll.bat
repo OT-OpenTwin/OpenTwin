@@ -273,6 +273,11 @@ ECHO ===============================================================
 CALL "%OT_ELMERFEM_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Service: StudioSuiteService
+ECHO ===============================================================
+CALL "%OT_STUDIOSUITE_SERVICE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Service: PythonExecutionService
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2

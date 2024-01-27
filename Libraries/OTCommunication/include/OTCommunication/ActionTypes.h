@@ -594,6 +594,7 @@
 #define OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "PythonExecutionService"
 #define OT_INFO_SERVICE_TYPE_BlockEditorService "BlockEditorService"
 #define OT_INFO_SERVICE_TYPE_CircuitSimulatorService "CircuitSimulatorService"
+#define OT_INFO_SERVICE_TYPE_STUDIOSUITE "StudioSuiteService"
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 
