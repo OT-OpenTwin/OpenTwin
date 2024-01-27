@@ -25,6 +25,7 @@ public:
 private:
 	void initializeProjectType3DSimulation(void);
 	void initializeProjectTypeDataPipeline(void);
+	void initializeProjectTypeStudioSuite(void);
 
 	bool _hasGeometryRoot				= true;
 	bool _hasMaterialRoot				= true;

@@ -33,7 +33,8 @@ SET OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"ElmerFEMService",^
 		"DataProcessingService",^
 		"BlockEditorService",^
-		"CircuitSimulatorService"^
+		"CircuitSimulatorService",^
+		"StudioSuiteService"^
 		]^
 	}
 

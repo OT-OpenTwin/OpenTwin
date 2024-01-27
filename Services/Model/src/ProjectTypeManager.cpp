@@ -20,6 +20,10 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	{
 		initializeProjectTypeDataPipeline();
 	}
+	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE)
+	{
+		initializeProjectTypeStudioSuite();
+	}
 	else
 	{
 		// This is an unknown project type which defaults to development
@@ -65,6 +69,26 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	_has1DView						= true;
 	_hasTableView					= true;
 	_hasBlockPicker					= true;
+}
+
+void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
+{
+	_hasGeometryRoot = true;
+	_hasMaterialRoot = true;
+	_hasMeshRoot = false;
+	_hasSolverRoot = false;
+	_hasScriptsRoot = false;
+	_hasUnitRoot = true;
+	_hasDataCategorizationRoot = false;
+	_hasRMDCategorization = false;
+	_hasRMDCategorizationPreview = false;
+	_hasDatasetRoot = false;
+	_hasDatasetRMD = false;
+
+	_has3DView = true;
+	_has1DView = true;
+	_hasTableView = false;
+	_hasBlockPicker = false;
 }
 
 std::string ProjectTypeManager::getViews(void)
