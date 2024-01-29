@@ -88,6 +88,11 @@ namespace ot {
 	class OT_GUI_API_EXPORTONLY GraphicsFlowItemBuilder {
 		OT_DECL_NOCOPY(GraphicsFlowItemBuilder)
 	public:
+		enum BackgroundImageInsertMode {
+			OnLayout,
+			OnStack
+		};
+
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin flow block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
 		ot::GraphicsItemCfg* createGraphicsItem(void) const;
@@ -214,6 +219,8 @@ namespace ot {
 		void setBackgroundImagePath(const std::string& _path) { m_backgroundImagePath = _path; };
 		void setBackgroundImageAlignment(ot::Alignment _align) { m_backgroundImageAlignment = _align; };
 		void setBackgroundImageMargins(const ot::MarginsD& _margins) { m_backgroundImageMargins = _margins; };
+		void setBackgroundImageInsertMode(BackgroundImageInsertMode _mode) { m_backgroundImageInsertMode = _mode; };
+		void setBackgroundImageMaintainAspectRatio(bool _active) { m_backgroundImageMaintainAspectRatio = _active; };
 
 		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
 
@@ -234,6 +241,8 @@ namespace ot {
 		std::string m_backgroundImagePath;
 		ot::Alignment m_backgroundImageAlignment;
 		ot::MarginsD m_backgroundImageMargins;
+		BackgroundImageInsertMode m_backgroundImageInsertMode;
+		bool m_backgroundImageMaintainAspectRatio;
 
 		GraphicsFlowItemConnector m_defaultConnectorStyle;
 

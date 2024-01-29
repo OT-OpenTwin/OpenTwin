@@ -302,8 +302,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	ot::GraphicsHBoxLayoutItemCfg* cLay = new ot::GraphicsHBoxLayoutItemCfg;
 	cLay->setName(m_name + "_cLay");
 	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-	mLay->addChildItem(cLay, 1);
-
+	
 	// Left connector layout
 	ot::GraphicsGridLayoutItemCfg* lcLay = new ot::GraphicsGridLayoutItemCfg((int)m_left.size() + 1, 2);
 	lcLay->setName(m_name + "_lcLay");
@@ -330,24 +329,35 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		ix++;
 	}
 
-	// Setup central layout (left connector layout)
-	cLay->addChildItem(lcLay);
-
-	if (m_backgroundImagePath.empty()) {
-		// Setup central layout (stretch)
-		cLay->addStrech(1);
-	}
-	else {
-		// Setup central layout (central image)
-		ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
+	// Create background image
+	ot::GraphicsImageItemCfg* cImg = nullptr;
+	if (!m_backgroundImagePath.empty()) {
+		cImg = new ot::GraphicsImageItemCfg;
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(m_name + "_cImg");
 		cImg->setMargins(m_backgroundImageMargins);
 		cImg->setSizePolicy(ot::Dynamic);
 		cImg->setAlignment(m_backgroundImageAlignment);
-		cImg->setMaintainAspectRatio(true);
+		cImg->setMaintainAspectRatio(m_backgroundImageMaintainAspectRatio);
 		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+	}
 
+	// Create central stack (if background image is set and the image insert mode is "onStack")
+	ot::GraphicsStackItemCfg* cStack = nullptr;
+	if (cImg && m_backgroundImageInsertMode == OnStack) {
+		cStack = new ot::GraphicsStackItemCfg;
+		cStack->setName(m_name + "_cStack");
+		cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+
+		cStack->addItemBottom(cImg, false, true);
+		cStack->addItemTop(cLay, true, false);
+	}
+
+	// Setup central layout (left connector layout)
+	cLay->addChildItem(lcLay);
+
+	// Setup central layout (central image (if on layout mode is set))
+	if (cImg && m_backgroundImageInsertMode == OnLayout) {
 		if (!m_left.empty() && m_right.empty()) {
 			// Only left connectors
 			cImg->setAlignment(ot::AlignLeft);
@@ -356,23 +366,31 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 			// Only right connectors
 			cImg->setAlignment(ot::AlignRight);
 		}
-		else {
-			// No or connectors on both sides
-			cImg->setAlignment(ot::AlignCenter);
-		}
-
 		cLay->addChildItem(cImg, 1);
+	}
+	else {
+		// Setup central layout (stretch)
+		cLay->addStrech(1);
 	}
 
 	// Setup central layout (right connector layout)
 	cLay->addChildItem(rcLay);
 
+	// Add central layout or stack to main layout
+	if (cStack) {
+		mLay->addChildItem(cStack, 1);
+	}
+	else {
+		mLay->addChildItem(cLay, 1);
+	}
+	
 	return root;
 }
 
 ot::GraphicsFlowItemBuilder::GraphicsFlowItemBuilder()
 	: m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
-	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(5., 2., 2., 2.)
+	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(5., 2., 2., 2.), m_backgroundImageInsertMode(OnLayout),
+	m_backgroundImageMaintainAspectRatio(true)
 {
 	this->setBackgroundColor(ot::Color(50, 50, 50));
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));

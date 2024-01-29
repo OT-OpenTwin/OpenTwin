@@ -130,6 +130,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	ot::GraphicsFlowItemBuilder block;
 	block.setName(this->getClassName());
 	block.setTitle(this->CreateBlockHeadline());
+	//block.setBackgroundImageInsertMode(ot::GraphicsFlowItemBuilder::OnStack);
 
 	const ot::Color colourTitle(ot::Color::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);

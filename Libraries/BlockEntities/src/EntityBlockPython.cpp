@@ -35,6 +35,7 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setLeftTitleCornerImagePath("Images/Python.png");
 	block.setBackgroundImagePath("Images/Script.svg");
+	//block.setBackgroundImageInsertMode(ot::GraphicsFlowItemBuilder::OnStack);
 
 	const std::string blockName = getClassName();
 	const std::string blockTitel = CreateBlockHeadline();
