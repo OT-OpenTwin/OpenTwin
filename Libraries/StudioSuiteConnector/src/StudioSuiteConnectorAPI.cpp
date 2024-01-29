@@ -3,18 +3,14 @@
 
 #include <QFileDialog>					// QFileDialog
 
-void StudioSuiteConnectorAPI::importProject(std::string projectName, std::string studioSuiteServiceURL)
+void StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL, QObject* mainObject)
 {
-	QString fileName = QFileDialog::getOpenFileName(
-		nullptr,
-		"Import CST File",
-		QDir::currentPath(),
-		QString("*.cst ;; All files (*.*)"));
+	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL, mainObject);
+}
 
-	if (fileName != "")
-	{
-		ProjectManager::getInstance().importProject(fileName.toStdString(), projectName, studioSuiteServiceURL);
-	}
+void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string projectName)
+{
+	ProjectManager::getInstance().importProject(fileName, projectName);
 }
 
 

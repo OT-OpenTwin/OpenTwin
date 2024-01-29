@@ -228,7 +228,7 @@ public:
 	bool sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument &doc, std::string &response);
-	bool sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response);
+	bool sendHttpRequest(RequestType operation, const std::string& url, const std::string& message, std::string& response);
 	bool sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender);
 	void sendRubberbandResultsToService(ot::serviceID_t _serviceId, const std::string& _note, const std::string& _pointJson, const std::vector<double> &transform);
@@ -288,6 +288,9 @@ public slots:
 	void queueAction(const char *json, const char *senderIP);
 	void deallocateData(const char *data);
 	void shutdownAfterSessionServiceDisconnected(void);
+	char *sendExecuteRequest(const char *url, const char *message);
+	void setProgressState(bool visible, const char* message, bool continuous);
+	void setProgressValue(int percentage);
 
 private:
 	// ###################################################################################################

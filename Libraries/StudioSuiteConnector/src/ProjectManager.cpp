@@ -1,12 +1,28 @@
 #include "StudioSuiteConnector/ProjectManager.h"
+#include "StudioSuiteConnector/ServiceConnector.h"
 #include "StudioSuiteConnector/StudioConnector.h"
 #include "StudioSuiteConnector/VersionFile.h"
+#include "StudioSuiteConnector/ProgressInfo.h"
+
+#include "OTCommunication/ActionTypes.h"
 
 #include <filesystem>
 #include <algorithm>
 
-void ProjectManager::importProject(const std::string &fileName, const std::string &projectName, const std::string& studioSuiteServiceURL)
+void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject)
 {
+	ServiceConnector::getInstance().setServiceURL(studioSuiteServiceURL);
+	ServiceConnector::getInstance().setMainObject(mainObject);
+
+	ProgressInfo::getInstance().setMainObject(mainObject);
+}
+
+void ProjectManager::importProject(const std::string &fileName, const std::string &projectName)
+{
+	ProgressInfoHelper progress;
+	progress.getProgressInfo().setProgressState(true, "Importing project", false);
+	progress.getProgressInfo().setProgressValue(0);
+
 	// Determine the base project name (without .cst extension)
 	std::string baseProjectName = getBaseProjectName(fileName);
 
@@ -25,7 +41,9 @@ void ProjectManager::importProject(const std::string &fileName, const std::strin
 
 	// Retrieve UIDs and Version IDs
 	std::list<ot::UID> entityIDList, entityVersionList;
-	retrieveEntityIDsAndVersions(uploadFileList.size(), entityIDList, entityVersionList, studioSuiteServiceURL);
+	retrieveEntityIDsAndVersions(uploadFileList.size(), entityIDList, entityVersionList);
+
+	progress.getProgressInfo().setProgressValue(10);
 
 	// Upload files
 	uploadFiles(uploadFileList, entityIDList, entityVersionList);
@@ -33,11 +51,15 @@ void ProjectManager::importProject(const std::string &fileName, const std::strin
 	// Create the new version
 	std::string newVersion = commitNewVersion();
 
+	progress.getProgressInfo().setProgressValue(70);
+
 	// Copy the files to the cache directory
 	copyCacheFiles(baseProjectName, newVersion, cacheFolderName);
 
 	// Store version information
 	writeVersionFile(projectName, newVersion, cacheFolderName);
+
+	progress.getProgressInfo().setProgressValue(100);
 }
 
 std::string ProjectManager::getBaseProjectName(const std::string& cstFileName)
@@ -87,9 +109,37 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 	return uploadFiles;
 }
 
-void ProjectManager::retrieveEntityIDsAndVersions(size_t count, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& studioSuiteServiceURL)
+void ProjectManager::retrieveEntityIDsAndVersions(size_t count, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)
 {
+	entityIDList.clear();
+	entityVersionList.clear();
 
+	ot::JsonDocument commandDoc;
+	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SS_GetIDList, commandDoc.GetAllocator()), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_COUNT, ot::JsonValue((int64_t)count), commandDoc.GetAllocator());
+
+	std::string response;
+	ServiceConnector::getInstance().sendExecuteRequest(commandDoc, response);
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+
+	rapidjson::Value entityIDArray = responseDoc[OT_ACTION_PARAM_MODEL_EntityIDList].GetArray();
+	rapidjson::Value versionArray = responseDoc[OT_ACTION_PARAM_MODEL_EntityVersionList].GetArray();
+
+	size_t numberEntityID = entityIDArray.Size();
+	size_t numberVersion = versionArray.Size();
+	assert(numberEntityID == numberVersion);
+
+	for (size_t i = 0; i < numberEntityID; i++)
+	{
+		entityIDList.push_back(entityIDArray[i].GetInt64());
+	}
+
+	for (size_t i = 0; i < numberVersion; i++)
+	{
+		entityVersionList.push_back(versionArray[i].GetInt64());
+	}
 }
 
 void ProjectManager::uploadFiles(std::list<std::string> &uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)

@@ -3008,11 +3008,21 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			else if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
 				try
 				{
-					std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+					QString fileName = QFileDialog::getOpenFileName(
+						nullptr,
+						"Import CST File",
+						QDir::currentPath(),
+						QString("*.cst ;; All files (*.*)"));
 
-					StudioSuiteConnectorAPI::importProject(AppBase::instance()->getCurrentProjectName(), studioSuiteServiceURL);
+					if (fileName != "")
+					{
+						std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
 
-					AppBase::instance()->showInfoPrompt("The CST Studio Suite project has been imported successfully.", "Success");
+						StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+						StudioSuiteConnectorAPI::importProject(fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
+
+						AppBase::instance()->showInfoPrompt("The CST Studio Suite project has been imported successfully.", "Success");
+					}
 				}
 				catch (std::string& error)
 				{
@@ -4142,6 +4152,31 @@ void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
 	ak::uiAPI::promptDialog::show("The session service has died unexpectedly. The application will be closed now.", "Error", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 	exit(0);
+}
+
+char *ExternalServicesComponent::sendExecuteRequest(const char* url, const char* message)
+{
+	std::string responseString;
+	sendHttpRequest(EXECUTE, url, message, responseString);
+
+	char *response = new char[responseString.length()+1];
+	strcpy(response, responseString.c_str());
+
+	return response;
+}
+
+void ExternalServicesComponent::setProgressState(bool visible, const char* message, bool continuous)
+{
+	AppBase* app = AppBase::instance();
+	assert(app != nullptr);
+	if (app != nullptr) app->setProgressBarVisibility(message, visible, continuous);
+}
+
+void ExternalServicesComponent::setProgressValue(int percentage)
+{
+	AppBase* app = AppBase::instance();
+	assert(app != nullptr);
+	if (app != nullptr) app->setProgressBarValue(percentage);
 }
 
 // ###################################################################################################

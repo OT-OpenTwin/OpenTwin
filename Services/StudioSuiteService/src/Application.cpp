@@ -59,6 +59,11 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
+	if (_action == OT_ACTION_CMD_SS_GetIDList)
+	{
+		return getIDList(_doc);
+	}
+
 	return OT_ACTION_RETURN_UnknownAction;
 }
 
@@ -184,4 +189,23 @@ void Application::importProject(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
+}
+
+std::string Application::getIDList(ot::JsonDocument& _doc)
+{
+	size_t count = ot::json::getInt64(_doc, OT_ACTION_PARAM_COUNT);
+
+	ot::UIDList entityID, versionID;
+
+	for (size_t i = 0; i < count; i++)
+	{
+		entityID.push_back(m_modelComponent->createEntityUID());
+		versionID.push_back(m_modelComponent->createEntityUID());
+	}
+
+	ot::JsonDocument resultDoc;
+	resultDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+	resultDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+	
+	return resultDoc.toJson();
 }
