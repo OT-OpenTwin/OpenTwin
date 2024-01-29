@@ -63,5 +63,5 @@ QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	_painter->setFont(m_font);
 	_painter->setPen(m_pen);
-	_painter->drawText(_rect, Qt::AlignCenter, m_text);
+	_painter->drawText(_rect, ot::OTQtConverter::toQt(this->graphicsItemAlignment()), m_text);
 }
