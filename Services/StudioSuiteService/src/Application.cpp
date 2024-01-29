@@ -71,14 +71,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
-	_ui->addMenuPage("StudioSuite");
+	_ui->addMenuPage("Project");
 	
-	_ui->addMenuGroup("StudioSuite", "Hello");
+	_ui->addMenuGroup("Project", "Import");
 
 	ot::Flags<ot::ui::lockType> modelWrite;
 	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
 
-	_ui->addMenuButton("StudioSuite", "Hello", "World", "World", modelWrite, "World", "Default");
+	_ui->addMenuButton("Project", "Import", "CST File", "CST File", modelWrite, "Import", "Default");
 
 	modelSelectionChangedNotification();
 
@@ -128,7 +128,7 @@ bool Application::startAsRelayService(void) const
 
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (     action == "StudioSuite:Hello:World")			  addSolver();
+	if (     action == "Project:Import:CST File")			  importProject();
 	//else if (action == "ElmerFEM:Solver:Run Solver")		  runSolver();
 	//else if (action == "Model:Sources:Add Terminal")	      addTerminal();
 	//else if (action == "ElmerFEM:Sources:Define Electrostatic Potential")  definePotential();
@@ -173,17 +173,15 @@ void Application::EnsureVisualizationModelIDKnown(void)
 }
 
 
-void Application::addSolver(void)
+void Application::importProject(void)
 {
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
+	// TODO: Check whether the project has already been initialized
+	 
+	
+	// Send the import message to the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_IMPORT, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	if (m_uiComponent == nullptr) {
-		assert(0); throw std::exception("Model not connected");
-	}
-
-
+	uiComponent()->sendMessage(true, doc);
 }

@@ -157,6 +157,8 @@
 #define OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions "UI.RemoveVersionGraph.Versions"
 #define OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion "UI.AddActivateGraph.Version"
 
+#define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
+
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"
 #define OT_ACTION_CMD_UI_RequestPluginSuccess "UI.Plugin.RequestConnection.Success"

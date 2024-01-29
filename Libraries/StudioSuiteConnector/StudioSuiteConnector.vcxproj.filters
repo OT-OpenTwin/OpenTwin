@@ -7,6 +7,15 @@
     <ClCompile Include="src\StudioSuiteConnectorAPI.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StudioConnector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionFile.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -18,6 +27,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\StudioSuiteConnector\StudioSuiteConnectorAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StudioSuiteConnector\ProjectManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StudioSuiteConnector\StudioConnector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StudioSuiteConnector\VersionFile.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -55,6 +55,8 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/TextEditor.h"
 
+#include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
+
 // Curl
 #include "curl/curl.h"					// Curl
 
@@ -3001,6 +3003,20 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				if (editor) {
 					editor->setContentChanged(true);
+				}
+			}
+			else if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
+				try
+				{
+					std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+
+					StudioSuiteConnectorAPI::importProject(AppBase::instance()->getCurrentProjectName(), studioSuiteServiceURL);
+
+					AppBase::instance()->showInfoPrompt("The CST Studio Suite project has been imported successfully.", "Success");
+				}
+				catch (std::string& error)
+				{
+					AppBase::instance()->showErrorPrompt(error.c_str(), "Error");
 				}
 			}
 			else

@@ -20,10 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\ProjectManager.cpp" />
+    <ClCompile Include="src\StudioConnector.cpp" />
     <ClCompile Include="src\StudioSuiteConnectorAPI.cpp" />
+    <ClCompile Include="src\VersionFile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\StudioSuiteConnector\ProjectManager.h" />
+    <ClInclude Include="include\StudioSuiteConnector\StudioConnector.h" />
     <ClInclude Include="include\StudioSuiteConnector\StudioSuiteConnectorAPI.h" />
+    <ClInclude Include="include\StudioSuiteConnector\VersionFile.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>

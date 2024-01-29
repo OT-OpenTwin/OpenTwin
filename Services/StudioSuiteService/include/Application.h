@@ -108,7 +108,7 @@ public:
 
 	void modelSelectionChangedNotification(void);
 
-	void addSolver(void);
+	void importProject(void);
 
 	void EnsureVisualizationModelIDKnown(void);
 

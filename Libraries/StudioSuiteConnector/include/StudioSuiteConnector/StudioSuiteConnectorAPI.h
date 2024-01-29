@@ -4,7 +4,7 @@
 
 namespace StudioSuiteConnectorAPI
 {
-	__declspec(dllexport) void openProject(const std::string& path);
+	__declspec(dllexport) void importProject(std::string projectName, std::string studioSuiteServiceURL);
 
 
 
