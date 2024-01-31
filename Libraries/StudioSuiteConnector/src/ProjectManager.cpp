@@ -177,11 +177,7 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 	try
 	{
 		std::filesystem::copy(cstFileName, versionFolderName);
-
-		std::filesystem::copy_options options;
-		options |= std::filesystem::copy_options::recursive;
-
-		std::filesystem::copy(resultFolderName, versionFolderName + "/Result", options);
+		std::filesystem::copy(resultFolderName, versionFolderName + "/Result", std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
 	}
 	catch (std::exception &error)
 	{
