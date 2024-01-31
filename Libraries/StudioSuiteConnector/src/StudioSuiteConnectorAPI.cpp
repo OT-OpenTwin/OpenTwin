@@ -14,3 +14,7 @@ void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string pr
 }
 
 
+void StudioSuiteConnectorAPI::uploadAndCopyFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
+{
+	ProjectManager::getInstance().uploadAndCopyFiles(entityIDList, entityVersionList);
+}

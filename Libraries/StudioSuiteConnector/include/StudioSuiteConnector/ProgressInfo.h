@@ -21,6 +21,11 @@ public:
     void setProgressState(bool visible, const std::string& message, bool continuous);
     void setProgressValue(int percentage);
 
+    void unlockGui(void);
+
+    void showError(const std::string& message);
+    void showInformation(const std::string& message);
+
 private:
     ProgressInfo() : mainObject(nullptr) {};
     ~ProgressInfo() {};
@@ -28,11 +33,3 @@ private:
     QObject* mainObject;
 };
 
-class ProgressInfoHelper
-{
-public:
-    ProgressInfoHelper() {};
-    ~ProgressInfoHelper() { ProgressInfo::getInstance().setProgressState(false, "", false); };
-
-    ProgressInfo& getProgressInfo() { return ProgressInfo::getInstance(); }
-};

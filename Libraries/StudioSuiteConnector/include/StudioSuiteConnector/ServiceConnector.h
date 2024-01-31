@@ -19,7 +19,7 @@ public:
     void setServiceURL(const std::string &url) { serviceURL = url; }
     void setMainObject(QObject* main) { mainObject = main; }
 
-    bool sendExecuteRequest(ot::JsonDocument& doc, std::string& response);
+    void sendExecuteRequest(ot::JsonDocument& doc);
 
 private:
     ServiceConnector() : mainObject(nullptr) {};

@@ -288,9 +288,12 @@ public slots:
 	void queueAction(const char *json, const char *senderIP);
 	void deallocateData(const char *data);
 	void shutdownAfterSessionServiceDisconnected(void);
-	char *sendExecuteRequest(const char *url, const char *message);
+	void sendExecuteRequest(const char *url, const char *message);
 	void setProgressState(bool visible, const char* message, bool continuous);
 	void setProgressValue(int percentage);
+	void unlockGui(void);
+	void showError(const char* message);
+	void showInformation(const char* message);
 
 private:
 	// ###################################################################################################

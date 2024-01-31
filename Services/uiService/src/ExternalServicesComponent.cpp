@@ -3006,28 +3006,35 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
-				try
-				{
-					QString fileName = QFileDialog::getOpenFileName(
-						nullptr,
-						"Import CST File",
-						QDir::currentPath(),
-						QString("*.cst ;; All files (*.*)"));
 
-					if (fileName != "")
-					{
-						std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+				QString fileName = QFileDialog::getOpenFileName(
+					nullptr,
+					"Import CST File",
+					QDir::currentPath(),
+					QString("*.cst ;; All files (*.*)"));
 
-						StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
-						StudioSuiteConnectorAPI::importProject(fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
+				if (fileName == "") return "";
 
-						AppBase::instance()->showInfoPrompt("The CST Studio Suite project has been imported successfully.", "Success");
-					}
-				}
-				catch (std::string& error)
-				{
-					AppBase::instance()->showErrorPrompt(error.c_str(), "Error");
-				}
+				ot::Flags<ot::ui::lockType> lockFlags;
+				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+				lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+				lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+				m_lockManager->lock(nullptr, lockFlags);
+
+				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+
+				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+
+				std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
+				workerThread.detach();
+			}
+			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY) {
+
+				std::list<ot::UID> entityIDList = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				std::list<ot::UID> entityVersionList = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+
+				std::thread workerThread(StudioSuiteConnectorAPI::uploadAndCopyFiles, entityIDList, entityVersionList);
+				workerThread.detach();
 			}
 			else
 			{
@@ -4154,15 +4161,13 @@ void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	exit(0);
 }
 
-char *ExternalServicesComponent::sendExecuteRequest(const char* url, const char* message)
+void ExternalServicesComponent::sendExecuteRequest(const char* url, const char* message)
 {
 	std::string responseString;
 	sendHttpRequest(EXECUTE, url, message, responseString);
 
-	char *response = new char[responseString.length()+1];
-	strcpy(response, responseString.c_str());
-
-	return response;
+	delete [] url; url = nullptr;
+	delete [] message; message = nullptr;
 }
 
 void ExternalServicesComponent::setProgressState(bool visible, const char* message, bool continuous)
@@ -4170,6 +4175,9 @@ void ExternalServicesComponent::setProgressState(bool visible, const char* messa
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
 	if (app != nullptr) app->setProgressBarVisibility(message, visible, continuous);
+
+	delete[] message;
+	message = nullptr;
 }
 
 void ExternalServicesComponent::setProgressValue(int percentage)
@@ -4177,6 +4185,36 @@ void ExternalServicesComponent::setProgressValue(int percentage)
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
 	if (app != nullptr) app->setProgressBarValue(percentage);
+}
+
+void ExternalServicesComponent::unlockGui(void)
+{
+	ot::Flags<ot::ui::lockType> lockFlags;
+	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+
+	m_lockManager->unlock(nullptr, lockFlags);
+}
+
+void ExternalServicesComponent::showError(const char* message)
+{
+	AppBase* app = AppBase::instance();
+	assert(app != nullptr);
+	if (app != nullptr) app->showErrorPrompt(message, "Error");
+
+	delete[] message;
+	message = nullptr;
+}
+
+void ExternalServicesComponent::showInformation(const char* message)
+{
+	AppBase* app = AppBase::instance();
+	assert(app != nullptr);
+	if (app != nullptr) app->showInfoPrompt(message, "Success");
+
+	delete[] message;
+	message = nullptr;
 }
 
 // ###################################################################################################

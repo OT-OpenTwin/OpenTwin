@@ -8,6 +8,11 @@
 
 #include <filesystem>
 #include <algorithm>
+#include <chrono>
+#include <thread>
+
+#include <QFileDialog>					// QFileDialog
+#include <qdir.h>						// QDir
 
 void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject)
 {
@@ -17,49 +22,82 @@ void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceU
 	ProgressInfo::getInstance().setMainObject(mainObject);
 }
 
-void ProjectManager::importProject(const std::string &fileName, const std::string &projectName)
+void ProjectManager::importProject(const std::string& fileName, const std::string& prjName)
 {
-	ProgressInfoHelper progress;
-	progress.getProgressInfo().setProgressState(true, "Importing project", false);
-	progress.getProgressInfo().setProgressValue(0);
+	try
+	{
+		uploadFileList.clear();
+		projectName.clear();
+		baseProjectName.clear();
+		cacheFolderName.clear();
 
-	// Determine the base project name (without .cst extension)
-	std::string baseProjectName = getBaseProjectName(fileName);
+		projectName = prjName;
 
-	// Create the cache folder
-	std::string cacheFolderName = createCacheFolder(baseProjectName);
+		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
+		ProgressInfo::getInstance().setProgressValue(0);
 
-	// Open the cst project in a studio suite instance
-	StudioConnector::getInstance().openProject(fileName);
+		// Determine the base project name (without .cst extension)
+		baseProjectName = getBaseProjectName(fileName);
 
-	// Now save the project (if needed) and extract the data 
-	StudioConnector::getInstance().saveProject();
-	StudioConnector::getInstance().extractInformation();
+		// Create the cache folder
+		cacheFolderName = createCacheFolder(baseProjectName);
 
-	// Get the files to be uploaded
-	std::list<std::string> uploadFileList = determineUploadFiles(baseProjectName);
+		// Open the cst project in a studio suite instance
+		StudioConnector::getInstance().openProject(fileName);
 
-	// Retrieve UIDs and Version IDs
-	std::list<ot::UID> entityIDList, entityVersionList;
-	retrieveEntityIDsAndVersions(uploadFileList.size(), entityIDList, entityVersionList);
+		// Now save the project (if needed) and extract the data 
+		StudioConnector::getInstance().saveProject();
+		StudioConnector::getInstance().extractInformation();
 
-	progress.getProgressInfo().setProgressValue(10);
+		// Get the files to be uploaded
+		uploadFileList = determineUploadFiles(baseProjectName);
 
-	// Upload files
-	uploadFiles(uploadFileList, entityIDList, entityVersionList);
+		ProgressInfo::getInstance().setProgressValue(10);
 
-	// Create the new version
-	std::string newVersion = commitNewVersion();
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_COUNT, uploadFileList.size(), doc.GetAllocator());
 
-	progress.getProgressInfo().setProgressValue(70);
+		ServiceConnector::getInstance().sendExecuteRequest(doc);
+	}
+	catch (std::string &error)
+	{
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().showError(error);
+		ProgressInfo::getInstance().unlockGui();
+	}
+}
 
-	// Copy the files to the cache directory
-	copyCacheFiles(baseProjectName, newVersion, cacheFolderName);
+void ProjectManager::uploadAndCopyFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList)
+{
+	ProgressInfo::getInstance().setProgressValue(10);
 
-	// Store version information
-	writeVersionFile(projectName, newVersion, cacheFolderName);
+	try
+	{
+		// Upload files
+		uploadFiles(uploadFileList, entityIDList, entityVersionList);
 
-	progress.getProgressInfo().setProgressValue(100);
+		// Create the new version
+		std::string newVersion = commitNewVersion();
+
+		ProgressInfo::getInstance().setProgressValue(70);
+
+		// Copy the files to the cache directory
+		copyCacheFiles(baseProjectName, newVersion, cacheFolderName);
+
+		// Store version information
+		writeVersionFile(projectName, newVersion, cacheFolderName);
+
+		ProgressInfo::getInstance().setProgressValue(100);
+		ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been imported successfully.");
+	}
+	catch (std::string& error)
+	{
+		ProgressInfo::getInstance().showError(error);
+	}
+
+	ProgressInfo::getInstance().setProgressState(false, "", false);
+	ProgressInfo::getInstance().unlockGui();
 }
 
 std::string ProjectManager::getBaseProjectName(const std::string& cstFileName)
@@ -109,49 +147,6 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 	return uploadFiles;
 }
 
-void ProjectManager::retrieveEntityIDsAndVersions(size_t count, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)
-{
-	entityIDList.clear();
-	entityVersionList.clear();
-
-	ot::JsonDocument commandDoc;
-	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SS_GetIDList, commandDoc.GetAllocator()), commandDoc.GetAllocator());
-	commandDoc.AddMember(OT_ACTION_PARAM_COUNT, ot::JsonValue((int64_t)count), commandDoc.GetAllocator());
-
-	std::string response;
-	ServiceConnector::getInstance().sendExecuteRequest(commandDoc, response);
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	rapidjson::Value entityIDArray = responseDoc[OT_ACTION_PARAM_MODEL_EntityIDList].GetArray();
-	rapidjson::Value versionArray = responseDoc[OT_ACTION_PARAM_MODEL_EntityVersionList].GetArray();
-
-	size_t numberEntityID = entityIDArray.Size();
-	size_t numberVersion = versionArray.Size();
-	assert(numberEntityID == numberVersion);
-
-	for (size_t i = 0; i < numberEntityID; i++)
-	{
-		entityIDList.push_back(entityIDArray[i].GetInt64());
-	}
-
-	for (size_t i = 0; i < numberVersion; i++)
-	{
-		entityVersionList.push_back(versionArray[i].GetInt64());
-	}
-}
-
-void ProjectManager::uploadFiles(std::list<std::string> &uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)
-{
-
-}
-
-std::string ProjectManager::commitNewVersion(void)
-{
-	return "1.0.0";
-}
-
 void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const std::string &newVersion, const std::string &cacheFolderName)
 {
 	// Create new version subfolder
@@ -188,9 +183,9 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 
 		std::filesystem::copy(resultFolderName, versionFolderName + "/Result", options);
 	}
-	catch (std::exception)
+	catch (std::exception &error)
 	{
-		throw("Unable to copy data to cache: " + versionFolderName);
+		throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
 	}
 }
 
@@ -199,6 +194,17 @@ void ProjectManager::writeVersionFile(const std::string& projectName, const std:
 	VersionFile version(std::string(cacheFolderName + "/version.info"));
 
 	version.write(projectName, newVersion);
+}
+
+void ProjectManager::uploadFiles(std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)
+{
+
+
+}
+
+std::string ProjectManager::commitNewVersion(void)
+{
+	return "1.0.0";
 }
 
 

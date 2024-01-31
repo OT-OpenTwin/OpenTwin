@@ -59,9 +59,10 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
-	if (_action == OT_ACTION_CMD_SS_GetIDList)
+	if (_action == OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY_NEEDED)
 	{
-		return getIDList(_doc);
+		uploadAndCopyNeeded(_doc);
+		return "";
 	}
 
 	return OT_ACTION_RETURN_UnknownAction;
@@ -191,7 +192,7 @@ void Application::importProject(void)
 	uiComponent()->sendMessage(true, doc);
 }
 
-std::string Application::getIDList(ot::JsonDocument& _doc)
+void Application::uploadAndCopyNeeded(ot::JsonDocument& _doc)
 {
 	size_t count = ot::json::getInt64(_doc, OT_ACTION_PARAM_COUNT);
 
@@ -203,9 +204,10 @@ std::string Application::getIDList(ot::JsonDocument& _doc)
 		versionID.push_back(m_modelComponent->createEntityUID());
 	}
 
-	ot::JsonDocument resultDoc;
-	resultDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, resultDoc.GetAllocator()), resultDoc.GetAllocator());
-	resultDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	
-	return resultDoc.toJson();
+	uiComponent()->sendMessage(true, doc);
 }

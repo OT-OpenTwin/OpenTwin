@@ -158,8 +158,8 @@
 #define OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion "UI.AddActivateGraph.Version"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
-
-#define OT_ACTION_CMD_SS_GetIDList "StudioSuite.GetIDList"
+#define OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY "StudioSuite.UploadAndCopy"
+#define OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY_NEEDED "StudioSuite.UploadAndCopyNeeded"
 
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"
