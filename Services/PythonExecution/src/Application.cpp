@@ -1,5 +1,13 @@
 #include "Application.h"
 
+void Application::setModelServiceURL(const std::string& url)
+{
+}
+
+void Application::setUIServiceURL(const std::string& url)
+{
+}
+
 ot::components::ModelComponent* Application::modelComponent()
 {
 	return nullptr;

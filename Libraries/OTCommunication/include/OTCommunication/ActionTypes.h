@@ -578,6 +578,7 @@
 
 #define OT_INFO_SERVICE_TYPE_MODEL "Model"
 #define OT_INFO_SERVICE_TYPE_UI "UI"
+#define OT_INFO_SERVICE_TYPE_DataBase "Database"
 #define OT_INFO_SERVICE_TYPE_LOGGER "LoggerService"
 #define OT_INFO_SERVICE_TYPE_AuthorisationService "AuthorisationService"
 #define OT_INFO_SERVICE_TYPE_PHREEC "PHREECService"

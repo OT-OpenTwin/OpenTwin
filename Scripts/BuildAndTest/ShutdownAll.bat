@@ -3,6 +3,8 @@
 REM Shutdown microservices
 taskkill /IM "open_twin.exe" /F
 
+taskkill /IM "PythonExecution.exe" /F
+
 REM Shutdown ui
 taskkill /IM "uiFrontend.exe" /F
 

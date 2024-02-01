@@ -64,8 +64,16 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
-	char* arguments[2];
-	_subprocessHandler = new SubprocessHandler(sessionID(), 1, arguments);
+	if (_subprocessHandler == nullptr)
+	{
+		_subprocessHandler = new SubprocessHandler(sessionID());
+	}
+	const std::string dbURL = DataBase::GetDataBase()->getDataBaseServerURL();
+	const std::string userName= DataBase::GetDataBase()->getUserName();
+	const std::string psw = DataBase::GetDataBase()->getUserPassword();
+	const std::string siteID = this->siteID();
+	const std::string collectionName = this->m_collectionName;
+	_subprocessHandler->setDatabase(dbURL, userName, psw,collectionName,siteID);
 }
 
 
@@ -147,7 +155,11 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-
+	if (_subprocessHandler == nullptr)
+	{
+		_subprocessHandler = new SubprocessHandler(sessionID());
+	}
+	_subprocessHandler->setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -161,20 +173,11 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-	OT_LOG_D("Starting to create the subprocess");
-#ifdef _DEBUG
-	try
+	if (_subprocessHandler == nullptr)
 	{
-		
+		_subprocessHandler = new SubprocessHandler(sessionID());
 	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		throw e;
-	}
-#else
-
-#endif // DEBUG
+	_subprocessHandler->setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

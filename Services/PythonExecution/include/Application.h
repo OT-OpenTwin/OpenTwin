@@ -12,6 +12,9 @@ public:
 		return &INSTANCE;
 	}
 
+	void setModelServiceURL(const std::string& url);
+	void setUIServiceURL(const std::string& url);
+
 	ot::components::ModelComponent* modelComponent();
 	ClassFactory&  getClassFactory();
 	

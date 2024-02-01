@@ -1,7 +1,6 @@
 #pragma once
 #include <optional>
 #include <list>
-#include "PythonAPI.h"
 #include "PythonWrapper.h"
 #include "EntityFile.h"
 #include "PythonObjectBuilder.h"
