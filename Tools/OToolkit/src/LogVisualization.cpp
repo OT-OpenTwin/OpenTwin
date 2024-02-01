@@ -681,7 +681,7 @@ void LogVisualization::connectToLogger(bool _isAutoConnect) {
 	dia.queueRecenterRequest();
 	dia.exec();
 
-	if (!dia.success()) {
+	if (!dia.dialogResult() == ot::Dialog::Ok) {
 		return;
 	}
 	

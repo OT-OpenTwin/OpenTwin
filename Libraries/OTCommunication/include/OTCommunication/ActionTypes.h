@@ -152,6 +152,7 @@
 #define OT_ACTION_CMD_UI_ContextMenuItemClicked "UI.ContextMenu.Item.Clicked"
 #define OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged "UI.ContextMenu.Item.CheckedChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_EntitySelectionDialog "UI.EntitySelectionDialog"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraph "UI.SetVersionGraph"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive "UI.SetVersionGraph.Active"
 #define OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions "UI.RemoveVersionGraph.Versions"
@@ -268,6 +269,8 @@
 #define OT_ACTION_PARAM_UI_TREE_IconSize "UI.Tree.IconSize"
 #define OT_ACTION_PARAM_UI_TREE_IconItemVisible "UI.Tree.ItemVisibleIcon"
 #define OT_ACTION_PARAM_UI_TREE_IconItemHidden "UI.Tree.ItemHiddenIcon"
+#define OT_ACTION_PARAM_UI_TREE_Items "UI.Tree.Items"
+#define OT_ACTION_PARAM_UI_TREE_SelectedItems "UI.Tree.SelectedItems"
 
 #define OT_ACTION_CMD_UI_Freeze3DView "UI.View.Freeze"
 #define OT_ACTION_PARAM_UI_DisabledControlsList "UI.Object.DisabledList"

@@ -43,6 +43,7 @@
     <ClInclude Include="include\OTGui\GuiTypes.h" />
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />
+    <ClInclude Include="include\OTGui\NavigationTreeItem.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
@@ -74,6 +75,7 @@
     <ClCompile Include="src\GuiTypes.cpp" />
     <ClCompile Include="src\LinearGradientPainter2D.cpp" />
     <ClCompile Include="src\Margins.cpp" />
+    <ClCompile Include="src\NavigationTreeItem.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />

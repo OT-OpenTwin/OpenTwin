@@ -50,6 +50,7 @@
     <ClCompile Include="src\OTQtConverter.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\PlainTextEdit.cpp" />
+    <ClCompile Include="src\PushButton.cpp" />
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="include\OTWidgets\OTQtConverter.h" />
     <ClInclude Include="include\OTWidgets\Painter2DFactory.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEdit.h" />
+    <ClInclude Include="include\OTWidgets\PushButton.h" />
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h" />
     <QtMoc Include="include\OTWidgets\TabWidget.h" />
     <QtMoc Include="include\OTWidgets\ToolTipHandler.h" />

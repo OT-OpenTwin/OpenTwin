@@ -40,6 +40,7 @@
     <ClCompile Include="src\ManageAccess.cpp" />
     <ClCompile Include="src\ManageGroups.cpp" />
     <ClCompile Include="src\ManageOwner.cpp" />
+    <ClCompile Include="src\SelectEntitiesDialog.cpp" />
     <ClCompile Include="src\ShortcutManager.cpp" />
     <ClCompile Include="src\ProjectManagement.cpp" />
     <ClCompile Include="src\ToolBar.cpp" />
@@ -66,6 +67,7 @@
     <QtMoc Include="include\DevLogger.h" />
     <ClInclude Include="include\FileHandler.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
+    <QtMoc Include="include\SelectEntitiesDialog.h" />
     <ClInclude Include="include\ToolBar.h" />
     <QtMoc Include="include\welcomeScreen.h" />
     <ClInclude Include="include\ProjectManagement.h" />
@@ -162,7 +164,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(BOOST_INCD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(BOOST_INCD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -190,7 +192,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

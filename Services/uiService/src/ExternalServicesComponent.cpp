@@ -16,6 +16,7 @@
 #include "UserSettings.h"
 #include "ContextMenuManager.h"
 #include "UiPluginManager.h"
+#include "SelectEntitiesDialog.h"
 
 // Qt header
 #include <QFileDialog>					// QFileDialog
@@ -45,6 +46,7 @@
 
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/NavigationTreeItem.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
 #include "OTWidgets/GraphicsItem.h"
@@ -3035,6 +3037,30 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				std::thread workerThread(StudioSuiteConnectorAPI::uploadAndCopyFiles, entityIDList, entityVersionList);
 				workerThread.detach();
+			}
+			else if (action == OT_ACTION_CMD_UI_EntitySelectionDialog) {
+				
+
+				ot::ConstJsonArray itemArr = ot::json::getArray(_doc, OT_ACTION_PARAM_UI_TREE_Items);
+				std::list<ot::NavigationTreeItem> items;
+				for (rapidjson::SizeType i = 0; i < itemArr.Size(); i++) {
+					ot::ConstJsonObject itemObj = ot::json::getObject(itemArr, i);
+					ot::NavigationTreeItem newItem;
+					newItem.setFromJsonObject(itemObj);
+					items.push_back(newItem);
+				}
+
+				ot::ConstJsonArray sitemArr = ot::json::getArray(_doc, OT_ACTION_PARAM_UI_TREE_SelectedItems);
+				std::list<ot::NavigationTreeItem> sitems;
+				for (rapidjson::SizeType i = 0; i < sitemArr.Size(); i++) {
+					ot::ConstJsonObject itemObj = ot::json::getObject(sitemArr, i);
+					ot::NavigationTreeItem newItem;
+					newItem.setFromJsonObject(itemObj);
+					sitems.push_back(newItem);
+				}
+
+				SelectEntitiesDialog dia(items, sitems, nullptr);
+				dia.showDialog();
 			}
 			else
 			{

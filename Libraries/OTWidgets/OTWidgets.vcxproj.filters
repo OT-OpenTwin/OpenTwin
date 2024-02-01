@@ -112,6 +112,9 @@
     <ClCompile Include="src\PlainTextEdit.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\PushButton.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -219,6 +222,9 @@
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PlainTextEdit.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PushButton.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>

@@ -108,6 +108,9 @@
     <ClCompile Include="src\FileHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SelectEntitiesDialog.cpp">
+      <Filter>Source Files\customWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -183,6 +186,9 @@
     </QtMoc>
     <QtMoc Include="include\DevLogger.h">
       <Filter>Header Files\Components</Filter>
+    </QtMoc>
+    <QtMoc Include="include\SelectEntitiesDialog.h">
+      <Filter>Header Files\customWidgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

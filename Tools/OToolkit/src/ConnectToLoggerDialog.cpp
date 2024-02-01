@@ -23,7 +23,7 @@
 #define DIA_LOGW(___message) OTOOLKIT_LOGW("Logger Service Connector", ___message)
 #define DIA_LOGE(___message) OTOOLKIT_LOGE("Logger Service Connector", ___message)
 
-ConnectToLoggerDialog::ConnectToLoggerDialog() : m_success(false) {
+ConnectToLoggerDialog::ConnectToLoggerDialog() {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
 	// Create layouts
@@ -77,7 +77,7 @@ void ConnectToLoggerDialog::queueRecenterRequest(void) {
 }
 
 void ConnectToLoggerDialog::slotCancel(void) {
-	close();
+	this->close(ot::Dialog::Cancel);
 }
 
 void ConnectToLoggerDialog::slotConnect(void) {
@@ -111,8 +111,7 @@ void ConnectToLoggerDialog::slotDone(void) {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 	settings->setValue("LoggerServiceURL", m_url->text());
 
-	m_success = true;
-	this->close();
+	this->close(ot::Dialog::Ok);
 }
 
 void ConnectToLoggerDialog::slotRecenter(void) {
