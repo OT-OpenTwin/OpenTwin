@@ -10,7 +10,7 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName)
 	_subprocessPath = FindSubprocessPath() + _executableName;
 	InitiateProcess();
 #ifdef _DEBUG
-	OT_LOG_D("Debug")
+	OT_LOG_D("Debug");
 	_subProcess.start();
 	bool processStarted = _subProcess.waitForStarted(_timeoutSubprocessStart);
 	_socket.connectToServer(_serverName.c_str());
