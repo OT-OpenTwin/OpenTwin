@@ -66,6 +66,7 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Encryption.cpp">
+    <ClCompile Include="src\ModelServiceAPI.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,6 +153,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\Encryption.h">
+          <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

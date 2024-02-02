@@ -192,6 +192,7 @@
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
+    <ClCompile Include="src\ModelServiceAPI.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
     <ClCompile Include="src\Dispatcher.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="include\OTServiceFoundation\MenuButtonDescription.h" />
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
+    <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h" />
     <ClInclude Include="include\OTServiceFoundation\OTObject.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
     <ClInclude Include="include\OTServiceFoundation\SettingsData.h" />

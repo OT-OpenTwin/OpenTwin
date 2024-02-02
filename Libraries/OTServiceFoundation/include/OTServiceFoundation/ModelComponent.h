@@ -10,6 +10,7 @@
 
  // OpenTwin header
 #include "OTCore/ServiceBase.h"			// Base class
+#include "OTServiceFoundation/ModelServiceAPI.h"
 #include "OTCore/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/EntityInformation.h"
@@ -39,7 +40,7 @@ namespace ot {
 
 	namespace components {
 
-		class OT_SERVICEFOUNDATION_API_EXPORT ModelComponent : public ServiceBase {
+		class OT_SERVICEFOUNDATION_API_EXPORT ModelComponent : public ServiceBase, public ModelServiceAPI {
 		public:
 			ModelComponent(
 				const std::string &			_name,
@@ -50,41 +51,9 @@ namespace ot {
 			);
 			virtual ~ModelComponent();
 
+			UID createEntityUID(void);
 
-			// #########################################################################################################
-
-			// Model management
-
-			std::string getCurrentModelVersion(void);
-			EntityBase * readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactoryHandler &classFactory);
-			UID getCurrentVisualizationModelID(void);
-
-			std::list<std::string> getListOfFolderItems(const std::string & _folder, bool recursive = false);
-			void getAvailableMeshes(std::string & _meshFolderName, UID & _meshFolderID, std::string & _meshName, UID & _meshID);
-			std::list<UID> getIDsOfFolderItemsOfType(const std::string &_folder, const std::string &_entityClassName, bool recursive);
-
-			// #########################################################################################################
-
-			// Entity management
-
-			void addEntitiesToModel(std::list<UID> & _topologyEntityIDList, std::list<UID> & _topologyEntityVersionList, std::list<bool> & _topologyEntityForceVisible, std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList, const std::string & _changeComment);
-			void addEntitiesToModel(std::list<UID> && _topologyEntityIDList, std::list<UID> && _topologyEntityVersionList, std::list<bool> && _topologyEntityForceVisible, std::list<UID> && _dataEntityIDList, std::list<UID> && _dataEntityVersionList, std::list<UID> && _dataEntityParentList, const std::string & _changeComment);
-			void addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName, std::list<UID> & _dataEntityIDList, std::list<UID> & _dataEntityVersionList, std::list<UID> & _dataEntityParentList, std::list<std::string> & _childrenList, const std::string & _changeComment);
-			void deleteEntitiesFromModel(std::list<std::string> & _entityNameList, bool _saveModel = true);
-			void getEntityInformation(const std::list<UID> & _entities, std::list<EntityInformation> & _entityInfo);
-			void getEntityInformation(const std::list<std::string> & _entities, std::list<EntityInformation> & _entityInfo);
-			void getEntityInformation(const std::string & _entity, EntityInformation & _entityInfo);
-			void getEntityChildInformation(const std::string & _entity, std::list<EntityInformation> & _entityInfo, bool recursive);
-			void getEntityChildInformation(UID _entity, std::list<EntityInformation> & _entityInfo, bool recursive);
-			void getSelectedEntityInformation(std::list<EntityInformation> & _entityInfo, const std::string& typeFilter);
-			void addPropertiesToEntities(std::list<UID>& _entityList, const std::string& _propertiesJson);
-			void getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
-			void getEntityProperties(const std::string &entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
-
-			void updatePropertyGrid();
-			void updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment);
-			
-			// Specific entity management helper functions
+			// Convenience wrapper
 			EntityResult1DPlot * addResult1DPlotEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID, std::string>> &curves);
 			EntityResult1DCurve * addResult1DCurveEntity(const std::string &name, const std::vector<double> &xdata,
 											  const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
@@ -93,18 +62,8 @@ namespace ot {
 			EntityResultText *addResultTextEntity(const std::string &name, const std::string &text);
 			void facetAndStoreGeometryEntity(EntityGeometry *entityGeom, bool forceVisible);
 
-			// #########################################################################################################
-
-			// UID management
-
-			UID createEntityUID(void);
-
-			// #########################################################################################################
-
 			void importTableFile(const std::string &itemName);
-			void enableMessageQueueing(bool flag);
-			void modelChangeOperationCompleted(const std::string &description);
-
+		
 			std::string sendMessage(bool _queue, JsonDocument& _doc);
 
 			void clearNewEntityList(void);
@@ -114,7 +73,10 @@ namespace ot {
 
 		private:
 			
-			ApplicationBase *			m_application;
+			ApplicationBase * m_application = nullptr;
+
+			virtual const std::string& getModelServiceURL() override;
+			virtual const std::string& getThisServiceURL() override;
 
 			ModelComponent() = delete;
 			ModelComponent(const ModelComponent &) = delete;
