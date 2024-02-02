@@ -47,7 +47,7 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 	typeLabelQuantity->setValue("");
 	getProperties().createProperty(typeLabelQuantity, _groupQuantitySetttings);
 
-	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyComparator, comparators, comparators.front(), "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupQuantitySetttings, _propertyComparator, comparators, comparators.back(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupQuantitySetttings, _propertyValueQuantity, "", "default", getProperties());
 
 	//Parameter 1 settings
@@ -58,7 +58,7 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 	typeLabelP1->setGroup(_groupParamSettings1);
 	typeLabelP1->setValue("");
 	getProperties().createProperty(typeLabelP1, _groupParamSettings1);
-	EntityPropertiesSelection::createProperty(_groupParamSettings1, _propertyComparatorP1, comparators, comparators.front(), "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings1, _propertyComparatorP1, comparators, comparators.back(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings1, _propertyValueP1, "", "default", getProperties());
 
 	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyNameP2, {}, "", "default", getProperties());
@@ -68,7 +68,7 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 	typeLabelP2->setGroup(_groupParamSettings2);
 	typeLabelP2->setValue("");
 	getProperties().createProperty(typeLabelP2, _groupParamSettings2);
-	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyComparatorP2, comparators, comparators.front(), "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings2, _propertyComparatorP2, comparators, comparators.back(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings2, _propertyValueP2, "", "default", getProperties());
 
 	EntityPropertiesSelection::createProperty(_groupParamSettings3, _propertyNameP3, {}, "", "default", getProperties());
@@ -78,7 +78,7 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 	typeLabelP3->setGroup(_groupParamSettings3);
 	typeLabelP3->setValue("");
 	getProperties().createProperty(typeLabelP3, _groupParamSettings3);
-	EntityPropertiesSelection::createProperty(_groupParamSettings3, _propertyComparatorP3, comparators, comparators.front(), "default", getProperties());
+	EntityPropertiesSelection::createProperty(_groupParamSettings3, _propertyComparatorP3, comparators, comparators.back(), "default", getProperties());
 	EntityPropertiesString::createProperty(_groupParamSettings3, _propertyValueP3, "", "default", getProperties());
 
 	SetVisibleParameter2(false);

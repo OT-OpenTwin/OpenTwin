@@ -20,6 +20,7 @@ public:
 	void UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position, ClassFactory *classFactory);
 	std::map<std::string, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 
+	static std::string getQueryForRangeSelection() { return "Range"; }
 private:
 	const std::string _blockFolder = ot::FolderNames::BlockFolder;
 	const std::string _packageName = "Data Processing";

@@ -165,10 +165,72 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition& definition)
 {
 	const std::string& comparator = definition.getComparator();
-	if (comparator != " ")
+	AdvancedQueryBuilder builder;
+	ot::StringToVariableConverter converter;
+	
+	if (comparator == BlockEntityHandler::getQueryForRangeSelection())
 	{
-		AdvancedQueryBuilder builder;
-		ot::StringToVariableConverter converter;
+		const std::string& name = definition.getName();
+		std::string valueStr = definition.getValue();
+		const std::string& type = definition.getType();
+		valueStr.erase(std::remove(valueStr.begin(), valueStr.end(), ' '), valueStr.end());
+		char openingBracket = valueStr[0];
+		char closingBracket = valueStr[valueStr.size()-1];
+		size_t posDelimiter = valueStr.find(",");
+		const bool notationIsCorrect = (openingBracket == '(' || openingBracket == '[') && (closingBracket == ')' || closingBracket == ']') && posDelimiter != std::string::npos;
+		if (notationIsCorrect)
+		{
+
+			const bool dataTypeCompatible = type == ot::TypeNames::getInt32TypeName() || type == ot::TypeNames::getInt64TypeName() || type == ot::TypeNames::getDoubleTypeName() || type == ot::TypeNames::getFloatTypeName();
+			if (dataTypeCompatible)
+			{
+				const std::string firstValue = valueStr.substr(1, posDelimiter - 1);
+				const std::string secondValue = valueStr.substr(posDelimiter + 1, valueStr.size()-1);
+
+				ot::Variable vFirstValue(converter(firstValue));
+				ot::Variable vSecondValue(converter(secondValue));
+
+				std::string correspondingComparator;
+				if (openingBracket == '(')
+				{
+					correspondingComparator = ">";
+				}
+				else
+				{
+					correspondingComparator = ">=";
+				}
+				
+				auto firstCompare = builder.CreateComparison(correspondingComparator, vFirstValue);
+
+				if (closingBracket == ')')
+				{
+					correspondingComparator = "<";
+				}
+				else
+				{
+					correspondingComparator = "<=";
+				}
+
+				auto secondCompare = builder.CreateComparison(correspondingComparator, vSecondValue);
+				auto intervalCompare = builder.ConnectWithAND({ firstCompare,secondCompare });
+				_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(intervalCompare)));
+
+			}
+			else
+			{
+				throw std::invalid_argument("Query for interval incorrect. The datatype of the selected field helds no numerical value.");
+			}
+
+			
+		}
+		else
+		{
+			throw std::invalid_argument("Query for interval incorrect. The interval to follow the english notation, e.g.: (2,3.5].");
+		}
+
+	}
+	else if (comparator != " ")
+	{
 		const std::string& name = definition.getName();
 		const std::string& valueStr = definition.getValue();
 		const std::string& type = definition.getType();
@@ -216,6 +278,10 @@ void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition
 
 		auto compare = builder.CreateComparison(comparator, *value);
 		_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
+	}
+	else
+	{
+		return;
 	}
 }
 

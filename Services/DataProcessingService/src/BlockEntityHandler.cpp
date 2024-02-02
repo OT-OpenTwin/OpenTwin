@@ -151,6 +151,7 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	if (dbaBlock != nullptr)
 	{
 		auto comparators = AdvancedQueryBuilder::getComparators();
+		comparators.push_back(getQueryForRangeSelection());
 		comparators.push_back(" ");
 		dbaBlock->createProperties(comparators);
 	}
