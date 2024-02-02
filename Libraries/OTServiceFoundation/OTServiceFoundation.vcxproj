@@ -191,6 +191,7 @@
     <ClCompile Include="src\ApplicationBase.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
+    <ClCompile Include="src\Encryption.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
     <ClCompile Include="src\Dispatcher.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="include\OTServiceFoundation\BusinessLogicHandler.h" />
     <ClInclude Include="include\OTServiceFoundation\ContextMenu.h" />
     <ClInclude Include="include\OTServiceFoundation\Dispatcher.h" />
+    <ClInclude Include="include\OTServiceFoundation\Encryption.h" />
     <ClInclude Include="include\OTServiceFoundation\EntityInformation.h" />
     <ClInclude Include="include\OTServiceFoundation\ExternalServicesComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\FoundationAPIExport.h" />
