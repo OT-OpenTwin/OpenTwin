@@ -45,6 +45,9 @@
     <ClCompile Include="src\Application.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActionHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">
@@ -90,6 +93,9 @@
       <Filter>include\DataHandling</Filter>
     </ClInclude>
     <ClInclude Include="include\Application.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ActionHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

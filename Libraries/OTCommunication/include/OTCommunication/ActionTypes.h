@@ -218,15 +218,13 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges "UI.VIEW.SelectRanges"
 
 #define OT_ACTION_CMD_PYTHON_EXECUTE "Python.Execute"
+#define OT_ACTION_CMD_PYTHON_EXECUTE_Scripts "Python.Execute.Scripts"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS "Python.Execute.Results"
 #define OT_ACTION_CMD_PYTHON_Scripts "Python.Scripts"
 #define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
 #define OT_ACTION_CMD_PYTHON_Result "Python.Result"
 #define OT_ACTION_CMD_PYTHON_Portdata_Names "Python.Portdata.Names"
 #define OT_ACTION_CMD_PYTHON_Portdata_Data "Python.Portdata.Data"
-
-#define OT_ACTION_CMD_PYTHON_Request_Initialization "Python.Request.Initialize"
-#define OT_ACTION_CMD_PYTHON_Initialization "Python.Initialize"
 
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker "UI.GraphicsPicker.Fill"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor "UI.GraphicsEditor.Create"

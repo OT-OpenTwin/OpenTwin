@@ -60,6 +60,8 @@ ot::JsonDocument ot::PythonServiceInterface::AssembleMessage()
 		}
 	}
 
+	_scriptNamesWithParameter.clear();
+
 	if (_portDataByPortName.size() > 0)
 	{
 		ot::JsonArray portDataEntries;
@@ -82,12 +84,13 @@ ot::JsonDocument ot::PythonServiceInterface::AssembleMessage()
 		}
 		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Data, portDataEntries, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Names, portDataNames,doc.GetAllocator());
+		_portDataByPortName.clear();
 	}
 
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, doc.GetAllocator()), doc.GetAllocator());
 	
 	return doc;
 }

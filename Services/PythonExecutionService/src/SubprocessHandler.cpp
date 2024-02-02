@@ -10,12 +10,12 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName)
 	_subprocessPath = FindSubprocessPath() + _executableName;
 	InitiateProcess();
 #ifdef _DEBUG
-	OT_LOG_D("Debug");
-	_subProcess.start();
-	bool processStarted = _subProcess.waitForStarted(_timeoutSubprocessStart);
-	_socket.connectToServer(_serverName.c_str());
+
+	_socket.connectToServer("TestServer");
 	bool connected = _socket.waitForConnected(-1);
 	assert(connected);
+	_initialConnectionEstablished = true;
+	InitialiseSubprocess();
 #else
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
@@ -204,16 +204,19 @@ ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 	
 }
 
-void SubprocessHandler::setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID)
+void SubprocessHandler::setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID, int sessionID, int serviceID)
 {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_DataBase, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString( siteID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(psw, doc.GetAllocator()), doc.GetAllocator());
+	
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, sessionID,doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, serviceID, doc.GetAllocator());
 	_initialisationRoutines.push_back(doc.toJson());
 	_initialisationPrepared = _initialisationRoutines.size() == _numberOfInitialisationRoutines;
 	InitialiseSubprocess();
@@ -223,7 +226,7 @@ void SubprocessHandler::ModelComponentWasSet()
 {
 	const std::string url = _modelComponent->serviceURL();
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
 	_initialisationRoutines.push_back(doc.toJson());
@@ -235,7 +238,7 @@ void SubprocessHandler::UIComponentWasSet()
 {
 	const std::string url = _uiComponent->serviceURL();
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
 	_initialisationRoutines.push_back(doc.toJson());
@@ -246,7 +249,7 @@ void SubprocessHandler::UIComponentWasSet()
 void SubprocessHandler::SetPythonPath()
 {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(_pythonModulePath, doc.GetAllocator()), doc.GetAllocator());
 

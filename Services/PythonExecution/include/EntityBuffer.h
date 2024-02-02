@@ -10,7 +10,7 @@
 #include "EntityBase.h"
 #include <string>
 #include <memory>
-#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ModelServiceAPI.h"
 #include "EntityResultTable.h"
 #include "ClassFactory.h"
 
@@ -24,7 +24,7 @@ public:
 		static EntityBuffer instance;
 		return instance;
 	} 
-	void setModelComponent(ot::components::ModelComponent* modelComponent) { _modelComponent = modelComponent; };
+	void setModelServiceAPI(ot::ModelServiceAPI* modelServiceAPI) { _modelServiceAPI = modelServiceAPI; };
 
 	PyObject* GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName);
 	PyObject* GetTableCellValue(const std::string& absoluteEntityName, int32_t row, int32_t column);
@@ -40,7 +40,7 @@ private:
 	std::map<std::string, std::shared_ptr<EntityResultTable<std::string>>> _bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> _bufferedEntityProperties;
 
-	ot::components::ModelComponent* _modelComponent = nullptr;
+	ot::ModelServiceAPI* _modelServiceAPI = nullptr;
 	void EnsurePropertyToBeLoaded(const std::string& absoluteEntityName, const std::string& propertyName);
 	void EnsureTableToBeLoaded(const std::string& absoluteEntityName);
 	std::shared_ptr<EntityBase> LoadEntity(const std::string& absoluteEntityName);

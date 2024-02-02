@@ -23,7 +23,7 @@ PythonAPI::PythonAPI()
 ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet)
 {
 	EnsureScriptsAreLoaded(scripts);
-	EntityBuffer::INSTANCE().setModelComponent(Application::instance()->modelComponent());
+	EntityBuffer::INSTANCE().setModelServiceAPI(&Application::instance()->ModelServiceAPI());
 	auto currentParameterSet = parameterSet.begin();
 	
 	PythonObjectBuilder pyObBuilder;
@@ -54,8 +54,8 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 
 	scripts.unique();
 	std::list<ot::EntityInformation> entityInfos;
-	auto modelComponent = Application::instance()->modelComponent();
-	modelComponent->getEntityInformation(scripts, entityInfos);
+	auto modelComponent = Application::instance()->ModelServiceAPI();
+	modelComponent.getEntityInformation(scripts, entityInfos);
 	
 	if (entityInfos.size() != scripts.size())
 	{
@@ -98,8 +98,8 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 
 void PythonAPI::LoadScipt(ot::EntityInformation& entityInformation)
 {
-	auto modelComponent = Application::instance()->modelComponent();
-	auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), Application::instance()->getClassFactory());
+	auto modelComponent = Application::instance()->ModelServiceAPI();
+	auto baseEntity = modelComponent.readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), Application::instance()->getClassFactory());
 	std::unique_ptr<EntityFile> script(dynamic_cast<EntityFile*>(baseEntity));
 	auto plainData = script->getData()->getData();
 	std::string execution(plainData.begin(), plainData.end());

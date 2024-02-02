@@ -17,7 +17,7 @@ public:
 	~SubprocessHandler();
 	ot::ReturnMessage Send(const std::string& message);
 	
-	void setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID);
+	void setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID, int sessionID, int serviceID);
 
 private:
 	std::string _serverName;

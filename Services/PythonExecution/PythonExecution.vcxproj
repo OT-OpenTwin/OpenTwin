@@ -275,6 +275,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
@@ -286,6 +287,7 @@
     <ClCompile Include="src\PythonWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\CPythonObjectBorrowed.h" />

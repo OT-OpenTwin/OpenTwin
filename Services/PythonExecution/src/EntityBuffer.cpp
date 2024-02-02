@@ -41,8 +41,8 @@ void EntityBuffer::SaveChangedEntities()
 		topoEntVersion.push_back(entity->getEntityStorageVersion());
 		forceVis.push_back(false);
 	}
-	_modelComponent->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
-	_modelComponent->updatePropertyGrid();
+	_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+	_modelServiceAPI->updatePropertyGrid();
 }
 
 bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
@@ -55,7 +55,7 @@ bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
 		std::list<bool> forceVis;
 		topoEntID.push_back(entity->getEntityID());
 		topoEntVersion.push_back(entity->getEntityStorageVersion());
-		_modelComponent->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+		_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
 		return true;
 	}
 	return false;
@@ -107,12 +107,12 @@ std::shared_ptr<EntityBase> EntityBuffer::LoadEntity(const std::string& absolute
 	{
 		ot::EntityInformation entityInfo;
 
-		_modelComponent->getEntityInformation(absoluteEntityName, entityInfo);
+		_modelServiceAPI->getEntityInformation(absoluteEntityName, entityInfo);
 		if (entityInfo.getName() == "")
 		{
 			throw std::exception(("Requested entity " + absoluteEntityName + " does not exist.").c_str());
 		}
-		EntityBase* entity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
+		EntityBase* entity = _modelServiceAPI->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 		_bufferedEntities[absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return _bufferedEntities[absoluteEntityName];
