@@ -105,6 +105,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
+	_item->getRootItem()->getQGraphicsItem()->setZValue(1);
 	_item->setGraphicsScene(m_scene);
 }
 
@@ -128,6 +129,7 @@ void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest,
 	m_scene->addItem(newConnection);
 	//newConnection->setGraphicsScene(m_scene);
 	newConnection->connectItems(_origin, _dest);
+	newConnection->setZValue(0);
 
 	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
 	m_connections.insert_or_assign(itmKey, newConnection);
