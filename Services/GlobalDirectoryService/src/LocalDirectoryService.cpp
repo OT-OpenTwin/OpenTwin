@@ -107,8 +107,6 @@ void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 					doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.id(), doc.GetAllocator()), doc.GetAllocator());
 					doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_session.sessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-					OT_LOG_D("xxxxx..... DEBUG: 1.start");
-
 					// Send message and check response
 					std::string response;
 					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
@@ -117,8 +115,6 @@ void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {
 						OT_LOG_E("Invalid response when sending session closed notification to LDS at " + m_serviceURL);
 					}
-
-					OT_LOG_D("xxxxx..... DEBUG: 1.end");
 				}
 
 				// Erase entry

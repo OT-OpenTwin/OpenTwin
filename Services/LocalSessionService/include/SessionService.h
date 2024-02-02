@@ -180,6 +180,8 @@ private:
 	OT_HANDLER(handleRegisterNewGlobalDirectoryService, SessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleServiceStartupFailed, SessionService, OT_ACTION_CMD_ServiceStartupFailed, ot::SECURE_MESSAGE_TYPES);
 
+	void workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId);
+
 	std::string									m_dataBaseURL;						//! The database IP address
 	std::string									m_siteID;							//! The site ID
 	std::string									m_serviceAuthorisationURL;			//! The authorization service IP address

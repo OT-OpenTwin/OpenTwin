@@ -736,46 +736,11 @@ std::string SessionService::handleMessage(ot::JsonDocument& _commandDoc) {
 
 std::string SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
 {
-	m_masterLock.lock();
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
-	// Get service info
-	Session * theSession = getSession(sessionID);
-	Service * theService = theSession->getService(serviceID);
-	std::string senderServiceName("<No service name>");
-	if (theService) {
-		senderServiceName = theService->name();
-		theService->setReceiveBroadcastMessages(false);
-	}
-	// Notify GDS
-	m_globalDirectoryService->notifySessionClosed(sessionID);
-
-#ifdef OT_USE_GSS
-	// Notify GSS
-	ot::JsonDocument gssShutdownDoc;
-	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(sessionID, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 	
-	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->serviceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
-		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->serviceURL() + "\"");
-	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_globalSessionService->serviceURL() + "\"");
-	}
-
-#endif
-	// Close service
-	serviceClosing(theService, false, false);
-
-	// Close session
-	theSession->shutdown(nullptr);
-	removeSession(theSession);
-
-	// Show info log
-	OT_LOG_D("The session with the ID \"" + sessionID + 
-		"\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
-	m_masterLock.unlock();
+	std::thread t(&SessionService::workerShutdownSession, this, serviceID, sessionID);
+	t.detach();
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -1033,4 +998,45 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	m_masterLock.unlock();
 
 	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
+	m_masterLock.lock();
+	// Get service info
+	Session* theSession = getSession(_sessionId);
+	Service* theService = theSession->getService(_serviceId);
+	std::string senderServiceName("<No service name>");
+	if (theService) {
+		senderServiceName = theService->name();
+		theService->setReceiveBroadcastMessages(false);
+	}
+	// Notify GDS
+	m_globalDirectoryService->notifySessionClosed(_sessionId);
+
+#ifdef OT_USE_GSS
+	// Notify GSS
+	ot::JsonDocument gssShutdownDoc;
+	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionId, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send(url(), m_globalSessionService->serviceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
+		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->serviceURL() + "\"");
+	}
+	if (response != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_globalSessionService->serviceURL() + "\"");
+	}
+
+#endif
+	// Close service
+	serviceClosing(theService, false, false);
+
+	// Close session
+	theSession->shutdown(nullptr);
+	removeSession(theSession);
+
+	// Show info log
+	OT_LOG_D("The session with the ID \"" + _sessionId +
+		"\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
+	m_masterLock.unlock();
 }
