@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -20,9 +21,9 @@ namespace ot {
 	class OT_GUI_API_EXPORT NavigationTreeItem : public ot::Serializable {
 	public:
 		NavigationTreeItem();
-		NavigationTreeItem(const std::string& _text);
-		NavigationTreeItem(const std::string& _text, const std::string& _iconName, const std::string& _iconPath);
-		NavigationTreeItem(const std::string& _text, const std::string& _iconName, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems);
+		NavigationTreeItem(const std::string& _text, ot::NavigationItemFlag _flags = ot::NoNavigationItemFlags);
+		NavigationTreeItem(const std::string& _text, const std::string& _iconPath, ot::NavigationItemFlag _flags = ot::NoNavigationItemFlags);
+		NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, ot::NavigationItemFlag _flags = ot::NoNavigationItemFlags);
 		NavigationTreeItem(const NavigationTreeItem& _other);
 		virtual ~NavigationTreeItem();
 
@@ -41,9 +42,6 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string text(void) const { return m_text; };
 
-		void setIconName(const std::string& _iconName) { m_iconName = _iconName; };
-		const std::string& iconName(void) const { return m_iconName; };
-
 		void setIconPath(const std::string& _iconPath) { m_iconPath = _iconPath; };
 		const std::string& iconPath(void) const { return m_iconPath; };
 
@@ -51,11 +49,15 @@ namespace ot {
 		void setChildItems(const std::list<NavigationTreeItem>& _items) { m_childs = _items; };
 		const std::list<NavigationTreeItem>& childItems(void) const { return m_childs; };
 
+		void setFlags(NavigationItemFlag _flags) { m_flags = _flags; };
+		NavigationItemFlag flags(void) const { return m_flags; };
+
 	private:
 		std::string m_text;
-		std::string m_iconName;
 		std::string m_iconPath;
 		std::list<NavigationTreeItem> m_childs;
+		NavigationItemFlag m_flags;
+
 	};
 
 }
