@@ -59,9 +59,14 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
-	if (_action == OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY_NEEDED)
+	if (_action == OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED)
 	{
-		uploadAndCopyNeeded(_doc);
+		uploadNeeded(_doc);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_FILES_UPLOADED)
+	{
+		filesUploaded(_doc);
 		return "";
 	}
 
@@ -192,7 +197,7 @@ void Application::importProject(void)
 	uiComponent()->sendMessage(true, doc);
 }
 
-void Application::uploadAndCopyNeeded(ot::JsonDocument& _doc)
+void Application::uploadNeeded(ot::JsonDocument& _doc)
 {
 	size_t count = ot::json::getInt64(_doc, OT_ACTION_PARAM_COUNT);
 
@@ -205,9 +210,51 @@ void Application::uploadAndCopyNeeded(ot::JsonDocument& _doc)
 	}
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	
+	uiComponent()->sendMessage(true, doc);
+}
+
+void Application::filesUploaded(ot::JsonDocument& _doc)
+{
+	std::string changeMessage = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
+
+	std::list<std::string> modifiedNameList = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Name);
+	std::list<ot::UID> fileEntityIDList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityID);
+	std::list<ot::UID> fileVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersion);
+	std::list<ot::UID> dataEntityIDList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataID);
+	std::list<ot::UID> dataVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataVersion);
+
+	std::list<std::string> deletedNameList = ot::json::getStringList(_doc, OT_ACTION_CMD_MODEL_DeleteEntity);
+
+	// Now we need to send the model change to the model service 
+
+	modelComponent()->clearNewEntityList();
+
+	for (auto item : modifiedNameList)
+	{
+		ot::UID fileEntityID = fileEntityIDList.front(); fileEntityIDList.pop_front();
+		ot::UID fileVersion  = fileVersionList.front();  fileVersionList.pop_front();
+		ot::UID dataEntityID = dataEntityIDList.front(); dataEntityIDList.pop_front();
+		ot::UID dataVersion  = dataVersionList.front();  dataVersionList.pop_front();
+
+		modelComponent()->addNewTopologyEntity(fileEntityID, fileVersion, false);
+		modelComponent()->addNewDataEntity(dataEntityID, dataVersion, fileEntityID);
+	}
+
+	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
+
+	m_modelComponent->storeNewEntities(changeMessage);
+
+	// Determine the new version
+	std::string newVersion = m_modelComponent->getCurrentModelVersion();
+
+	// Finally we send the new version to the frontend 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COPY, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc.GetAllocator()), doc.GetAllocator());
+
 	uiComponent()->sendMessage(true, doc);
 }

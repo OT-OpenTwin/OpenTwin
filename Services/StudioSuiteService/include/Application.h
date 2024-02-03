@@ -113,8 +113,9 @@ public:
 	void EnsureVisualizationModelIDKnown(void);
 
 private:
-	void uploadAndCopyNeeded(ot::JsonDocument& _doc);
-
+	void uploadNeeded(ot::JsonDocument& _doc);
+	void filesUploaded(ot::JsonDocument& _doc);
+	
 	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
 

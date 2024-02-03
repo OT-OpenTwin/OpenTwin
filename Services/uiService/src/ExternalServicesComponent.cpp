@@ -3030,12 +3030,19 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
 				workerThread.detach();
 			}
-			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY) {
+			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD) {
 
 				std::list<ot::UID> entityIDList = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 				std::list<ot::UID> entityVersionList = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
 
-				std::thread workerThread(StudioSuiteConnectorAPI::uploadAndCopyFiles, entityIDList, entityVersionList);
+				std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList);
+				workerThread.detach();
+			}
+			else if (action == OT_ACTION_CMD_UI_SS_COPY) {
+
+				std::string newVersion = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
+
+				std::thread workerThread(StudioSuiteConnectorAPI::copyFiles, newVersion);
 				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_EntitySelectionDialog) {

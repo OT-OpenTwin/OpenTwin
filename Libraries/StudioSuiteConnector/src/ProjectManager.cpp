@@ -6,6 +6,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 
+#include "EntityBinaryData.h"
+#include "EntityFile.h"
+#include "DataBase.h"
+
 #include <filesystem>
 #include <algorithm>
 #include <chrono>
@@ -30,8 +34,12 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		projectName.clear();
 		baseProjectName.clear();
 		cacheFolderName.clear();
+		newOrModifiedFiles.clear();
+		dependentDataFiles.clear();
+		deletedFiles.clear();
 
 		projectName = prjName;
+		changeMessage = "Import CST Studio Suite project";
 
 		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
@@ -55,8 +63,8 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		ProgressInfo::getInstance().setProgressValue(10);
 
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_AND_COPY_NEEDED, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_COUNT, uploadFileList.size(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
 
 		ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}
@@ -68,25 +76,42 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 	}
 }
 
-void ProjectManager::uploadAndCopyFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList)
+void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList)
 {
 	ProgressInfo::getInstance().setProgressValue(10);
 
 	try
 	{
+		// Determine the project root folder
+		std::filesystem::path projectPath(baseProjectName);
+		std::string projectRoot = projectPath.parent_path().string();
+
 		// Upload files
-		uploadFiles(uploadFileList, entityIDList, entityVersionList);
+		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
 
 		// Create the new version
-		std::string newVersion = commitNewVersion();
+		commitNewVersion(changeMessage);
 
 		ProgressInfo::getInstance().setProgressValue(70);
+	}
+	catch (std::string& error)
+	{
+		ProgressInfo::getInstance().showError(error);
+	}
 
+	ProgressInfo::getInstance().setProgressState(false, "", false);
+	ProgressInfo::getInstance().unlockGui();
+}
+
+void ProjectManager::copyFiles(const std::string &newVersion)
+{
+	try
+	{
 		// Copy the files to the cache directory
 		copyCacheFiles(baseProjectName, newVersion, cacheFolderName);
 
 		// Store version information
-		writeVersionFile(projectName, newVersion, cacheFolderName);
+		writeVersionFile(baseProjectName, projectName, newVersion, cacheFolderName);
 
 		ProgressInfo::getInstance().setProgressValue(100);
 		ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been imported successfully.");
@@ -138,10 +163,13 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 	// Now add the content of the results folder
 	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(baseProjectName + "/Result"))
 	{
-		path = dirEntry.path().string();
-		std::replace(path.begin(), path.end(), '\\', '/');
+		if (!dirEntry.is_directory())
+		{
+			path = dirEntry.path().string();
+			std::replace(path.begin(), path.end(), '\\', '/');
 
-		uploadFiles.push_back(path);
+			uploadFiles.push_back(path);
+		}
 	}
 
 	return uploadFiles;
@@ -185,22 +213,114 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 	}
 }
 
-void ProjectManager::writeVersionFile(const std::string& projectName, const std::string& newVersion, const std::string& cacheFolderName)
+void ProjectManager::writeVersionFile(const std::string& baseProjectName, const std::string& projectName, const std::string& newVersion, const std::string& cacheFolderName)
 {
 	VersionFile version(std::string(cacheFolderName + "/version.info"));
-
-	version.write(projectName, newVersion);
+	version.write(baseProjectName, projectName, newVersion);
 }
 
-void ProjectManager::uploadFiles(std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)
+void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList)
 {
+	size_t dataSize = 0;
 
+	DataBase::GetDataBase()->queueWriting(true);
 
+	for (auto file : uploadFileList)
+	{
+		ot::UID dataEntityID = entityIDList.front(); entityIDList.pop_front();
+		ot::UID fileEntityID = entityIDList.front(); entityIDList.pop_front();
+
+		ot::UID dataVersion = entityVersionList.front(); entityVersionList.pop_front();
+		ot::UID fileVersion = entityVersionList.front(); entityVersionList.pop_front();
+
+		// add the file to the list of modified files
+		newOrModifiedFiles[file] = std::pair<ot::UID, ot::UID>(fileEntityID, fileVersion);
+		dependentDataFiles[file] = std::pair<ot::UID, ot::UID>(dataEntityID, dataVersion);
+
+		// upload the binary data entity
+		EntityBinaryData *dataEntity = new EntityBinaryData(dataEntityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+
+		std::ifstream dataFile(file, std::ios::binary | std::ios::ate);
+
+		std::streampos size = dataFile.tellg();
+
+		char *memBlock = new char[size];
+		dataFile.seekg(0, std::ios::beg);
+		dataFile.read(memBlock, size);
+		dataFile.close();
+
+		dataSize = size;
+
+		dataEntity->setData(memBlock, size);
+		dataEntity->StoreToDataBase(dataVersion);
+
+		delete dataEntity;
+		dataEntity = nullptr;
+
+		delete[] memBlock;
+		memBlock = nullptr;
+
+		// Upload the file entity
+		EntityFile* fileEntity = new EntityFile(fileEntityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+
+		std::string pathName = file.substr(projectRoot.size() + 1);
+		std::filesystem::path filePath(pathName);
+
+		fileEntity->setName("Files/" + pathName);
+		fileEntity->setFileProperties(pathName, filePath.filename().string(), "Absolute");
+		fileEntity->setData(dataEntityID, dataVersion);
+		fileEntity->setEditable(false);
+
+		fileEntity->StoreToDataBase(fileVersion);
+
+		delete fileEntity;
+		fileEntity = nullptr;
+
+		if (dataSize > 100000000)
+		{
+			// We have more than 100 MB since the last store
+			DataBase::GetDataBase()->flushWritingQueue();
+			dataSize = 0;
+		}
+	}
+
+	DataBase::GetDataBase()->queueWriting(false);
 }
 
-std::string ProjectManager::commitNewVersion(void)
+void ProjectManager::commitNewVersion(const std::string &changeMessage)
 {
-	return "1.0.0";
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_FILES_UPLOADED, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(changeMessage, doc.GetAllocator()), doc.GetAllocator());
+
+	// add the list of new files and modified files together with the entityID and versions
+	std::list<std::string> fileNameList;
+	std::list<ot::UID> fileEntityIDList;
+	std::list<ot::UID> fileVersionList;
+	std::list<ot::UID> dataEntityIDList;
+	std::list<ot::UID> dataVersionList;
+
+	for (auto item : newOrModifiedFiles)
+	{
+		fileNameList.push_back(item.first);
+		fileEntityIDList.push_back(item.second.first);
+		fileVersionList.push_back(item.second.second);
+
+		dataEntityIDList.push_back(dependentDataFiles[item.first].first);
+		dataVersionList.push_back(dependentDataFiles[item.first].second);
+	}
+
+	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonArray(fileNameList, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, ot::JsonArray(fileEntityIDList, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, ot::JsonArray(fileVersionList, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_DataID, ot::JsonArray(dataEntityIDList, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, ot::JsonArray(dataVersionList, doc.GetAllocator()), doc.GetAllocator());
+
+	// add the list of deleted files
+	doc.AddMember(OT_ACTION_CMD_MODEL_DeleteEntity, ot::JsonArray(deletedFiles, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }
 
 
