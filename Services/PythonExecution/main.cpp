@@ -1,7 +1,6 @@
 #include <QtWidgets/qapplication.h>
 #include <QtWidgets/qmainwindow.h>
 
-#include <QtNetwork/qlocalserver.h>
 #include <QtNetwork/qlocalsocket.h>
 #include <QtCore/qeventloop.h>
 #include <QtCore/qobject.h>
@@ -9,17 +8,18 @@
 #include "OTCore/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-
+#include <thread>
 
 #undef slots
 #include "ActionHandler.h"
 #define slots Q_SLOTS
 
-QLocalSocket* _socket = nullptr;
+QLocalSocket _socket;
 ActionHandler _actionHandler;
 
 int _socketConnectionTimeout = 60000; //60 seconds
-
+int _numberOfServerConnectionTrials = 30;
+int _secondsUntilSearchForServer = 1;
 
 ot::ReturnMessage HandleMessage(ot::JsonDocument& message)
 {
@@ -29,16 +29,16 @@ ot::ReturnMessage HandleMessage(ot::JsonDocument& message)
 
 void Send(const std::string& message)
 {
-	_socket->write(message.c_str());
-	_socket->flush();
-	bool allIsWritten = _socket->waitForBytesWritten(-1);
+	_socket.write(message.c_str());
+	_socket.flush();
+	bool allIsWritten = _socket.waitForBytesWritten(-1);
 }
 
 void MessageReceived()
 {
-	if(_socket->canReadLine())
+	if(_socket.canReadLine())
 	{
-		const std::string message(_socket->readLine().data());
+		const std::string message(_socket.readLine().data());
 
 		ot::JsonDocument document;
 		document.fromJson(message);
@@ -68,23 +68,33 @@ int main(int argc, char* argv[], char* envp[])
 	ot::ServiceLogNotifier::initialize("PythonSubprocess", "", false);
 #endif // _DEBUG
 
-	QLocalServer _server;
-	OT_LOG_D("Starting subservice with server: " + serverName);
-	bool success = _server.listen(serverName.c_str());
-	
-	bool connectionReceived = _server.waitForNewConnection(_socketConnectionTimeout);
-	if (!connectionReceived)
+	OT_LOG_D("Connecting subservice with server: " + serverName);
+	int count(0);
+	do
 	{
-		OT_LOG_E("Timeout while waiting for socket connection. Shutting down.");
+		std::this_thread::sleep_for(std::chrono::seconds(_secondsUntilSearchForServer));
+		_socket.connectToServer(serverName.c_str());
+		count++;
+
+	} while (_socket.error() == QLocalSocket::ServerNotFoundError && count < _numberOfServerConnectionTrials);
+	
+	if (_socket.state() == QLocalSocket::ConnectingState)
+	{
+		_socket.waitForConnected(_socketConnectionTimeout);
+	}
+	
+	if (_socket.state() != QLocalSocket::ConnectedState)
+	{
+		auto socketError = _socket.errorString();
+		OT_LOG_E("Error while trying to connect to PYthon Service: " + socketError.toStdString());
+		OT_LOG_E("Shutting down");
 		exit(0);
 	}
-	_socket = _server.nextPendingConnection();
-	_socket->waitForConnected();
 	OT_LOG_D("Connected with socket");
 
 	QEventLoop loop;
-	QObject::connect(_socket, &QLocalSocket::readyRead, &loop, &MessageReceived);
-	QObject::connect(_socket, &QLocalSocket::disconnected, &loop, &DisConnect);
+	QObject::connect(&_socket, &QLocalSocket::readyRead, &loop, &MessageReceived);
+	QObject::connect(&_socket, &QLocalSocket::disconnected, &loop, &DisConnect);
 		
 	loop.exec();
 	return a.exec();

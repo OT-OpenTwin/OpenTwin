@@ -39,7 +39,8 @@ private:
 	const int _heartBeat = _timeoutSubprocessStart;
 
 	QProcess _subProcess;
-	QLocalSocket _socket;
+	QLocalServer _server;
+	QLocalSocket* _socket = nullptr;
 	
 	void ModelComponentWasSet() override;
 	void UIComponentWasSet() override;
@@ -50,13 +51,13 @@ private:
 	
 	void RunSubprocess();
 	bool StartProcess();
-	bool ConnectWithSubService();
+	void ConnectWithSubprocess();
 	void CloseSubprocess();
 	
 	bool SendSucceeded();
 	bool SubprocessResponsive(std::string& errorMessage);
-	bool ProcessErrorOccured(std::string& message);
-	bool SocketErrorOccured(std::string& message);
+	void ProcessErrorOccured(std::string& message);
+	void SocketErrorOccured(std::string& message);
 
 	void InitialiseSubprocess();
 

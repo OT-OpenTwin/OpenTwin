@@ -9,19 +9,15 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName)
 	
 	_subprocessPath = FindSubprocessPath() + _executableName;
 	InitiateProcess();
-#ifdef _DEBUG
 
-	_socket.connectToServer("TestServer");
-	bool connected = _socket.waitForConnected(-1);
-	assert(connected);
-	_initialConnectionEstablished = true;
-	InitialiseSubprocess();
-#else
+#ifdef _DEBUG
+	_serverName = "TestServer";
+#endif
+	_server.listen(_serverName.c_str());
+#ifndef _DEBUG
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
-
-#endif // DEBUG
-
+#endif
 }
 
 SubprocessHandler::~SubprocessHandler()
@@ -67,14 +63,8 @@ void SubprocessHandler::RunSubprocess()
 		}
 		OT_LOG_D("Python Subprocess started");
 
-		const bool connectionSuccessfull = ConnectWithSubService();
-		if (!connectionSuccessfull)
-		{
-			std::string message = "Connecting with Python Subprocess timeout.";
-			OT_LOG_E(message);
-			throw std::exception(message.c_str());
-		}
-		OT_LOG_D("Connection with Python Subprocess established");
+		ConnectWithSubprocess();
+		
 		_initialConnectionEstablished = true;
 		InitialiseSubprocess();
 	}
@@ -105,14 +95,12 @@ bool SubprocessHandler::StartProcess()
 			{
 				return true;
 			}
-			else
+			else if(_subProcess.error() != QProcess::Timedout)
 			{
 				std::string errorMessage;
-				if (ProcessErrorOccured(errorMessage))
-				{
-					errorMessage = "Error occured while starting Python Subservice: " + errorMessage;
-					throw std::exception(errorMessage.c_str());
-				}
+				ProcessErrorOccured(errorMessage);
+				errorMessage = "Error occured while starting Python Subservice: " + errorMessage;
+				throw std::exception(errorMessage.c_str());
 			}
 		}
 		else
@@ -126,46 +114,31 @@ bool SubprocessHandler::StartProcess()
 	
 }
 
-bool SubprocessHandler::ConnectWithSubService()
+void SubprocessHandler::ConnectWithSubprocess()
 {
-	bool connectionEstablished = false;
-	for (int i = 1; i <= _numberOfRetries; i++)
+	OT_LOG_D("Waiting for connection servername: " + _serverName);
+	bool connected = _server.waitForNewConnection(_timeoutServerConnect);
+	if (connected)
 	{
-		OT_LOG_D("Attempting connection with server: " + _serverName + " trial: " + std::to_string(i) + "/"+ std::to_string(_numberOfRetries));
-		_socket.connectToServer(_serverName.c_str());
-
-		auto socketState =_socket.state();
-		if (socketState == QLocalSocket::UnconnectedState || socketState == QLocalSocket::ClosingState)
+		_socket = _server.nextPendingConnection();
+		_socket->waitForConnected(_timeoutServerConnect);
+		connected = _socket->state() == QLocalSocket::ConnectedState;
+		if (connected)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(_timeoutServerConnect));
-		}
-		else if (socketState == QLocalSocket::ConnectingState)
-		{
-			connectionEstablished = _socket.waitForConnected(_timeoutServerConnect);
-			if (connectionEstablished)
-			{
-				OT_LOG_D("Connection with subservice established");
-				return connectionEstablished;
-			}
-			else
-			{
-				std::string errorMessage;
-				if (SocketErrorOccured(errorMessage))
-				{
-					errorMessage = "Error occured while connecting with Python Subservice: " + errorMessage;
-					throw std::exception(errorMessage.c_str());
-				}
-			}
+			OT_LOG_D("Connection with subservice established");
 		}
 		else
 		{
-			assert(socketState == QLocalSocket::ConnectedState);
-			OT_LOG_D("Connection with subservice established");
-			connectionEstablished = true;
-			return connectionEstablished;
+			std::string errorMessage;
+			SocketErrorOccured(errorMessage);
+			errorMessage = "Error occured while connecting with Python Subservice: " + errorMessage;
+			throw std::exception(errorMessage.c_str());
 		}
 	}
-	return connectionEstablished;
+	else
+	{
+		throw std::exception("Timout while waiting for subprocess to connect with server.");
+	}
 }
 
 ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
@@ -185,9 +158,9 @@ ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 		RunSubprocess();
 	}
 	const std::string messageAsLine = message + "\n";
-	_socket.write(messageAsLine.c_str());
-	_socket.flush();
-	bool allIsWritten = _socket.waitForBytesWritten(_timeoutSendingMessage);
+	_socket->write(messageAsLine.c_str());
+	_socket->flush();
+	bool allIsWritten = _socket->waitForBytesWritten(_timeoutSendingMessage);
 
 	if (!SendSucceeded())
 	{
@@ -195,7 +168,7 @@ ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 		return Send(message);
 	}
 
-	const std::string returnString(_socket.readLine().data());
+	const std::string returnString(_socket->readLine().data());
 
 	ot::ReturnMessage returnMessage;
 	returnMessage.fromJson(returnString);
@@ -262,13 +235,15 @@ bool SubprocessHandler::SubprocessResponsive(std::string& errorMessage)
 #ifndef _DEBUG
 	if (_subProcess.state() != QProcess::Running)
 	{
-		subProcessResponsive &= !ProcessErrorOccured(errorMessage);
+		subProcessResponsive = false;
+		ProcessErrorOccured(errorMessage);
 	}
 #endif // _DEBUG
 
-	if (!_socket.isValid())
+	if (!_socket->isValid())
 	{
-		subProcessResponsive &= !SocketErrorOccured(errorMessage);
+		subProcessResponsive = false;
+		SocketErrorOccured(errorMessage);
 	}
 	return subProcessResponsive;
 }
@@ -295,9 +270,8 @@ void SubprocessHandler::InitialiseSubprocess()
 
 void SubprocessHandler::CloseSubprocess()
 {
-	_socket.close();
-	_socket.waitForDisconnected(_timeoutServerConnect);
-	_subProcess.kill();
+	_socket->close();
+	_socket->waitForDisconnected(_timeoutServerConnect);
 	_subProcess.waitForFinished(_timeoutSubprocessStart);
 	OT_LOG_D("Closed Python Subprocess");
 }
@@ -305,9 +279,9 @@ void SubprocessHandler::CloseSubprocess()
 
 bool SubprocessHandler::SendSucceeded()
 {
-	while (!_socket.canReadLine())
+	while (!_socket->canReadLine())
 	{
-		bool receivedMessage = _socket.waitForReadyRead(_heartBeat);
+		bool receivedMessage = _socket->waitForReadyRead(_heartBeat);
 		if (!receivedMessage)
 		{
 			std::string errorMessage;
@@ -324,149 +298,12 @@ bool SubprocessHandler::SendSucceeded()
 }
 
 
-bool SubprocessHandler::ProcessErrorOccured(std::string& message)
+void SubprocessHandler::ProcessErrorOccured(std::string& message)
 {
-	const auto error = _subProcess.error();
-	bool errorOccured = true;
-	if (error == QProcess::FailedToStart)
-	{
-		message = "The process failed to start. Either the invoked program is missing, or you may have insufficient permissions or resources to invoke the program.\n";
-	}
-	else if (error == QProcess::Crashed)
-	{
-		message = "The process crashed some time after starting successfully.\n";
-	}
-	else if (error == QProcess::Timedout)
-	{
-		//The last waitFor...() function timed out.The state of QProcess is unchanged, and you can try calling waitFor...() again.
-		errorOccured = false;
-	}
-	else if (error == QProcess::WriteError)
-	{
-		message = "An error occurred when attempting to write to the process. For example, the process may not be running, or it may have closed its input channel.\n";
-	}
-	else if (error == QProcess::ReadError)
-	{
-		message = "An error occurred when attempting to read from the process. For example, the process may not be running.\n";
-	}
-	else if (error == QProcess::UnknownError)
-	{
-		message = "An unknown error occurred.\n";
-	}
-	else
-	{
-		assert(0);
-	}
-	return errorOccured;
+	message = _subProcess.errorString().toStdString();
 }
 
-bool SubprocessHandler::SocketErrorOccured(std::string& message)
+void SubprocessHandler::SocketErrorOccured(std::string& message)
 {
-	const auto error = _socket.error();
-	bool errorOccured = true;
-	if (error == QLocalSocket::ConnectionRefusedError)
-	{
-		message = "The connection was refused by the peer(or timed out).\n";
-
-	}
-	else if (error == QLocalSocket::PeerClosedError)
-	{
-		message = "The remote socket closed the connection.\n";
-			//Note that the client socket(i.e., this socket) will be closed after the remote close notification has been sent.";
-	}
-	else if (error == QLocalSocket::ServerNotFoundError)
-	{
-		message = "The local socket name was not found.\n";
-
-	}
-	else if (error == QLocalSocket::SocketAccessError)
-	{
-		message = "The socket operation failed because the application lacked the required privileges.\n";
-	}
-	else if (error == QLocalSocket::SocketResourceError)
-	{
-		message = "The local system ran out of resources(e.g., too many sockets).\n";
-	}
-	else if (error == QLocalSocket::SocketTimeoutError)
-	{
-		//The socket operation timed out.
-		errorOccured = false;
-	}
-	else if (error == QLocalSocket::DatagramTooLargeError)
-	{
-		message = "The datagram was larger than the operating system's limit (which can be as low as 8192 bytes).\n";
-	}
-	else if (error == QLocalSocket::ConnectionError)
-	{
-		message = "An error occurred with the connection.\n";
-	}
-	else if (error == QLocalSocket::UnsupportedSocketOperationError)
-	{
-		message = "The requested socket operation is not supported by the local operating system.\n";
-	}
-	else if (error == QLocalSocket::OperationError)
-	{
-		message = "An operation was attempted while the socket was in a state that did not permit it.\n";
-	}
-	else if (error == QLocalSocket::UnknownSocketError)
-	{
-		message = "An unidentified error occurred.\n";
-	}
-	else
-	{
-		assert(0);
-	}
-	return errorOccured;
+	message = _socket->errorString().toStdString();
 }
-
-//bool SubprocessHandler::SocketStateChanged(std::string& message)
-//{
-//	const auto state = _socket.state();
-//	bool socketInvalid = true;
-//	if (state == QLocalSocket::UnconnectedState)
-//	{
-//		message = "The socket is not connected.\n";
-//	}
-//	else if (state == QLocalSocket::ConnectingState)
-//	{
-//		message = "The socket has started establishing a connection.\n";
-//	}
-//	else if (state == QLocalSocket::ConnectedState)
-//	{
-//		//	A connection is established.
-//		socketInvalid = false;
-//	}
-//	else if (state == QLocalSocket::ClosingState)
-//	{
-//		message = "The socket is about to close (data may still be waiting to be written).\n";
-//	}
-//	else
-//	{
-//		assert(0);
-//	}
-//	return socketInvalid;
-//}
-
-//bool SubprocessHandler::ProcessStateChanged(std::string& message)
-//{
-//	const auto state = _subProcess.state();
-//	bool processInvalid = true;
-//	if (state == QProcess::NotRunning)
-//	{
-//		message = "The process is not running.\n";
-//	}
-//	else if (state == QProcess::Starting)
-//	{
-//		message = "The process is starting, but the program has not yet been invoked.\n";
-//	}
-//	else if (state == QProcess::Running)
-//	{
-//		//The process is running and is ready for reading and writing.
-//		processInvalid = false;
-//	}
-//	else
-//	{
-//		assert(0);
-//	}
-//	return processInvalid;
-//}
