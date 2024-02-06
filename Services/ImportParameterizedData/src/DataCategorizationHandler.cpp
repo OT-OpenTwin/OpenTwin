@@ -689,7 +689,14 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 		pythonScriptName++;
 	}
 	ot::ReturnMessage returnValue = _pythonInterface->SendExecutionOrder();
-	_uiComponent->displayMessage(returnValue.toJson());
+	if (returnValue.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
+	{
+		_uiComponent->displayMessage("Python execution succeeded.\n");
+	}
+	else
+	{
+		_uiComponent->displayMessage("Python execution failed due to error: " + returnValue.getWhat() + ".\n");
+	}
 }
 
 void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
