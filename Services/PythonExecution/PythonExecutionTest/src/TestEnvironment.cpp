@@ -5,19 +5,20 @@ TEST(Environment, EnvironmentIsSet)
 {
 	std::string envName = "OPENTWIN_DEV_ROOT";
 	const char* deploymentFolder = ot::os::getEnvironmentVariable(envName.c_str());
-	EXPECT_TRUE(std::string(deploymentFolder).size() != 0);
+	EXPECT_TRUE(deploymentFolder != nullptr);
 }
 
 TEST(Environment, PATH)
 {
-	std::string envName = "DebuggerArgs";
-	const char* deploymentFolder = ot::os::getEnvironmentVariable(envName.c_str());
-	EXPECT_TRUE(std::string(deploymentFolder).size() != 0);
+	std::string envName = "PATH";
+	const char* pathVar=ot::os::getEnvironmentVariable(envName.c_str());
+
+	EXPECT_TRUE(pathVar!= nullptr);
 }
 
 TEST(Environment, OT_ALL_DLLD)
 {
 	std::string envName = "OT_ALL_DLLD";
 	const char* deploymentFolder = ot::os::getEnvironmentVariable(envName.c_str());
-	EXPECT_TRUE(std::string(deploymentFolder).size() != 0);
+	EXPECT_TRUE(deploymentFolder != nullptr);
 }

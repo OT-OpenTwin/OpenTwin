@@ -45,8 +45,12 @@
 
 	private:
 		std::list<std::string> _pythonPath;
+		std::string _pythonRoot;
 		std::string _defaultSitePackagesPath;
 		bool _interpreterSuccessfullyInitialized = false;
+
+		std::string DeterminePythonRootDirectory();
+		std::string DeterminePythonSitePackageDirectory();
 
 		static void signalHandlerAbort(int sig);
 

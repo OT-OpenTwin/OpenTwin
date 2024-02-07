@@ -15,15 +15,16 @@
 #define slots Q_SLOTS
 
 QLocalSocket _socket;
-ActionHandler _actionHandler;
 
 int _socketConnectionTimeout = 60000; //60 seconds
 int _numberOfServerConnectionTrials = 30;
 int _secondsUntilSearchForServer = 1;
 
+ActionHandler* _actionHandler = nullptr;
+
 ot::ReturnMessage HandleMessage(ot::JsonDocument& message)
 {
-	ot::ReturnMessage returnMessage = _actionHandler.Handle(message);
+	ot::ReturnMessage returnMessage = _actionHandler->Handle(message);
 	return returnMessage;
 }
 
@@ -91,6 +92,8 @@ int main(int argc, char* argv[], char* envp[])
 		exit(0);
 	}
 	OT_LOG_D("Connected with socket");
+	
+	_actionHandler = new ActionHandler();
 
 	QEventLoop loop;
 	QObject::connect(&_socket, &QLocalSocket::readyRead, &loop, &MessageReceived);

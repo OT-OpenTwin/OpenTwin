@@ -263,7 +263,7 @@ TEST_F(FixturePythonWrapper, PythonImportNumpyWithoutExtendedPath)
 
 TEST_F(FixturePythonWrapper, PythonImportNumpyWithExtendedPath)
 {
-	AddNumpyToPath();
+	//Now numpy is contained in the default site-package folder
 	const std::string checkupScript = "import sys\n"
 		"path = sys.path\n";
 	ExecuteString(checkupScript, "__main__");

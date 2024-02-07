@@ -63,7 +63,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(PYTHON_INCR);$(MONGO_BOOST_ROOT);$(PYTHON_ROOT)\Lib\site-packages\numpy\core\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_PYTHON_INC_LEGACY);$(MONGO_BOOST_ROOT);$(OT_PYTHON_ROOT_LEGACY)\Lib\site-packages\numpy\core\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
@@ -73,7 +73,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(ZLIB_LIBPATHR);$(PYTHON_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_PYTHON_LIBPATH_LEGACY);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(ZLIB_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -88,7 +88,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(PYTHON_INCD);$(PYTHON_ROOT)\Lib\site-packages\numpy\core\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC_LEGACY);$(OT_PYTHON_ROOT_LEGACY)\Lib\site-packages\numpy\core\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,7 +96,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(ZLIB_LIBPATHD);$(PYTHON_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_PYTHON_LIBPATH_LEGACY);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(ZLIB_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

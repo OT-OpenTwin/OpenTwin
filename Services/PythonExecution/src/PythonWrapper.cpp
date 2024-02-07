@@ -2,26 +2,19 @@
 #include "PythonWrapper.h"
 #include "PythonObjectBuilder.h"
 #include "PythonExtension.h"
+#include "OTSystem/OperatingSystem.h"
 
 PythonWrapper::PythonWrapper()
 {
-	std::string pythonRoot;
-#ifdef _RELEASEDEBUG
-	pythonRoot = getenv("PYTHON310_ROOT");
-#else
-	pythonRoot = ".\\Python";
-#endif // RELEASEDEBUG
-	_pythonPath.push_back(pythonRoot);
-	_pythonPath.push_back(pythonRoot + "\\Lib");
-	_defaultSitePackagesPath = pythonRoot + "\\site-packages";
+	_pythonRoot = DeterminePythonRootDirectory();
+	OT_LOG_D("Setting Python root path: " + _pythonRoot);
+	_pythonPath.push_back(_pythonRoot);
+	_pythonPath.push_back(_pythonRoot + "\\Lib");
+	std::string sitePackageDirectory = DeterminePythonSitePackageDirectory();
+	_pythonPath.push_back(sitePackageDirectory);
+	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
 	signal(SIGABRT, &signalHandlerAbort);
 }
-
-//PythonWrapper* PythonWrapper::INSTANCE()
-//{
-//	static PythonWrapper instance;
-//	return &instance;
-//}
 
 PythonWrapper::~PythonWrapper()
 {
@@ -94,6 +87,50 @@ void PythonWrapper::AddToSysPath(const std::string& newPathComponent)
 	const std::string addToPythonPath = "import sys\n"
 		"sys.path.append(\""+newPathComponent+"\")\n";
 	Execute(addToPythonPath);
+}
+
+std::string PythonWrapper::DeterminePythonRootDirectory()
+{
+	std::string envName = "OT_PYTHON_ROOT";
+	const char*  pythonRoot = ot::os::getEnvironmentVariable(envName.c_str());
+	
+	if (pythonRoot == nullptr)
+	{
+		//Enduser execution from deployment folder
+		return ".\\Python";
+	}
+	return std::string(pythonRoot);
+}
+
+std::string PythonWrapper::DeterminePythonSitePackageDirectory()
+{
+	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
+	
+	const char * pythonSitePackagePath = ot::os::getEnvironmentVariable(envName.c_str());
+
+
+	std::string path;
+	if (pythonSitePackagePath == nullptr)
+	{
+		envName = "OT_PYTHON_ROOT";
+		const char* pythonRoot = ot::os::getEnvironmentVariable(envName.c_str());
+		if (pythonRoot == nullptr)
+		{
+			//Enduser execution from deployment folder
+			path = ".\\Python";
+		}
+		else
+		{
+			path = pythonRoot;
+			path += "\\Lib";
+		}
+		path += "\\site-packages";
+	}
+	else
+	{
+		path =(pythonSitePackagePath);
+	}
+	return path;
 }
 
 void PythonWrapper::signalHandlerAbort(int sig)
