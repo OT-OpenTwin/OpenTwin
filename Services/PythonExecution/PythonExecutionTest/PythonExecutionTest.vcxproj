@@ -20,6 +20,7 @@
     <ClCompile Include="src\TestPythonAPI.cpp" />
     <ClCompile Include="src\TestPythonObjectBuilder.cpp" />
     <ClCompile Include="src\TestsPythonWrapper.cpp" />
+    <ClCompile Include="src\Tets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixturePropertyPythonObjectInterface.h" />
@@ -57,12 +58,13 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);$(PYTHON310_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHR);$(PYTHON310_ROOT)\libs;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python310.lib;PythonExecution.lib;$(GOOGLE_TEST_LIB);BlockEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(GOOGLE_TEST_LIB);PythonExecution.lib;$(OT_DEFAULT_SERVICE_LIBD);python310.lib;BlockEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

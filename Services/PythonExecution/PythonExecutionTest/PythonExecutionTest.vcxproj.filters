@@ -9,6 +9,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Tets.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -21,6 +24,9 @@
     <ClCompile Include="src\FixturePythonWrapper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestEnvironment.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -31,9 +37,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TestsPythonWrapper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TestEnvironment.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
