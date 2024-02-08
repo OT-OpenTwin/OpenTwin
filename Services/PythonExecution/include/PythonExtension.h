@@ -45,20 +45,22 @@ namespace PythonExtensions
         PythonObjectBuilder pyObBuilder;
         std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         
-        std::optional<std::string> moduleName =  PythonLoadedModules::INSTANCE()->getModuleName(absoluteScriptName);
+
+        auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
+        ot::EntityInformation entityInfo(baseEntity.get());
+        std::optional<std::string> moduleName =  PythonLoadedModules::INSTANCE()->getModuleName(entityInfo);
         CPythonObjectNew moduleImported(nullptr);
 
         if (!moduleName.has_value())
         {
-            auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
             EntityFile* script = dynamic_cast<EntityFile*>(baseEntity.get());
             if (script == nullptr)
             {
                 throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");
             }
 
-            PythonLoadedModules::INSTANCE()->AddModuleForEntity(script);
-            moduleName = PythonLoadedModules::INSTANCE()->getModuleName(absoluteScriptName);
+            PythonLoadedModules::INSTANCE()->AddModuleForEntity(entityInfo);
+            moduleName = PythonLoadedModules::INSTANCE()->getModuleName(entityInfo);
 
             auto plainData = script->getData()->getData();
             std::string execution(plainData.begin(), plainData.end());

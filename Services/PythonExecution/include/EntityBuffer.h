@@ -29,9 +29,12 @@ public:
 	PyObject* GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName);
 	PyObject* GetTableCellValue(const std::string& absoluteEntityName, int32_t row, int32_t column);
 	void UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values);
+	std::shared_ptr<EntityBase> GetEntity (const std::string& absoluteEntityName);
+	
 	void SaveChangedEntities();
 	bool SaveChangedEntities(std::string absoluteEntityName);
-	std::shared_ptr<EntityBase> GetEntity (const std::string& absoluteEntityName);
+
+	void ClearBuffer();
 
 private:
 	EntityBuffer();
@@ -45,6 +48,5 @@ private:
 	void EnsureTableToBeLoaded(const std::string& absoluteEntityName);
 	std::shared_ptr<EntityBase> LoadEntity(const std::string& absoluteEntityName);
 
-	void ClearBuffer();
 
 };

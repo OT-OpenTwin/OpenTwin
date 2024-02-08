@@ -251,17 +251,7 @@ TEST_F(FixturePythonWrapper, PythonExtensionFunctionGetter)
 	EXPECT_EQ(result, "21");
 }
 
-TEST_F(FixturePythonWrapper, PythonImportNumpyWithoutExtendedPath)
-{
-	ResetPythonPath();
-	const std::string script = "import sys\n"
-		"print(sys.path)\n"
-		"import numpy\n";
-	EXPECT_ANY_THROW(ExecuteString(script, "someModule"));
-}
-
-
-TEST_F(FixturePythonWrapper, PythonImportNumpyWithExtendedPath)
+TEST_F(FixturePythonWrapper, PythonImportNumpy)
 {
 	//Now numpy is contained in the default site-package folder
 	const std::string checkupScript = "import sys\n"

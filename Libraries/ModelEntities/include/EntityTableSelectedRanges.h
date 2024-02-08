@@ -14,11 +14,11 @@ public:
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties(void) override;
 	void createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, bool selectEntireRow = false, bool selectEntireColumn = false);
-	void SetTableProperties(std::string tableName, ot::UID tableID, ot::UID tableVersion, std::string tableOrientation);
+	void SetTableProperties(std::string tableName, ot::UID tableID, std::string tableOrientation);
 
 	std::string getSelectedType();
-	const std::string getTableName() const { return _tableName; }
-	const std::string getTableOrientation() const { return _tableOrientation; }
+	const std::string getTableName();
+	const std::string getTableOrientation();
 	void getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t & leftColumn, uint32_t & rightColumn, std::shared_ptr<EntityParameterizedDataTable> referencedTable);
 	void getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t & leftColumn, uint32_t & rightColumn);
 	bool getConsiderForBatchprocessing();
@@ -28,22 +28,14 @@ public:
 
 	bool getPassOnScript();
 	std::string getScriptName();
-	void AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell);
+	void SetRange(uint32_t topRow, uint32_t bottomRow, uint32_t leftColumn, uint32_t rightColumn);
 
 private:
 
+	ot::UID _tableID = 0;
 	const std::string _propNameConsiderForBatchProcessing = "Consider for batching";
 	const std::string _propNamePassOnScript= "Pass on script";
 	const std::string _pythonScriptProperty = "Update script";
-	uint32_t _topCells = 0;
-	uint32_t _buttomCells = 0;
-	uint32_t _leftCells = 0;
-	uint32_t _rightCells = 0;
-
-	std::string _tableName = "";
-	std::string _tableOrientation = "";
-	ot::UID _tableID = -1;
-	ot::UID _tableVersion = -1;
 
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;

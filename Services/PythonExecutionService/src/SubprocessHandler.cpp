@@ -17,6 +17,11 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName)
 #ifndef _DEBUG
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
+#else
+	ConnectWithSubprocess();
+
+	_initialConnectionEstablished = true;
+	InitialiseSubprocess();
 #endif
 }
 

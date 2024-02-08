@@ -8,6 +8,7 @@
 #pragma once
 #include <map>
 #include <string>
+#include <set>
 #include <optional>
 
 class PythonLoadedModules
@@ -19,39 +20,43 @@ public:
 		return &instance;
 	}
 	
-	std::optional<std::string> getModuleName(const std::string& scriptName) 
+	std::optional<std::string> getModuleName(ot::EntityInformation& scriptEntityInfos) 
 	{
-		if (_moduleNamesByScriptName.find(scriptName) == _moduleNamesByScriptName.end())
+		bool found = false;
+		std::string moduleName = CreateUniqueModuleName(scriptEntityInfos);
+		for (std::string& name : _moduleNames)
+		{
+			if (moduleName == name)
+			{
+				found = true;
+				break;
+			}
+		}
+		
+		if(!found)
 		{
 			return {};
 		}
 		else
 		{
-			return _moduleNamesByScriptName[scriptName]; 
+			return moduleName;
 		}
 	}
-	std::string AddModuleForEntity(EntityBase* baseEntity)
+
+	std::string AddModuleForEntity(ot::EntityInformation& scriptEntityInfo)
 	{
-		std::string moduleName = CreateModuleName(baseEntity->getEntityID(), baseEntity->getEntityStorageVersion());
-		_moduleNamesByScriptName[baseEntity->getName()] = moduleName;
+		std::string moduleName = CreateUniqueModuleName(scriptEntityInfo);
+		_moduleNames.push_back(moduleName);
 		return moduleName;
 	};
-	std::string GetModuleName(ot::EntityInformation& entityInfo)
-	{
-		return CreateModuleName(entityInfo.getID(), entityInfo.getVersion());
-	}
-	void RemoveModule(const std::string& scriptName)
-	{
-		_moduleNamesByScriptName.erase(scriptName);
-	}
 
-private:
-	std::string CreateModuleName(ot::UID entityID, ot::UID entityVersion)
+	std::string CreateUniqueModuleName(ot::EntityInformation& entityInfo)
 	{
-		return std::to_string(entityID) + std::to_string(entityVersion);
+		return std::to_string(entityInfo.getID()) + std::to_string(entityInfo.getVersion());
 	}
-	
+private:
+
 	PythonLoadedModules() {};
-	std::map<std::string, std::string> _moduleNamesByScriptName;
+	std::list<std::string> _moduleNames;
 
 };

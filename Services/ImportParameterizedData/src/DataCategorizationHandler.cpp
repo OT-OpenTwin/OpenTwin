@@ -295,8 +295,21 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 		{
 			std::unique_ptr<EntityTableSelectedRanges> tableRange
 			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-			tableRange->AddRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
-			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getEntityStorageVersion(), tableEntPtr->getSelectedHeaderOrientationString());
+		
+			ot::EntityInformation entityInfo;
+			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
+			if (allScripts.size() > 0)
+			{
+				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+				tableRange->createProperties(_scriptFolder, _scriptFolderUID, entityInfo.getName(), entityInfo.getID());
+			}
+			else
+			{
+				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1);
+			}
+			
+			tableRange->SetRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
+			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(true);
 			std::string name = "";
 
@@ -333,17 +346,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			std::replace(name.begin(), name.end(), '/', '\\');
 			name =	CreateNewUniqueTopologyNamePlainPossible(categoryEntity->getName(), name, takenNames);
 			tableRange->setName(name);
-			ot::EntityInformation entityInfo;
-			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
-			if (allScripts.size() > 0)
-			{
-				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
-				tableRange->createProperties(_scriptFolder,_scriptFolderUID, entityInfo.getName(), entityInfo.getID());
-			}
-			else
-			{
-				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1);
-			}
+
 
 
 			tableRange->StoreToDataBase();
@@ -620,18 +623,22 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 
 			std::string postfix = selectionName.substr(position, selectionName.size());
 			std::string newSelectionName=	prefix + postfix;
+			
 			std::unique_ptr<EntityTableSelectedRanges> newSelection( new EntityTableSelectedRanges(_modelComponent->createEntityUID(),nullptr,nullptr,nullptr,nullptr,OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+			
 			newSelection->setName(newSelectionName);
 			ot::EntityInformation entityInfo;
 			_modelComponent->getEntityInformation(selection->getTableName(), entityInfo);
-			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getID(),entityInfo.getVersion(), selection->getTableOrientation());
-			uint32_t topRow, bottomRow, leftColun, rightColumn;
-			selection->getSelectedRange(topRow, bottomRow, leftColun, rightColumn);
 			bool selectEntireColumn = selection->getSelectEntireColumn();
 			bool selectEntireRow = selection->getSelectEntireRow();
-			newSelection->AddRange(topRow, bottomRow, leftColun, rightColumn);
-			_modelComponent->getEntityInformation(selection->getScriptName(), entityInfo);
 			newSelection->createProperties(_scriptFolder, _scriptFolderUID, selection->getScriptName(), entityInfo.getID(),selectEntireRow,selectEntireColumn);
+			
+			
+			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getID(),selection->getTableOrientation());
+			uint32_t topRow, bottomRow, leftColun, rightColumn;
+			selection->getSelectedRange(topRow, bottomRow, leftColun, rightColumn);
+			newSelection->SetRange(topRow, bottomRow, leftColun, rightColumn);
+			_modelComponent->getEntityInformation(selection->getScriptName(), entityInfo);
 			newSelection->setConsiderForBatchprocessing(true);
 			newSelection->StoreToDataBase();
 

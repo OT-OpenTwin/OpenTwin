@@ -65,9 +65,9 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 {
 	std::string sourceFileGroup = "Source file";
 
-	auto tableName = new EntityPropertiesString("Table name", _tableName);
+	auto tableName = new EntityPropertiesString("Table name", "");
 	tableName->setReadOnly(true);
-	auto tableOrientation = new EntityPropertiesString("Header position", _tableOrientation);
+	auto tableOrientation = new EntityPropertiesString("Header position", "");
 	tableOrientation->setReadOnly(true);
 	getProperties().createProperty(tableName,sourceFileGroup);
 	getProperties().createProperty(tableOrientation,sourceFileGroup);
@@ -76,13 +76,13 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	EntityPropertiesSelection::createProperty(categoryGroup, "Datatype", { ot::TypeNames::getDoubleTypeName(), ot::TypeNames::getInt64TypeName(), ot::TypeNames::getInt32TypeName(), ot::TypeNames::getStringTypeName() }, ot::TypeNames::getStringTypeName(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 
 	const std::string rangeGroup = "Range";
-	auto topRow = new EntityPropertiesInteger("Top row", _topCells);
+	auto topRow = new EntityPropertiesInteger("Top row", 0);
 	topRow->setReadOnly(true);
-	auto bottomRow = new EntityPropertiesInteger("Bottom row", _buttomCells);
+	auto bottomRow = new EntityPropertiesInteger("Bottom row", 0);
 	bottomRow->setReadOnly(true);
-	auto leftColumn = new EntityPropertiesInteger("Left column", _leftCells);
+	auto leftColumn = new EntityPropertiesInteger("Left column", 0);
 	leftColumn->setReadOnly(true);
-	auto rightColumn = new EntityPropertiesInteger("Right column", _rightCells);
+	auto rightColumn = new EntityPropertiesInteger("Right column", 0);
 	rightColumn->setReadOnly(true);
 	
 	const std::string updateStrategyGroup = "Update strategy";
@@ -108,12 +108,14 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	getProperties().createProperty(passOnScript, updateStrategyGroup);
 }
 
-void EntityTableSelectedRanges::SetTableProperties(std::string tableName, ot::UID tableID, ot::UID tableVersion, std::string tableOrientation)
+void EntityTableSelectedRanges::SetTableProperties(std::string tableName, ot::UID tableID, std::string tableOrientation)
 {
-	_tableName = tableName;
+	auto tableNameEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Table name"));
+	auto headerPosEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
+	tableNameEnt->setValue(tableName);
+	headerPosEnt->setValue(tableOrientation);
 	_tableID = tableID;
-	_tableVersion = tableVersion;
-	_tableOrientation = tableOrientation;
+	setModified();
 }
 
 
@@ -122,6 +124,18 @@ std::string EntityTableSelectedRanges::getSelectedType()
 	auto typeSelection = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Datatype"));
 	return typeSelection->getValue();
 
+}
+
+const std::string EntityTableSelectedRanges::getTableName()
+{
+	auto tableNameEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Table name"));
+	return tableNameEnt->getValue();
+}
+
+const std::string EntityTableSelectedRanges::getTableOrientation()
+{
+	auto headerPosEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
+	return headerPosEnt->getValue();
 }
 
 void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t& leftColumn, uint32_t& rightColumn, std::shared_ptr<EntityParameterizedDataTable> referencedTable)
@@ -156,10 +170,16 @@ void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bot
 
 void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t& leftColumn, uint32_t& rightColumn)
 {
-	topRow = _topCells;
-	bottomRow = _buttomCells;
-	leftColumn = _leftCells;
-	rightColumn = _rightCells;
+	
+	auto topRowEnt =		dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Top row"));
+	auto bottomRowEnt =		dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Bottom row"));
+	auto leftColumnEnt =	dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Left column"));
+	auto rightColumnEnt =	dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Right column"));
+
+	topRow = topRowEnt->getValue();
+	bottomRow = bottomRowEnt->getValue();
+	leftColumn = leftColumnEnt->getValue();
+	rightColumn = rightColumnEnt->getValue();
 }
 
 bool EntityTableSelectedRanges::getConsiderForBatchprocessing()
@@ -199,42 +219,34 @@ std::string EntityTableSelectedRanges::getScriptName()
 	return selectedScript->getValueName();
 }
 
-void EntityTableSelectedRanges::AddRange(uint32_t topCell, uint32_t buttomCell, uint32_t leftCell, uint32_t rightCell)
+void EntityTableSelectedRanges::SetRange(uint32_t topRow, uint32_t bottomRow, uint32_t leftColumn, uint32_t rightColumn)
 {
-	if (topCell >= topCell && rightCell >= leftCell)
+	if (bottomRow >= topRow && rightColumn >= leftColumn)
 	{
-		_topCells = topCell;
-		_buttomCells = buttomCell;
-		_leftCells = leftCell;
-		_rightCells = rightCell;
+		auto topRowEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Top row"));
+		auto bottomRowEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Bottom row"));
+		auto leftColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Left column"));
+		auto rightColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Right column"));
+		topRowEnt->setValue(topRow);
+		bottomRowEnt->setValue(bottomRow);
+		leftColumnEnt->setValue(leftColumn);
+		rightColumnEnt->setValue(rightColumn);
+		setModified();
 	}
 }
 
-void EntityTableSelectedRanges::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityTableSelectedRanges::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBase::AddStorageData(storage);
-
 	storage.append(
-		bsoncxx::builder::basic::kvp("TopCells", static_cast<int32_t>(_topCells)),
-		bsoncxx::builder::basic::kvp("ButtomCells", static_cast<int32_t>(_buttomCells)),
-		bsoncxx::builder::basic::kvp("LeftCells", static_cast<int32_t>(_leftCells)),
-		bsoncxx::builder::basic::kvp("RightCells", static_cast<int32_t>(_rightCells)),
-		bsoncxx::builder::basic::kvp("TableName", _tableName),
-		bsoncxx::builder::basic::kvp("TableOrientierung", _tableOrientation)
+		bsoncxx::builder::basic::kvp("TableID", static_cast<int64_t>(_tableID))
 	);
+	
 }
 
-void EntityTableSelectedRanges::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityTableSelectedRanges::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
-
-	_topCells = static_cast<uint32_t>(doc_view["TopCells"].get_int32().value);
-	_buttomCells = static_cast<uint32_t>(doc_view["ButtomCells"].get_int32().value);
-	_leftCells = static_cast<uint32_t>(doc_view["LeftCells"].get_int32().value);
-	_rightCells = static_cast<uint32_t>(doc_view["RightCells"].get_int32().value);
-
-	_tableName = doc_view["TableName"].get_utf8().value.data();
-	_tableOrientation = doc_view["TableOrientierung"].get_utf8().value.data();
+	_tableID = static_cast<ot::UID>(doc_view["TableID"].get_int64());
 }
 
 bool EntityTableSelectedRanges::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)

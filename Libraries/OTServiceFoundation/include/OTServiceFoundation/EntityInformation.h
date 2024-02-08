@@ -7,12 +7,21 @@
 #include <string>
 #include <Types.h>
 
+#include "EntityBase.h"
+
 namespace ot {
 
 	class OT_SERVICEFOUNDATION_API_EXPORT EntityInformation
 	{
 	public:
 		EntityInformation() : m_id(0), m_version(0) {};
+		EntityInformation(EntityBase* entity)
+		{
+			m_id = entity->getEntityID();
+			m_version = entity->getEntityStorageVersion();
+			m_name = entity->getName();
+			m_type = entity->getClassName();
+		}
 		virtual ~EntityInformation() {};
 
 		void setID(UID _id) { m_id = _id; }

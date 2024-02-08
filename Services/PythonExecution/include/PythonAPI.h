@@ -15,8 +15,8 @@ public:
 	ot::ReturnValues Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet) noexcept(false);
 
 private:
-	std::map<std::string , std::string> _moduleEntrypointByScriptName;
+	std::map<std::string , std::string> _moduleEntrypointByModuleName;
 	PythonWrapper _wrapper;
-	void EnsureScriptsAreLoaded(std::list<std::string> scripts);
+	std::list<ot::EntityInformation> EnsureScriptsAreLoaded(std::list<std::string> scripts);
 	void LoadScipt(ot::EntityInformation& entityInformation);
 };

@@ -43,6 +43,7 @@ void EntityBuffer::SaveChangedEntities()
 	}
 	_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
 	_modelServiceAPI->updatePropertyGrid();
+	ClearBuffer();
 }
 
 bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
@@ -56,6 +57,7 @@ bool EntityBuffer::SaveChangedEntities(std::string absoluteEntityName)
 		topoEntID.push_back(entity->getEntityID());
 		topoEntVersion.push_back(entity->getEntityStorageVersion());
 		_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+		_bufferedEntities.erase(absoluteEntityName);
 		return true;
 	}
 	return false;

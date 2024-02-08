@@ -2,6 +2,7 @@
 #include <QtWidgets/qmainwindow.h>
 
 #include <QtNetwork/qlocalsocket.h>
+
 #include <QtCore/qeventloop.h>
 #include <QtCore/qobject.h>
 
@@ -15,6 +16,7 @@
 #define slots Q_SLOTS
 
 QLocalSocket _socket;
+
 
 int _socketConnectionTimeout = 60000; //60 seconds
 int _numberOfServerConnectionTrials = 30;

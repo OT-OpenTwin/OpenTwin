@@ -22,16 +22,16 @@ PythonAPI::PythonAPI()
 
 ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet)
 {
-	EnsureScriptsAreLoaded(scripts);
+	std::list<ot::EntityInformation> scriptEntities = EnsureScriptsAreLoaded(scripts);
 	EntityBuffer::INSTANCE().setModelServiceAPI(&Application::instance()->ModelServiceAPI());
 	auto currentParameterSet = parameterSet.begin();
 	
 	PythonObjectBuilder pyObBuilder;
 	ot::ReturnValues returnValues;
-	for (std::string& scriptName : scripts)
+	for (ot::EntityInformation& scriptEntity : scriptEntities)
 	{
-		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName).value();
-		std::string entryPoint = _moduleEntrypointByScriptName[scriptName];
+		std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptEntity).value();
+		std::string entryPoint = _moduleEntrypointByModuleName[moduleName];
 
 		std::list<ot::Variable>& parameterSetForScript = *currentParameterSet;
 		CPythonObjectNew pythonParameterSet(nullptr);
@@ -40,18 +40,19 @@ ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<s
 			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript));
 		}
 
-		OT_LOG_D("Execute script " + scriptName);
+		OT_LOG_D("Execute script " + scriptEntity.getName());
 		CPythonObjectNew pReturnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
-		returnValues.addData(scriptName, pyObBuilder.getVariableList(pReturnValue));
+		returnValues.addData(scriptEntity.getName(), pyObBuilder.getVariableList(pReturnValue));
 		currentParameterSet++;
 		OT_LOG_D("Script execution succeeded");
+		EntityBuffer::INSTANCE().ClearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
 	}
 	return returnValues;
 }
 
-void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
-{
 
+std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
+{
 	scripts.unique();
 	std::list<ot::EntityInformation> entityInfos;
 	auto modelComponent = Application::instance()->ModelServiceAPI();
@@ -72,27 +73,48 @@ void PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 		missingScripts = missingScripts.substr(0, missingScripts.size() - 2);
 		throw std::exception(("Python execution aborted since the following scripts were not found: " + missingScripts).c_str());
 	}
-
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+		
+	std::list<ot::EntityInformation> scriptsNotLoadedYet;
 	for (auto& entityInfo : entityInfos)
 	{
-		std::string scriptName = entityInfo.getName();
+		const std::string scriptName = entityInfo.getName();
 		OT_LOG_D("Loading script " + scriptName);
-		std::optional<std::string> moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptName);
+		std::optional<std::string> moduleName = PythonLoadedModules::INSTANCE()->getModuleName(entityInfo);
 		if (!moduleName.has_value())
+		{
+			scriptsNotLoadedYet.push_back(entityInfo);
+		}
+	}
+
+	if (scriptsNotLoadedYet.size() != 0)
+	{
+		Application::instance()->prefetchDocumentsFromStorage(scriptsNotLoadedYet);
+		for (ot::EntityInformation& entityInfo : scriptsNotLoadedYet)
 		{
 			LoadScipt(entityInfo);
 		}
-		else
+	}
+
+	if (scripts.size() == entityInfos.size())
+	{
+		return entityInfos;
+	}
+	else
+	{
+		std::list<ot::EntityInformation> scriptEntityInfoList;
+		for (const std::string& scriptName : scripts)
 		{
-			std::string shouldModuleName = PythonLoadedModules::INSTANCE()->GetModuleName(entityInfo);
-			if (moduleName.value() != shouldModuleName) // Script with same name but different ID or Version
+			for (ot::EntityInformation& entityInfo : entityInfos)
 			{
-				PythonLoadedModules::INSTANCE()->RemoveModule(scriptName);
-				_moduleEntrypointByScriptName.erase(scriptName);
-				LoadScipt(entityInfo);
+				if (entityInfo.getName() == scriptName)
+				{
+					scriptEntityInfoList.push_back(entityInfo);
+					break;
+				}
 			}
 		}
+		assert(scriptEntityInfoList.size() == entityInfos.size());
+		return scriptEntityInfoList;
 	}
 }
 
@@ -104,9 +126,9 @@ void PythonAPI::LoadScipt(ot::EntityInformation& entityInformation)
 	auto plainData = script->getData()->getData();
 	std::string execution(plainData.begin(), plainData.end());
 
-	std::string moduleName = PythonLoadedModules::INSTANCE()->AddModuleForEntity(baseEntity);
+	std::string moduleName = PythonLoadedModules::INSTANCE()->AddModuleForEntity(entityInformation);
 	_wrapper.Execute(execution, moduleName);
 	PythonModuleAPI moduleAPI;
-	_moduleEntrypointByScriptName[script->getName()] = moduleAPI.GetModuleEntryPoint(moduleName);
+	_moduleEntrypointByModuleName[moduleName] = moduleAPI.GetModuleEntryPoint(moduleName);
 }
 
