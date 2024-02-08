@@ -358,14 +358,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 	// Setup central layout (central image (if on layout mode is set))
 	if (cImg && m_backgroundImageInsertMode == OnLayout) {
-		if (!m_left.empty() && m_right.empty()) {
-			// Only left connectors
-			cImg->setAlignment(ot::AlignLeft);
-		}
-		else if (m_left.empty() && !m_right.empty()) {
-			// Only right connectors
-			cImg->setAlignment(ot::AlignRight);
-		}
 		cLay->addChildItem(cImg, 1);
 	}
 	else {
