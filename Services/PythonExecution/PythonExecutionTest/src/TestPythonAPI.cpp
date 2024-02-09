@@ -71,3 +71,14 @@ TEST_F(FixturePythonAPI, CreateParameterSet_Double)
 	EXPECT_EQ(result, expectedValue);
 
 }
+
+TEST_F(FixturePythonAPI, ExecuteCommand)
+{
+	const std::string command = "file1 = open(r\"MyFile.txt\", \"w\")\n"
+		"file1.write(\"Hello World\")\n"
+		"file1.close()\n";
+
+	ot::ReturnMessage msg =	ExecuteCommand(command);
+	ASSERT_EQ(msg.getStatus(), ot::ReturnMessage::Ok);
+
+}

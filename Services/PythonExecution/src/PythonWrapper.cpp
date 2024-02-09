@@ -139,7 +139,7 @@ void PythonWrapper::signalHandlerAbort(int sig)
 	throw std::exception("Abort was called.");
 }
 
-void PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
+CPythonObjectNew PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
 {
 	CPythonObjectNew module(GetModule(moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
@@ -148,6 +148,7 @@ void PythonWrapper::Execute(const std::string& executionCommand, const std::stri
 	{
 		throw PythonException();
 	}
+	return result;
 }
 
 CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName, CPythonObject& parameter, const std::string& moduleName)

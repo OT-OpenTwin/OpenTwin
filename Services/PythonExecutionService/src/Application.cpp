@@ -83,52 +83,23 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 {
 	try
 	{
-		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{			
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			OT_LOG_D("Executing action: " + action);
-			if (action == OT_ACTION_CMD_PYTHON_EXECUTE_Scripts)
-			{
-				if (_doc.HasMember(OT_ACTION_CMD_PYTHON_Scripts) && _doc.HasMember(OT_ACTION_CMD_PYTHON_Parameter))
-				{
-					if (_doc[OT_ACTION_CMD_PYTHON_Scripts].IsArray() && _doc[OT_ACTION_CMD_PYTHON_Parameter].IsArray())
-					{
-						ot::JsonDocument subprocessDoc;
-						auto& scripts = _doc[OT_ACTION_CMD_PYTHON_Scripts];
-						subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, subprocessDoc.GetAllocator());
-						auto& parameter = _doc[OT_ACTION_CMD_PYTHON_Parameter];
-						subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, parameter,subprocessDoc.GetAllocator());
-						
-						if (_doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Names) && _doc[OT_ACTION_CMD_PYTHON_Portdata_Names].IsArray())
-						{
-							assert(_doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Data));
-							auto& portData = _doc[OT_ACTION_CMD_PYTHON_Portdata_Data];
-							subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Data, portData, subprocessDoc.GetAllocator());
-							auto& portNames = _doc[OT_ACTION_CMD_PYTHON_Portdata_Names];
-
-							subprocessDoc.AddMember(OT_ACTION_CMD_PYTHON_Portdata_Names, portNames,subprocessDoc.GetAllocator());
-						}
-						subprocessDoc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, subprocessDoc.GetAllocator()), subprocessDoc.GetAllocator());
-						ot::ReturnMessage msg = _subprocessHandler->Send(subprocessDoc.toJson());
-						return msg.toJson();
-					}
-					else
-					{
-						ot::ReturnMessage msg(ot::ReturnMessage::Failed, "Scripts and parameter are not of expected type.");
-						return msg.toJson();
-					}
-				}
-										
-			}
+			ot::ReturnMessage returnMessage = _subprocessHandler->Send(_doc.toJson());
+			return returnMessage.toJson();
 		}
-		return returnMessage;
+		else
+		{
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported action").toJson();
+		}
 	}
-	catch (std::runtime_error& e)
+	catch (const std::exception& e)
 	{
-		std::string errorMessage = "Failed to execute action " + _action + " due to runtime error: " + e.what();
+		std::string errorMessage = "Failed to execute action " + _action + " due to exception: " + e.what();
 		m_uiComponent->displayMessage(errorMessage);
-		return errorMessage;
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, errorMessage).toJson();
 	}
 }
 

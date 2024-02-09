@@ -50,6 +50,17 @@ ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<s
 	return returnValues;
 }
 
+ot::ReturnValues PythonAPI::Execute(const std::string& command) noexcept(false)
+{
+	std::string moduleName = std::to_string(EntityBase::getUidGenerator()->getUID());
+	CPythonObjectNew pReturnValue = _wrapper.Execute(command,moduleName);
+	ot::ReturnValues returnValues;
+	PythonObjectBuilder pyObBuilder;
+	returnValues.addData("", pyObBuilder.getVariableList(pReturnValue));
+	return returnValues;
+}
+
+
 
 std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 {

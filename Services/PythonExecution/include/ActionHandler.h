@@ -24,10 +24,11 @@ private:
 
 	ot::ReturnMessage ShutdownProcess(ot::JsonDocument& doc);
 	ot::ReturnMessage ExecuteScript(ot::JsonDocument& doc);
-	ot::ReturnMessage Execute(ot::JsonDocument& doc);
+	ot::ReturnMessage ExecuteCommand(ot::JsonDocument& doc);
 	ot::ReturnMessage Initialise(ot::JsonDocument& doc);
 
-	ot::ReturnMessage CheckParameterExecute(ot::JsonDocument& doc);
+	ot::ReturnMessage CheckParameterExecuteScript(ot::JsonDocument& doc);
+	ot::ReturnMessage CheckParameterExecuteCommand(ot::JsonDocument& doc);
 
 };
 #pragma once

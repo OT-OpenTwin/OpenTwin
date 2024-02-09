@@ -221,8 +221,10 @@
 
 #define OT_ACTION_CMD_PYTHON_EXECUTE "Python.Execute"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_Scripts "Python.Execute.Scripts"
+#define OT_ACTION_CMD_PYTHON_EXECUTE_Command "Python.Execute.Command"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_RESULTS "Python.Execute.Results"
 #define OT_ACTION_CMD_PYTHON_Scripts "Python.Scripts"
+#define OT_ACTION_CMD_PYTHON_Command "Python.Command"
 #define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
 #define OT_ACTION_CMD_PYTHON_Result "Python.Result"
 #define OT_ACTION_CMD_PYTHON_Portdata_Names "Python.Portdata.Names"

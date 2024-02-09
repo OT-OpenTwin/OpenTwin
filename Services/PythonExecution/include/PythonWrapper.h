@@ -34,7 +34,7 @@
 		void AddToSysPath(const std::string& newPathComponent);
 		void ClosePythonInterpreter();
 
-		void Execute(const std::string& executionCommand, const std::string& moduleName = "__main__");
+		CPythonObjectNew Execute(const std::string& executionCommand, const std::string& moduleName = "__main__");
 		
 		CPythonObjectNew ExecuteFunction(const std::string& functionName, CPythonObject& parameter, const std::string& moduleName = "__main__");
 		

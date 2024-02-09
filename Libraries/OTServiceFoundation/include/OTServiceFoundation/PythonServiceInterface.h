@@ -31,6 +31,8 @@ namespace ot
 
 		ot::ReturnMessage SendExecutionOrder();
 
+		ot::ReturnMessage SendSingleExecutionCommand(const std::string& command);
+
 	private:
 		const std::string _pythonExecutionServiceURL;
 		std::list<std::tuple<std::string, scriptParameter>> _scriptNamesWithParameter;

@@ -17,8 +17,11 @@ ActionHandler::ActionHandler()
 	_checkParameterFunctions[OT_ACTION_CMD_ServiceShutdown] = _noParameterCheck;
 	_handlingFunctions[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::ShutdownProcess, this, arguments);
 
-	_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::CheckParameterExecute, this, arguments);
+	_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::CheckParameterExecuteScript, this, arguments);
 	_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::ExecuteScript, this, arguments);
+
+	_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Command] = std::bind(&ActionHandler::CheckParameterExecuteCommand, this, arguments);
+	_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Command] = std::bind(&ActionHandler::ExecuteCommand, this, arguments);
 
 	_checkParameterFunctions[OT_ACTION_CMD_Init] = _noParameterCheck;
 	_handlingFunctions[OT_ACTION_CMD_Init] = std::bind(&ActionHandler::Initialise, this, arguments);
@@ -53,6 +56,45 @@ ot::ReturnMessage ActionHandler::Handle(ot::JsonDocument& doc)
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Action \"" + action + "\" not supported.");
 	}
 
+	return returnMessage;
+}
+
+ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
+{
+	const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
+	ot::ReturnMessage returnMessage(ot::ReturnMessage::Ok, "Initialisation succeeded");
+	if (serviceName == OT_INFO_SERVICE_TYPE_DataBase)
+	{
+		OT_LOG_D("Initialise Database Connection");
+		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		const std::string userName = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
+		const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
+		const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
+		const std::string siteID = ot::json::getString(doc, OT_ACTION_PARAM_SITE_ID);
+		const int sessionID = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_ID);
+		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+		DataBase::GetDataBase()->setProjectName(collectionName);
+		DataBase::GetDataBase()->setUserCredentials(userName, psw);
+		DataBase::GetDataBase()->InitializeConnection(url, siteID);
+		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionID, serviceID));
+	}
+	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL)
+	{
+		OT_LOG_D("Connecting with modelService");
+		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		Application::instance()->setModelServiceURL(url);
+
+	}
+	else if (serviceName == OT_INFO_SERVICE_TYPE_UI)
+	{
+		OT_LOG_D("Connecting with uiService");
+		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		Application::instance()->setUIServiceURL(url);
+	}
+	else
+	{
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
+	}
 	return returnMessage;
 }
 
@@ -133,12 +175,29 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 
 }
 
-ot::ReturnMessage ActionHandler::Execute(ot::JsonDocument& doc)
+ot::ReturnMessage ActionHandler::ExecuteCommand(ot::JsonDocument& doc)
 {
-	return ot::ReturnMessage();
+	std::string executionCommand = ot::json::getString(doc, OT_ACTION_CMD_PYTHON_Command);
+	try
+	{
+		ot::ReturnValues result = _pythonAPI.Execute(executionCommand);
+		if (result.getNumberOfEntries() != 0)
+		{
+			return ot::ReturnMessage(result);
+		}
+		else
+		{
+			return ot::ReturnMessage(ot::ReturnMessage::Ok);
+		}
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_D("Execution of command failed due to exception: " + std::string(e.what()));
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
+	}
 }
 
-ot::ReturnMessage ActionHandler::CheckParameterExecute(ot::JsonDocument& doc)
+ot::ReturnMessage ActionHandler::CheckParameterExecuteScript(ot::JsonDocument& doc)
 {
 	if (!doc.HasMember(OT_ACTION_CMD_PYTHON_Scripts) || !doc.HasMember(OT_ACTION_CMD_PYTHON_Parameter))
 	{
@@ -146,45 +205,18 @@ ot::ReturnMessage ActionHandler::CheckParameterExecute(ot::JsonDocument& doc)
 	}
 	else
 	{
-		return _noParameterCheck(doc);
+		return ot::ReturnMessage();
 	}
 }
 
-ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
+ot::ReturnMessage ActionHandler::CheckParameterExecuteCommand(ot::JsonDocument& doc)
 {
-	const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
-	ot::ReturnMessage returnMessage(ot::ReturnMessage::Ok,"Initialisation succeeded");
-	if (serviceName == OT_INFO_SERVICE_TYPE_DataBase)
+	if (!doc.HasMember(OT_ACTION_CMD_PYTHON_Command))
 	{
-		OT_LOG_D("Initialise Database Connection");
-		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		const std::string userName = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
-		const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
-		const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
-		const std::string siteID = ot::json::getString(doc, OT_ACTION_PARAM_SITE_ID);
-		const int sessionID = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_ID);
-		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		DataBase::GetDataBase()->setProjectName(collectionName);
-		DataBase::GetDataBase()->setUserCredentials(userName, psw);
-		DataBase::GetDataBase()->InitializeConnection(url, siteID);
-		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionID, serviceID));
-	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL)
-	{
-		OT_LOG_D("Connecting with modelService");
-		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		Application::instance()->setModelServiceURL(url);
-
-	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_UI)
-	{
-		OT_LOG_D("Connecting with uiService");
-		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		Application::instance()->setUIServiceURL(url);
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Message does not contain a command to execute");
 	}
 	else
 	{
-		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
+		return ot::ReturnMessage();
 	}
-	return returnMessage;
 }
