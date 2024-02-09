@@ -44,21 +44,7 @@ bool EntityTableSelectedRanges::updateFromProperties(void)
 	// Here we need to update the plot (send a message to the visualization service)
 	getProperties().forceResetUpdateForAllProperties();
 	
-	auto showScriptSelection = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
-	auto scriptSelectionProperty = getProperties().getProperty(_pythonScriptProperty);
-	auto passOnScriptProperty = getProperties().getProperty(_propNamePassOnScript);
-
-	if (showScriptSelection->getValue() != scriptSelectionProperty->getVisible())
-	{
-		scriptSelectionProperty->setVisible(showScriptSelection->getValue());
-		passOnScriptProperty->setVisible(showScriptSelection->getValue());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	
+	return UpdateVisibility();
 }
 
 void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, bool selectEntireRow , bool selectEntireColumn)
@@ -192,6 +178,7 @@ void EntityTableSelectedRanges::setConsiderForBatchprocessing(bool considerForBa
 {
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
 	considerForBatchProcessing->setValue(considerForBatchprocessing);
+	UpdateVisibility();
 }
 
 bool EntityTableSelectedRanges::getSelectEntireRow()
@@ -232,6 +219,24 @@ void EntityTableSelectedRanges::SetRange(uint32_t topRow, uint32_t bottomRow, ui
 		leftColumnEnt->setValue(leftColumn);
 		rightColumnEnt->setValue(rightColumn);
 		setModified();
+	}
+}
+
+bool EntityTableSelectedRanges::UpdateVisibility()
+{
+	auto showScriptSelection = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
+	auto scriptSelectionProperty = getProperties().getProperty(_pythonScriptProperty);
+	auto passOnScriptProperty = getProperties().getProperty(_propNamePassOnScript);
+
+	if (showScriptSelection->getValue() != scriptSelectionProperty->getVisible())
+	{
+		scriptSelectionProperty->setVisible(showScriptSelection->getValue());
+		passOnScriptProperty->setVisible(showScriptSelection->getValue());
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

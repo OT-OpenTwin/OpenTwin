@@ -37,6 +37,8 @@ private:
 	const std::string _propNamePassOnScript= "Pass on script";
 	const std::string _pythonScriptProperty = "Update script";
 
+	bool UpdateVisibility();
+
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 };
