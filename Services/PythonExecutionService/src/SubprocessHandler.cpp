@@ -19,9 +19,17 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName)
 	workerThread.detach();
 #else
 	ConnectWithSubprocess();
-
-	_initialConnectionEstablished = true;
-	InitialiseSubprocess();
+	if (WaitForResponse())
+	{
+		std::string response = _socket->readLine().data();
+		assert(response.substr(0,response.size()-1) == OT_ACTION_CMD_CheckStartupCompleted);
+		_startupChecked = true;
+		InitialiseSubprocess();
+	}
+	else
+	{
+		assert(0);
+	}
 #endif
 }
 
@@ -69,9 +77,16 @@ void SubprocessHandler::RunSubprocess()
 		OT_LOG_D("Python Subprocess started");
 
 		ConnectWithSubprocess();
-		
-		_initialConnectionEstablished = true;
-		InitialiseSubprocess();
+		if (WaitForResponse())
+		{
+			std::string response = _socket->readLine().data();
+			_startupChecked = true;
+			InitialiseSubprocess();
+		}
+		else
+		{
+			throw std::exception("Failed in waiting for python subprocess startup");
+		}
 	}
 	catch (std::exception& e)
 	{
@@ -148,7 +163,7 @@ void SubprocessHandler::ConnectWithSubprocess()
 
 ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 {
-	while (!_initialConnectionEstablished)
+	while (!_startupChecked)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(_timeoutSubprocessStart));
 	}
@@ -158,7 +173,8 @@ ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 	if (!readyToWrite)
 	{
 		_uiComponent->displayMessage("Python Subservice not responsive. Restarting ...\n");
-		OT_LOG_D("Python Subservice not responsive. Restarting ...");
+		OT_LOG_E("Python Subservice not responsive. Due to error: " + errorMessage);
+
 		CloseSubprocess();
 		RunSubprocess();
 	}
@@ -167,19 +183,17 @@ ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 	_socket->flush();
 	bool allIsWritten = _socket->waitForBytesWritten(_timeoutSendingMessage);
 
-	if (!SendSucceeded())
+	if (!WaitForResponse())
 	{
 		_uiComponent->displayMessage("Retrying to send message to Python Subservice\n");
 		return Send(message);
 	}
 
 	const std::string returnString(_socket->readLine().data());
-
 	ot::ReturnMessage returnMessage;
 	returnMessage.fromJson(returnString);
 
-	return returnMessage;
-	
+	return returnMessage;	
 }
 
 void SubprocessHandler::setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID, int sessionID, int serviceID)
@@ -240,6 +254,7 @@ bool SubprocessHandler::SubprocessResponsive(std::string& errorMessage)
 #ifndef _DEBUG
 	if (_subProcess.state() != QProcess::Running)
 	{
+		OT_LOG_E("Sending message failed. Process state: " + _subProcess.state());
 		subProcessResponsive = false;
 		ProcessErrorOccured(errorMessage);
 	}
@@ -247,6 +262,7 @@ bool SubprocessHandler::SubprocessResponsive(std::string& errorMessage)
 
 	if (!_socket->isValid())
 	{
+		OT_LOG_E("Sending message failed. Socket state: " + _socket->state());
 		subProcessResponsive = false;
 		SocketErrorOccured(errorMessage);
 	}
@@ -256,7 +272,7 @@ bool SubprocessHandler::SubprocessResponsive(std::string& errorMessage)
 void SubprocessHandler::InitialiseSubprocess()
 {
 	std::unique_lock<std::mutex> lock (_mtx);
-	if (_initialisationPrepared && _initialConnectionEstablished)
+	if (_initialisationPrepared && _startupChecked)
 	{
 		_initialisationPrepared = false;
 		OT_LOG_D("Initialising Python Subservice.");
@@ -265,6 +281,7 @@ void SubprocessHandler::InitialiseSubprocess()
 			ot::ReturnMessage returnMessage = Send(routine);
 			if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed)
 			{
+				OT_LOG_E("Failed to initialise Python subprocess");
 				std::string errorMessage = "Failed to initialise Python subprocess, due to following error: " + returnMessage.getWhat();
 				throw std::exception(errorMessage.c_str());
 			}
@@ -282,7 +299,7 @@ void SubprocessHandler::CloseSubprocess()
 }
 
 
-bool SubprocessHandler::SendSucceeded()
+bool SubprocessHandler::WaitForResponse()
 {
 	while (!_socket->canReadLine())
 	{

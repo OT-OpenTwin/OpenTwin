@@ -33,18 +33,18 @@
     <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLR);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2024-02-08T11:46:55.5332814Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-02-09T07:18:39.1792906Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
-    <QtLastBackgroundBuild>2024-02-08T11:46:55.6048755Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-02-09T07:18:39.2740589Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <QtLastBackgroundBuild>2024-02-08T11:46:55.6742449Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-02-09T07:18:39.4580456Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-02-08T11:46:55.7297621Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-02-09T07:18:39.5124336Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-02-08T11:46:55.7858157Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-02-09T07:18:39.5644322Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

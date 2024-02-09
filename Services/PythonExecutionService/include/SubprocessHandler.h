@@ -28,8 +28,9 @@ private:
 	std::vector<std::string> _initialisationRoutines;
 	const int _numberOfInitialisationRoutines = 3;
 	
-	std::atomic_bool _initialConnectionEstablished = false;
+	std::atomic_bool _startupChecked = false;
 	std::atomic_bool _initialisationPrepared = false;
+
 	std::mutex _mtx;
 
 	const int _numberOfRetries = 3;
@@ -54,7 +55,7 @@ private:
 	void ConnectWithSubprocess();
 	void CloseSubprocess();
 	
-	bool SendSucceeded();
+	bool WaitForResponse();
 	bool SubprocessResponsive(std::string& errorMessage);
 	void ProcessErrorOccured(std::string& message);
 	void SocketErrorOccured(std::string& message);

@@ -153,7 +153,7 @@ ot::ReturnMessage ActionHandler::CheckParameterExecute(ot::JsonDocument& doc)
 ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
 {
 	const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
-	ot::ReturnMessage returnMessage;
+	ot::ReturnMessage returnMessage(ot::ReturnMessage::Ok,"Initialisation succeeded");
 	if (serviceName == OT_INFO_SERVICE_TYPE_DataBase)
 	{
 		OT_LOG_D("Initialise Database Connection");

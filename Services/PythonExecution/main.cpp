@@ -32,7 +32,7 @@ ot::ReturnMessage HandleMessage(ot::JsonDocument& message)
 
 void Send(const std::string& message)
 {
-	_socket.write(message.c_str());
+	_socket.write((message + "\n").c_str());
 	_socket.flush();
 	bool allIsWritten = _socket.waitForBytesWritten(-1);
 }
@@ -46,7 +46,7 @@ void MessageReceived()
 		ot::JsonDocument document;
 		document.fromJson(message);
 		ot::ReturnMessage returnMessage = HandleMessage(document);
-		Send(returnMessage.toJson() + "\n");
+		Send(returnMessage.toJson());
 
 	}
 }
@@ -100,7 +100,9 @@ int main(int argc, char* argv[], char* envp[])
 	QEventLoop loop;
 	QObject::connect(&_socket, &QLocalSocket::readyRead, &loop, &MessageReceived);
 	QObject::connect(&_socket, &QLocalSocket::disconnected, &loop, &DisConnect);
-		
+	OT_LOG_D("Finished startup. Starting to listen.");
+	ot::ReturnMessage msg(ot::ReturnMessage::Ok, OT_ACTION_CMD_CheckStartupCompleted);
+	Send(msg.toJson());
 	loop.exec();
 	return a.exec();
 }
