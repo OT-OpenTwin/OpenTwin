@@ -36,12 +36,16 @@ private:
     void runSubprocess();
     bool startProcess();
     void connectWithSubprocess();
+    ot::ReturnMessage executeCommand(const std::string& command);
     ot::ReturnMessage send(const std::string& message);
     bool checkSubprocessResponsive(std::string& errorMessage);
     void closeSubprocess();
     bool waitForResponse();
     void getProcessErrorOccured(std::string& message);
     void getSocketErrorOccured(std::string& message);
+
+    void determineStudioSuiteInstallation(int& version, std::string& studioPath);
+
 
     bool subProcessRunning = false;
     std::string serverName;

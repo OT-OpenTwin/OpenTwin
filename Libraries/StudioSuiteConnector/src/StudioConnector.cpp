@@ -4,8 +4,10 @@
 #include "OTSystem/OperatingSystem.h"
 
 #include <cassert>
+#include <sstream>
 
 #include "quuid.h"
+#include "qsettings.h"
 
 //#define DEBUG_PYTHON_SERVER
 
@@ -13,6 +15,19 @@ void StudioConnector::openProject(const std::string& fileName)
 {
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
+
+	// Get the latest version of Studio Suite and the installpath
+	int version = 0;
+	std::string studioPath;
+	determineStudioSuiteInstallation(version, studioPath);
+
+	std::stringstream script;
+	script << "import sys" << std::endl;
+	script << "sys.path.append(r\"" << studioPath << "\\AMD64\\python_cst_libraries\")" << std::endl;
+
+
+	executeCommand("print(1)");
+
 
 	// Now we need to get a list of all process ids of running CST STUDIO SUITE DESIGN ENVIRONMENTS
 
@@ -44,6 +59,30 @@ void StudioConnector::extractInformation()
 StudioConnector::~StudioConnector()
 {
 	closeSubprocess();
+}
+
+void StudioConnector::determineStudioSuiteInstallation(int &version, std::string &studioPath)
+{
+	// First, read the latest version of the installed CST Studio Suite Software
+
+	QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432node\\CST AG\\CST DESIGN ENVIRONMENT",	QSettings::NativeFormat);
+
+	version = 0;
+	for (auto key : registry.childGroups())
+	{
+		int thisVersion = atoi(key.toStdString().c_str());
+
+		version = std::max(thisVersion, version);
+	}
+
+	if (version == 0) throw std::string("CST Studio Suite is not installed on this computer.");
+	if (version < 2023) throw std::string("This version of CST Studio Suite is not supported: " + std::to_string(version));
+
+
+	// Now read the installation path of this version
+	QSettings studioKey(QString(("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432node\\CST AG\\CST DESIGN ENVIRONMENT\\" + std::to_string(version)).c_str()), QSettings::NativeFormat);
+
+	studioPath = studioKey.value("INSTALLPATH").toString().toStdString();
 }
 
 void StudioConnector::startSubprocess()
@@ -192,6 +231,15 @@ void StudioConnector::connectWithSubprocess()
 	{
 		throw std::string("Timout while waiting for subprocess to connect with server.");
 	}
+}
+
+ot::ReturnMessage StudioConnector::executeCommand(const std::string& command)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(command, doc.GetAllocator()), doc.GetAllocator());
+
+	return send(doc.toJson());
 }
 
 ot::ReturnMessage StudioConnector::send(const std::string& message)
