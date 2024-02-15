@@ -66,6 +66,8 @@ public:
 	AbstractPlot::PlotType getPlotType(void) { return plotType; }
 	PlotDataset::axisQuantity getPlotQuantity(void) { return plotQuantity; }
 
+	bool getSelectChildren(void) override { return false; };
+
 	Model *getModel(void) { return model; };
 	void setModel(Model *m) { model = m; };
 

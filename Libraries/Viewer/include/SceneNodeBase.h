@@ -66,7 +66,7 @@ public:
 	double getOffset(void) { return offset; };
 
 	void setSelectChildren(bool flag) { selectChildren = flag; }
-	bool getSelectChildren(void) { return selectChildren; }
+	virtual bool getSelectChildren(void) { return selectChildren; }
 
 	void setManageVisibilityOfParent(bool flag) { manageVisibilityOfParent = flag; }
 	bool getManageVisibilityOfParent(void) { return manageVisibilityOfParent; }
