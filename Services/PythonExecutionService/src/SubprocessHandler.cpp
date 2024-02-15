@@ -2,11 +2,19 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
 
-SubprocessHandler::SubprocessHandler(const std::string& serverName)
+SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID)
 	:_serverName(serverName)
 {
 	_initialisationRoutines.reserve(_numberOfInitialisationRoutines);
 	
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, sessionID, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, serviceID, doc.GetAllocator());
+	_initialisationRoutines.push_back(doc.toJson());
+
 	_subprocessPath = FindSubprocessPath() + _executableName;
 	InitiateProcess();
 
@@ -22,7 +30,9 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName)
 	if (WaitForResponse())
 	{
 		std::string response = _socket->readLine().data();
-		assert(response.substr(0,response.size()-1) == OT_ACTION_CMD_CheckStartupCompleted);
+		ot::ReturnMessage msg;
+		msg.fromJson(response);
+		assert(msg.getStatus() == ot::ReturnMessage::Ok);
 		_startupChecked = true;
 		InitialiseSubprocess();
 	}
@@ -161,7 +171,7 @@ void SubprocessHandler::ConnectWithSubprocess()
 	}
 }
 
-ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
+std::string SubprocessHandler::Send(const std::string& message)
 {
 	while (!_startupChecked)
 	{
@@ -190,25 +200,22 @@ ot::ReturnMessage SubprocessHandler::Send(const std::string& message)
 	}
 
 	const std::string returnString(_socket->readLine().data());
-	ot::ReturnMessage returnMessage;
-	returnMessage.fromJson(returnString);
 
-	return returnMessage;	
+	return returnString;	
 }
 
-void SubprocessHandler::setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID, int sessionID, int serviceID)
+void SubprocessHandler::setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_DataBase, doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString( siteID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(psw, doc.GetAllocator()), doc.GetAllocator());
 	
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, sessionID,doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, serviceID, doc.GetAllocator());
 	_initialisationRoutines.push_back(doc.toJson());
 	_initialisationPrepared = _initialisationRoutines.size() == _numberOfInitialisationRoutines;
 	InitialiseSubprocess();
@@ -278,7 +285,8 @@ void SubprocessHandler::InitialiseSubprocess()
 		OT_LOG_D("Initialising Python Subservice.");
 		for (std::string& routine: _initialisationRoutines)
 		{
-			ot::ReturnMessage returnMessage = Send(routine);
+			ot::ReturnMessage returnMessage;
+			returnMessage.fromJson(Send(routine));
 			if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed)
 			{
 				OT_LOG_E("Failed to initialise Python subprocess");

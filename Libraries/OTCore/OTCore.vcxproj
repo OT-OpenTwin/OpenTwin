@@ -26,6 +26,7 @@
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
     <ClCompile Include="src\EncodingGuesser.cpp" />
     <ClCompile Include="src\GenericDataStruct.cpp" />
+    <ClCompile Include="src\GenericDataStructFactory.cpp" />
     <ClCompile Include="src\GenericDataStructMatrix.cpp" />
     <ClCompile Include="src\GenericDataStructSingle.cpp" />
     <ClCompile Include="src\GenericDataStructVector.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="include\OTCore\FlagsHelper.h" />
     <ClInclude Include="include\OTCore\FolderNames.h" />
     <ClInclude Include="include\OTCore\GenericDataStruct.h" />
+    <ClInclude Include="include\OTCore\GenericDataStructFactory.h" />
     <ClInclude Include="include\OTCore\GenericDataStructMatrix.h" />
     <ClInclude Include="include\OTCore\GenericDataStructSingle.h" />
     <ClInclude Include="include\OTCore\GenericDataStructVector.h" />

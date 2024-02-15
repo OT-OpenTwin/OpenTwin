@@ -43,6 +43,7 @@ namespace ot
 		ReturnMessage(ReturnMessageStatus _status = ReturnMessageStatus::Ok, const std::string& _what = std::string());
 
 		ReturnMessage(ot::ReturnValues& values);
+		ReturnMessage(ot::ReturnValues&& values);
 
 		//! @brief Constructor
 		//! @param _status The status
@@ -51,6 +52,7 @@ namespace ot
 		ReturnMessage(const ReturnMessage& _other);
 		~ReturnMessage() {};
 		ReturnMessage& operator = (const ReturnMessage& _other);
+		ReturnMessage& operator = (ReturnMessage&& _other) noexcept;
 		ReturnMessage& operator = (const char * _what);
 		ReturnMessage& operator = (const std::string& _what);
 		ReturnMessage& operator = (ReturnMessageStatus _status);

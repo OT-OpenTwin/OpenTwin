@@ -1,6 +1,10 @@
 #include "PythonObjectBuilder.h"
 #include "PythonException.h"
+#include "OTCore/GenericDataStructSingle.h"
+#include "OTCore/GenericDataStructVector.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
+#include <iterator>
 
 void PythonObjectBuilder::StartTupleAssemply(int size)
 {
@@ -208,6 +212,66 @@ std::list<bool> PythonObjectBuilder::getBoolList(const CPythonObject& pValue, co
 	return values;
 }
 
+ot::GenericDataStructList PythonObjectBuilder::getGenericDataStructList(CPythonObject& pValue)
+{
+	if (PyList_Check(pValue))
+	{
+		ot::GenericDataStructList data;
+		for (auto i = 0; i < PyList_Size(pValue); i++)
+		{
+			CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+			const auto dataEntry = getGenericDataStruct(listItem);
+			data.push_back(dataEntry);
+		}
+		return data;
+	}
+	else if (PyTuple_Check(pValue))
+	{
+		ot::GenericDataStructList data;
+		for (auto i = 0; i < PyTuple_Size(pValue); i++)
+		{
+			CPythonObjectBorrowed listItem(PyTuple_GetItem(pValue, i));
+			const auto dataEntry = getGenericDataStruct(listItem);
+			data.push_back(dataEntry);
+		}
+		return data;
+	}
+	else
+	{
+		return { getGenericDataStruct(pValue) };
+	}
+}
+
+ot::GenericDataStruct* PythonObjectBuilder::getGenericDataStruct(CPythonObject& pValue)
+{
+	if (PyList_Check(pValue) || PyTuple_Check(pValue))
+	{
+		std::list<ot::Variable> varList = getVariableList(pValue);
+		ot::GenericDataStructVector* entry(new ot::GenericDataStructVector());
+		std::vector< ot::Variable> varVect(varList.begin(), varList.end());
+		entry->setValues(std::move(varVect));
+		return entry;
+	}
+	/*else if ()
+	{
+
+	}*/
+	else
+	{
+		ot::GenericDataStructSingle* entry(new ot::GenericDataStructSingle());
+		std::optional<ot::Variable> var = getVariable(pValue);
+		if (var.has_value())
+		{
+			entry->setValue(var.value());
+			return entry;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+}
+
 std::list<ot::Variable> PythonObjectBuilder::getVariableList(CPythonObject& pValue)
 {
 	if (PyList_Check(pValue))
@@ -216,6 +280,21 @@ std::list<ot::Variable> PythonObjectBuilder::getVariableList(CPythonObject& pVal
 		for (auto i = 0; i < PyList_Size(pValue); i++)
 		{
 			CPythonObjectBorrowed listItem(PyList_GetItem(pValue, i));
+
+			std::optional<ot::Variable> variable = getVariable(listItem);
+			if (variable.has_value())
+			{
+				variables.push_back(variable.value());
+			}
+		}
+		return variables;
+	}
+	else if (PyTuple_Check(pValue))
+	{
+		std::list<ot::Variable> variables{};
+		for (auto i = 0; i < PyTuple_Size(pValue); i++)
+		{
+			CPythonObjectBorrowed listItem(PyTuple_GetItem(pValue, i));
 
 			std::optional<ot::Variable> variable = getVariable(listItem);
 			if (variable.has_value())
@@ -300,56 +379,98 @@ CPythonObjectNew PythonObjectBuilder::setBool(const bool value)
 	return returnVal;
 }
 
-CPythonObjectNew PythonObjectBuilder::setVariableList(std::list<ot::Variable>& values)
+
+
+CPythonObjectNew PythonObjectBuilder::setVariableTuple(const std::list<ot::Variable>& values)
 {
-	uint64_t assemblySize =values.size();
+	uint64_t assemblySize = values.size();
 	PyObject* assembly = PyTuple_New(assemblySize);
 	uint64_t counter = 0;
-	for (ot::Variable& value : values)
+	for (const ot::Variable& value : values)
 	{
-		CPythonObjectNew pValue(nullptr);
-		if (value.isInt32())
-		{
-			pValue.reset(setInt32(value.getInt32()));
-		}
-		else if (value.isInt64())
-		{
-			pValue.reset(setInt32(static_cast<int32_t>(value.getInt64())));
-		}
-		else if (value.isDouble())
-		{
-			pValue.reset(setDouble(value.getDouble()));
-		}
-		else if (value.isFloat())
-		{
-			pValue.reset(setDouble(static_cast<double>(value.getFloat())));
-		}
-		else if (value.isConstCharPtr())
-		{
-			pValue.reset(setString(std::string(value.getConstCharPtr())));
-		}
-		else if (value.isBool())
-		{
-			pValue.reset(setBool(value.getBool()));
-		}
-		else
-		{
-			throw std::exception("Type is not supported by the python service.");
-		}
 
+		CPythonObjectNew pValue = setVariable(value);
 		int success = PyTuple_SetItem(assembly, counter, pValue);
 		assert(success == 0);
 		pValue.DropOwnership();
 		counter++;
 	}
-	
 	return CPythonObjectNew(assembly);
+}
+
+CPythonObjectNew PythonObjectBuilder::setVariableList(const std::list<ot::Variable>& values)
+{
+	uint64_t assemblySize =values.size();
+	PyObject* assembly = PyList_New(assemblySize);
+	uint64_t counter = 0;
+	for (const ot::Variable& value : values)
+	{
+		
+		CPythonObjectNew pValue = setVariable(value);
+		int success = PyList_SetItem(assembly, counter, pValue);
+		assert(success == 0);
+		pValue.DropOwnership();
+		counter++;
+	}
+	return CPythonObjectNew(assembly);
+}
+
+CPythonObjectNew PythonObjectBuilder::setVariableList(const std::vector<ot::Variable>& values)
+{
+	uint64_t assemblySize = values.size();
+	PyObject* assembly = PyList_New(assemblySize);
+	uint64_t counter = 0;
+	for (const ot::Variable& value : values)
+	{
+		CPythonObjectNew pValue = setVariable(value);
+		int success = PyList_SetItem(assembly, counter, pValue);
+		assert(success == 0);
+		pValue.DropOwnership();
+		counter++;
+	}
+
+	return CPythonObjectNew(assembly);
+}
+
+CPythonObjectNew PythonObjectBuilder::setVariable(const ot::Variable& value)
+{
+	CPythonObjectNew pValue(nullptr);
+	if (value.isInt32())
+	{
+		pValue.reset(setInt32(value.getInt32()));
+	}
+	else if (value.isInt64())
+	{
+		pValue.reset(setInt32(static_cast<int32_t>(value.getInt64())));
+	}
+	else if (value.isDouble())
+	{
+		pValue.reset(setDouble(value.getDouble()));
+	}
+	else if (value.isFloat())
+	{
+		pValue.reset(setDouble(static_cast<double>(value.getFloat())));
+	}
+	else if (value.isConstCharPtr())
+	{
+		pValue.reset(setString(std::string(value.getConstCharPtr())));
+	}
+	else if (value.isBool())
+	{
+		pValue.reset(setBool(value.getBool()));
+	}
+	else
+	{
+		throw std::exception("Type is not supported by the python service.");
+	}
+	return pValue;
 }
 
 CPythonObjectNew PythonObjectBuilder::setVariableList(rapidjson::GenericArray<false, rapidjson::Value>& valueJSONArray)
 {
 	uint64_t assemblySize = valueJSONArray.Size();
-	PyObject* assembly = PyTuple_New(assemblySize);
+	//PyObject* assembly = PyTuple_New(assemblySize);
+	PyObject* assembly = PyList_New(assemblySize);
 	uint64_t counter = 0;
 
 	for (auto& value : valueJSONArray)
@@ -384,6 +505,45 @@ CPythonObjectNew PythonObjectBuilder::setVariableList(rapidjson::GenericArray<fa
 			throw std::exception("Type is not supported by the python service.");
 		}
 
+		int success = PyList_SetItem(assembly, counter, pValue);
+		assert(success == 0);
+		pValue.DropOwnership();
+		counter++;
+	}
+
+	return CPythonObjectNew(assembly);
+}
+
+
+CPythonObjectNew PythonObjectBuilder::setGenericDataStruct(ot::GenericDataStruct* genericDataStruct)
+{
+	auto singleVal = dynamic_cast<ot::GenericDataStructSingle*>(genericDataStruct);
+	if (singleVal != nullptr)
+	{
+		return setVariable(singleVal->getValue());
+	}
+	
+	auto vectVal = dynamic_cast<ot::GenericDataStructVector*>(genericDataStruct);
+	if (vectVal != nullptr)
+	{
+		return setVariableList(vectVal->getValues());
+	}
+
+	auto matrixVal = dynamic_cast<ot::GenericDataStructMatrix*>(genericDataStruct);
+	if (matrixVal != nullptr)
+	{
+		
+	}
+}
+
+CPythonObjectNew PythonObjectBuilder::setGenericDataStructList(const ot::GenericDataStructList& values)
+{
+	uint64_t assemblySize = values.size();
+	PyObject* assembly = PyTuple_New(assemblySize);
+	uint64_t counter = 0;
+	for (const ot::GenericDataStruct* value : values)
+	{
+		CPythonObjectNew pValue = setVariable(value);
 		int success = PyTuple_SetItem(assembly, counter, pValue);
 		assert(success == 0);
 		pValue.DropOwnership();

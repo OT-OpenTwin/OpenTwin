@@ -22,6 +22,32 @@ GenericDataStructMatrix::~GenericDataStructMatrix()
 	//_values = NULL;
 }
 
+ot::GenericDataStructMatrix::GenericDataStructMatrix(const GenericDataStructMatrix& other)
+	:GenericDataStruct(getClassName(),other._numberOfEntries),_values(other._values)
+{
+}
+
+ot::GenericDataStructMatrix::GenericDataStructMatrix(GenericDataStructMatrix&& other)
+	:GenericDataStruct(getClassName(), other._numberOfEntries), _values(std::move(other._values))
+{
+	other._numberOfEntries = 0;
+}
+
+GenericDataStructMatrix& ot::GenericDataStructMatrix::operator=(const GenericDataStructMatrix& other)
+{
+	_values = other._values;
+	_numberOfEntries = other._numberOfEntries;
+	return *this;
+}
+
+GenericDataStructMatrix& ot::GenericDataStructMatrix::operator=(GenericDataStructMatrix&& other)
+{
+	_values = std::move(other._values);
+	_numberOfEntries = other._numberOfEntries;
+	other._numberOfEntries = 0;
+	return *this;
+}
+
 void GenericDataStructMatrix::setValue(uint32_t columnIndex, uint32_t rowIndex, ot::Variable&& value)
 {
 	/*const uint32_t index = getIndex(columnIndex, rowIndex);

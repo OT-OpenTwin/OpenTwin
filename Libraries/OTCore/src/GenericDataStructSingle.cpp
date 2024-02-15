@@ -7,6 +7,32 @@ ot::GenericDataStructSingle::GenericDataStructSingle()
 {
 }
 
+ot::GenericDataStructSingle::GenericDataStructSingle(const GenericDataStructSingle& other)
+	:GenericDataStruct(getClassName(), other._numberOfEntries), _value(other._value)
+{
+}
+
+ot::GenericDataStructSingle::GenericDataStructSingle(GenericDataStructSingle&& other)
+	:GenericDataStruct(getClassName(), other._numberOfEntries), _value(std::move(other._value))
+{
+	other._numberOfEntries = 0;
+}
+
+ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(const GenericDataStructSingle& other)
+{
+	_value = other._value;
+	_numberOfEntries = other._numberOfEntries;
+	return *this;
+}
+
+ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(GenericDataStructSingle&& other)
+{
+	_value = std::move(other._value);
+	_numberOfEntries = other._numberOfEntries;
+	other._numberOfEntries = 0;
+	return *this;
+}
+
 ot::GenericDataStructSingle::~GenericDataStructSingle()
 {
 }

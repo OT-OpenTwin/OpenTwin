@@ -9,9 +9,9 @@ class BlockHandler : public BusinessLogicHandler
 {
 public:
 	using HandlerMap = std::map<std::shared_ptr<GraphNode>, std::shared_ptr<BlockHandler>>;
-	using GenericDataList = std::list < std::shared_ptr<ot::GenericDataStruct>>;
+	using GenericDataList = ot::GenericDataStructList;
 	BlockHandler(const HandlerMap& allHandler);
-	virtual ~BlockHandler() {};
+	virtual ~BlockHandler();
 	void executeOwnNode(std::shared_ptr<GraphNode> ownNode);
 	virtual void setData(GenericDataList& data, const std::string& targetPort);
 

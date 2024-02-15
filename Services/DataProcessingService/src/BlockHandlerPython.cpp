@@ -65,15 +65,8 @@ bool BlockHandlerPython::executeSpecialized()
                 }
                 else
                 {
-                    const std::list<ot::Variable>& returnValueList = valuesPointer->second;
-                    GenericDataList genericDataBlocks;
-                    for (const ot::Variable& returnValueEntry: returnValueList)
-                    {
-                        std::shared_ptr<ot::GenericDataStructSingle> singleValue(new ot::GenericDataStructSingle());
-                        singleValue->setValue(returnValueEntry);
-                        genericDataBlocks.push_back(singleValue);
-                    }
-                    _dataPerPort[outputName] = genericDataBlocks;
+                    const GenericDataList& returnValueList = valuesPointer->second;
+                    _dataPerPort[outputName] = returnValueList;
                 }
             }
         }

@@ -45,9 +45,8 @@ void MessageReceived()
 
 		ot::JsonDocument document;
 		document.fromJson(message);
-		ot::ReturnMessage returnMessage = HandleMessage(document);
+		ot::ReturnMessage returnMessage (HandleMessage(document));
 		Send(returnMessage.toJson());
-
 	}
 }
 

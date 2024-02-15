@@ -52,6 +52,10 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	if (allSet)
 	{
 		GenericDataList& genericXValues(_dataPerPort[_xDataConnector]);
+		if (genericXValues.size() == 0)
+		{
+			throw std::exception("X axis values are empty. Nothing to plot.");
+		}
 		std::vector<double> xValues = transformDataToDouble(genericXValues);
 		const int colorID(0);
 
@@ -66,6 +70,11 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		for (std::string& yAxisData : _yDataConnectors)
 		{
 			GenericDataList& genericYValues(_dataPerPort[yAxisData]);
+			if (genericYValues.size() == 0)
+			{
+				throw std::exception("Y axis values are empty. Nothing to plot.");
+			}
+
 			std::vector<double> yValues = transformDataToDouble(genericYValues);
 			const std::string curveName = *currentCurveName;
 			currentCurveName++;
@@ -84,9 +93,6 @@ bool BlockHandlerPlot1D::executeSpecialized()
 			forceVis.push_back(false);
 		}
 
-		
-
-
 		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
 		topoEntID.push_back(plotID->getEntityID());
 		topoEntVers.push_back(plotID->getEntityStorageVersion());
@@ -100,37 +106,57 @@ std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& g
 {
 	std::vector<double> doubleValues;
 	doubleValues.reserve(genericDataBlocks.size());
-	for (auto& genericDataBlock: genericDataBlocks)
+	if (genericDataBlocks.size() > 1)
 	{
-		ot::GenericDataStructSingle* entry = dynamic_cast<ot::GenericDataStructSingle*>(genericDataBlock.get());
+		for (auto& genericDataBlock : genericDataBlocks)
+		{
+			ot::GenericDataStructSingle* entry = dynamic_cast<ot::GenericDataStructSingle*>(genericDataBlock);
+			if (entry == nullptr)
+			{
+				throw std::exception("Datainput not matching format. Only plots of a one dimensional data struct are possible.");
+			}
+
+			const ot::Variable& value = entry->getValue();
+			doubleValues.push_back(VariableToDouble(value));
+		}
+	}
+	else
+	{
+		ot::GenericDataStructVector* entry = dynamic_cast<ot::GenericDataStructVector*>(*genericDataBlocks.begin());
 		if (entry == nullptr)
 		{
-			throw std::exception("Datainput nopt matching format. Requried format: single entries");
+			throw std::exception("Datainput not matching format. Only plots of a one dimensional data struct are possible.");
+		}
+		const std::vector<ot::Variable> values = entry->getValues();
+		for (const ot::Variable& value : values)
+		{
+			doubleValues.push_back(VariableToDouble(value));
 		}
 
-		const ot::Variable& value = entry->getValue();
-		
-		if (value.isInt32())
-		{
-			doubleValues.push_back(static_cast<double>(value.getInt32()));
-		}
-		else if (value.isInt64())
-		{
-			doubleValues.push_back(static_cast<double>(value.getInt64()));
-		}
-		else if (value.isFloat())
-		{
-			doubleValues.push_back(static_cast<double>(value.getFloat()));
-		}
-		else if (value.isDouble())
-		{
-			doubleValues.push_back(value.getDouble());
-		}
-		else
-		{
-			throw std::exception("Block of type Plot1D can only handle input data of type float, double, int32 or int64");
-		}
 	}
 	return doubleValues;
 }
 
+double BlockHandlerPlot1D::VariableToDouble(const ot::Variable& value)
+{
+	if (value.isInt32())
+	{
+		return (static_cast<double>(value.getInt32()));
+	}
+	else if (value.isInt64())
+	{
+		return (static_cast<double>(value.getInt64()));
+	}
+	else if (value.isFloat())
+	{
+		return (static_cast<double>(value.getFloat()));
+	}
+	else if (value.isDouble())
+	{
+		return (value.getDouble());
+	}
+	else
+	{
+		throw std::exception("Block of type Plot1D can only handle input data of type float, double, int32 or int64");
+	}
+}

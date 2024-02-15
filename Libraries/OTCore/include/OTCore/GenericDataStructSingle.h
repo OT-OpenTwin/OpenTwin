@@ -9,6 +9,10 @@ namespace ot
 	
 	public:
 		GenericDataStructSingle();
+		GenericDataStructSingle(const GenericDataStructSingle& other);
+		GenericDataStructSingle(GenericDataStructSingle&& other);
+		GenericDataStructSingle& operator=(const GenericDataStructSingle& other);
+		GenericDataStructSingle& operator=(GenericDataStructSingle&& other);
 		~GenericDataStructSingle();
 
 		void setValue(const ot::Variable& value);
@@ -19,7 +23,7 @@ namespace ot
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		static std::string getClassName() { return "GenericDataStructMatrix"; }
+		static std::string getClassName() { return "GenericDataStructSingle"; }
 	
 	private:
 		ot::Variable _value;

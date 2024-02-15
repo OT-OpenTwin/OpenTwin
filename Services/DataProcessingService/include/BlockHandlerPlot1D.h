@@ -25,4 +25,5 @@ private:
 	std::string _yunit;
 
 	std::vector<double> transformDataToDouble(GenericDataList& data);
+	double VariableToDouble(const ot::Variable& var);
 };

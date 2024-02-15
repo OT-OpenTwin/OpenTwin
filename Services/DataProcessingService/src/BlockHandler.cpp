@@ -5,6 +5,19 @@ BlockHandler::BlockHandler(const HandlerMap& allHandler)
 {
 }
 
+BlockHandler::~BlockHandler()
+{
+	for (auto dataByName : _dataPerPort)
+	{
+		ot::GenericDataStructList dataList = dataByName.second;
+		for (ot::GenericDataStruct* data : dataList)
+		{
+			delete data;
+			data = nullptr;
+		}
+	}
+}
+
 void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 {
 	bool proceed = executeSpecialized();

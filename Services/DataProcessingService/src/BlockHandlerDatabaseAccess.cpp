@@ -128,7 +128,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 					std::list<ot::Variable> values = converter(jsValues);
 					auto currentValue = values.begin();
 					const uint32_t numberOfEntries = _dataColumns * _dataRows;
-					std::shared_ptr<ot::GenericDataStructMatrix> dataBlock(new ot::GenericDataStructMatrix(_dataColumns, _dataRows));
+					ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(_dataColumns, _dataRows));
 					for (uint32_t j = 0; j < numberOfEntries; j++)
 					{
 						dataBlock->setValue(columnCounter, rowCounter, *currentValue);
@@ -148,7 +148,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 				else
 				{
 					ot::Variable value = converter(projectedValues[projectionName.c_str()]);
-					std::shared_ptr<ot::GenericDataStructSingle> dataBlock(new ot::GenericDataStructSingle());
+					ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
 					dataBlock->setValue(value);
 					const std::string connectorName = _connectorNames[count];
 					_dataPerPort[connectorName].push_back(dataBlock);

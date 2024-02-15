@@ -1,8 +1,10 @@
 #pragma once
 #include "OTCore/Serializable.h"
+#pragma warning(disable:4251)
 
 namespace ot
 {
+	
 	class __declspec(dllexport) GenericDataStruct : public Serializable
 	{
 	public:
@@ -19,4 +21,6 @@ namespace ot
 		uint32_t _numberOfEntries;
 		std::string _typeName;
 	};
+
+	using GenericDataStructList = std::list<ot::GenericDataStruct*>;
 }

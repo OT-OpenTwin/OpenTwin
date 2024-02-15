@@ -14,7 +14,7 @@ void ot::PythonServiceInterface::AddScriptWithParameter(const std::string& scrip
 	_scriptNamesWithParameter.push_back(std::make_tuple(scriptName, scriptParameter));
 }
 
-void ot::PythonServiceInterface::AddPortData(const std::string& portName, const GenericDataList& data)
+void ot::PythonServiceInterface::AddPortData(const std::string& portName, const ot::GenericDataStructList& data)
 {
 	assert(_portDataByPortName.find(portName) == _portDataByPortName.end());
 	_portDataByPortName[portName] = data;
@@ -86,7 +86,7 @@ ot::JsonDocument ot::PythonServiceInterface::AssembleMessage()
 			
 			ot::JsonArray portDataJSON;
 			const auto& genericPortDataList = portDataByPortName.second;
-			for (std::shared_ptr<ot::GenericDataStruct> genericPortData : genericPortDataList)
+			for (ot::GenericDataStruct* genericPortData : genericPortDataList)
 			{
 				ot::JsonObject entry;
 				genericPortData->addToJsonObject(entry, doc.GetAllocator());

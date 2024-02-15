@@ -77,6 +77,11 @@ ot::ReturnMessage::ReturnMessage(ot::ReturnValues& values)
 	: m_status(ot::ReturnMessage::ReturnMessageStatus::Ok), m_values(values)
 {}
 
+ot::ReturnMessage::ReturnMessage(ot::ReturnValues && values)
+	: m_status(ot::ReturnMessage::ReturnMessageStatus::Ok), m_values(std::move(values))
+{
+}
+
 ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocument& _document) : m_status(_status) {
 	m_what = _document.toJson();
 }
@@ -87,6 +92,17 @@ ot::ReturnMessage& ot::ReturnMessage::operator = (const ReturnMessage& _other) {
 	if (this != &_other) {
 		m_status = _other.m_status;
 		m_what = _other.m_what;
+		m_values = _other.m_values;
+	}
+	return *this;
+}
+
+ot::ReturnMessage& ot::ReturnMessage::operator=(ReturnMessage&& _other) noexcept
+{
+	if (this != &_other) {
+		m_status = std::move(_other.m_status);
+		m_what = std::move(_other.m_what);
+		m_values = std::move(_other.m_values);
 	}
 	return *this;
 }
@@ -111,7 +127,7 @@ bool ot::ReturnMessage::operator == (const ReturnMessageStatus _status) const {
 }
 
 bool ot::ReturnMessage::operator == (const ReturnMessage& _other) const {
-	return this->m_status == _other.m_status && this->m_what == _other.m_what;
+	return this->m_status == _other.m_status && this->m_what == _other.m_what && this->m_values == _other.m_values;
 }
 
 bool ot::ReturnMessage::operator != (const ReturnMessageStatus _status) const {
@@ -119,7 +135,7 @@ bool ot::ReturnMessage::operator != (const ReturnMessageStatus _status) const {
 }
 
 bool ot::ReturnMessage::operator != (const ReturnMessage& _other) const {
-	return this->m_status != _other.m_status || this->m_what != _other.m_what;
+	return this->m_status != _other.m_status || this->m_what != _other.m_what || this->m_values != _other.m_values;
 }
 
 void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

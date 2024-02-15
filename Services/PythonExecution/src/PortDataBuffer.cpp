@@ -2,13 +2,13 @@
 #include "OTCore/Logger.h"
 #include "PythonObjectBuilder.h"
 
-void PortDataBuffer::addNewPortData(const std::string& portName, const std::list<ot::Variable>& data)
+void PortDataBuffer::addNewPortData(const std::string& portName, const ot::GenericDataStructList& data)
 {
 	assert(_portData.find(portName) == _portData.end());
 	_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data)));
 }
 
-void PortDataBuffer::addOrOverridePortData(const std::string& portName, const std::list<ot::Variable>& data)
+void PortDataBuffer::addOrOverridePortData(const std::string& portName, const ot::GenericDataStructList& data)
 {
 	if (_portData.find(portName) == _portData.end())
 	{
@@ -30,8 +30,8 @@ PyObject* PortDataBuffer::getPortData(const std::string& portName)
 	PythonObjectBuilder builder;
 	if (portEntry != _portData.end())
 	{
-		std::list<ot::Variable> values = portEntry->second.getValues();
-		CPythonObjectNew pObject = builder.setVariableList(values);
+		ot::GenericDataStructList values = portEntry->second.getValues();
+		CPythonObjectNew pObject = builder.setGenericDataStructList(values);
 		Py_INCREF(pObject);
 		return pObject;
 	}
@@ -49,8 +49,7 @@ void PortDataBuffer::AddModifiedPortData(ot::ReturnValues& returnValues)
 		PortData& portData = item.second;
 		if (portData.getModified())
 		{
-			const std::list<ot::Variable> portValues = portData.getValues();
-			returnValues.addData(item.first, portValues);
+			returnValues.addData(item.first, std::move(portData.HandDataOver()));
 		}
 	}
 }

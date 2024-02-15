@@ -64,18 +64,18 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
+	const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
 	if (_subprocessHandler == nullptr)
 	{
-		_subprocessHandler = new SubprocessHandler(sessionID());
+		_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
 	}
 	const std::string dbURL = DataBase::GetDataBase()->getDataBaseServerURL();
 	const std::string userName= DataBase::GetDataBase()->getUserName();
 	const std::string psw = DataBase::GetDataBase()->getUserPassword();
 	const std::string siteID = this->siteID();
 	const std::string collectionName = this->m_collectionName;
-	const int sessionID = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	_subprocessHandler->setDatabase(dbURL, userName, psw,collectionName,siteID,sessionID,serviceID);
+	_subprocessHandler->setDatabase(dbURL, userName, psw,collectionName,siteID);
 }
 
 
@@ -87,8 +87,8 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		{			
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			OT_LOG_D("Executing action: " + action);
-			ot::ReturnMessage returnMessage = _subprocessHandler->Send(_doc.toJson());
-			return returnMessage.toJson();
+			std::string returnMessage = _subprocessHandler->Send(_doc.toJson());
+			return returnMessage;
 		}
 		else
 		{
@@ -112,7 +112,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	if (_subprocessHandler == nullptr)
 	{
-		_subprocessHandler = new SubprocessHandler(sessionID());
+		const int sessionCount = Application::instance()->getSessionCount();
+		const int serviceID = Application::instance()->getServiceIDAsInt();
+		_subprocessHandler = new SubprocessHandler(sessionID(),sessionCount,serviceID);
 	}
 	_subprocessHandler->setUIComponent(_ui);
 }
@@ -130,7 +132,9 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	if (_subprocessHandler == nullptr)
 	{
-		_subprocessHandler = new SubprocessHandler(sessionID());
+		const int sessionCount = Application::instance()->getSessionCount();
+		const int serviceID = Application::instance()->getServiceIDAsInt();
+		_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
 	}
 	_subprocessHandler->setModelComponent(_model);
 }

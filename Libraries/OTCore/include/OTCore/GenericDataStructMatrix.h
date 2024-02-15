@@ -11,10 +11,16 @@ namespace ot
 	class __declspec(dllexport) GenericDataStructMatrix : public GenericDataStruct
 	{
 	public:
-		GenericDataStructMatrix(uint32_t numberofColumns, uint32_t numberofRows);
 		GenericDataStructMatrix();
 		~GenericDataStructMatrix();
+		GenericDataStructMatrix(const GenericDataStructMatrix& other);
+		GenericDataStructMatrix(GenericDataStructMatrix&& other);
+		GenericDataStructMatrix& operator=(const GenericDataStructMatrix& other);
+		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& other);
 
+
+		GenericDataStructMatrix(uint32_t numberofColumns, uint32_t numberofRows);
+		
 		void setValue(uint32_t columnIndex, uint32_t rowIndex, ot::Variable&& value);
 		void setValue(uint32_t columnIndex, uint32_t rowIndex, const ot::Variable& value);
 		const ot::Variable& getValue(uint32_t columnIndex, uint32_t rowIndex)const;

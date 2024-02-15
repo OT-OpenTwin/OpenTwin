@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
-#include "PythonObjectBuilder.h"
-#include "FixturePythonObjectBuilder.h"
 #include <limits>
 #include <optional>
+#include <memory>
+
+#include "PythonObjectBuilder.h"
+#include "FixturePythonObjectBuilder.h"
+#include "OTCore/GenericDataStructVector.h"
 TEST_F(FixturePythonObjectBuilder, FloatToVariable)
 {
 	constexpr float expectedValue = std::numeric_limits<float>::max();
@@ -71,4 +74,46 @@ TEST_F(FixturePythonObjectBuilder, TupleCreation)
 	EXPECT_TRUE(PyTuple_Check(result));
 	EXPECT_TRUE(result != nullptr);
 	EXPECT_EQ(PyTuple_Size(result), 4);
+}
+
+TEST_F(FixturePythonObjectBuilder, Variable)
+{
+	ot::Variable expected(3.134);
+
+	PythonObjectBuilder builder;
+	auto pValue = builder.setVariable(expected);
+	auto actual = builder.getVariable(pValue);
+	
+	ASSERT_EQ(actual, expected);
+}
+
+TEST_F(FixturePythonObjectBuilder, VariableList)
+{
+	std::list<ot::Variable> expected{ ot::Variable(3.134), ot::Variable(5.1), ot::Variable(13.) };
+
+
+	PythonObjectBuilder builder;
+	auto pValue = builder.setVariableList(expected);
+
+	auto actual = builder.getVariableList(pValue);
+	ASSERT_EQ(actual.size(), expected.size());
+	auto actualVal = actual.begin();
+	for (const auto& extectedVal : expected)
+	{
+		EXPECT_EQ(*actualVal, extectedVal);
+		actualVal++;
+	}
+}
+
+
+TEST_F(FixturePythonObjectBuilder, GenericDataStructure)
+{
+	ot::GenericDataStructVector expected ({ 1,2,3,4,5,6 });
+
+	PythonObjectBuilder builder;
+	auto pValue = builder.setGenericDataStruct(&expected);
+	auto gValue = builder.getGenericDataStruct(pValue);
+	auto actual = dynamic_cast<ot::GenericDataStructVector*>(gValue);
+
+	ASSERT_EQ(actual->getNumberOfEntries(), expected.getNumberOfEntries());
 }

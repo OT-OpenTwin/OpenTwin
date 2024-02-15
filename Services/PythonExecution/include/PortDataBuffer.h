@@ -18,8 +18,8 @@ public:
 		return instance;
 	}
 
-	void addNewPortData(const std::string& portName,const std::list<ot::Variable>& data);
-	void addOrOverridePortData(const std::string& portName,const std::list<ot::Variable>& data);
+	void addNewPortData(const std::string& portName,const ot::GenericDataStructList& data);
+	void addOrOverridePortData(const std::string& portName,const ot::GenericDataStructList& data);
 	void clearPortData();
 	PyObject* getPortData(const std::string& portName);
 	void AddModifiedPortData(ot::ReturnValues& returnValues);

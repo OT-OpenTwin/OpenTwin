@@ -13,11 +13,11 @@
 class SubprocessHandler : public BusinessLogicHandler
 {
 public:
-	SubprocessHandler(const std::string& serverName);
+	SubprocessHandler(const std::string& serverName, int sessionID, int serviceID);
 	~SubprocessHandler();
-	ot::ReturnMessage Send(const std::string& message);
+	std::string Send(const std::string& message);
 	
-	void setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID, int sessionID, int serviceID);
+	void setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID);
 
 private:
 	std::string _serverName;
@@ -26,7 +26,7 @@ private:
 	std::string _pythonModulePath;
 
 	std::vector<std::string> _initialisationRoutines;
-	const int _numberOfInitialisationRoutines = 3;
+	const int _numberOfInitialisationRoutines = 4;
 	
 	std::atomic_bool _startupChecked = false;
 	std::atomic_bool _initialisationPrepared = false;

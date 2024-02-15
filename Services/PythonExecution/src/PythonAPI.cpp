@@ -37,12 +37,12 @@ ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<s
 		CPythonObjectNew pythonParameterSet(nullptr);
 		if (parameterSetForScript.size() != 0)
 		{
-			pythonParameterSet.reset(pyObBuilder.setVariableList(parameterSetForScript));
+			pythonParameterSet.reset(pyObBuilder.setVariableTuple(parameterSetForScript));
 		}
 
 		OT_LOG_D("Execute script " + scriptEntity.getName());
 		CPythonObjectNew pReturnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
-		returnValues.addData(scriptEntity.getName(), pyObBuilder.getVariableList(pReturnValue));
+		returnValues.addData(scriptEntity.getName(), pyObBuilder.getGenericDataStructList(pReturnValue));
 		currentParameterSet++;
 		OT_LOG_D("Script execution succeeded");
 		EntityBuffer::INSTANCE().ClearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
@@ -56,11 +56,9 @@ ot::ReturnValues PythonAPI::Execute(const std::string& command) noexcept(false)
 	CPythonObjectNew pReturnValue = _wrapper.Execute(command,moduleName);
 	ot::ReturnValues returnValues;
 	PythonObjectBuilder pyObBuilder;
-	returnValues.addData("", pyObBuilder.getVariableList(pReturnValue));
+	returnValues.addData("", pyObBuilder.getGenericDataStructList(pReturnValue));
 	return returnValues;
 }
-
-
 
 std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std::string> scripts)
 {

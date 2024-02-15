@@ -18,7 +18,7 @@ public:
 	CPythonObjectNew CreateParameterSet(std::list<ot::Variable>& parameterSet) 
 	{ 
 		PythonObjectBuilder pyObBuilder;
-		return pyObBuilder.setVariableList(parameterSet); 
+		return pyObBuilder.setVariableTuple(parameterSet); 
 	};
 	
 	std::string GetModuleEntryPoint() { 

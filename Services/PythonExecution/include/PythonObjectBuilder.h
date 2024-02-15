@@ -11,12 +11,14 @@
 #include "CPythonObjectBorrowed.h"
 #include "OTCore/Variable.h"
 #include "OTCore/JSON.h"
+#include "OTCore/Variable.h"
+#include "OTCore/GenericDataStruct.h"
 
 #include <stdint.h>
 #include <string>
 #include <list>
 #include <map>
-#include "OTCore/Variable.h"
+#include <memory>
 #include <optional>
 
 /// <summary>
@@ -50,6 +52,8 @@ public:
 	std::list<std::string> getStringList(const CPythonObject& pValue, const std::string& varName);
 	std::list<bool> getBoolList(const CPythonObject& pValue, const std::string& varName);
 
+	ot::GenericDataStructList getGenericDataStructList(CPythonObject& pValue);
+	ot::GenericDataStruct* getGenericDataStruct(CPythonObject& pValue);
 	std::list<ot::Variable> getVariableList(CPythonObject& pValue);
 	std::optional<ot::Variable> getVariable(CPythonObject& pValue);
 
@@ -59,8 +63,15 @@ public:
 	CPythonObjectNew setString(const std::string& value);
 	CPythonObjectNew setBool(const bool value);
 
-	CPythonObjectNew setVariableList(std::list<ot::Variable>& values);
+	CPythonObjectNew setVariableTuple(const std::list<ot::Variable>& values);
+	CPythonObjectNew setVariableList(const std::list<ot::Variable>& values);
+	CPythonObjectNew setVariableList(const std::vector<ot::Variable>& values);
 	CPythonObjectNew setVariableList(rapidjson::GenericArray<false,rapidjson::Value> & values);
+	
+	CPythonObjectNew setVariable(const ot::Variable& value);
+
+	CPythonObjectNew setGenericDataStruct(ot::GenericDataStruct* genericDataStruct);
+	CPythonObjectNew setGenericDataStructList(const ot::GenericDataStructList& values);
 
 private:
 	PyObject* _assembly = nullptr;

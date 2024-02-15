@@ -91,6 +91,9 @@
     <ClCompile Include="src\GenericDataStructSingle.cpp">
       <Filter>src\GenericDataStruct</Filter>
     </ClCompile>
+    <ClCompile Include="src\GenericDataStructFactory.cpp">
+      <Filter>src\GenericDataStruct</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -226,6 +229,9 @@
       <Filter>include\GenericDataStruct</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\GenericDataStructSingle.h">
+      <Filter>include\GenericDataStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\GenericDataStructFactory.h">
       <Filter>include\GenericDataStruct</Filter>
     </ClInclude>
   </ItemGroup>

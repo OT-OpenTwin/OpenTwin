@@ -14,8 +14,6 @@
 #include "PythonModuleAPI.h"
 #include "PythonLoadedModules.h"
 
-//class PythonWrapper;
-
 namespace PythonExtensions
 {
     static PyObject* OT_GetPropertyValue(PyObject* self, PyObject* args)
@@ -169,7 +167,7 @@ namespace PythonExtensions
         PythonObjectBuilder pyObBuilder;
         std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 1");
-        std::list<ot::Variable> values = pyObBuilder.getVariableList(pvalue);
+        auto values = pyObBuilder.getGenericDataStructList(pvalue);
         PortDataBuffer::INSTANCE().addOrOverridePortData(portName, std::move(values));
         return PyBool_FromLong(true);
     }

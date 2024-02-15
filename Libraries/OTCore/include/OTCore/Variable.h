@@ -38,7 +38,7 @@ namespace ot
 			_ptr = new char[length] {};
 			memcpy(_ptr, other._ptr, length);
 		}
-		StringWrapper(StringWrapper&& other)
+		StringWrapper(StringWrapper&& other) noexcept
 		{
 			size_t length = strlen(other._ptr) + 1;
 			_ptr = new char[length];
@@ -57,7 +57,7 @@ namespace ot
 			memcpy(_ptr, other._ptr, length);
 			return *this;
 		}
-		StringWrapper& operator=(StringWrapper&& other)
+		StringWrapper& operator=(StringWrapper&& other) noexcept
 		{
 			if (_ptr != nullptr)
 			{

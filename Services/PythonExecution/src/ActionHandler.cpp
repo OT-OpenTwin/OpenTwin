@@ -5,6 +5,8 @@
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
+#include "OTCore/GenericDataStruct.h"
+#include "OTCore/GenericDataStructFactory.h"
 #include "PortDataBuffer.h"
 
 #include "Application.h"
@@ -32,7 +34,7 @@ ot::ReturnMessage ActionHandler::Handle(ot::JsonDocument& doc)
 {
 	std::lock_guard<std::mutex> lock(_mutex);
 	
-	ot::ReturnMessage returnMessage;
+	ot::ReturnMessage returnMessage ;
 
 	std::string action = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
 	if (_handlingFunctions.find(action) != _handlingFunctions.end())
@@ -43,11 +45,11 @@ ot::ReturnMessage ActionHandler::Handle(ot::JsonDocument& doc)
 		{
 			OT_LOG_D("Executing action " + action);
 			auto& handlingFunction = _handlingFunctions[action];
-			returnMessage = handlingFunction(doc).toJson();
+			returnMessage = handlingFunction(doc);
 		}
 		else
 		{
-			returnMessage = checkResult.toJson();
+			returnMessage = checkResult;
 		}
 	}
 	else
@@ -62,7 +64,7 @@ ot::ReturnMessage ActionHandler::Handle(ot::JsonDocument& doc)
 ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
 {
 	const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
-	ot::ReturnMessage returnMessage(ot::ReturnMessage::Ok, "Initialisation succeeded");
+	ot::ReturnMessage returnMessage = ot::ReturnMessage(ot::ReturnMessage::Ok, "Initialisation succeeded");
 	if (serviceName == OT_INFO_SERVICE_TYPE_DataBase)
 	{
 		OT_LOG_D("Initialise Database Connection");
@@ -71,11 +73,16 @@ ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
 		const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
 		const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
 		const std::string siteID = ot::json::getString(doc, OT_ACTION_PARAM_SITE_ID);
-		const int sessionID = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_ID);
-		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+
 		DataBase::GetDataBase()->setProjectName(collectionName);
 		DataBase::GetDataBase()->setUserCredentials(userName, psw);
 		DataBase::GetDataBase()->InitializeConnection(url, siteID);
+	}
+	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE)
+	{
+		OT_LOG_D("Initialise UID Generator");
+		const int sessionID = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_ID);
+		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionID, serviceID));
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL)
@@ -93,7 +100,7 @@ ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
 	}
 	else
 	{
-		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
+		returnMessage =ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
 	}
 	return returnMessage;
 }
@@ -147,8 +154,14 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 			auto portName = portDataNames.begin();
 			for (uint32_t i = 0; i < portData.Size(); i++)
 			{
-				auto portDataEntry = ot::json::getArray(portData, i);
-				const std::list<ot::Variable> values = converterJ2V(portDataEntry);
+				auto portDataEntries = ot::json::getArray(portData, i);
+				ot::GenericDataStructList values;
+				for (const auto& jGenericDataStruct : portDataEntries)
+				{
+					ot::GenericDataStruct* genericDataStruct = ot::GenericDataStructFactory::Create(jGenericDataStruct.GetObject());
+					values.push_back(genericDataStruct);
+				}
+
 				PortDataBuffer::INSTANCE().addNewPortData(*portName, values);
 				portName++;
 			}
@@ -160,7 +173,7 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 
 		if (result.getNumberOfEntries() != 0)
 		{
-			return ot::ReturnMessage(result);
+			return ot::ReturnMessage(std::move(result));;
 		}
 		else
 		{
@@ -170,7 +183,7 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 	catch (std::exception& e)
 	{
 		OT_LOG_D("Script execution failed due to exception: " + std::string(e.what()));
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
+		return ot::ReturnMessage(ot::ReturnMessage::ReturnMessageStatus::Failed, e.what());
 	}
 
 }
