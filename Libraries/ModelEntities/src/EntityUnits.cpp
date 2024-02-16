@@ -17,7 +17,7 @@ bool EntityUnits::getEntityBox(double & xmin, double & xmax, double & ymin, doub
 void EntityUnits::createProperties(void)
 {
 	EntityPropertiesSelection::createProperty(unitGroupname, unitNameDimension, GetUnitList(dimensionsList), "m", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTemperature, GetUnitList(temperatureList), "C", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTemperature, GetUnitList(temperatureList), "degC", unitGroupname, getProperties());
 	EntityPropertiesSelection::createProperty(unitGroupname, unitNameFrequency, GetUnitList(frequencyList), "Hz", unitGroupname, getProperties());
 	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTime, GetUnitList(timeList), "s", unitGroupname, getProperties());
 	EntityPropertiesSelection::createProperty(unitGroupname, unitNameVoltage, GetUnitList(voltageList), "V", unitGroupname, getProperties());
@@ -168,7 +168,7 @@ void EntityUnits::addVisualizationNodes(void)
 void EntityUnits::SetUnitLists()
 {
 	dimensionsList = { {"nm", pow(10,-6)}, {"um", pow(10,-6)}, {"mm",0.001}, {"cm",0.1}, {"m",1.}, {"mil", pow(2.54, -5)}, {"in",0.0254}, {"ft",0.3048} };
-	temperatureList = { {"C",1.}, {"K",1.}, {"F",1.} };
+	temperatureList = { {"degC",1.}, {"K",1.}, {"degF",1.} };
 	frequencyList = { {"Hz", 1.}, {"kHz", pow(10,3)}, {"MHz", pow(10,6)}, {"GHz", pow(10,6)}, {"THz", pow(10,9)}, {"PHz", pow(10,12)} };
 	timeList = { {"fs", pow(10,-15)}, {"ps", pow(10,-12)}, {"ns", pow(10,-9)}, {"us", pow(10,-6)}, {"ms", pow(10,-3)}, {"s", 1.} };
 	voltageList = { {"nV", pow(10,-9)}, {"uV", pow(10,-6)}, {"mV", pow(10,-3)}, {"V",1.}, {"kV", pow(10,3)}, {"MV", pow(10,6)} };
