@@ -22,6 +22,7 @@
 #include "ClassFactory.h"
 #include "EntityResultText.h"
 #include "EntityUnits.h"
+#include "EntityMaterial.h"
 #include "EntityProperties.h"
 
 #include <thread>
@@ -331,7 +332,132 @@ void Application::processSingleUnit(const std::string& unitName, std::stringstre
 
 void Application::changeMaterials(const std::string &content)
 {
+	std::stringstream buffer(content);
 
+	while (processSingleMaterial(buffer));
+}
+
+bool Application::processSingleMaterial(std::stringstream& buffer)
+{
+	std::string materialName, materialColor, materialType, materialEps, materialMu, materialSigma;
+	double materialEpsValue(1.0), materialMuValue(1.0), materialSigmaValue(0.0);
+
+	std::getline(buffer, materialName);
+	if (materialName.empty()) return false;
+
+	std::getline(buffer, materialColor);
+	double r(0.0), g(0.0), b(0.0);
+	readDoubleTriple(materialColor, r, g, b);
+
+	materialColors[materialName] = std::tuple<double, double, double>(r, g, b);
+
+	std::getline(buffer, materialType);
+
+	if (materialType == "Normal")
+	{
+		std::getline(buffer, materialEps);
+		double epsx(0.0), epsy(0.0), epsz(0.0);
+		readDoubleTriple(materialEps, epsx, epsy, epsz);
+		materialEpsValue = sqrt((epsx * epsx + epsy * epsy + epsz * epsz)/3.0);
+
+		std::getline(buffer, materialMu);
+		double mux(0.0), muy(0.0), muz(0.0);
+		readDoubleTriple(materialMu, mux, muy, muz);
+		materialMuValue = sqrt((mux * mux + muy * muy + muz * muz) / 3.0);
+
+		std::getline(buffer, materialSigma);
+		double sigmax(0.0), sigmay(0.0), sigmaz(0.0);
+		readDoubleTriple(materialSigma, sigmax, sigmay, sigmaz);
+		materialSigmaValue = sqrt((sigmax * sigmax + sigmay * sigmay + sigmaz * sigmaz) / 3.0);
+	}
+
+	if (materialName[0] == '$')
+	{
+		// This is an internal material which we should not consider
+		return true;
+	}
+
+	// Try loading the material
+	EntityMaterial* material = nullptr;
+
+	ot::EntityInformation entityInformation;
+	if (modelComponent()->getEntityInformation("Materials/" + materialName, entityInformation))
+	{
+		material = dynamic_cast<EntityMaterial*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), getClassFactory()));
+	}
+
+	bool changed = false;
+
+	if (material == nullptr)
+	{
+		// We have a new material to create
+		material = new EntityMaterial(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName());
+		material->setName("Materials/" + materialName);
+		material->createProperties();
+
+		EntityPropertiesSelection* type = dynamic_cast<EntityPropertiesSelection*>(material->getProperties().getProperty("Material type"));
+		EntityPropertiesDouble* permittivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permittivity (relative)"));
+		EntityPropertiesDouble* permeability = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permeability (relative)"));
+		EntityPropertiesDouble* conductivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Conductivity"));
+
+		type->setValue(materialType == "Normal" ? "Volumetric" : "PEC");
+		type->setNeedsUpdate();
+
+		permittivity->setValue(materialEpsValue);
+		permeability->setValue(materialMuValue);
+		conductivity->setValue(materialSigmaValue);
+
+		changed = true;
+	}
+	else
+	{
+		// We need to modify an existing material
+		EntityPropertiesSelection* type = dynamic_cast<EntityPropertiesSelection*>(material->getProperties().getProperty("Material type"));
+		EntityPropertiesDouble* permittivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permittivity (relative)"));
+		EntityPropertiesDouble* permeability = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permeability (relative)"));
+		EntityPropertiesDouble* conductivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Conductivity"));
+
+		type->setValue(materialType == "Normal" ? "Volumetric" : "PEC");
+
+		permittivity->setValue(materialEpsValue);
+		permeability->setValue(materialMuValue);
+		conductivity->setValue(materialSigmaValue);
+
+		if (material->getProperties().anyPropertyNeedsUpdate())
+		{
+			changed = true;
+		}
+	}
+
+	// If a change is necessary, store the new entity
+	if (changed)
+	{
+		material->updateFromProperties();
+		material->StoreToDataBase();
+		modelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
+	}
+
+	delete material; material = nullptr;
+
+	return true;
+}
+
+void Application::readDoubleTriple(const std::string& line, double& a, double& b, double& c)
+{
+	std::stringstream buffer(line);
+
+	std::string sA, sB, sC;
+	buffer >> sA;
+	buffer >> sB;
+	buffer >> sC;
+
+	std::replace(sA.begin(), sA.end(), ',', '.');
+	std::replace(sB.begin(), sB.end(), ',', '.');
+	std::replace(sC.begin(), sC.end(), ',', '.');
+
+	a = std::atof(sA.c_str());
+	b = std::atof(sB.c_str());
+	c = std::atof(sC.c_str());
 }
 
 void Application::shapeInformation(const std::string &content)

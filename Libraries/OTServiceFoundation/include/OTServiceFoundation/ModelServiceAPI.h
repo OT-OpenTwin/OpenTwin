@@ -33,7 +33,7 @@ namespace ot {
 		void deleteEntitiesFromModel(std::list<std::string>& _entityNameList, bool _saveModel = true);
 		void getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo);
 		void getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo);
-		void getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo);
+		bool getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo);
 		void getEntityChildInformation(const std::string& _entity, std::list<EntityInformation>& _entityInfo, bool recursive);
 		void getEntityChildInformation(UID _entity, std::list<EntityInformation>& _entityInfo, bool recursive);
 		void getSelectedEntityInformation(std::list<EntityInformation>& _entityInfo, const std::string& typeFilter);

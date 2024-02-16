@@ -356,16 +356,18 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, 
 	}
 }
 
-void ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo)
+bool ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo)
 {
 	std::list<std::string> entities{ _entity };
 	std::list<EntityInformation> entityInfoList;
 
 	getEntityInformation(entities, entityInfoList);
 
-	assert(entityInfoList.size() == 1);
+	if (entityInfoList.empty()) return false;
 
 	_entityInfo = entityInfoList.front();
+
+	return true;
 }
 
 void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo)

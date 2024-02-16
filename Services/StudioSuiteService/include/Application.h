@@ -118,6 +118,8 @@ public:
 	void changeMaterials(const std::string &content);
 	void shapeInformation(const std::string &content);
 	void processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed);
+	bool processSingleMaterial(std::stringstream& buffer);
+	void readDoubleTriple(const std::string& line, double& a, double& b, double& c);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
@@ -126,4 +128,5 @@ private:
 	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
 
+	std::map<std::string, std::tuple<double, double, double>> materialColors;
 };
