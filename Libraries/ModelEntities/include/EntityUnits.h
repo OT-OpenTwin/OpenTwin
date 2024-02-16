@@ -46,6 +46,18 @@ private:
 	const std::string unitNameCapacitance = "Capacitance";
 	const std::string unitNameConductivity = "Conductivity";
 
+	std::list<std::pair<std::string, double>> dimensionsList;
+	std::list<std::pair<std::string, double>> temperatureList;
+	std::list<std::pair<std::string, double>> frequencyList;
+	std::list<std::pair<std::string, double>> timeList;
+	std::list<std::pair<std::string, double>> voltageList;
+	std::list<std::pair<std::string, double>> currentList;
+	std::list<std::pair<std::string, double>> conductanceList;
+	std::list<std::pair<std::string, double>> resistanceList;
+	std::list<std::pair<std::string, double>> inductanceList;
+	std::list<std::pair<std::string, double>> capacitanceList;
+	std::list<std::pair<std::string, double>> conductivityList;
+
 	std::map<std::string, double> dimensions;
 	std::map<std::string, double> temperature;
 	std::map<std::string, double> frequency;
@@ -59,5 +71,6 @@ private:
 	std::map<std::string, double> conductivity;
 
 	void SetUnitLists();
-	std::list<std::string> GetUnitList(std::map<std::string, double>& quantity);
+	std::list<std::string> GetUnitList(std::list<std::pair<std::string, double>>& quantity);
+	void BuildMap(const std::list<std::pair<std::string, double>>& list, std::map<std::string, double>& map);
 };
