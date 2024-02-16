@@ -21,10 +21,12 @@
 #include "DataBase.h"
 #include "ClassFactory.h"
 #include "EntityResultText.h"
+#include "EntityUnits.h"
+#include "EntityProperties.h"
 
 #include <thread>
-
 #include <map>
+#include <sstream>
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_STUDIOSUITE
@@ -204,6 +206,8 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 void Application::importProject(void)
 {
+	modelComponent()->clearNewEntityList();
+
 	// TODO: Check whether the project has already been initialized
 	 
 	
@@ -249,8 +253,6 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	// Now we need to send the model change to the model service 
 
-	modelComponent()->clearNewEntityList();
-
 	for (auto item : modifiedNameList)
 	{
 		ot::UID fileEntityID = fileEntityIDList.front(); fileEntityIDList.pop_front();
@@ -264,10 +266,10 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
 
-	m_modelComponent->storeNewEntities(changeMessage);
+	modelComponent()->storeNewEntities(changeMessage);
 
 	// Determine the new version
-	std::string newVersion = m_modelComponent->getCurrentModelVersion();
+	std::string newVersion = modelComponent()->getCurrentModelVersion();
 
 	// Finally we send the new version to the frontend 
 	ot::JsonDocument doc;
@@ -277,17 +279,62 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	uiComponent()->sendMessage(true, doc);
 }
 
-void Application::changeUnits(const std::string& content)
+void Application::changeUnits(const std::string &content)
+{
+	// Load the current units entity
+	ot::EntityInformation entityInformation;
+	modelComponent()->getEntityInformation("Units", entityInformation);
+	EntityUnits* units = dynamic_cast<EntityUnits*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), getClassFactory()));
+	assert(units != nullptr);
+	if (units == nullptr) return;
+
+	// Loop through the various units and check whether an update is necessary
+	std::stringstream buffer(content);
+	bool changed = false;
+
+	processSingleUnit("Dimension", buffer, units, changed);
+	processSingleUnit("Temperature", buffer, units, changed);
+	processSingleUnit("Voltage", buffer, units, changed);
+	processSingleUnit("Current", buffer, units, changed);
+	processSingleUnit("Resistance", buffer, units, changed);
+	processSingleUnit("Conductance", buffer, units, changed);
+	processSingleUnit("Capacitance", buffer, units, changed);
+	processSingleUnit("Inductance", buffer, units, changed);
+	processSingleUnit("Frequency", buffer, units, changed);
+	processSingleUnit("Time", buffer, units, changed);
+
+	// If a change is necessary, store the new entity
+	if (changed)
+	{
+		units->StoreToDataBase();
+		modelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
+	}
+
+	delete units; units = nullptr;
+}
+
+void Application::processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed)
+{
+	std::string currentValue;
+	std::getline(buffer, currentValue);
+
+	EntityPropertiesSelection* scale = dynamic_cast<EntityPropertiesSelection*>(units->getProperties().getProperty(unitName));
+	assert(scale != nullptr);
+	if (scale == nullptr) return;
+
+	if (scale->getValue() != currentValue)
+	{
+		changed = true;
+		scale->setValue(currentValue);
+	}
+}
+
+void Application::changeMaterials(const std::string &content)
 {
 
 }
 
-void Application::changeMaterials(const std::string& content)
-{
-
-}
-
-void Application::shapeInformation(const std::string& content)
+void Application::shapeInformation(const std::string &content)
 {
 
 }

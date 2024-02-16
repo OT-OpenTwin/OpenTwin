@@ -26,6 +26,8 @@ namespace ot {
 	}
 }
 
+class EntityUnits;
+
 class Application : public ot::ApplicationBase {
 public:
 	Application();
@@ -112,9 +114,10 @@ public:
 
 	void EnsureVisualizationModelIDKnown(void);
 
-	void changeUnits(const std::string& content);
-	void changeMaterials(const std::string& content);
-	void shapeInformation(const std::string& content);
+	void changeUnits(const std::string &content);
+	void changeMaterials(const std::string &content);
+	void shapeInformation(const std::string &content);
+	void processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
