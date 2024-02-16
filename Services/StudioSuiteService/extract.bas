@@ -95,7 +95,10 @@ End Sub
 
 
 Sub Main
-	baseFolder = "C:/Users/Peter/Desktop"
+
+	baseFolder = GetProjectPath("Temp") + "/Upload"
+	On Error Resume Next
+	MkDir baseFolder
 	count = 0
 
 	Open baseFolder + "/shape.info" For Output As #1

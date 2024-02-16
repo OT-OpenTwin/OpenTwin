@@ -13,6 +13,7 @@
 
 void StudioConnector::openProject(const std::string& fileName)
 {
+	return;
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
 
@@ -299,10 +300,13 @@ bool StudioConnector::checkSubprocessResponsive(std::string& errorMessage)
 
 void StudioConnector::closeSubprocess()
 {
-	socket->close();
-	socket->waitForDisconnected(timeoutServerConnect);
-	subProcess.waitForFinished(timeoutSubprocessStart);
-	OT_LOG_D("Closed Python Subprocess");
+	if (socket != nullptr)
+	{
+		socket->close();
+		socket->waitForDisconnected(timeoutServerConnect);
+		subProcess.waitForFinished(timeoutSubprocessStart);
+		OT_LOG_D("Closed Python Subprocess");
+	}
 }
 
 bool StudioConnector::waitForResponse()

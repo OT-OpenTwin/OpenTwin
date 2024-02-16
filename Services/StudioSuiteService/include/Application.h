@@ -112,6 +112,10 @@ public:
 
 	void EnsureVisualizationModelIDKnown(void);
 
+	void changeUnits(const std::string& content);
+	void changeMaterials(const std::string& content);
+	void shapeInformation(const std::string& content);
+
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);

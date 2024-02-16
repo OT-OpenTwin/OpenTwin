@@ -35,7 +35,10 @@ private:
     void                    commitNewVersion(const std::string& changeMessage);
     void                    copyCacheFiles(const std::string& baseProjectName, const std::string& newVersion, const std::string& cacheFolderName);
     void                    writeVersionFile(const std::string& baseProjectName, const std::string &projectName, const std::string& newVersion, const std::string& cacheFolderName);
-
+    void                    sendUnitsInformation(const std::string& projectRoot);
+    void                    sendMaterialInformation(const std::string& projectRoot);
+    void                    sendShapeInformationAndTriangulation(const std::string& projectRoot);
+    void                    readFileContent(const std::string& fileName, std::string& content);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

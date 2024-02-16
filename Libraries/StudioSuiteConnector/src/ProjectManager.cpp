@@ -89,6 +89,15 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Upload files
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
 
+		// Send the units information
+		sendUnitsInformation(baseProjectName);
+
+		// Send the material information
+		sendMaterialInformation(baseProjectName);
+
+		// Send the shapes information and triangulations
+		sendShapeInformationAndTriangulation(baseProjectName);
+
 		// Create the new version
 		commitNewVersion(changeMessage);
 
@@ -323,4 +332,66 @@ void ProjectManager::commitNewVersion(const std::string &changeMessage)
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }
 
+void ProjectManager::sendUnitsInformation(const std::string &projectRoot)
+{
+	std::string fileContent;
+	readFileContent(projectRoot + "/Temp/Upload/units.info", fileContent);
 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UNITS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
+}
+
+void ProjectManager::sendMaterialInformation(const std::string& projectRoot)
+{
+	std::string fileContent;
+	readFileContent(projectRoot + "/Temp/Upload/material.info", fileContent);
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_MATERIALS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
+}
+
+void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot)
+{
+	std::string fileContent;
+	readFileContent(projectRoot + "/Temp/Upload/shape.info", fileContent);
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SHAPEINFO, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
+
+	// Determine checksums and send them to the service
+
+
+
+	// Now send the triangulations (one by one)
+
+
+
+
+}
+
+void ProjectManager::readFileContent(const std::string &fileName, std::string &content)
+{
+	content.clear();
+
+	std::ifstream t(fileName);
+	if (!t.is_open()) throw std::string("Unable to read file: " + fileName);
+
+	t.seekg(0, std::ios::end);
+	content.reserve(t.tellg());
+	t.seekg(0, std::ios::beg);
+
+	content.assign((std::istreambuf_iterator<char>(t)),
+					std::istreambuf_iterator<char>());
+}

@@ -69,6 +69,24 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		filesUploaded(_doc);
 		return "";
 	}
+	else if (_action == OT_ACTION_CMD_UI_SS_UNITS)
+	{
+		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+		changeUnits(content);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_MATERIALS)
+	{
+		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+		changeMaterials(content);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_SHAPEINFO)
+	{
+		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+		shapeInformation(content);
+		return "";
+	}
 
 	return OT_ACTION_RETURN_UnknownAction;
 }
@@ -257,4 +275,19 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
+}
+
+void Application::changeUnits(const std::string& content)
+{
+
+}
+
+void Application::changeMaterials(const std::string& content)
+{
+
+}
+
+void Application::shapeInformation(const std::string& content)
+{
+
 }
