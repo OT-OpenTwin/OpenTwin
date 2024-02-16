@@ -42,15 +42,15 @@ void EntityUnits::TurnToSITemperature(double & value, std::string& formerUnit)
 	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameTemperature));
 	assert(entity != nullptr);
 	formerUnit = entity->getValue();
-	if (formerUnit == "Celsius")
+	if (formerUnit == "Celsius" || formerUnit == "°C")
 	{
 		value += 273.15;
 	}
-	else if (formerUnit == "Kelvin")
+	else if (formerUnit == "Kelvin" || formerUnit == "K")
 	{
 		return;
 	}
-	else if (formerUnit == "Fahrenheit")
+	else if (formerUnit == "Fahrenheit" || formerUnit == "°F")
 	{
 		value = (value - 32) * (5 / 9) + 273.15;
 	}
@@ -168,15 +168,15 @@ void EntityUnits::addVisualizationNodes(void)
 void EntityUnits::SetUnitLists()
 {
 	dimensions = { {"m",1.}, {"cm",0.1}, {"mm",0.001}, {"um", pow(10,-6)}, {"nm", pow(10,-6)}, {"ft",0.3048}, {"mil", pow(2.54, -5)}, {"in",0.0254}};
-	temperature = { {"Celsius",1.}, {"Kelvin",1.}, {"Fahrenheit",1.} };
+	temperature = { {"°C",1.}, {"K",1.}, {"°F",1.} };
 	frequency = { {"Hz", 1.}, {"kHz", pow(10,3)}, {"MHz", pow(10,6)}, {"GHz", pow(10,6)}, {"THz", pow(10,9)}, {"PHz", pow(10,12)} };
 	time = { {"fs", pow(10,-15)}, {"ps", pow(10,-12)}, {"ns", pow(10,-9)}, {"us", pow(10,-6)}, {"ms", pow(10,-3)}, {"s", 1.} };
-	voltage = { {"V",1.} };
-	current = { {"A",1.} };
-	conductance = { {"S",1.} };
-	resistance = { {"Ohm",1.} };
-	inductance = { {"H",1.} };
-	capacitance = { {"F",1.} };
+	voltage = { {"V",1.}, {"MV", pow(10,6)},{"kV", pow(10,3)}, {"mV", pow(10,-3)}, {"uV", pow(10,-6)}, {"nV", pow(10,-9)} };
+	current = { {"A",1.}, {"MA", pow(10,6)},{"kA", pow(10,3)}, {"mA", pow(10,-3)}, {"uA", pow(10,-6)}, {"nA", pow(10,-9)} };
+	conductance = { {"S",1.}, {"MS", pow(10,6)},{"kS", pow(10,3)}, {"mS", pow(10,-3)}, {"uS", pow(10,-6)}, {"nS", pow(10,-9)} };
+	resistance = { {"Ohm",1.}, {"GOhm", pow(10,9)} , {"MOhm", pow(10,6)},{"kOhm", pow(10,3)}, {"mOhm", pow(10,-3)}, {"uOhm", pow(10,-6)}, {"nOhm", pow(10,-9)} };
+	inductance = { {"H",1.}, {"mH", pow(10,-3)}, {"uH", pow(10,-6)}, {"nH", pow(10,-9)}, {"pH", pow(10,-12)} };
+	capacitance = { {"F",1.}, {"mF", pow(10,-3)}, {"uF", pow(10,-6)}, {"nF", pow(10,-9)}, {"pF", pow(10,-12)}, {"fF", pow(10,-15)} };
 	conductivity = { {"S/m",1.} };
 }
 
