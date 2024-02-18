@@ -13,7 +13,6 @@
 
 void StudioConnector::openProject(const std::string& fileName)
 {
-	return;
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
 
@@ -59,7 +58,11 @@ void StudioConnector::extractInformation()
 
 StudioConnector::~StudioConnector()
 {
-	closeSubprocess();
+	if (subProcessRunning)
+	{
+		subProcess.kill();
+		server.close();
+	}
 }
 
 void StudioConnector::determineStudioSuiteInstallation(int &version, std::string &studioPath)
@@ -88,10 +91,7 @@ void StudioConnector::determineStudioSuiteInstallation(int &version, std::string
 
 void StudioConnector::startSubprocess()
 {
-	if (subProcessRunning)
-	{
-		closeSubprocess();
-	}
+	if (subProcessRunning) return;
 
 	// Determine new unique server name
 	QUuid uidGenerator = QUuid::createUuid();
@@ -105,15 +105,36 @@ void StudioConnector::startSubprocess()
 #endif
 	server.listen(serverName.c_str());
 #ifndef DEBUG_PYTHON_SERVER
-	std::thread workerThread(&StudioConnector::runSubprocess, this);
-	workerThread.detach();
+	//std::thread workerThread(&StudioConnector::runSubprocess, this);
+	//workerThread.detach();
+
+	runSubprocess();
 #endif
 	connectWithSubprocess();
 
 	if (waitForResponse())
 	{
 		std::string response = socket->readLine().data();
+		ot::ReturnMessage msg;
+		msg.fromJson(response);
+		assert(msg.getStatus() == ot::ReturnMessage::Ok);
 		startupChecked = true;
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+
+		doc.AddMember(OT_ACTION_PARAM_SESSION_ID, 0, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, 0, doc.GetAllocator());   
+
+		ot::ReturnMessage returnMessage = send(doc.toJson());
+
+		if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed)
+		{
+			OT_LOG_E("Failed to initialise Python subprocess");
+			std::string errorMessage = "Failed to initialise Python subprocess, due to following error: " + returnMessage.getWhat();
+			throw std::string(errorMessage);
+		}
 	}
 	else
 	{
@@ -302,6 +323,13 @@ void StudioConnector::closeSubprocess()
 {
 	if (socket != nullptr)
 	{
+		//subProcess.kill();
+		//delete socket;
+		//socket = nullptr;
+
+		subProcessRunning = false;
+		startupChecked = false;
+
 		socket->close();
 		socket->waitForDisconnected(timeoutServerConnect);
 		subProcess.waitForFinished(timeoutSubprocessStart);

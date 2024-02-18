@@ -12,7 +12,7 @@
 #include <atomic>
 #include <chrono>
 
-class StudioConnector : public BusinessLogicHandler
+class StudioConnector
 {
 public:
     static StudioConnector& getInstance()
