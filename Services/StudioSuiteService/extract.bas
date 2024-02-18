@@ -21,6 +21,8 @@ Sub ExportSolidChildItem(parent$)
 		solidName = Right(itemName, Len(itemName)-index)
 		componentName = Left(itemName, index-1)
 
+		componentName = Replace(componentName, "\", "/")
+
 		With STL
 			.Reset
 			.FileName (baseFolder + "/stl" + CStr(count) + ".stl")
@@ -96,14 +98,23 @@ End Sub
 
 Sub Main
 
+	SetLock(True)
+
 	baseFolder = GetProjectPath("Temp") + "/Upload"
 	On Error Resume Next
 	MkDir baseFolder
 	count = 0
 
+	ScreenUpdating(False)
+	Dim currentItem As String
+	currentItem = GetSelectedTreeItem()
+
 	Open baseFolder + "/shape.info" For Output As #1
 	ExportSolidChildItem("Components")
 	Close #1
+
+	SelectTreeItem(currentItem)
+	ScreenUpdating(True)
 
 	Open baseFolder + "/material.info" For Output As #1
 	ExportMaterials()
