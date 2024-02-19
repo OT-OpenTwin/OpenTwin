@@ -25,8 +25,7 @@ void StudioConnector::openProject(const std::string& fileName)
 	script << "import sys" << std::endl;
 	script << "sys.path.append(r\"" << studioPath << "\\AMD64\\python_cst_libraries\")" << std::endl;
 
-
-	executeCommand("print(1)");
+	executeCommand(script.str());
 
 
 	// Now we need to get a list of all process ids of running CST STUDIO SUITE DESIGN ENVIRONMENTS
