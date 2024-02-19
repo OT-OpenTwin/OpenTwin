@@ -38,7 +38,8 @@ private:
     void getSocketErrorOccured(std::string& message);
 
     void determineStudioSuiteInstallation(int& version, std::string& studioPath);
-
+    std::list<long long> getRunningDesignEnvironmentProcesses();
+    bool connectToRunningDesignEnvironmentProcess(long long pid, std::string fileName);
 
     bool subProcessRunning = false;
     std::string serverName;

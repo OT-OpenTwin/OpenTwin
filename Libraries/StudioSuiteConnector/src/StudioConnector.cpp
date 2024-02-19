@@ -27,21 +27,27 @@ void StudioConnector::openProject(const std::string& fileName)
 
 	executeCommand(script.str());
 
-
 	// Now we need to get a list of all process ids of running CST STUDIO SUITE DESIGN ENVIRONMENTS
-
+	std::list<long long> studioPidList = getRunningDesignEnvironmentProcesses();
 
 	// Connect to each of them and check whether the project is open there
+	bool connected = false;
 
-
+	for (auto pid : studioPidList)
+	{
+		if (connectToRunningDesignEnvironmentProcess(pid, fileName))
+		{
+			connected = true;
+			break;
+		}
+	}
 
 	// Here the project is not open yet, so we create a new instance and open the project there
 
+	if (!connected)
+	{
 
-
-
-
-
+	}
 
 }
 
@@ -61,6 +67,50 @@ StudioConnector::~StudioConnector()
 	{
 		closeSubprocess();
 	}
+}
+
+std::list<long long> StudioConnector::getRunningDesignEnvironmentProcesses()
+{
+	QProcess tasklist;
+	tasklist.start(
+		"tasklist",
+		QStringList()
+		<< "/FO" << "LIST"
+		<< "/FI" << QString("IMAGENAME eq  CST DESIGN ENVIRONMENT_AMD64.exe"));
+	tasklist.waitForFinished();
+	std::stringstream output(tasklist.readAllStandardOutput().toStdString());
+
+	std::list<long long> processIDs;
+
+	while (!output.eof())
+	{
+		std::string line;
+		std::getline(output, line);
+
+		if (line.substr(0, 4) == "PID:")
+		{
+			long long pid = atoll(line.substr(5).c_str());
+			processIDs.push_back(pid);
+		}
+	}
+
+	return processIDs;
+}
+
+bool StudioConnector::connectToRunningDesignEnvironmentProcess(long long pid, std::string fileName)
+{
+	std::replace(fileName.begin(), fileName.end(), '/', '\\');
+
+	std::stringstream script;
+	script << "from cst.interface import DesignEnvironment" << std::endl;
+	script << "de = DesignEnvironment.connect(" << pid << ")" << std::endl;
+	script << "if not de.is_connected():" << std::endl;
+	script << "   raise Exception('not connected')" << std::endl;
+	//script << "prj = de.get_open_project('" << fileName <<"')" << std::endl;
+
+	ot::ReturnMessage returnMessage = executeCommand(script.str());
+
+	return (returnMessage.getStatus() == ot::ReturnMessage::Ok);
 }
 
 void StudioConnector::determineStudioSuiteInstallation(int &version, std::string &studioPath)
@@ -289,8 +339,7 @@ ot::ReturnMessage StudioConnector::send(const std::string& message)
 	}
 
 	const std::string returnString(socket->readLine().data());
-	ot::ReturnMessage returnMessage;
-	returnMessage.fromJson(returnString);
+	ot::ReturnMessage returnMessage = ot::ReturnMessage::fromJson(returnString);
 
 	return returnMessage;
 }
