@@ -334,10 +334,33 @@ void Application::changeMaterials(const std::string &content)
 {
 	std::stringstream buffer(content);
 
-	while (processSingleMaterial(buffer));
+	ot::UIDList currentMaterials = modelComponent()->getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
+	std::list<ot::EntityInformation> currentMaterialInfo;
+	modelComponent()->getEntityInformation(currentMaterials, currentMaterialInfo);
+	std::map<std::string, bool> materialProcessed;
+
+	while (processSingleMaterial(buffer, materialProcessed));
+
+	// Now we need to check if an existing material was not processed, which means that it no longer exists.
+	// In this case, we need to delete the material
+
+	std::list<std::string> obsoleteMaterials;
+
+	for (auto material : currentMaterialInfo)
+	{
+		if (materialProcessed.count(material.getName()) == 0)
+		{
+			obsoleteMaterials.push_back(material.getName());
+		}
+	}
+
+	if (!obsoleteMaterials.empty())
+	{
+		modelComponent()->deleteEntitiesFromModel(obsoleteMaterials, false);
+	}
 }
 
-bool Application::processSingleMaterial(std::stringstream& buffer)
+bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed)
 {
 	std::string materialName, materialColor, materialType, materialEps, materialMu, materialSigma;
 	double materialEpsValue(1.0), materialMuValue(1.0), materialSigmaValue(0.0);
@@ -427,6 +450,8 @@ bool Application::processSingleMaterial(std::stringstream& buffer)
 		{
 			changed = true;
 		}
+
+		materialProcessed[material->getName()] = true;
 	}
 
 	// If a change is necessary, store the new entity

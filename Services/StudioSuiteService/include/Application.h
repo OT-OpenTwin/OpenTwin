@@ -118,7 +118,7 @@ public:
 	void changeMaterials(const std::string &content);
 	void shapeInformation(const std::string &content);
 	void processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed);
-	bool processSingleMaterial(std::stringstream& buffer);
+	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed);
 	void readDoubleTriple(const std::string& line, double& a, double& b, double& c);
 
 private:
