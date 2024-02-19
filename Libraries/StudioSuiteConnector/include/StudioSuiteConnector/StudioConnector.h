@@ -15,21 +15,14 @@
 class StudioConnector
 {
 public:
-    static StudioConnector& getInstance()
-    {
-        static StudioConnector instance; // Guaranteed to be destroyed.
-        // Instantiated on first use.
-        return instance;
-    }
+    StudioConnector() {};
+    ~StudioConnector();
 
     void openProject(const std::string &fileName);
     void saveProject();
     void extractInformation();
 
 private:
-    StudioConnector() {};
-    ~StudioConnector();
-
     void startSubprocess();
     std::string findSubprocessPath();
     void initiateProcess();
@@ -60,7 +53,6 @@ private:
     const int heartBeat = timeoutSubprocessStart;
 
     std::atomic_bool startupChecked = false;
-    std::mutex mtx;
 
     QProcess subProcess;
     QLocalServer server;

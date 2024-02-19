@@ -60,8 +60,7 @@ StudioConnector::~StudioConnector()
 {
 	if (subProcessRunning)
 	{
-		subProcess.kill();
-		server.close();
+		closeSubprocess();
 	}
 }
 
@@ -334,6 +333,9 @@ void StudioConnector::closeSubprocess()
 		socket->waitForDisconnected(timeoutServerConnect);
 		subProcess.waitForFinished(timeoutSubprocessStart);
 		OT_LOG_D("Closed Python Subprocess");
+
+		delete socket;
+		socket = nullptr;
 	}
 }
 
