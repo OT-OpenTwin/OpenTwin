@@ -34,7 +34,7 @@ namespace ot
 		void addData(const std::string& entryName, const GenericDataStructList& values);
 		void addData(const std::string& entryName, GenericDataStructList&& values);
 		const size_t getNumberOfEntries() const { return _valuesByName.size(); }
-		const std::map<std::string, GenericDataStructList>& getValuesByName() const { return _valuesByName; }
+		std::map<std::string, GenericDataStructList>& getValuesByName() { return _valuesByName; }
 
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;

@@ -28,6 +28,7 @@ bool BlockHandlerDataDimensionReducer::executeSpecialized()
 		const ot::Variable& value = matrixData->getValue(_column, _row);
 		
 		filteredData->setValue(count, value);
+		count++;
 	}
 
 	_dataPerPort[_outputConnectorName] = { filteredData };

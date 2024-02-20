@@ -6,7 +6,7 @@
 class PortData
 {
 public:
-	PortData(const std::string& portName, const ot::GenericDataStructList& values, bool modified = false);
+	PortData(const std::string& portName, const ot::GenericDataStructList& values, bool modified);
 	PortData(PortData&& other) noexcept;
 	PortData(const PortData& other) = delete;
 	PortData& operator=(PortData&& other) noexcept;

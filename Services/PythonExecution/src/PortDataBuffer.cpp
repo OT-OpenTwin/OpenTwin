@@ -5,14 +5,14 @@
 void PortDataBuffer::addNewPortData(const std::string& portName, const ot::GenericDataStructList& data)
 {
 	assert(_portData.find(portName) == _portData.end());
-	_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data)));
+	_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data, false)));
 }
 
-void PortDataBuffer::addOrOverridePortData(const std::string& portName, const ot::GenericDataStructList& data)
+void PortDataBuffer::OverridePortData(const std::string& portName, const ot::GenericDataStructList& data)
 {
 	if (_portData.find(portName) == _portData.end())
 	{
-		_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data,true)));
+		_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data, true)));
 	}
 	else
 	{

@@ -536,15 +536,27 @@ CPythonObjectNew PythonObjectBuilder::setGenericDataStruct(ot::GenericDataStruct
 	}
 }
 
-CPythonObjectNew PythonObjectBuilder::setGenericDataStructList(const ot::GenericDataStructList& values)
+CPythonObjectNew PythonObjectBuilder::setGenericDataStructList(ot::GenericDataStructList& values)
 {
 	uint64_t assemblySize = values.size();
-	PyObject* assembly = PyTuple_New(assemblySize);
+	PyObject* assembly = PyList_New(assemblySize);
 	uint64_t counter = 0;
-	for (const ot::GenericDataStruct* value : values)
+	
+	if (values.size() == 1)
 	{
-		CPythonObjectNew pValue = setVariable(value);
-		int success = PyTuple_SetItem(assembly, counter, pValue);
+		auto value=	values.begin();
+		auto vectorValue = dynamic_cast<ot::GenericDataStructVector*>(*value);
+		if (vectorValue != nullptr)
+		{
+			CPythonObjectNew pValue = setGenericDataStruct(*value);
+			return pValue;
+		}
+	}
+	
+	for (ot::GenericDataStruct* value : values)
+	{
+		CPythonObjectNew pValue = setGenericDataStruct(value);
+		int success = PyList_SetItem(assembly, counter, pValue);
 		assert(success == 0);
 		pValue.DropOwnership();
 		counter++;

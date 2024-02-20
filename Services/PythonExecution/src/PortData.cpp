@@ -7,7 +7,7 @@ PortData::PortData(const std::string& portName, const ot::GenericDataStructList&
 }
 
 PortData::PortData(PortData&& other) noexcept
-	:_portName(other._portName), _values(std::move(other._values))
+	:_portName(other._portName), _modified(other.getModified()), _values(std::move(other._values))
 {
 }
 
@@ -15,6 +15,7 @@ PortData& PortData::operator=(PortData&& other) noexcept
 {
 	_portName = (other._portName);
 	_values = (std::move(other._values));
+	_modified = other.getModified();
 	return *this;
 }
 

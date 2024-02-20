@@ -19,7 +19,7 @@ public:
 	}
 
 	void addNewPortData(const std::string& portName,const ot::GenericDataStructList& data);
-	void addOrOverridePortData(const std::string& portName,const ot::GenericDataStructList& data);
+	void OverridePortData(const std::string& portName,const ot::GenericDataStructList& data);
 	void clearPortData();
 	PyObject* getPortData(const std::string& portName);
 	void AddModifiedPortData(ot::ReturnValues& returnValues);

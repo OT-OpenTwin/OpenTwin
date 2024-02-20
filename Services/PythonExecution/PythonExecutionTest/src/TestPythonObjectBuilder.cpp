@@ -117,3 +117,19 @@ TEST_F(FixturePythonObjectBuilder, GenericDataStructure)
 
 	ASSERT_EQ(actual->getNumberOfEntries(), expected.getNumberOfEntries());
 }
+
+TEST_F(FixturePythonObjectBuilder, GenericDataStructureList)
+{
+	ot::GenericDataStructList expected{ new ot::GenericDataStructVector({ 1.2,2.3,3.4,4.5,5.6,6.7 }),new ot::GenericDataStructVector({ 7,8,9}),new ot::GenericDataStructVector({ 10,12,13,14,15,16 }) };
+
+	PythonObjectBuilder builder;
+	auto pValue = builder.setGenericDataStructList(expected);
+	auto gValue = builder.getGenericDataStructList(pValue);
+	auto actual = dynamic_cast<ot::GenericDataStructVector*>(*gValue.begin());
+
+	ASSERT_EQ(actual->getNumberOfEntries(), (*expected.begin())->getNumberOfEntries());
+}
+
+
+
+

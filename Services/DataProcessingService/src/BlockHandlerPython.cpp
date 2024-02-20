@@ -54,8 +54,8 @@ bool BlockHandlerPython::executeSpecialized()
         ot::ReturnMessage returnMessage = _pythonServiceInterface->SendExecutionOrder();
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
         {
-            const ot::ReturnValues& returnValues = returnMessage.getValues();
-            const auto& valuesByName =  returnValues.getValuesByName();
+            ot::ReturnValues& returnValues = returnMessage.getValues();
+            auto& valuesByName =  returnValues.getValuesByName();
             for (const std::string& outputName : _outputs)
             {
                 auto valuesPointer = valuesByName.find(outputName);
@@ -65,8 +65,8 @@ bool BlockHandlerPython::executeSpecialized()
                 }
                 else
                 {
-                    const GenericDataList& returnValueList = valuesPointer->second;
-                    _dataPerPort[outputName] = returnValueList;
+                    auto& returnValueList = valuesPointer->second;
+                    _dataPerPort[outputName] = std::move(returnValueList);
                 }
             }
         }

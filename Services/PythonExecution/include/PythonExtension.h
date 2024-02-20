@@ -168,7 +168,7 @@ namespace PythonExtensions
         std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 1");
         auto values = pyObBuilder.getGenericDataStructList(pvalue);
-        PortDataBuffer::INSTANCE().addOrOverridePortData(portName, std::move(values));
+        PortDataBuffer::INSTANCE().OverridePortData(portName, std::move(values));
         return PyBool_FromLong(true);
     }
 

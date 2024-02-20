@@ -71,7 +71,7 @@ public:
 	CPythonObjectNew setVariable(const ot::Variable& value);
 
 	CPythonObjectNew setGenericDataStruct(ot::GenericDataStruct* genericDataStruct);
-	CPythonObjectNew setGenericDataStructList(const ot::GenericDataStructList& values);
+	CPythonObjectNew setGenericDataStructList(ot::GenericDataStructList& values);
 
 private:
 	PyObject* _assembly = nullptr;

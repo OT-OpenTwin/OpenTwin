@@ -79,7 +79,7 @@ namespace ot
 		//! @brief Get the return message status
 		ReturnMessageStatus getStatus(void) const { return m_status; }
 
-		const ReturnValues& getValues() const { return m_values; }
+		ReturnValues& getValues() { return m_values; }
 
 		//! @brief Returns a string representation of the status
 		std::string getStatusString(void) const;
