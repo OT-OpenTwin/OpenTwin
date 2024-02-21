@@ -40,6 +40,10 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+REM Get the current timestamp (capture echo call from the batch)
+for /f "delims=" %%a in ('call "%OPENTWIN_DEV_ROOT%\Scripts\Other\PrintCurrentTimestamp.bat" "Build started at: " ""') do set OT_LCL_BuildStart=%%a
+echo %OT_LCL_BuildStart%
+
 REM Create the certificates if necessary 
 cd /D "%OPENTWIN_DEV_ROOT%\Certificates\CreateLocalCertificates"
 CALL CreateLocalCertificates.bat
@@ -352,6 +356,13 @@ if "%2"=="" (
 
 FIND %searchString% buildLog_Debug.txt buildLog_Release.txt > buildLog_Summary.txt
 FIND """message"":" RUSTbuildLog.txt >> buildLog_Summary.txt
+
+ECHO %OT_LCL_BuildStart% >> buildLog_Summary.txt
+
+REM Get the current timestamp (capture echo call from the batch)
+for /f "delims=" %%a in ('call "%OPENTWIN_DEV_ROOT%\Scripts\Other\PrintCurrentTimestamp.bat" "Build finished at: " ""') do set OT_LCL_BuildEnd=%%a
+ECHO %OT_LCL_BuildEnd%
+ECHO %OT_LCL_BuildEnd% >> buildLog_Summary.txt
 
 EXIT /b 0
 
