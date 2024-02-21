@@ -3177,6 +3177,48 @@ void Model::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point)
 	updateCapGeometryForSceneNodes(sceneNodesRoot, normal, point);
 }
 
+std::list<std::string> Model::getSelectedCurves()
+{
+	ot::UIDList treeItemIDs;
+	getSelectedTreeItemIDs(treeItemIDs);
+	std::list<std::string> curveDescriptions;
+	for (ot::UID treeID : treeItemIDs)
+	{
+		auto sceneNodeBaseByUID = treeItemToSceneNodesMap.find(treeID);
+		assert(sceneNodeBaseByUID != treeItemToSceneNodesMap.end());
+		auto sceneNodeBase = sceneNodeBaseByUID->second;
+		SceneNodeResult1DItem* curve = dynamic_cast<SceneNodeResult1DItem*>(sceneNodeBase);
+		if (curve != nullptr)
+		{
+			curveDescriptions.push_back(curve->getName());
+		}
+	}
+	return curveDescriptions;
+}
+
+void Model::removedSelectedCurveNodes()
+{
+	ot::UIDList treeItemIDs;
+	getSelectedTreeItemIDs(treeItemIDs);
+	ot::UIDList treeItemDeleteList;  // We group the tree item deletions for better performance
+	for (ot::UID treeID : treeItemIDs)
+	{
+		auto sceneNodeBaseByUID = treeItemToSceneNodesMap.find(treeID);
+		assert(sceneNodeBaseByUID != treeItemToSceneNodesMap.end());
+		auto sceneNodeBase = sceneNodeBaseByUID->second;
+		SceneNodeResult1DItem* curve = dynamic_cast<SceneNodeResult1DItem*>(sceneNodeBase);
+		
+		if (curve!= nullptr)
+		{
+			removeSceneNodeAndChildren(curve, treeItemDeleteList);
+		}
+	}
+	// Remove the shapes from the tree
+	getNotifier()->removeTreeItems(treeItemDeleteList);
+}
+
+
+
 void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point)
 {
 	if (root->isVisible() && dynamic_cast<SceneNodeGeometry*>(root) != nullptr)

@@ -75,10 +75,12 @@ public:
 	bool updatePropertyVisibilities(void);
 
 	void addCurve(ot::UID curveID, const std::string &name);
-	void deleteCurve(ot::UID curveID);
+	bool deleteCurve(ot::UID curveID);
+	bool deleteCurve(const std::string& curveName);
 	std::list<ot::UID> getCurves(void);
 	std::list<std::string> getCurveNames(void);
-
+	void overrideReferencedCurves(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames);
+	
 private:
 	virtual int getSchemaVersion(void) { return 1; };
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
@@ -94,7 +96,7 @@ private:
 	void addPropertiesToDocument(ot::JsonDocument &doc);
 
 	std::list<ot::UID> curves;
-	std::map<ot::UID, std::string> curveNames;
+	std::map<ot::UID, std::string> curveNamesByUID;
 };
 
 

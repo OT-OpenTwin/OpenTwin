@@ -41,7 +41,7 @@ void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document &stora
 	for (auto curve : curves)
 	{
 		curveID.append((long long) curve);
-		curveName.append(curveNames[curve]);
+		curveName.append(curveNamesByUID[curve]);
 	}
 
 	storage.append(
@@ -59,19 +59,19 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view &d
 	auto arrayCurveItems = doc_view["Curves"].get_array().value;
 	auto arrayCurveNames = doc_view["CurveNames"].get_array().value;
 	curves.clear();
-	curveNames.clear();
+	curveNamesByUID.clear();
 
-	for (bsoncxx::array::element item : arrayCurveItems)
+	for (const bsoncxx::array::element& item : arrayCurveItems)
 	{
 		ot::UID curveID = item.get_int64();
 		curves.push_back(curveID);
 	}
 
 	auto it = curves.begin();
-	for (bsoncxx::array::element name : arrayCurveNames)
+	for (const bsoncxx::array::element& name : arrayCurveNames)
 	{
 		std::string curveName = name.get_utf8().value.data();
-		curveNames[*it] = curveName;
+		curveNamesByUID[*it] = curveName;
 
 		it++;
 	}
@@ -327,13 +327,37 @@ void EntityResult1DPlot::addCurve(ot::UID curveID, const std::string &name)
 {
 	deleteCurve(curveID);
 	curves.push_back(curveID);
-	curveNames[curveID] = name;
+	curveNamesByUID[curveID] = name;
+	setModified();
 }
 
-void EntityResult1DPlot::deleteCurve(ot::UID curveID)
+bool EntityResult1DPlot::deleteCurve(ot::UID curveID)
 {
-	curves.remove(curveID);
-	curveNames.erase(curveID);
+	if (curveNamesByUID.find(curveID) != curveNamesByUID.end())
+	{
+		curves.remove(curveID);
+		curveNamesByUID.erase(curveID);
+		setModified();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
+}
+
+bool EntityResult1DPlot::deleteCurve(const std::string& curveName)
+{
+	for (const auto curveNameByUID : curveNamesByUID)
+	{
+		if (curveNameByUID.second == curveName)
+		{
+			setModified();
+			return deleteCurve(curveNameByUID.first);
+		}
+	}
+	return false;
 }
 
 std::list<ot::UID> EntityResult1DPlot::getCurves(void)
@@ -346,10 +370,22 @@ std::list<std::string> EntityResult1DPlot::getCurveNames(void)
 	std::list<std::string> names;
 	for (auto curve : curves)
 	{
-		names.push_back(curveNames[curve]);
+		names.push_back(curveNamesByUID[curve]);
 	}
 
 	return names;
+}
+
+void EntityResult1DPlot::overrideReferencedCurves(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames)
+{
+	curves = curveIDs;
+	curveNamesByUID.clear();
+	auto curveName = curveNames.begin();
+	for (const ot::UID& curveID : curveIDs)
+	{
+		curveNamesByUID[curveID] = *curveName;
+	}
+	setModified();
 }
 
 bool EntityResult1DPlot::updatePropertyVisibilities(void)

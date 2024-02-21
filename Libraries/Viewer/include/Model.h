@@ -3,6 +3,7 @@
 #include "OTCore/CoreTypes.h"
 
 #include <list>
+#include <tuple>
 
 #include <osg/ref_ptr>
 #include <osg/Group>
@@ -226,7 +227,8 @@ public:
 	void lockSelectionAndModification(bool flag);
 
 	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
-
+	std::list<std::string> getSelectedCurves();
+	void removedSelectedCurveNodes();
 private:
 	// Methods
 	void	   fillTree(void);

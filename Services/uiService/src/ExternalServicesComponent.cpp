@@ -2216,6 +2216,27 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 				std::list<ak::UID> entityID = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_ID);
 				removeShapesFromVisualization(visualizationModelID, entityID);
+
+				std::list<std::string> curveNames= ViewerAPI::getSelectedCurves(visualizationModelID);
+				ViewerAPI::removeSelectedCurveNodes(visualizationModelID);
+
+				ot::JsonDocument requestDoc;
+				ot::JsonArray jCurveNames;
+				for (auto& curveName : curveNames)
+				{
+					jCurveNames.PushBack(ot::JsonString(curveName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+				}
+				requestDoc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, jCurveNames, requestDoc.GetAllocator());
+				requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+				std::string response;
+				sendHttpRequest(QUEUE, m_modelServiceURL, requestDoc, response);
+				OT_ACTION_IF_RESPONSE_ERROR(response) {
+					assert(0); // ERROR
+				}
+				else OT_ACTION_IF_RESPONSE_WARNING(response)
+				{
+					assert(0); // WARNING
+				}
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording)
 			{
@@ -2557,10 +2578,15 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged)
 			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-				visualizationResult1DPropertiesChanged(visModelID, entityID, entityVersion);
+				ak::UID visModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
+				ot::UIDList entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_ID);
+				ot::UIDList entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_Version);
+				auto entityVersion = entityVersions.begin();
+				for (ot::UID entityID : entityIDs)
+				{
+					visualizationResult1DPropertiesChanged(visModelID, entityID, *entityVersion);
+					entityVersion++;
+				}
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode)
 			{

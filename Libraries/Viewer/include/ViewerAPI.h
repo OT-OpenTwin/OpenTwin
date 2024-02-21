@@ -140,6 +140,9 @@ namespace ViewerAPI
 	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned long long modelEntityID, bool displayTetEdges);
 
+	__declspec(dllexport) std::list<std::string> getSelectedCurves(ot::UID osgModelID);
+	__declspec(dllexport) void removeSelectedCurveNodes(ot::UID osgModelID);
+
 	__declspec(dllexport) void addVisualizationPlot1DNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
 														  bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ot::UID> &curvesID, std::list<ot::UID> &curvesVersions,  std::list<std::string> &curvesNames);
 	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long entityVersion);

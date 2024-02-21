@@ -174,8 +174,12 @@ bool EntityResult1DCurve::updateFromProperties(void)
 	// Send a notification message to the observer, that the result1d properties have changed
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getEntityStorageVersion(), doc.GetAllocator());
+	ot::JsonArray entityIDs;
+	entityIDs.PushBack(this->getEntityID(),doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, entityIDs, doc.GetAllocator());
+	ot::JsonArray entityVersions;
+	entityVersions.PushBack(this->getEntityStorageVersion(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, entityVersions, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 

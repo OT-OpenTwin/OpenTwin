@@ -351,6 +351,22 @@ void ViewerAPI::visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned lo
 	}
 }
 
+std::list<std::string> ViewerAPI::getSelectedCurves(ot::UID osgModelID)
+{
+	Model* model = osgModelManager.at(osgModelID);
+	
+	std::list<std::string> curveDescriptions = model->getSelectedCurves();
+	
+	return curveDescriptions;
+}
+
+void ViewerAPI::removeSelectedCurveNodes(ot::UID osgModelID)
+{
+	Model* model = osgModelManager.at(osgModelID);
+
+	model->removedSelectedCurveNodes();
+}
+
 void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
 {
 	try

@@ -1,6 +1,6 @@
 // Model.cpp : Defines the Model class which is exported for the DLL application.
 //
-
+#include "OTGui/NavigationTreeItem.h"
 #include "stdafx.h"
 #include "Model.h"
 #include "EntityBase.h"
@@ -397,13 +397,15 @@ void Model::setupUIControls()
 	addMenuAction("Model", "Material", "Create Material", "Create Material", modelWrite, "AddMaterial");
 	addMenuAction("Model", "Material", "Show By Material", "Show By Material", modelRead, "ShowByMaterial");
 	addMenuAction("Model", "Material", "Material Missing", "Material Missing", modelRead, "ShowMaterialMissing");
-
+	
 	addMenuAction("Model", "Parameters", "Create Parameter", "Create Parameter", modelRead, "CreateParameter");
 
 	addMenuAction("Model", "Edit", "Undo", "Undo", modelWrite, "Undo", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_Z));
 	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_Y));
 	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::ui::keySequenceToString(ot::ui::Key_Delete));
 	
+	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "icon", "Default");
+
 	addMenuGroup("View", "Visibility");
 
 	uiCreated = true;
@@ -428,7 +430,32 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 	else if (action == "Model:Material:Show By Material")			showByMaterial();
 	else if (action == "Model:Material:Material Missing")			showMaterialMissing();
 	else if (action == "Model:Parameters:Create Parameter")			createNewParameter();
+	else if (action == "Model:Parameters:Add Curves")
+	{
+		//Für container: ot::RemoveItemWhenEmpty
+		//Für curves: ot::ItemMayBeAdded
+		//item.setFlags()
+		//for (auto& entityByUID : entityMap)
+		//{
+		//	EntityBase* baseEntity = entityByUID.second;
+		//	EntityResult1DCurve* curveEntity = dynamic_cast<EntityResult1DCurve*>(baseEntity);
+		//	if (curveEntity != nullptr)
+		//	{
 
+		//	}
+		//}
+
+		//ot::JsonDocument request;
+
+		//request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OpenSelectEntitiesDialog,request.GetAllocator()), request.GetAllocator());
+
+		//getNotifier()->sendMessageToService(false, "", request);
+		//std::list<std::string> curveNames = ot::json::getStringList(doc, OT_ACTION_PARAM_VIEW1D_CurveNames);
+		//ot::UIDList curveIDs = ot::json::getUInt64List(doc, OT_ACTION_PARAM_VIEW1D_CurveIDs);
+		//ot::UIDList plotIDs = ot::json::getUInt64List(doc, OT_ACTION_PARAM_VIEW1D_PlotIDs);
+		//updateCurvesInPlot(curveIDs,curveNames,plotIDs);
+	}
+	
 	else assert(0); // Unhandled button action
 }
 
@@ -1619,6 +1646,20 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 
 void Model::keySequenceActivated(const std::string &keySequence) {
 
+}
+
+void Model::updateCurvesInPlot(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames, const ot::UIDList& plotIDs)
+{
+	for (const ot::UID& plotID : plotIDs)
+	{
+		auto baseEntity = entityMap.find(plotID);
+		assert(baseEntity != entityMap.end());
+		EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
+		plotEntity->overrideReferencedCurves(curveIDs, curveNames);
+		plotEntity->StoreToDataBase();
+	}
+	setModified();
+	modelChangeOperationCompleted("Updated curve reference in plot");
 }
 
 void Model::processSelectionsForOtherOwners(std::list<ot::UID> &selectedEntities)
@@ -4295,44 +4336,41 @@ void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool
 
 void Model::deleteCurves(std::list<std::string>& entityNameList)
 {
+	if (entityNameList.size() == 0) return;
+	ot::UIDList plotIDs, plotVersions;
+	std::map<std::string,EntityResult1DPlot*> plotEntitiesByName;
 
-	std::map<std::string,std::list<ot::UID>> curveIDsByPlotEntityNames;
-	
 	for (const std::string curveName : entityNameList)
 	{
-		//It is expected to have one plot entity above the curve reference navigationtree item
-		const std::string plotEntName =	curveName.substr(0, curveName.find_last_of("/") - 1);
-		const ot::UID curveID = findEntityFromName(curveName)->getEntityID();
-		curveIDsByPlotEntityNames[plotEntName].push_back(curveID);
-	}
-	
-	ot::UIDList plotIDs, plotVersions;
-
-	for (auto curveIDsByPlotEntityName : curveIDsByPlotEntityNames)
-	{
-		const std::string plotName =  curveIDsByPlotEntityName.first;
-		EntityBase* entityBase = findEntityFromName(plotName);
-		auto plotEntity = dynamic_cast<EntityResult1DPlot*>(entityBase);
-		assert(plotEntity != nullptr);
-
+		//It is expected to have one plot entity above the curve reference in the navigationtree item. The parent of the curve is NOT the plot!
+		const std::string plotEntName =	curveName.substr(0, curveName.find_last_of("/"));
+		const std::string curveNameWithoutPath = curveName.substr(curveName.find_last_of("/") + 1, curveName.size());
+		auto plotEntityByName =	plotEntitiesByName.find(plotEntName);
+		if (plotEntityByName == plotEntitiesByName.end())
+		{
+			EntityBase* entityBase = findEntityFromName(plotEntName);
+			if (entityBase == nullptr) { continue; }
+			auto plotEntity = dynamic_cast<EntityResult1DPlot*>(entityBase);
+			assert(plotEntity != nullptr);
+			plotEntitiesByName[plotEntName] = plotEntity;
+			plotEntityByName = plotEntitiesByName.find(plotEntName);
+		}
+		
+		//The curve name cannot be mapped via the model state since the name belongs only to the navigationtree item and not to the entity itself.
+		EntityResult1DPlot* plotEntity = plotEntityByName->second;
+		bool deletionCompleted = plotEntity->deleteCurve(curveNameWithoutPath);
+		assert(deletionCompleted);
 		plotIDs.push_back(plotEntity->getEntityID());
 		plotVersions.push_back(plotEntity->getEntityStorageVersion());
-
-		const std::list<ot::UID>& curveIDs = curveIDsByPlotEntityName.second;
-		for (ot::UID curveID : curveIDs)
-		{
-			plotEntity->deleteCurve(curveID);
-		}
+		setModified();
 	}
-
+	
 	if (visualizationModelID != 0)
 	{
 		getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
 	}
-	
 
-	setModified();
-
+	modelChangeOperationCompleted("Removed curves from plot");
 }
 
 void Model::setMeshingActive(ot::UID meshEntityID, bool flag)

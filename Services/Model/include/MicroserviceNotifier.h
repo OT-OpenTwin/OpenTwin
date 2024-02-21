@@ -30,26 +30,39 @@ public:
 	void addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::Flags<ot::ui::lockType> &flags);
 	void addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::Flags<ot::ui::lockType> &flags);
 	void addShortcut(const std::string &keySequence);
+	//Not existing in uiComponent
 	void setMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, bool checked);
+	//Not existing in uiComponent
 	void setMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, bool error);
 	void removeUIElements(const std::string &type, std::list<std::string> &itemList);
+	//Not existing in uiComponent
 	void activateMenuTab(const std::string &pageName);
+	//Not existing in uiComponent
 	void updatePlotEntities(ot::UIDList& plotIDs, ot::UIDList& plotVersions, ot::UID visModelID);
-
+	//Not existing in uiComponent
 	void enableDisableControls(std::list<std::string> &enabled, std::list<std::string> &disabled);
+	//setControlToolTip in uiComponent ?
 	void setToolTip(const std::string &item, const std::string &text);
 
 	void displayMessage(const std::string &message);
+	//Not existing in uiComponent
 	void reportError(const std::string &message);
+	//Not existing in uiComponent
 	void reportWarning(const std::string &message);
+	//Not existing in uiComponent
 	void reportInformation(const std::string &message);
+	//Not existing in uiComponent
 	void resetAllViews(ot::UID visualizationModelID);
+
 	void refreshAllViews(ot::UID visualizationModelID);
+	//Not existing in uiComponent
 	void clearSelection(ot::UID visualizationModelID);
 	void refreshSelection(ot::UID visualizationModelID);
+	//Not existing in uiComponent
 	void selectObject(ot::UID visualizationModelID, ot::UID entityID);
+	//Not existing in uiComponent
 	void promptChoice(const std::string &message, const std::string &icon, const std::string &options, const std::string &promptResponse, const std::string &parameter1);
-
+	//Not existing in uiComponent
 	void addVisualizationNodeFromFacetData(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
 		double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
 	void addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
@@ -71,17 +84,18 @@ public:
 	void setShapeVisibility(ot::UID visualizationModelID, std::list<ot::UID> &visibleEntityIDs, std::list<ot::UID> &hiddenEntityIDs);
 	void hideEntities(ot::UID visualizationModelID, std::list<ot::UID> &hiddenEntityIDs);
 	void setTreeStateRecording(ot::UID visualizationModelID, bool flag);
-
+	//until here
 	void enterEntitySelectionMode(ot::UID visualizationModelID, const std::string &selectionType, bool allowMultipleSelection, const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage, const std::map<std::string, std::string> &options);
-
+	//Not existing in uiComponent
 	void isModified(ot::UID visualizationModelID, bool modifiedState);
-
+	//Not existing in uiComponent
 	void enableQueuingHttpRequests(bool flag);
+	//Not existing in uiComponent
 	void queuedHttpRequestToUI(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds);
 
 	std::string sendMessageToService(bool queue, const std::string &owner, ot::JsonDocument &doc);
+	//Maybe available?
 	std::string dispatchAction(ot::JsonDocument &doc);
-
+	//Not existing in uiComponent
 	bool isUIAvailable(void);
-
 };

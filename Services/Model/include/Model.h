@@ -56,7 +56,7 @@ public:
 	void			modelSelectionChangedNotification(std::list<ot::UID> &selectedEntityID, std::list<ot::UID> &selectedVisibleEntityID);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);
 	void			keySequenceActivated(const std::string &keySequence);
-
+	void			updateCurvesInPlot(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames, const ot::UIDList& plotIDs);
 	std::map<std::string, bool> getListOfEntityNames();
 	std::map<std::string, ot::UID> getEntityNameToIDMap();
 
@@ -323,6 +323,7 @@ private:
 	std::map<ot::UID, bool>		   meshingActive;
 	bool						   modelSelectionChangedNotificationInProgress;
 	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;
+
 
 	Model() = delete;
 	Model(const Model&) = delete;

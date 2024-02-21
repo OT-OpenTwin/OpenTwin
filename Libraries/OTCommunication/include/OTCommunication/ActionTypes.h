@@ -113,6 +113,8 @@
 #define OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities "Model.Entities.UpdateProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
+#define OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot "Model.Plot.UpdateCurves"
+#define OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots "Model.Plot.DeleteCurves"
 
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
@@ -157,6 +159,7 @@
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive "UI.SetVersionGraph.Active"
 #define OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions "UI.RemoveVersionGraph.Versions"
 #define OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion "UI.AddActivateGraph.Version"
+#define OT_ACTION_CMD_UI_OpenSelectEntitiesD "Ui.SelectEntitiesDialog.Open"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
 #define OT_ACTION_CMD_UI_SS_UPLOAD "StudioSuite.Upload"
@@ -455,6 +458,7 @@
 #define OT_ACTION_PARAM_MODEL_JSON "Model.JSON"
 #define OT_ACTION_PARAM_MODEL_ViewsForProjectType "Model.ViewsForType"
 
+
 #define OT_ACTION_PARAM_MESH_CartesianCoordX "Mesh.Cartesian.X"
 #define OT_ACTION_PARAM_MESH_CartesianCoordY "Mesh.Cartesian.Y"
 #define OT_ACTION_PARAM_MESH_CartesianCoordZ "Mesh.Cartesian.Z"
@@ -468,6 +472,7 @@
 #define OT_ACTION_PARAM_VIEW1D_Title "View1D.Title"
 #define OT_ACTION_PARAM_VIEW1D_PlotType "View1D.PlotType"
 #define OT_ACTION_PARAM_VIEW1D_PlotQuantity "View1D.PlotQuantity"
+#define OT_ACTION_PARAM_VIEW1D_PlotIDs "View1D.PlotIDs"
 #define OT_ACTION_PARAM_VIEW1D_CurveIDs "View1D.CurveIDs"
 #define OT_ACTION_PARAM_VIEW1D_CurveVersions "View1D.CurveVersions"
 #define OT_ACTION_PARAM_VIEW1D_CurveNames "View1D.CurveNames"

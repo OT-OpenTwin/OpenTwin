@@ -642,7 +642,12 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 
 			return getReturnJSONFromUIDList(globalModel->getIDsOfFolderItemsOfType(folder, className, recursive));
 		}
-
+		else if (action == OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots)
+		{
+			std::list<std::string> curveNames = ot::json::getStringList(doc, OT_ACTION_PARAM_VIEW1D_CurveNames);
+			if (globalModel == nullptr) throw std::exception("No model created yet");
+			globalModel->deleteCurves(curveNames);
+		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdateVisualizationEntity)
 		{
 			ot::UID visEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
