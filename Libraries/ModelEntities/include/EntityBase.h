@@ -109,6 +109,9 @@ public:
 	const std::string &getOwningService(void) { return owningService; };
 
 	virtual void detachFromHierarchy(void);
+
+	void setDeletable(bool deletable) { isDeletable = deletable; };
+	const bool deletable() const { return isDeletable; }
 	//virtual void onRemoveFromModelState() {}
 
 protected:
@@ -129,6 +132,7 @@ private:
 	ot::UID				    entityStorageVersion;
 	bool                initiallyHidden;
 	bool				isEditable;
+	bool				isDeletable = true;
 	bool				selectChildren;
 	bool				manageParentVisibility;
 	bool				manageChildVisibility;

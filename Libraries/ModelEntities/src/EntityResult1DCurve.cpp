@@ -19,6 +19,7 @@ EntityResult1DCurve::EntityResult1DCurve(ot::UID ID, EntityBase *parent, EntityO
 	dataType {EMPTY}
 {
 	setCreateVisualizationItem(false);
+	setDeletable(false);
 }
 
 EntityResult1DCurve::~EntityResult1DCurve()

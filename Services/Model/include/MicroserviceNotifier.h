@@ -34,6 +34,7 @@ public:
 	void setMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, bool error);
 	void removeUIElements(const std::string &type, std::list<std::string> &itemList);
 	void activateMenuTab(const std::string &pageName);
+	void updatePlotEntities(ot::UIDList& plotIDs, ot::UIDList& plotVersions, ot::UID visModelID);
 
 	void enableDisableControls(std::list<std::string> &enabled, std::list<std::string> &disabled);
 	void setToolTip(const std::string &item, const std::string &text);

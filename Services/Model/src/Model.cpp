@@ -19,6 +19,8 @@
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityMetadataCampaign.h"
 #include "EntityParameterizedDataPreviewTable.h"
+#include "EntityResult1DPlot.h"
+
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
 #include "ClassFactory.h"
@@ -1416,13 +1418,21 @@ void Model::deleteSelectedShapes(void)
 
 	// Remove all protected entities from the list
 	std::list<EntityBase *> selectedUnprotectedEntities;
+	std::list<EntityBase *> protectedEntities;
+
 	for (auto entity : selectedEntities)
 	{
 		if (!isProtectedEntity(entity))
 		{
 			selectedUnprotectedEntities.push_back(entity);
 		}
+		else
+		{
+			protectedEntities.push_back(entity);
+		}
 	}
+
+	removeParentsOfProtected(selectedUnprotectedEntities,protectedEntities);
 
 	std::list<ot::UID> topLevelBlockEntities = RemoveBlockConnections(selectedUnprotectedEntities);
 
@@ -1477,8 +1487,8 @@ bool Model::isProtectedEntity(EntityBase *entity)
 {
 	if (entity->getParent() == nullptr) return true;
 	if (entity->getParent() == entityRoot) return true;
-
-	return false;
+	
+	return !entity->deletable();
 }
 
 bool Model::anyMeshItemSelected(std::list<ot::UID> &selectedEntityID)
@@ -2041,6 +2051,26 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 		setEntityOutdated(entity);
 	}
 	return topLevelBlockEntityIDs;
+}
+
+void Model::removeParentsOfProtected(std::list<EntityBase*>& unprotectedEntities, const std::list<EntityBase*>& protectedEntities)
+{
+	std::set<EntityBase*> unprotectedEntitySet(unprotectedEntities.begin(), unprotectedEntities.end());
+	for (auto protectedEntity: protectedEntities)
+	{
+		EntityBase* currentParent = protectedEntity->getParent();
+
+		while (currentParent != nullptr)
+		{
+			auto unprotectedParent = unprotectedEntitySet.find(currentParent);
+			if (unprotectedParent != unprotectedEntitySet.end())
+			{
+				unprotectedEntities.remove(*unprotectedParent);
+			}
+			currentParent = currentParent->getParent();
+		}
+	}
+
 }
 
 std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& allEntitiesForDeletion)
@@ -4261,6 +4291,48 @@ void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool
 	{
 		modelChangeOperationCompleted("delete objects");
 	}
+}
+
+void Model::deleteCurves(std::list<std::string>& entityNameList)
+{
+
+	std::map<std::string,std::list<ot::UID>> curveIDsByPlotEntityNames;
+	
+	for (const std::string curveName : entityNameList)
+	{
+		//It is expected to have one plot entity above the curve reference navigationtree item
+		const std::string plotEntName =	curveName.substr(0, curveName.find_last_of("/") - 1);
+		const ot::UID curveID = findEntityFromName(curveName)->getEntityID();
+		curveIDsByPlotEntityNames[plotEntName].push_back(curveID);
+	}
+	
+	ot::UIDList plotIDs, plotVersions;
+
+	for (auto curveIDsByPlotEntityName : curveIDsByPlotEntityNames)
+	{
+		const std::string plotName =  curveIDsByPlotEntityName.first;
+		EntityBase* entityBase = findEntityFromName(plotName);
+		auto plotEntity = dynamic_cast<EntityResult1DPlot*>(entityBase);
+		assert(plotEntity != nullptr);
+
+		plotIDs.push_back(plotEntity->getEntityID());
+		plotVersions.push_back(plotEntity->getEntityStorageVersion());
+
+		const std::list<ot::UID>& curveIDs = curveIDsByPlotEntityName.second;
+		for (ot::UID curveID : curveIDs)
+		{
+			plotEntity->deleteCurve(curveID);
+		}
+	}
+
+	if (visualizationModelID != 0)
+	{
+		getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
+	}
+	
+
+	setModified();
+
 }
 
 void Model::setMeshingActive(ot::UID meshEntityID, bool flag)
