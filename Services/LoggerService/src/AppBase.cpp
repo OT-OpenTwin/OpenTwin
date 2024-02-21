@@ -53,6 +53,11 @@ std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 	ot::LogMessage msg;
 	msg.setFromJsonObject(obj);
 
+	// ToDo: Rework password logging
+	if (msg.text().find("password") != std::string::npos || msg.text().find("Password") != std::string::npos) {
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+
 	msg.setCurrentTimeAsGlobalSystemTime();
 
 	m_messages.push_back(msg);
