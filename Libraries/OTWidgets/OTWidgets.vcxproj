@@ -23,6 +23,7 @@
     <ClCompile Include="src\Dialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DockWatcherAction.cpp" />
+    <ClCompile Include="src\EventNotifier.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
@@ -62,6 +63,7 @@
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
     <ClInclude Include="include\OTWidgets\Dialog.h" />
+    <QtMoc Include="include\OTWidgets\EventNotifier.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />

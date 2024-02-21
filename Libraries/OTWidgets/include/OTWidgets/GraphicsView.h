@@ -16,6 +16,7 @@
 
 // std header
 #include <map>
+#include <list>
 #include <string>
 
 namespace ot {
@@ -53,9 +54,12 @@ namespace ot {
 
 		void addItem(ot::GraphicsItem* _item);
 		void removeItem(const std::string& _itemUid);
+		std::list<std::string> selectedItems(void) const;
+
 		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest, const GraphicsConnectionCfg& _config);
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
+		std::list<std::string> selectedConnections(void) const;
 
 		void requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 		void notifyItemMoved(ot::GraphicsItem* _item);
@@ -74,6 +78,8 @@ namespace ot {
 		void connectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 		
 		void itemMoved(const std::string& _uid, const QPointF& _newPos);
+
+		void removeItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;

@@ -122,6 +122,20 @@ void ot::GraphicsView::removeItem(const std::string& _itemUid) {
 	m_items.erase(_itemUid);
 }
 
+std::list<std::string> ot::GraphicsView::selectedItems(void) const {
+	std::list<std::string> sel; // Selected items
+	for (auto s : m_scene->selectedItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
+		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
+
+		if (itm) {
+			// Item selected
+			sel.push_back(itm->graphicsItemUid());
+		}
+	}
+	return sel;
+}
+
 void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest, const GraphicsConnectionCfg& _config) {
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
 	newConnection->setupFromConfig(_config);
@@ -164,6 +178,20 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 
 void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
 	this->removeConnection(GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector));
+}
+
+std::list<std::string> ot::GraphicsView::selectedConnections(void) const {
+	std::list<std::string> sel; // Selected items
+	for (auto s : m_scene->selectedItems()) {
+		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
+
+		if (citm) {
+			// Connection selected
+			sel.push_back(citm->getConnectionInformation().buildKey());
+		}
+	}
+
+	return sel;
 }
 
 void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
@@ -242,6 +270,11 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 	{
 		// Reset the view
 		this->resetView();
+	}
+	else if (_event->key() == Qt::Key_Delete) {
+		std::list<std::string> itm = this->selectedItems();
+		std::list<std::string> con = this->selectedConnections();
+		emit removeItemsRequested(itm, con);
 	}
 }
 

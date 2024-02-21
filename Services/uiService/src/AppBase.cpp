@@ -2444,6 +2444,34 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 	}
 }
 
+void AppBase::slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections) {
+	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	if (_items.empty() && _connections.empty()) return;
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(_items, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds, ot::JsonArray(_connections, doc.GetAllocator()), doc.GetAllocator());
+	ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+
+	std::string response;
+	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		OT_LOG_EA("Failed to send http request");
+		return;
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Request failed: " + rMsg.getWhat());
+		return;
+	}
+}
+
 void AppBase::slotTextEditorSaveRequested(void) {
 	ot::TextEditor* editor = dynamic_cast<ot::TextEditor*>(sender());
 	if (editor == nullptr) {

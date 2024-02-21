@@ -514,6 +514,7 @@ public slots:
 	void slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos);
 	void slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 	void slotGraphicsSelectionChanged(void);
+	void slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections);
 	void slotTextEditorSaveRequested(void);
 
 private slots:

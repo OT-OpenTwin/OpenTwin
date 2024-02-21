@@ -115,6 +115,9 @@
     <ClCompile Include="src\PushButton.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\EventNotifier.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -254,6 +257,9 @@
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TextEditor.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\EventNotifier.h">
       <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
