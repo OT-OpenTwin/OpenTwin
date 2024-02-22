@@ -66,12 +66,6 @@ namespace ot {
 		ReflectSpread //! Reflect the gradient
 	};
 
-	enum NavigationItemFlag {
-		NoNavigationItemFlags = 0x00,
-		RemoveItemWhenEmpty   = 0x01, //! @brief If set the item will be removed when all the child items are removed
-		ItemMayBeAdded        = 0x02 //! @brief If set the item may be added/dragged/dropped
-	};
-
 	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
 	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
 
@@ -92,11 +86,4 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(GradientSpread _spread);
 	OT_GUI_API_EXPORT GradientSpread stringToGradientSpread(const std::string& _spread);
-
-	OT_GUI_API_EXPORT std::string toString(NavigationItemFlag _flag);
-	OT_GUI_API_EXPORT std::list<std::string> toStringList(NavigationItemFlag _flags);
-	OT_GUI_API_EXPORT NavigationItemFlag stringToNavigationItemFlag(const std::string& _flag);
-	OT_GUI_API_EXPORT NavigationItemFlag stringListToNavigationItemFlags(const std::list<std::string>& _flags);
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::NavigationItemFlag);

@@ -23,6 +23,7 @@ class QTreeWidgetItem;
 
 namespace ot { 
 	class TreeWidget;
+	class TreeWidgetItem;
 	class TreeWidgetFilter;
 }
 
@@ -47,7 +48,7 @@ private slots:
 
 private:
 	void addSelectedPaths(QTreeWidgetItem* _item, std::list<std::string>& _list, char _pathDelimiter, bool _bottomLevelOnly) const;
-	void addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item);
+	ot::TreeWidgetItem* addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item);
 
 	std::list<std::string> m_initiallySelected;
 	ot::TreeWidgetFilter* m_available;

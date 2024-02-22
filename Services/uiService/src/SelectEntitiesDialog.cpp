@@ -57,16 +57,9 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	// Fill data
 	for (const ot::NavigationTreeItem& itm : _config.rootItems()) {
 		this->addItem(m_available->treeWidget(), nullptr, itm);
-	}
-
-	m_initiallySelected = _config.selectedItems();
-	for (const std::string& itm : m_initiallySelected) {
-		QTreeWidgetItem* item = m_available->treeWidget()->findItem(QString::fromStdString(itm));
-		if (!item) {
-			OT_LOG_WAS("Item does not exist but set as selected. { \"ItemPath\": \"" + itm + "\"");
-			continue;
+		if (itm.flags() & ot::ItemIsSelected) {
+			this->addItem(m_selected->treeWidget(), nullptr, itm);
 		}
-		this->slotAdd(item, 0);
 	}
 
 	if (_config.flags() && ot::NavigationTreePackage::ItemsDefaultExpanded) {
@@ -120,7 +113,7 @@ void SelectEntitiesDialog::addSelectedPaths(QTreeWidgetItem* _item, std::list<st
 	}
 }
 
-void SelectEntitiesDialog::addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item) {
+ot::TreeWidgetItem* SelectEntitiesDialog::addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item) {
 	ot::TreeWidgetItem* newItem = new ot::TreeWidgetItem(_item);
 
 	if (_parentItem) {
@@ -129,6 +122,8 @@ void SelectEntitiesDialog::addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _pare
 	else {
 		_tree->addTopLevelItem(newItem);
 	}
+
+	return newItem;
 }
 
 void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {

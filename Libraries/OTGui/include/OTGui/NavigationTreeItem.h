@@ -18,12 +18,24 @@
 
 namespace ot {
 
+	enum NavigationTreeItemFlag {
+		NoNavigationTreeItemFlags = 0x00, //! @brief Empty mask, no flags set
+		RemoveItemWhenEmpty       = 0x01, //! @brief If set the item will be removed when all the child items are removed
+		ItemMayBeAdded            = 0x02, //! @brief If set the item may be added/dragged/dropped
+		ItemIsSelected            = 0x04  //! @brief If set this item is selected
+	};
+
+	OT_GUI_API_EXPORT std::string toString(NavigationTreeItemFlag _flag);
+	OT_GUI_API_EXPORT std::list<std::string> toStringList(NavigationTreeItemFlag _flags);
+	OT_GUI_API_EXPORT NavigationTreeItemFlag stringToNavigationItemFlag(const std::string& _flag);
+	OT_GUI_API_EXPORT NavigationTreeItemFlag stringListToNavigationItemFlags(const std::list<std::string>& _flags);
+
 	class OT_GUI_API_EXPORT NavigationTreeItem : public ot::Serializable {
 	public:
 		NavigationTreeItem();
-		NavigationTreeItem(const std::string& _text, ot::NavigationItemFlag _flags = ot::NoNavigationItemFlags);
-		NavigationTreeItem(const std::string& _text, const std::string& _iconPath, ot::NavigationItemFlag _flags = ot::NoNavigationItemFlags);
-		NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, ot::NavigationItemFlag _flags = ot::NoNavigationItemFlags);
+		NavigationTreeItem(const std::string& _text, ot::NavigationTreeItemFlag _flags = ot::NoNavigationTreeItemFlags);
+		NavigationTreeItem(const std::string& _text, const std::string& _iconPath, ot::NavigationTreeItemFlag _flags = ot::NoNavigationTreeItemFlags);
+		NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, ot::NavigationTreeItemFlag _flags = ot::NoNavigationTreeItemFlags);
 		NavigationTreeItem(const NavigationTreeItem& _other);
 		virtual ~NavigationTreeItem();
 
@@ -49,8 +61,8 @@ namespace ot {
 		void setChildItems(const std::list<NavigationTreeItem>& _items);
 		const std::list<NavigationTreeItem>& childItems(void) const { return m_childs; };
 
-		void setFlags(NavigationItemFlag _flags) { m_flags = _flags; };
-		NavigationItemFlag flags(void) const { return m_flags; };
+		void setFlags(ot::NavigationTreeItemFlag _flags) { m_flags = _flags; };
+		ot::NavigationTreeItemFlag flags(void) const { return m_flags; };
 
 		void merge(const NavigationTreeItem& _other);
 
@@ -66,8 +78,10 @@ namespace ot {
 		std::string m_text;
 		std::string m_iconPath;
 		std::list<NavigationTreeItem> m_childs;
-		NavigationItemFlag m_flags;
+		ot::NavigationTreeItemFlag m_flags;
 
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreeItemFlag);

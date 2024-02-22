@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/NavigationTreeItem.h"
 #include "OTGui/NavigationTreePackage.h"
 
 // std header
@@ -32,13 +33,8 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string& title(void) const { return m_title; };
 
-		void setSelectedItems(const std::list<std::string>& _itemPaths) { m_selectedItems = _itemPaths; };
-		void addSelectedItem(const std::string& _itemPath);
-		const std::list<std::string>& selectedItems(void) const { return m_selectedItems; };
-
 	private:
 		std::string m_title;
-		std::list<std::string> m_selectedItems;
 	};
 
 }

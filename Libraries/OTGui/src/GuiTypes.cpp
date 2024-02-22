@@ -175,39 +175,3 @@ ot::GradientSpread ot::stringToGradientSpread(const std::string& _spread) {
 		throw std::exception("Unknown gradient spread");
 	}
 }
-
-std::string ot::toString(NavigationItemFlag _flag) {
-	switch (_flag)
-	{
-	case ot::NavigationItemFlag::RemoveItemWhenEmpty: return "RemoveItemWhenEmpty";
-	case ot::NavigationItemFlag::ItemMayBeAdded: return "ItemMayBeAdded";
-	default:
-		OT_LOG_EA("Unknown navigation tree item flag");
-		return "";
-	}
-}
-
-std::list<std::string> ot::toStringList(NavigationItemFlag _flags) {
-	std::list<std::string> ret;
-	if (_flags & ot::RemoveItemWhenEmpty) ret.push_back(toString(ot::RemoveItemWhenEmpty));
-	if (_flags & ot::ItemMayBeAdded) ret.push_back(toString(ot::ItemMayBeAdded));
-
-	return ret;
-}
-
-ot::NavigationItemFlag ot::stringToNavigationItemFlag(const std::string& _flag) {
-	if (_flag == ot::toString(NavigationItemFlag::RemoveItemWhenEmpty)) return NavigationItemFlag::RemoveItemWhenEmpty;
-	else if (_flag == ot::toString(NavigationItemFlag::ItemMayBeAdded)) return NavigationItemFlag::ItemMayBeAdded;
-	else {
-		OT_LOG_EA("Unknown navigation tree item flag");
-		return NoNavigationItemFlags;
-	}
-}
-
-ot::NavigationItemFlag ot::stringListToNavigationItemFlags(const std::list<std::string>& _flags) {
-	NavigationItemFlag ret = ot::NoNavigationItemFlags;
-	for (const std::string& flag : _flags) {
-		ret |= stringToNavigationItemFlag(flag);
-	}
-	return ret;
-}

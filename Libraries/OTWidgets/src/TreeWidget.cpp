@@ -7,7 +7,7 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(ot::NoNavigationItemFlags) {}
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(ot::NoNavigationTreeItemFlags) {}
 
 ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
 	: m_text(QString::fromStdString(_config.text())), m_flags(_config.flags())
@@ -122,7 +122,7 @@ void ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo&
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::TreeWidgetItem::TreeWidgetItem(int _type)
-	: QTreeWidgetItem(_type), m_flags(ot::NoNavigationItemFlags)
+	: QTreeWidgetItem(_type), m_flags(ot::NoNavigationTreeItemFlags)
 {
 
 }
@@ -161,7 +161,7 @@ ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
 			info.setFlags(castItem->navigationItemFlags());
 		}
 		else {
-			info.setFlags(ot::NoNavigationItemFlags);
+			info.setFlags(ot::NoNavigationTreeItemFlags);
 		}
 
 		info.addChildItem(child);
