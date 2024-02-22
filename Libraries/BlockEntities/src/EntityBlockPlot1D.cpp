@@ -47,11 +47,12 @@ bool EntityBlockPlot1D::updateFromProperties()
 	}
 	if(refresh)
 	{
-		getProperties().forceResetUpdateForAllProperties();
-		getProperties().setNeedsUpdate();
 		CreateBlockItem();
 		CreateConnections();
 	}
+
+	getProperties().forceResetUpdateForAllProperties();
+
 	return refresh;
 }
 
