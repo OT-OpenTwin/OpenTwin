@@ -1,6 +1,6 @@
 // Model.cpp : Defines the Model class which is exported for the DLL application.
 //
-#include "OTGui/NavigationTreeItem.h"
+
 #include "stdafx.h"
 #include "Model.h"
 #include "EntityBase.h"
@@ -69,6 +69,7 @@
 #include "tinyexpr.h"
 
 #include "EntityBlock.h"
+#include "OTGui/NavigationTreeItem.h"
 
 extern MicroserviceNotifier *globalNotifier;
 
@@ -389,6 +390,8 @@ void Model::setupUIControls()
 	addMenuGroup("Model", "Material");
 	addMenuGroup("Model", "Parameters");
 	addMenuGroup("Model", "Edit");	
+	addMenuGroup("Model", "Plots");	
+
 
 	//addMenuAction("Model", "Database", "Save", "ProjectSave");
 
@@ -404,7 +407,7 @@ void Model::setupUIControls()
 	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_Y));
 	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::ui::keySequenceToString(ot::ui::Key_Delete));
 	
-	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "icon", "Default");
+	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Icon", "Default");
 
 	addMenuGroup("View", "Visibility");
 
@@ -430,30 +433,109 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 	else if (action == "Model:Material:Show By Material")			showByMaterial();
 	else if (action == "Model:Material:Material Missing")			showMaterialMissing();
 	else if (action == "Model:Parameters:Create Parameter")			createNewParameter();
-	else if (action == "Model:Parameters:Add Curves")
+	else if (action == "Model:Plots:Add Curves")
 	{
+		
 		//Für container: ot::RemoveItemWhenEmpty
 		//Für curves: ot::ItemMayBeAdded
 		//item.setFlags()
-		//for (auto& entityByUID : entityMap)
-		//{
-		//	EntityBase* baseEntity = entityByUID.second;
-		//	EntityResult1DCurve* curveEntity = dynamic_cast<EntityResult1DCurve*>(baseEntity);
-		//	if (curveEntity != nullptr)
-		//	{
+		std::list<ot::NavigationTreeItem> endpoints;
+		std::list<ot::NavigationTreeItem> alreadyContained;
 
-		//	}
-		//}
+		ot::UIDList selectedEntityIDs =	selectedModelEntityIDs;
+		if (selectedEntityIDs.size() == 0)
+		{
+			return;
+		}
+		std::set<ot::UID> selectedCurves;
+		
+		if (selectedEntityIDs.size() != 1) return;
+		EntityBase* selectedEntity	= entityMap[*selectedEntityIDs.begin()];
+		EntityResult1DPlot* selectedPlot =	dynamic_cast<EntityResult1DPlot*>(selectedEntity);
+		if (selectedPlot != nullptr)
+		{
+			ot::UIDList curveIDs = selectedPlot->getCurves();
+			selectedCurves = { curveIDs.begin(),curveIDs.end() };
+		}
+		else
+		{
+			return;
+		}
+		
+		
+		for (auto& entityByUID : entityMap)
+		{
+			EntityBase* baseEntity = entityByUID.second;
+			EntityResult1DCurve* curveEntity = dynamic_cast<EntityResult1DCurve*>(baseEntity);
+			if (curveEntity != nullptr)
+			{
+				ot::NavigationTreeItem* item = new ot::NavigationTreeItem();
+				item->setIconPath("Default/Plot1DVisible.png");
+				const std::string fullName = curveEntity->getName();
+				const std::string curveText = fullName.substr(fullName.find_last_of("/")+1, fullName.size());
+				item->setText(curveText);
+						
+				EntityBase* parent = curveEntity->getParent();
+				std::string parentName = parent->getName();
+				ot::NavigationTreeItem* child = item;
+				ot::NavigationTreeItem* parentItem = nullptr;
+				while (parent != nullptr && parentName != "")
+				{
 
-		//ot::JsonDocument request;
+					parentItem = new ot::NavigationTreeItem();
+					if (parentName.find("/") != std::string::npos)
+					{
+						const std::string text = parentName.substr(parentName.find_last_of("/")+1, parentName.size());
+						parentItem->setText(text);
+					}
+					else
+					{
+						parentItem->setText(parentName);
+					}
+					parentItem->setIconPath("Default/ContainerVisible.png");
+					
+					parentItem->addChildItem(*child);
+					delete child;
+					child = parentItem;
+					parentItem = nullptr;
+					parent = parent->getParent();
+					parentName = parent->getName();
+				}
+				endpoints.push_back(*child);
+				
+				bool isAlreadyPartOfPlot = selectedCurves.find(curveEntity->getEntityID()) != selectedCurves.end();
 
-		//request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OpenSelectEntitiesDialog,request.GetAllocator()), request.GetAllocator());
+				if (isAlreadyPartOfPlot)
+				{
+					alreadyContained.push_back(*child);
+				}
+			}
+		}
+		
+		ot::JsonDocument request;
+		ot::JsonArray treeItems;
 
-		//getNotifier()->sendMessageToService(false, "", request);
-		//std::list<std::string> curveNames = ot::json::getStringList(doc, OT_ACTION_PARAM_VIEW1D_CurveNames);
-		//ot::UIDList curveIDs = ot::json::getUInt64List(doc, OT_ACTION_PARAM_VIEW1D_CurveIDs);
-		//ot::UIDList plotIDs = ot::json::getUInt64List(doc, OT_ACTION_PARAM_VIEW1D_PlotIDs);
-		//updateCurvesInPlot(curveIDs,curveNames,plotIDs);
+		for (auto& endpoint : endpoints)
+		{
+			ot::JsonObject object;
+			endpoint.addToJsonObject(object, request.GetAllocator());
+			treeItems.PushBack(object, request.GetAllocator());
+		}
+
+		ot::JsonArray treeItemsAlreadyPart;
+		for (ot::NavigationTreeItem& item : alreadyContained)
+		{
+			ot::JsonObject object;
+			item.addToJsonObject(object, request.GetAllocator());
+			treeItemsAlreadyPart.PushBack(object, request.GetAllocator());
+		}
+		
+		request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_EntitySelectionDialog,request.GetAllocator()), request.GetAllocator());
+		request.AddMember(OT_ACTION_PARAM_UI_TREE_Items, treeItems,request.GetAllocator());
+		request.AddMember(OT_ACTION_PARAM_UI_TREE_SelectedItems, treeItemsAlreadyPart,request.GetAllocator());
+		
+		std::list<std::pair<ot::UID, ot::UID>> prefetchedIds;
+		getNotifier()->queuedHttpRequestToUI(request, prefetchedIds);
 	}
 	
 	else assert(0); // Unhandled button action
