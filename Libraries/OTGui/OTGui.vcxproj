@@ -44,9 +44,11 @@
     <ClInclude Include="include\OTGui\LinearGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\Margins.h" />
     <ClInclude Include="include\OTGui\NavigationTreeItem.h" />
+    <ClInclude Include="include\OTGui\NavigationTreePackage.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
+    <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
     <ClInclude Include="include\OTGui\StyleValue.h" />
   </ItemGroup>
   <ItemGroup>
@@ -76,8 +78,10 @@
     <ClCompile Include="src\LinearGradientPainter2D.cpp" />
     <ClCompile Include="src\Margins.cpp" />
     <ClCompile Include="src\NavigationTreeItem.cpp" />
+    <ClCompile Include="src\NavigationTreePackage.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
+    <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

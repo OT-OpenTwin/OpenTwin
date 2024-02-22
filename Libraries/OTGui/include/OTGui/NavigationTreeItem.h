@@ -46,13 +46,23 @@ namespace ot {
 		const std::string& iconPath(void) const { return m_iconPath; };
 
 		void addChildItem(const NavigationTreeItem& _item);
-		void setChildItems(const std::list<NavigationTreeItem>& _items) { m_childs = _items; };
+		void setChildItems(const std::list<NavigationTreeItem>& _items);
 		const std::list<NavigationTreeItem>& childItems(void) const { return m_childs; };
 
 		void setFlags(NavigationItemFlag _flags) { m_flags = _flags; };
 		NavigationItemFlag flags(void) const { return m_flags; };
 
+		void merge(const NavigationTreeItem& _other);
+
+		std::string itemPath(char _delimiter = '/', const std::string& _suffix = std::string());
+
+	protected:
+		void setParentNavigationTreeItem(NavigationTreeItem* _parent) { m_parent = _parent; };
+		NavigationTreeItem* parentNavigationTreeItem(void) const { return m_parent; };
+
 	private:
+		NavigationTreeItem* m_parent;
+
 		std::string m_text;
 		std::string m_iconPath;
 		std::list<NavigationTreeItem> m_childs;

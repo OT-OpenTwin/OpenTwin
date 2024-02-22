@@ -252,6 +252,10 @@
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
+
+
+
+
 #define OT_ACTION_PARAM_BASETYPE_UID "BaseTypes.UID"
 #define OT_ACTION_PARAM_BASETYPE_Bool "BaseTypes.Boolean"
 #define OT_ACTION_PARAM_BASETYPE_List "BaseTypes.List"
@@ -260,6 +264,9 @@
 
 #define OT_ACTION_PARAM_DATABASE_URL "Database.URL"
 #define OT_ACTION_PARAM_PROCESS_ID "PROCESS.ID"
+
+#define OT_ACTION_PARAM_Config "Config"
+#define OT_ACTION_PARAM_Package "Package"
 
 #define OT_ACTION_PARAM_UI_ToolBarTabOrder "UI.TTB.TabOrder"
 #define OT_ACTION_PARAM_UI_CONTROL_TabName "UI.TTB.TabName"

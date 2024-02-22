@@ -59,9 +59,9 @@ ot::TreeWidget::~TreeWidget() {
 
 }
 
-bool ot::TreeWidget::itemExists(const QString& _itemPath, char _delimiter) const {
+QTreeWidgetItem* ot::TreeWidget::findItem(const QString& _itemPath, char _delimiter) const {
 	QStringList lst = _itemPath.split(_delimiter, Qt::SkipEmptyParts);
-	return this->itemExists(this->invisibleRootItem(), lst);
+	return this->findItem(this->invisibleRootItem(), lst);
 }
 
 QString ot::TreeWidget::itemPath(QTreeWidgetItem* _item, char _delimiter) const {
@@ -83,23 +83,23 @@ void ot::TreeWidget::addItem(const TreeWidgetItemInfo& _item) {
 	this->addItem(this->invisibleRootItem(), _item);
 }
 
-bool ot::TreeWidget::itemExists(QTreeWidgetItem* _item, const QStringList& _childPath) const {
-	if (_childPath.isEmpty()) return false;
+QTreeWidgetItem* ot::TreeWidget::findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const {
+	if (_childPath.isEmpty()) return nullptr;
 
 	for (int i = 0; i < _item->childCount(); i++) {
 		if (_item->child(i)->text(0) == _childPath.front()) {
 			if (_childPath.count() == 1)
 			{
-				return true;
+				return _item->child(i);
 			}
 			else {
 				QStringList lst = _childPath;
 				lst.pop_front();
-				return this->itemExists(_item->child(i), lst);
+				return this->findItem(_item->child(i), lst);
 			}
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 void ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item) {

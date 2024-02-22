@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTGui/NavigationTreeItem.h"
+#include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTWidgets/Dialog.h"
 
 // Qt header
@@ -28,10 +29,10 @@ namespace ot {
 class SelectEntitiesDialog : public ot::Dialog {
 	Q_OBJECT
 public:
-	SelectEntitiesDialog(const std::list<ot::NavigationTreeItem>& _availableItems, const std::list<ot::NavigationTreeItem>& _selectedItems, QWidget* _parent = (QWidget*)nullptr);
+	SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
 	~SelectEntitiesDialog();
 
-	bool hasChanged(void) const { return m_changed; };
+	bool selectionHasChanged(void) const;
 
 	//! @brief Returns the paths of the selected items
 	//! @param _pathDelimiter The character used to separete the item names
@@ -48,7 +49,7 @@ private:
 	void addSelectedPaths(QTreeWidgetItem* _item, std::list<std::string>& _list, char _pathDelimiter, bool _bottomLevelOnly) const;
 	void addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item);
 
-	bool m_changed;
+	std::list<std::string> m_initiallySelected;
 	ot::TreeWidgetFilter* m_available;
 	ot::TreeWidgetFilter* m_selected;
 };

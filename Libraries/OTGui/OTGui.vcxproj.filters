@@ -31,6 +31,12 @@
     <Filter Include="Source Files\General">
       <UniqueIdentifier>{97465b02-9b77-4c33-a0bf-b901b5830d49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Dialogs">
+      <UniqueIdentifier>{c87a01af-0724-4c2d-bca7-d3630ad51284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dialogs">
+      <UniqueIdentifier>{773ba64f-c743-422b-84e0-1ff585e3f58b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h">
@@ -120,6 +126,12 @@
     <ClInclude Include="include\OTGui\NavigationTreeItem.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\NavigationTreePackage.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -208,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="src\NavigationTreeItem.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NavigationTreePackage.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SelectEntitiesDialogCfg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

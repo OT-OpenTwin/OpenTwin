@@ -67,15 +67,15 @@ namespace ot {
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
 
-		bool itemExists(const QString& _itemPath, char _delimiter = '/') const;
+		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
+		bool itemExists(const QString& _itemPath, char _delimiter = '/') const { return this->findItem(_itemPath, _delimiter); };
 
 		QString itemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
 
 		void addItem(const TreeWidgetItemInfo& _item);
 	private:
 
-		//! @brief Returns true if the specified item exists
-		bool itemExists(QTreeWidgetItem* _item, const QStringList& _childPath) const;
+		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
 
 		void addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
 	};

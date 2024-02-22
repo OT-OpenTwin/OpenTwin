@@ -15,8 +15,8 @@
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 
-SelectEntitiesDialog::SelectEntitiesDialog(const std::list<ot::NavigationTreeItem>& _availableItems, const std::list<ot::NavigationTreeItem>& _selectedItems, QWidget* _parent)
-	: ot::Dialog(_parent), m_changed(false)
+SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent)
+	: ot::Dialog(_parent)
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
@@ -24,7 +24,6 @@ SelectEntitiesDialog::SelectEntitiesDialog(const std::list<ot::NavigationTreeIte
 	QVBoxLayout* avaLay = new QVBoxLayout;
 	QVBoxLayout* selLay = new QVBoxLayout;
 	QHBoxLayout* btnLay = new QHBoxLayout;
-
 
 	// Create controls
 	QLabel* lAvail = new QLabel("Available");
@@ -56,12 +55,27 @@ SelectEntitiesDialog::SelectEntitiesDialog(const std::list<ot::NavigationTreeIte
 	btnLay->addWidget(btnCancel);
 
 	// Fill data
-	for (const ot::NavigationTreeItem& itm : _availableItems) {
+	for (const ot::NavigationTreeItem& itm : _config.rootItems()) {
 		this->addItem(m_available->treeWidget(), nullptr, itm);
 	}
-	for (const ot::NavigationTreeItem& itm : _selectedItems) {
-		this->addItem(m_selected->treeWidget(), nullptr, itm);
+
+	m_initiallySelected = _config.selectedItems();
+	for (const std::string& itm : m_initiallySelected) {
+		QTreeWidgetItem* item = m_available->treeWidget()->findItem(QString::fromStdString(itm));
+		if (!item) {
+			OT_LOG_WAS("Item does not exist but set as selected. { \"ItemPath\": \"" + itm + "\"");
+			continue;
+		}
+		this->slotAdd(item, 0);
 	}
+
+	if (_config.flags() && ot::NavigationTreePackage::ItemsDefaultExpanded) {
+		m_available->treeWidget()->expandAll();
+		m_selected->treeWidget()->expandAll();
+	}
+
+	// Setup window
+	this->setWindowTitle(QString::fromStdString(_config.title()));
 
 	// Connect signals
 	this->connect(m_available->treeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotAdd);
@@ -72,6 +86,15 @@ SelectEntitiesDialog::SelectEntitiesDialog(const std::list<ot::NavigationTreeIte
 
 SelectEntitiesDialog::~SelectEntitiesDialog() {
 
+}
+
+bool SelectEntitiesDialog::selectionHasChanged(void) const {
+	std::list<std::string> currentSelection = this->selectedItemPaths();
+	if (currentSelection.size() != m_initiallySelected.size()) return true;
+	for (const std::string& ini : m_initiallySelected) {
+		if (std::find(currentSelection.begin(), currentSelection.end(), ini) == currentSelection.end()) return false;
+	}
+	return true;
 }
 
 std::list<std::string> SelectEntitiesDialog::selectedItemPaths(char _pathDelimiter, bool _bottomLevelOnly) const {
@@ -123,8 +146,6 @@ void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {
 	}
 
 	m_selected->treeWidget()->addItem(itm->getFullInfo());
-
-	m_changed = true;
 }
 
 void SelectEntitiesDialog::slotRemove(QTreeWidgetItem* _item, int _col) {

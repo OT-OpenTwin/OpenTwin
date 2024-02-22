@@ -20,6 +20,9 @@
 
 namespace ot {
 
+	//! @brief Size type
+	typedef rapidjson::SizeType JsonSizeType;
+
 	//! @brief Writable JSON value
 	typedef rapidjson::Value JsonValue;
 
