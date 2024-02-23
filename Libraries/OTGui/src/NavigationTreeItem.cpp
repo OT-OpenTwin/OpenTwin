@@ -140,14 +140,31 @@ void ot::NavigationTreeItem::setChildItems(const std::list<NavigationTreeItem>& 
 }
 
 void ot::NavigationTreeItem::merge(const NavigationTreeItem& _other) {
+	// Merge own childs
+	std::list<NavigationTreeItem> bck = m_childs;
+	m_childs.clear();
+	for (const NavigationTreeItem& item : bck) {
+		bool exists = false;
+		for (NavigationTreeItem& eItem : m_childs) {
+			if (eItem.text() == item.text()) {
+				eItem.merge(item);
+				exists = true;
+				break;
+			}
+		}
+		if (!exists) {
+			m_childs.push_back(item);
+			m_childs.back().setParentNavigationTreeItem(this);
+		}
+	}
+
 	if (this->text() != _other.text()) return;
 	if (this->iconPath() != _other.iconPath()) {
 		OT_LOG_WA("Icon path differs on merge. Ignoring");
 	}
 
-	std::list<NavigationTreeItem> bck = m_childs;
-	m_childs.clear();
-	for (const NavigationTreeItem& item : bck) {
+	// Merge with other
+	for (const NavigationTreeItem& item : _other.childItems()) {
 		bool exists = false;
 		for (NavigationTreeItem& eItem : m_childs) {
 			if (eItem.text() == item.text()) {
