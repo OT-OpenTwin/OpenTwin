@@ -125,7 +125,7 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
 
-	EntityPropertiesBoolean::createProperty("X axis", "Logscale X", true, "", getProperties());
+	EntityPropertiesBoolean::createProperty("X axis", "Logscale X", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty("X axis", "Autoscale X", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "X min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "X max", 0.0, "", getProperties());
