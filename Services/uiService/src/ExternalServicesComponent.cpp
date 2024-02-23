@@ -3081,7 +3081,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				dia.showDialog();
 
 				if (dia.dialogResult() == ot::Dialog::Ok && dia.selectionHasChanged()) {
-					std::list<std::string> selectedItems = dia.selectedItemPaths(true);
+					std::list<std::string> selectedItems = dia.selectedItemPaths();
 					int x = 1;
 					// ... 
 

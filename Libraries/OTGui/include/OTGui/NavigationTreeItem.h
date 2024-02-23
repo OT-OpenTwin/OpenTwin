@@ -68,6 +68,10 @@ namespace ot {
 
 		std::string itemPath(char _delimiter = '/', const std::string& _suffix = std::string()) const;
 
+		//! @brief Removes all child items which dont have the flag(s) set
+		//! Returns true if this item or any of the childs matches the filter
+		bool filter(NavigationTreeItemFlag _flags);
+
 	protected:
 		void setParentNavigationTreeItem(NavigationTreeItem* _parent) { m_parent = _parent; };
 		NavigationTreeItem* parentNavigationTreeItem(void) const { return m_parent; };

@@ -57,7 +57,8 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	// Fill data
 	for (const ot::NavigationTreeItem& itm : _config.rootItems()) {
 		this->addItem(m_available->treeWidget(), nullptr, itm);
-		if (itm.flags() & ot::ItemIsSelected) {
+		ot::NavigationTreeItem cop(itm);
+		if (cop.filter(ot::ItemIsSelected)) {
 			this->addItem(m_selected->treeWidget(), nullptr, itm);
 		}
 	}

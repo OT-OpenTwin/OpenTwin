@@ -188,3 +188,15 @@ std::string ot::NavigationTreeItem::itemPath(char _delimiter, const std::string&
 		return m_text + _suffix;
 	}
 }
+
+bool ot::NavigationTreeItem::filter(NavigationTreeItemFlag _flags) {
+	std::list<NavigationTreeItem> bck = m_childs;
+	m_childs.clear();
+	for (NavigationTreeItem& itm : bck) {
+		if (itm.filter(_flags)) {
+			m_childs.push_back(itm);
+			m_childs.back().setParentNavigationTreeItem(this);
+		}
+	}
+	return (m_flags & _flags) || !m_childs.empty();
+}
