@@ -56,7 +56,7 @@ public:
 	void			modelSelectionChangedNotification(std::list<ot::UID> &selectedEntityID, std::list<ot::UID> &selectedVisibleEntityID);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);
 	void			keySequenceActivated(const std::string &keySequence);
-	void			updateCurvesInPlot(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames, const ot::UIDList& plotIDs);
+	void			updateCurvesInPlot(const std::list<std::string>& curveNames, const ot::UID& plotID);
 	std::map<std::string, bool> getListOfEntityNames();
 	std::map<std::string, ot::UID> getEntityNameToIDMap();
 
