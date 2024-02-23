@@ -72,12 +72,12 @@ namespace ot {
 
 		QString itemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
 
-		void addItem(const TreeWidgetItemInfo& _item);
+		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
 	private:
 
 		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
 
-		void addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
+		QTreeWidgetItem* addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -98,6 +98,8 @@ namespace ot {
 		//! @brief Returns the item info
 		//! The information returned only contains the path to this item (other childs of parent items are ignored)
 		TreeWidgetItemInfo getFullInfo(void) const;
+
+		void expandAllParents(bool _expandThis = false);
 
 	private:
 		NavigationTreeItemFlag m_flags;

@@ -79,8 +79,8 @@ QString ot::TreeWidget::itemPath(QTreeWidgetItem* _item, char _delimiter) const 
 	return pth;
 }
 
-void ot::TreeWidget::addItem(const TreeWidgetItemInfo& _item) {
-	this->addItem(this->invisibleRootItem(), _item);
+QTreeWidgetItem* ot::TreeWidget::addItem(const TreeWidgetItemInfo& _item) {
+	return this->addItem(this->invisibleRootItem(), _item);
 }
 
 QTreeWidgetItem* ot::TreeWidget::findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const {
@@ -102,17 +102,19 @@ QTreeWidgetItem* ot::TreeWidget::findItem(QTreeWidgetItem* _item, const QStringL
 	return nullptr;
 }
 
-void ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item) {
+QTreeWidgetItem* ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item) {
 	for (int i = 0; i < _parent->childCount(); i++) {
 		if (_parent->child(i)->text(0) == _item.text()) {
 			for (const TreeWidgetItemInfo& child : _item.childItems()) {
 				this->addItem(_parent->child(i), child);
 			}
-			return;
+			return _parent->child(i);
 		}
 	}
 
-	_parent->addChild(new TreeWidgetItem(_item));
+	TreeWidgetItem* newItem = new TreeWidgetItem(_item);
+	_parent->addChild(newItem);
+	return newItem;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -169,4 +171,13 @@ ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
 	}
 
 	return info;
+}
+
+void ot::TreeWidgetItem::expandAllParents(bool _expandThis) {
+	if (_expandThis) { this->setExpanded(true); }
+	QTreeWidgetItem* itm = parent();
+	while (itm) {
+		itm->setExpanded(true);
+		itm = itm->parent();
+	}
 }

@@ -16,7 +16,7 @@
 #include <QtWidgets/qlayout.h>
 
 SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent)
-	: ot::Dialog(_parent)
+	: ot::Dialog(_parent), m_flags(_config.flags())
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
@@ -62,7 +62,7 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 		}
 	}
 
-	if (_config.flags() && ot::NavigationTreePackage::ItemsDefaultExpanded) {
+	if (m_flags && ot::NavigationTreePackage::ItemsDefaultExpanded) {
 		m_available->treeWidget()->expandAll();
 		m_selected->treeWidget()->expandAll();
 	}
@@ -140,7 +140,15 @@ void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {
 		return;
 	}
 
-	m_selected->treeWidget()->addItem(itm->getFullInfo());
+	ot::TreeWidgetItem* newItem = dynamic_cast<ot::TreeWidgetItem*>(m_selected->treeWidget()->addItem(itm->getFullInfo()));
+	if (newItem) {
+		if (m_flags & ot::NavigationTreePackage::ItemsDefaultExpanded) {
+			newItem->expandAllParents(true);
+		}
+	}
+	else {
+		OT_LOG_EA("Item cast failed");
+	}
 }
 
 void SelectEntitiesDialog::slotRemove(QTreeWidgetItem* _item, int _col) {

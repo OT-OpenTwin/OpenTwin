@@ -7,7 +7,9 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/NavigationTreeItem.h"
+#include "OTGui/NavigationTreePackage.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTWidgets/Dialog.h"
 
@@ -29,6 +31,7 @@ namespace ot {
 
 class SelectEntitiesDialog : public ot::Dialog {
 	Q_OBJECT
+	OT_DECL_NOCOPY(SelectEntitiesDialog)
 public:
 	SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
 	~SelectEntitiesDialog();
@@ -50,7 +53,10 @@ private:
 	void addSelectedPaths(QTreeWidgetItem* _item, std::list<std::string>& _list, char _pathDelimiter, bool _bottomLevelOnly) const;
 	ot::TreeWidgetItem* addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item);
 
+	ot::NavigationTreePackage::NavigationTreePackageFlags m_flags;
 	std::list<std::string> m_initiallySelected;
 	ot::TreeWidgetFilter* m_available;
 	ot::TreeWidgetFilter* m_selected;
+
+	SelectEntitiesDialog() = delete;
 };
