@@ -3080,7 +3080,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			}
 			else if (action == OT_ACTION_CMD_UI_EntitySelectionDialog) {
 				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-
+				const ot::UID entityToBeExtended = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_EntityID);
+								
 				ot::SelectEntitiesDialogCfg pckg;
 				pckg.setFromJsonObject(cfgObj);
 
@@ -3088,10 +3089,21 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				dia.showDialog();
 
 				if (dia.dialogResult() == ot::Dialog::Ok && dia.selectionHasChanged()) {
-					std::list<std::string> selectedItems = dia.selectedItemPaths();
-					int x = 1;
-					// ... 
-
+					std::list<std::string> selectedItems = dia.selectedItemPaths(true);
+					if (selectedItems.size() != 0)
+					{
+						ot::JsonDocument responseDoc;
+						ot::JsonArray jSelectedItemsNames;
+						for (const std::string& selectedItem : selectedItems)
+						{
+							jSelectedItemsNames.PushBack(ot::JsonString(selectedItem, responseDoc.GetAllocator()),responseDoc.GetAllocator());
+						}
+						responseDoc.AddMember(OT_ACTION_PARAM_UI_TREE_SelectedItems, jSelectedItemsNames, responseDoc.GetAllocator());
+						responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityToBeExtended ,responseDoc.GetAllocator());
+						responseDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, responseDoc.GetAllocator());
+						std::string response;
+						sendHttpRequest(QUEUE, m_modelServiceURL, response, response);
+					}
 				}
 			}
 			else if (action == OT_ACTION_CMD_UI_PropertyDialog) {

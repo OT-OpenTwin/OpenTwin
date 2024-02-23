@@ -1723,18 +1723,29 @@ void Model::keySequenceActivated(const std::string &keySequence) {
 
 }
 
-void Model::updateCurvesInPlot(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames, const ot::UIDList& plotIDs)
+void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const ot::UID& plotID)
 {
-	for (const ot::UID& plotID : plotIDs)
+
+	auto baseEntity = entityMap.find(plotID);
+	assert(baseEntity != entityMap.end());
+	EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
+	ot::UIDList curveIDs;
+	for (const std::string& curveName : curveNames)
 	{
-		auto baseEntity = entityMap.find(plotID);
-		assert(baseEntity != entityMap.end());
-		EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
-		plotEntity->overrideReferencedCurves(curveIDs, curveNames);
-		plotEntity->StoreToDataBase();
+		EntityBase* baseEnt = findEntityFromName(curveName);
+		curveIDs.push_back(baseEnt->getEntityID());
 	}
+	plotEntity->overrideReferencedCurves(curveIDs, curveNames);
+	plotEntity->StoreToDataBase();
+
 	setModified();
 	modelChangeOperationCompleted("Updated curve reference in plot");
+	if (visualizationModelID != 0)
+	{
+		ot::UIDList plotIDs{ plotID };
+		ot::UIDList plotVersions{ plotEntity->getEntityStorageVersion() };
+		getNotifier()->updatePlotEntities(plotIDs,plotVersions, visualizationModelID);
+	}
 }
 
 void Model::processSelectionsForOtherOwners(std::list<ot::UID> &selectedEntities)
