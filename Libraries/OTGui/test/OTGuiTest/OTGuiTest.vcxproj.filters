@@ -15,5 +15,11 @@
     <ClCompile Include="src\TestGraphicsLayoutItemCfg.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestNavigationTreeItem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestNavigationTreePackage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

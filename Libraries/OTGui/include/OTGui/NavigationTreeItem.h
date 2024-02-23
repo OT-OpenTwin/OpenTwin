@@ -66,7 +66,7 @@ namespace ot {
 
 		void merge(const NavigationTreeItem& _other);
 
-		std::string itemPath(char _delimiter = '/', const std::string& _suffix = std::string());
+		std::string itemPath(char _delimiter = '/', const std::string& _suffix = std::string()) const;
 
 	protected:
 		void setParentNavigationTreeItem(NavigationTreeItem* _parent) { m_parent = _parent; };

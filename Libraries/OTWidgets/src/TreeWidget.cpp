@@ -72,7 +72,7 @@ QString ot::TreeWidget::itemPath(QTreeWidgetItem* _item, char _delimiter) const 
 			pth = itm->text(0);
 		}
 		else {
-			pth = itm->text(0) + _delimiter + pth;
+			pth = itm->text(0) + QString(QChar(_delimiter)) + pth;
 		}
 		itm = itm->parent();
 	}

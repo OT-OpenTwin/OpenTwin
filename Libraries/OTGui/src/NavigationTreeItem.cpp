@@ -180,7 +180,7 @@ void ot::NavigationTreeItem::merge(const NavigationTreeItem& _other) {
 	}
 }
 
-std::string ot::NavigationTreeItem::itemPath(char _delimiter, const std::string& _suffix) {
+std::string ot::NavigationTreeItem::itemPath(char _delimiter, const std::string& _suffix) const {
 	if (m_parent) {
 		return m_parent->itemPath(_delimiter, _delimiter + m_text + _suffix);
 	}
