@@ -185,6 +185,7 @@ void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 		{
 		}
 
+		isDeletable = true;
 		if (doc_view.find("isDeletable") != doc_view.end())
 		{
 			isDeletable = doc_view["isDeletable"].get_bool();
