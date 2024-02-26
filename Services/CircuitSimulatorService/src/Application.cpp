@@ -221,7 +221,7 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (action == "Circuit Simulator:Edit:New Circuit")
+	if (action == "Circuit Simulator:Edit:Add Solver")
 	{
 		addSolver();
 	}
@@ -528,8 +528,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage("Circuit Simulator");
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
-	_ui->addMenuButton("Circuit Simulator", "Edit","New Circuit", "New Circuit", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add","Default");
-	_ui->addMenuButton("Circuit Simulator","Simulate","New Simulation","New Simulation", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add", "Default");
+	_ui->addMenuButton("Circuit Simulator", "Edit","Add Solver", "Add Solver", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add","Default");
+	_ui->addMenuButton("Circuit Simulator","Simulate","New Simulation","New Simulation", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Kriging", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
