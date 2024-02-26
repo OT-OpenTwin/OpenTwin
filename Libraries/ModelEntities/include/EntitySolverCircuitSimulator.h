@@ -12,6 +12,9 @@ public:
 	EntitySolverCircuitSimulator(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual ~EntitySolverCircuitSimulator();
 
+	void createProperties(const std::string circuitFolderName, ot::UID circuitFolderID, const std::string circuitName, ot::UID circuitID);
+	virtual bool updateFromProperties(void) override;
+
 	virtual std::string getClassName(void) override { return "EntitySolverCircuitSimulator"; };
 
 protected:
