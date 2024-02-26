@@ -126,6 +126,7 @@
     <ClInclude Include="include\VariableToBSONConverter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\EntitySolverCircuitSimulator.h" />
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
+    <ClCompile Include="src\EntitySolverCircuitSimulator.cpp" />
     <ClCompile Include="src\EntitySolverElmerFEM.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarSurface.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarVolume.cpp" />

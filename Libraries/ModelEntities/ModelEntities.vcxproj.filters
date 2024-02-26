@@ -627,5 +627,11 @@
     <ClCompile Include="src\EntitySolverElmerFEM.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\EntitySolverCircuitSimulator.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="include\EntitySolverCircuitSimulator.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

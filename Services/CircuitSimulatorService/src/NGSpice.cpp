@@ -60,6 +60,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 			conn.setID(std::to_string(++Numbers::id));
 			conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
 
+			// if the adding doesingt work because it already added the connection than it counts the Nodenumber++ but i dont need that to do it
 			it->second.addConnection(temp.originUid(), conn);
 			it->second.addConnection(temp.destUid(), conn);
 		}
