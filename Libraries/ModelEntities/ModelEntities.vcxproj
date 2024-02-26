@@ -30,6 +30,7 @@
     <ClInclude Include="include\EntityMetadataCampaign.h" />
     <ClInclude Include="include\EntityResultUnstructuredMesh.h" />
     <ClInclude Include="include\EntityResultUnstructuredMeshData.h" />
+    <ClInclude Include="include\EntitySolverCircuitSimulator.h" />
     <ClInclude Include="include\EntitySolverElmerFEM.h" />
     <ClInclude Include="include\EntitySolverGetDP.h" />
     <ClInclude Include="include\EntityFileText.h" />
@@ -126,7 +127,6 @@
     <ClInclude Include="include\VariableToBSONConverter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\EntitySolverCircuitSimulator.h" />
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />

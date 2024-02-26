@@ -333,7 +333,7 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	}
 	else if (entityType == "EntitySolverCircuitSimulator")
 	{
-		return new EntitySolverCircuitSimulator(0, nullptr, nullptr, nullptr, nullptr, "");
+		return new EntitySolverCircuitSimulator(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else
 	{

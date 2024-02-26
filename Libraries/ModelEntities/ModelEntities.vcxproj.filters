@@ -364,6 +364,9 @@
     <ClInclude Include="include\EntitySolverElmerFEM.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntitySolverCircuitSimulator.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -629,9 +632,6 @@
     </ClCompile>
     <ClCompile Include="src\EntitySolverCircuitSimulator.cpp">
       <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="include\EntitySolverCircuitSimulator.h">
-      <Filter>Header Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
