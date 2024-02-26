@@ -28,6 +28,7 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "EntitySolverCircuitSimulator.h"
 
 
 // Third Party Header
@@ -220,8 +221,11 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	//if (action == "Circuit Simulator:Edit:New Circuit") return 	createNewCircuitEditor();
-	if (action == "Circuit Simulator:Simulate:New Simulation")
+	if (action == "Circuit Simulator:Edit:New Circuit")
+	{
+		addSolver();
+	}
+	else if (action == "Circuit Simulator:Simulate:New Simulation")
 	{
 		std::string editorName = "Circuit Simulator";
 		auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
@@ -233,6 +237,63 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 	//	assert(0);
 	//	}// Unhandled button action
 	return std::string();
+}
+
+void Application::addSolver()
+{
+	if (!EnsureDataBaseConnection())
+	{
+		assert(0); // Data base connection failed
+		return;
+	}
+
+	if (m_uiComponent == nullptr)
+	{
+		assert(0); throw std::exception("Model not connected");
+	}
+
+	//First get a list of all folder items of the Solvers folder
+	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems("Solvers");
+
+	// Get new Entity Id for the new item
+	ot::UID entityID = m_modelComponent->createEntityUID();
+
+	// Create a unique na,e for the new solver item
+	int count = 1;
+	std::string solverName;
+	do
+	{
+		solverName = "Solvers/CircuitSimulator" + std::to_string(count);
+		count++;
+	} while (std::find(solverItems.begin(), solverItems.end(), solverName) != solverItems.end());
+
+	// Get information about the available circuits 
+	std::string circuitFolderName, circuitName;
+	ot::UID circuitFolderID{ 0 }, circuitID{ 0 };
+
+	// Here i need my own function for getAvailableCircuits
+	//m_modelComponent->getAvailableMeshes(circuitFolderName, circuitFolderID, circuitName, circuitID);
+
+	// Create the new solver item and store it in the data base
+	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	solverEntity->setName(solverName);
+	solverEntity->setEditable(true);
+
+	solverEntity->createProperties(circuitFolderName, circuitFolderID, circuitName, circuitID);
+	solverEntity->StoreToDataBase();
+
+	// Register the new solver item in the model
+	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false };
+	std::list<ot::UID> dataEntityIDList;
+	std::list<ot::UID> dataEntityVersionList;
+	std::list<ot::UID> dataEntityParentList;
+
+	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
+		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
+
+	
 }
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
