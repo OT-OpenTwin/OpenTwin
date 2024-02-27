@@ -29,6 +29,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntitySolverCircuitSimulator.h"
+#include "DataBase.h"
 
 
 // Third Party Header
@@ -227,16 +228,39 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 	}
 	else if (action == "Circuit Simulator:Simulate:New Simulation")
 	{
-		std::string editorName = "Circuit Simulator";
-		auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
-		m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID,editorName);
-		m_ngSpice.clearBufferStructure();
+		runCircuitSimulation();
+		
 	}
 	//else {
 		//OT_LOG_W("Unknown model action");
 	//	assert(0);
 	//	}// Unhandled button action
 	return std::string();
+}
+
+std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
+	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+	modelSelectionChangedNotification();
+	return std::string();
+}
+
+void Application::modelSelectionChangedNotification(void)
+{
+	if (isUiConnected()) {
+		std::list<std::string> enabled;
+		std::list<std::string> disabled;
+
+		if (selectedEntities.size() > 0)
+		{
+			enabled.push_back("Circuit Simulator:Simulate:New Simulation");
+		}
+		else
+		{
+			disabled.push_back("Circuit Simulator:Simulate:New Simulation");
+		}
+
+		m_uiComponent->setControlsEnabledState(enabled, disabled);
+	}
 }
 
 void Application::addSolver()
@@ -294,6 +318,107 @@ void Application::addSolver()
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 
 	
+}
+
+void Application::runCircuitSimulation()
+{
+	if (!EnsureDataBaseConnection())
+	{
+		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base. \n");
+		return;
+	}
+
+	if (selectedEntities.empty())
+	{
+		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		return;
+	}
+
+	//First we get a list of all selected Entities
+	std::list<ot::EntityInformation> selectedEntityInfo;
+	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
+	m_modelComponent->getEntityInformation(selectedEntities, selectedEntityInfo);
+
+	//Here we first need to check which solvers are selected and then run them one by on
+	std::map<std::string, bool> solverRunMap;
+	for (auto entity : selectedEntityInfo)
+	{
+		if (entity.getType() == "EntitySolverCircuitSimulator" || entity.getType() == "EntitySolver")
+		{
+			if (entity.getName().substr(0, 8) == "Solvers/")
+			{
+				size_t index = entity.getName().find('/', 8);
+				if (index != std::string::npos)
+				{
+					solverRunMap[entity.getName().substr(0, index - 1)] = true;
+				}
+				else
+				{
+					solverRunMap[entity.getName()] = true;
+				}
+			}
+		}
+	}
+
+	std::list<std::string> solverRunList;
+	for (auto solver : solverRunMap)
+	{
+		solverRunList.push_back(solver.first);
+	}
+
+	if (solverRunList.empty())
+	{
+		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		return;
+	}
+
+	//Now we retrieve information about the solver items
+	std::list<ot::EntityInformation> solverInfo;
+	m_modelComponent->getEntityInformation(solverRunList, solverInfo);
+
+	// Prefetch the solver information
+	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
+
+	for (auto info : solverInfo)
+	{
+		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+	}
+
+	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+
+	//Now read the solver objects for each solver
+	std::map<std::string, EntityBase*> solverMap;
+	for (auto info : solverInfo)
+	{
+		EntityBase* entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
+		solverMap[info.getName()] = entity;
+	}
+
+	// Get the current model version
+	std::string modelVersion = m_modelComponent->getCurrentModelVersion();
+
+	// Finally start the worker thread to run the solvers
+	std::thread workerThread(&Application::solverThread, this, solverInfo, modelVersion, solverMap);
+	workerThread.detach();
+}
+
+void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion, std::map<std::string, EntityBase*> solverMap) {
+	for (auto solver : solverInfo)
+	{
+		runSingleSolver(solver, modelVersion, solverMap[solver.getName()]);
+	}
+}
+
+void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity)
+{
+
+	std::string editorName = "Circuit Simulator";
+	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
+	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, editorName);
+	m_ngSpice.clearBufferStructure();
 }
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)

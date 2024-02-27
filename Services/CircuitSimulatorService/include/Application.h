@@ -40,6 +40,7 @@ private:
 	virtual ~Application();
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
+	std::list<ot::UID>	selectedEntities;
 	
 public:
 
@@ -58,9 +59,15 @@ public:
 	OT_HANDLER(handleRemoveGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
+
+	void modelSelectionChangedNotification(void);
 
 	void addSolver();
-	
+	void runCircuitSimulation();
+	void solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion,  std::map<std::string, EntityBase*> solverMap);
+	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
+
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
 	NGSpice& getNGSpice() { return m_ngSpice; }
