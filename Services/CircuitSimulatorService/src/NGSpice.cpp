@@ -104,7 +104,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 
 
 
-std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
+std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType)
 {
 	/*std::string Title = "*Test";
 	outfile << Title << std::endl;
@@ -229,7 +229,9 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	//		OT_LOG_E("No EntityBlock found!");
 	//	}
 	//}
-	ngSpice_Command(const_cast<char*>("circbyline .dc V1 0 12 1"));
+	simulationType = "circbyline " + simulationType;
+
+	ngSpice_Command(const_cast<char*>(simulationType.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	ngSpice_Command(const_cast<char*>("circbyline print all"));
@@ -243,7 +245,7 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -273,7 +275,7 @@ std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<En
 	/* Some simulation*/
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
 	 updateBufferClasses(allEntitiesByBlockID,editorname);
-	 generateNetlist(allEntitiesByBlockID);
+	 generateNetlist(allEntitiesByBlockID,simulationType);
 
 	 Numbers::nodeNumber = 0;
 	 Numbers::id = 0;

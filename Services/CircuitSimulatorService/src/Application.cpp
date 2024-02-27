@@ -414,10 +414,16 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity)
 {
+	EntityPropertiesString* simulationType = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Simulation Type"));
+	assert(simulationType != nullptr);
 
-	std::string editorName = "Circuit Simulator";
+	EntityPropertiesString* circuitName = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Circuit Name"));
+	assert(circuitName != nullptr);
+
+
+	
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
-	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, editorName);
+	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue());
 	m_ngSpice.clearBufferStructure();
 }
 
