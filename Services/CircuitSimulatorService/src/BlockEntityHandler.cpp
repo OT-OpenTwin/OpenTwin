@@ -16,6 +16,7 @@
 namespace NodeNumbers
 {
 	static unsigned long long nodeNumber = 0;
+	
 }
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position)

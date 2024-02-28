@@ -63,6 +63,8 @@ namespace ottest
 
 	static unsigned long long currenConnectorID = 1;
 
+	static unsigned long long currentEditorID = 1;
+
 	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
 		ot::GraphicsFlowItemConnector cfg;
 
@@ -245,7 +247,8 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 // Trying to create more circuits
 void Application::createNewCircuit()
 {
-	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage("Circuit Simulator 2", "Circuit Simulator 2");
+	std::string circuitName = "Circuit Simulator" + std::to_string(ottest::currentEditorID);
+	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
 	ot::JsonDocument doc;
 	ot::JsonObject pckgObj;
 	editor->addToJsonObject(pckgObj, doc.GetAllocator());
@@ -262,6 +265,8 @@ void Application::createNewCircuit()
 
 	// Message is queued, no response here
 	m_uiComponent->sendMessage(true, doc);
+
+	ottest::currentEditorID++;
 }
 
 
