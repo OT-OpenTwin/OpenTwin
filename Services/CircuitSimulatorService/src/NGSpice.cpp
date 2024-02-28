@@ -17,14 +17,22 @@ namespace Numbers
 	
 }
 
-void NGSpice::clearBufferStructure()
+void NGSpice::clearBufferStructure(std::string name)
 {
-	this->getMapOfCircuits().find("Circuit Simulator")->second.getMapOfElements().clear();
+	this->getMapOfCircuits().find(name)->second.getMapOfElements().clear();
 
 }
 
 void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
+	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
+	if ( it == Application::instance()->getNGSpice().getMapOfCircuits().end())
+	{
+		Circuit circuit;
+		circuit.setEditorName(editorname);
+		circuit.setId(editorname);
+		Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editorname, circuit);
+	}
 	for (auto& blockEntityByID : allEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
@@ -110,7 +118,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 
 
 
-std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings)
+std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
 {
 	/*std::string Title = "*Test";
 	outfile << Title << std::endl;
@@ -149,7 +157,7 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 		std::string TitleLine = "circbyline *Test";
 		ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
 
-	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find("Circuit Simulator");
+	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
 	for (auto mapOfElements : it->second.getMapOfElements())
 	{
@@ -282,7 +290,7 @@ std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<En
 	/* Some simulation*/
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
 	 updateBufferClasses(allEntitiesByBlockID,editorname);
-	 generateNetlist(allEntitiesByBlockID,simulationType,printSettings);
+	 generateNetlist(allEntitiesByBlockID,simulationType,printSettings,editorname);
 
 	 Numbers::nodeNumber = 0;
 	 Numbers::id = 0;

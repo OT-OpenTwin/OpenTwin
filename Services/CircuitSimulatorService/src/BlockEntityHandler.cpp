@@ -30,6 +30,10 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
+
+	// Here i want to add the items to the corresponding editor
+
+
 	blockEntity->SetGraphicsScenePackageName(_packageName);
 	
 
@@ -42,29 +46,6 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
 	
 	InitSpecialisedCircuitElementEntity(blockEntity);
-	
-	
-	
-
-	/*CircuitElement element;
-	element.setEditorName(editorName);
-	element.setItemName(blockEntity->getBlockTitle());
-	element.setUID(blockEntity->getBlockID());
-
-	if (blockEntity->getBlockTitle() == "Circuit Element")
-	{
-		auto myElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
-		element.setValue(myElement->getElementType());
-	}
-	else if (blockEntity->getBlockTitle() == "Circuit Element Resistor")
-	{
-		auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
-		element.setValue(myElement->getElementType());
-	}
-	
-	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
-	it->second.addElement(element.getUID(), element);*/
-	
 
 	blockEntity->StoreToDataBase();
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
@@ -125,6 +106,7 @@ bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockE
 
 void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name)
 {
+	
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
@@ -229,4 +211,16 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(pckg->name(), circuit);
 
 	return pckg;
+}
+
+//Setter
+void BlockEntityHandler::setPackageName(std::string name)
+{
+	this->_packageName = name;
+}
+
+//Getter
+std::string BlockEntityHandler::getPackageName()
+{
+	return this->_packageName;
 }

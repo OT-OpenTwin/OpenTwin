@@ -23,9 +23,15 @@ public:
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
 	NGSpice m_ngSpice;
+
+	//Setter
+	void setPackageName(std::string name);
+
+	//Getter
+	std::string getPackageName();
 private:
 	const std::string _blockFolder = ot::FolderNames::BlockFolder;
-	const std::string _packageName = "Circuit Simulator";
+	std::string _packageName = "Circuit Simulator";
 
 	void InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();

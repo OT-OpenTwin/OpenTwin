@@ -25,9 +25,9 @@ public:
 	std::string getBlockEntityTitleByUID(std::string UID, std::map<std::string, std::shared_ptr<EntityBlock>>&);*/
 
 	void updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string);
-	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&, std::string simulationType,std::string printSettings);
+	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&, std::string simulationType,std::string printSettings,std::string editorname);
 	std::string ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string,std::string simulationType,std::string printSettings);
-	void clearBufferStructure();
+	void clearBufferStructure(std::string name);
 
 	static int MySendCharFunction(char*, int, void*);
 	static int MySendStat(char*, int, void*);

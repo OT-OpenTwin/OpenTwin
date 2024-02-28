@@ -231,12 +231,41 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 		runCircuitSimulation();
 		
 	}
-	//else {
+	else if (action == "Circuit Simulator:Edit:Add Circuit")
+	{
+		createNewCircuit();
+	}
+	else {
 		//OT_LOG_W("Unknown model action");
-	//	assert(0);
-	//	}// Unhandled button action
+		assert(0);
+		}// Unhandled button action
 	return std::string();
 }
+
+// Trying to create more circuits
+void Application::createNewCircuit()
+{
+	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage("Circuit Simulator 2", "Circuit Simulator 2");
+	ot::JsonDocument doc;
+	ot::JsonObject pckgObj;
+	editor->addToJsonObject(pckgObj, doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+
+	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
+
+	Circuit circuit;
+	circuit.setEditorName(editor->title());
+	circuit.setId(editor->name());
+	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editor->name(), circuit);
+
+	// Message is queued, no response here
+	m_uiComponent->sendMessage(true, doc);
+}
+
+
+
 
 std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
 	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
@@ -423,9 +452,10 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesString* printSettings = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
 	assert(printSettings != nullptr);
 
+	m_blockEntityHandler.setPackageName(circuitName->getValue());
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue(),printSettings->getValue());
-	m_ngSpice.clearBufferStructure();
+	m_ngSpice.clearBufferStructure(circuitName->getValue());
 }
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
@@ -484,7 +514,7 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 	{
 		it->second.addElement(element.getUID(), element);
 	}*/
-
+	m_blockEntityHandler.setPackageName(editorName);
 	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
 	return "";
 	
@@ -548,7 +578,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 {
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
+	m_blockEntityHandler.setPackageName(pckg.name());
 	m_blockEntityHandler.AddBlockConnection(pckg.connections(),pckg.name());
 
 	
@@ -662,6 +692,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
 	_ui->addMenuButton("Circuit Simulator", "Edit","Add Solver", "Add Solver", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add","Default");
 	_ui->addMenuButton("Circuit Simulator","Simulate","New Simulation","New Simulation", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Kriging", "Default");
+	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
