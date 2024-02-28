@@ -147,7 +147,7 @@ namespace ViewerAPI
 														  bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ot::UID> &curvesID, std::list<ot::UID> &curvesVersions,  std::list<std::string> &curvesNames);
 	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long entityVersion);
 	__declspec(dllexport) void visualizationPlot1DPropertiesChanged(ot::UID osgModelID, ot::UID modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-																	bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax);
+		bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax);
 	__declspec(dllexport) void addVisualizationTextNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
 														ot::UID textEntityID, ot::UID textEntityVersion);
 	__declspec(dllexport) void addVisualizationTableNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,

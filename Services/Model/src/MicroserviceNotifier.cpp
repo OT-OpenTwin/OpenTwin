@@ -182,7 +182,7 @@ void MicroserviceNotifier::activateMenuTab(const std::string &pageName)
 
 void MicroserviceNotifier::updatePlotEntities(ot::UIDList& entityIDs, ot::UIDList& entityVersions, ot::UID visModelID)
 {
-	ot::JsonDocument doc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged);
+	ot::JsonDocument doc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged);
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), doc.GetAllocator());
 	ot::JsonArray jEntityIDs;
 	for (ot::UID id : entityIDs)
