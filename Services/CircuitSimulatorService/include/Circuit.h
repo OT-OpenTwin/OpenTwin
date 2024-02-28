@@ -23,7 +23,7 @@ public:
 	void setId(const std::string id);
 	
 	//additionalFunctions
-	void addConnection(const std::string& key, const Connection& obj);
+	bool addConnection(const std::string& key, const Connection& obj);
 	std::string findElement(const std::string& key);
 		
 private:

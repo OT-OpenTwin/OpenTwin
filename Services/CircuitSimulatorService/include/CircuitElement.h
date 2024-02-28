@@ -41,7 +41,7 @@ public:
 	void setValue(std::string name);
 
 	//Additional Functions
-	void addConnection(const Connection& obj);
+	bool addConnection(const Connection& obj);
 	
 	
 	

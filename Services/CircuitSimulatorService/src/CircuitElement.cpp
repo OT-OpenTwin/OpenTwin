@@ -49,6 +49,10 @@ void CircuitElement::setValue(std::string name) { this->value = name; }
 
 //Additional Functions
 
-void CircuitElement::addConnection(const Connection& obj) {  listOfConnections.insert(obj); }
+bool CircuitElement::addConnection(const Connection& obj) 
+{
+	auto result = listOfConnections.insert(obj);
+	return result.second;
+}
 
 

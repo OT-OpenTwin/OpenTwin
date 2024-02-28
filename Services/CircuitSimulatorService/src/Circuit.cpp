@@ -60,11 +60,12 @@ void Circuit::setId(std::string id)
 	this->id = id;
 }
 
-void Circuit::addConnection(const std::string& key, const Connection& obj)
+bool Circuit::addConnection(const std::string& key, const Connection& obj)
 {
 	if (mapOfElements.find(key) != mapOfElements.end())
 	{
-		mapOfElements[key].addConnection(obj);
+		bool result = mapOfElements[key].addConnection(obj);
+		return result;
 
 	}
 	else
