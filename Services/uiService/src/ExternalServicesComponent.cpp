@@ -3089,7 +3089,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				dia.showDialog();
 
 				if (dia.dialogResult() == ot::Dialog::Ok && dia.selectionHasChanged()) {
-					std::list<std::string> selectedItems = dia.selectedItemPaths(true);
+					std::list<std::string> selectedItems = dia.selectedItemPaths();
 					if (selectedItems.size() != 0)
 					{
 						ot::JsonDocument responseDoc;
@@ -3102,7 +3102,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 						responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityToBeExtended ,responseDoc.GetAllocator());
 						responseDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, responseDoc.GetAllocator());
 						std::string response;
-						sendHttpRequest(QUEUE, m_modelServiceURL, response, response);
+						sendHttpRequest(QUEUE, m_modelServiceURL, responseDoc, response);
 					}
 				}
 			}

@@ -1730,12 +1730,14 @@ void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const o
 	assert(baseEntity != entityMap.end());
 	EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
 	ot::UIDList curveIDs;
+	std::list<std::string> curveNamesOnly;
 	for (const std::string& curveName : curveNames)
 	{
 		EntityBase* baseEnt = findEntityFromName(curveName);
 		curveIDs.push_back(baseEnt->getEntityID());
+		curveNamesOnly.push_back(curveName.substr(curveName.find_last_of("/") + 1, curveName.size()));
 	}
-	plotEntity->overrideReferencedCurves(curveIDs, curveNames);
+	plotEntity->overrideReferencedCurves(curveIDs, curveNamesOnly);
 	plotEntity->StoreToDataBase();
 
 	setModified();
