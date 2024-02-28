@@ -110,7 +110,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 
 
 
-std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType)
+std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings)
 {
 	/*std::string Title = "*Test";
 	outfile << Title << std::endl;
@@ -236,11 +236,12 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	//	}
 	//}
 	simulationType = "circbyline " + simulationType;
+	printSettings = "circbyline " + printSettings;
 
 	ngSpice_Command(const_cast<char*>(simulationType.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
-	ngSpice_Command(const_cast<char*>("circbyline print all"));
+	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
 
@@ -251,7 +252,7 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType)
+std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -281,7 +282,7 @@ std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<En
 	/* Some simulation*/
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
 	 updateBufferClasses(allEntitiesByBlockID,editorname);
-	 generateNetlist(allEntitiesByBlockID,simulationType);
+	 generateNetlist(allEntitiesByBlockID,simulationType,printSettings);
 
 	 Numbers::nodeNumber = 0;
 	 Numbers::id = 0;

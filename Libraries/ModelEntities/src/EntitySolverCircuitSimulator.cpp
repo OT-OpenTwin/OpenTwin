@@ -17,6 +17,7 @@ void EntitySolverCircuitSimulator::createProperties(const std::string circuitFol
 	//EntityPropertiesEntityList::createProperty("Circuit", "Circuit", circuitFolderName, circuitFolderID, circuitName, circuitID, "CircuitSimulator", getProperties());
 	EntityPropertiesString::createProperty("Settings", "Simulation Type", ".dc V1 0 12 1", "CircuitSimulator", getProperties());
 	EntityPropertiesString::createProperty("Settings", "Circuit Name", "Circuit Simulator", "CircuitSimulator", getProperties());
+	EntityPropertiesString::createProperty("Settings", "Print Settings", "print all", "CircuitSimulator", getProperties());
 }
 
 bool EntitySolverCircuitSimulator::updateFromProperties(void)

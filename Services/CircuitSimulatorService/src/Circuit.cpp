@@ -71,6 +71,7 @@ bool Circuit::addConnection(const std::string& key, const Connection& obj)
 	else
 	{
 		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
+		return false;
 
 	}
 

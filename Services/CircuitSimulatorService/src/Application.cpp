@@ -420,10 +420,11 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesString* circuitName = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Circuit Name"));
 	assert(circuitName != nullptr);
 
+	EntityPropertiesString* printSettings = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
+	assert(printSettings != nullptr);
 
-	
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
-	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue());
+	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue(),printSettings->getValue());
 	m_ngSpice.clearBufferStructure();
 }
 

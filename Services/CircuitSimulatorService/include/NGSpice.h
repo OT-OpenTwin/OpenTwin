@@ -25,8 +25,8 @@ public:
 	std::string getBlockEntityTitleByUID(std::string UID, std::map<std::string, std::shared_ptr<EntityBlock>>&);*/
 
 	void updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string);
-	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&, std::string simulationType);
-	std::string ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string,std::string simulationType);
+	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&, std::string simulationType,std::string printSettings);
+	std::string ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string,std::string simulationType,std::string printSettings);
 	void clearBufferStructure();
 
 	static int MySendCharFunction(char*, int, void*);
