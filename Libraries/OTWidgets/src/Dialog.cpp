@@ -6,8 +6,17 @@
 // OpenTwin header
 #include "OTWidgets/Dialog.h"
 
-ot::Dialog::Dialog(QWidget* _parent) : QDialog(_parent), m_result(DialogResult::Cancel) {
+ot::Dialog::Dialog(QWidget* _parent)
+	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel) 
+{
 	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
+}
+
+ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent) 
+	: QDialog(_parent), m_flags(_config.flags()), m_dialogName(_config.name()), m_result(DialogResult::Cancel)
+{
+	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
+	this->setWindowTitle(QString::fromStdString(_config.title()));
 }
 
 ot::Dialog::~Dialog() {}

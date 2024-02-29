@@ -154,12 +154,14 @@
 #define OT_ACTION_CMD_UI_ContextMenuItemClicked "UI.ContextMenu.Item.Clicked"
 #define OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged "UI.ContextMenu.Item.CheckedChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
+#define OT_ACTION_CMD_UI_OnePropertyDialog "UI.OnePropertyDialog"
+#define OT_ACTION_CMD_UI_OnePropertyDialogValue "UI.OnePropertyDialogValue"
 #define OT_ACTION_CMD_UI_EntitySelectionDialog "UI.EntitySelectionDialog"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraph "UI.SetVersionGraph"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive "UI.SetVersionGraph.Active"
 #define OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions "UI.RemoveVersionGraph.Versions"
 #define OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion "UI.AddActivateGraph.Version"
-#define OT_ACTION_CMD_UI_OpenSelectEntitiesD "Ui.SelectEntitiesDialog.Open"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
 #define OT_ACTION_CMD_UI_SS_UPLOAD "StudioSuite.Upload"
@@ -265,8 +267,10 @@
 #define OT_ACTION_PARAM_DATABASE_URL "Database.URL"
 #define OT_ACTION_PARAM_PROCESS_ID "PROCESS.ID"
 
+#define OT_ACTION_PARAM_Value "Value"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Package "Package"
+#define OT_ACTION_PARAM_ObjectName "ObjectName"
 
 #define OT_ACTION_PARAM_UI_ToolBarTabOrder "UI.TTB.TabOrder"
 #define OT_ACTION_PARAM_UI_CONTROL_TabName "UI.TTB.TabName"

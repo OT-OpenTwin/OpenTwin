@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/DialogCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/QWidgetInterface.h"
 
@@ -27,6 +28,7 @@ namespace ot {
 		};
 
 		Dialog(QWidget* _parent = (QWidget*)nullptr);
+		Dialog(const DialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~Dialog();
 		
 		//! @brief Returns a pointer to the root widget of this object
@@ -37,10 +39,18 @@ namespace ot {
 
 		void close(DialogResult _result);
 
+		void setDialogFlags(DialogCfg::DialogFlags _flags) { m_flags = _flags; };
+		DialogCfg::DialogFlags dialogFlags(void) const { return m_flags; };
+
 		DialogResult dialogResult(void) const { return m_result; };
 
+		void setDialogName(const std::string& _name) { m_dialogName = _name; };
+		const std::string& dialogName(void) const { return m_dialogName; };
+
 	private:
+		DialogCfg::DialogFlags m_flags;
 		DialogResult m_result;
+		std::string m_dialogName;
 	};
 
 }

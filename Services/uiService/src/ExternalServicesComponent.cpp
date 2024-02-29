@@ -46,6 +46,8 @@
 
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/PropertyDialogCfg.h"
+#include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
@@ -56,6 +58,11 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/TextEditor.h"
+#include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/OnePropertyDialog.h"
+#include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/PropertyGridGroup.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 
@@ -3085,6 +3092,41 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					int x = 1;
 					// ... 
 
+				}
+			}
+			else if (action == OT_ACTION_CMD_UI_PropertyDialog) {
+				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
+
+				ot::PropertyDialogCfg pckg;
+				pckg.setFromJsonObject(cfgObj);
+
+				ot::PropertyDialog dia(pckg, nullptr);
+				dia.showDialog();
+
+				if (dia.dialogResult() == ot::Dialog::Ok) {
+					
+				}
+			}
+			else if (action == OT_ACTION_CMD_UI_OnePropertyDialog) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
+
+				ot::OnePropertyDialogCfg pckg;
+				pckg.setFromJsonObject(cfgObj);
+
+				ot::OnePropertyDialog dia(pckg, nullptr);
+				dia.showDialog();
+
+				if (dia.dialogResult() == ot::Dialog::Ok && dia.valueHasChanged()) {
+					ot::JsonDocument responseDoc;
+					responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OnePropertyDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+					responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(dia.dialogName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+					dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
+
+					std::string response;
+					sendHttpRequest(EXECUTE, info, responseDoc, response);
 				}
 			}
 			else

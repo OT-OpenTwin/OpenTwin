@@ -46,7 +46,9 @@ public:
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleEditorSaveRequested, Application, OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleOnePropertyDialogValue, Application, OT_ACTION_CMD_UI_OnePropertyDialogValue, ot::SECURE_MESSAGE_TYPES);
 	
+	std::string test(void);
 	std::string createEmptyTestEditor(void);
 
 	// ##################################################################################################################################################################################################################

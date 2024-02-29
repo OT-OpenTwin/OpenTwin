@@ -118,6 +118,51 @@
     <ClCompile Include="src\EventNotifier.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\PropertyGrid.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridGroup.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItem.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyDialog.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemFactory.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemDouble.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemString.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemStringList.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemInt.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemBool.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OnePropertyDialog.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpinBox.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputInt.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInput.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputFactory.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -137,6 +182,12 @@
     </Filter>
     <Filter Include="src\General">
       <UniqueIdentifier>{a4fb4c3c-12e7-4533-8201-e6fcd5789c20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Properties">
+      <UniqueIdentifier>{2fe5312b-1583-42eb-b29a-2ced76229950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Properties">
+      <UniqueIdentifier>{2f24509f-ba9f-4e5f-9b4e-d42b24aad0f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +281,42 @@
     <ClInclude Include="include\OTWidgets\PushButton.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItem.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridGroup.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemFactory.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemString.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemStringList.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemBool.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemInt.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemDouble.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\OnePropertyDialog.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SpinBox.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputInt.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputFactory.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -261,6 +348,15 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\EventNotifier.h">
       <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyGrid.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyDialog.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInput.h">
+      <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
