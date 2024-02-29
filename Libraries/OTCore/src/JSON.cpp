@@ -46,6 +46,124 @@ for (rapidjson::SizeType i = 0; i < it.Size(); i++) { \
 return ___list;
 
 
+bool ot::json::exists(const JsonValue & _value, const char* _member) {
+	return _value.HasMember(_member);
+}
+
+bool ot::json::exists(const ConstJsonObject & _value, const char* _member) {
+	return _value.HasMember(_member);
+}
+
+bool ot::json::isNull(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsNull();
+}
+
+bool ot::json::isNull(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsNull();
+}
+
+bool ot::json::isBool(const JsonValue & _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsBool();
+}
+
+bool ot::json::isBool(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsBool();
+}
+
+bool ot::json::isInt(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsInt();
+}
+
+bool ot::json::isInt(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsInt();
+}
+
+bool ot::json::isUInt(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsUint();
+}
+
+bool ot::json::isUInt(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsUint();
+}
+
+bool ot::json::isInt64(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsInt64();
+}
+
+bool ot::json::isInt64(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsInt64();
+}
+
+bool ot::json::isUInt64(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsUint64();
+}
+
+bool ot::json::isUInt64(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsUint64();
+}
+
+bool ot::json::isFloat(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsFloat();
+}
+
+bool ot::json::isFloat(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsFloat();
+}
+
+bool ot::json::isDouble(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsDouble();
+}
+
+bool ot::json::isDouble(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsDouble();
+}
+
+bool ot::json::isString(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsString();
+}
+
+bool ot::json::isString(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsString();
+}
+
+bool ot::json::isObject(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsObject();
+}
+
+bool ot::json::isObject(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsObject();
+}
+
+bool ot::json::isArray(const JsonValue& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsArray();
+}
+
+bool ot::json::isArray(const ConstJsonObject& _value, const char* _member) {
+	if (!_value.HasMember(_member)) return false;
+	return _value[_member].IsArray();
+}
+
 bool ot::json::getBool(const JsonValue& _value, const char* _member, bool _default) {
 	OT_JSON_getFromObject(_value, _member, Bool, return _default);
 }
@@ -326,10 +444,115 @@ std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonObject& 
 	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
 }
 
+bool ot::json::isNull(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsNull();
+}
 
+bool ot::json::isNull(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsNull();
+}
 
+bool ot::json::isBool(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsBool();
+}
 
+bool ot::json::isBool(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsBool();
+}
 
+bool ot::json::isInt(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsInt();
+}
+
+bool ot::json::isInt(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsInt();
+}
+
+bool ot::json::isUInt(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsUint();
+}
+
+bool ot::json::isUInt(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsUint();
+}
+
+bool ot::json::isInt64(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsInt64();
+}
+
+bool ot::json::isInt64(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsInt64();
+}
+
+bool ot::json::isUInt64(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsUint64();
+}
+
+bool ot::json::isUInt64(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsUint64();
+}
+
+bool ot::json::isFloat(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsFloat();
+}
+
+bool ot::json::isFloat(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsFloat();
+}
+
+bool ot::json::isDouble(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsDouble();
+}
+
+bool ot::json::isDouble(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsDouble();
+}
+
+bool ot::json::isString(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsString();
+}
+
+bool ot::json::isString(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsString();
+}
+
+bool ot::json::isObject(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsObject();
+}
+
+bool ot::json::isObject(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsObject();
+}
+
+bool ot::json::isArray(const JsonValue& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsArray();
+}
+
+bool ot::json::isArray(const ConstJsonArray& _value, unsigned int _ix) {
+	if (_ix >= _value.Size()) return false;
+	return _value[_ix].IsArray();
+}
 
 bool ot::json::getBool(const JsonValue& _value, unsigned int _ix, bool _default) {
 	OT_JSON_getFromArray(_value, _ix, Bool, return _default);

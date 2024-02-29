@@ -303,6 +303,66 @@ namespace ot {
 	//! @brief Provides helper functions to acces content of json objects and arrays
 	namespace json {
 
+		//! @brief Returns true if the specified object member exists
+		OT_CORE_API_EXPORT bool exists(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member exists
+		OT_CORE_API_EXPORT bool exists(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a null
+		OT_CORE_API_EXPORT bool isNull(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a null
+		OT_CORE_API_EXPORT bool isNull(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a bool
+		OT_CORE_API_EXPORT bool isBool(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a bool
+		OT_CORE_API_EXPORT bool isBool(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a int
+		OT_CORE_API_EXPORT bool isInt(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a int
+		OT_CORE_API_EXPORT bool isInt(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a uInt
+		OT_CORE_API_EXPORT bool isUInt(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a uInt
+		OT_CORE_API_EXPORT bool isUInt(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a int64
+		OT_CORE_API_EXPORT bool isInt64(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a int64
+		OT_CORE_API_EXPORT bool isInt64(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a uInt64
+		OT_CORE_API_EXPORT bool isUInt64(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a uInt64
+		OT_CORE_API_EXPORT bool isUInt64(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a float
+		OT_CORE_API_EXPORT bool isFloat(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a float
+		OT_CORE_API_EXPORT bool isFloat(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a double
+		OT_CORE_API_EXPORT bool isDouble(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a double
+		OT_CORE_API_EXPORT bool isDouble(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a string
+		OT_CORE_API_EXPORT bool isString(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a string
+		OT_CORE_API_EXPORT bool isString(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a object
+		OT_CORE_API_EXPORT bool isObject(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a object
+		OT_CORE_API_EXPORT bool isObject(const ConstJsonObject& _value, const char* _member);
+
+		//! @brief Returns true if the specified object member is a array
+		OT_CORE_API_EXPORT bool isArray(const JsonValue& _value, const char* _member);
+		//! @brief Returns true if the specified object member is a array
+		OT_CORE_API_EXPORT bool isArray(const ConstJsonObject& _value, const char* _member);
+
 		//! @brief Check and return the requested value
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
 		OT_CORE_API_EXPORT bool getBool(const JsonValue& _value, const char* _member, bool _default = false);
@@ -458,6 +518,61 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// ###########################################################################################################################################################################################################################################################################################################################
+
+		//! @brief Returns true if the specified array entry is a null
+		OT_CORE_API_EXPORT bool isNull(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a null
+		OT_CORE_API_EXPORT bool isNull(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a bool
+		OT_CORE_API_EXPORT bool isBool(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a bool
+		OT_CORE_API_EXPORT bool isBool(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a int
+		OT_CORE_API_EXPORT bool isInt(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a int
+		OT_CORE_API_EXPORT bool isInt(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a uInt
+		OT_CORE_API_EXPORT bool isUInt(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a uInt
+		OT_CORE_API_EXPORT bool isUInt(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a int64
+		OT_CORE_API_EXPORT bool isInt64(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a int64
+		OT_CORE_API_EXPORT bool isInt64(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a uInt64
+		OT_CORE_API_EXPORT bool isUInt64(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a uInt64
+		OT_CORE_API_EXPORT bool isUInt64(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a float
+		OT_CORE_API_EXPORT bool isFloat(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a float
+		OT_CORE_API_EXPORT bool isFloat(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a double
+		OT_CORE_API_EXPORT bool isDouble(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a double
+		OT_CORE_API_EXPORT bool isDouble(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a string
+		OT_CORE_API_EXPORT bool isString(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a string
+		OT_CORE_API_EXPORT bool isString(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a object
+		OT_CORE_API_EXPORT bool isObject(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a object
+		OT_CORE_API_EXPORT bool isObject(const ConstJsonArray& _value, unsigned int _ix);
+
+		//! @brief Returns true if the specified array entry is a array
+		OT_CORE_API_EXPORT bool isArray(const JsonValue& _value, unsigned int _ix);
+		//! @brief Returns true if the specified array entry is a array
+		OT_CORE_API_EXPORT bool isArray(const ConstJsonArray& _value, unsigned int _ix);
 
 		//! @brief Check and return the requested value from the provided array value
 		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
