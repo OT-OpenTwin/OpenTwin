@@ -21,6 +21,12 @@ namespace ot {
 		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_path(_path) {};
 		virtual ~PropertyDirectory() {};
 
+		virtual PropertyType getPropertyType(void) const override { return DirectoryType; };
+
+		void setPath(const std::string& _path) { m_path = _path; };
+		std::string& path(void) { return m_path; };
+		const std::string& path(void) const { return m_path; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -32,10 +38,6 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
-
-		void setPath(const std::string& _path) { m_path = _path; };
-		std::string& path(void) { return m_path; };
-		const std::string& path(void) const { return m_path; };
 
 	private:
 		std::string m_path;

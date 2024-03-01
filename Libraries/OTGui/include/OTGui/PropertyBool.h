@@ -19,6 +19,10 @@ namespace ot {
 		virtual ~PropertyBool() {};
 
 		virtual PropertyType getPropertyType(void) const override { return Property::BoolType; };
+
+		void setValue(bool _value) { m_value = _value; };
+		bool value(void) const { return m_value; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -30,9 +34,6 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
-
-		void setValue(bool _value) { m_value = _value; };
-		bool value(void) const { return m_value; };
 
 	private:
 		bool m_value;

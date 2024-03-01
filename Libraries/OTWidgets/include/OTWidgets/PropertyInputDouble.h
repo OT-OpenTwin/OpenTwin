@@ -1,4 +1,4 @@
-//! @file PropertyInputInt.h
+//! @file PropertyInputDouble.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -10,15 +10,15 @@
 
 namespace ot {
 
-	class SpinBox;
-	class PropertyInt;
+	class DoubleSpinBox;
+	class PropertyDouble;
 
-	class PropertyInputInt : public PropertyInput {
+	class PropertyInputDouble : public PropertyInput {
 		Q_OBJECT
-		OT_DECL_NOCOPY(PropertyInputInt)
+		OT_DECL_NOCOPY(PropertyInputDouble)
 	public:
-		PropertyInputInt(const PropertyInt* _property);
-		virtual ~PropertyInputInt();
+		PropertyInputDouble(const PropertyDouble* _property);
+		virtual ~PropertyInputDouble();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
@@ -28,7 +28,7 @@ namespace ot {
 		void lclValueChanged(int);
 
 	private:
-		SpinBox* m_spinBox;
+		DoubleSpinBox* m_spinBox;
 	};
 
 }

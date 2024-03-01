@@ -1,4 +1,4 @@
-//! @file PropertyInputInt.h
+//! @file PropertyInputColor.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -10,25 +10,21 @@
 
 namespace ot {
 
-	class SpinBox;
-	class PropertyInt;
+	class ColorPickButton;
+	class PropertyColor;
 
-	class PropertyInputInt : public PropertyInput {
-		Q_OBJECT
-		OT_DECL_NOCOPY(PropertyInputInt)
+	class PropertyInputColor : public PropertyInput {
+		OT_DECL_NOCOPY(PropertyInputColor)
 	public:
-		PropertyInputInt(const PropertyInt* _property);
-		virtual ~PropertyInputInt();
+		PropertyInputColor(const PropertyColor* _property);
+		virtual ~PropertyInputColor();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 
-	private slots:
-		void lclValueChanged(int);
-
 	private:
-		SpinBox* m_spinBox;
+		ColorPickButton* m_colorBtn;
 	};
 
 }

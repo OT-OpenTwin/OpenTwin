@@ -20,6 +20,10 @@ namespace ot {
 		virtual ~PropertyColor() {};
 
 		virtual PropertyType getPropertyType(void) const override { return Property::ColorType; };
+
+		void setValue(ot::Color _value) { m_value = _value; };
+		ot::Color value(void) const { return m_value; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -31,9 +35,6 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
-
-		void setValue(ot::Color _value) { m_value = _value; };
-		ot::Color value(void) const { return m_value; };
 
 	private:
 		ot::Color m_value;

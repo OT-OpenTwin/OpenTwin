@@ -24,6 +24,8 @@ std::string ot::Property::toString(PropertyType _type) {
 	case ot::Property::StringType: return "String";
 	case ot::Property::StringListType: return "StringList";
 	case ot::Property::ColorType: return "Color";
+	case ot::Property::DirectoryType: return "Directory";
+	case ot::Property::FilePathType: return "FilePath";
 	default:
 		OT_LOG_EA("Unknown Property Type");
 		return "<null>";
@@ -37,6 +39,8 @@ ot::Property::PropertyType ot::Property::stringToPropertyType(const std::string&
 	else if (_type == Property::toString(StringType)) return StringType;
 	else if (_type == Property::toString(StringListType)) return StringListType;
 	else if (_type == Property::toString(ColorType)) return ColorType;
+	else if (_type == Property::toString(DirectoryType)) return DirectoryType;
+	else if (_type == Property::toString(FilePathType)) return FilePathType;
 	else {
 		OT_LOG_EA("Unknown Property Type");
 		return BoolType;

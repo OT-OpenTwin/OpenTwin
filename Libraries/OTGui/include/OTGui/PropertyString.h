@@ -24,8 +24,10 @@ namespace ot {
 		virtual PropertyType getPropertyType(void) const override { return Property::StringType; };
 
 		void setValue(const std::string& _value) { m_value = _value; };
-		std::string& value(void) { return m_value; };
 		const std::string& value(void) const { return m_value; };
+
+		void setPlaceholderText(const std::string& _text) { m_placeholderText = _text; };
+		const std::string& placeholderText(void) const { return m_placeholderText; };
 
 		void setMaxLength(int _length) { m_maxLength = _length; };
 		int maxLength(void) const { return m_maxLength; };
@@ -44,6 +46,7 @@ namespace ot {
 
 	private:
 		std::string m_value;
+		std::string m_placeholderText;
 		unsigned int m_maxLength;
 	};
 

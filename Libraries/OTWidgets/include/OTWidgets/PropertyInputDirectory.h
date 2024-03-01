@@ -1,4 +1,4 @@
-//! @file PropertyInputInt.h
+//! @file PropertyInputDirectory.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -10,25 +10,28 @@
 
 namespace ot {
 
-	class SpinBox;
-	class PropertyInt;
+	class LineEdit;
+	class PropertyDirectory;
 
-	class PropertyInputInt : public PropertyInput {
+	class PropertyInputDirectory : public PropertyInput {
 		Q_OBJECT
-		OT_DECL_NOCOPY(PropertyInputInt)
+		OT_DECL_NOCOPY(PropertyInputDirectory)
 	public:
-		PropertyInputInt(const PropertyInt* _property);
-		virtual ~PropertyInputInt();
+		PropertyInputDirectory(const PropertyDirectory* _property);
+		virtual ~PropertyInputDirectory();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 
-	private slots:
-		void lclValueChanged(int);
+	private Q_SLOTS:
+		void slotFind(void);
+		void slotChanged(void);
 
 	private:
-		SpinBox* m_spinBox;
+		QWidget* m_root;
+		LineEdit* m_edit;
+		QString m_text;
 	};
 
 }

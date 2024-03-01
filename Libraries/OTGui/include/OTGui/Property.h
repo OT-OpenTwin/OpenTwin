@@ -30,7 +30,9 @@ namespace ot {
 			DoubleType,
 			StringType,
 			StringListType,
-			ColorType
+			ColorType,
+			DirectoryType,
+			FilePathType
 		};
 
 		enum PropertyFlags {

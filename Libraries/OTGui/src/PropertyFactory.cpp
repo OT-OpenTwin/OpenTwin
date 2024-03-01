@@ -13,6 +13,8 @@
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyFilePath.h"
+#include "OTGui/PropertyDirectory.h"
 
 ot::Property* ot::PropertyFactory::createProperty(const ConstJsonObject& _jsonObject) {
 	std::string type = json::getString(_jsonObject, OT_JSON_MEMBER_Property_Type);
@@ -30,6 +32,8 @@ ot::Property* ot::PropertyFactory::createProperty(Property::PropertyType _proper
 	case ot::Property::StringType: return new PropertyString();
 	case ot::Property::StringListType: return new PropertyStringList();
 	case ot::Property::ColorType: return new PropertyColor();
+	case ot::Property::FilePathType: return new PropertyFilePath();
+	case ot::Property::DirectoryType: return new PropertyDirectory();
 	default:
 		OT_LOG_EAS("Unknown property type (" + std::to_string(_propertyType) + ")");
 		return nullptr;

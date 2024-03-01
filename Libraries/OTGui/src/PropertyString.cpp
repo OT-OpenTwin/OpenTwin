@@ -22,10 +22,12 @@ ot::PropertyString::PropertyString(const std::string& _name, const std::string& 
 
 void ot::PropertyString::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Value", JsonString(m_value, _allocator), _allocator);
+	_object.AddMember("Placeholder", JsonString(m_placeholderText, _allocator), _allocator);
 	_object.AddMember("MaxLength", m_maxLength, _allocator);
 }
 
 void ot::PropertyString::setPropertyData(const ot::ConstJsonObject& _object) {
 	m_value = json::getString(_object, "Value");
+	m_placeholderText = json::getString(_object, "Placeholder");
 	m_maxLength = json::getUInt(_object, "MaxLength");
 }

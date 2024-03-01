@@ -163,6 +163,42 @@
     <ClCompile Include="src\PropertyInputFactory.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="src\CheckBox.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputBool.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputColor.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputString.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputStringList.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputDirectory.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputFilePath.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInputDouble.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoubleSpinBox.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorPickButton.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorPreviewBox.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComboButton.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -311,10 +347,25 @@
     <ClInclude Include="include\OTWidgets\SpinBox.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyInputInt.h">
+    <ClInclude Include="include\OTWidgets\PropertyInputFactory.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyInputFactory.h">
+    <ClInclude Include="include\OTWidgets\PropertyInputBool.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputStringList.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CheckBox.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\DoubleSpinBox.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ColorPreviewBox.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
   </ItemGroup>
@@ -357,6 +408,27 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PropertyInput.h">
       <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputInt.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputDouble.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputString.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputFilePath.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputDirectory.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ComboButton.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ColorPickButton.h">
+      <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

@@ -52,9 +52,9 @@ ot::OnePropertyDialog::~OnePropertyDialog() {
 	if (m_input) delete m_input;
 }
 
-void ot::OnePropertyDialog::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberName, ot::JsonAllocator& _allocator) {
+void ot::OnePropertyDialog::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) {
 	if (m_input) {
-		m_input->addPropertyInputValueToJson(_object, _memberName, _allocator);
+		m_input->addPropertyInputValueToJson(_object, _memberNameValue, _allocator);
 	}
 	else {
 		OTAssert(0, "No input set");

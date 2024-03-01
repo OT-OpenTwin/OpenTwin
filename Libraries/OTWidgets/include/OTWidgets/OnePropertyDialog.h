@@ -19,7 +19,7 @@ namespace ot {
 		OnePropertyDialog(const OnePropertyDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~OnePropertyDialog();
 
-		void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberName, ot::JsonAllocator& _allocator);
+		void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator);
 		QVariant getCurrentValue(void) const;
 
 		bool valueHasChanged(void) const { return m_changed; };
