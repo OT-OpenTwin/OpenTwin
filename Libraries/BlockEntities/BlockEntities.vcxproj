@@ -165,6 +165,7 @@
     <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityBlock.h" />
     <ClInclude Include="include\EntityBlockCircuitResistor.h" />
+    <ClInclude Include="include\EntityBlockConnection.h" />
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityBlockDataDimensionReducer.h" />
     <ClInclude Include="include\EntityBlockPlot1D.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\EntityBlock.cpp" />
     <ClCompile Include="src\EntityBlockCircuitResistor.cpp" />
+    <ClCompile Include="src\EntityBlockConnection.cpp" />
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
     <ClCompile Include="src\EntityBlockDataDimensionReducer.cpp" />
     <ClCompile Include="src\EntityBlockPlot1D.cpp" />

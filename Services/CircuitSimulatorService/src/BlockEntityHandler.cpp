@@ -172,6 +172,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
 		}
 		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
+		//_modelComponent->addEntitiesToModel() // Add connection entites here
 	}
 }
 
