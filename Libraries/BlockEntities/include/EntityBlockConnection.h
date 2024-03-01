@@ -5,10 +5,9 @@ class __declspec(dllexport) EntityBlockConnection : public EntityBase
 {
 public:
 	EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockCircuitElement"; };
+	virtual std::string getClassName(void) override { return "EntityBlockConnection"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
-	//void createProperties();
-	std::string getElementType();
+	
 
 	
 
