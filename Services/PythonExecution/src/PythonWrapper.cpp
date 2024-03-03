@@ -6,10 +6,13 @@
 
 PythonWrapper::PythonWrapper()
 {
-	_pythonRoot = DeterminePythonRootDirectory();
+	//_pythonRoot = DeterminePythonRootDirectory();
+	_pythonRoot = "C:\\ThirdParty\\Python\\Python3913";
+	
 	OT_LOG_D("Setting Python root path: " + _pythonRoot);
 	_pythonPath.push_back(_pythonRoot);
 	_pythonPath.push_back(_pythonRoot + "\\Lib");
+	_pythonPath.push_back(_pythonRoot + "\\DLLs");
 	std::string sitePackageDirectory = DeterminePythonSitePackageDirectory();
 	_pythonPath.push_back(sitePackageDirectory);
 	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
