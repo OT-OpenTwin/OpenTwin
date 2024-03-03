@@ -123,11 +123,6 @@ ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: StudioSuiteConnector
-ECHO ===============================================================
-CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
 ECHO Build Library: ModelEntities
 ECHO ===============================================================
 CALL "%OT_MODELENTITIES_ROOT%\build.bat" %1 %2
@@ -146,6 +141,11 @@ ECHO ===============================================================
 ECHO Build Library: ServiceFoundation
 ECHO ===============================================================
 CALL "%OT_FOUNDATION_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Library: StudioSuiteConnector
+ECHO ===============================================================
+CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: uiCore
