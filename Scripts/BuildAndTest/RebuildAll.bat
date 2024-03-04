@@ -143,11 +143,6 @@ ECHO ===============================================================
 CALL "%OT_FOUNDATION_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: StudioSuiteConnector
-ECHO ===============================================================
-CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
 ECHO Build Library: uiCore
 ECHO ===============================================================
 CALL "%OT_UICORE_ROOT%\build.bat" %1 %2
@@ -181,6 +176,11 @@ ECHO ===============================================================
 ECHO Build Library: Result Data Access
 ECHO ===============================================================
 CALL "%OT_RESULT_DATA_ACCESS_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Library: StudioSuiteConnector
+ECHO ===============================================================
+CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Microservice Launcher: OpenTwin
