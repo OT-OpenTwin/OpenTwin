@@ -29,6 +29,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntitySolverCircuitSimulator.h"
+#include "EntityBlockConnection.h"
 #include "DataBase.h"
 
 
@@ -579,8 +580,14 @@ std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
+
+
 std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document)
 {
+	//std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+	//ot::Point2DD pos;
+	//pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
+
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 	m_blockEntityHandler.setPackageName(pckg.name());

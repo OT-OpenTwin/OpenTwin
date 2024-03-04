@@ -9,6 +9,7 @@
 #include "OTCore/FolderNames.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
+#include "EntityBlockConnection.h"
 
 // C++ header
 #include <string>
@@ -18,8 +19,10 @@ class BlockEntityHandler : public BusinessLogicHandler
 {
 public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
+
 	void OrderUIToCreateBlockPicker();
 	std::map<std::string, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
+	std::map<std::string, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections();
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
 	NGSpice m_ngSpice;
@@ -35,8 +38,6 @@ private:
 
 	void InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
-	
-
 };
 
 

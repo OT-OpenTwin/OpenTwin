@@ -102,5 +102,5 @@ private:
 	bool SetVisibleParameter3(bool visible);
 	void UpdateBlockConfig();
 	void UpdateConnections(std::list<std::string>& connectorsForRemoval);
-	void RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval);
+	void RemoveConnectionsAtConnectedEntities(std::list<ot::UID>& connectionsForRemoval);
 };

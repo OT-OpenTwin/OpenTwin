@@ -9,6 +9,7 @@
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
+#include "EntityBlockConnection.h"
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 {
@@ -39,6 +40,10 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	else if (entityType == "EntityBlockStorage")
 	{
 		return new EntityBlockStorage(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockConnection")
+	{
+		return new EntityBlockConnection(0, nullptr, nullptr, nullptr, this, "");
 	}
 	
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);

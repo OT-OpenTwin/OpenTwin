@@ -31,13 +31,13 @@ public:
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return _connectorsByName; }
 	const bool hasConnector(const std::string& connectorName) const { return _connectorsByName.find(connectorName) != _connectorsByName.end(); }
-	const std::list<ot::GraphicsConnectionCfg>& getAllConnections() const { return _connections; }
+	const std::list<ot::UID>& getAllConnections() const { return _connectionIDs; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
 
-	void AddConnection(const ot::GraphicsConnectionCfg& connection);
-	void RemoveConnection(const ot::GraphicsConnectionCfg& connectionForRemoval);
+	void AddConnection(const ot::UID id);
+	void RemoveConnection(const ot::UID idForRemoval);
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 protected:
@@ -50,7 +50,7 @@ protected:
 
 	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
-	std::list<ot::GraphicsConnectionCfg> _connections;
+	std::list<ot::UID> _connectionIDs;
 
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

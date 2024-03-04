@@ -104,7 +104,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 void EntityBlockPython::resetBlockRelatedAttributes()
 {
 	_connectorsByName.clear();
-	_connections.clear();
+	_connectionIDs.clear();
 	
 	auto allProperties = getProperties().getListOfAllProperties();
 	for (auto& property : allProperties)

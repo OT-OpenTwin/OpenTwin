@@ -4,7 +4,7 @@
 #include "Connection.h"
 //Open Twin Header
 #include "EntityBlock.h"
-
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
 //ThirdPartyHeader
 #include <ngspice/sharedspice.h>

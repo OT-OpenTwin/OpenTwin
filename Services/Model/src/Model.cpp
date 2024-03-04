@@ -21,6 +21,7 @@
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityResult1DPlot.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
+#include "EntityBlockConnection.h"
 
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
@@ -2128,6 +2129,9 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 	//Now go through all top level block entities and delete all connections with this block, in other block entities
 	std::set<EntityBase*> entitiesMarkedForStorage;
 	std::list<ot::UID> topLevelBlockEntityIDs;
+	
+	
+
 	for (auto& entity : topLevelBlockEntities)
 	{
 		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(entity);
@@ -2137,13 +2141,17 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 		for (auto& connection : allConnections)
 		{
 			ot::UID connectedEntityID;
-			if (connection.destUid() == std::to_string(entity->getEntityID()))
+			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityMap[connection]);
+			
+			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+
+			if (connectionCfg.destUid() == std::to_string(entity->getEntityID()))
 			{
-				connectedEntityID = std::stoull(connection.originUid());
+				connectedEntityID = std::stoull(connectionCfg.originUid());
 			}
 			else
 			{
-				connectedEntityID = std::stoull(connection.destUid());
+				connectedEntityID = std::stoull(connectionCfg.destUid());
 			}
 			auto connectedEntity = entityMap.find(connectedEntityID);
 			assert(connectedEntity != entityMap.end());
