@@ -7,7 +7,7 @@ REM ===========================================================================
 REM Launch the UI executable 
 REM ===========================================================================
 
-SET SRVROOT=%cd%/Apache
+SET SRVROOT="%cd%/Apache"
 
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& './OpenTwin_admin.ps1'"
 
