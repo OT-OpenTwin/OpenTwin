@@ -46,6 +46,12 @@ namespace ot {
 			ItemNetworkContext  //! @brief Item is placed in a network
 		};
 
+		enum GraphicsItemState {
+			NoState       = 0x00, //! @brief Default state
+			HoverState    = 0x01, //! @brief Item is hovered over by user
+			SelectedState = 0x02  //! @brief Item is selected
+		};
+
 		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
 
 		GraphicsItem(bool _isLayoutOrStack);
@@ -115,8 +121,8 @@ namespace ot {
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void);
 
-		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
-		bool hasHover(void) const { return m_hasHover; };		
+		void setStateFlags(GraphicsItemState _flags) { m_state = _flags; };
+		GraphicsItemState stateFlags(void) const { return m_state; };
 
 		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
 
@@ -160,7 +166,9 @@ namespace ot {
 
 	private:
 		bool m_isLayoutOrStack;
-		bool m_hasHover;
+		
+		GraphicsItemState m_state;
+
 		std::string m_uid;
 		std::string m_name;
 		std::string m_toolTip;
@@ -189,3 +197,5 @@ namespace ot {
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemState)
