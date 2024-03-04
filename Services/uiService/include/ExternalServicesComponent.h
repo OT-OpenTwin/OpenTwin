@@ -283,6 +283,8 @@ public:
 	// General purpose communication
 	void InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction);
 
+	ot::ServiceBase* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
+
 public slots:
 	char *performAction(const char *json, const char *senderIP);
 	void queueAction(const char *json, const char *senderIP);
@@ -341,7 +343,6 @@ private:
 
 	ot::ServiceBase * getService(ot::serviceID_t _serviceID);
 	ot::ServiceBase * getService(const ot::BasicServiceInformation& _serviceInfo);
-	ot::ServiceBase * getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
 	void determineViews(const std::string& modelServiceURL);
 

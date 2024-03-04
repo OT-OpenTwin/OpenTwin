@@ -2388,7 +2388,6 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, doc.GetAllocator()), doc.GetAllocator());
 
 	std::list<std::string> sel; // Selected items
-	std::list<ot::GraphicsConnectionCfg> csel; // Selected connections
 
 	for (auto s : scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
@@ -2400,28 +2399,27 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 		else if (citm) {
 			// Connection selected
-			csel.push_back(citm->getConnectionInformation());
+			sel.push_back(citm->uid());
 		}
 		else {
 			// Unknown selected
 			OTAssert(0, "Unknown graphics item selected");
 		}
 	}
-	if (sel.size() != 0)
-	{
-		ot::UID blockID = std::stoull(sel.front());
-		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(blockID);
-		AppBase::instance()->clearNavigationTreeSelection();
-		AppBase::instance()->setNavigationTreeItemSelected(treeID, true);
 
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
+	if (sel.empty()) {
+		return;
+	}
 
-		try {
-			ot::GraphicsView* view = scene->getGraphicsView();
-			ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-			doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
-			std::string response;
-			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
+
+	try {
+		ot::GraphicsView* view = scene->getGraphicsView();
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		auto ser = m_ExternalServicesComponent->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
+		if (ser) {
+			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, ser->serviceURL(), doc, response)) {
 				OT_LOG_EA("Failed to send http request");
 				return;
 			}
@@ -2432,16 +2430,17 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 				return;
 			}
 		}
-		catch (const std::exception& _e) {
-			OT_LOG_EAS(_e.what());
-		}
-		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
+		else {
+			OT_LOG_EA("No model connected");
 		}
 	}
-	else if (!csel.empty()) {
-		int x = 0;
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
 	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+	}
+
 }
 
 void AppBase::slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections) {

@@ -67,6 +67,9 @@ namespace ot {
 		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
 		const std::string& destConnectable(void) const { return m_destConnectable; };
 
+		void setUid(const std::string& _uid) { m_uid = _uid; };
+		const std::string& uid(void) const { return m_uid; };
+
 		void setLineWidth(int _width) { m_width = _width; };
 		int lineWidth(void) const { return m_width; };
 
@@ -82,6 +85,8 @@ namespace ot {
 
 		std::string m_destUID;
 		std::string m_destConnectable;
+
+		std::string m_uid;
 
 		int m_width;
 		ot::Color m_color;
