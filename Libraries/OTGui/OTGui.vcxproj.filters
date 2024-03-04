@@ -180,6 +180,9 @@
     <ClInclude Include="include\OTGui\PropertyColor.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyGridCfg.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -315,6 +318,9 @@
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyColor.cpp">
+      <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridCfg.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
   </ItemGroup>

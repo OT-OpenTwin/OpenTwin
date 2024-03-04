@@ -9,6 +9,7 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/Size2D.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -31,8 +32,8 @@ namespace ot {
 		static std::list<std::string> flagsToStringList(DialogFlags _flags);
 		static DialogFlags stringListToFlags(const std::list<std::string>& _flags);
 
-		DialogCfg(DialogFlags _flags = DialogFlags::NoFlags) : m_flags(_flags) {};
-		DialogCfg(const std::string& _title, DialogFlags _flags = DialogFlags::NoFlags) : m_flags(_flags), m_title(_title) {};
+		DialogCfg(DialogFlags _flags = DialogFlags::NoFlags);
+		DialogCfg(const std::string& _title, DialogFlags _flags = DialogFlags::NoFlags);
 		virtual ~DialogCfg() {};
 
 		//! @brief Add the object contents to the provided JSON object
@@ -54,10 +55,20 @@ namespace ot {
 		void setFlags(DialogFlags _flags) { m_flags = _flags; };
 		DialogFlags flags(void) const { return m_flags; };
 
+		void setMinSize(int _width, int _height) { this->setMinSize(ot::Size2D(_width, _height)); };
+		void setMinSize(const ot::Size2D& _size) { m_minSize = _size; };
+		const ot::Size2D& minSize(void) const { return m_minSize; };
+
+		void setMaxSize(int _width, int _height) { this->setMaxSize(ot::Size2D(_width, _height)); };
+		void setMaxSize(const ot::Size2D& _size) { m_maxSize = _size; };
+		const ot::Size2D& maxSize(void) const { return m_maxSize; };
+
 	private:
 		std::string m_name;
 		std::string m_title;
 		DialogFlags m_flags;
+		ot::Size2D m_minSize;
+		ot::Size2D m_maxSize;
 	};
 
 }

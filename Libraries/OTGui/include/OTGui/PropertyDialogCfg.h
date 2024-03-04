@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/DialogCfg.h"
+#include "OTGui/PropertyGridCfg.h"
 
 // std header
 #include <list>
@@ -15,9 +16,6 @@
 #pragma warning(disable:4251)
 
 namespace ot {
-
-	class Property;
-	class PropertyGroup;
 
 	class OT_GUI_API_EXPORT PropertyDialogCfg : public DialogCfg {
 		OT_DECL_NOCOPY(PropertyDialogCfg)
@@ -35,17 +33,16 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		PropertyGroup* defaultGroup(void) const { return m_defaultGroup; };
+		const PropertyGridCfg& gridConfig(void) const { return m_gridConfig; };
 
-		void setRootGroups(const std::list<PropertyGroup*>& _groups) { m_rootGroups = _groups; };
-		void addRootGroup(PropertyGroup* _group);
-		const std::list<PropertyGroup*>& rootGroups(void) const { return m_rootGroups; };
+		PropertyGroup* defaultGroup(void) const { return m_gridConfig.defaultGroup(); };
+
+		void setRootGroups(const std::list<PropertyGroup*>& _groups) { m_gridConfig.setRootGroups(_groups); };
+		void addRootGroup(PropertyGroup* _group) { m_gridConfig.addRootGroup(_group); };
+		const std::list<PropertyGroup*>& rootGroups(void) const { return m_gridConfig.rootGroups(); };
 
 	private:
-		void clear(void);
-	
-		PropertyGroup* m_defaultGroup;
-		std::list<PropertyGroup*> m_rootGroups;
+		PropertyGridCfg m_gridConfig;
 	};
 
 }

@@ -7,6 +7,7 @@
 #include "OTGui/PropertyGroup.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 
 // Qt header
@@ -14,7 +15,7 @@
 #include <QtWidgets/qpushbutton.h>
 
 ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget)
-	: Dialog(_parentWidget), m_changed(false)
+	: Dialog(_config, _parentWidget), m_changed(false)
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
@@ -36,14 +37,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	btnLay->addWidget(btnCancel);
 
 	// Setup data
-	for (PropertyGroup* group : _config.rootGroups()) {
-		PropertyGridGroup* newGroup = new PropertyGridGroup;
-		newGroup->setupFromConfig(group);
-		m_grid->addGroup(newGroup);
-	}
-
-	// Setup window
-	this->setWindowTitle(QString::fromStdString(_config.title()));
+	m_grid->setupFromConfig(_config.gridConfig());
 
 	// Connect signals
 	this->connect(btnConfirm, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);

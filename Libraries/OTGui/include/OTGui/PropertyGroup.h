@@ -14,16 +14,19 @@
 // std header
 #include <list>
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	class Property;
+	class Painter2D;
 
 	class OT_GUI_API_EXPORT PropertyGroup : public Serializable {
 		OT_DECL_NOCOPY(PropertyGroup)
 	public:
-		PropertyGroup() {};
-		PropertyGroup(const std::string& _name) : m_name(_name) {};
-		PropertyGroup(const std::string& _name, const std::string& _title) : m_name(_name), m_title(_title) {};
+		PropertyGroup();
+		PropertyGroup(const std::string& _name);
+		PropertyGroup(const std::string& _name, const std::string& _title);
 		virtual ~PropertyGroup();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -36,10 +39,6 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void setProperties(const std::list<Property*>& _properties);
-		void addProperty(Property* _property);
-		const std::list<Property*>& properties(void) const { return m_properties; };
-
 		void setName(const std::string& _name) { m_name = _name; };
 		std::string& name(void) { return m_name; };
 		const std::string& name(void) const { return m_name; };
@@ -48,10 +47,35 @@ namespace ot {
 		std::string& title(void) { return m_title; };
 		const std::string& title(void) const { return m_title; };
 
+		//! @brief Set the properties.
+		//! This group takes ownership of the properties.
+		void setProperties(const std::list<Property*>& _properties);
+
+		//! @brief Add the property.
+		//! This group takes ownership of the property.
+		void addProperty(Property* _property);
+		const std::list<Property*>& properties(void) const { return m_properties; };
+
+		//! @brief Set the child groups.
+		//! This group takes ownership of the groups.
+		void setChildGroups(const std::list<PropertyGroup*>& _groups);
+
+		//! @brief Add the provided group as a child.
+		//! This group takes ownership of the child.
+		void addChildGroup(PropertyGroup* _group);
+
+		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
+		void setBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
+		void setBackgroundColor(const Color& _color);
+		void setBackgroundPainter(Painter2D* _painter);
+		Painter2D* backgroundPainter(void) const { return m_backgroundPainter; };
+
 	private:
 		std::string m_name;
 		std::string m_title;
+		Painter2D* m_backgroundPainter;
 		std::list<Property*> m_properties;
+		std::list<PropertyGroup*> m_childGroups;
 	};
 
 }

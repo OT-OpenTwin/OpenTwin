@@ -14,13 +14,13 @@
 #include <QtWidgets/qcolordialog.h>
 
 ot::ColorPickButton::ColorPickButton(const QColor& _color, QWidget* _parent)
-	: QWidget(_parent)
+	: QFrame(_parent)
 {
 	this->ini(_color);
 }
 
 ot::ColorPickButton::ColorPickButton(const ot::Color& _color, QWidget* _parent) 
-	: QWidget(_parent)
+	: QFrame(_parent)
 {
 	this->ini(OTQtConverter::toQt(_color));
 }
@@ -65,9 +65,11 @@ void ot::ColorPickButton::updateButtonText(void) {
 void ot::ColorPickButton::ini(const QColor& _color) {
 	// Create layout and controls
 	QHBoxLayout* cLay = new QHBoxLayout(this);
+	cLay->setContentsMargins(0, 0, 0, 0);
 
-	m_view = new ColorPreviewBox(_color);
 	m_btn = new PushButton;
+	m_view = new ColorPreviewBox(_color);
+	m_view->setFixedSize(18, 18);
 
 	// Setup layout
 	cLay->addWidget(m_view);
