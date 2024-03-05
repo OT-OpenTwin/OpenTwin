@@ -72,7 +72,6 @@ void ot::GraphicsView::viewAll(void) {
 ot::GraphicsItem* ot::GraphicsView::getItem(const std::string&  _itemUid) {
 	auto it = m_items.find(_itemUid);
 	if (it == m_items.end()) {
-		OT_LOG_D("Item with the UID \"" + _itemUid + "\" does not exist");
 		return nullptr;
 	}
 	else {
@@ -107,6 +106,14 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
 	_item->getRootItem()->getQGraphicsItem()->setZValue(1);
 	_item->setGraphicsScene(m_scene);
+
+	// Apply connection buffer
+	std::list<GraphicsConnectionCfg> tmp = m_connectionBuffer;
+	m_connectionBuffer.clear();
+	for (const GraphicsConnectionCfg& c : tmp) {
+		this->addConnection(c);
+	}
+
 }
 
 void ot::GraphicsView::removeItem(const std::string& _itemUid) {
@@ -136,16 +143,32 @@ std::list<std::string> ot::GraphicsView::selectedItems(void) const {
 	return sel;
 }
 
-void ot::GraphicsView::addConnection(GraphicsItem* _origin, GraphicsItem* _dest, const GraphicsConnectionCfg& _config) {
+void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
+	ot::GraphicsItem* src = this->getItem(_config.originUid());
+	ot::GraphicsItem* dest = this->getItem(_config.destUid());
+
+	if (!src || !dest) {
+		m_connectionBuffer.push_back(_config);
+		return;
+	}
+
+	ot::GraphicsItem* srcConn = src->findItem(_config.originConnectable());
+	ot::GraphicsItem* destConn = dest->findItem(_config.destConnectable());
+
+	if (!srcConn || !destConn) {
+		OT_LOG_EA("Invalid connectable name");
+		return;
+	}
+
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
 	newConnection->setupFromConfig(_config);
 	
 	m_scene->addItem(newConnection);
 	//newConnection->setGraphicsScene(m_scene);
-	newConnection->connectItems(_origin, _dest);
+	newConnection->connectItems(srcConn, destConn);
 	newConnection->setZValue(0);
 
-	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(_origin->getRootItem()->graphicsItemUid(), _origin->graphicsItemName(), _dest->getRootItem()->graphicsItemUid(), _dest->graphicsItemName());
+	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(srcConn->getRootItem()->graphicsItemUid(), srcConn->graphicsItemName(), destConn->getRootItem()->graphicsItemUid(), destConn->graphicsItemName());
 	m_connections.insert_or_assign(itmKey, newConnection);
 }
 

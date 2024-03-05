@@ -56,7 +56,7 @@ namespace ot {
 		void removeItem(const std::string& _itemUid);
 		std::list<std::string> selectedItems(void) const;
 
-		void addConnection(GraphicsItem* _origin, GraphicsItem* _dest, const GraphicsConnectionCfg& _config);
+		void addConnection(const GraphicsConnectionCfg& _config);
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
 		std::list<std::string> selectedConnections(void) const;
@@ -104,5 +104,6 @@ namespace ot {
 
 		std::map<std::string, ot::GraphicsItem*> m_items;
 		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
+		std::list<GraphicsConnectionCfg> m_connectionBuffer;
 	};
 }

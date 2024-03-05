@@ -88,6 +88,7 @@ void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->adjustChildItems();
 	ot::GraphicsGroupItem::paint(_painter, _opt, _widget);
+	this->paintGeneralGraphics(_painter, _opt, _widget);
 }
 
 void ot::GraphicsStackItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
