@@ -2958,21 +2958,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (const auto& connection : pckg.connections()) {
-					ot::GraphicsItem* src = editor->getItem(connection.originUid());
-					ot::GraphicsItem* dest = editor->getItem(connection.destUid());
-					
-					if (dest != nullptr && src != nullptr && !editor->connectionAlreadyExists(connection))
-					{
-						ot::GraphicsItem* srcConn = src->findItem(connection.originConnectable());
-						ot::GraphicsItem* destConn = dest->findItem(connection.destConnectable());
-
-						if (srcConn && destConn) {
-							editor->addConnection(srcConn, destConn, connection);
-						}
-						else {
-							OT_LOG_EA("Invalid graphics item name");
-						}
-					}
+					editor->addConnection(connection);
 				}
 
 			}
