@@ -43,6 +43,8 @@ namespace ot {
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
+		void addItem(ot::GraphicsItem* _item, bool _isMaster, bool _isSlave);
+
 	private:
 		void memClear(void);
 		void adjustChildItems(void);

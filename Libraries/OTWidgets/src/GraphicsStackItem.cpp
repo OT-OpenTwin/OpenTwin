@@ -41,18 +41,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		try {
 			i = ot::GraphicsFactory::itemFromConfig(itm.item);
 			if (i) {
-				GraphicsStackItemEntry e;
-				e.isMaster = itm.isMaster;
-				e.isSlave = itm.isSlave;
-				e.item = i;
-				i->setParentGraphicsItem(this);
-				if (e.isMaster) {
-					// If the item is a master item, install an event filter for resizing the child items
-					i->addGraphicsItemEventHandler(this);
-				}
-				m_items.push_back(e);
-
-				this->addToGroup(e.item->getQGraphicsItem());
+				this->addItem(i, itm.isMaster, itm.isSlave);
 			}
 			else {
 				OT_LOG_EA("Failed to created graphics item from factory");
@@ -152,4 +141,19 @@ void ot::GraphicsStackItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	for (auto itm : m_items) {
 		itm.item->setGraphicsItemRequestedSize(_size);
 	}
+}
+
+void ot::GraphicsStackItem::addItem(ot::GraphicsItem* _item, bool _isMaster, bool _isSlave) {
+	GraphicsStackItemEntry e;
+	e.isMaster = _isMaster;
+	e.isSlave = _isSlave;
+	e.item = _item;
+	_item->setParentGraphicsItem(this);
+	if (_isMaster) {
+		// If the item is a master item, install an event filter for resizing the child items
+		_item->addGraphicsItemEventHandler(this);
+	}
+	m_items.push_back(e);
+
+	this->addToGroup(e.item->getQGraphicsItem());
 }
