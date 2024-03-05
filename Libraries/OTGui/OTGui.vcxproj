@@ -57,6 +57,7 @@
     <ClInclude Include="include\OTGui\PropertyDouble.h" />
     <ClInclude Include="include\OTGui\PropertyFactory.h" />
     <ClInclude Include="include\OTGui\PropertyFilePath.h" />
+    <ClInclude Include="include\OTGui\PropertyGridCfg.h" />
     <ClInclude Include="include\OTGui\PropertyGroup.h" />
     <ClInclude Include="include\OTGui\PropertyInt.h" />
     <ClInclude Include="include\OTGui\PropertyString.h" />
@@ -104,6 +105,7 @@
     <ClCompile Include="src\PropertyDouble.cpp" />
     <ClCompile Include="src\PropertyFactory.cpp" />
     <ClCompile Include="src\PropertyFilePath.cpp" />
+    <ClCompile Include="src\PropertyGridCfg.cpp" />
     <ClCompile Include="src\PropertyGroup.cpp" />
     <ClCompile Include="src\PropertyInt.cpp" />
     <ClCompile Include="src\PropertyString.cpp" />

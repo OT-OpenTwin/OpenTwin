@@ -1,6 +1,6 @@
 //! @file ColorPickButton.h
 //! @author Alexander Kuester (alexk95)
-//! @date February 2024
+//! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -12,14 +12,14 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
-#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qframe.h>
 
 namespace ot {
 
 	class PushButton;
 	class ColorPreviewBox;
 
-	class ColorPickButton : public QWidget, public QWidgetInterface {
+	class ColorPickButton : public QFrame, public QWidgetInterface {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ColorPickButton)
 	public:

@@ -67,12 +67,17 @@ namespace ot {
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
 
+		virtual void mousePressEvent(QMouseEvent* _event) override;
+
+		virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override;
+
 		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
 		bool itemExists(const QString& _itemPath, char _delimiter = '/') const { return this->findItem(_itemPath, _delimiter); };
 
 		QString itemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
 
 		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
+
 	private:
 
 		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;

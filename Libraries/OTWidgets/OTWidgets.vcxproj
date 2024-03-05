@@ -58,6 +58,7 @@
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\PlainTextEdit.cpp" />
     <ClCompile Include="src\PropertyDialog.cpp" />
+    <ClCompile Include="src\PropertyGridItemDelegate.cpp" />
     <ClCompile Include="src\PropertyInputBool.cpp" />
     <ClCompile Include="src\PropertyInputColor.cpp" />
     <ClCompile Include="src\PropertyInputDirectory.cpp" />
@@ -66,12 +67,6 @@
     <ClCompile Include="src\PropertyGrid.cpp" />
     <ClCompile Include="src\PropertyGridItem.cpp" />
     <ClCompile Include="src\PropertyGridGroup.cpp" />
-    <ClCompile Include="src\PropertyGridItemBool.cpp" />
-    <ClCompile Include="src\PropertyGridItemDouble.cpp" />
-    <ClCompile Include="src\PropertyGridItemFactory.cpp" />
-    <ClCompile Include="src\PropertyGridItemInt.cpp" />
-    <ClCompile Include="src\PropertyGridItemString.cpp" />
-    <ClCompile Include="src\PropertyGridItemStringList.cpp" />
     <ClCompile Include="src\PropertyInput.cpp" />
     <ClCompile Include="src\PropertyInputFilePath.cpp" />
     <ClCompile Include="src\PropertyInputInt.cpp" />
@@ -118,6 +113,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsVBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.h" />
     <ClInclude Include="include\OTWidgets\LineEdit.h" />
+    <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputBool.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputDirectory.h" />
@@ -135,12 +131,6 @@
     <QtMoc Include="include\OTWidgets\PropertyDialog.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItem.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridGroup.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItemBool.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItemDouble.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItemFactory.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItemInt.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItemString.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItemStringList.h" />
     <QtMoc Include="include\OTWidgets\PropertyInput.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputInt.h" />
     <ClInclude Include="include\OTWidgets\PushButton.h" />

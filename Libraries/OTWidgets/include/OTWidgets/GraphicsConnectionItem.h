@@ -52,6 +52,9 @@ namespace ot {
 		GraphicsItem* originItem(void) const { return m_origin; };
 		GraphicsItem* destItem(void) const { return m_dest; };
 
+		void setUid(const std::string& _uid) { m_uid = _uid; };
+		const std::string& uid(void) const { return m_uid; };
+
 	private:
 		void calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const;
 		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
@@ -59,6 +62,8 @@ namespace ot {
 
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
+
+		std::string m_uid;
 
 		QRectF m_lastRect;
 

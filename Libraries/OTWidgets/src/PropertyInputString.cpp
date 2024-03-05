@@ -13,6 +13,7 @@ ot::PropertyInputString::PropertyInputString(const PropertyString* _property)
 {
 	m_lineEdit = new LineEdit;
 	m_lineEdit->setToolTip(QString::fromStdString(_property->propertyTip()));
+	m_lineEdit->setPlaceholderText(QString::fromStdString(_property->placeholderText()));
 	m_text = QString::fromStdString(_property->value());
 	if (_property->propertyFlags() & Property::HasMultipleValues) {
 		m_lineEdit->setText("...");

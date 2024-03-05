@@ -29,65 +29,31 @@ Application* g_instance{ nullptr };
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyBool.h"
+#include "OTGui/PropertyColor.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyDouble.h"
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyStringList.h"
+#include "OTGui/PropertyFilePath.h"
+#include "OTGui/PropertyDirectory.h"
 
-std::string Application::test(void) {
-	// Create json document
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OnePropertyDialog, doc.GetAllocator()), doc.GetAllocator());
-	
-	// Create property to edit
-	ot::PropertyInt* prop = new ot::PropertyInt;
-	prop->setPropertyName("<name>");   // Is not relevant for the OnePropertyDialog
-	prop->setPropertyTitle("<title>"); // Title that will be displayed to the user
-	prop->setRange(1, 99);             // Value range for the user input
-	prop->setValue(2);                 // Inital value
-
-	// Create dialog configuration
-	ot::OnePropertyDialogCfg cfg(prop);
-	cfg.setName("MyIntegerDialog");       // Dialog name that may be used to identify the dialog (e.g. when the service wants to request different dialogs)
-	cfg.setTitle("MyIntegerDialogTitle");            // Title that will be displayed to the user
-	cfg.setFlags(ot::DialogCfg::CancelOnNoChange); // If set the dialog will behave as if the user pressed cancel when the user did not change any value before confirming
-
-	// Serialize
-	ot::JsonObject cfgObj;
-	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
-
-	// Add service information
-	this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-	// or use "Application::instance()->" instead of "this" when using outside of class Application
-	
-	// Send
-	m_uiComponent->sendMessage(true, doc);
-	
-	//--- OR ---
-	std::string response; // Response will be empty when calling queue
-	if (!ot::msg::send("<sender url>", "<UI url>", ot::QUEUE, doc.toJson(), response)) {
-		// Error handling
-	}
-
-	return "";
-}
-/*
 std::string Application::test(void) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PropertyDialog, doc.GetAllocator()), doc.GetAllocator());
 	
-
 	ot::PropertyDialogCfg cfg;
 	cfg.setTitle("Testing");
+	cfg.setName("Testing");
 
-	ot::PropertyBool* cb1 = new ot::PropertyBool("Enabled", false);
-	cfg.defaultGroup()->addProperty(cb1);
+	ot::PropertyBool* tl1 = new ot::PropertyBool("Top Lvl", false);
+	cfg.defaultGroup()->addProperty(tl1);
 
-	ot::PropertyGroup* g1 = new ot::PropertyGroup("G1", "Group 1");
+	ot::PropertyGroup* g1 = new ot::PropertyGroup("G1", "Base types");
+	ot::PropertyBool* cb1 = new ot::PropertyBool("Bool", false);
 	ot::PropertyInt* i1 = new ot::PropertyInt("Int", 1);
 	i1->setMin(0);
 	i1->setMax(99);
+	g1->addProperty(cb1);
 	g1->addProperty(i1);
 
 	ot::PropertyDouble* d1 = new ot::PropertyDouble("Double", 1.1);
@@ -96,7 +62,10 @@ std::string Application::test(void) {
 	d1->setPrecision(4);
 	g1->addProperty(d1);
 
-	ot::PropertyGroup* g2 = new ot::PropertyGroup("G2", "Group 2");
+	ot::PropertyGroup* g2 = new ot::PropertyGroup("G2", "Objects");
+	ot::PropertyColor* c1 = new ot::PropertyColor("Color", ot::Color(1, 2, 3));
+	g2->addProperty(c1);
+
 	ot::PropertyString* s1 = new ot::PropertyString("String", "Test");
 	s1->setMaxLength(10);
 	g2->addProperty(s1);
@@ -104,8 +73,16 @@ std::string Application::test(void) {
 	ot::PropertyStringList* sl1 = new ot::PropertyStringList("StringList", "Test", { "Test", "Other", "Some" });
 	g2->addProperty(sl1);
 
+	ot::PropertyGroup* g3 = new ot::PropertyGroup("G3", "File system");
+	ot::PropertyFilePath* fp1 = new ot::PropertyFilePath("FilePath", "X:/YourPath/YourFile.YourExtension");
+	g3->addProperty(fp1);
+
+	ot::PropertyFilePath* dir1 = new ot::PropertyFilePath("Directory", "X:/YourPath");
+	g3->addProperty(dir1);
+
 	cfg.addRootGroup(g1);
 	cfg.addRootGroup(g2);
+	cfg.addRootGroup(g3);
 
 	ot::JsonObject cfgObj;
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
@@ -113,7 +90,7 @@ std::string Application::test(void) {
 	m_uiComponent->sendMessage(true, doc);
 	return "";
 }
-*/
+
 
 
 
@@ -192,7 +169,57 @@ std::string Application::handleOnePropertyDialogValue(ot::JsonDocument& _documen
 		// Get the value, in this example the value type is integer
 		int value = ot::json::getInt(_document, OT_ACTION_PARAM_Value);
 
-		m_uiComponent->displayMessage("Dialog test resulted with value: " + std::to_string(value));
+		m_uiComponent->displayMessage("Dialog test resulted with value: " + std::to_string(value) + "\n");
+	}
+	else if (dialogName == "MyDoubleDialog") {
+
+		// Get the value, in this example the value type is integer
+		double value = ot::json::getDouble(_document, OT_ACTION_PARAM_Value);
+
+		m_uiComponent->displayMessage("Dialog test resulted with value: " + std::to_string(value) + "\n");
+	}
+	else if (dialogName == "MyBoolDialog") {
+
+		// Get the value, in this example the value type is integer
+		bool value = ot::json::getBool(_document, OT_ACTION_PARAM_Value);
+
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + (value ? "True\n" : "False\n"));
+	}
+	else if (dialogName == "MyStringDialog") {
+
+		// Get the value, in this example the value type is integer
+		std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + value + "\n");
+	}
+	else if (dialogName == "MyStringListDialog") {
+
+		// Get the value, in this example the value type is integer
+		std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + value + "\n");
+	}
+	else if (dialogName == "MyColorDialog") {
+
+		// Get the value, in this example the value type is integer
+		ot::ConstJsonObject value = ot::json::getObject(_document, OT_ACTION_PARAM_Value);
+		ot::Color c;
+		c.setFromJsonObject(value);
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + std::to_string(c.rInt()) + ", " + std::to_string(c.gInt()) + ", " + std::to_string(c.bInt()) + ", " + std::to_string(c.aInt()) + "\n");
+	}
+	else if (dialogName == "MyFileDialog") {
+
+		// Get the value, in this example the value type is integer
+		std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + value + "\n");
+	}
+	else if (dialogName == "MyDirDialog") {
+
+		// Get the value, in this example the value type is integer
+		std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + value + "\n");
 	}
 	return std::string();
 }

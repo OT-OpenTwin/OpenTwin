@@ -130,24 +130,6 @@
     <ClCompile Include="src\PropertyDialog.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyGridItemFactory.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGridItemDouble.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGridItemString.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGridItemStringList.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGridItemInt.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGridItemBool.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
     <ClCompile Include="src\OnePropertyDialog.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
@@ -198,6 +180,9 @@
     </ClCompile>
     <ClCompile Include="src\ComboButton.cpp">
       <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridItemDelegate.cpp">
+      <Filter>src\Properties</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -317,28 +302,7 @@
     <ClInclude Include="include\OTWidgets\PushButton.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItem.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyGridGroup.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemFactory.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemString.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemStringList.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemBool.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemInt.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemDouble.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\OnePropertyDialog.h">
@@ -366,6 +330,12 @@
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItem.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
   </ItemGroup>

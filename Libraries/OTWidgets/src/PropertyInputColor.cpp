@@ -12,6 +12,7 @@ ot::PropertyInputColor::PropertyInputColor(const PropertyColor* _property)
 	: PropertyInput(_property)
 {
 	m_colorBtn = new ColorPickButton(_property->value());
+	m_colorBtn->getQWidget()->setContentsMargins(0, 0, 0, 0);
 	if (_property->propertyFlags() & Property::HasMultipleValues) {
 		m_colorBtn->replaceButtonText("...");
 	}

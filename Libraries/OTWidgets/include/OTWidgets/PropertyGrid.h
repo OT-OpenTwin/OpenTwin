@@ -6,9 +6,9 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/QWidgetInterface.h"
-#include "OTWidgets/TreeWidget.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>
@@ -16,10 +16,13 @@
 // std header
 #include <list>
 
+class QTreeWidgetItem;
+
 namespace ot {
 
-	class PropertyGridGroup;
+	class TreeWidget;
 	class PropertyGridItem;
+	class PropertyGridGroup;
 
 	class OT_WIDGETS_API_EXPORT PropertyGrid : public QObject, public QWidgetInterface {
 		Q_OBJECT
@@ -28,15 +31,21 @@ namespace ot {
 		PropertyGrid(QObject* _parentObject = (QObject*)nullptr);
 		virtual ~PropertyGrid();
 
-		virtual QWidget* getQWidget(void) override { return m_tree; };
+		virtual QWidget* getQWidget(void) override;
 
+		TreeWidget* getTreeWidget(void) const;
+
+		void setupFromConfig(const PropertyGridCfg& _config);
+		void addRootItem(PropertyGridItem* _item);
 		void addGroup(PropertyGridGroup* _group);
 
 	private slots:
 		void slotPropertyChanged();
+		void slotItemChanged(QTreeWidgetItem* _item, int _column);
 
 	private:
-		ot::TreeWidget* m_tree;
+		class PropertyGridTree;
+		PropertyGridTree* m_tree;
 
 		PropertyGridGroup* m_defaultGroup;
 		std::list<PropertyGridGroup*> m_groups;

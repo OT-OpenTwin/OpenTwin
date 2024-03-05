@@ -7,6 +7,9 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 
+// Qt header
+#include <QtGui/qevent.h>
+
 ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(ot::NoNavigationTreeItemFlags) {}
 
 ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
@@ -51,12 +54,18 @@ void ot::TreeWidgetItemInfo::clearChildItems(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::TreeWidget::TreeWidget(QWidget * _parentWidget) : QTreeWidget(_parentWidget) {
-
-}
+ot::TreeWidget::TreeWidget(QWidget * _parentWidget) : QTreeWidget(_parentWidget) {}
 
 ot::TreeWidget::~TreeWidget() {
 
+}
+
+void ot::TreeWidget::mousePressEvent(QMouseEvent* _event) {
+	QTreeWidget::mousePressEvent(_event);
+}
+
+void ot::TreeWidget::drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const {
+	QTreeWidget::drawRow(_painter, _options, _index);
 }
 
 QTreeWidgetItem* ot::TreeWidget::findItem(const QString& _itemPath, char _delimiter) const {

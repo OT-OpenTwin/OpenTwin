@@ -41,14 +41,32 @@ ot::DialogCfg::DialogFlags ot::DialogCfg::stringListToFlags(const std::list<std:
 	return ret;
 }
 
+ot::DialogCfg::DialogCfg(DialogFlags _flags)
+	: m_flags(_flags), m_minSize(-1, -1), m_maxSize(-1, -1)
+{}
+
+ot::DialogCfg::DialogCfg(const std::string& _title, DialogFlags _flags)
+	: m_flags(_flags), m_title(_title), m_minSize(-1, -1), m_maxSize(-1, -1)
+{}
+
 void ot::DialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 	_object.AddMember("Flags", JsonArray(DialogCfg::flagsToStringList(m_flags), _allocator), _allocator);
+
+	JsonObject minSizeObj;
+	m_minSize.addToJsonObject(minSizeObj, _allocator);
+	_object.AddMember("MinSize", minSizeObj, _allocator);
+
+	JsonObject maxSizeObj;
+	m_maxSize.addToJsonObject(maxSizeObj, _allocator);
+	_object.AddMember("MaxSize", maxSizeObj, _allocator);
 }
 
 void ot::DialogCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_name = json::getString(_object, "Name");
 	m_title = json::getString(_object, "Title");
 	m_flags = DialogCfg::stringListToFlags(json::getStringList(_object, "Flags"));
+	m_minSize.setFromJsonObject(json::getObject(_object, "MinSize"));
+	m_maxSize.setFromJsonObject(json::getObject(_object, "MaxSize"));
 }

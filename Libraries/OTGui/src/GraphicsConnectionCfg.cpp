@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 
+#define OT_JSON_Member_Uid "UID"
 #define OT_JSON_Member_Color "Color"
 #define OT_JSON_Member_Style "Style"
 #define OT_JSON_Member_Width "Width"
@@ -74,6 +75,7 @@ ot::GraphicsConnectionCfg& ot::GraphicsConnectionCfg::operator = (const Graphics
 }
 
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	_object.AddMember(OT_JSON_Member_Uid, JsonString(m_uid, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_SourceUid, JsonString(m_originUID, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_SourceName, JsonString(m_originConnectable, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_DestinationUid, JsonString(m_destUID, _allocator), _allocator);
@@ -87,6 +89,7 @@ void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocato
 }
 
 void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
+	m_uid = json::getString(_object, OT_JSON_Member_Uid);
 	m_originUID = json::getString(_object, OT_JSON_Member_SourceUid);
 	m_originConnectable = json::getString(_object, OT_JSON_Member_SourceName);
 	m_destUID = json::getString(_object, OT_JSON_Member_DestinationUid);

@@ -65,7 +65,6 @@ QSizeF ot::GraphicsEllipseItem::getPreferredGraphicsItemSize(void) const {
 // Base class functions: ot::CustomGraphicsItem
 
 void ot::GraphicsEllipseItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	this->paintGeneralGraphics(_painter, _opt, _widget);
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
 	_painter->drawEllipse(_rect.center(), _rect.width() / 2., _rect.height() / 2.);

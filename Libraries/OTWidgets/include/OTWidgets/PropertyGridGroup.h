@@ -10,6 +10,7 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtGui/qbrush.h>
 #include <QtWidgets/qtreewidget.h>
 
 namespace ot {
@@ -24,10 +25,16 @@ namespace ot {
 
 		void setupFromConfig(PropertyGroup* _group);
 
+		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
+		void finishSetup(void);
+
 		void addItem(PropertyGridItem* _item);
 
-	private:
+		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
+		const QBrush& groupBrush(void) const { return m_groupBrush; };
 
+	private:
+		QBrush m_groupBrush;
 	};
 
 }

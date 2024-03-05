@@ -105,7 +105,7 @@ void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _ev
 // ###########################################################################################################################################################################################################################################################################################################################
 
 bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg& _cfg) {
-	//this->prepareGeometryChange();
+	this->m_uid = _cfg.uid();
 	this->m_style = _cfg.style();
 
 	m_pen.setWidth(_cfg.lineWidth());
@@ -116,6 +116,8 @@ bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg
 
 ot::GraphicsConnectionCfg ot::GraphicsConnectionItem::getConnectionInformation(void) const {
 	ot::GraphicsConnectionCfg info;
+	info.setUid(m_uid);
+
 	if (m_origin) {
 		info.setOriginUid(m_origin->getRootItem()->graphicsItemUid());
 		info.setOriginConnectable(m_origin->graphicsItemName());

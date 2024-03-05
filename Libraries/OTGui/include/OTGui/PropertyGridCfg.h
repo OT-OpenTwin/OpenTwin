@@ -1,23 +1,25 @@
-//! @file OnePropertyDialogCfg.h
+//! @file PropertyGridCfg.h
 //! @author Alexander Kuester (alexk95)
-//! @date February 2024
+//! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTGui/DialogCfg.h"
+#include "OTCore/Flags.h"
+#include "OTCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
 
-	class Property;
+	class PropertyGroup;
 
-	class OT_GUI_API_EXPORT OnePropertyDialogCfg : public DialogCfg {
-		OT_DECL_NOCOPY(OnePropertyDialogCfg)
+	class OT_GUI_API_EXPORT PropertyGridCfg : public ot::Serializable {
+		OT_DECL_NOCOPY(PropertyGridCfg)
 	public:
-		OnePropertyDialogCfg(Property* _property = (Property*)nullptr);
-		OnePropertyDialogCfg(const std::string& _title, Property* _property = (Property*)nullptr);
-		virtual ~OnePropertyDialogCfg();
+		PropertyGridCfg();
+		virtual ~PropertyGridCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -29,16 +31,17 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		//! @brief Set or replace the property
-		//! If a property was set before it will be destroyed
-		void setProperty(Property* _property);
-		Property* getProperty(void) const { return m_property; };
+		PropertyGroup* defaultGroup(void) const { return m_defaultGroup; };
 
-		//! @brief Returns the current property and replaces it with null
-		Property* takeProperty(void);
+		void setRootGroups(const std::list<PropertyGroup*>& _groups);
+		void addRootGroup(PropertyGroup* _group);
+		const std::list<PropertyGroup*>& rootGroups(void) const { return m_rootGroups; };
 
 	private:
-		Property* m_property;
+		void clear(void);
+
+		PropertyGroup* m_defaultGroup;
+		std::list<PropertyGroup*> m_rootGroups;
 	};
 
 }
