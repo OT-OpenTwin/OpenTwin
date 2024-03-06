@@ -132,7 +132,7 @@
 	!define OPENTWIN_REPO_GITADDRESS "git@github.com:OT-OpenTwin/OpenTwin.git"
 	!define THIRDPARTY_REPO_GITADDRESS "git@github.com:OT-OpenTwin/ThirdParty.git"
 
-	!define TEMP_TOOLCHAIN_DIR "$DEV_ROOT\_temp"
+	!define TEMP_TOOLCHAIN_DIR '$DEV_ROOT\_temp'
 
 	!define DEV_ROOT_DIR '"$ROOTDIR\OT"'
 
@@ -216,11 +216,11 @@ Function .onInit
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
-	StrCpy $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION "C:\Program Files (x86)\GitHub Desktop Deployment"
+	StrCpy $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION "$PROGRAMFILES\GitHub Desktop Deployment"
 		#standard and apparently unchangeable path of github desktop deployment application
 
 	StrCpy "$ROOTDIR" "$WINDIR" 2
-	StrCpy "$TempToolChain" ${TEMP_TOOLCHAIN_DIR}
+	
 
 FunctionEnd
 
@@ -811,7 +811,7 @@ FunctionEnd
 				#assign variable paths but don't create them yet!
 				#git wouldn't clone if a path already exists!
 			StrCpy $INSTDIR "$OPEN_TWIN_DEV_ROOT\Deployment"
-
+			StrCpy "$TempToolChain" ${TEMP_TOOLCHAIN_DIR}
 	FunctionEnd
 
 ; MUI Settings
@@ -859,7 +859,7 @@ FunctionEnd
 	; Finish page
 	#!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenTwin_local.bat"
 
-	!define MUI_TEXT_FINISH_INFO_TEXT "Installation completed successfully. All programs and dependencies have been setup and installed successfully"
+	!define MUI_TEXT_FINISH_INFO_TEXT "Installation complete. All programs and dependencies have been setup and installed successfully. Click on Finish to close the installer."
 
 	!insertmacro MUI_PAGE_FINISH
 
@@ -893,142 +893,144 @@ SectionGroup /e "Git"
 		AddSize 403000
 		ExpandEnvStrings $0 %COMSPEC%
 			#ExecWait '"$0" /c "START /MIN cmd.exe /k ""$INSTDIR\Installer_Tools\ThirdParty\Git-2.44.0-64-bit.exe" /VERYSILENT""'
-			ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\Git-2.44.0-64-bit.exe" /SILENT"'
+			ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\Git-2.44.0-64-bit.exe" /VERYSILENT"'
 	SectionEnd
 	
 	Section "Git GUI Frontend" SEC02_1
 		AddSize 613000
 		DetailPrint "Installing Github Desktop Environment"
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "msiexec.exe /i "$TempToolChain\Installer_Tools\ThirdParty\GitHubDesktopSetup-x64.msi" /quiet""'
-			ExecWait '"$GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION\GitHubDesktopDeploymentTool.exe" /silent'
-			Delete $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION
+		ExpandEnvStrings $0 %COMSPEC%
+			ExecWait 'msiexec.exe /i "$TempToolChain\Installer_Tools\ThirdParty\GitHubDesktopSetup-x64.msi" /quiet'
+		ExecWait '"$GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION\GitHubDesktopDeploymentTool.exe" /silent'
 	SectionEnd
 SectionGroupEnd 
 
-Section "!Clone OpenTwin Repository" SEC03
-	MessageBox MB_ICONINFORMATION|MB_OK "This step of the installation will clone the OpenTwin repository on GitHub. Press OK to continue."
+SectionGroup /e "OpenTwin"
+	Section "!Clone OpenTwin Repository" SEC03
+		MessageBox MB_ICONINFORMATION|MB_OK "This step of the installation will clone the OpenTwin repository on GitHub. Press OK to continue."
 
-	#start git bash
-	SetRegView 64
-	ReadRegStr $0 HKLM "SOFTWARE\GitForWindows" "InstallPath"
-	StrCpy $GitInstallPath $0
-	MessageBox MB_ICONINFORMATION|MB_OK "GitHub Path: $GitInstallPath" #debug
-	SetRegView 32
+		#start git bash
+		SetRegView 64
+		ReadRegStr $0 HKLM "SOFTWARE\GitForWindows" "InstallPath"
+		StrCpy $GitInstallPath $0
+		MessageBox MB_ICONINFORMATION|MB_OK "GitHub Path: $GitInstallPath" #debug
+		SetRegView 32
 
-	IfFileExists "$DEV_ROOT" DEV_ROOT_Exists DEV_ROOT_NotExists
+		IfFileExists "$DEV_ROOT" DEV_ROOT_Exists DEV_ROOT_NotExists
 
-	DEV_ROOT_Exists:
-		DetailPrint "Cloning repositories..."
+		DEV_ROOT_Exists:
+			DetailPrint "Cloning repositories..."
+			ExpandEnvStrings $0 %COMSPEC%
+				#ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
+				ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && exit"'
+			#ExecWait '"$GitInstallPath\git-bash.exe" -c "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
+			Goto done_cloning
+		
+		DEV_ROOT_NotExists:
+			DetailPrint "DEV_ROOT path doesn't exist yet! Creating path..."
+				CreateDirectory $DEV_ROOT
+			Goto DEV_ROOT_Exists
+		
+		done_cloning:
+	SectionEnd
+
+	Section "OpenTwin Deployment Files (Required)" SEC04
+		SectionIn RO ;read only section
+		SetOutPath "$INSTDIR"
+		SetOverwrite ifnewer
+
+		DetailPrint "Extracting OpenTwin Deployment files..."
+
+		File /r "..\..\..\Deployment\*.*"
+			#relative to script location
+			#    ".\" 	 = the script location itself
+			#    "..\" 	 = one directory up
+			#    "..\..\"  = two directories up etc.
+
+		${If} $PublicIpSet <> 0 #public IP was set
+			ExpandEnvStrings $0 %COMSPEC%
+				ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate_custom.cmd" "$NetworkModeSelection" "$PUBLIC_CERT_PATH"" '
+
+		${Else}
+			Goto +2
+		${EndIf}
+
+		DetailPrint "Installing VC Redistributable..."
+		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\VC_redist.x64" /silent'
+
+		DetailPrint "Setting environment variables..."
+		
+		#		
+		#SET OPEN_TWIN_DEV_ROOT on C:\OT\OpenTwin
+		#EXTRACT FILES TO: C:\OT\OpenTwin\Deployment
+		#OPENTWIN_THIRDPARTY_ROOT on C:\OT\ThirdParty
+		#CLONE REPO
+		# on C:\
+		# clone all 3 repos
+		# 
+
+		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DEV_ROOT" "$OPEN_TWIN_DEV_ROOT"
+			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+
+		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_THIRDPARTY_ROOT" "$OPENTWIN_THIRDPARTY_ROOT"
+			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
+
+		; Shortcuts
+		!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+		CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
+		CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\OpenTwin.lnk" "$INSTDIR\OpenTwin_local.bat" "" ${OPENTWIN_APP_ICON}
+		CreateShortCut "$DESKTOP\OpenTwin.lnk" "$INSTDIR\OpenTwin_local.bat" "" ${OPENTWIN_APP_ICON}
+		!insertmacro MUI_STARTMENU_WRITE_END
+	SectionEnd
+
+
+	Section "MongoDB Setup" SEC05
+		AddSize 738000
+		; /i = package to install
+		; /qn = quiet install
+		; INSTALLLOCATION = install directory
+		
+		#this execwait would have to be enabled again if the custom install location can be used again
+		#ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'
+		
+		DetailPrint "Running MongoDB installation scripts..."
+
+		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\Installer_Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="1" ADDLOCAL="ServerService,Client"'		
+		
+		##########################################
+		# call for python scripts via $INSTDIR
+		##########################################
+
+		DetailPrint "Running scripts..."
+		# mongoDB_storage_script_noAuth.py
+		ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
+
+		#set directory permissions for the mongoDB service
+		ExecWait '"$TempToolChain\Installer_Tools\Python\dist\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
+
+		# restarting mongoDB service
+		nsExec::ExecToLog 'net stop "MongoDB"'	
+		nsExec::ExecToLog 'net start "MongoDB"'
+		# 'net' command waits for the service to be stopped/started automatically
+		# no additional checks needed
+
+		# call for js script to paste admin user creation
 		ExpandEnvStrings $0 %COMSPEC%
-			#ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
-			ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && exit"'
-		#ExecWait '"$GitInstallPath\git-bash.exe" -c "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
-		Goto done_cloning
-	
-	DEV_ROOT_NotExists:
-		DetailPrint "DEV_ROOT path doesn't exist yet! Creating path..."
-			CreateDirectory $DEV_ROOT
-		Goto DEV_ROOT_Exists
-	
-	done_cloning:
-SectionEnd
+			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\Installer_Tools\javascript\db_admin.js" " "'
 
-Section "OpenTwin Deployment Files (Required)" SEC04
-	SectionIn RO ;read only section
-	SetOutPath "$INSTDIR"
-	SetOverwrite ifnewer
-
-	DetailPrint "Extracting OpenTwin Deployment files..."
-
-	File /r "..\..\..\Deployment\*.*"
-		#relative to script location
-		#    ".\" 	 = the script location itself
-		#    "..\" 	 = one directory up
-		#    "..\..\"  = two directories up etc.
-
-	${If} $PublicIpSet <> 0 #public IP was set
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate_custom.cmd" "$NetworkModeSelection" "$PUBLIC_CERT_PATH"" '
-
-	${Else}
-		Goto +2
-	${EndIf}
-
-	DetailPrint "Installing VC Redistributable..."
-	ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\VC_redist.x64" /silent'
-
-	DetailPrint "Setting environment variables..."
-	
-	#		
-	#SET OPEN_TWIN_DEV_ROOT on C:\OT\OpenTwin
-	#EXTRACT FILES TO: C:\OT\OpenTwin\Deployment
-	#OPENTWIN_THIRDPARTY_ROOT on C:\OT\ThirdParty
-	#CLONE REPO
-	# on C:\
-	# clone all 3 repos
-	# 
-
-	WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DEV_ROOT" "$OPEN_TWIN_DEV_ROOT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
-	WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_THIRDPARTY_ROOT" "$OPENTWIN_THIRDPARTY_ROOT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
-
-	; Shortcuts
-	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-	CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-	CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\OpenTwin.lnk" "$INSTDIR\OpenTwin_local.bat" "" ${OPENTWIN_APP_ICON}
-	CreateShortCut "$DESKTOP\OpenTwin.lnk" "$INSTDIR\OpenTwin_local.bat" "" ${OPENTWIN_APP_ICON}
-	!insertmacro MUI_STARTMENU_WRITE_END
-SectionEnd
-
-
-Section "MongoDB installation and setup" SEC05
-	AddSize 738000
-	; /i = package to install
-	; /qn = quiet install
-	; INSTALLLOCATION = install directory
-	
-	#this execwait would have to be enabled again if the custom install location can be used again
-	#ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'
-	
-	DetailPrint "Running MongoDB installation scripts..."
-
-	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\Installer_Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="1" ADDLOCAL="ServerService,Client"'		
-	
-	##########################################
-	# call for python scripts via $INSTDIR
-	##########################################
-
-	DetailPrint "Running scripts..."
-	# mongoDB_storage_script_noAuth.py
-	ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
-
-	#set directory permissions for the mongoDB service
-	ExecWait '"$TempToolChain\Installer_Tools\Python\dist\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
-
-	# restarting mongoDB service
-	nsExec::ExecToLog 'net stop "MongoDB"'	
-	nsExec::ExecToLog 'net start "MongoDB"'
-	# 'net' command waits for the service to be stopped/started automatically
-	# no additional checks needed
-
-	# call for js script to paste admin user creation
-	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\Installer_Tools\javascript\db_admin.js" " "'
-
-	# mongoDB_storage_script_wauth.py
-	${If} $PublicIpSet <> 0
-		ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
-	${Else}
-		ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$STANDARD_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$STANDARD_CERT_PATH\ca.pem"""" '
-	${EndIf}
-	
-SectionEnd
+		# mongoDB_storage_script_wauth.py
+		${If} $PublicIpSet <> 0
+			ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+			ExpandEnvStrings $0 %COMSPEC%
+				ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
+		${Else}
+			ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$STANDARD_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+			ExpandEnvStrings $0 %COMSPEC%
+				ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$STANDARD_CERT_PATH\ca.pem"""" '
+		${EndIf}
+		
+	SectionEnd
+SectionGroupEnd
 
 #Visual studio is a lenghty online installer that runs its own set of operations - might be problematic during installer runtime
 #requires internet
@@ -1039,7 +1041,7 @@ SectionGroup /e "Visual Studio & Rust"
 		DetailPrint "Installing Microsoft Visual Studio 2022 with C++ compilers..."
 
 		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\VisualStudioSetup.exe"' 	#not running this silently, because the installation is very lenghty
-																				#this package here already contains all required C++ compilers
+																						#this package here already contains all required C++ compilers
 	SectionEnd
 
 	Section "Install Rust" SEC06_1
@@ -1058,29 +1060,29 @@ Section "Install PostMan 64-bit" SEC07
 	AddSize 535000
 	DetailPrint "Installing PostMan..."
 		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\Postman-win64-Setup.exe" /silent'	#silent installs postman - postman installation is mostly silent already
-																							#the '/silent' switch surpresses the automatic app launch after installation
+																								#the '/silent' switch surpresses the automatic app launch after installation
 SectionEnd
 
 Section "Install Node.js and yarn" SEC08
 	AddSize 83100
 	DetailPrint "Installing Node.js"
-		ExecWait 'msiexec.exe /i "$TempToolChain\Installer_Tools\ThirdParty\node-v0.10.23-x64.msi" /quiet'
-		#ExecWait 'msiexec.exe /i "$INSTDIR\Installer_Tools\ThirdParty\node-v0.10.23-x64.msi" /passive' 	# '/passive' includes a progress bar but doesn't need any input 
+		ExecWait 'msiexec.exe /i "$TempToolChain\Installer_Tools\ThirdParty\node-v20.11.1-x64.msi" /quiet'
+		#ExecWait 'msiexec.exe /i "$INSTDIR\Installer_Tools\ThirdParty\node-v20.11.1-x64.msi" /passive' 	# '/passive' includes a progress bar but doesn't need any input 
 																											# use "INSTALLDIR="path\to\NodeJS" to install to a specific location 
 	DetailPrint "Installing yarn..."
 		ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c "npm install --global yarn" " '
+				ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$TempToolChain\Installer_Tools\cmd" && RefreshEnv.cmd && npm install --global yarn" " '
 SectionEnd
 
 SectionGroup /e "Python & Sphinx"
-	Section "Install Python 3" SEC09
+	Section "Install Python 3.9" SEC09
 		AddSize 151000
-		DetailPrint "Installing Python..."
+		DetailPrint "Installing Python 3.9..."
 			#replace with python 3.9
-			ExecWait '"$TempToolChain\Tools\ThirdParty\python-3.12.2-amd64.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0'
+			ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\python-3.9.0-amd64.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0'
 			# /quiet 			- installs python silently
 			# InstallAllUsers	- installs python for all users
-			# PrependPath 		- Prepend install and Scripts directories to PATH and add .PY to PATHEXT
+			# PrependPath 		- Prepend install and scripts directories to PATH and add .PY to PATHEXT
 			# Include_test 		- Install standard library test suite
 			# these settings replicate a standard python 3 installation
 			# (via https://docs.python.org/3/using/windows.html)
@@ -1090,8 +1092,8 @@ SectionGroup /e "Python & Sphinx"
 		AddSize 22000
 		DetailPrint "Installing Sphinx..."
 			ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "pip install -U sphinx" " '
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "pip install -U sphinx_rtd_theme" " '
+			ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$TempToolChain\Installer_Tools\cmd" && RefreshEnv.cmd && pip install -U sphinx && pip install -U sphinx_rtd_theme" " '
+			#ExecWait '"$0" /c "START /MIN cmd.exe /c "pip install -U sphinx_rtd_theme" " '
 	SectionEnd
 SectionGroupEnd
 
@@ -1099,6 +1101,7 @@ Section "-CleanupTasks"
 	SectionIn RO
 	DetailPrint "Cleaning up..."
 	RMDir /r ${TEMP_TOOLCHAIN_DIR}
+	RMDir /r $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION
 SectionEnd
 
 Section -AdditionalIcons
@@ -1127,8 +1130,8 @@ SectionEnd
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Clones both required GitHub repositories under https://github.com/OT-OpenTwin into the OpenTwin Developer directory"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "Install all required OpenTwin files"
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "Install MongoDB and set up all configurations for OpenTwin"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "OpenTwin Deployment Files - Install all required OpenTwin files"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "MongoDB Setup - Install MongoDB and set up all configurations for OpenTwin"
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} "Install Microsoft Visual Studio 2022 IDE and C++ Compilers"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06_1} "Install Rust (only in combination with Visual Studio 2022)"
