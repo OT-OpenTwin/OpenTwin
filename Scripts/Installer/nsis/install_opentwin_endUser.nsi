@@ -776,7 +776,7 @@ FunctionEnd
 	; Finish page
 	#!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenTwin_local.bat"
 
-	!define MUI_TEXT_FINISH_INFO_TEXT "Installation completed successfully. All programs and dependencies have been setup and installed successfully. Click on Finish to close the installer."
+	!define MUI_TEXT_FINISH_INFO_TEXT "Installation complete. All programs and dependencies have been setup and installed successfully. Click on Finish to close the installer."
 
 	!insertmacro MUI_PAGE_FINISH
 
