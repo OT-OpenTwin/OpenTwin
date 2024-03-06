@@ -72,7 +72,6 @@
 	Var MONGODB_DB_PATH
 	Var MONGODB_LOG_PATH
 
-	Var OPEN_TWIN_LOG_PORT
 	Var OPEN_TWIN_SERVICES_ADDRESS
 
 #=================================================================
@@ -85,18 +84,22 @@
 #						GLOBAL DEFINES
 #=================================================================
 	!define PRODUCT_NAME "OpenTwin"
+	BrandingText "OpenTwin Simulation Platform"
 	!define REGPATH_UNINSTSUBKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\AppMainExe.exe"
+	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\OpenTwin.exe"
 	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 	!define PRODUCT_UNINST_ROOT_KEY "HKLM"
 	!define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
 
-
+	# at script compile icons/images
 	!define MUI_WELCOMEFINISHPAGE_BITMAP "..\Graphics\Wizard\openTwin_headerImage_01.bmp"
 	!define MUI_ICON_PATH '"..\Graphics\Icons\openTwin_icon_48x48.ico"'
 	!define MUI_UNICON_PATH '"..\Graphics\Icons\opentwin_uninstall_icon_48x48.ico"'
-	!define OPENTWIN_APP_ICON '"..\Graphics\Icons\OpenTwin.ico"'
+
+	# post installation icons/images
+	!define OPENTWIN_APP_ICON '"$INSTDIR\icons\Application\OpenTwin.ico"'
+	!define OPENTWIN_UNAPP_ICON '"$INSTDIR\icons\Application\opentwin_uninstall_icon_48x48.ico"'
 
 	!define CREATE_CERTIFICATE_BATCH '"$INSTDIR\Certificates\CreateServerCertificate_custom.cmd"'
 	!define DEFAULT_MONGODB_STORAGE_PATH '"$INSTDIR\DataStorage\data"'
@@ -108,7 +111,6 @@
 #=================================================================
 #						END OF DEFINES
 #=================================================================
-
 
 RequestExecutionLevel admin
 
@@ -187,7 +189,6 @@ Function .onInit
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
-	StrCpy $OPEN_TWIN_LOG_PORT "8090"
 
 	StrCpy "$ROOTDIR" "$WINDIR" 2
 
@@ -736,12 +737,9 @@ FunctionEnd
 */
 
 ; MUI Settings
-	BrandingText "OpenTwin Simulation Platform"
+	
 	!define MUI_ABORTWARNING
-	#!define MUI_ICON "..\..\..\Deployment\Graphics\Icons\openTwin_icon_48x48.ico"
 	!define MUI_ICON ${MUI_ICON_PATH}
-
-	#!define MUI_UNICON "..\..\..\Deployment\Graphics\Icons\opentwin_uninstall_icon_48x48.ico"
 	!define MUI_UNICON ${MUI_UNICON_PATH} 
 
 	; Welcome page
@@ -778,7 +776,7 @@ FunctionEnd
 	; Finish page
 	#!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenTwin_local.bat"
 
-	!define MUI_TEXT_FINISH_INFO_TEXT "Installation completed successfully. In order to ensure proper functionality of OpenTwin, a reboot is required. Do you want to reboot now?"
+	!define MUI_TEXT_FINISH_INFO_TEXT "Installation completed successfully. All programs and dependencies have been setup and installed successfully. Click on Finish to close the installer."
 
 	!insertmacro MUI_PAGE_FINISH
 
@@ -880,13 +878,13 @@ SectionEnd
 
 Section -AdditionalIcons
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\Uninstall_OpenTwin.exe" "" ${MUI_UNICON_PATH}
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\Uninstall_OpenTwin.exe" "" ${OPENTWIN_UNAPP_ICON}
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
 Section -Post
 	WriteUninstaller "$INSTDIR\Uninstall_OpenTwin.exe"
-	WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\AppMainExe.exe"
+	WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\OpenTwin.exe"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
 	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "${PRODUCT_NAME}"
 	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$INSTDIR\OpenTwin.exe,0"
