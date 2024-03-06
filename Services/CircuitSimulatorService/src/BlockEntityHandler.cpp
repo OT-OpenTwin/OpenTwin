@@ -181,7 +181,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionCfg.setDestUid(connection.destUid());
 		connectionCfg.setOriginConnectable(connection.originConnectable());
 		connectionCfg.setDestConnectable(connection.destConnectable());
-		connectionCfg.setUid(std::to_string(connectionEntity->getEntityID()));
+		//connectionCfg.setUid(std::to_string(connectionEntity->getEntityID()));
 		
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity->setConnectionCfg(connectionCfg);
@@ -242,28 +242,52 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	}
 
 	
+
+
 	
 
 	if (entitiesForUpdate.size() != 0)
 	{
-		ot::UIDList topoEntIDs, topoEntVers;
+		std::list<ot::UID> topoEntIDs, topoEntVers;
+		std::list<bool> topoEntForceVisible;
+		std::list<ot::EntityInformation> entityInfos;
+		ot::UIDList coordinateEntityIDList;
 
 		for (auto entityForUpdate : entitiesForUpdate)
 		{
 			entityForUpdate->StoreToDataBase();
 			topoEntIDs.push_back(entityForUpdate->getEntityID());
 			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
-			//topologyEntityForceVisible.push_back(false);
+
+			/*coordinateEntityIDList.push_back(entityForUpdate->getCoordinateEntityID());
+
+			_modelComponent->getEntityInformation(coordinateEntityIDList, entityInfos);
+			dataEntityParentList.push_back(entityForUpdate->getEntityID());
+			topologyEntityForceVisible.push_back(false);*/
 		}
+		/*ClassFactory classFactory;
+
+		for (auto& entityInfo : entityInfos)
+		{
+			EntityBase* entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+			dataEntityIDList.push_back(entBase->getEntityID());
+			dataEntityVersionList.push_back(entBase->getEntityStorageVersion());
+		}*/
+		//_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "Added Block: " + blockName);
+		
+		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
+
 
 		//Now i add the EntityBlockConnections to the model
 		_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 			dataEntityIDList, dataEntityVersionList, dataEntityParentList, "Added Block: " + blockName);
-
-		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
 		
-		//_modelComponent->addEntitiesToModel() // Add connection entites here
 	}
+
+	
+	
+	
+
 
 	/*for (auto entityBlockConnection : entityBlockConnectionsByBlockID)
 	{

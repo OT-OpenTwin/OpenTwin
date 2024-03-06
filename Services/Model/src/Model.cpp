@@ -2856,6 +2856,7 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		setParameter(entity->getName(), dynamic_cast<EntityParameter*>(entity)->getNumericValue(), dynamic_cast<EntityParameter*>(entity));
 		return;
 	}
+
 }
 
 void Model::performEntityMeshUpdate(EntityMeshTet *entity)

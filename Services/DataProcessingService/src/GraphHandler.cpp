@@ -73,7 +73,7 @@ bool GraphHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlock>
 			bool connectionIsSet = false;
 			for (auto& connection : allConnections)
 			{
-				if (connection.destConnectable() == connector.getConnectorName() || connection.originConnectable() == connector.getConnectorName())
+			//	if (connection.destConnectable() == connector.getConnectorName() || connection.originConnectable() == connector.getConnectorName())
 				{
 					connectionIsSet = true;
 					break;
@@ -146,47 +146,47 @@ Graph GraphHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock
 
 		auto& connections = blockEntity->getAllConnections();
 		auto& connectorsByName = blockEntity->getAllConnectorsByName();
-		for (const ot::GraphicsConnectionCfg& connection : connections)
-		{
-			const std::string* thisConnectorName = nullptr;
-			const std::string* otherConnectorName = nullptr;
-			const std::string* pairedBlockID = nullptr;
+	//	for (const ot::GraphicsConnectionCfg& connection : connections)
+	//	{
+	//		const std::string* thisConnectorName = nullptr;
+	//		const std::string* otherConnectorName = nullptr;
+	//		const std::string* pairedBlockID = nullptr;
 
-			if (connection.destUid() == blockID)
-			{
-				thisConnectorName = &connection.destConnectable();
-				otherConnectorName = &connection.originConnectable();
-				pairedBlockID = &connection.originUid();
-			}
-			else
-			{
-				thisConnectorName = &connection.originConnectable();
-				otherConnectorName = &connection.destConnectable();
-				pairedBlockID = &connection.destUid();
-			}
+	//		if (connection.destUid() == blockID)
+	//		{
+	//			thisConnectorName = &connection.destConnectable();
+	//			otherConnectorName = &connection.originConnectable();
+	//			pairedBlockID = &connection.originUid();
+	//		}
+	//		else
+	//		{
+	//			thisConnectorName = &connection.originConnectable();
+	//			otherConnectorName = &connection.destConnectable();
+	//			pairedBlockID = &connection.destUid();
+	//		}
 
-			//Some blocks have dynamic connectors. We need to check if the connection entry is still valid.
-			auto connectorByName = connectorsByName.find(*thisConnectorName);
-			auto connectedBlock = allBlockEntitiesByBlockID.find(*pairedBlockID);
-			auto connectorsOfConnectedBlock = connectedBlock->second->getAllConnectorsByName();
-			if (connectorByName != connectorsByName.end() && connectorsOfConnectedBlock.find(*otherConnectorName) != connectorsOfConnectedBlock.end())
-			{
-				ot::Connector connector = connectorByName->second;
-				assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
+	//		//Some blocks have dynamic connectors. We need to check if the connection entry is still valid.
+	//		auto connectorByName = connectorsByName.find(*thisConnectorName);
+	//		auto connectedBlock = allBlockEntitiesByBlockID.find(*pairedBlockID);
+	//		auto connectorsOfConnectedBlock = connectedBlock->second->getAllConnectorsByName();
+	//		if (connectorByName != connectorsByName.end() && connectorsOfConnectedBlock.find(*otherConnectorName) != connectorsOfConnectedBlock.end())
+	//		{
+	//			ot::Connector connector = connectorByName->second;
+	//			assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
 
-				std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
-				std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
+	//			std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
+	//			std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
 
-				if (connector.getConnectorType() == ot::ConnectorType::Out)
-				{
-					thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
-				}
-				else
-				{
-					thisNode->addPreviousNode(pairedNode);
-				}
-			}
-		}
+	//			if (connector.getConnectorType() == ot::ConnectorType::Out)
+	//			{
+	//				thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
+	//			}
+	//			else
+	//			{
+	//				thisNode->addPreviousNode(pairedNode);
+	//			}
+	//		}
+	//	}
 	}
 	return graph;
 }

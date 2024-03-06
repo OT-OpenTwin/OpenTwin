@@ -73,9 +73,9 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
 		{
-			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
+			//blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
-			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
+			//blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
 		}
 		else
