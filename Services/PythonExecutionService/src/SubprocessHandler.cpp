@@ -34,6 +34,7 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 		msg.fromJson(response);
 		assert(msg.getStatus() == ot::ReturnMessage::Ok);
 		_startupChecked = true;
+		OT_LOG_D("Python Subprocess signalized readiness");
 		InitialiseSubprocess();
 	}
 	else
