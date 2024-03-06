@@ -2384,10 +2384,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, doc.GetAllocator()), doc.GetAllocator());
-
-	std::list<std::string> sel; // Selected items
+	ot::UIDList selectedBlockItemIDs; 
 
 	for (auto s : scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
@@ -2395,11 +2392,11 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 
 		if (itm) {
 			// Item selected
-			sel.push_back(itm->graphicsItemUid());
+			selectedBlockItemIDs.push_back(std::stoull(itm->graphicsItemUid()));
 		}
 		else if (citm) {
 			// Connection selected
-			sel.push_back(citm->uid());
+			selectedBlockItemIDs.push_back(std::stoull(citm->uid()));
 		}
 		else {
 			// Unknown selected
@@ -2407,40 +2404,17 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 	}
 
-	if (sel.empty()) {
+	if (selectedBlockItemIDs.empty()) {
 		return;
 	}
-
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
-
-	try {
-		ot::GraphicsView* view = scene->getGraphicsView();
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
-		std::string response;
-		auto ser = m_ExternalServicesComponent->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
-		if (ser) {
-			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, ser->serviceURL(), doc, response)) {
-				OT_LOG_EA("Failed to send http request");
-				return;
-			}
-
-			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-			if (rMsg != ot::ReturnMessage::Ok) {
-				OT_LOG_E("Request failed: " + rMsg.getWhat());
-				return;
-			}
-		}
-		else {
-			OT_LOG_EA("No model connected");
-		}
+	
+	clearNavigationTreeSelection();
+	
+	for (ot::UID selectedBlockItemID : selectedBlockItemIDs)
+	{
+		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedBlockItemID);
+		setNavigationTreeItemSelected(treeID, true);	
 	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
-	}
-
 }
 
 void AppBase::slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections) {
