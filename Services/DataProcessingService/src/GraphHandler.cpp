@@ -1,6 +1,7 @@
 #include "GraphHandler.h"
-
 #include "GraphNode.h"
+#include "EntityBlockConnection.h"
+#include "ClassFactoryBlock.h"
 
 bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
@@ -144,49 +145,57 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& 
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
 		const ot::UID& blockID = blockEntityByBlockID.first;
 
-		auto& connections = blockEntity->getAllConnections();
+		auto& connectionIDs = blockEntity->getAllConnections();
+		std::list<ot::EntityInformation> entityInfos;
+		_modelComponent->getEntityInformation(connectionIDs, entityInfos);
+		//Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 		auto& connectorsByName = blockEntity->getAllConnectorsByName();
-	//	for (const ot::GraphicsConnectionCfg& connection : connections)
-	//	{
-	//		const std::string* thisConnectorName = nullptr;
-	//		const std::string* otherConnectorName = nullptr;
-	//		const std::string* pairedBlockID = nullptr;
+		for (const auto& entityInfo: entityInfos)
+		{
+			ClassFactoryBlock classFactory;
+			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+			
+			std::unique_ptr<EntityBlockConnection>connectionEnt(dynamic_cast<EntityBlockConnection*>(baseEnt));
+			auto connection = connectionEnt->getConnectionCfg();
+			const std::string* thisConnectorName = nullptr;
+			const std::string* otherConnectorName = nullptr;
+			const ot::UID* pairedBlockID = nullptr;
 
-	//		if (connection.destUid() == blockID)
-	//		{
-	//			thisConnectorName = &connection.destConnectable();
-	//			otherConnectorName = &connection.originConnectable();
-	//			pairedBlockID = &connection.originUid();
-	//		}
-	//		else
-	//		{
-	//			thisConnectorName = &connection.originConnectable();
-	//			otherConnectorName = &connection.destConnectable();
-	//			pairedBlockID = &connection.destUid();
-	//		}
+			if (connection.getDestinationUid() == blockID)
+			{
+				thisConnectorName = &connection.destConnectable();
+				otherConnectorName = &connection.originConnectable();
+				pairedBlockID = &connection.getOriginUid();
+			}
+			else
+			{
+				thisConnectorName = &connection.originConnectable();
+				otherConnectorName = &connection.destConnectable();
+				pairedBlockID = &connection.getDestinationUid();
+			}
 
-	//		//Some blocks have dynamic connectors. We need to check if the connection entry is still valid.
-	//		auto connectorByName = connectorsByName.find(*thisConnectorName);
-	//		auto connectedBlock = allBlockEntitiesByBlockID.find(*pairedBlockID);
-	//		auto connectorsOfConnectedBlock = connectedBlock->second->getAllConnectorsByName();
-	//		if (connectorByName != connectorsByName.end() && connectorsOfConnectedBlock.find(*otherConnectorName) != connectorsOfConnectedBlock.end())
-	//		{
-	//			ot::Connector connector = connectorByName->second;
-	//			assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
+			//Some blocks have dynamic connectors. We need to check if the connection entry is still valid.
+			auto connectorByName = connectorsByName.find(*thisConnectorName);
+			auto connectedBlock = allBlockEntitiesByBlockID.find(*pairedBlockID);
+			auto connectorsOfConnectedBlock = connectedBlock->second->getAllConnectorsByName();
+			if (connectorByName != connectorsByName.end() && connectorsOfConnectedBlock.find(*otherConnectorName) != connectorsOfConnectedBlock.end())
+			{
+				ot::Connector connector = connectorByName->second;
+				assert(connector.getConnectorType() != ot::ConnectorType::UNKNOWN);
 
-	//			std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
-	//			std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
+				std::shared_ptr<GraphNode> thisNode = _graphNodeByBlockID[blockID];
+				std::shared_ptr<GraphNode> pairedNode = _graphNodeByBlockID[*pairedBlockID];
 
-	//			if (connector.getConnectorType() == ot::ConnectorType::Out)
-	//			{
-	//				thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
-	//			}
-	//			else
-	//			{
-	//				thisNode->addPreviousNode(pairedNode);
-	//			}
-	//		}
-	//	}
+				if (connector.getConnectorType() == ot::ConnectorType::Out)
+				{
+					thisNode->addSucceedingNode(pairedNode, {*thisConnectorName,*otherConnectorName});
+				}
+				else
+				{
+					thisNode->addPreviousNode(pairedNode);
+				}
+			}
+		}
 	}
 	return graph;
 }
