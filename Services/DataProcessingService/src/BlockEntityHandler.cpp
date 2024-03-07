@@ -49,6 +49,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	for (auto& connection : connections)
 	{
 		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		connectionEntity.createProperties();
 		ot::GraphicsConnectionCfg newConnection(connection);
 		newConnection.setUid(connectionEntity.getEntityID());
 		const std::string connectionName = CreateNewUniqueTopologyName(_blockFolder + "/" + _connectionFolder, "Connection", 1, false);

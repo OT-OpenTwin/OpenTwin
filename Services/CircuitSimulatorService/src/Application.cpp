@@ -460,6 +460,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 	m_blockEntityHandler.setPackageName(circuitName->getValue());
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
+	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
+
 	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue(),printSettings->getValue());
 	m_ngSpice.clearBufferStructure(circuitName->getValue());
 }

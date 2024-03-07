@@ -174,7 +174,9 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 		//Here i create the connectionEntity
 		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		connectionEntity->createProperties();
 		
+	
 		//Now i create the GraphicsConnectionCfg and set it with the information
 
 		ot::GraphicsConnectionCfg connectionCfg;

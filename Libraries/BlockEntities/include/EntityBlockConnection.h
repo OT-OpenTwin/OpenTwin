@@ -18,9 +18,10 @@ public:
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
 	
+	void createProperties();
+	virtual bool updateFromProperties() override;
 	virtual void addVisualizationNodes(void) override;
 	virtual int getSchemaVersion(void) override { return 1; };
-
 private:
 	std::string _navigationTreeIconName = "";
 	std::string _navigationTreeIconNameHidden = "";
@@ -35,9 +36,9 @@ private:
 	std::string _connectorNameOrigin;
 	std::string _connectorNameDestination;
 	
+	
 	void CreateNavigationTreeEntry();
 	void CreateConnections();
-
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

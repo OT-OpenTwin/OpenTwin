@@ -17,18 +17,40 @@ EntityBlockConnection::~EntityBlockConnection()
 ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 {
 	ot::GraphicsConnectionCfg cfg(_blockIDOrigin, _connectorNameOrigin, _blockIDDestination, _connectorNameDestination);
+	auto colorProperty = dynamic_cast<EntityPropertiesColor*>(this->getProperties().getProperty("Color"));
+	int r = colorProperty->getColorR();
+	int g = colorProperty->getColorG();
+	int b = colorProperty->getColorB();
+	ot::Color color(r, g, b);
+	cfg.setColor(color);
+	
+
+	auto lineWidthProperty = dynamic_cast<EntityPropertiesInteger*>(this->getProperties().getProperty("Line Width"));
+	cfg.setLineWidth(lineWidthProperty->getValue());
+
+	auto lineStyleProperty = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
+
+	cfg.setStyle(ot::GraphicsConnectionCfg::stringToStyle(lineStyleProperty->getValue()));
+	
+
+
 	cfg.setUid(getEntityID());
-	cfg.setColor(_color);
-	cfg.setStyle(_lineStyle);
-	cfg.setLineWidth(_lineWidth);
 	return cfg;
 }
 
 void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
-	_color = connectionCfg.color();
+	EntityPropertiesColor* color = dynamic_cast<EntityPropertiesColor*>(this->getProperties().getProperty("Color"));
+	color->setColorRGB(connectionCfg.color().rInt(), connectionCfg.color().gInt(), connectionCfg.color().bInt());
+
+	EntityPropertiesInteger* lineWidth = dynamic_cast<EntityPropertiesInteger*>(this->getProperties().getProperty("Line Width"));
+	lineWidth->setValue(connectionCfg.lineWidth());
+
+	EntityPropertiesSelection* lineStyle = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
+	lineStyle->setValue(ot::GraphicsConnectionCfg::styleToString(connectionCfg.style()));
+	/*_color = connectionCfg.color();
 	_lineWidth = connectionCfg.lineWidth();
-	_lineStyle = connectionCfg.style();
+	_lineStyle = connectionCfg.style();*/
 
 	_blockIDOrigin = connectionCfg.getOriginUid();
 	_blockIDDestination = connectionCfg.getDestinationUid();
@@ -38,9 +60,10 @@ void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& co
 
 void EntityBlockConnection::CreateConnections()
 {
+	
 	ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
 	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
-	connectionCfg.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
+
 
 	connectionPckg.addConnection(connectionCfg);
 
@@ -55,12 +78,29 @@ void EntityBlockConnection::CreateConnections()
 	getObserver()->sendMessageToViewer(reqDoc);
 }
 
+void EntityBlockConnection::createProperties()
+{
+	ot::Color* color = new ot::Color(ot::Color::DefaultColor::Black);
+	EntityPropertiesColor::createProperty("Settings", "Color", {color->aInt(),color->bInt(),color->gInt()}, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Settings", "Line Width", 2, "default", getProperties());
+	EntityPropertiesSelection::createProperty("Settings", "Line Style", { "SmoothLine","DirectLine" }, {}, "default", getProperties());
+}
+
+bool EntityBlockConnection::updateFromProperties()
+{
+	CreateConnections();
+	getProperties().forceResetUpdateForAllProperties();
+	return true;
+}
+
 
 void EntityBlockConnection::addVisualizationNodes(void)
 {
 	CreateNavigationTreeEntry();
 	CreateConnections();
 }
+
+
 
 void EntityBlockConnection::CreateNavigationTreeEntry()
 {
