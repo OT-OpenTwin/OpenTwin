@@ -2396,7 +2396,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 		else if (citm) {
 			// Connection selected
-			selectedBlockItemIDs.push_back(std::stoull(citm->uid()));
+			selectedBlockItemIDs.push_back(citm->uid());
 		}
 		else {
 			// Unknown selected

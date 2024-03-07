@@ -12,6 +12,7 @@
 #include "AdvancedQueryBuilder.h"
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
+#include "EntityBlockConnection.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -44,39 +45,51 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
+	ot::UIDList topoEntIDs, topoEntVers;
 	for (auto& connection : connections)
 	{
+		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		ot::GraphicsConnectionCfg newConnection(connection);
+		newConnection.setUid(connectionEntity.getEntityID());
+		const std::string connectionName = CreateNewUniqueTopologyName(_blockFolder + "/" + _connectionFolder, "Connection", 1, false);
+		connectionEntity.setName(connectionName);
+		connectionEntity.setConnectionCfg(newConnection);
+		connectionEntity.StoreToDataBase();
+		
+		topoEntIDs.push_back(connectionEntity.getEntityID());
+		topoEntVers.push_back(connectionEntity.getEntityStorageVersion());
+		
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
-		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(newConnection.originUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.originUid()];
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.originUid()];
 			
-			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
+			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.originConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.originUid() + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + newConnection.originUid() + " was not found");
 			continue;
 		}
 
-		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(newConnection.destUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
-			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.destUid()];
+			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.destConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
+			OT_LOG_EAS("Could not create connection since block " + newConnection.destUid() + " was not found.");
 			continue;
 		}
 
 		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
 		{
-			//blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
-			//blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
+			blockEntitiesByBlockID[newConnection.originUid()]->AddConnection(newConnection.getUid());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.originUid()]);
+			blockEntitiesByBlockID[newConnection.destUid()]->AddConnection(newConnection.getUid());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.destUid()]);
 		}
 		else
 		{
@@ -86,8 +99,6 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 	if (entitiesForUpdate.size() != 0)
 	{
-		ot::UIDList topoEntIDs, topoEntVers;
-
 		for (auto entityForUpdate : entitiesForUpdate)
 		{
 			entityForUpdate->StoreToDataBase();

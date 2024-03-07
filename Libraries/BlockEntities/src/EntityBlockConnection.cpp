@@ -24,7 +24,7 @@ ot::GraphicsConnectionCfg& EntityBlockConnection::getConnectionCfg()
 	return this->connection;
 }
 
-void EntityBlockConnection::setConnectionCfg(ot::GraphicsConnectionCfg& connectionCfg)
+void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
 	this->connection = connectionCfg;
 }

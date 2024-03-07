@@ -24,6 +24,7 @@ bsoncxx::builder::basic::document ot::BlockConnectionBSON::SerializeBSON() const
 	newSubdocument.append(bsoncxx::builder::basic::kvp("ToConnectable", _connection.destConnectable()));
 	newSubdocument.append(bsoncxx::builder::basic::kvp("FromUID", _connection.originUid()));
 	newSubdocument.append(bsoncxx::builder::basic::kvp("ToUID", _connection.destUid()));
+	newSubdocument.append(bsoncxx::builder::basic::kvp("uid", static_cast<int64_t>(_connection.getUid())));
 	return newSubdocument;
 }
 
@@ -33,5 +34,6 @@ void ot::BlockConnectionBSON::DeserializeBSON(bsoncxx::v_noabi::types::b_documen
 	_connection.setDestConnectable(storage.view()["ToConnectable"].get_utf8().value.to_string());
 	_connection.setOriginUid(storage.view()["FromUID"].get_utf8().value.to_string());
 	_connection.setDestUid(storage.view()["ToUID"].get_utf8().value.to_string());
+	_connection.setUid(static_cast<ot::UID>(storage.view()["uid"].get_int64()));
 }
 

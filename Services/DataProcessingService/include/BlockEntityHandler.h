@@ -23,6 +23,7 @@ public:
 	static std::string getQueryForRangeSelection() { return "Range"; }
 private:
 	const std::string _blockFolder = ot::FolderNames::BlockFolder;
+	const std::string _connectionFolder = "Connections";
 	const std::string _packageName = "Data Processing";
 
 	void InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity);

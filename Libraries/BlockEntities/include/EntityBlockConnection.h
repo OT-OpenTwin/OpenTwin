@@ -14,7 +14,7 @@ public:
 
 	std::string getBlockID() const { return std::to_string(getEntityID()); }
 	ot::GraphicsConnectionCfg& getConnectionCfg();
-	void setConnectionCfg(ot::GraphicsConnectionCfg& connectionCfg);
+	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
 	void CreateConnections();

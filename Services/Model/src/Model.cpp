@@ -4604,17 +4604,22 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		EntityBase* newEntity = readEntityFromEntityIDandVersion(nullptr, topoEntityID, *topoEntityVersion, map);
 		topoEntityVersion++;
 		EntityBase* oldEntity = findEntityFromName(newEntity->getName());
-		if (oldEntity == nullptr)
+
+		if (oldEntity != nullptr)
 		{
-			throw std::exception("Cannot update an entity that is not part of the model.");
+			removeFromDisplay.push_back(oldEntity->getEntityID());
+			// Remove the entity from the entity map and also from the model state
+			removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
+			delete oldEntity;
+
+			entityList.push_back(newEntity);
+			topologyEntityForceVisible.push_back(false);
 		}
-		removeFromDisplay.push_back(oldEntity->getEntityID());
-		// Remove the entity from the entity map and also from the model state
-		removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
-		delete oldEntity;
-		
-		entityList.push_back(newEntity);
-		topologyEntityForceVisible.push_back(false);
+		else
+		{
+			entityList.push_back(newEntity);
+			topologyEntityForceVisible.push_back(false);
+		}
 	}
 
 	if (!removeFromDisplay.empty())

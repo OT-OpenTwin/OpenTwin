@@ -52,7 +52,7 @@ ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const std::string& _originUid, 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const GraphicsConnectionCfg& _other) 
 	: m_style(_other.m_style), m_width(_other.m_width), m_color(_other.m_color),
 	m_originUID(_other.m_originUID), m_originConnectable(_other.m_originConnectable), 
-	m_destUID(_other.m_destUID), m_destConnectable(_other.m_destConnectable)
+	m_destUID(_other.m_destUID), m_destConnectable(_other.m_destConnectable), m_uid(_other.m_uid)
 {
 
 }
@@ -71,11 +71,13 @@ ot::GraphicsConnectionCfg& ot::GraphicsConnectionCfg::operator = (const Graphics
 	m_style = _other.m_style;
 	m_width = _other.m_width;
 	m_color = _other.m_color;
+
+	m_uid = _other.m_uid;
 	return *this;
 }
 
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	_object.AddMember(OT_JSON_Member_Uid, JsonString(m_uid, _allocator), _allocator);
+	_object.AddMember(OT_JSON_Member_Uid, m_uid, _allocator);
 	_object.AddMember(OT_JSON_Member_SourceUid, JsonString(m_originUID, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_SourceName, JsonString(m_originConnectable, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_DestinationUid, JsonString(m_destUID, _allocator), _allocator);
@@ -89,7 +91,7 @@ void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocato
 }
 
 void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
-	m_uid = json::getString(_object, OT_JSON_Member_Uid);
+	m_uid = json::getUInt64(_object, OT_JSON_Member_Uid);
 	m_originUID = json::getString(_object, OT_JSON_Member_SourceUid);
 	m_originConnectable = json::getString(_object, OT_JSON_Member_SourceName);
 	m_destUID = json::getString(_object, OT_JSON_Member_DestinationUid);

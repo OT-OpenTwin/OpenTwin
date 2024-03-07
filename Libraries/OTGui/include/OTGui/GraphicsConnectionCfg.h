@@ -9,7 +9,7 @@
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
-
+#include "OTCore/CoreTypes.h"
 // std header
 #include <string>
 
@@ -67,8 +67,8 @@ namespace ot {
 		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
 		const std::string& destConnectable(void) const { return m_destConnectable; };
 
-		void setUid(const std::string& _uid) { m_uid = _uid; };
-		const std::string& uid(void) const { return m_uid; };
+		void setUid(const ot::UID& _uid) { m_uid = _uid; };
+		const ot::UID& getUid(void) const { return m_uid; };
 
 		void setLineWidth(int _width) { m_width = _width; };
 		int lineWidth(void) const { return m_width; };
@@ -86,7 +86,7 @@ namespace ot {
 		std::string m_destUID;
 		std::string m_destConnectable;
 
-		std::string m_uid;
+		ot::UID m_uid;
 
 		int m_width;
 		ot::Color m_color;
