@@ -215,7 +215,7 @@ void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connec
 		ot::GraphicsConnectionCfg connection = connectionEntity->getConnectionCfg();
 		std::string connectorOfThisBlock;
 
-		if (connection.destUid() == getBlockID())
+		if (connection.getDestinationUid() == getEntityID())
 		{
 			connectorOfThisBlock = connection.destConnectable();
 		}
@@ -261,13 +261,13 @@ void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<o
 			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityBase);
 			ot::GraphicsConnectionCfg connection = connectionEntity->getConnectionCfg();
 
-			if (connection.destUid() == getBlockID())
+			if (connection.getDestinationUid() == getEntityID())
 			{
-				entitiesForUpdate.push_back(std::stoull(connection.originUid()));
+				entitiesForUpdate.push_back(connection.getOriginUid());
 			}
 			else
 			{
-				entitiesForUpdate.push_back(std::stoull(connection.destUid()));
+				entitiesForUpdate.push_back(connection.getDestinationUid());
 			}
 			connectionsForRemovalByEntityID[entitiesForUpdate.back()].push_back(&connection);
 		}

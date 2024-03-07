@@ -69,7 +69,7 @@ void ot::GraphicsView::viewAll(void) {
 	}
 }
 
-ot::GraphicsItem* ot::GraphicsView::getItem(const std::string&  _itemUid) {
+ot::GraphicsItem* ot::GraphicsView::getItem(const ot::UID&  _itemUid) {
 	auto it = m_items.find(_itemUid);
 	if (it == m_items.end()) {
 		return nullptr;
@@ -79,10 +79,10 @@ ot::GraphicsItem* ot::GraphicsView::getItem(const std::string&  _itemUid) {
 	}
 }
 
-ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _connectionUid) {
+ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const ot::UID& _connectionUid) {
 	auto it = m_connections.find(_connectionUid);
 	if (it == m_connections.end()) {
-		OT_LOG_WAS("Connection with the UID \"" + _connectionUid + "\" does not exist");
+		OT_LOG_WAS("Connection with the UID \"" + std::to_string(_connectionUid)+ "\" does not exist");
 		return nullptr;
 	}
 	else {
@@ -92,7 +92,7 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const std::string& _
 
 bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& _connection)
 {
-	return (m_connections.find(_connection.buildKey()) != m_connections.end() || m_connections.find(_connection.buildReversedKey()) != m_connections.end()) ;
+	return (m_connections.find(_connection.getUid()) != m_connections.end());
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
@@ -116,7 +116,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 }
 
-void ot::GraphicsView::removeItem(const std::string& _itemUid) {
+void ot::GraphicsView::removeItem(const ot::UID& _itemUid) {
 	auto it = m_items.find(_itemUid);
 	if (it == m_items.end()) {
 		//OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
@@ -129,8 +129,8 @@ void ot::GraphicsView::removeItem(const std::string& _itemUid) {
 	m_items.erase(_itemUid);
 }
 
-std::list<std::string> ot::GraphicsView::selectedItems(void) const {
-	std::list<std::string> sel; // Selected items
+std::list<ot::UID> ot::GraphicsView::selectedItems(void) const {
+	std::list<ot::UID> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
 		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
@@ -144,8 +144,8 @@ std::list<std::string> ot::GraphicsView::selectedItems(void) const {
 }
 
 void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
-	ot::GraphicsItem* src = this->getItem(_config.originUid());
-	ot::GraphicsItem* dest = this->getItem(_config.destUid());
+	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
+	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
 
 	if (!src || !dest) {
 		m_connectionBuffer.push_back(_config);
@@ -168,21 +168,17 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	newConnection->connectItems(srcConn, destConn);
 	newConnection->setZValue(0);
 
-	std::string itmKey = ot::GraphicsConnectionCfg::buildKey(srcConn->getRootItem()->graphicsItemUid(), srcConn->graphicsItemName(), destConn->getRootItem()->graphicsItemUid(), destConn->graphicsItemName());
-	m_connections.insert_or_assign(itmKey, newConnection);
+	m_connections.insert_or_assign(_config.getUid(), newConnection);
 }
 
 void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation) {
-	auto it = m_connections.find(_connectionInformation.buildKey());
+	auto it = m_connections.find(_connectionInformation.getUid());
 	if (it == m_connections.end()) {
-		it = m_connections.find(_connectionInformation.buildReversedKey());
-		if (it == m_connections.end()) {
-			OT_LOG_W("Connection not found { \"OriginUID\": \"" + _connectionInformation.originUid() + 
+		OT_LOG_W("Connection not found { \"OriginUID\": \"" + std::to_string(_connectionInformation.getOriginUid()) + 
 				"\", \"OriginConnectable\": \"" + _connectionInformation.originConnectable() + 
-				"\", \"DestUID\": \"" + _connectionInformation.destUid() + 
+				"\", \"DestUID\": \"" + std::to_string(_connectionInformation.getDestinationUid()) + 
 				"\", \"DestConnectable\": \"" + _connectionInformation.destConnectable() + "\" }");
 			return;
-		}
 	}
 
 	// Remove connection from items
@@ -195,31 +191,30 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 	delete it->second;
 
 	// Erase connection from map
-	m_connections.erase(_connectionInformation.buildKey());
-	m_connections.erase(_connectionInformation.buildReversedKey());
+	m_connections.erase(_connectionInformation.getUid());
 }
 
-void ot::GraphicsView::removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+void ot::GraphicsView::removeConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
 	this->removeConnection(GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector));
 }
 
-std::list<std::string> ot::GraphicsView::selectedConnections(void) const {
-	std::list<std::string> sel; // Selected items
+ot::UIDList ot::GraphicsView::selectedConnections(void) const {
+	ot::UIDList sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
 
 		if (citm) {
 			// Connection selected
-			sel.push_back(citm->getConnectionInformation().buildKey());
+			sel.push_back(citm->getConnectionInformation().getUid());
 		}
 	}
 
 	return sel;
 }
 
-void ot::GraphicsView::requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
 	if (this->connectionAlreadyExists(ot::GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector))) {
-		OT_LOG_W("Connection already exists { \"Origin.UID\": \"" + _fromUid + "\", \"Origin.Conn\"" + _fromConnector + "\", \"Dest.UID\": \"" + _toUid + "\", \"Dest.Conn\": \"" + _toConnector + "\" }");
+		OT_LOG_W("Connection already exists { \"Origin.UID\": \"" + std::to_string(_fromUid) + "\", \"Origin.Conn\"" + _fromConnector + "\", \"Dest.UID\": \"" + std::to_string(_toUid) + "\", \"Dest.Conn\": \"" + _toConnector + "\" }");
 		return;
 	}
 	emit connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
@@ -295,8 +290,8 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		this->resetView();
 	}
 	else if (_event->key() == Qt::Key_Delete) {
-		std::list<std::string> itm = this->selectedItems();
-		std::list<std::string> con = this->selectedConnections();
+		ot::UIDList itm = this->selectedItems();
+		ot::UIDList con = this->selectedConnections();
 		emit removeItemsRequested(itm, con);
 	}
 }

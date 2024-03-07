@@ -1,6 +1,5 @@
 #include "EntityBlockConnection.h"
 #include "OTCommunication/ActionTypes.h"
-#include "BlockConnectionBSON.h"
 #include "OTGui/GraphicsPackage.h"
 
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
@@ -8,7 +7,6 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 {
 	_navigationTreeIconName = "connection";
 	_navigationTreeIconNameHidden = "connection";
-	_blockTitle = "Connection";	
 }
 
 EntityBlockConnection::~EntityBlockConnection()
@@ -16,14 +14,26 @@ EntityBlockConnection::~EntityBlockConnection()
 
 }
 
-ot::GraphicsConnectionCfg& EntityBlockConnection::getConnectionCfg()
+ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 {
-	return this->connection;
+	ot::GraphicsConnectionCfg cfg(_blockIDOrigin, _connectorNameOrigin, _blockIDDestination, _connectorNameDestination);
+	cfg.setUid(getEntityID());
+	cfg.setColor(_color);
+	cfg.setStyle(_lineStyle);
+	cfg.setLineWidth(_lineWidth);
+	return cfg;
 }
 
 void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
-	this->connection = connectionCfg;
+	_color = connectionCfg.color();
+	_lineWidth = connectionCfg.lineWidth();
+	_lineStyle = connectionCfg.style();
+
+	_blockIDOrigin = connectionCfg.getOriginUid();
+	_blockIDDestination = connectionCfg.getDestinationUid();
+	_connectorNameDestination = connectionCfg.destConnectable();
+	_connectorNameOrigin = connectionCfg.originConnectable();
 }
 
 void EntityBlockConnection::CreateConnections()
@@ -85,13 +95,18 @@ void EntityBlockConnection::AddStorageData(bsoncxx::builder::basic::document& st
 
 	// Store the ConnectionCfg
 
-	ot::BlockConnectionBSON serializeableConnection(this->connection);
-	auto subDocument = serializeableConnection.SerializeBSON();
-	storage.append(bsoncxx::builder::basic::kvp("ConnectionCfg", subDocument),
-				   bsoncxx::builder::basic::kvp("GraphicPackageName", _graphicsScenePackage),
-				   bsoncxx::builder::basic::kvp("ServiceName", _info.serviceName()),
-				   bsoncxx::builder::basic::kvp("ServiceType", _info.serviceType())
-				  );
+	
+	storage.append(
+		
+	   bsoncxx::builder::basic::kvp("GraphicPackageName", _graphicsScenePackage),
+	   bsoncxx::builder::basic::kvp("ServiceName", _info.serviceName()),
+	   bsoncxx::builder::basic::kvp("ServiceType", _info.serviceType()),
+
+		bsoncxx::builder::basic::kvp("FromConnectable", _connectorNameOrigin),
+		bsoncxx::builder::basic::kvp("ToConnectable", _connectorNameDestination),
+		bsoncxx::builder::basic::kvp("FromUID", static_cast<int64_t>(_blockIDOrigin)),
+		bsoncxx::builder::basic::kvp("ToUID", static_cast<int64_t>(_blockIDDestination))
+);
 	
 }
 
@@ -103,12 +118,9 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	_graphicsScenePackage = doc_view["GraphicPackageName"].get_utf8().value.data();
 	_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
 	_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
-	auto connectionCfg = doc_view["ConnectionCfg"].get_document();
 	
-	auto& subDocument = connectionCfg;
-	ot::BlockConnectionBSON connection;
-	connection.DeserializeBSON(subDocument);
-	ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();
-	this->connection = graphicsConnection;
-	
+	_connectorNameOrigin = doc_view["FromConnectable"].get_utf8().value.to_string();
+	_connectorNameDestination = doc_view["ToConnectable"].get_utf8().value.to_string();
+	_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
+	_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());	
 }

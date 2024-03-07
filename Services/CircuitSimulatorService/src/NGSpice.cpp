@@ -24,7 +24,7 @@ void NGSpice::clearBufferStructure(std::string name)
 
 }
 
-void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	if ( it == Application::instance()->getNGSpice().getMapOfCircuits().end())
@@ -40,7 +40,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 		CircuitElement element;
 		element.setEditorName(editorname);
 		element.setItemName(blockEntity->getBlockTitle());
-		element.setUID(blockEntity->getBlockID());
+		element.setUID(blockEntity->getEntityID());
 
 		if (blockEntity->getBlockTitle() == "Circuit Element")
 		{
@@ -67,7 +67,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 		{
 			
 			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
-			std::shared_ptr<EntityBlock> blockEntity = allEntitiesByBlockID.at(std::to_string(connectionID));
+			std::shared_ptr<EntityBlock> blockEntity = allEntitiesByBlockID.at(connectionID);
 			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(blockEntity.get());
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
@@ -76,8 +76,8 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 			conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
 
 			// if the adding doesingt work because it already added the connection than it counts the Nodenumber++ but i dont need that to do it
-			bool res1 = it->second.addConnection(connectionCfg.originUid(), conn);
-			bool res2 = it->second.addConnection(connectionCfg.destUid(), conn);
+			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), conn);
+			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), conn);
 			if (res1 == false && res2 == false )
 			{
 				--Numbers::id;
@@ -125,7 +125,7 @@ void NGSpice::updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBl
 
 
 
-std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
+std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
 {
 	/*std::string Title = "*Test";
 	outfile << Title << std::endl;
@@ -267,7 +267,7 @@ std::string NGSpice::generateNetlist(std::map<std::string, std::shared_ptr<Entit
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
+std::string NGSpice::ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;

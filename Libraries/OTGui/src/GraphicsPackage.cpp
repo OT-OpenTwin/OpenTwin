@@ -180,7 +180,7 @@ void ot::GraphicsConnectionPackage::setFromJsonObject(const ConstJsonObject& _ob
 	}
 }
 
-void ot::GraphicsConnectionPackage::addConnection(const std::string& _fromUid, const std::string& _fromConnectable, const std::string& _toUid, const std::string& _toConnectable) {
+void ot::GraphicsConnectionPackage::addConnection(const ot::UID& _fromUid, const std::string& _fromConnectable, const ot::UID& _toUid, const std::string& _toConnectable) {
 	GraphicsConnectionCfg newConnection(_fromUid, _fromConnectable, _toUid, _toConnectable);
 	this->addConnection(newConnection);
 }

@@ -42,8 +42,8 @@ namespace ot {
 
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
-		GraphicsItem* getItem(const std::string& _itemUid);
-		GraphicsConnectionItem* getConnection(const std::string& _connectionUid);
+		GraphicsItem* getItem(const ot::UID& _itemUid);
+		GraphicsConnectionItem* getConnection(const ot::UID& _connectionUid);
 		
 		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
 
@@ -53,15 +53,15 @@ namespace ot {
 		const std::string& graphicsViewName(void) const { return m_viewName; };
 
 		void addItem(ot::GraphicsItem* _item);
-		void removeItem(const std::string& _itemUid);
-		std::list<std::string> selectedItems(void) const;
+		void removeItem(const ot::UID& _itemUid);
+		std::list<ot::UID> selectedItems(void) const;
 
 		void addConnection(const GraphicsConnectionCfg& _config);
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
-		void removeConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
-		std::list<std::string> selectedConnections(void) const;
+		void removeConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
+		ot::UIDList selectedConnections(void) const;
 
-		void requestConnection(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
+		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		void notifyItemMoved(ot::GraphicsItem* _item);
 
 	signals:
@@ -75,11 +75,11 @@ namespace ot {
 		//! @param _fromConnector Source connector (child of source item)
 		//! @param _toUid Destination item UID
 		//! @param _toConnector Destination connector (child of destination item)
-		void connectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
+		void connectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		
-		void itemMoved(const std::string& _uid, const QPointF& _newPos);
+		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
 
-		void removeItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections);
+		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
@@ -102,8 +102,8 @@ namespace ot {
 		bool m_dropEnabled;
 		QPoint m_lastPanPos;
 
-		std::map<std::string, ot::GraphicsItem*> m_items;
-		std::map<std::string, ot::GraphicsConnectionItem*> m_connections;
+		std::map<ot::UID, ot::GraphicsItem*> m_items;
+		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
 		std::list<GraphicsConnectionCfg> m_connectionBuffer;
 	};
 }

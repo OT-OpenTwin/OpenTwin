@@ -569,13 +569,11 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 
 std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 {	
-	std::list<std::string> items;
+	ot::UIDList items;
 
 	// Add Item UIDs to the list above (Items to be removed)
-	std::string itemUID = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+	ot::UID itemUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 	items.push_back(itemUID);
-
-
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }

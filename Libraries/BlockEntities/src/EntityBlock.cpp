@@ -2,7 +2,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
-#include "BlockConnectionBSON.h"
+
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
 
@@ -173,7 +173,7 @@ void EntityBlock::CreateBlockItem()
 	assert(entCoordinate != nullptr);
 
 	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
-	blockCfg->setUid(getBlockID());
+	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
 
 	ot::GraphicsScenePackage pckg(_graphicsScenePackage);

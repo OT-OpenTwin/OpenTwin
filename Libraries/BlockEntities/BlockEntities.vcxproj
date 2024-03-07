@@ -159,7 +159,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\BlockConnectionBSON.h" />
     <ClInclude Include="include\EntityBlockCircuitElement.h" />
     <ClInclude Include="include\ClassFactoryBlock.h" />
     <ClInclude Include="include\Connector.h" />
@@ -175,7 +174,6 @@
     <ClInclude Include="include\ValueComparisionDefinition.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BlockConnectionBSON.cpp" />
     <ClCompile Include="src\EntityBlockCircuitElement.cpp" />
     <ClCompile Include="src\ClassFactoryBlock.cpp" />
     <ClCompile Include="src\Connector.cpp" />

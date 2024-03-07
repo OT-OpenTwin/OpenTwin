@@ -2,7 +2,7 @@
 
 #include "GraphNode.h"
 
-bool GraphHandler::blockDiagramIsValid(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	_rootNodes.clear();
 	_entityByGraphNode.clear();
@@ -10,12 +10,12 @@ bool GraphHandler::blockDiagramIsValid(std::map<std::string, std::shared_ptr<Ent
 }
 
 
-bool GraphHandler::allRequiredConnectionsSet(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	std::string uiErrorMessage = "";
 	std::string uiInfoMessage = "";
 	bool allRequiredConnectionsSet = true;
-	std::list<std::string> toBeErased;
+	std::list<ot::UID> toBeErased;
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
@@ -33,7 +33,7 @@ bool GraphHandler::allRequiredConnectionsSet(std::map<std::string, std::shared_p
 		}
 	}
 	
-	for (std::string& blockID : toBeErased)
+	for (ot::UID& blockID : toBeErased)
 	{
 		allBlockEntitiesByBlockID.erase(blockID);
 	}
@@ -90,7 +90,7 @@ bool GraphHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlock>
 	return allIncommingConnectionsAreSet;
 }
 
-bool GraphHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+bool GraphHandler::hasNoCycle(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	const Graph graph = buildGraph(allBlockEntitiesByBlockID);
 	auto& allNodes = graph.getContainedNodes();
@@ -124,14 +124,14 @@ bool GraphHandler::hasNoCycle(std::map<std::string, std::shared_ptr<EntityBlock>
 	return !anyCycleExists;
 }
 
-Graph GraphHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	Graph graph;
 	
 
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
-		const std::string& blockID = blockEntityByBlockID.first;
+		const ot::UID& blockID = blockEntityByBlockID.first;
 		const std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
 
 		std::shared_ptr<GraphNode> node = graph.addNode();
@@ -142,7 +142,7 @@ Graph GraphHandler::buildGraph(std::map<std::string, std::shared_ptr<EntityBlock
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
-		const std::string& blockID = blockEntityByBlockID.first;
+		const ot::UID& blockID = blockEntityByBlockID.first;
 
 		auto& connections = blockEntity->getAllConnections();
 		auto& connectorsByName = blockEntity->getAllConnectorsByName();

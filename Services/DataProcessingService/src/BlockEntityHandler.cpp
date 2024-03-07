@@ -64,35 +64,35 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
-		if (blockEntitiesByBlockID.find(newConnection.originUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(newConnection.getOriginUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[newConnection.originUid()];
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.getOriginUid()];
 			
 			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.originConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + newConnection.originUid() + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getOriginUid()) + " was not found");
 			continue;
 		}
 
-		if (blockEntitiesByBlockID.find(newConnection.destUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(newConnection.getDestinationUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[newConnection.destUid()];
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.getDestinationUid()];
 			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.destConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + newConnection.destUid() + " was not found.");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getDestinationUid()) + " was not found.");
 			continue;
 		}
 
 		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
 		{
-			blockEntitiesByBlockID[newConnection.originUid()]->AddConnection(newConnection.getUid());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.originUid()]);
-			blockEntitiesByBlockID[newConnection.destUid()]->AddConnection(newConnection.getUid());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.destUid()]);
+			blockEntitiesByBlockID[newConnection.getOriginUid()]->AddConnection(newConnection.getUid());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.getOriginUid()]);
+			blockEntitiesByBlockID[newConnection.getDestinationUid()]->AddConnection(newConnection.getUid());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.getDestinationUid()]);
 		}
 		else
 		{
@@ -128,12 +128,12 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc);
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position, ClassFactory* classFactory)
+void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, ot::Point2DD& position, ClassFactory* classFactory)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 	if (blockEntitiesByBlockID.find(blockID) == blockEntitiesByBlockID.end())
 	{
-		OT_LOG_EAS("Position of block item cannot be updated because a block with id: " + blockID + " was not found");
+		OT_LOG_EAS("Position of block item cannot be updated because a block with id: " + std::to_string(blockID) + " was not found");
 	}
 	auto blockEntity = blockEntitiesByBlockID[blockID];
 	std::list<ot::EntityInformation> entityInfos;
@@ -218,7 +218,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
+std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
 {
 	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
 	std::list<ot::EntityInformation> entityInfos;
@@ -226,7 +226,7 @@ std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllB
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactoryBlock classFactory;
 
-	std::map<std::string, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
+	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
 		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
@@ -234,7 +234,7 @@ std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllB
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 			assert(blockEntity != nullptr);
-			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
+			blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
 		}
 	}
 	return blockEntitiesByBlockID;

@@ -22,7 +22,6 @@ public:
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	virtual void addVisualizationNodes(void) override;
 
-	std::string getBlockID() const { return std::to_string(getEntityID()); }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	const std::string& getBlockTitle() const { return _blockTitle; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }

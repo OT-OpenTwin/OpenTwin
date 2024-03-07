@@ -9,7 +9,7 @@
 #include "BlockHandlerPython.h"
 #include "BlockHandlerDataDimensionReducer.h"
 
-void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<std::string, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	try
 	{
@@ -26,13 +26,13 @@ void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNo
 	}
 }
 
-void PipelineHandler::initiate(const std::map<std::string, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<std::string, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+void PipelineHandler::initiate(const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
-		std::shared_ptr<GraphNode> graphNode = graphNodesByBlockID.find(blockEntity->getBlockID())->second;
+		std::shared_ptr<GraphNode> graphNode = graphNodesByBlockID.find(blockEntity->getEntityID())->second;
 		_blockHandlerByGraphNode[graphNode] = createBlockHandler(blockEntity);
 		_blockHandlerByGraphNode[graphNode]->setModelComponent(_modelComponent);
 		_blockHandlerByGraphNode[graphNode]->setUIComponent(_uiComponent);

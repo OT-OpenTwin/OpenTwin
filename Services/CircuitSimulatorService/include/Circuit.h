@@ -17,18 +17,18 @@ public:
 	
 	std::string getEditorName();
 	std::string getId();
-	std::map<std::string, CircuitElement>& getMapOfElements();
-	void addElement(std::string key, const CircuitElement& obj);
+	std::map<ot::UID, CircuitElement>& getMapOfElements();
+	void addElement(ot::UID key, const CircuitElement& obj);
 	void setEditorName(std::string name);
 	void setId(const std::string id);
 	
 	//additionalFunctions
-	bool addConnection(const std::string& key, const Connection& obj);
-	std::string findElement(const std::string& key);
+	bool addConnection(const ot::UID& key, const Connection& obj);
+	std::string findElement(const ot::UID& key);
 		
 private:
 
-	std::map <std::string, CircuitElement> mapOfElements;
+	std::map <ot::UID, CircuitElement> mapOfElements;
 	std::string editorName;
 	std::string id;
 	

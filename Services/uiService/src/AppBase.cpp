@@ -2298,7 +2298,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	}
 }
 
-void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos) {
+void AppBase::slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2307,7 +2307,7 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, ot::JsonString(_uid, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, _uid, doc.GetAllocator());
 
 	ot::Point2DD itmPos(_newPos.x(), _newPos.y());
 	ot::JsonObject itemPosObj;
@@ -2338,7 +2338,7 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 	}
 }
 
-void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2392,7 +2392,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 
 		if (itm) {
 			// Item selected
-			selectedBlockItemIDs.push_back(std::stoull(itm->graphicsItemUid()));
+			selectedBlockItemIDs.push_back(itm->graphicsItemUid());
 		}
 		else if (citm) {
 			// Connection selected
@@ -2417,7 +2417,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 	}
 }
 
-void AppBase::slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections) {
+void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");

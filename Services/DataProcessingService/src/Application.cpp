@@ -82,7 +82,7 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 			if (isValid)
 			{
 				const std::list<std::shared_ptr<GraphNode>>& rootNodes= _graphHandler.getRootNodes();
-				const std::map<std::string, std::shared_ptr<GraphNode>> graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+				const std::map<ot::UID, std::shared_ptr<GraphNode>> graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
 				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID,allBlockEntities);
 			}
 		}
@@ -130,7 +130,7 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved)
 	{
-		const std::string blockID = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+		const ot::UID blockID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 		ot::Point2DD position;
 		position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
 		_blockEntityHandler.UpdateBlockPosition(blockID,position,&getClassFactory());

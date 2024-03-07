@@ -12,7 +12,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/SimpleFactory.h"
 #include "OTCore/Flags.h"
-
+#include "OTCore/CoreTypes.h"
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
@@ -126,8 +126,8 @@ namespace ot {
 
 		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
 
-		void setGraphicsItemUid(const std::string& _uid) { m_uid = _uid; };
-		const std::string& graphicsItemUid(void) const { return m_uid; };
+		void setGraphicsItemUid(const ot::UID& _uid) { m_uid = _uid; };
+		const ot::UID& graphicsItemUid(void) const { return m_uid; };
 
 		virtual void setGraphicsItemName(const std::string& _name) { m_name = _name; };
 		const std::string& graphicsItemName(void) const { return m_name; };
@@ -169,7 +169,7 @@ namespace ot {
 		
 		GraphicsItemState m_state;
 
-		std::string m_uid;
+		ot::UID m_uid;
 		std::string m_name;
 		std::string m_toolTip;
 		ot::Alignment m_alignment;

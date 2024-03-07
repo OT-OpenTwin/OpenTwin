@@ -2145,13 +2145,13 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 			
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
-			if (connectionCfg.destUid() == std::to_string(entity->getEntityID()))
+			if (connectionCfg.getDestinationUid() == entity->getEntityID())
 			{
-				connectedEntityID = std::stoull(connectionCfg.originUid());
+				connectedEntityID = connectionCfg.getOriginUid();
 			}
 			else
 			{
-				connectedEntityID = std::stoull(connectionCfg.destUid());
+				connectedEntityID = connectionCfg.getDestinationUid();
 			}
 			auto connectedEntity = entityMap.find(connectedEntityID);
 			assert(connectedEntity != entityMap.end());
