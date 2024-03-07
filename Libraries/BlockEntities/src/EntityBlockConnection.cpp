@@ -6,8 +6,8 @@
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "Icon";
-	_navigationTreeIconNameHidden = "Icon";
+	_navigationTreeIconName = "connection";
+	_navigationTreeIconNameHidden = "connection";
 	_blockTitle = "Connection";	
 }
 
