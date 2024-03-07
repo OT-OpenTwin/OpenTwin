@@ -8,10 +8,7 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 {
 	_navigationTreeIconName = "Icon";
 	_navigationTreeIconNameHidden = "Icon";
-	_blockTitle = "Connection";
-
-
-	
+	_blockTitle = "Connection";	
 }
 
 EntityBlockConnection::~EntityBlockConnection()
@@ -108,10 +105,10 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	auto connectionCfg = doc_view["ConnectionCfg"].get_document();
 	
-		auto& subDocument = connectionCfg;
-		ot::BlockConnectionBSON connection;
-		connection.DeserializeBSON(subDocument);
-		ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();
-		this->connection = graphicsConnection;
+	auto& subDocument = connectionCfg;
+	ot::BlockConnectionBSON connection;
+	connection.DeserializeBSON(subDocument);
+	ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();
+	this->connection = graphicsConnection;
 	
 }

@@ -52,7 +52,6 @@ bool EntityBlockPython::updateFromProperties()
 	{
 		updateBlockAccordingToScriptHeader();
 		CreateBlockItem();
-		CreateConnections();
 	}
 	getProperties().forceResetUpdateForAllProperties();
 	return true;

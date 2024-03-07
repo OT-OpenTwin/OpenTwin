@@ -245,7 +245,6 @@ void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connec
 	}
 	_connectionIDs = std::move(remainingConnections);
 	RemoveConnectionsAtConnectedEntities(connectionsForRemoval);
-	CreateConnections();
 }
 
 void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<ot::UID>& connectionsForRemoval)

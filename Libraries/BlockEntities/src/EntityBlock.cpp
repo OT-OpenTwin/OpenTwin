@@ -13,10 +13,8 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 
 void EntityBlock::addVisualizationNodes(void)
 {
-	//Queque for ui messages needed!
 	CreateNavigationTreeEntry();
 	CreateBlockItem();
-	//CreateConnections(); 
 }
 
 void EntityBlock::AddConnector(const ot::Connector& connector)
@@ -131,12 +129,6 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	{
 		auto subDocument = element.get_value().get_int64();
 		_connectionIDs.push_back(subDocument);
-
-		
-		/*ot::BlockConnectionBSON connection;*/
-		/*connection.DeserializeBSON(subDocument);*/
-		/*ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();*/
-		/*_connections.push_back(graphicsConnection);*/
 	}
 
 	
@@ -199,31 +191,6 @@ void EntityBlock::CreateBlockItem()
 	getObserver()->sendMessageToViewer(reqDoc);
 }
 
-void EntityBlock::CreateConnections()
-{
-	ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
-	std::map<ot::UID, EntityBase*> entityMap;
-	// Store connection information
-	for (auto& connectionID : _connectionIDs)
-	{
-		EntityBase* entityBase = readEntityFromEntityID(this, connectionID, entityMap);
-		EntityBlockConnection* connection = dynamic_cast<EntityBlockConnection*>(entityBase);
-		ot::GraphicsConnectionCfg connectionCfg = connection->getConnectionCfg();
-		connectionCfg.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
-
-		connectionPckg.addConnection(connectionCfg);
-	}
-
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
-	ot::JsonObject pckgObj;
-	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-	getObserver()->sendMessageToViewer(reqDoc);
-}
 
 void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {

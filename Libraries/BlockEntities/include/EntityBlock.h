@@ -60,6 +60,5 @@ protected:
 
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();
-	void CreateConnections();
 	void AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 };
