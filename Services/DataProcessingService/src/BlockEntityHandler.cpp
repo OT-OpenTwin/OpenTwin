@@ -16,7 +16,7 @@
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
-	ClassFactoryBlock factory;
+	ClassFactory& factory = Application::instance()->getClassFactory();
 	EntityBase* baseEntity = factory.CreateEntity(blockName);
 	assert(baseEntity != nullptr);		
 	std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
@@ -134,20 +134,21 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 
 void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, ot::Point2DD& position, ClassFactory* classFactory)
 {
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
-	if (blockEntitiesByBlockID.find(blockID) == blockEntitiesByBlockID.end())
-	{
-		OT_LOG_EAS("Position of block item cannot be updated because a block with id: " + std::to_string(blockID) + " was not found");
-	}
-	auto blockEntity = blockEntitiesByBlockID[blockID];
 	std::list<ot::EntityInformation> entityInfos;
-	ot::UIDList entityList{ blockEntity->getCoordinateEntityID() };
-	_modelComponent->getEntityInformation(entityList, entityInfos);
+	ot::UIDList entityIDList{ blockID };
+	_modelComponent->getEntityInformation(entityIDList, entityInfos);
 	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
+	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+	
+	ot::UID positionID = blockEnt->getCoordinateEntityID();
+	entityInfos.clear();
+	entityIDList = { positionID };
+	_modelComponent->getEntityInformation(entityIDList, entityInfos);
+	entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();
-	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Update BlockItem position");
+	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
 }
 
 void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
@@ -228,12 +229,11 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactoryBlock classFactory;
-
+	
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
