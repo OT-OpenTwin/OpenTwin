@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/CustomGraphicsItem.h"
@@ -52,8 +53,8 @@ namespace ot {
 		GraphicsItem* originItem(void) const { return m_origin; };
 		GraphicsItem* destItem(void) const { return m_dest; };
 
-		void setUid(const std::string& _uid) { m_uid = _uid; };
-		const std::string& uid(void) const { return m_uid; };
+		void setUid(const ot::UID& _uid) { m_uid = _uid; };
+		const ot::UID& uid(void) const { return m_uid; };
 
 	private:
 		void calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const;
@@ -63,7 +64,7 @@ namespace ot {
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
 
-		std::string m_uid;
+		ot::UID m_uid;
 
 		QRectF m_lastRect;
 

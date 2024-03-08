@@ -11,11 +11,13 @@
 #include "ClassFactory.h"
 #include "EntityBlockCircuitElement.h"
 #include "EntityBlockCircuitResistor.h"
+#include "EntityBlockConnection.h"
 // Third Party Header
 
 namespace NodeNumbers
 {
 	static unsigned long long nodeNumber = 0;
+	static unsigned long long connectionNumber = 1;
 	
 }
 
@@ -52,6 +54,8 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
+
+
 void BlockEntityHandler::OrderUIToCreateBlockPicker()
 {
 	auto graphicsEditorPackage = BuildUpBlockPicker();
@@ -68,7 +72,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc);
 }
 
-std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
+std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
 {
 	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
 	std::list<ot::EntityInformation> entityInfos;
@@ -76,18 +80,43 @@ std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllB
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	ClassFactoryBlock classFactory;
 
-	std::map<std::string, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
+	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
 		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
+		if (baseEntity != nullptr && baseEntity->getClassName() != "EntityBlockConnection") //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 			assert(blockEntity != nullptr);
-			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
+			blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
 		}
 	}
 	return blockEntitiesByBlockID;
+}
+
+std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections()
+{
+	std::list<std::string> connectionItemNames = _modelComponent->getListOfFolderItems("Blocks/" + _packageName + "/Connections");
+	std::list<ot::EntityInformation> entityInfos;
+	_modelComponent->getEntityInformation(connectionItemNames, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	ClassFactoryBlock classFactory;
+
+	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
+	for (auto& entityInfo : entityInfos)
+	{
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection")
+		{
+			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
+			assert(blockEntityConnection != nullptr);
+			entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
+		}
+	}
+
+	return entityBlockConnectionsByBlockID;
+
+	
 }
 
 bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName)
@@ -105,48 +134,101 @@ bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockE
 	}
 }
 
+
+
 void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name)
 {
 	
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
+	//auto entityBlockConnectionsByBlockID = findAllEntityBlockConnections();
+
+	std::list<ot::UID> topologyEntityIDList;
+	std::list<ot::UID> topologyEntityVersionList;
+	std::list<bool> topologyEntityForceVisible = { false };
+	std::list<ot::UID> dataEntityIDList;
+	std::list<ot::UID> dataEntityVersionList;
+	std::list<ot::UID> dataEntityParentList;
+
+	std::string blockName = "EntityBlockConnection";
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	for (auto& connection : connections)
 	{
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
-		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
+		std::list<std::string> connectionItems = _modelComponent->getListOfFolderItems("Blocks/" + name + "/Connections");
+
+
+		//Now I first create the needed parameters for entName
+		ot::UID entityID = _modelComponent->createEntityUID();
+		std::string editorName = "Circuit Simulator";
+		
+		int count = 1;
+		std::string connectionName;
+		do
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.originUid()];
+			connectionName = "Blocks/" + name + "/Connections/" + "Connection" + std::to_string(count);
+			count++;
+		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
+
+
+		//Here i create the connectionEntity
+		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		connectionEntity->createProperties();
+		
+	
+		//Now i create the GraphicsConnectionCfg and set it with the information
+
+		ot::GraphicsConnectionCfg connectionCfg;
+		connectionCfg.setOriginUid(connection.getOriginUid());
+		connectionCfg.setDestUid(connection.getDestinationUid());
+		connectionCfg.setOriginConnectable(connection.originConnectable());
+		connectionCfg.setDestConnectable(connection.destConnectable());
+
+		
+		//Now i set the attirbutes of connectionEntity
+		connectionEntity->setConnectionCfg(connectionCfg);
+		connectionEntity->setName(connectionName);
+		connectionEntity->SetGraphicsScenePackageName(name);
+		connectionEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		connectionEntity->StoreToDataBase();
+
+		topologyEntityIDList.push_back(connectionEntity->getEntityID());
+		topologyEntityVersionList.push_back(connectionEntity->getEntityStorageVersion());
+
+
+		if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end())
+		{
+			auto& blockEntity = blockEntitiesByBlockID[connection.getOriginUid()];
 
 			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.originUid() + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getOriginUid()) + " was not found");
 			continue;
 		}
 
-		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(connection.getDestinationUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
+			auto& blockEntity = blockEntitiesByBlockID[connection.getDestinationUid()];
 			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getDestinationUid()) + " was not found.");
 			continue;
 		}
 
 		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
 		{
-			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
-			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
+			blockEntitiesByBlockID[connection.getOriginUid()]->AddConnection(connectionEntity->getEntityID());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getOriginUid()]);
+			blockEntitiesByBlockID[connection.getDestinationUid()]->AddConnection(connectionEntity->getEntityID());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getDestinationUid()]);
 
 			/*auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(name);*/
-
 			/*Connection conn(connection);
 			
 			conn.setNodeNumber(std::to_string(NodeNumbers::nodeNumber++));
@@ -161,19 +243,32 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		}
 	}
 
+	
+
+
+	
+
 	if (entitiesForUpdate.size() != 0)
 	{
-		ot::UIDList topoEntIDs, topoEntVers;
 
 		for (auto entityForUpdate : entitiesForUpdate)
 		{
 			entityForUpdate->StoreToDataBase();
-			topoEntIDs.push_back(entityForUpdate->getEntityID());
-			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
+			topologyEntityIDList.push_back(entityForUpdate->getEntityID());
+			topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
 		}
-		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
-		//_modelComponent->addEntitiesToModel() // Add connection entites here
+		
+		_modelComponent->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Added new connection to BlockEntities");
+		
 	}
+
+	
+	
+	
+
+
+	
+
 }
 
 void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity)

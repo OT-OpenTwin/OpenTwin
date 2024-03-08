@@ -29,6 +29,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntitySolverCircuitSimulator.h"
+#include "EntityBlockConnection.h"
 #include "DataBase.h"
 
 
@@ -459,6 +460,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 	m_blockEntityHandler.setPackageName(circuitName->getValue());
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
+	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
+
 	m_ngSpice.ngSpice_Initialize(allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue(),printSettings->getValue());
 	m_ngSpice.clearBufferStructure(circuitName->getValue());
 }
@@ -568,19 +571,23 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 
 std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 {	
-	std::list<std::string> items;
+	ot::UIDList items;
 
 	// Add Item UIDs to the list above (Items to be removed)
-	std::string itemUID = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
+	ot::UID itemUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 	items.push_back(itemUID);
-
-
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
+
+
 std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document)
 {
+	//std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+	//ot::Point2DD pos;
+	//pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
+
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 	m_blockEntityHandler.setPackageName(pckg.name());

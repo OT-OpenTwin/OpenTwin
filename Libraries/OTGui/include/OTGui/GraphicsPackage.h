@@ -152,7 +152,7 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& name(void) const { return m_name; };
 
-		void addConnection(const std::string& _fromUid, const std::string& _fromConnectable, const std::string& _toUid, const std::string& _toConnectable);
+		void addConnection(const ot::UID& _fromUid, const std::string& _fromConnectable, const ot::UID& _toUid, const std::string& _toConnectable);
 		void addConnection(const GraphicsConnectionCfg& _info) { m_connections.push_back(_info); };
 		const std::list<GraphicsConnectionCfg>& connections(void) const { return m_connections; };
 

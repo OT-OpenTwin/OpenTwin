@@ -69,7 +69,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Flags, flagArr, _allocator);
 
-	_object.AddMember(OT_JSON_MEMBER_Uid, JsonString(m_uid, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Uid, static_cast<int64_t>(m_uid), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_tile, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
@@ -80,7 +80,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 }
 
 void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
-	m_uid = json::getString(_object, OT_JSON_MEMBER_Uid);
+	m_uid = static_cast<ot::UID>(json::getInt64(_object, OT_JSON_MEMBER_Uid));
 	m_name = json::getString(_object, OT_JSON_MEMBER_Name);
 	m_tile = json::getString(_object, OT_JSON_MEMBER_Title);
 	m_tooltip = json::getString(_object, OT_JSON_MEMBER_ToolTip);

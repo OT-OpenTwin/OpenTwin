@@ -4,7 +4,7 @@
 #include "Connection.h"
 //Open Twin Header
 #include "EntityBlock.h"
-
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
 //ThirdPartyHeader
 #include <ngspice/sharedspice.h>
@@ -24,9 +24,9 @@ public:
 	/*void setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>&);
 	std::string getBlockEntityTitleByUID(std::string UID, std::map<std::string, std::shared_ptr<EntityBlock>>&);*/
 
-	void updateBufferClasses(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string);
-	std::string generateNetlist(std::map<std::string, std::shared_ptr<EntityBlock>>&, std::string simulationType,std::string printSettings,std::string editorname);
-	std::string ngSpice_Initialize(std::map<std::string, std::shared_ptr<EntityBlock>>&,std::string,std::string simulationType,std::string printSettings);
+	void updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
+	std::string generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string simulationType,std::string printSettings,std::string editorname);
+	std::string ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string,std::string simulationType,std::string printSettings);
 	void clearBufferStructure(std::string name);
 
 	static int MySendCharFunction(char*, int, void*);

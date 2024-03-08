@@ -6,8 +6,7 @@
 
 PythonWrapper::PythonWrapper()
 {
-	//_pythonRoot = DeterminePythonRootDirectory();
-	_pythonRoot = "C:\\ThirdParty\\Python\\Python3913";
+	_pythonRoot = DeterminePythonRootDirectory();
 	
 	OT_LOG_D("Setting Python root path: " + _pythonRoot);
 	_pythonPath.push_back(_pythonRoot);

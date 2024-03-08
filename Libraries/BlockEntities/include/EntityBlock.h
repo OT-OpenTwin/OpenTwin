@@ -22,7 +22,6 @@ public:
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	virtual void addVisualizationNodes(void) override;
 
-	std::string getBlockID() const { return std::to_string(getEntityID()); }
 	ot::UID getCoordinateEntityID() const { return _coordinate2DEntityID; }
 	const std::string& getBlockTitle() const { return _blockTitle; }
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
@@ -31,13 +30,13 @@ public:
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return _connectorsByName; }
 	const bool hasConnector(const std::string& connectorName) const { return _connectorsByName.find(connectorName) != _connectorsByName.end(); }
-	const std::list<ot::GraphicsConnectionCfg>& getAllConnections() const { return _connections; }
+	const std::list<ot::UID>& getAllConnections() const { return _connectionIDs; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
 
-	void AddConnection(const ot::GraphicsConnectionCfg& connection);
-	void RemoveConnection(const ot::GraphicsConnectionCfg& connectionForRemoval);
+	void AddConnection(const ot::UID id);
+	void RemoveConnection(const ot::UID idForRemoval);
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 protected:
@@ -50,7 +49,7 @@ protected:
 
 	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
-	std::list<ot::GraphicsConnectionCfg> _connections;
+	std::list<ot::UID> _connectionIDs;
 
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
@@ -60,6 +59,5 @@ protected:
 
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();
-	void CreateConnections();
 	void AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 };

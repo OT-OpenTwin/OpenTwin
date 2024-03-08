@@ -963,7 +963,8 @@ void ExternalServicesComponent::removeShapesFromVisualization(ModelUIDtype visua
 		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto view : views) {
 			for (auto uid : entityID) {
-				view->removeItem(std::to_string(uid));
+				view->removeItem(uid);
+				view->removeConnection(uid);
 			}
 		}
 	}
@@ -2922,7 +2923,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::BasicServiceInformation info;
 				info.setFromJsonObject(_doc.GetConstObject());
 
-				std::list<std::string> itemUids = ot::json::getStringList(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+				ot::UIDList itemUids = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
 				if (_doc.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName)) {
 					// Specific view
@@ -2931,8 +2932,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
 
 					if (editor) {
-						for (auto u : itemUids) {
-							editor->removeItem(u);
+						for (auto itemUID : itemUids) {
+							editor->removeItem(itemUID);
 						}
 					}
 				}
@@ -2958,21 +2959,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (const auto& connection : pckg.connections()) {
-					ot::GraphicsItem* src = editor->getItem(connection.originUid());
-					ot::GraphicsItem* dest = editor->getItem(connection.destUid());
-					
-					if (dest != nullptr && src != nullptr && !editor->connectionAlreadyExists(connection))
-					{
-						ot::GraphicsItem* srcConn = src->findItem(connection.originConnectable());
-						ot::GraphicsItem* destConn = dest->findItem(connection.destConnectable());
-
-						if (srcConn && destConn) {
-							editor->addConnection(srcConn, destConn, connection);
-						}
-						else {
-							OT_LOG_EA("Invalid graphics item name");
-						}
-					}
+					editor->addConnection(connection);
 				}
 
 			}
@@ -2988,17 +2975,17 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
-					for (auto c : pckg.connections()) {
-						editor->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
+					for (auto connection : pckg.connections()) {
+						editor->removeConnection(connection.getUid());
 					}
 				}
 				else {
 					// Any editor
 
 					std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
-					for (auto v : views) {
-						for (auto c : pckg.connections()) {
-							v->removeConnection(c.originUid(), c.originConnectable(), c.destUid(), c.destConnectable());
+					for (auto view : views) {
+						for (auto connection : pckg.connections()) {
+							view->removeConnection(connection.getUid());
 						}
 					}
 				}

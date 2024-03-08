@@ -2,8 +2,9 @@
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
-#include "BlockConnectionBSON.h"
+
 #include "EntityBlock.h"
+#include "EntityBlockConnection.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner){}
@@ -12,10 +13,8 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 
 void EntityBlock::addVisualizationNodes(void)
 {
-	//Queque for ui messages needed!
 	CreateNavigationTreeEntry();
 	CreateBlockItem();
-	CreateConnections();
 }
 
 void EntityBlock::AddConnector(const ot::Connector& connector)
@@ -44,28 +43,18 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 	}
 }
 
-void EntityBlock::AddConnection(const ot::GraphicsConnectionCfg& connection)
+void EntityBlock::AddConnection(const ot::UID id)
 {
-	_connections.push_back(connection);
+	_connectionIDs.push_back(id);
 	setModified();
 }
 
-void EntityBlock::RemoveConnection(const ot::GraphicsConnectionCfg& connectionForRemoval)
+void EntityBlock::RemoveConnection(const ot::UID idForRemoval)
 {
-	auto connection = _connections.begin();
-	while(connection != _connections.end())
-	{
-		if (connection->buildKey() == connectionForRemoval.buildKey() || connection->buildReversedKey() == connectionForRemoval.buildKey())
-		{
-			connection = _connections.erase(connection);
-		}
-		else
-		{
-			connection++;
-		}
-	}
+	_connectionIDs.remove(idForRemoval);
 	setModified();
 }
+
 
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
@@ -86,14 +75,16 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	}
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
 
-	auto connectionArray = bsoncxx::builder::basic::array();
-	for (auto& connection : _connections)
+	auto connectionIDArray = bsoncxx::builder::basic::array();
+	std::map<ot::UID, EntityBase*> entityMap;
+
+	for (auto& connection : _connectionIDs)
 	{
-		ot::BlockConnectionBSON serializeableConnection(connection);
-		auto subDocument = serializeableConnection.SerializeBSON();
-		connectionArray.append(subDocument);
+		//Here i add the ConnectionIDs
+		auto subDocument = connection;
+		connectionIDArray.append(static_cast<int64_t>(subDocument));
 	}
-	storage.append(bsoncxx::builder::basic::kvp("Connections", connectionArray));
+	storage.append(bsoncxx::builder::basic::kvp("ConnectionIDs", connectionIDArray));
 }
 
 void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
@@ -114,15 +105,14 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
-	auto connections = doc_view["Connections"].get_array();
+	auto connections = doc_view["ConnectionIDs"].get_array();
 	for (auto& element : connections.value)
 	{
-		auto subDocument = element.get_value().get_document();
-		ot::BlockConnectionBSON connection;
-		connection.DeserializeBSON(subDocument);
-		ot::GraphicsConnectionCfg graphicsConnection = connection.getConnection();
-		_connections.push_back(graphicsConnection);
+		auto subDocument = element.get_value().get_int64();
+		_connectionIDs.push_back(subDocument);
 	}
+
+	
 }
 
 std::string EntityBlock::CreateBlockHeadline()
@@ -164,7 +154,7 @@ void EntityBlock::CreateBlockItem()
 	assert(entCoordinate != nullptr);
 
 	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
-	blockCfg->setUid(getBlockID());
+	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
 
 	ot::GraphicsScenePackage pckg(_graphicsScenePackage);
@@ -182,28 +172,6 @@ void EntityBlock::CreateBlockItem()
 	getObserver()->sendMessageToViewer(reqDoc);
 }
 
-void EntityBlock::CreateConnections()
-{
-	ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
-
-	// Store connection information
-	for (auto& connection : _connections)
-	{
-		connection.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
-
-		connectionPckg.addConnection(connection);
-	}
-
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
-	ot::JsonObject pckgObj;
-	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-	getObserver()->sendMessageToViewer(reqDoc);
-}
 
 void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {

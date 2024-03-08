@@ -9,6 +9,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsStackItem.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration) {
@@ -19,17 +20,22 @@ ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _conf
 		return nullptr;
 	}
 
+	// Create item
 	ot::GraphicsItem* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItem>(
 		ot::GlobalKeyMap::instance().get(
 			_configuration->simpleFactoryObjectKey()));
+
 	if (itm == nullptr) {
 		OT_LOG_EA("Failed to create item from config");
 		return nullptr;
 	}
+
+	// Setup item
 	if (!itm->setupFromConfig(_configuration)) {
 		OT_LOG_EA("Setup from configuration failed");
 		delete itm;
 		return nullptr;
 	}
+
 	return itm;
 }

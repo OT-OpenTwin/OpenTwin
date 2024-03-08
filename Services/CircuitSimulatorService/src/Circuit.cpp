@@ -40,12 +40,12 @@ std::string Circuit::getId()
 	return this->id;
 }
 
-std::map<std::string, CircuitElement>& Circuit::getMapOfElements()
+std::map<ot::UID, CircuitElement>& Circuit::getMapOfElements()
 {
 	return this->mapOfElements;
 }
 
-void Circuit::addElement(std::string key, const CircuitElement& obj)
+void Circuit::addElement(ot::UID key, const CircuitElement& obj)
 {
 	mapOfElements[key] = obj;
 }
@@ -60,7 +60,7 @@ void Circuit::setId(std::string id)
 	this->id = id;
 }
 
-bool Circuit::addConnection(const std::string& key, const Connection& obj)
+bool Circuit::addConnection(const ot::UID& key, const Connection& obj)
 {
 	if (mapOfElements.find(key) != mapOfElements.end())
 	{
@@ -77,7 +77,7 @@ bool Circuit::addConnection(const std::string& key, const Connection& obj)
 
 }
 
-std::string Circuit::findElement(const std::string& key)
+std::string Circuit::findElement(const ot::UID& key)
 {
 	if (mapOfElements.find(key) != mapOfElements.end())
 	{

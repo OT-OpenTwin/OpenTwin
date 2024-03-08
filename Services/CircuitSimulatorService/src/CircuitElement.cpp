@@ -32,7 +32,7 @@ std::string CircuitElement::getItemName()	{return this->m_itemName;}
 
 std::string CircuitElement::getEditorName()   {return this->m_editorName;}
 
-std::string CircuitElement::getUID() { return this->Uid; }
+ot::UID CircuitElement::getUID() { return this->Uid; }
 
 std::string CircuitElement::getValue() { return this->value; }
 
@@ -43,7 +43,7 @@ void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
 void CircuitElement::setEditorName(std::string name)	{this->m_editorName = name;}
 
-void CircuitElement::setUID(std::string id) { this->Uid = id; }
+void CircuitElement::setUID(ot::UID id) { this->Uid = id; }
 
 void CircuitElement::setValue(std::string name) { this->value = name; }
 

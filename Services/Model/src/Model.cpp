@@ -21,6 +21,7 @@
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityResult1DPlot.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
+#include "EntityBlockConnection.h"
 
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
@@ -1536,13 +1537,12 @@ void Model::deleteSelectedShapes(void)
 
 	removeParentsOfProtected(selectedUnprotectedEntities,protectedEntities);
 
-	std::list<ot::UID> topLevelBlockEntities = RemoveBlockConnections(selectedUnprotectedEntities);
+	// Now we remove all entities from the visualizaton and delete them afterward (if they are not protected)
+	std::list<ot::UID> removeFromDisplay;
+	std::list<ot::UID> blocksAndConnectionsForRemoval = RemoveBlockConnections(selectedUnprotectedEntities);
 
 	// Remove all children from the list
 	std::list<EntityBase *> selectedTopLevelEntities = removeChildrenFromList(selectedUnprotectedEntities);
-
-	// Now we remove all entities from the visualizaton and delete them afterward (if they are not protected)
-	std::list<ot::UID> removeFromDisplay;
 
 	for (auto entity : selectedTopLevelEntities)
 	{
@@ -1553,7 +1553,7 @@ void Model::deleteSelectedShapes(void)
 		delete entity;
 	}
 
-	removeFromDisplay.splice(removeFromDisplay.begin(), topLevelBlockEntities);
+	removeFromDisplay.splice(removeFromDisplay.begin(), blocksAndConnectionsForRemoval);
 	removeFromDisplay.unique();
 
 	removeShapesFromVisualization(removeFromDisplay);
@@ -2177,37 +2177,87 @@ std::list<EntityBase*> Model::getTopLevelEntitiesByName(std::list<EntityBase*> e
 
 std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
 {
+	ot::UIDList entitiesForRemoval;
 	std::list<EntityBase*> topLevelBlockEntities = FindTopLevelBlockEntities(entities);
-	if (topLevelBlockEntities.size() == 0) { return {}; }
-
-	//Now go through all top level block entities and delete all connections with this block, in other block entities
-	std::set<EntityBase*> entitiesMarkedForStorage;
-	std::list<ot::UID> topLevelBlockEntityIDs;
-	for (auto& entity : topLevelBlockEntities)
+	
+	std::map<ot::UID,EntityBlockConnection*> connectionsSelectedForRemovalByEntID;
+	for (EntityBase* entity : entities)
 	{
-		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(entity);
-		assert(entityBlock != nullptr);
-		
-		auto& allConnections = entityBlock->getAllConnections();
-		for (auto& connection : allConnections)
+		EntityBlockConnection* connectionEnt = dynamic_cast<EntityBlockConnection*>(entity);
+		if (connectionEnt != nullptr)
 		{
+			connectionsSelectedForRemovalByEntID[connectionEnt->getEntityID()] = connectionEnt;
+		}
+	}
+	if (topLevelBlockEntities.size() == 0 && connectionsSelectedForRemovalByEntID.size() == 0) { return {}; }
+
+	//First remove the block entities, delete all listed connections and update connected blocks
+
+	std::set<EntityBase*> entitiesMarkedForStorage;
+	
+	for (auto& blockEntityBase : topLevelBlockEntities)
+	{
+		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(blockEntityBase);
+		assert(entityBlock != nullptr);
+		auto& allConnectionIDs = entityBlock->getAllConnections();
+
+		//Now delete all connections from connected entities and delete the connection entities.
+		for (auto& connectionID : allConnectionIDs)
+		{
+			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityMap[connectionID]);
+			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+			
+			//Find and load the connected block. Then remove its reference to the connection entity.
 			ot::UID connectedEntityID;
-			if (connection.destUid() == std::to_string(entity->getEntityID()))
+			if (connectionCfg.getDestinationUid() == entityBlock->getEntityID())
 			{
-				connectedEntityID = std::stoull(connection.originUid());
+				connectedEntityID = connectionCfg.getOriginUid();
 			}
 			else
 			{
-				connectedEntityID = std::stoull(connection.destUid());
+				connectedEntityID = connectionCfg.getDestinationUid();
 			}
 			auto connectedEntity = entityMap.find(connectedEntityID);
 			assert(connectedEntity != entityMap.end());
 			EntityBlock* connectedBlockEntity =	dynamic_cast<EntityBlock*>(connectedEntity->second);
 			assert(connectedBlockEntity != nullptr);
-			connectedBlockEntity->RemoveConnection(connection);
+			connectedBlockEntity->RemoveConnection(connectionID);
 			entitiesMarkedForStorage.insert(connectedEntity->second);
+
+			//Check if the connection was also selected for removal
+			if (connectionsSelectedForRemovalByEntID.find(connectionEntity->getEntityID()) != connectionsSelectedForRemovalByEntID.end())
+			{
+				connectionsSelectedForRemovalByEntID.erase(connectionEntity->getEntityID());
+			}
+			// Remove the entity from the entity map and also from the model state
+			//removeEntityFromMap(connectionEntity, false, false);
+			//delete connectionEntity;
+			//removeShapes.push_back(connectionID);
+			entitiesForRemoval.push_back(connectionEntity->getEntityID());
 		}
-		topLevelBlockEntityIDs.push_back(entity->getEntityID());
+		entitiesForRemoval.push_back(blockEntityBase->getEntityID());
+	}
+
+	//Remove the leftover connection entities
+	for (auto connectionSelectedForRemovalByEntID : connectionsSelectedForRemovalByEntID)
+	{
+		ot::UID connectionID = connectionSelectedForRemovalByEntID.first;
+		EntityBlockConnection* connection =	connectionSelectedForRemovalByEntID.second;
+
+		ot::GraphicsConnectionCfg connectionCfg = connection->getConnectionCfg();
+		ot::UID destinationBlockID = connectionCfg.getDestinationUid();
+		ot::UID originBlockID = connectionCfg.getOriginUid();
+		EntityBase* destinationBlockBase =	entityMap[destinationBlockID];
+		EntityBase* originBlockBase = entityMap[originBlockID];
+		EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationBlockBase);
+		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(originBlockBase);
+		assert(originBlock != nullptr);
+		assert(destinationBlock != nullptr);
+		originBlock->RemoveConnection(connectionID);
+		destinationBlock->RemoveConnection(connectionID);
+		entitiesForRemoval.push_back(connectionID);
+		entitiesMarkedForStorage.insert(destinationBlock);
+		entitiesMarkedForStorage.insert(originBlock);
 	}
 
 	//Now check if the updated block entities are by themselve suppose to be deleted. In that case their change shall not be stored in the database.
@@ -2234,7 +2284,7 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 	{
 		setEntityOutdated(entity);
 	}
-	return topLevelBlockEntityIDs;
+	return entitiesForRemoval;
 }
 
 void Model::removeParentsOfProtected(std::list<EntityBase*>& unprotectedEntities, const std::list<EntityBase*>& protectedEntities)
@@ -2267,7 +2317,6 @@ std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& 
 	{
 		entityMap[entity] = true;
 	}
-
 
 	std::list<EntityBase*> selectedTopLevelBlockEntities;
 
@@ -2903,6 +2952,7 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		setParameter(entity->getName(), dynamic_cast<EntityParameter*>(entity)->getNumericValue(), dynamic_cast<EntityParameter*>(entity));
 		return;
 	}
+
 }
 
 void Model::performEntityMeshUpdate(EntityMeshTet *entity)
@@ -4650,17 +4700,22 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		EntityBase* newEntity = readEntityFromEntityIDandVersion(nullptr, topoEntityID, *topoEntityVersion, map);
 		topoEntityVersion++;
 		EntityBase* oldEntity = findEntityFromName(newEntity->getName());
-		if (oldEntity == nullptr)
+
+		if (oldEntity != nullptr)
 		{
-			throw std::exception("Cannot update an entity that is not part of the model.");
+			removeFromDisplay.push_back(oldEntity->getEntityID());
+			// Remove the entity from the entity map and also from the model state
+			removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
+			delete oldEntity;
+
+			entityList.push_back(newEntity);
+			topologyEntityForceVisible.push_back(false);
 		}
-		removeFromDisplay.push_back(oldEntity->getEntityID());
-		// Remove the entity from the entity map and also from the model state
-		removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
-		delete oldEntity;
-		
-		entityList.push_back(newEntity);
-		topologyEntityForceVisible.push_back(false);
+		else
+		{
+			entityList.push_back(newEntity);
+			topologyEntityForceVisible.push_back(false);
+		}
 	}
 
 	if (!removeFromDisplay.empty())

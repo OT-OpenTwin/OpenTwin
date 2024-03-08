@@ -202,6 +202,7 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
+	this->m_state |= GraphicsItem::HoverState;
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
@@ -219,14 +220,16 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	ToolTipHandler::hideToolTip();
+	this->m_state &= (~GraphicsItem::HoverState);
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (this->m_parent) return; // Root items only
 	if (m_state & HoverState) {
-		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(0, 0, 0, 128));
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(255, 0, 0));
 	}
 	else if (m_state & SelectedState) {
-		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(0, 0, 0, 128));
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(255, 0, 0));
 	}
 }
 
