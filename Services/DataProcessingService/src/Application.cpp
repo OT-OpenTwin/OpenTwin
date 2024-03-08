@@ -125,8 +125,8 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 	{
 		ot::GraphicsConnectionPackage pckg;
 		pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-		_blockEntityHandler.AddBlockConnection(pckg.connections());
+		const std::string editorName = pckg.name();
+		_blockEntityHandler.AddBlockConnection(pckg.connections(), editorName);
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved)
 	{

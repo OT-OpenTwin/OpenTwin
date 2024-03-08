@@ -40,19 +40,21 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections)
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& editorName)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	ot::UIDList topoEntIDs, topoEntVers;
+	const std::string connectionFolderName = _blockFolder + "/" + editorName + "/" + _connectionFolder;
 	for (auto& connection : connections)
 	{
 		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
 		connectionEntity.createProperties();
 		ot::GraphicsConnectionCfg newConnection(connection);
 		newConnection.setUid(connectionEntity.getEntityID());
-		const std::string connectionName = CreateNewUniqueTopologyName(_blockFolder + "/" + _connectionFolder, "Connection", 1, false);
+		newConnection.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
+		const std::string connectionName = CreateNewUniqueTopologyName(connectionFolderName, "Connection", 1, false);
 		connectionEntity.setName(connectionName);
 		connectionEntity.setConnectionCfg(newConnection);
 		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
