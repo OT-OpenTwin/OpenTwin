@@ -117,7 +117,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 
 std::string EntityBlock::CreateBlockHeadline()
 {
-	const std::string nameWithoutRootDirectory = getName().substr(getName().find_first_of("/") + 1, getName().size());
+	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
 	//const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
 	if (nameWithoutRootDirectory.empty()) return _blockTitle;
 	else return nameWithoutRootDirectory;

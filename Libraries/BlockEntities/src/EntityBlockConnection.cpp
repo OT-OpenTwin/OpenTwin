@@ -18,10 +18,10 @@ ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 {
 	ot::GraphicsConnectionCfg cfg(_blockIDOrigin, _connectorNameOrigin, _blockIDDestination, _connectorNameDestination);
 	auto colorProperty = dynamic_cast<EntityPropertiesColor*>(this->getProperties().getProperty("Color"));
-	int r = colorProperty->getColorR();
-	int g = colorProperty->getColorG();
-	int b = colorProperty->getColorB();
-	ot::Color color(r, g, b);
+	double r = colorProperty->getColorR();
+	double g = colorProperty->getColorG();
+	double b = colorProperty->getColorB();
+	ot::Color color(static_cast<float>(r), static_cast<float>(g), static_cast<float>(b));
 	cfg.setColor(color);
 	
 
