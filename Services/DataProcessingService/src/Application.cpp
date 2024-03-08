@@ -95,16 +95,18 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 	{
-		assert(m_selectedEntities.size() == 1);
-		std::list<ot::EntityInformation> entityInfos;
-		m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-		
-		auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), getClassFactory());
-		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
-		if (dbAccess != nullptr)
+		if (m_selectedEntities.size() == 1)
 		{
-			auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-			PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+			std::list<ot::EntityInformation> entityInfos;
+			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
+		
+			auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), getClassFactory());
+			auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
+			if (dbAccess != nullptr)
+			{
+				auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+				PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+			}
 		}
 	}
 	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
@@ -190,6 +192,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	_blockEntityHandler.setModelComponent(_model);
+	_graphHandler.setModelComponent(_model);
 	_pipelineHandler.setModelComponent(_model);
 	BufferResultCollectionAccess::INSTANCE().setModelComponent(_model);
 }

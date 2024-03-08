@@ -237,8 +237,10 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
-			assert(blockEntity != nullptr);
-			blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
+			if (blockEntity != nullptr)
+			{
+				blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
+			}
 		}
 	}
 	return blockEntitiesByBlockID;
