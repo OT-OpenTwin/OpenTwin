@@ -184,7 +184,7 @@ void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 		const std::string connectorTitle = connector.getConnectorTitle();
 		if (connectorType == ot::ConnectorType::In)
 		{
-			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleLeft);
+			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
 		}
 		else if (connectorType == ot::ConnectorType::InOptional)
 		{
