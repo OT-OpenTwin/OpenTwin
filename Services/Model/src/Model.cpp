@@ -2069,13 +2069,26 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 		return e1->getName().size() < e2->getName().size();
 	});
 
+	// We need to get a list of all top level entities only
+	std::list<EntityBase*> topLevelEntities = getTopLevelEntitiesByName(entities);
+	std::set<EntityBase*> topLevelEntitySet(std::begin(topLevelEntities), std::end(topLevelEntities));
+
 	for (EntityBase* entity : entities)
 	{
-		bool addVisualizationContainer = true;
+		// We only need to add visualization containers above the top level entities if needed, since
+		// all containers below the top level entities are part of the model and therefore are children of the top
+		// level entities. These children will be added together with the entity below.
+		
+		bool addVisualizationContainer = false;
 
-		if (dynamic_cast<EntityContainer*>(entity) != nullptr)
+		if (topLevelEntitySet.find(entity) != topLevelEntitySet.end())
 		{
-			addVisualizationContainer = dynamic_cast<EntityContainer*>(entity)->getCreateVisualizationItem();
+			addVisualizationContainer = true;
+
+			if (dynamic_cast<EntityContainer*>(entity) != nullptr)
+			{
+				addVisualizationContainer = dynamic_cast<EntityContainer*>(entity)->getCreateVisualizationItem();
+			}
 		}
 
 		GeometryOperations::EntityList allNewEntities;
@@ -2096,28 +2109,70 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 		getStateManager()->storeEntity(entity->getEntityID(), parentID, entity->getEntityStorageVersion(), ModelStateEntity::tEntityType::TOPOLOGY);
 	}
 	
-	//Might be that the visualisation of a parent entity depends on a child entity. Thus the children have to be part of the state before the visualisation is taken care of.
+	// Might be that the visualisation of a parent entity depends on a child entity. Thus the children have to be part of the state before the visualisation is taken care of.
+	// Here we will need to loop through the top level entities only, since they will automatically add their children.
+
+	for (EntityBase* entity : topLevelEntities)
+	{
+		entity->addVisualizationNodes();
+	}
+
+	// Here we need to ensure that the entities with the force visible flag are visible
+
+	ot::UIDList visibleEntityID;
 	for (EntityBase* entity : entities)
 	{
 		if (forceEntityVisible[entity] && entity->getInitiallyHidden())
 		{
-			assert(!entity->getModified());
-			// We add the entity to the visualization here and the forceShowEntities flag is set.
-			// In this case, the initially hidden flag shall not be considered and the entity needs to be shown 
-			// in any case.
-
-			entity->setInitiallyHidden(false);
-
-			entity->addVisualizationNodes();
-
-			entity->setInitiallyHidden(true);
-			entity->resetModified();
-		}
-		else
-		{
-			entity->addVisualizationNodes();
+			// Ensure that this entity is visible
+			visibleEntityID.push_back(entity->getEntityID());
 		}
 	}
+
+	if (!visibleEntityID.empty())
+	{
+		ot::UIDList hiddenEntityID;
+		setShapeVisibility(visibleEntityID, hiddenEntityID);
+	}
+}
+
+std::list<EntityBase*> Model::getTopLevelEntitiesByName(std::list<EntityBase*> entities)
+{
+	std::list<EntityBase*> topLevelEntities;
+
+	while (!entities.empty())
+	{
+		// We assume that the list of entities is sorted by name, so the first item is a top level entity
+		EntityBase* thisTopLevelEntity = entities.front();
+
+		topLevelEntities.push_back(thisTopLevelEntity);
+		entities.pop_front();
+
+		// Now we remove all children of the current toplevel entity and store the remaining entities in the otherEntities list
+		std::list<EntityBase*> otherEntities;
+		for (auto item : entities)
+		{
+			// Check whether the item is a child of the current toplevel entity
+			if (item->getName().size() > thisTopLevelEntity->getName().size())
+			{
+				// This item can potentially be a child
+				if (item->getName().substr(0, thisTopLevelEntity->getName().size() + 1) != thisTopLevelEntity->getName() + "/")
+				{
+					// This item is not a child of the toplevel entity
+					otherEntities.push_back(item);
+				}
+			}
+			else
+			{
+				// This item cannot be a child
+				otherEntities.push_back(item);
+			}
+		}
+
+		entities = otherEntities; // Now we have removed all children from the list
+	}
+
+	return topLevelEntities;
 }
 
 std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entities)
@@ -4399,7 +4454,7 @@ void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool
 	// Remove all children from the list
 	std::list<EntityBase *> topLevelEntities = removeChildrenFromList(entityList);
 
-	// Now we remove all entities from the visualizaton and delete them afterward (if they are not protected)
+	// Now we remove all entities from the visualizaton and delete them afterward 
 	std::list<ot::UID> removeFromDisplay;
 
 	for (auto entity : topLevelEntities)
