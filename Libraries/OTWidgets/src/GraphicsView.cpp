@@ -172,13 +172,15 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 }
 
 void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation) {
-	auto it = m_connections.find(_connectionInformation.getUid());
+	removeConnection(_connectionInformation.getUid());
+}
+
+void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
+{
+	auto it = m_connections.find(_connectionUID);
 	if (it == m_connections.end()) {
-		OT_LOG_W("Connection not found { \"OriginUID\": \"" + std::to_string(_connectionInformation.getOriginUid()) + 
-				"\", \"OriginConnectable\": \"" + _connectionInformation.originConnectable() + 
-				"\", \"DestUID\": \"" + std::to_string(_connectionInformation.getDestinationUid()) + 
-				"\", \"DestConnectable\": \"" + _connectionInformation.destConnectable() + "\" }");
-			return;
+		OT_LOG_W("Connection not found { \"UID\": \"" + std::to_string(_connectionUID));
+		return;
 	}
 
 	// Remove connection from items
@@ -191,11 +193,7 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 	delete it->second;
 
 	// Erase connection from map
-	m_connections.erase(_connectionInformation.getUid());
-}
-
-void ot::GraphicsView::removeConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
-	this->removeConnection(GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector));
+	m_connections.erase(_connectionUID);
 }
 
 ot::UIDList ot::GraphicsView::selectedConnections(void) const {

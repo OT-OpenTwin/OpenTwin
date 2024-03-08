@@ -12,7 +12,6 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlockConnection"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 
-	std::string getBlockID() const { return std::to_string(getEntityID()); }
 	ot::GraphicsConnectionCfg getConnectionCfg();
 	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
 	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }

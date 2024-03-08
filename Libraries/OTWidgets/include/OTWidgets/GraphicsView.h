@@ -58,7 +58,7 @@ namespace ot {
 
 		void addConnection(const GraphicsConnectionCfg& _config);
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
-		void removeConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
+		void removeConnection(const ot::UID& _connectionInformation);
 		ot::UIDList selectedConnections(void) const;
 
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);

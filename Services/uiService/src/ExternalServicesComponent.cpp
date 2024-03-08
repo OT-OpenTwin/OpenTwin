@@ -964,6 +964,7 @@ void ExternalServicesComponent::removeShapesFromVisualization(ModelUIDtype visua
 		for (auto view : views) {
 			for (auto uid : entityID) {
 				view->removeItem(uid);
+				view->removeConnection(uid);
 			}
 		}
 	}
@@ -2975,7 +2976,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 					for (auto connection : pckg.connections()) {
-						editor->removeConnection(connection.getOriginUid(), connection.originConnectable(), connection.getDestinationUid(), connection.destConnectable());
+						editor->removeConnection(connection.getUid());
 					}
 				}
 				else {
@@ -2984,7 +2985,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
 					for (auto view : views) {
 						for (auto connection : pckg.connections()) {
-							view->removeConnection(connection.getOriginUid(), connection.originConnectable(), connection.getDestinationUid(), connection.destConnectable());
+							view->removeConnection(connection.getUid());
 						}
 					}
 				}

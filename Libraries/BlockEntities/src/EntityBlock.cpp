@@ -51,29 +51,10 @@ void EntityBlock::AddConnection(const ot::UID id)
 
 void EntityBlock::RemoveConnection(const ot::UID idForRemoval)
 {
-	for (auto connectionID : _connectionIDs)
-	{
-		if (connectionID == idForRemoval)
-		{
-			auto it = std::find(_connectionIDs.begin(), _connectionIDs.end(), connectionID);
-			_connectionIDs.erase(it);
-		}
-	}
-
-	/*auto connection = _connections.begin();
-	while(connection != _connections.end())
-	{
-		if (connection->buildKey() == connectionForRemoval.buildKey() || connection->buildReversedKey() == connectionForRemoval.buildKey())
-		{
-			connection = _connections.erase(connection);
-		}
-		else
-		{
-			connection++;
-		}
-	}*/
+	_connectionIDs.remove(idForRemoval);
 	setModified();
 }
+
 
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {

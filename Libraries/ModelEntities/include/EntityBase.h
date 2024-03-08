@@ -112,7 +112,6 @@ public:
 
 	void setDeletable(bool deletable) { isDeletable = deletable; };
 	const bool deletable() const { return isDeletable; }
-	//virtual void onRemoveFromModelState() {}
 
 protected:
 	virtual int getSchemaVersion(void) { return 1; };

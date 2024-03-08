@@ -58,6 +58,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 		connectionEntity.SetGraphicsScenePackageName(_packageName);
+		connectionEntity.createProperties();
 
 		connectionEntity.StoreToDataBase();
 		topoEntIDs.push_back(connectionEntity.getEntityID());
