@@ -141,6 +141,7 @@
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
@@ -148,12 +149,14 @@
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
     <TargetExt>.lib</TargetExt>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
@@ -161,6 +164,7 @@
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
     <TargetExt>.lib</TargetExt>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
