@@ -71,6 +71,9 @@ namespace ot {
 		void setStyle(ConnectionStyle _style) { m_style = _style; };
 		ConnectionStyle style(void) const { return m_style; };
 
+		std::string createConnectionKey() const;
+		std::string createConnectionKeyReverse() const;
+
 	private:
 		ot::UID m_originUID;
 		std::string m_originConnectable;

@@ -113,7 +113,7 @@ std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& g
 			ot::GenericDataStructSingle* entry = dynamic_cast<ot::GenericDataStructSingle*>(genericDataBlock);
 			if (entry == nullptr)
 			{
-				throw std::exception("Datainput not matching format. Only plots of a one dimensional data struct are possible.");
+				throw std::exception("Plot 1D block detected incompatible data format in data input. Only one-dimensional data structures are supported");
 			}
 
 			const ot::Variable& value = entry->getValue();
@@ -125,7 +125,7 @@ std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& g
 		ot::GenericDataStructVector* entry = dynamic_cast<ot::GenericDataStructVector*>(*genericDataBlocks.begin());
 		if (entry == nullptr)
 		{
-			throw std::exception("Datainput not matching format. Only plots of a one dimensional data struct are possible.");
+			throw std::exception("Plot 1D block detected incompatible data format in data input. Only one-dimensional data structures are supported.");
 		}
 		const std::vector<ot::Variable> values = entry->getValues();
 		for (const ot::Variable& value : values)

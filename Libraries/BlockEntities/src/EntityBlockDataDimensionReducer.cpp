@@ -36,8 +36,8 @@ ot::GraphicsItemCfg* EntityBlockDataDimensionReducer::CreateBlockCfg()
 void EntityBlockDataDimensionReducer::createProperties()
 {
 	EntityPropertiesSelection::createProperty("Output Dimensions", "Output Dimensions", { "1", "2", "3" }, "1", "default", getProperties());
-	EntityPropertiesInteger::createProperty("Input Index", "Column", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("Input Index", "Row", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Input Index", "Column", _minValue, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Input Index", "Row", _minValue, "default", getProperties());
 }
 
 int EntityBlockDataDimensionReducer::getInputRow()
@@ -52,4 +52,24 @@ int EntityBlockDataDimensionReducer::getInputColumn()
 	auto baseProperty =	getProperties().getProperty("Column");
 	auto integerProperty =	dynamic_cast<EntityPropertiesInteger*>(baseProperty);
 	return integerProperty->getValue();
+}
+
+bool EntityBlockDataDimensionReducer::updateFromProperties()
+{
+	bool refresh = false;
+	auto baseProperty = getProperties().getProperty("Column");
+	auto integerPropertyColumn = dynamic_cast<EntityPropertiesInteger*>(baseProperty);
+	if (integerPropertyColumn->getValue() < _minValue)
+	{
+		integerPropertyColumn->setValue(_minValue);
+		refresh = true;
+	}
+	baseProperty = getProperties().getProperty("Row");
+	auto integerPropertyRow = dynamic_cast<EntityPropertiesInteger*>(baseProperty);
+	if (integerPropertyRow->getValue() < _minValue)
+	{
+		integerPropertyRow->setValue(_minValue);
+		refresh = true;
+	}
+	return refresh;
 }

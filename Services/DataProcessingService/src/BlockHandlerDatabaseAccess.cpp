@@ -38,6 +38,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
 	const auto selectedQuantity = resultCollectionAccess->FindMetadataQuantity(quantityDef.getName());
+	if (selectedQuantity == nullptr) 
+	{
+		throw std::exception("DatabaseAccessBlock has no quantity set.");
+	}
 	_dataRows= selectedQuantity->dataRows;
 	_dataColumns = selectedQuantity->dataColumns;
 
@@ -56,6 +60,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
 	const auto parameter1 =	resultCollectionAccess->FindMetadataParameter(param1Def.getName());
+	if (parameter1 == nullptr)
+	{
+		throw std::exception("DatabaseAccessBlock has the parameter 1 not set.");
+	}
 	AddParameter(param1Def, *parameter1, parameterConnectorName);
 	AddComparision(param1Def);
 
@@ -67,6 +75,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
 		const auto parameter = resultCollectionAccess->FindMetadataParameter(param2Def.getName());
+		if (parameter == nullptr)
+		{
+			throw std::exception("DatabaseAccessBlock has the parameter 2 not set.");
+		}
 		AddParameter(param2Def, *parameter, param2ConnectorName);
 		AddComparision(param2Def);
 	}
@@ -75,6 +87,10 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
 		const auto parameter = resultCollectionAccess->FindMetadataParameter(param3Def.getName());
+		if (parameter == nullptr)
+		{
+			throw std::exception("DatabaseAccessBlock has the parameter 3 not set.");
+		}
 		AddParameter(param3Def, *parameter, param3ConnectorName);
 		AddComparision(param3Def);
 	}

@@ -15,8 +15,11 @@ public:
 
 	const ot::Connector* getInputConnector() const { return &_inputConnector; }
 	const ot::Connector* getOutputConnector() const { return &_outputConnector; }
+	
+	virtual bool updateFromProperties() override;
 private:
+	int _minValue = 1;
+	
 	ot::Connector _inputConnector;
 	ot::Connector _outputConnector;
-
 };

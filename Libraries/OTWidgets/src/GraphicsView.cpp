@@ -92,7 +92,16 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const ot::UID& _conn
 
 bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& _connection)
 {
-	return (m_connections.find(_connection.getUid()) != m_connections.end());
+	bool alreadyExisting = false;
+	for (auto& connection : m_connections)
+	{
+		if (connection.second->getConnectionKey() == _connection.createConnectionKey() || connection.second->getConnectionKey() == _connection.createConnectionKeyReverse())
+		{
+			alreadyExisting = true;
+			break;
+		}
+	}
+	return (alreadyExisting);
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {

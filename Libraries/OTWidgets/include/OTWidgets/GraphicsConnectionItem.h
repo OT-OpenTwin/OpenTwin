@@ -56,6 +56,9 @@ namespace ot {
 		void setUid(const ot::UID& _uid) { m_uid = _uid; };
 		const ot::UID& uid(void) const { return m_uid; };
 
+		const std::string& getConnectionKey() const { return m_connectionKey; };
+
+
 	private:
 		void calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const;
 		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
@@ -63,6 +66,8 @@ namespace ot {
 
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
+
+		std::string m_connectionKey;
 
 		ot::UID m_uid;
 
