@@ -3,6 +3,9 @@
 #include "MongoProjectFunctions.h"
 #include "MongoURL.h"
 #include "OTCore/JSON.h"
+
+#include <set>
+
 /*
 	These functions must cover the following functionalities
 	1) Register ✅
@@ -12,10 +15,17 @@
 	5) Update Username ✅ (Not fully working, the _id field CANNOT BE CHANGED)
 	6) Change User Password  ✅
 */
+
+std::set<std::string> authenticatedUserTokens;
+
 namespace MongoUserFunctions
 {
 	bool authenticateUser(std::string username, std::string password, std::string databaseUrl)
 	{
+		// This authentication may take some time. Therefore, we want to cache the credentials to speed up subsequent checks
+		std::string token = username + "\n" + password + "\n" + databaseUrl;
+		if (authenticatedUserTokens.find(token) != authenticatedUserTokens.end()) return true;
+
 		std::string uriStr = getMongoURL(databaseUrl, username, password);
 
 		mongocxx::uri uri(uriStr);
@@ -36,6 +46,8 @@ namespace MongoUserFunctions
 
 			return false;
 		}
+
+		authenticatedUserTokens.insert(token);
 		
 		return true;
 	}
@@ -367,6 +379,7 @@ namespace MongoUserFunctions
 		// Dropping this user's settings collection.
 		adminClient[MongoConstants::SETTINGS_DB][userToBeDeleted.settingsCollectionName].drop();
 
+		authenticatedUserTokens.clear();
 
 		return true;
 	}
@@ -443,10 +456,9 @@ namespace MongoUserFunctions
 
 		removeUser(oldUser, adminClient);
 
+		authenticatedUserTokens.clear();
 
-
-		return false;
-
+		return true;
 	}
 
 	bool updateUserUsername(std::string oldUsername, std::string oldPassword, std::string newUsername, mongocxx::client& adminClient)
@@ -506,7 +518,7 @@ namespace MongoUserFunctions
 
 		removeUser(oldUser, adminClient);
 
-		
+		authenticatedUserTokens.clear();
 
 		return true;
 
@@ -528,14 +540,14 @@ namespace MongoUserFunctions
 		// Getting elements from this document:
 		element el = command_result.view()["ok"];
 
+		authenticatedUserTokens.clear();
+
 		if (el.get_double() == 1)
 		{
 			return true;
 		}
 
 		return false;
-
-
 	}
 
 	bool updateUsername(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient)
@@ -566,6 +578,8 @@ namespace MongoUserFunctions
 
 		int32_t matchedCount = result.get().matched_count();
 		int32_t modifiedCount = result.get().modified_count();
+
+		authenticatedUserTokens.clear();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
