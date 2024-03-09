@@ -102,3 +102,13 @@ ot::GraphicsConnectionCfg ot::GraphicsConnectionCfg::getReversedConnection(void)
 	GraphicsConnectionCfg ret(m_destUID, m_destConnectable, m_originUID, m_originConnectable);
 	return ret;
 }
+
+std::string ot::GraphicsConnectionCfg::createConnectionKey() const
+{
+	return std::to_string(m_originUID) + m_originConnectable + std::to_string(m_destUID) + m_destConnectable;
+}
+
+std::string ot::GraphicsConnectionCfg::createConnectionKeyReverse() const
+{
+	return std::to_string(m_destUID) + m_destConnectable + std::to_string(m_originUID) + m_originConnectable;
+}
