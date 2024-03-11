@@ -9,7 +9,7 @@
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
-
+#include "OTCore/CoreTypes.h"
 // std header
 #include <string>
 
@@ -24,13 +24,11 @@ namespace ot {
 			SmoothLine
 		};
 
-		static std::string buildKey(const std::string& _originUid, const std::string& _originItemName, const std::string& _destUid, const std::string& _destItemName);
-
 		static std::string styleToString(ConnectionStyle _style);
 		static ConnectionStyle stringToStyle(const std::string _style);
 
 		GraphicsConnectionCfg();
-		GraphicsConnectionCfg(const std::string& _originUid, const std::string& _originConnectableName, const std::string& _destinationUid, const std::string& _destinationName);
+		GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName);
 		GraphicsConnectionCfg(const GraphicsConnectionCfg& _other);
 		virtual ~GraphicsConnectionCfg();
 
@@ -49,26 +47,20 @@ namespace ot {
 		//! @brief Create a copy of this connection but the origin an destination are swapped
 		GraphicsConnectionCfg getReversedConnection(void) const;
 
-		//! @brief Creates a key that identifies this connection
-		std::string buildKey(void) const;
-
-		//! @brief Creates a key that identifies this connection, but the origin and destination are switched
-		std::string buildReversedKey(void) const;
-
-		void setOriginUid(const std::string& _uid) { m_originUID = _uid; };
-		const std::string& originUid(void) const { return m_originUID; };
+		void setOriginUid(const ot::UID& _uid) { m_originUID = _uid; };
+		const ot::UID& getOriginUid(void) const { return m_originUID; };
 
 		void setOriginConnectable(const std::string& _name) { m_originConnectable = _name; };
 		const std::string& originConnectable(void) const { return m_originConnectable; };
 
-		void setDestUid(const std::string& _uid) { m_destUID = _uid; };
-		const std::string& destUid(void) const { return m_destUID; };
+		void setDestUid(const ot::UID& _uid) { m_destUID = _uid; };
+		const ot::UID& getDestinationUid(void) const { return m_destUID; };
 
 		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
 		const std::string& destConnectable(void) const { return m_destConnectable; };
 
-		void setUid(const std::string& _uid) { m_uid = _uid; };
-		const std::string& uid(void) const { return m_uid; };
+		void setUid(const ot::UID& _uid) { m_uid = _uid; };
+		const ot::UID& getUid(void) const { return m_uid; };
 
 		void setLineWidth(int _width) { m_width = _width; };
 		int lineWidth(void) const { return m_width; };
@@ -79,14 +71,17 @@ namespace ot {
 		void setStyle(ConnectionStyle _style) { m_style = _style; };
 		ConnectionStyle style(void) const { return m_style; };
 
+		std::string createConnectionKey() const;
+		std::string createConnectionKeyReverse() const;
+
 	private:
-		std::string m_originUID;
+		ot::UID m_originUID;
 		std::string m_originConnectable;
 
-		std::string m_destUID;
+		ot::UID m_destUID;
 		std::string m_destConnectable;
 
-		std::string m_uid;
+		ot::UID m_uid;
 
 		int m_width;
 		ot::Color m_color;

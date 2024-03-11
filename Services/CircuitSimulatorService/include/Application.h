@@ -70,6 +70,7 @@ public:
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion,  std::map<std::string, EntityBase*> solverMap);
 	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
 
+
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
 	NGSpice& getNGSpice() { return m_ngSpice; }

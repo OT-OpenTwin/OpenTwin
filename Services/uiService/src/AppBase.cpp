@@ -2298,7 +2298,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	}
 }
 
-void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos) {
+void AppBase::slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2307,7 +2307,7 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, ot::JsonString(_uid, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, _uid, doc.GetAllocator());
 
 	ot::Point2DD itmPos(_newPos.x(), _newPos.y());
 	ot::JsonObject itemPosObj;
@@ -2338,7 +2338,7 @@ void AppBase::slotGraphicsItemMoved(const std::string& _uid, const QPointF& _new
 	}
 }
 
-void AppBase::slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector) {
+void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2384,10 +2384,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged, doc.GetAllocator()), doc.GetAllocator());
-
-	std::list<std::string> sel; // Selected items
+	ot::UIDList selectedBlockItemIDs; 
 
 	for (auto s : scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
@@ -2395,11 +2392,11 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 
 		if (itm) {
 			// Item selected
-			sel.push_back(itm->graphicsItemUid());
+			selectedBlockItemIDs.push_back(itm->graphicsItemUid());
 		}
 		else if (citm) {
 			// Connection selected
-			sel.push_back(citm->uid());
+			selectedBlockItemIDs.push_back(citm->uid());
 		}
 		else {
 			// Unknown selected
@@ -2407,43 +2404,20 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 	}
 
-	if (sel.empty()) {
+	if (selectedBlockItemIDs.empty()) {
 		return;
 	}
-
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(sel, doc.GetAllocator()), doc.GetAllocator());
-
-	try {
-		ot::GraphicsView* view = scene->getGraphicsView();
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
-		std::string response;
-		auto ser = m_ExternalServicesComponent->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
-		if (ser) {
-			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, ser->serviceURL(), doc, response)) {
-				OT_LOG_EA("Failed to send http request");
-				return;
-			}
-
-			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-			if (rMsg != ot::ReturnMessage::Ok) {
-				OT_LOG_E("Request failed: " + rMsg.getWhat());
-				return;
-			}
-		}
-		else {
-			OT_LOG_EA("No model connected");
-		}
+	
+	clearNavigationTreeSelection();
+	
+	for (ot::UID selectedBlockItemID : selectedBlockItemIDs)
+	{
+		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedBlockItemID);
+		setNavigationTreeItemSelected(treeID, true);	
 	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
-	}
-
 }
 
-void AppBase::slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections) {
+void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {
 	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");

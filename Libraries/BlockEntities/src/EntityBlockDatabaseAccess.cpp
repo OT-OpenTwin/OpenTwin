@@ -1,6 +1,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntityBlockDatabaseAccess.h"
+#include "EntityBlockConnection.h"	
 
 
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
@@ -204,13 +205,17 @@ void EntityBlockDatabaseAccess::UpdateBlockConfig()
 
 void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connectorsForRemoval)
 {
-	std::list<ot::GraphicsConnectionCfg> connectionsForRemoval;
-	std::list<ot::GraphicsConnectionCfg> remainingConnections;
-	
-	for (auto& connection : _connections)
+	std::list<ot::UID> connectionsForRemoval;
+	std::list<ot::UID> remainingConnections;
+	std::map<ot::UID, EntityBase*> entityMap;
+	for (auto& connectionID : _connectionIDs)
 	{
+		EntityBase* entityBase = readEntityFromEntityID(this, connectionID, entityMap);
+		EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityBase);
+		ot::GraphicsConnectionCfg connection = connectionEntity->getConnectionCfg();
 		std::string connectorOfThisBlock;
-		if (connection.destUid() == getBlockID())
+
+		if (connection.getDestinationUid() == getEntityID())
 		{
 			connectorOfThisBlock = connection.destConnectable();
 		}
@@ -230,47 +235,53 @@ void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connec
 		}
 		if (removeConnection)
 		{
-			connectionsForRemoval.push_back(connection);
+			connectionsForRemoval.push_back(connectionEntity->getEntityID());
 		}
 		else
 		{
-			remainingConnections.push_back(connection);
+			remainingConnections.push_back(connectionEntity->getEntityID());
 		}
+
 	}
-	_connections = std::move(remainingConnections);
+	_connectionIDs = std::move(remainingConnections);
 	RemoveConnectionsAtConnectedEntities(connectionsForRemoval);
-	CreateConnections();
 }
 
-void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<ot::GraphicsConnectionCfg>& connectionsForRemoval)
+void EntityBlockDatabaseAccess::RemoveConnectionsAtConnectedEntities(std::list<ot::UID>& connectionsForRemoval)
 {
 	if (connectionsForRemoval.size() != 0)
 	{
+		std::map<ot::UID, EntityBase*> entityMapFirst;
 		ot::UIDList entitiesForUpdate;
 		std::map<ot::UID, std::list<ot::GraphicsConnectionCfg*>> connectionsForRemovalByEntityID;
-		for (auto& connection : connectionsForRemoval)
+
+		for (auto& connectionID : connectionsForRemoval)
 		{
-			if (connection.destUid() == getBlockID())
+			EntityBase* entityBase = readEntityFromEntityID(this, connectionID, entityMapFirst);
+			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityBase);
+			ot::GraphicsConnectionCfg connection = connectionEntity->getConnectionCfg();
+
+			if (connection.getDestinationUid() == getEntityID())
 			{
-				entitiesForUpdate.push_back(std::stoull(connection.originUid()));
+				entitiesForUpdate.push_back(connection.getOriginUid());
 			}
 			else
 			{
-				entitiesForUpdate.push_back(std::stoull(connection.destUid()));
+				entitiesForUpdate.push_back(connection.getDestinationUid());
 			}
 			connectionsForRemovalByEntityID[entitiesForUpdate.back()].push_back(&connection);
 		}
-		std::map<ot::UID, EntityBase*> entityMap;
+		std::map<ot::UID, EntityBase*> entityMapSecond;
 		for (const ot::UID& entityID : entitiesForUpdate)
 		{
-			EntityBase* entityBase = readEntityFromEntityID(nullptr, entityID, entityMap);
+			EntityBase* entityBase = readEntityFromEntityID(nullptr, entityID, entityMapSecond);
 			assert(entityBase != nullptr);
 			std::unique_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(entityBase));
 			assert(blockEntity != nullptr);
 
 			for (auto connection : connectionsForRemovalByEntityID[entityID])
 			{
-				blockEntity->RemoveConnection(*connection);
+				blockEntity->RemoveConnection(entityID);
 			}
 			blockEntity->StoreToDataBase();
 			getModelState()->modifyEntityVersion(blockEntity->getEntityID(), blockEntity->getEntityStorageVersion());

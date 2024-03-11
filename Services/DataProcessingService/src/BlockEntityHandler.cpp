@@ -12,10 +12,11 @@
 #include "AdvancedQueryBuilder.h"
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
+#include "EntityBlockConnection.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
-	ClassFactoryBlock factory;
+	ClassFactory& factory = Application::instance()->getClassFactory();
 	EntityBase* baseEntity = factory.CreateEntity(blockName);
 	assert(baseEntity != nullptr);		
 	std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
@@ -39,44 +40,63 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections)
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& editorName)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
+	ot::UIDList topoEntIDs, topoEntVers;
+	const std::string connectionFolderName = _blockFolder + "/" + editorName + "/" + _connectionFolder;
 	for (auto& connection : connections)
 	{
+		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		connectionEntity.createProperties();
+		ot::GraphicsConnectionCfg newConnection(connection);
+		newConnection.setUid(connectionEntity.getEntityID());
+		newConnection.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
+		const std::string connectionName = CreateNewUniqueTopologyName(connectionFolderName, "Connection", 1, false);
+		connectionEntity.setName(connectionName);
+		connectionEntity.setConnectionCfg(newConnection);
+		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
+		connectionEntity.SetGraphicsScenePackageName(_packageName);
+		connectionEntity.createProperties();
+
+		connectionEntity.StoreToDataBase();
+		topoEntIDs.push_back(connectionEntity.getEntityID());
+		topoEntVers.push_back(connectionEntity.getEntityStorageVersion());
+		
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
-		if (blockEntitiesByBlockID.find(connection.originUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(newConnection.getOriginUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.originUid()];
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.getOriginUid()];
 			
-			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
+			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.originConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.originUid() + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getOriginUid()) + " was not found");
 			continue;
 		}
 
-		if (blockEntitiesByBlockID.find(connection.destUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(newConnection.getDestinationUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.destUid()];
-			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.getDestinationUid()];
+			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.destConnectable());
 		}
 		else
 		{
-			OT_LOG_EAS("Could not create connection since block " + connection.destUid() + " was not found.");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getDestinationUid()) + " was not found.");
 			continue;
 		}
 
 		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
 		{
-			blockEntitiesByBlockID[connection.originUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.originUid()]);
-			blockEntitiesByBlockID[connection.destUid()]->AddConnection(connection);
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.destUid()]);
+			blockEntitiesByBlockID[newConnection.getOriginUid()]->AddConnection(newConnection.getUid());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.getOriginUid()]);
+			blockEntitiesByBlockID[newConnection.getDestinationUid()]->AddConnection(newConnection.getUid());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.getDestinationUid()]);
 		}
 		else
 		{
@@ -86,8 +106,6 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 	if (entitiesForUpdate.size() != 0)
 	{
-		ot::UIDList topoEntIDs, topoEntVers;
-
 		for (auto entityForUpdate : entitiesForUpdate)
 		{
 			entityForUpdate->StoreToDataBase();
@@ -114,22 +132,23 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc);
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const std::string& blockID, ot::Point2DD& position, ClassFactory* classFactory)
+void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, ot::Point2DD& position, ClassFactory* classFactory)
 {
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
-	if (blockEntitiesByBlockID.find(blockID) == blockEntitiesByBlockID.end())
-	{
-		OT_LOG_EAS("Position of block item cannot be updated because a block with id: " + blockID + " was not found");
-	}
-	auto blockEntity = blockEntitiesByBlockID[blockID];
 	std::list<ot::EntityInformation> entityInfos;
-	ot::UIDList entityList{ blockEntity->getCoordinateEntityID() };
-	_modelComponent->getEntityInformation(entityList, entityInfos);
+	ot::UIDList entityIDList{ blockID };
+	_modelComponent->getEntityInformation(entityIDList, entityInfos);
 	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
+	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+	
+	ot::UID positionID = blockEnt->getCoordinateEntityID();
+	entityInfos.clear();
+	entityIDList = { positionID };
+	_modelComponent->getEntityInformation(entityIDList, entityInfos);
+	entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();
-	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Update BlockItem position");
+	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
 }
 
 void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
@@ -204,23 +223,24 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-std::map<std::string, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
+std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
 {
 	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactoryBlock classFactory;
-
-	std::map<std::string, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
+	
+	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
 		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
-			assert(blockEntity != nullptr);
-			blockEntitiesByBlockID[blockEntity->getBlockID()] = blockEntity;
+			if (blockEntity != nullptr)
+			{
+				blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
+			}
 		}
 	}
 	return blockEntitiesByBlockID;

@@ -61,9 +61,7 @@ bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 // Base class functions: ot::CustomGraphicsItem
 
-void ot::GraphicsTriangleItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	this->paintGeneralGraphics(_painter, _opt, _widget);
-	
+void ot::GraphicsTriangleItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {	
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
 

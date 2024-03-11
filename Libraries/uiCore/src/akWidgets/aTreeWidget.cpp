@@ -297,7 +297,10 @@ void ak::aTreeWidget::setItemIcon(
 ) {
 	auto itm = m_items.find(_itemId);
 	assert(itm != m_items.end()); // Invalid item ID
-	itm->second->setIcon(0, _icon);
+	if (itm != m_items.end())
+	{
+		itm->second->setIcon(0, _icon);
+	}
 }
 
 void ak::aTreeWidget::setSortingEnabled(

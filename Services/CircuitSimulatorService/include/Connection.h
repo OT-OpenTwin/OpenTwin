@@ -17,11 +17,11 @@ public:
 	Connection(const GraphicsConnectionCfg& obj);
 
 	bool operator<(const Connection& other) const {
-		if (this->originUid() == other.originUid()) {
-			return this->destUid() < other.destUid();
+		if (this->getOriginUid() == other.getOriginUid()) {
+			return this->getDestinationUid() < other.getDestinationUid();
 		}
 		else {
-			return this->originUid() < other.originUid();
+			return this->getOriginUid() < other.getOriginUid();
 		}
 	}
 

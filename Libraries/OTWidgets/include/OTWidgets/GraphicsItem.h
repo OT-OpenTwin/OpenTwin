@@ -12,7 +12,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/SimpleFactory.h"
 #include "OTCore/Flags.h"
-
+#include "OTCore/CoreTypes.h"
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
@@ -44,6 +44,12 @@ namespace ot {
 			NoContext, //! @brief Item is not placed anywhere
 			ItemPreviewContext, //! @brief Item is placed in a preview
 			ItemNetworkContext  //! @brief Item is placed in a network
+		};
+
+		enum GraphicsItemState {
+			NoState       = 0x00, //! @brief Default state
+			HoverState    = 0x01, //! @brief Item is hovered over by user
+			SelectedState = 0x02  //! @brief Item is selected
 		};
 
 		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
@@ -115,13 +121,13 @@ namespace ot {
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void);
 
-		void setHasHover(bool _hasHover) { m_hasHover = _hasHover; };
-		bool hasHover(void) const { return m_hasHover; };		
+		void setStateFlags(GraphicsItemState _flags) { m_state = _flags; };
+		GraphicsItemState stateFlags(void) const { return m_state; };
 
 		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
 
-		void setGraphicsItemUid(const std::string& _uid) { m_uid = _uid; };
-		const std::string& graphicsItemUid(void) const { return m_uid; };
+		void setGraphicsItemUid(const ot::UID& _uid) { m_uid = _uid; };
+		const ot::UID& graphicsItemUid(void) const { return m_uid; };
 
 		virtual void setGraphicsItemName(const std::string& _name) { m_name = _name; };
 		const std::string& graphicsItemName(void) const { return m_name; };
@@ -160,8 +166,10 @@ namespace ot {
 
 	private:
 		bool m_isLayoutOrStack;
-		bool m_hasHover;
-		std::string m_uid;
+		
+		GraphicsItemState m_state;
+
+		ot::UID m_uid;
 		std::string m_name;
 		std::string m_toolTip;
 		ot::Alignment m_alignment;
@@ -189,3 +197,5 @@ namespace ot {
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemState)

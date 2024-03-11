@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataStorage", "DataStorage.vcxproj", "{5DCF28A9-5B2B-4E2B-887D-AB063D427E49}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataStorageTest", "DataStorageTest\DataStorageTest.vcxproj", "{6B235D0F-4765-4DC3-A4E2-FD9D67418C81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5DCF28A9-5B2B-4E2B-887D-AB063D427E49} = {5DCF28A9-5B2B-4E2B-887D-AB063D427E49}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

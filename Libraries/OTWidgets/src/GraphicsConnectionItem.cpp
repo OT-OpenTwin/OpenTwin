@@ -105,12 +105,12 @@ void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _ev
 // ###########################################################################################################################################################################################################################################################################################################################
 
 bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg& _cfg) {
-	this->m_uid = _cfg.uid();
+	this->m_uid = _cfg.getUid();
 	this->m_style = _cfg.style();
-
 	m_pen.setWidth(_cfg.lineWidth());
 	m_pen.setColor(ot::OTQtConverter::toQt(_cfg.color()));
 
+	m_connectionKey = _cfg.createConnectionKey();
 	return true;
 }
 

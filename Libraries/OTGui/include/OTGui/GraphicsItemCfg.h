@@ -17,7 +17,7 @@
 #include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/OTGuiAPIExport.h"
-
+#include "OTCore/CoreTypes.h"
 // std header
 #include <string>
 
@@ -115,8 +115,8 @@ namespace ot {
 		void setAlignment(ot::Alignment _align) { m_alignment = _align; };
 		ot::Alignment alignment(void) const { return m_alignment; };
 
-		void setUid(const std::string& _uid) { m_uid = _uid; };
-		const std::string& uid(void) const { return m_uid; };
+		void setUid(const ot::UID& _uid) { m_uid = _uid; };
+		const ot::UID& uid(void) const { return m_uid; };
 
 		void setSizePolicy(ot::SizePolicy _policy) { m_sizePolicy = _policy; };
 		ot::SizePolicy sizePolicy(void) const { return m_sizePolicy; };
@@ -127,7 +127,7 @@ namespace ot {
 	private:
 		std::string m_name;
 		std::string m_tile;
-		std::string m_uid;
+		ot::UID m_uid;
 		std::string m_tooltip;
 		Point2DD m_pos;
 

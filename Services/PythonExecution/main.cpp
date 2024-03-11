@@ -41,12 +41,19 @@ void MessageReceived()
 {
 	if(_socket.canReadLine())
 	{
-		const std::string message(_socket.readLine().data());
+		try
+		{
+			const std::string message(_socket.readLine().data());
 
-		ot::JsonDocument document;
-		document.fromJson(message);
-		ot::ReturnMessage returnMessage (HandleMessage(document));
-		Send(returnMessage.toJson());
+			ot::JsonDocument document;
+			document.fromJson(message);
+			ot::ReturnMessage returnMessage(HandleMessage(document));
+			Send(returnMessage.toJson());
+		}
+		catch (std::exception e)
+		{
+			OT_LOG_E("Failed to handle incoming message due to: " + std::string(e.what()));
+		}
 	}
 }
 
@@ -69,39 +76,45 @@ int main(int argc, char* argv[], char* envp[])
 	const std::string serverName = argv[1];
 	ot::ServiceLogNotifier::initialize("PythonSubprocess", "", false);
 #endif // _DEBUG
-
-	OT_LOG_D("Connecting subservice with server: " + serverName);
-	int count(0);
-	do
+	try
 	{
-		std::this_thread::sleep_for(std::chrono::seconds(_secondsUntilSearchForServer));
-		_socket.connectToServer(serverName.c_str());
-		count++;
+		OT_LOG_D("Connecting subservice with server: " + serverName);
+		int count(0);
+		do
+		{
+			std::this_thread::sleep_for(std::chrono::seconds(_secondsUntilSearchForServer));
+			_socket.connectToServer(serverName.c_str());
+			count++;
 
-	} while (_socket.error() == QLocalSocket::ServerNotFoundError && count < _numberOfServerConnectionTrials);
-	
-	if (_socket.state() == QLocalSocket::ConnectingState)
-	{
-		_socket.waitForConnected(_socketConnectionTimeout);
+		} while (_socket.error() == QLocalSocket::ServerNotFoundError && count < _numberOfServerConnectionTrials);
+
+		if (_socket.state() == QLocalSocket::ConnectingState)
+		{
+			_socket.waitForConnected(_socketConnectionTimeout);
+		}
+
+		if (_socket.state() != QLocalSocket::ConnectedState)
+		{
+			auto socketError = _socket.errorString();
+			OT_LOG_E("Error while trying to connect to PYthon Service: " + socketError.toStdString());
+			OT_LOG_E("Shutting down");
+			exit(0);
+		}
+		OT_LOG_D("Connected with socket");
+
+		_actionHandler = new ActionHandler();
+
+		QEventLoop loop;
+		QObject::connect(&_socket, &QLocalSocket::readyRead, &loop, &MessageReceived);
+		QObject::connect(&_socket, &QLocalSocket::disconnected, &loop, &DisConnect);
+		OT_LOG_D("Finished startup. Starting to listen.");
+		ot::ReturnMessage msg(ot::ReturnMessage::Ok, OT_ACTION_CMD_CheckStartupCompleted);
+		Send(msg.toJson());
+		loop.exec();
+		return a.exec();
 	}
-	
-	if (_socket.state() != QLocalSocket::ConnectedState)
+	catch (const std::exception& e)
 	{
-		auto socketError = _socket.errorString();
-		OT_LOG_E("Error while trying to connect to PYthon Service: " + socketError.toStdString());
-		OT_LOG_E("Shutting down");
-		exit(0);
+		OT_LOG_E("Crash during setup: " + std::string(e.what()));
 	}
-	OT_LOG_D("Connected with socket");
-	
-	_actionHandler = new ActionHandler();
-
-	QEventLoop loop;
-	QObject::connect(&_socket, &QLocalSocket::readyRead, &loop, &MessageReceived);
-	QObject::connect(&_socket, &QLocalSocket::disconnected, &loop, &DisConnect);
-	OT_LOG_D("Finished startup. Starting to listen.");
-	ot::ReturnMessage msg(ot::ReturnMessage::Ok, OT_ACTION_CMD_CheckStartupCompleted);
-	Send(msg.toJson());
-	loop.exec();
-	return a.exec();
 }

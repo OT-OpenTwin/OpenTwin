@@ -86,7 +86,7 @@ QRectF ot::GraphicsItem::calculateInnerRect(const QRectF& _outerRect, const QSiz
 
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItemCfg::NoFlags), m_context(NoContext), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
-	m_hasHover(false), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
+	m_state(NoState), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
 	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny)
 {
 
@@ -202,6 +202,7 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
+	this->m_state |= GraphicsItem::HoverState;
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
@@ -219,11 +220,16 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	ToolTipHandler::hideToolTip();
+	this->m_state &= (~GraphicsItem::HoverState);
 }
 
 void ot::GraphicsItem::paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_hasHover && (m_flags & GraphicsItemCfg::ItemIsConnectable)) {
-		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(0, 0, 0, 128));
+	if (this->m_parent) return; // Root items only
+	if (m_state & HoverState) {
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(255, 0, 0));
+	}
+	else if (m_state & SelectedState) {
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(255, 0, 0));
 	}
 }
 

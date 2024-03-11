@@ -511,10 +511,10 @@ public:
 
 public slots:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
-	void slotGraphicsItemMoved(const std::string& _uid, const QPointF& _newPos);
-	void slotGraphicsConnectionRequested(const std::string& _fromUid, const std::string& _fromConnector, const std::string& _toUid, const std::string& _toConnector);
+	void slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos);
+	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsSelectionChanged(void);
-	void slotGraphicsRemoveItemsRequested(const std::list<std::string>& _items, const std::list<std::string>& _connections);
+	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 	void slotTextEditorSaveRequested(void);
 
 private slots:
