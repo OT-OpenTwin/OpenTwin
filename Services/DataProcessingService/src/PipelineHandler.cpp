@@ -3,11 +3,13 @@
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
 #include "EntityBlockDataDimensionReducer.h"
+#include "EntityBlockDisplay.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPlot1D.h"
 #include "BlockHandlerPython.h"
 #include "BlockHandlerDataDimensionReducer.h"
+#include "BlockHandlerDisplay.h"
 
 void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
@@ -63,6 +65,12 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 	if (dataDimensionReducer != nullptr)
 	{
 		return std::shared_ptr<BlockHandler>(new BlockHandlerDataDimensionReducer(dataDimensionReducer,_blockHandlerByGraphNode));
+	}
+
+	EntityBlockDisplay* display = dynamic_cast<EntityBlockDisplay*>(blockEntity.get());
+	if (display != nullptr)
+	{
+		return std::shared_ptr<BlockHandlerDisplay>(new BlockHandlerDisplay(display, _blockHandlerByGraphNode));
 	}
 	else
 	{

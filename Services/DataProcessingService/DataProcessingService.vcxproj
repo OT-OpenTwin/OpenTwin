@@ -190,6 +190,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BlockHandler.cpp" />
     <ClCompile Include="src\BlockHandlerDataDimensionReducer.cpp" />
+    <ClCompile Include="src\BlockHandlerDisplay.cpp" />
     <ClCompile Include="src\BlockHandlerPython.cpp" />
     <ClCompile Include="src\BufferResultCollectionAccess.cpp" />
     <ClCompile Include="src\Graph.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="include\BlockHandler.h" />
     <ClInclude Include="include\BlockHandlerDatabaseAccess.h" />
     <ClInclude Include="include\BlockHandlerDataDimensionReducer.h" />
+    <ClInclude Include="include\BlockHandlerDisplay.h" />
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BlockHandlerPython.h" />
     <ClInclude Include="include\BufferBlockDatabaseAccess.h" />

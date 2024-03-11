@@ -25,6 +25,9 @@ namespace ot
 		void setValue(uint32_t columnIndex, uint32_t rowIndex, ot::Variable&& value);
 		void setValue(uint32_t columnIndex, uint32_t rowIndex, const ot::Variable& value);
 		void setValues(const ot::Variable* values, uint32_t size);
+		/// <summary>
+		/// column-major access
+		/// </summary>
 		const ot::Variable& getValue(uint32_t columnIndex, uint32_t rowIndex)const;
 		const ot::Variable* getValues()const;
 		const uint32_t getNumberOfColumns() const { return _numberOfColumns; }
