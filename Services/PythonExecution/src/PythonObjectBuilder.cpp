@@ -3,8 +3,142 @@
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
-
 #include <iterator>
+
+
+
+int PythonObjectBuilder::initiateNumpy()
+{
+	import_array1(0);
+	return 1;
+}
+
+void* PythonObjectBuilder::variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, NPY_TYPES& pType)
+{
+	const ot::Variable& firstVal = values[0];
+
+	if (firstVal.isBool())
+	{
+		pType = NPY_BOOL;
+		bool* data = new bool[size];
+		for (uint32_t i = 0; i < size; i++)
+		{
+			data[i] = values[i].getBool();
+		}
+		return data;
+	}
+	else if (firstVal.isConstCharPtr())
+	{
+		//char* data = new char[size];
+		//for (uint32_t i = 0; i < size; i++)
+		//{
+		//	data[i] = values[i].getConstCharPtr();
+		//}
+		//return data;
+		return nullptr;
+	}
+	else if (firstVal.isDouble())
+	{
+		pType = NPY_DOUBLE;
+		double* data = new double[size];
+		for (uint32_t i = 0; i < size; i++)
+		{
+			data[i] = values[i].getDouble();
+		}
+		return data;
+	}
+	else if (firstVal.isFloat())
+	{
+		pType = NPY_FLOAT;
+		float* data = new float[size];
+		for (uint32_t i = 0; i < size; i++)
+		{
+			data[i] = values[i].getFloat();
+		}
+		return data;
+	}
+	else if (firstVal.isInt32())
+	{
+		pType = NPY_INT;
+		int32_t* data = new int32_t[size];
+		for (uint32_t i = 0; i < size; i++)
+		{
+			data[i] = values[i].getInt32();
+		}
+		return data;
+	}
+	else
+	{
+		assert(firstVal.isInt64());
+		pType = NPY_LONG;
+		int64_t* data = new int64_t[size];
+		for (uint32_t i = 0; i < size; i++)
+		{
+			data[i] = values[i].getInt64();
+		}
+		return data;
+	}
+}
+
+const ot::Variable* PythonObjectBuilder::voidArrayToVariableArray(void* data, const uint32_t size, int type)
+{
+	std::function<ot::Variable(void*, uint32_t)> cast;
+	if (type == NPY_BOOL)
+	{
+		cast = [](void* data, uint32_t index) 
+		{
+			const bool castedData = ((bool*)data)[index];
+			return ot::Variable(castedData); 
+		};
+	}
+	else if (type == NPY_INT)
+	{
+
+		cast = [](void* data, uint32_t index) 
+		{
+			const int32_t castedData = ((int*)data)[index];
+			return ot::Variable(castedData);
+		};
+	}
+	else if (type == NPY_INT64)
+	{
+		cast = [](void* data, uint32_t index) 
+		{
+			const int64_t castedData = ((int64_t*)data)[index];
+			return ot::Variable(castedData); 
+		};
+	}
+	else if (type == NPY_DOUBLE)
+	{
+		cast = [](void* data, uint32_t index) 
+		{
+			const double castedData = ((double*)data)[index]; 
+			return ot::Variable(castedData);
+		};
+	}
+	else
+	{
+		assert(type == NPY_FLOAT);
+		cast = [](void* data, uint32_t index) 
+		{
+			const float castedData = ((float*)data)[index];
+			return ot::Variable(castedData);
+		};
+	}
+	ot::Variable* variables = new ot::Variable[size];
+	for (uint32_t index = 0; index < size; index++)
+	{
+		variables[index] = cast(data,index);
+	}
+
+	return variables;
+}
+
+PythonObjectBuilder::PythonObjectBuilder()
+	: _assembly(nullptr)
+{
+	initiateNumpy();
+}
 
 void PythonObjectBuilder::StartTupleAssemply(int size)
 {
@@ -252,10 +386,21 @@ ot::GenericDataStruct* PythonObjectBuilder::getGenericDataStruct(CPythonObject& 
 		entry->setValues(std::move(varVect));
 		return entry;
 	}
-	/*else if ()
+	else if (PyArray_Check(pValue))
 	{
+		PyObject* pValueBase = pValue;
+		npy_intp* shape = PyArray_SHAPE((PyArrayObject*)pValueBase);
+		int type = PyArray_TYPE((PyArrayObject*)pValueBase);
 
-	}*/
+		uint32_t rows = static_cast<uint32_t>(shape[0]);
+		uint32_t columns = static_cast<uint32_t>(shape[1]);
+		uint32_t size = rows * columns;
+		ot::GenericDataStructMatrix* matrix(new ot::GenericDataStructMatrix(columns, rows));
+		void* pyArrayData =	PyArray_DATA((PyArrayObject*)pValueBase);
+		const ot::Variable* variableArray = voidArrayToVariableArray(pyArrayData, size, type);
+		matrix->setValues(variableArray, size);
+		return matrix;
+	}
 	else
 	{
 		ot::GenericDataStructSingle* entry(new ot::GenericDataStructSingle());
@@ -517,23 +662,39 @@ CPythonObjectNew PythonObjectBuilder::setVariableList(rapidjson::GenericArray<fa
 
 CPythonObjectNew PythonObjectBuilder::setGenericDataStruct(ot::GenericDataStruct* genericDataStruct)
 {
-	auto singleVal = dynamic_cast<ot::GenericDataStructSingle*>(genericDataStruct);
-	if (singleVal != nullptr)
-	{
-		return setVariable(singleVal->getValue());
-	}
-	
-	auto vectVal = dynamic_cast<ot::GenericDataStructVector*>(genericDataStruct);
-	if (vectVal != nullptr)
-	{
-		return setVariableList(vectVal->getValues());
-	}
 
-	auto matrixVal = dynamic_cast<ot::GenericDataStructMatrix*>(genericDataStruct);
-	if (matrixVal != nullptr)
-	{
-		
-	}
+		auto singleVal = dynamic_cast<ot::GenericDataStructSingle*>(genericDataStruct);
+		if (singleVal != nullptr)
+		{
+			return setVariable(singleVal->getValue());
+		}
+
+		auto vectVal = dynamic_cast<ot::GenericDataStructVector*>(genericDataStruct);
+		if (vectVal != nullptr)
+		{
+			return setVariableList(vectVal->getValues());
+		}
+
+		auto matrixVal = dynamic_cast<ot::GenericDataStructMatrix*>(genericDataStruct);
+		if (matrixVal != nullptr)
+		{
+			uint32_t rows = matrixVal->getNumberOfRows();
+			uint32_t columns = matrixVal->getNumberOfColumns();
+			NPY_TYPES type;
+			npy_intp* pColumns = new npy_intp[rows];
+			for (uint32_t i = 0; i < rows; i++)
+			{
+				pColumns[i] = columns;
+			}
+
+			const ot::Variable* values =	matrixVal->getValues();
+			const const uint32_t numberOfEntries =	matrixVal->getNumberOfEntries();
+			void* data = variableArrayToVoidArray(values, numberOfEntries, type);
+			
+			PyObject* pMatrix = PyArray_SimpleNewFromData(rows, pColumns, type, data);
+			
+			return CPythonObjectNew(pMatrix);
+		}
 }
 
 CPythonObjectNew PythonObjectBuilder::setGenericDataStructList(ot::GenericDataStructList& values)

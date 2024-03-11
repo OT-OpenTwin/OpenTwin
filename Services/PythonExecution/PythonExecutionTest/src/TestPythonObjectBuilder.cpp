@@ -6,6 +6,8 @@
 #include "PythonObjectBuilder.h"
 #include "FixturePythonObjectBuilder.h"
 #include "OTCore/GenericDataStructVector.h"
+#include "OTCore/GenericDataStructMatrix.h"
+
 TEST_F(FixturePythonObjectBuilder, FloatToVariable)
 {
 	constexpr float expectedValue = std::numeric_limits<float>::max();
@@ -116,6 +118,67 @@ TEST_F(FixturePythonObjectBuilder, GenericDataStructure)
 	auto actual = dynamic_cast<ot::GenericDataStructVector*>(gValue);
 
 	ASSERT_EQ(actual->getNumberOfEntries(), expected.getNumberOfEntries());
+}
+
+int initiateNumpyLoc()
+{
+	import_array1(0);
+	return 0;
+}
+
+TEST_F(FixturePythonObjectBuilder, GenericDataStructureMatrixToNumpyMatrix)
+{
+	initiateNumpyLoc();
+	double expected = 7.7;
+	double data[] = { 1.0, 2.0, 3., 4.0, 5.5, 6., expected,8.8,9.9 };
+	npy_intp dims[] = { 3,3,3 };
+
+	ot::GenericDataStructMatrix expectedMatrix(3, 3);
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			int index = i * 3 + j;
+			ot::Variable temp(data[index]);
+			expectedMatrix.setValue(j, i,temp);
+		}
+	}
+
+	PythonObjectBuilder builder;
+	CPythonObjectNew pDataStruct(builder.setGenericDataStruct(&expectedMatrix));
+	PyObject* numpy_array = pDataStruct;
+	pDataStruct.DropOwnership();
+
+	double third_element = *(double*)PyArray_GETPTR2((PyArrayObject*)numpy_array, 0, 2);
+
+	ASSERT_DOUBLE_EQ(third_element, expected);
+}
+
+TEST_F(FixturePythonObjectBuilder, NumpyMatrixToGenericDataStructureMatrix)
+{
+	initiateNumpyLoc();
+	double expected = 7.7;
+	double data[] = { 1.0, 2.0, 3., 4.0, 5.5, 6., expected,8.8,9.9 };
+	npy_intp dims[] = { 3,3,3 };
+
+	ot::GenericDataStructMatrix expectedMatrix(3, 3);
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			int index = i * 3 + j;
+			ot::Variable temp(data[index]);
+			expectedMatrix.setValue(j, i, temp);
+		}
+	}
+
+	PythonObjectBuilder builder;
+	CPythonObjectNew pDataStruct(builder.setGenericDataStruct(&expectedMatrix));
+	ot::GenericDataStruct* actualDataStruct = builder.getGenericDataStruct(pDataStruct);
+	ot::GenericDataStructMatrix* actualMatrix = dynamic_cast<ot::GenericDataStructMatrix*>(actualDataStruct);
+	const ot::Variable& expectedValue = expectedMatrix.getValue(2, 3);
+	const ot::Variable& actualValue = actualMatrix->getValue(2, 3);
+	ASSERT_TRUE( actualValue==expectedValue );
 }
 
 TEST_F(FixturePythonObjectBuilder, GenericDataStructureList)

@@ -5,12 +5,12 @@
 TEST(GenericDataStructMatrix, FillingWithOneValue)
 {
 	ot::Variable expectedValue(5);
-	ot::GenericDataStructMatrix matrix(1, 1);
+	ot::GenericDataStructMatrix matrix(3, 3);
 	{
 		ot::Variable value(5);
-		matrix.setValue(0, 0, std::move(value));
+		matrix.setValue(2, 2, std::move(value));
 	}
-	const ot::Variable& actualValue = matrix.getValue(0, 0);
+	const ot::Variable& actualValue = matrix.getValue(2, 2);
 
 	EXPECT_EQ(actualValue, expectedValue);
 }

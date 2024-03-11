@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OTCore", "OTCore.vcxproj", "{E58DB32D-7D02-400E-9DD6-D9A95EFEA088}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OTCoreTest", "test\OTCoreTest\OTCoreTest.vcxproj", "{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E58DB32D-7D02-400E-9DD6-D9A95EFEA088} = {E58DB32D-7D02-400E-9DD6-D9A95EFEA088}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
