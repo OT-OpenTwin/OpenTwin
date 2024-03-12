@@ -542,6 +542,7 @@ void Model::modelSelectionChangedNotification(std::list<ot::UID> &selectedEntity
 	// Since we are performing notifications in a parallel thread, we need to make sure that all notifications are done before
 	// we send the next round of notifications
 	using namespace std::chrono_literals;
+
 	while (modelSelectionChangedNotificationInProgress) std::this_thread::sleep_for(1ms);
 
 	// It might happen that the UI still has some reference to entitires which have already been deleted.
@@ -838,6 +839,9 @@ void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool ke
 	{
 		getStateManager()->removeEntity(entity->getEntityID(),considerChildren);
 	}
+
+	selectedModelEntityIDs.remove(entity->getEntityID());
+	selectedVisibleModelEntityIDs.remove(entity->getEntityID());
 
 	setModified();
 }

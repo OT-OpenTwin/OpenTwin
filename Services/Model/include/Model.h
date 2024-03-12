@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <atomic>
 
 #include "EntityContainer.h"
 #include "Geometry.h"
@@ -322,7 +323,8 @@ private:
 	bool						   versionGraphCreated;
 	std::string					   newTableItemName;
 	std::map<ot::UID, bool>		   meshingActive;
-	bool						   modelSelectionChangedNotificationInProgress;
+
+	std::atomic_bool				modelSelectionChangedNotificationInProgress;
 	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;
 
 
