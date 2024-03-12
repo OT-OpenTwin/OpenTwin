@@ -15,11 +15,11 @@ bool BlockHandlerDataDimensionReducer::executeSpecialized()
 {
 	GenericDataList& genericDataBlocks = _dataPerPort[_inputConnectorName];
 
-	ot::GenericDataStructVector* filteredData = new ot::GenericDataStructVector(static_cast<uint32_t>(genericDataBlocks.size()));
+	std::shared_ptr<ot::GenericDataStructVector> filteredData (new ot::GenericDataStructVector(static_cast<uint32_t>(genericDataBlocks.size())));
 	uint32_t count(0);
 	for (const auto& genericData : genericDataBlocks)
 	{
-		auto matrixData = dynamic_cast<ot::GenericDataStructMatrix*>(genericData);
+		auto matrixData = dynamic_cast<ot::GenericDataStructMatrix*>(genericData.get());
 		if (matrixData == nullptr)
 		{
 			throw std::exception((_errorMessageBase + _blockTypeName + " requires a matrix as input.").c_str());

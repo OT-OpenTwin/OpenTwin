@@ -15,16 +15,16 @@ bool BlockHandlerDisplay::executeSpecialized()
 	GenericDataList& dataList =	_dataPerPort[_input.getConnectorName()];
 	std::string displayMessage = _description + "\n";
 
-	for (ot::GenericDataStruct* data : dataList)
+	for (auto data : dataList)
 	{
-		ot::GenericDataStructSingle* single = dynamic_cast<ot::GenericDataStructSingle*>(data);
+		ot::GenericDataStructSingle* single = dynamic_cast<ot::GenericDataStructSingle*>(data.get());
 		if (single != nullptr)
 		{
 			const std::string stringVal = variableToString(single->getValue());
 			displayMessage += stringVal + "\n";
 		}
 
-		ot::GenericDataStructVector* vector = dynamic_cast<ot::GenericDataStructVector*>(data);
+		ot::GenericDataStructVector* vector = dynamic_cast<ot::GenericDataStructVector*>(data.get());
 		if (vector != nullptr)
 		{
 			displayMessage += "[";
@@ -42,7 +42,7 @@ bool BlockHandlerDisplay::executeSpecialized()
 			displayMessage += "]\n";
 		}
 
-		ot::GenericDataStructMatrix* matrix = dynamic_cast<ot::GenericDataStructMatrix*>(data);
+		ot::GenericDataStructMatrix* matrix = dynamic_cast<ot::GenericDataStructMatrix*>(data.get());
 		if(matrix != nullptr)
 		{
 			uint32_t rows =	matrix->getNumberOfRows();
