@@ -107,7 +107,7 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	auto it = m_items.find(_item->graphicsItemUid());
 	if (it != m_items.end()) {
-		OT_LOG_D("Overwriting item with the ID \"" + _item->graphicsItemUid());
+		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->graphicsItemUid()));
 		this->removeItem(_item->graphicsItemUid());
 	}
 
@@ -126,16 +126,18 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 }
 
 void ot::GraphicsView::removeItem(const ot::UID& _itemUid) {
-	auto it = m_items.find(_itemUid);
-	if (it == m_items.end()) {
+	auto graphicsItemByUID = m_items.find(_itemUid);
+	if (graphicsItemByUID == m_items.end()) {
 		//OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
 		return;
 	}
-
-	it->second->removeAllConnections();
-	m_scene->removeItem(it->second->getQGraphicsItem());
-	delete it->second;
+	m_stateChangeInProgress = true;
+	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
+	graphicsItem->removeAllConnections();
+	m_scene->removeItem(graphicsItem->getQGraphicsItem());
+	delete graphicsItem;
 	m_items.erase(_itemUid);
+	m_stateChangeInProgress = false;
 }
 
 std::list<ot::UID> ot::GraphicsView::selectedItems(void) const {
@@ -186,23 +188,24 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 
 void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 {
-	auto it = m_connections.find(_connectionUID);
-	if (it == m_connections.end()) {
+	auto connectionByUID = m_connections.find(_connectionUID);
+	if (connectionByUID == m_connections.end()) {
 		OT_LOG_W("Connection not found { \"UID\": \"" + std::to_string(_connectionUID));
 		return;
 	}
+	m_stateChangeInProgress = true;
 
 	// Remove connection from items
-	it->second->disconnectItems();
-
-	// Remove connection from view
-	m_scene->removeItem(it->second);
+	ot::GraphicsConnectionItem* connection = connectionByUID->second;
+	connection->disconnectItems();
 
 	// Destroy connection
-	delete it->second;
+	delete connection;
+	connection = nullptr;
 
 	// Erase connection from map
 	m_connections.erase(_connectionUID);
+	m_stateChangeInProgress = false;
 }
 
 ot::UIDList ot::GraphicsView::selectedConnections(void) const {

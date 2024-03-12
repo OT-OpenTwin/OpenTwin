@@ -2383,36 +2383,47 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		OT_LOG_E("GraphicsScene cast failed");
 		return;
 	}
+	ot::GraphicsView* graphicsView =scene->getGraphicsView();
+	if (graphicsView->getStateChangeInProgress())
+	{
+		return;
+	}
 
-	ot::UIDList selectedBlockItemIDs; 
+	ot::UIDList selectedGraphicSceneItemIDs; 
+	auto selectedItems = scene->selectedItems();
+	if (selectedItems.size() == 0)
+	{
+		return;
+	}
 
-	for (auto s : scene->selectedItems()) {
-		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
-		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
-
-		if (itm) {
-			// Item selected
-			selectedBlockItemIDs.push_back(itm->graphicsItemUid());
+	for (auto selectedItem : selectedItems) 
+	{
+		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
+		if (selectedGraphicsItem) 
+		{
+			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->graphicsItemUid());
+			continue;
 		}
-		else if (citm) {
-			// Connection selected
-			selectedBlockItemIDs.push_back(citm->uid());
+		
+		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
+		if (selectedConnection) 
+		{
+			selectedGraphicSceneItemIDs.push_back(selectedConnection->uid());
+			continue;
 		}
-		else {
+
+		if(selectedConnection == nullptr && selectedGraphicsItem == nullptr)
+		{
 			// Unknown selected
 			OTAssert(0, "Unknown graphics item selected");
 		}
 	}
-
-	if (selectedBlockItemIDs.empty()) {
-		return;
-	}
 	
 	clearNavigationTreeSelection();
 	
-	for (ot::UID selectedBlockItemID : selectedBlockItemIDs)
+	for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
 	{
-		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedBlockItemID);
+		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
 		setNavigationTreeItemSelected(treeID, true);	
 	}
 }

@@ -30,7 +30,7 @@ ot::GraphicsItemCfg* EntityBlockDisplay::CreateBlockCfg()
 	
 	const ot::Color colourTitle(ot::Color::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath("Images/chardevice.png");
+	block.setLeftTitleCornerImagePath("Default/chardevice.png");
 	AddConnectors(block);
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();

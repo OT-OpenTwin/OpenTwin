@@ -318,10 +318,10 @@ void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
 }
 
 void ot::GraphicsItem::forgetConnection(GraphicsConnectionItem* _connection) {
-	auto it = std::find(m_connections.begin(), m_connections.end(), _connection);
-	while (it != m_connections.end()) {
-		m_connections.erase(it);
-		it = std::find(m_connections.begin(), m_connections.end(), _connection);
+	auto connection = std::find(m_connections.begin(), m_connections.end(), _connection);
+	while (connection != m_connections.end()) {
+		m_connections.erase(connection);
+		connection = std::find(m_connections.begin(), m_connections.end(), _connection);
 	}
 }
 

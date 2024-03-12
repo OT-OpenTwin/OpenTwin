@@ -40,6 +40,8 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
 
+		const bool getStateChangeInProgress() const { return m_stateChangeInProgress; }
+
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
 		GraphicsItem* getItem(const ot::UID& _itemUid);
@@ -95,6 +97,8 @@ namespace ot {
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
 	private:
+		bool m_stateChangeInProgress = false;
+		
 		std::string m_viewName;
 		GraphicsScene* m_scene;
 		bool m_isPressed;
