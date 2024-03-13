@@ -19,9 +19,10 @@
 #include "SelectEntitiesDialog.h"
 
 // Qt header
-#include <QFileDialog>					// QFileDialog
-#include <qdir.h>						// QDir
-#include <qeventloop.h>
+#include <QtCore/qdir.h>						// QDir
+#include <QtCore/qeventloop.h>
+#include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
@@ -46,6 +47,7 @@
 
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
@@ -58,6 +60,7 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/TextEditor.h"
+#include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/OnePropertyDialog.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -3127,6 +3130,25 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					std::string response;
 					sendHttpRequest(EXECUTE, info, responseDoc, response);
 				}
+			}
+			else if (action == OT_ACTION_CMD_UI_MessageDialog) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
+
+				ot::MessageDialogCfg cfg;
+				cfg.setFromJsonObject(cfgObj);
+
+				ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+
+				ot::JsonDocument responseDoc;
+				responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MessageDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+				responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(cfg.name(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+				responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(ot::MessageDialogCfg::buttonToString(result), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+				std::string response;
+				sendHttpRequest(EXECUTE, info, responseDoc, response);
 			}
 			else
 			{

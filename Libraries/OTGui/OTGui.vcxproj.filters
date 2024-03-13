@@ -171,9 +171,6 @@
     <ClInclude Include="include\OTGui\OnePropertyDialogCfg.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\DialogCfg.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\PropertyFactory.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
@@ -182,6 +179,12 @@
     </ClInclude>
     <ClInclude Include="include\OTGui\PropertyGridCfg.h">
       <Filter>Header Files\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\MessageDialogCfg.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\DialogCfg.h">
+      <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -311,9 +314,6 @@
     <ClCompile Include="src\OnePropertyDialogCfg.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\DialogCfg.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\PropertyFactory.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
@@ -322,6 +322,12 @@
     </ClCompile>
     <ClCompile Include="src\PropertyGridCfg.cpp">
       <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageDialogCfg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DialogCfg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
