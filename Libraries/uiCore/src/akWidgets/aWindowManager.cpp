@@ -474,8 +474,8 @@ bool ak::aWindowManager::restoreState(
 	if (_setPositionAndSize) {
 		if (!isMax) {
 			QSize size{ doc["SizeWidth"].GetInt(), doc["SizeHeight"].GetInt() };
-			m_window->showNormal();
 			m_window->resize(size);
+			m_window->showNormal();
 		}
 		else {
 			m_window->showMaximized();

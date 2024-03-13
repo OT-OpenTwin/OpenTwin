@@ -82,6 +82,8 @@ namespace ak {
 			QMovie *							_movie
 		);
 
+		void showEvent(QShowEvent* event);
+
 	private:
 
 		aAnimationOverlayWidget *					m_centralWidget;
