@@ -83,7 +83,7 @@ void ServiceRunStarter::worker(void) {
 			// Get next notifier
 			startupInformation info = m_queue.front();
 			m_queue.pop_front();
-			
+
 			// Create run document
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Run, doc.GetAllocator()), doc.GetAllocator());
@@ -93,7 +93,7 @@ void ServiceRunStarter::worker(void) {
 			doc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(info.sessionType, doc.GetAllocator()), doc.GetAllocator());
 
 			// Get session
-			Session * session = SessionService::instance()->getSession(info.sessionId, false);
+			Session* session = SessionService::instance()->getSession(info.sessionId, false);
 			if (session == nullptr) {
 				m_mutex.unlock();																// Unlock
 
@@ -108,25 +108,31 @@ void ServiceRunStarter::worker(void) {
 				// Unlock must happen after the addServiceListToDocument() call, since it may happen that the
 				// Session Service is deleting the sessing while document is built (racing condition)
 				m_mutex.unlock();																// Unlock
-			} 
-			
+			}
+
 			OT_LOG_D("Sending run command to service (name = \"" + info.serviceName + "\"; type = \"" + info.serviceType +
 				"\"; id = \"" + std::to_string(info.serviceId) + "\")");
 
-			std::string response;
 			std::string messageOut = doc.toJson();
-			if (!ot::msg::send("", info.serviceUrl, ot::EXECUTE, messageOut, response, 3000)) {
-				assert(0);
-				OT_LOG_E("Failed to send run command to service (name = \"" + info.serviceName + "\"; type = \"" + info.serviceType +
-					"\"; id = \"" + std::to_string(info.serviceId) + "\")");
-				// todo: add error handling for startup error
-			}
-			if (response != OT_ACTION_RETURN_VALUE_OK) {
-				// todo: response should be OK
-				//assert(0);
-				//OT_LOG_E("Invalid service response (expected: \"" OT_ACTION_RETURN_VALUE_OK "\"): " + response);
-			}
+
+			std::thread runThread(&ServiceRunStarter::sendRunMessageToService, this, info.serviceUrl, messageOut, info.serviceName, info.serviceType, std::to_string(info.serviceId));
+			runThread.detach();
 		}
 	}
 	m_isRunning = false;
+}
+
+void ServiceRunStarter::sendRunMessageToService(std::string serviceURL, std::string messageOut, std::string serviceName, std::string serviceType, std::string serviceId)
+{
+	std::string response;
+	if (!ot::msg::send("", serviceURL, ot::EXECUTE, messageOut, response, 3000)) {
+		assert(0);
+		OT_LOG_E("Failed to send run command to service (name = \"" + serviceName + "\"; type = \"" + serviceType + "\"; id = \"" + serviceId + "\")");
+		// todo: add error handling for startup error
+	}
+	if (response != OT_ACTION_RETURN_VALUE_OK) {
+		// todo: response should be OK
+		//assert(0);
+		//OT_LOG_E("Invalid service response (expected: \"" OT_ACTION_RETURN_VALUE_OK "\"): " + response);
+	}
 }
