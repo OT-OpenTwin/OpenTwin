@@ -35,6 +35,11 @@ namespace DataStorageAPI
 
 	void ConnectionAPI::configurePool(std::string connectionUri, bool useDefaultUri)
 	{
+		static std::string lastConnectionUri;
+		if (lastConnectionUri == connectionUri) return;  // In this case, the connection pool has already been configured
+
+		lastConnectionUri = connectionUri;
+
 		mongocxx::uri uri{ useDefaultUri ? mongocxx::uri::k_default_uri : connectionUri };
 		_pool = bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(uri));
 	}
