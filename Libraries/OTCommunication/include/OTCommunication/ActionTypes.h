@@ -154,6 +154,8 @@
 #define OT_ACTION_CMD_UI_ContextMenuItemClicked "UI.ContextMenu.Item.Clicked"
 #define OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged "UI.ContextMenu.Item.CheckedChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_MessageDialog "UI.MessageDialog"
+#define OT_ACTION_CMD_UI_MessageDialogValue "UI.MessageDialogValue"
 #define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialog "UI.OnePropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialogValue "UI.OnePropertyDialogValue"
