@@ -43,10 +43,10 @@ QMessageBox::Icon ot::MessageDialog::convertIcon(MessageDialogCfg::BasicIcon _ic
 	switch (_icon)
 	{
 	case ot::MessageDialogCfg::NoIcon: return QMessageBox::NoIcon;
-	case ot::MessageDialogCfg::Information: return QMessageBox::NoIcon;
-	case ot::MessageDialogCfg::Question: return QMessageBox::NoIcon;
-	case ot::MessageDialogCfg::Warning: return QMessageBox::NoIcon;
-	case ot::MessageDialogCfg::Critical: return QMessageBox::NoIcon;
+	case ot::MessageDialogCfg::Information: return QMessageBox::Information;
+	case ot::MessageDialogCfg::Question: return QMessageBox::Question;
+	case ot::MessageDialogCfg::Warning: return QMessageBox::Warning;
+	case ot::MessageDialogCfg::Critical: return QMessageBox::Critical;
 	default:
 		OT_LOG_EAS("Unknown icon (" + std::to_string((int)_icon) + ")");
 		return QMessageBox::NoIcon;
