@@ -18,6 +18,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <atomic>
 
 namespace ot {
 
@@ -55,10 +56,11 @@ namespace ot {
 		const std::string& graphicsViewName(void) const { return m_viewName; };
 
 		void addItem(ot::GraphicsItem* _item);
-		void removeItem(const ot::UID& _itemUid);
+		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
 		std::list<ot::UID> selectedItems(void) const;
 
-		void addConnection(const GraphicsConnectionCfg& _config);
+		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
+
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const ot::UID& _connectionInformation);
 		ot::UIDList selectedConnections(void) const;
@@ -97,7 +99,7 @@ namespace ot {
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
 	private:
-		bool m_stateChangeInProgress;
+		std::atomic_bool m_stateChangeInProgress = false;
 		
 		std::string m_viewName;
 		GraphicsScene* m_scene;
@@ -108,6 +110,10 @@ namespace ot {
 
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
 		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
-		std::list<GraphicsConnectionCfg> m_connectionBuffer;
+		std::list<GraphicsConnectionCfg> m_connectionCreationBuffer;
+		std::list<GraphicsConnectionCfg> m_itemRemovalConnectionBuffer;
+
+		void addConnection(const GraphicsConnectionCfg& _config);
+		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 	};
 }

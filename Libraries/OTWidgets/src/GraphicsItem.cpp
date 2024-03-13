@@ -145,11 +145,11 @@ void ot::GraphicsItem::removeAllConnections(void) {
 	GraphicsView* view = scene->getGraphicsView();
 	OTAssertNullptr(view);
 
-	std::list<ot::GraphicsConnectionCfg> lst;
+	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
 	for (const auto& connection : m_connections) {
-		lst.push_back(connection->getConnectionInformation());
+		graphicConnectionCfgList.push_back(connection->getConnectionInformation());
 	}
-	for (const auto& connection : lst) {	
+	for (const auto& connection : graphicConnectionCfgList) {
 		view->removeConnection(connection);
 	}
 }
@@ -389,4 +389,24 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 		// Calculate the inner rectangle
 		return this->calculateInnerRect(r, inner, m_alignment);
 	}
+}
+
+
+std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs() 
+{
+	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
+	for (const auto& connection : m_connections) 
+	{
+		graphicConnectionCfgList.push_back(connection->getConnectionInformation());
+	}
+
+	for (auto childQGraphicsItem : getQGraphicsItem()->childItems()) 
+	{
+		ot::GraphicsItem* graphicsItem= dynamic_cast<ot::GraphicsItem*>(childQGraphicsItem);
+		if (graphicsItem != nullptr)
+		{
+			graphicConnectionCfgList.splice(graphicConnectionCfgList.end(),graphicsItem->getConnectionCfgs());
+		}
+	}
+	return graphicConnectionCfgList;
 }

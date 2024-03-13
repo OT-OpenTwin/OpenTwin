@@ -2912,13 +2912,14 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				ot::GraphicsView * editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
-				for (auto itm : pckg.items()) {
-					ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm);
-					if (i) {
-						i->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
-						//i->setGraphicsItemFlags(i->graphicsItemFlags() | ot::GraphicsItem::ItemIsMoveable | ot::GraphicsItem::ItemNetworkContext);
-						i->getQGraphicsItem()->setPos(QPointF(itm->position().x(), itm->position().y()));
-						editor->addItem(i);
+				for (auto graphicsItemCfg : pckg.items()) {
+					ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg);
+					if (graphicsItem != nullptr) {
+						graphicsItem->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
+						const double xCoordinate = graphicsItemCfg->position().x();
+						const double yCoordinate = graphicsItemCfg->position().y();
+						graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));
+						editor->addItem(graphicsItem);
 					}
 				}
 			}
@@ -2962,7 +2963,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (const auto& connection : pckg.connections()) {
-					editor->addConnection(connection);
+					editor->addConnectionIfConnectedItemsExist(connection);
 				}
 
 			}

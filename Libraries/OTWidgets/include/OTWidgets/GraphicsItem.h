@@ -13,6 +13,8 @@
 #include "OTCore/SimpleFactory.h"
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
+#include "OTGui/GraphicsConnectionCfg.h"
+
 // Qt header
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
@@ -163,6 +165,9 @@ namespace ot {
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
 		virtual bool graphicsItemRequiresHover(void) const { return !m_toolTip.empty(); };
+
+
+		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
 	private:
 		bool m_isLayoutOrStack;
