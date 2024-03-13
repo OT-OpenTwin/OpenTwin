@@ -97,7 +97,7 @@ namespace ot {
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
 	private:
-		bool m_stateChangeInProgress = false;
+		bool m_stateChangeInProgress;
 		
 		std::string m_viewName;
 		GraphicsScene* m_scene;

@@ -19,7 +19,7 @@
 #include <QtWidgets/qgraphicsproxywidget.h>
 //#include <QtWidgets/qgraphicsscene.h>
 
-ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false) {
+ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false) {
 	m_scene = new GraphicsScene(this);
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
@@ -155,6 +155,10 @@ std::list<ot::UID> ot::GraphicsView::selectedItems(void) const {
 }
 
 void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
+	// Clear existing connection
+	this->removeConnection(_config.getUid());
+
+	// Find source and destination items
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
 
@@ -163,6 +167,7 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 		return;
 	}
 
+	// Find source and destination connectables
 	ot::GraphicsItem* srcConn = src->findItem(_config.originConnectable());
 	ot::GraphicsItem* destConn = dest->findItem(_config.destConnectable());
 
@@ -171,6 +176,7 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 		return;
 	}
 
+	// Create and add new connection
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
 	newConnection->setupFromConfig(_config);
 	
@@ -183,14 +189,23 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 }
 
 void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation) {
-	removeConnection(_connectionInformation.getUid());
+	this->removeConnection(_connectionInformation.getUid());
 }
 
 void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 {
+	// Clear buffer
+	std::list<GraphicsConnectionCfg> tmp = m_connectionBuffer;
+	m_connectionBuffer.clear();
+	for (const GraphicsConnectionCfg& cfg : tmp) {
+		if (cfg.getUid() != _connectionUID) {
+			m_connectionBuffer.push_back(cfg);
+		}
+	}
+
+	// Ensure connection exists
 	auto connectionByUID = m_connections.find(_connectionUID);
 	if (connectionByUID == m_connections.end()) {
-		OT_LOG_W("Connection not found { \"UID\": \"" + std::to_string(_connectionUID));
 		return;
 	}
 	m_stateChangeInProgress = true;
