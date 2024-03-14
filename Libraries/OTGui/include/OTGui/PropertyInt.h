@@ -13,9 +13,9 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyInt : public Property {
 		OT_DECL_NOCOPY(PropertyInt)
 	public:
-		PropertyInt(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(0) {};
-		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
-		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
+		PropertyInt(PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~PropertyInt() {};
 
 		virtual PropertyType getPropertyType(void) const override { return Property::IntType; };
