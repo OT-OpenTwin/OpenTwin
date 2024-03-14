@@ -117,8 +117,7 @@ void ot::GenericDataStructMatrix::setFromJsonObject(const ot::ConstJsonObject& _
 	
 	JSONToVariableConverter converter;
 	auto jArray = ot::json::getArray(_object, "values");
-	//ot::Variable var = converter(jArray[0]);
-	//AllocateValueMemory(/*var.getTypeName()*/);
+	AllocateValueMemory(/*var.getTypeName()*/);
 	//_setter(0, std::move(var));
 	for (uint32_t index = 0; index < _numberOfEntries; index++)
 	{

@@ -79,6 +79,7 @@ bool BlockHandlerPython::executeSpecialized()
                     }
 
                     _dataPerPort[outputName] = std::move(returnValuesListSPtr);
+                    valuesByName.erase(valuesPointer->first);
                 }
             }
         }
