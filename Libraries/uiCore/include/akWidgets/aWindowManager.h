@@ -330,7 +330,7 @@ namespace ak {
 		);
 
 		//! @brief Will return the state of the window so it can be restored
-		std::string saveState(void);
+		std::string saveState(std::string currentState);
 
 		bool restoreState(
 			const std::string &								_state,

@@ -434,7 +434,8 @@ void AppBase::notify(
 				m_graphicsPickerDock->setVisible(true);
 			}
 			else {
-				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow);
+				// We want to maintain the size of the application window
+				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow, false);
 			}
 			saveState();
 
@@ -529,6 +530,10 @@ bool AppBase::closeEvent() {
 	if (m_mainWindow != invalidUID) {
 		if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) != 0) {
 			m_currentStateWindow = uiAPI::window::saveState(m_mainWindow);
+		}
+		else
+		{
+			m_currentStateWindow = uiAPI::window::saveState(m_mainWindow, m_currentStateWindow);
 		}
 	}
 

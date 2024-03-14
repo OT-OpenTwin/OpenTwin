@@ -423,8 +423,10 @@ void ak::aWindowManager::resize(
 	int		_height
 ) { m_window->resize(_width, _height); }
 
-std::string ak::aWindowManager::saveState(void) {
+std::string ak::aWindowManager::saveState(std::string currentState) {
+
 	AK_rJSON_createDOC(doc);
+
 	rJSON::add(doc, "ObjectName", m_window->objectName().toStdString());
 	rJSON::add(doc, "IsMaximized", m_window->isMaximized());
 	rJSON::add(doc, "IsMinimized", m_window->isMinimized());
@@ -433,12 +435,29 @@ std::string ak::aWindowManager::saveState(void) {
 	rJSON::add(doc, "PositionX", m_window->pos().x());
 	rJSON::add(doc, "PositionY", m_window->pos().y());
 
-	QByteArray lastConfig(m_window->saveState());
-	AK_rJSON_createValueArray(stat);
-	for (auto itm : lastConfig) {
-		stat.PushBack((int)itm, doc.GetAllocator());
+	if (!currentState.empty())
+	{
+		AK_rJSON_parseDOC(olddoc, currentState.c_str());
+
+		auto state = olddoc["State"].GetArray();
+
+		AK_rJSON_createValueArray(stat);
+
+		for (auto itm = state.Begin(); itm != state.End(); itm++) {
+			stat.PushBack(itm->GetInt(), doc.GetAllocator());
+		}
+
+		rJSON::add(doc, "State", stat);
 	}
-	rJSON::add(doc, "State", stat);
+	else
+	{
+		QByteArray lastConfig(m_window->saveState());
+		AK_rJSON_createValueArray(stat);
+		for (auto itm : lastConfig) {
+			stat.PushBack((int)itm, doc.GetAllocator());
+		}
+		rJSON::add(doc, "State", stat);
+	}
 
 	return rJSON::toJSON(doc);
 }
@@ -478,7 +497,10 @@ bool ak::aWindowManager::restoreState(
 			m_window->showNormal();
 		}
 		else {
+			QSize size{ doc["SizeWidth"].GetInt(), doc["SizeHeight"].GetInt() };
+			m_window->resize(size);
 			m_window->showMaximized();
+			QTimer::singleShot(100, [this]() { m_window->showMaximized(); });
 		}
 
 		QPoint pos{ doc["PositionX"].GetInt(), doc["PositionY"].GetInt() };
@@ -486,6 +508,7 @@ bool ak::aWindowManager::restoreState(
 
 		if (isMin) {
 			m_window->showMinimized();
+			QTimer::singleShot(100, [this]() { m_window->showMinimized(); });
 		}
 	}
 
