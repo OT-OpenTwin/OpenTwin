@@ -230,15 +230,6 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 
 void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 {
-	// Clear buffer
-	std::list<GraphicsConnectionCfg> tmp = m_connectionBuffer;
-	m_connectionBuffer.clear();
-	for (const GraphicsConnectionCfg& cfg : tmp) {
-		if (cfg.getUid() != _connectionUID) {
-			m_connectionBuffer.push_back(cfg);
-		}
-	}
-
 	// Ensure connection exists
 	auto connectionByUID = m_connections.find(_connectionUID);
 	if (connectionByUID == m_connections.end()) {
