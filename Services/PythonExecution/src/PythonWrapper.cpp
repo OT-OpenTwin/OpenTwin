@@ -1,8 +1,13 @@
 #include <signal.h>
 #include "PythonWrapper.h"
-#include "PythonObjectBuilder.h"
 #include "PythonExtension.h"
 #include "OTSystem/OperatingSystem.h"
+
+#define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/ndarrayobject.h"
+
+#include "PythonObjectBuilder.h"
 
 PythonWrapper::PythonWrapper()
 {
@@ -16,6 +21,22 @@ PythonWrapper::PythonWrapper()
 	_pythonPath.push_back(sitePackageDirectory);
 	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
 	signal(SIGABRT, &signalHandlerAbort);
+}
+
+int PythonWrapper::initiateNumpy()
+{
+	import_array1(0);
+	return 1;
+}
+
+std::string PythonWrapper::checkNumpyVersion()
+{
+	Execute("import numpy\n"
+		"numpyVersion = numpy.version.version", "__main__");
+	CPythonObjectBorrowed variable = GetGlobalVariable("numpyVersion","__main__");
+	PythonObjectBuilder builder;
+	const std::string numpyVersion = builder.getStringValue(variable, "numpyVersion");
+	return numpyVersion;
 }
 
 PythonWrapper::~PythonWrapper()
@@ -70,6 +91,14 @@ void PythonWrapper::InitializePythonInterpreter()
 		throw PythonException();
 	}
 	_interpreterSuccessfullyInitialized = true;
+	int numpyErrorCode = initiateNumpy();
+	if (numpyErrorCode == 0)
+	{
+		throw PythonException("Numpy Initialization failed: ");
+	}
+
+	const std::string numpyVersion = checkNumpyVersion();
+	OT_LOG_D("Initiated numpy version: " + numpyVersion);
 }
 
 void PythonWrapper::ResetSysPath()

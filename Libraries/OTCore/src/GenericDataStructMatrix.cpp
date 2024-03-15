@@ -80,6 +80,8 @@ void ot::GenericDataStructMatrix::setValues(const ot::Variable* values, uint32_t
 
 const ot::Variable& GenericDataStructMatrix::getValue(uint32_t columnIndex, uint32_t rowIndex) const
 {
+	assert(columnIndex < _numberOfColumns);
+	assert(rowIndex < _numberOfRows);
 	const uint32_t index =  getIndex(columnIndex, rowIndex);
 	return _values[index];
 	/*return _getter(index);*/

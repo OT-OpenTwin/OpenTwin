@@ -5,15 +5,12 @@
 #include "OTCore/GenericDataStructMatrix.h"
 #include <iterator>
 
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/ndarrayobject.h"
 
-
-int PythonObjectBuilder::initiateNumpy()
-{
-	import_array1(0);
-	return 1;
-}
-
-void* PythonObjectBuilder::variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, NPY_TYPES& pType)
+void* PythonObjectBuilder::variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, int& pType)
 {
 	const ot::Variable& firstVal = values[0];
 
@@ -137,8 +134,6 @@ const ot::Variable* PythonObjectBuilder::voidArrayToVariableArray(void* data, co
 PythonObjectBuilder::PythonObjectBuilder()
 	: _assembly(nullptr)
 {
-	int errcode = initiateNumpy();
-	assert(errcode == 1);
 }
 
 void PythonObjectBuilder::StartTupleAssemply(int size)
@@ -680,7 +675,7 @@ CPythonObjectNew PythonObjectBuilder::setGenericDataStruct(ot::GenericDataStruct
 
 	uint32_t rows = matrixVal->getNumberOfRows();
 	uint32_t columns = matrixVal->getNumberOfColumns();
-	NPY_TYPES type;
+	int type;
 	npy_intp* pColumns = new npy_intp[rows];
 	for (uint32_t i = 0; i < rows; i++)
 	{

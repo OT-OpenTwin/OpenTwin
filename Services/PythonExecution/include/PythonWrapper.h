@@ -27,6 +27,7 @@
 		PythonWrapper(const PythonWrapper&& other) = delete;
 		PythonWrapper& operator=(const PythonWrapper&& other) = delete;
 
+
 		~PythonWrapper();
 		
 		void InitializePythonInterpreter();
@@ -49,6 +50,8 @@
 		std::string _defaultSitePackagesPath;
 		bool _interpreterSuccessfullyInitialized = false;
 
+		int initiateNumpy();
+		std::string checkNumpyVersion();
 		std::string DeterminePythonRootDirectory();
 		std::string DeterminePythonSitePackageDirectory();
 

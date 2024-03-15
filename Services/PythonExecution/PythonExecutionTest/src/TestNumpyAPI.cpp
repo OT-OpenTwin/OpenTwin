@@ -1,16 +1,13 @@
 #include "FixtureNumpyAPI.h"
 #include "OTCore/Variable.h"
 
-
-int initiateNumpy()
-{
-	import_array1(0);
-	return 0;
-}
-
+#define PY_ARRAY_UNIQUE_SYMBOL FixtureNumpyAPI_ARRAY_API
+#define NO_IMPORT_ARRAY
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/ndarrayobject.h"
 TEST_F(FixtureNumpyAPI, Array_1D_Access)
 {
-	initiateNumpy();
+
 	// Create an array of float values
 	double expected = 3.;
 	npy_float64 data[] = { 1.0, 2.0, expected, 4.0, 5.5 };
@@ -31,7 +28,6 @@ TEST_F(FixtureNumpyAPI, Array_1D_Access)
 
 TEST_F(FixtureNumpyAPI, Array_2D_Access)
 {
-	initiateNumpy();
 	double expected = 7.7;
 	npy_float64 data[] = { 1.0, 2.0, 3., 4.0, 5.5, 6., expected,8.8,9.9 };
 	npy_intp dims[] = { 3,3,3 };

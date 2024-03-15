@@ -21,9 +21,6 @@
 #include <memory>
 #include <optional>
 
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "numpy/ndarrayobject.h"
-
 /// <summary>
 /// PyObjects don't distingiush between float and double and int32 and int64. All floating point values are handled as double and all integer values are handled as int64
 /// </summary>
@@ -81,8 +78,7 @@ private:
 	int _assemblySize = 0;
 	int _currentSize = 0;
 
-	int initiateNumpy();
-	void* variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, NPY_TYPES& pType);
+	void* variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, int& pType);
 	const ot::Variable* voidArrayToVariableArray(void* data, const uint32_t size, int pType);
 };
 

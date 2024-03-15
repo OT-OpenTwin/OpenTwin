@@ -8,6 +8,11 @@
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
 
+#define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
+#define NO_IMPORT_ARRAY
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/ndarrayobject.h"
+
 TEST_F(FixturePythonObjectBuilder, FloatToVariable)
 {
 	constexpr float expectedValue = std::numeric_limits<float>::max();
@@ -120,15 +125,10 @@ TEST_F(FixturePythonObjectBuilder, GenericDataStructure)
 	ASSERT_EQ(actual->getNumberOfEntries(), expected.getNumberOfEntries());
 }
 
-int initiateNumpyLoc()
-{
-	import_array1(0);
-	return 0;
-}
+
 
 TEST_F(FixturePythonObjectBuilder, GenericDataStructureMatrixToNumpyMatrix)
 {
-	initiateNumpyLoc();
 	double expected = 7.7;
 	double data[] = { 1.0, 2.0, 3., 4.0, 5.5, 6., expected,8.8,9.9 };
 	npy_intp dims[] = { 3,3,3 };
@@ -156,7 +156,6 @@ TEST_F(FixturePythonObjectBuilder, GenericDataStructureMatrixToNumpyMatrix)
 
 TEST_F(FixturePythonObjectBuilder, NumpyMatrixToGenericDataStructureMatrix)
 {
-	initiateNumpyLoc();
 	double expected = 7.7;
 	double data[] = { 1.0, 2.0, 3., 4.0, 5.5, 6., expected,8.8,9.9 };
 	npy_intp dims[] = { 3,3,3 };
@@ -176,8 +175,8 @@ TEST_F(FixturePythonObjectBuilder, NumpyMatrixToGenericDataStructureMatrix)
 	CPythonObjectNew pDataStruct(builder.setGenericDataStruct(&expectedMatrix));
 	ot::GenericDataStruct* actualDataStruct = builder.getGenericDataStruct(pDataStruct);
 	ot::GenericDataStructMatrix* actualMatrix = dynamic_cast<ot::GenericDataStructMatrix*>(actualDataStruct);
-	const ot::Variable& expectedValue = expectedMatrix.getValue(2, 3);
-	const ot::Variable& actualValue = actualMatrix->getValue(2, 3);
+	const ot::Variable& expectedValue = expectedMatrix.getValue(1, 2);
+	const ot::Variable& actualValue = actualMatrix->getValue(1, 2);
 	ASSERT_TRUE( actualValue==expectedValue );
 }
 
@@ -192,7 +191,3 @@ TEST_F(FixturePythonObjectBuilder, GenericDataStructureList)
 
 	ASSERT_EQ(actual->getNumberOfEntries(), (*expected.begin())->getNumberOfEntries());
 }
-
-
-
-

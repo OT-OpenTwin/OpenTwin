@@ -21,7 +21,7 @@ namespace ot
 		GenericDataStructVector& operator=(const GenericDataStructVector& other);
 		GenericDataStructVector& operator=(GenericDataStructVector&& other);
 
-		ot::Variable getValue(uint32_t index) { return _values[index]; };
+		ot::Variable getValue(uint32_t index) { assert(index < _numberOfEntries); return _values[index]; };
 		const std::vector<ot::Variable>& getValues() const { return _values; }
 		
 		void setValue(uint32_t index, const ot::Variable& value);
