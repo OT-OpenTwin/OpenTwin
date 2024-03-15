@@ -93,45 +93,42 @@ void PythonWrapper::AddToSysPath(const std::string& newPathComponent)
 
 std::string PythonWrapper::DeterminePythonRootDirectory()
 {
+#ifdef _RELEASEDEBUG
 	std::string envName = "OT_PYTHON_ROOT";
 	const char*  pythonRoot = ot::os::getEnvironmentVariable(envName.c_str());
-	
-	if (pythonRoot == nullptr)
-	{
-		//Enduser execution from deployment folder
-		return ".\\Python";
-	}
+	assert(pythonRoot != nullptr);
 	return std::string(pythonRoot);
+#else
+	//Execution from deployment folder
+	return ".\\Python";
+#endif
+
 }
 
 std::string PythonWrapper::DeterminePythonSitePackageDirectory()
 {
 	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
-	
 	const char * pythonSitePackagePath = ot::os::getEnvironmentVariable(envName.c_str());
-
-
 	std::string path;
+
 	if (pythonSitePackagePath == nullptr)
 	{
+#ifdef _RELEASEDEBUG
 		envName = "OT_PYTHON_ROOT";
 		const char* pythonRoot = ot::os::getEnvironmentVariable(envName.c_str());
-		if (pythonRoot == nullptr)
-		{
-			//Enduser execution from deployment folder
-			path = ".\\Python";
-		}
-		else
-		{
-			path = pythonRoot;
-			path += "\\Lib";
-		}
-		path += "\\site-packages";
+		assert(pythonRoot != nullptr);
+		path = pythonRoot;
+#else
+		path = ".\\Python";
+
+#endif
+
 	}
 	else
 	{
 		path =(pythonSitePackagePath);
 	}
+	path += "\\Lib\\site-packages";
 	return path;
 }
 
