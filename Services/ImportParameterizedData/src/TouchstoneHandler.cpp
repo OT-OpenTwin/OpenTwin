@@ -18,8 +18,6 @@ TouchstoneHandler::TouchstoneHandler(const std::string& fileName)
 {
 	auto posOfFileExtension = fileName.find_last_of(".") +1;
 	const std::string extension = fileName.substr(posOfFileExtension, fileName.size());
-	const std::string numberOfPortsAsString = extension.substr(1, extension.size() - 2);
-	_portNumber = std::stoi(numberOfPortsAsString);
 }
 
 TouchstoneHandler::TouchstoneHandler(TouchstoneHandler&& other) noexcept
@@ -45,8 +43,9 @@ int32_t TouchstoneHandler::deriveNumberOfPorts(const std::string& fileName)
 	return std::stoi(numberOfPortsAsString);
 }
 
-void TouchstoneHandler::AnalyseFile(const std::string& fileContent)
+void TouchstoneHandler::AnalyseFile(const std::string& fileContent, int32_t numberOfPorts)
 {
+	_portNumber = numberOfPorts;
 	std::stringstream stream;
 	ot::EncodingGuesser encodingGuesser;
 	ot::TextEncoding::EncodingStandard encodingStandard =	encodingGuesser(fileContent.c_str(), fileContent.size());

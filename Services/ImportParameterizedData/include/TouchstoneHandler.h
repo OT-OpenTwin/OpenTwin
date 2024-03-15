@@ -14,10 +14,8 @@ public:
 	TouchstoneHandler& operator=(TouchstoneHandler&& other) noexcept;
 
 	static int32_t deriveNumberOfPorts(const std::string& fileName);
-
-	const uint32_t getNumberOfPorts() const { return _portNumber; }
 	
-	void AnalyseFile(const std::string& fileContent);
+	void AnalyseFile(const std::string& fileContent, int32_t numberOfPorts);
 	const ts::OptionSettings& getOptionSettings() const { return _optionSettings; }
 	const std::string& getComments() const { return _comments; }
 	const std::list<ts::PortData>& getPortData() const { return _portData; }
@@ -29,7 +27,7 @@ private:
 	std::list<ts::PortData> _portData;
 
 	uint32_t _touchstoneVersion = 1;
-	uint32_t _portNumber;
+	uint32_t _portNumber = 0;
 
 	void AnalyseLine(std::string& content);
 	void AnalyseDataLine(std::string& content);

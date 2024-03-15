@@ -65,6 +65,8 @@
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/TextEditor.h"
 #include "DataBase.h"
+#include "OTGui/MessageDialogCfg.h"
+#include "OTWidgets/MessageDialog.h"
 
 // C++ header
 #include <thread>
@@ -2519,31 +2521,41 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+	ot::MessageDialogCfg cfg;
 
-	try {
-		ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->textEditorName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	cfg.setButtons(ot::MessageDialogCfg::BasicButton::Cancel | ot::MessageDialogCfg::BasicButton::Save);
+	//cfg.setButtons(ot::MessageDialogCfg::BasicButton::Save);
+	//cfg.setButtons(ot::MessageDialogCfg::BasicButton::No);
+	cfg.setTitle("Save changed text?");
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+	if (result == ot::MessageDialogCfg::BasicButton::Save)
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
-		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-			OT_LOG_EA("Failed to send http request");
-			return;
+		try {
+			ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->textEditorName(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+
+			std::string response;
+			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+				OT_LOG_EA("Failed to send http request");
+				return;
+			}
+
+			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+			if (rMsg != ot::ReturnMessage::Ok) {
+				OT_LOG_E("Request failed: " + rMsg.getWhat());
+				return;
+			}
 		}
-
-		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-		if (rMsg != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Request failed: " + rMsg.getWhat());
-			return;
+		catch (const std::exception& _e) {
+			OT_LOG_EAS(_e.what());
 		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		catch (...) {
+			OT_LOG_EA("[FATAL] Unknown error");
+		}
 	}
 }
 

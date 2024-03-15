@@ -3130,19 +3130,19 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				info.setFromJsonObject(_doc.GetConstObject());
 
 				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-
+				const std::string subsequentFunction = ot::json::getString(_doc,OT_ACTION_PARAM_MODEL_FunctionName);
 				ot::OnePropertyDialogCfg pckg;
 				pckg.setFromJsonObject(cfgObj);
 
 				ot::OnePropertyDialog dia(pckg, nullptr);
 				dia.showDialog();
 
-				if (dia.dialogResult() == ot::Dialog::Ok && dia.valueHasChanged()) {
+				if (dia.dialogResult() == ot::Dialog::Ok) {
 					ot::JsonDocument responseDoc;
-					responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OnePropertyDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-					responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(dia.dialogName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+					responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+					responseDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 					dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
-
+					
 					std::string response;
 					sendHttpRequest(EXECUTE, info, responseDoc, response);
 				}
