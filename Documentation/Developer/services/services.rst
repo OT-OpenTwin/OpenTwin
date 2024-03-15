@@ -13,6 +13,8 @@ The following sections describe the purpose and operation of the individual serv
    local_directory_service
    local_session_service
    logger_service
+   python_service
+   studio_suite_service
 
 .. toctree::
    :maxdepth: 3
