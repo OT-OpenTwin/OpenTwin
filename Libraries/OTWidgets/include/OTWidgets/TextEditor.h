@@ -48,6 +48,7 @@ namespace ot {
 
 		OT_PROPERTY(bool, contentChanged, setContentChanged, contentChanged)
 		OT_PROPERTY_REF(std::string, textEditorName, setTextEditorName, textEditorName)
+		OT_PROPERTY_REF(QString, textEditorTitle, setTextEditorTitle, textEditorTitle)
 	public:
 		TextEditor(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~TextEditor();

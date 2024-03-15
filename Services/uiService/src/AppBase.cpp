@@ -2156,6 +2156,7 @@ ot::TextEditor* AppBase::createNewTextEditor(const std::string& _name, const QSt
 
 	newEditor = new ot::TextEditor;
 	newEditor->setTextEditorName(_name);
+	newEditor->setTextEditorTitle(_title);
 
 	this->addTabToCentralView(_title, newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
@@ -2185,6 +2186,56 @@ ot::TextEditor* AppBase::findOrCreateTextEditor(const std::string& _name, const 
 
 	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewTextEditor(_name, _title, _serviceInfo);
+}
+
+void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_textEditors.contains(_serviceInfo)) {
+		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+		std::list<ot::TextEditor*> tmp = lst;
+		lst.clear();
+
+		for (auto v : tmp) {
+			if (v->textEditorName() == _name) {
+				QString title = v->textEditorTitle();
+				delete v;
+				ak::ID tabId = uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, title);
+				if (tabId != ak::invalidID) {
+					uiAPI::tabWidget::closeTab(m_tabViewWidget, tabId);
+				}
+				else {
+					OT_LOG_EA("Invalid tab ID");
+				}
+			}
+			else {
+				lst.push_back(v);
+			}
+		}
+	}
+	else {
+		OT_LOG_WA("Text editors not found for given service");
+	}
+}
+
+void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_textEditors.contains(_serviceInfo)) {
+		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+
+		for (auto v : lst) {
+			QString title = v->textEditorTitle();
+			delete v;
+			ak::ID tabId = uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, title);
+			if (tabId != ak::invalidID) {
+				uiAPI::tabWidget::closeTab(m_tabViewWidget, tabId);
+			}
+			else {
+				OT_LOG_EA("Invalid tab ID");
+			}
+		}
+		lst.clear();
+	}
+	else {
+		OT_LOG_WA("Text editors not found for given service");
+	}
 }
 
 std::list<ot::GraphicsView*> AppBase::getAllGraphicsEditors(void) {

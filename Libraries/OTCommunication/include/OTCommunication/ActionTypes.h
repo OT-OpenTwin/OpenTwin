@@ -253,6 +253,8 @@
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest "UI.TextEditor.SaveRequest"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved "UI.TextEditor.SetSaved"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SetModified "UI.TextEditor.SetModified"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_Close "UI.TextEditor.Close"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll "UI.TextEditor.CloseAll"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 

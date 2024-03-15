@@ -3033,6 +3033,19 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					editor->setContentChanged(true);
 				}
 			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_Close) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
+				AppBase::instance()->closeTextEditor(editorName, info);
+			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				AppBase::instance()->closeAllTextEditors(info);
+			}
 			else if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
 
 				QString fileName = QFileDialog::getOpenFileName(
