@@ -13,6 +13,8 @@ public:
 	TouchstoneHandler& operator=(const TouchstoneHandler& other) = delete;
 	TouchstoneHandler& operator=(TouchstoneHandler&& other) noexcept;
 
+	static int32_t deriveNumberOfPorts(const std::string& fileName);
+
 	const uint32_t getNumberOfPorts() const { return _portNumber; }
 	
 	void AnalyseFile(const std::string& fileContent);

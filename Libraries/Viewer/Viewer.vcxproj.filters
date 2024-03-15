@@ -156,30 +156,6 @@
     <ClInclude Include="include\Notifier.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodeAnnotation.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeBase.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeContainer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeGeometry.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeMesh.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeMeshItem.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodePlot1DItem.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeResult1DItem.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\stdafx.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -192,9 +168,6 @@
     <ClInclude Include="include\ViewManipulator.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodeCartesianMesh.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Plot.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -204,16 +177,7 @@
     <ClInclude Include="include\xyPlot.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodeCartesianMeshItem.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\polarPlot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeTextItem.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeTableItem.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeMaterialFactory.h">
@@ -238,9 +202,6 @@
       <Filter>include\Materials</Filter>
     </ClInclude>
     <ClInclude Include="include\Rubberband.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeVTK.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\WorkingPlane.h">
@@ -297,6 +258,45 @@
     <ClInclude Include="include\EntityHandler.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\SceneNodeAnnotation.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeBase.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeCartesianMesh.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeCartesianMeshItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeContainer.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeGeometry.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeMesh.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeMeshItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodePlot1DItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeResult1DItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeTableItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeTextItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeVTK.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\VersionGraph.h">
@@ -318,6 +318,9 @@
     </Filter>
     <Filter Include="src\Materials">
       <UniqueIdentifier>{6db3ec91-1b7b-408f-b87b-08e05ae991a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SceneNodes">
+      <UniqueIdentifier>{40dc3399-49f9-4bc7-9aa4-74b23c389a4f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

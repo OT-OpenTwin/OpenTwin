@@ -17,6 +17,9 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "OTServiceFoundation/TableRange.h"
+#include "OTGui/OnePropertyDialogCfg.h"
+#include "OTGui/PropertyInt.h"
+#include "EntityFileCSV.h"
 
 
 //Application specific includes
@@ -256,6 +259,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_Action_CMD_UI_StoreFileInDataBase, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import File", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("CSV files (*.csv;*.txt)", doc.GetAllocator()), doc.GetAllocator());
+				EntityFileCSV csvFile(0,nullptr,nullptr,nullptr,nullptr,"");
+				doc.AddMember(OT_ACTION_PARAM_FILE_Type, ot::JsonString(csvFile.getClassName(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_dataSourcesFolder, doc.GetAllocator()), doc.GetAllocator());
 				std::list<std::string> takenNames =	m_modelComponent->getListOfFolderItems(_dataSourcesFolder);
 				doc.AddMember(OT_ACTION_PARAM_FILE_TAKEN_NAMES, ot::JsonArray(takenNames, doc.GetAllocator()), doc.GetAllocator());
@@ -280,8 +285,10 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_Action_CMD_UI_StoreFileInDataBase, doc.GetAllocator()), doc.GetAllocator());
+				EntityFileText textEntity(0, nullptr, nullptr, nullptr, nullptr, "");
+				doc.AddMember(OT_ACTION_PARAM_FILE_Type, ot::JsonString(textEntity.getClassName(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import File", doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("CSV files (*.py)", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("Python files (*.py)", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_scriptsFolder, doc.GetAllocator()), doc.GetAllocator());
 				std::list<std::string> takenNames = m_modelComponent->getListOfFolderItems(_scriptsFolder);
 				doc.AddMember(OT_ACTION_PARAM_FILE_TAKEN_NAMES, ot::JsonArray(takenNames, doc.GetAllocator()), doc.GetAllocator());
@@ -432,8 +439,21 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+				ot::JsonDocument requestNumberOfDoc;
+				requestNumberOfDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_OnePropertyDialog, requestNumberOfDoc.GetAllocator());
 
-				_touchstoneToResultdata->CreateResultdata(originalName, fileContent, uncompressedDataLength);
+				ot::OnePropertyDialogCfg dialogCfg;
+
+				int32_t numberOfPorts = _touchstoneToResultdata->getAssumptionOfPortNumber(originalName); 
+				ot::PropertyInt* portNumberProperty= new ot::PropertyInt("Number of Ports:", numberOfPorts,ot::Property::AllowCustomValues);
+				portNumberProperty->setMin(2);
+				dialogCfg.setProperty(portNumberProperty);
+				dialogCfg.setName("Select the number of ports");
+				ot::JsonObject jConfig;
+				dialogCfg.addToJsonObject(jConfig, requestNumberOfDoc.GetAllocator());
+				requestNumberOfDoc.AddMember(OT_ACTION_PARAM_Config, jConfig, requestNumberOfDoc.GetAllocator());
+				m_uiComponent->sendMessage(true, requestNumberOfDoc);
+				//_touchstoneToResultdata->CreateResultdata(originalName, fileContent, uncompressedDataLength);
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
@@ -567,6 +587,20 @@ void Application::HandleSelectionChanged()
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, "", doc.GetAllocator());
 
 				uiComponent()->sendMessage(true, doc);
+			}
+			else if (entityName.find(ot::FolderNames::PythonScriptFolder) != std::string::npos)
+			{
+				EntityBase* entBase = modelComponent()->readEntityFromEntityIDandVersion(selectedEntityInfo.begin()->getID(), selectedEntityInfo.begin()->getVersion(), getClassFactory());
+				EntityFileText* fileEnt = dynamic_cast<EntityFileText*>(entBase);
+				const std::string fileContent = fileEnt->getText();
+				ot::JsonDocument uiRequest;
+				uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_SetText, uiRequest.GetAllocator());
+				ot::JsonObject serviceInfo;
+				getBasicServiceInformation().addToJsonObject(serviceInfo, uiRequest.GetAllocator());
+
+				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(selectedEntityInfo.begin()->getName(), uiRequest.GetAllocator()), uiRequest.GetAllocator());
+				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(fileContent, uiRequest.GetAllocator()), uiRequest.GetAllocator());
+				uiComponent()->sendMessage(true, uiRequest);
 			}
 			else
 			{

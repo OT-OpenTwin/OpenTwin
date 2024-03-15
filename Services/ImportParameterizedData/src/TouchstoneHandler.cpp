@@ -37,6 +37,14 @@ TouchstoneHandler& TouchstoneHandler::operator=(TouchstoneHandler&& other) noexc
 	return *this;
 }
 
+int32_t TouchstoneHandler::deriveNumberOfPorts(const std::string& fileName)
+{
+	auto posOfFileExtension = fileName.find_last_of(".") + 1;
+	const std::string extension = fileName.substr(posOfFileExtension, fileName.size());
+	const std::string numberOfPortsAsString = extension.substr(1, extension.size() - 2);
+	return std::stoi(numberOfPortsAsString);
+}
+
 void TouchstoneHandler::AnalyseFile(const std::string& fileContent)
 {
 	std::stringstream stream;

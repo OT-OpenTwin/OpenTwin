@@ -1825,9 +1825,10 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			{
 				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
 				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+				std::string entityType = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Type);
 				try
 				{
-					const std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
+					std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
 
 					if (absoluteFilePaths.size() != 0)
 					{
@@ -1857,7 +1858,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 						std::string entityPath = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
 						std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 						std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath));
+						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath), entityType);
 					}
 				}
 				catch (std::exception& e)
@@ -3000,6 +3001,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
 				std::string editorText = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
+
 				std::string editorTitle = editorName;
 				if (_doc.HasMember(OT_ACTION_PARAM_TEXTEDITOR_Title)) {
 					editorTitle = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Title);

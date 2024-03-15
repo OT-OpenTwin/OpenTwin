@@ -9,6 +9,7 @@ class TouchstoneToResultdata : public BusinessLogicHandler
 public:
 	TouchstoneToResultdata();
 	~TouchstoneToResultdata();
+	int getAssumptionOfPortNumber(const std::string& fileName);
 	void CreateResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength);
 private:
 	std::string _collectionName = "";

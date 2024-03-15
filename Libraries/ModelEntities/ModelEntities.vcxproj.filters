@@ -47,6 +47,9 @@
     <Filter Include="Header Files\ClassFactory">
       <UniqueIdentifier>{1f88b2c5-9712-47c9-a76b-1441fd294116}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\EntityInterfaces">
+      <UniqueIdentifier>{d7adf380-0920-4835-bd70-d8cdff2f0f84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EntityProperties.h">
@@ -366,6 +369,9 @@
     </ClInclude>
     <ClInclude Include="include\EntitySolverCircuitSimulator.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityInterfaceText.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

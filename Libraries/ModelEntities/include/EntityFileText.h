@@ -1,8 +1,9 @@
 #pragma once
 #include "EntityFile.h"
 #include "OTCore/TextEncoding.h"
+#include "EntityInterfaceText.h"
 
-class __declspec(dllexport) EntityFileText : public EntityFile
+class __declspec(dllexport) EntityFileText : public EntityFile, public EntityInterfaceText
 {
 public:
 	EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
@@ -13,6 +14,7 @@ public:
 	void setTextEncoding(ot::TextEncoding::EncodingStandard encoding);
 	ot::TextEncoding::EncodingStandard getTextEncoding();
 
+	std::string getText() override;
 protected:
 	void setSpecializedProperties() override;
 	virtual void AddStorageData(bsoncxx::builder::basic::document& storage) override;

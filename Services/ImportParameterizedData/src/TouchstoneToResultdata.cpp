@@ -24,6 +24,11 @@ TouchstoneToResultdata::~TouchstoneToResultdata()
 {
 }
 
+int TouchstoneToResultdata::getAssumptionOfPortNumber(const std::string& fileName)
+{
+	return TouchstoneHandler::deriveNumberOfPorts(fileName);
+}
+
 void TouchstoneToResultdata::CreateResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength)
 {
 	

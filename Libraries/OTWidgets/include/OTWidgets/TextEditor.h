@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/PlainTextEdit.h"
+#include "OTCore/CoreTypes.h"
 
 // Qt header
 #include <qstring.h>
@@ -62,7 +63,8 @@ namespace ot {
 		void setSyntaxHighlighter(QSyntaxHighlighter * _highlighter);
 		QSyntaxHighlighter * syntaxHighlighter(void) { return m_syntaxHighlighter; }
 
-	signals:
+		bool requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion);
+	signals:							
 		void saveRequested(void);
 
 	protected:
@@ -76,7 +78,9 @@ namespace ot {
 		void slotTextChanged(void);
 
 	private:
-		
+		ot::UID								m_displayedTextEntityID = 0;
+		ot::UID								m_displayedTextEntityVersion = 0;
+
 		QShortcut* m_saveShortcut;
 		TextEditorLineNumberArea*			m_lineNumberArea;
 		QSyntaxHighlighter *				m_syntaxHighlighter;

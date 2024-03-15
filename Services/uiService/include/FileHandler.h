@@ -31,7 +31,14 @@ public:
 	/// <returns> file name. </returns>
 	std::string ExtractFileNameFromPath(const std::string& absoluteFilePath);
 
-	void SetNewFileImportRequest(const std::string&& senderURL, const std::string&& subsequentFunction, const std::string&& senderName, const std::list<std::string>&& takenNames, const std::list<std::string>&& filePaths, const std::string&& entityPath);
+	void SetNewFileImportRequest(
+		const std::string&& senderURL, 
+		const std::string&& subsequentFunction, 
+		const std::string&& senderName, 
+		const std::list<std::string>&& takenNames, 
+		const std::list<std::string>&& filePaths, 
+		const std::string&& entityPath, 
+		const std::string& entityType);
 	const std::string& GetStoreFileFunctionName() { return functionName; }
 	const std::string& GetSenderURL() { return _senderURL; }
 
@@ -43,6 +50,7 @@ private:
 	std::list<std::string> _takenNames;
 	std::list<std::string> _filePaths;
 	std::string _entityPath = "";
+	std::string _entityType;
 
 	std::vector<char> ExtractFileContentAsBinary(const std::string& fileName);
 
@@ -54,7 +62,7 @@ private:
 	/// <param name="fileDestinationPath"></param>
 	/// <returns> Unique name for topology entity. </returns>
 	std::string CreateNewUniqueTopologyName(const std::string& fileName);
-	std::shared_ptr<EntityFile> CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner);
+	std::shared_ptr<EntityFile> CreateNewSourceEntity( ot::UID entityID, const std::string& owner);
 
 	ot::JsonDocument	CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers);
 };
