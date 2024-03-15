@@ -11,7 +11,7 @@
 
 //#define DEBUG_PYTHON_SERVER
 
-void StudioConnector::openProject(const std::string& fileName)
+std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName)
 {
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
@@ -21,44 +21,28 @@ void StudioConnector::openProject(const std::string& fileName)
 	std::string studioPath;
 	determineStudioSuiteInstallation(version, studioPath);
 
-	std::stringstream script;
-	script << "import sys" << std::endl;
-	script << "sys.path.append(r\"" << studioPath << "\\AMD64\\python_cst_libraries\")" << std::endl;
-
-	executeCommand(script.str());
-
 	// Now we need to get a list of all process ids of running CST STUDIO SUITE DESIGN ENVIRONMENTS
 	std::list<long long> studioPidList = getRunningDesignEnvironmentProcesses();
 
-	// Connect to each of them and check whether the project is open there
-	bool connected = false;
+	// Now we execute a python script which performs the following tasks:
+	// 1. Iterate through all pids and try connecting the DE. 
+	// 2. If a DE was found, check whether the file is opened there. If so, use this DE for further processing
+	// 3. If no DE with the given project was found, launch another DE instance and open the project there. Continue with this DE
+	// 4. Save the project
+	// 5. Execute a VBA script to extract the necessary information
 
-	for (auto pid : studioPidList)
+	std::string script = generateScript(studioPath, fileName, studioPidList);
+
+	ot::ReturnMessage returnMessage = executeCommand(script);
+
+	if (returnMessage.getStatus() == ot::ReturnMessage::Ok)
 	{
-		if (connectToRunningDesignEnvironmentProcess(pid, fileName))
-		{
-			connected = true;
-			break;
-		}
+		return "";
 	}
-
-	// Here the project is not open yet, so we create a new instance and open the project there
-
-	if (!connected)
+	else
 	{
-
+		return returnMessage.getWhat();
 	}
-
-}
-
-void StudioConnector::saveProject()
-{
-
-}
-
-void StudioConnector::extractInformation()
-{
-
 }
 
 StudioConnector::~StudioConnector()
@@ -97,20 +81,193 @@ std::list<long long> StudioConnector::getRunningDesignEnvironmentProcesses()
 	return processIDs;
 }
 
-bool StudioConnector::connectToRunningDesignEnvironmentProcess(long long pid, std::string fileName)
+std::string StudioConnector::generateScript(const std::string &studioPath, std::string fileName, std::list<long long> studioPidList)
 {
 	std::replace(fileName.begin(), fileName.end(), '/', '\\');
 
 	std::stringstream script;
-	script << "from cst.interface import DesignEnvironment" << std::endl;
-	script << "de = DesignEnvironment.connect(" << pid << ")" << std::endl;
-	script << "if not de.is_connected():" << std::endl;
-	script << "   raise Exception('not connected')" << std::endl;
-	//script << "prj = de.get_open_project('" << fileName <<"')" << std::endl;
 
-	ot::ReturnMessage returnMessage = executeCommand(script.str());
+	script << "fileName = r'" << fileName << "'\n";
+	script << "idlist = [";
+	while (!studioPidList.empty())
+	{
+		script << studioPidList.front();
+		studioPidList.pop_front();
 
-	return (returnMessage.getStatus() == ot::ReturnMessage::Ok);
+		if (!studioPidList.empty()) script << ",";
+	}
+	script << "]\n";
+
+	script << "import sys\n";
+	script << "sys.path.append(r'" << studioPath << "\\AMD64\\python_cst_libraries')\n";
+
+	script << "from cst.interface import DesignEnvironment\n";
+
+	script << "de = None\n";
+	script << "prj = None\n";
+
+	script << "for id in idlist:\n";
+	script << "    try:\n";
+	script << "       print('trying to connect...')\n";
+	script << "       de = DesignEnvironment.connect(id)\n";
+	script << "       if de.is_connected():\n";
+	script << "          print('connected.')\n";
+	script << "          prj = de.get_open_project(fileName)\n";
+	script << "          break\n";
+	script << "    except:\n";
+	script << "       de = None\n";
+
+	script << "if (prj == None):\n";
+	script << "    print('project not found, creating new instance')\n";
+	script << "    de = DesignEnvironment.new()\n";
+	script << "    try:\n";
+	script << "       prj = de.open_project(fileName)\n";
+	script << "       print('project found')\n";
+	script << "    except:\n";
+	script << "       de.close();\n";
+	script << "       raise Exception('Unable to open project')\n";
+
+	script << "print('saving project')\n";
+	script << "prj.save()\n";
+	script << "print('saving done')\n";
+
+	script << "vbaCode = (";
+
+	// Here comes the VBA code. Every " in the code needs to be masked as \\\".
+	// Every line is preceeded by "\" and appended by "\n"
+	// For a line break, \\n is appended to the line.
+
+	script << 
+		"\"'#Language \\\"WWB-COM\\\" \\n\"\n"
+		"\"\\n\"\n"
+		"\"Option Explicit\\n\"\n"
+		"\"\\n\"\n"
+		"\"Dim count As Long\\n\"\n"
+		"\"Dim baseFolder As String\\n\"\n"
+		"\"\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub ExportSolidChildItem(parent$)\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Dim item As String\\n\"\n"
+		"\"	item = Resulttree.GetFirstChildName(parent$)\\n\"\n"
+		"\"\\n\"\n"
+		"\"	If item = \\\"\\\" Then\\n\"\n"
+		"\"		Dim itemName As String\\n\"\n"
+		"\"		itemName = Right(parent, Len(parent)-11)\\n\"\n"
+		"\"		Dim index As Long\\n\"\n"
+		"\"		index = InStrRev(itemName, \\\"\\\\\\\")\\n\"\n"
+		"\"		Dim solidName As String\\n\"\n"
+		"\"		Dim componentName As String\\n\"\n"
+		"\"		solidName = Right(itemName, Len(itemName)-index)\\n\"\n"
+		"\"		componentName = Left(itemName, index-1)\\n\"\n"
+		"\"\\n\"\n"
+		"\"		componentName = Replace(componentName, \\\"\\\\\\\", \\\"/\\\")\\n\"\n"
+		"\"\\n\"\n"
+		"\"		With STL\\n\"\n"
+		"\"			.Reset\\n\"\n"
+		"\"			.FileName (baseFolder + \\\"/stl\\\" + CStr(count) + \\\".stl\\\")\\n\"\n"
+		"\"		    .Name (solidName)\\n\"\n"
+		"\"	   		.Component (componentName)\\n\"\n"
+		"\"    		.ExportFromActiveCoordinateSystem (False)\\n\"\n"
+		"\"    		.Write\\n\"\n"
+		"\"		End With\\n\"\n"
+		"\"\\n\"\n"
+		"\"		Print #1, itemName\\n\"\n"
+		"\"		Print #1, Solid.GetMaterialNameForShape(componentName + \\\":\\\" + solidName)\\n\"\n"
+		"\"\\n\"\n"
+		"\"		count = count + 1\\n\"\n"
+		"\"	End If\\n\"\n"
+		"\"\\n\"\n"
+		"\"	While item <> \\\"\\\"\\n\"\n"
+		"\"		ExportSolidChildItem(item)\\n\"\n"
+		"\"		item = Resulttree.GetNextItemName(item)\\n\"\n"
+		"\"	Wend\\n\"\n"
+		"\"\\n\"\n"
+		"\"End Sub\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub ExportMaterials()\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Dim index As Long\\n\"\n"
+		"\"	For index = 0 To Material.GetNumberOFMaterials()-1\\n\"\n"
+		"\"\\n\"\n"
+		"\"		Dim item As String\\n\"\n"
+		"\"		item = Material.GetNameOfMaterialFromIndex(index)\\n\"\n"
+		"\"\\n\"\n"
+		"\"		Dim materialType As String\\n\"\n"
+		"\"		materialType = Material.GetTypeOfMaterial(item)\\n\"\n"
+		"\"\\n\"\n"
+		"\"		Dim r As Double\\n\"\n"
+		"\"		Dim g As Double\\n\"\n"
+		"\"		Dim b As Double\\n\"\n"
+		"\"		Material.GetColour(item, r, g, b)\\n\"\n"
+		"\"\\n\"\n"
+		"\"		Print #1, item\\n\"\n"
+		"\"		Print #1, r; \\\" \\\"; g; \\\" \\\"; b\\n\"\n"
+		"\"		Print #1, materialType\\n\"\n"
+		"\"\\n\"\n"
+		"\"		If materialType = \\\"Normal\\\" Then\\n\"\n"
+		"\"			Dim x As Double\\n\"\n"
+		"\"			Dim y As Double\\n\"\n"
+		"\"			Dim z As Double\\n\"\n"
+		"\"			Material.GetEpsilon(item, x, y, z)\\n\"\n"
+		"\"			Print #1, x; \\\" \\\"; y; \\\" \\\"; z\\n\"\n"
+		"\"			Material.GetMu(item, x, y, z)\\n\"\n"
+		"\"			Print #1, x; \\\" \\\"; y; \\\" \\\"; z\\n\"\n"
+		"\"			Material.GetSigma(item, x, y, z)\\n\"\n"
+		"\"			Print #1, x; \\\" \\\"; y; \\\" \\\"; z\\n\"\n"
+		"\"		End If\\n\"\n"
+		"\"	Next\\n\"\n"
+		"\"End Sub\\n\"\n"
+		"\"\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub ExportUnits()\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Length\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Temperature\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Voltage\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Current\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Resistance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Conductance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Capacitance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Inductance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Frequency\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Time\\\")\\n\"\n"
+		"\"End Sub\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub Main\\n\"\n"
+		"\"\\n\"\n"
+		"\"	SetLock(True)\\n\"\n"
+		"\"\\n\"\n"
+		"\"	baseFolder = GetProjectPath(\\\"Temp\\\") + \\\"/Upload\\\"\\n\"\n"
+		"\"	On Error Resume Next\\n\"\n"
+		"\"	MkDir baseFolder\\n\"\n"
+		"\"	count = 0\\n\"\n"
+		"\"\\n\"\n"
+		"\"	ScreenUpdating(False)\\n\"\n"
+		"\"	Dim currentItem As String\\n\"\n"
+		"\"	currentItem = GetSelectedTreeItem()\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Open baseFolder + \\\"/shape.info\\\" For Output As #1\\n\"\n"
+		"\"	ExportSolidChildItem(\\\"Components\\\")\\n\"\n"
+		"\"	Close #1\\n\"\n"
+		"\"\\n\"\n"
+		"\"	SelectTreeItem(currentItem)\\n\"\n"
+		"\"	ScreenUpdating(True)\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Open baseFolder + \\\"/material.info\\\" For Output As #1\\n\"\n"
+		"\"	ExportMaterials()\\n\"\n"
+		"\"	Close #1\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Open baseFolder + \\\"/units.info\\\" For Output As #1\\n\"\n"
+		"\"	ExportUnits()\\n\"\n"
+		"\"	Close #1\\n\"\n"
+		"\"End Sub\\n\"\n";
+		
+	script << ")\n";
+
+	script << "print('execute VBA code')\n";
+	script << "prj.schematic.execute_vba_code(vbaCode)\n";
+
+	return script.str();
 }
 
 void StudioConnector::determineStudioSuiteInstallation(int &version, std::string &studioPath)

@@ -50,14 +50,9 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		// Create the cache folder
 		cacheFolderName = createCacheFolder(baseProjectName);
 
-		// Open the cst project in a studio suite instance
+		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-
-		studioObject.openProject(fileName);
-
-		// Now save the project (if needed) and extract the data 
-		studioObject.saveProject();
-		studioObject.extractInformation();
+		studioObject.searchProjectAndExtractData(fileName);
 
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName);
