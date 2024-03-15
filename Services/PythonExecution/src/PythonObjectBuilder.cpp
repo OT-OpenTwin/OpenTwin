@@ -137,7 +137,8 @@ const ot::Variable* PythonObjectBuilder::voidArrayToVariableArray(void* data, co
 PythonObjectBuilder::PythonObjectBuilder()
 	: _assembly(nullptr)
 {
-	initiateNumpy();
+	int errcode = initiateNumpy();
+	assert(errcode == 1);
 }
 
 void PythonObjectBuilder::StartTupleAssemply(int size)
@@ -662,39 +663,37 @@ CPythonObjectNew PythonObjectBuilder::setVariableList(rapidjson::GenericArray<fa
 
 CPythonObjectNew PythonObjectBuilder::setGenericDataStruct(ot::GenericDataStruct* genericDataStruct)
 {
+	auto singleVal = dynamic_cast<ot::GenericDataStructSingle*>(genericDataStruct);
+	if (singleVal != nullptr)
+	{
+		return setVariable(singleVal->getValue());
+	}
 
-		auto singleVal = dynamic_cast<ot::GenericDataStructSingle*>(genericDataStruct);
-		if (singleVal != nullptr)
-		{
-			return setVariable(singleVal->getValue());
-		}
+	auto vectVal = dynamic_cast<ot::GenericDataStructVector*>(genericDataStruct);
+	if (vectVal != nullptr)
+	{
+		return setVariableList(vectVal->getValues());
+	}
 
-		auto vectVal = dynamic_cast<ot::GenericDataStructVector*>(genericDataStruct);
-		if (vectVal != nullptr)
-		{
-			return setVariableList(vectVal->getValues());
-		}
+	auto matrixVal = dynamic_cast<ot::GenericDataStructMatrix*>(genericDataStruct);
+	assert(matrixVal != nullptr);
 
-		auto matrixVal = dynamic_cast<ot::GenericDataStructMatrix*>(genericDataStruct);
-		if (matrixVal != nullptr)
-		{
-			uint32_t rows = matrixVal->getNumberOfRows();
-			uint32_t columns = matrixVal->getNumberOfColumns();
-			NPY_TYPES type;
-			npy_intp* pColumns = new npy_intp[rows];
-			for (uint32_t i = 0; i < rows; i++)
-			{
-				pColumns[i] = columns;
-			}
+	uint32_t rows = matrixVal->getNumberOfRows();
+	uint32_t columns = matrixVal->getNumberOfColumns();
+	NPY_TYPES type;
+	npy_intp* pColumns = new npy_intp[rows];
+	for (uint32_t i = 0; i < rows; i++)
+	{
+		pColumns[i] = columns;
+	}
 
-			const ot::Variable* values =	matrixVal->getValues();
-			const const uint32_t numberOfEntries =	matrixVal->getNumberOfEntries();
-			void* data = variableArrayToVoidArray(values, numberOfEntries, type);
+	const ot::Variable* values =	matrixVal->getValues();
+	const uint32_t numberOfEntries =	matrixVal->getNumberOfEntries();
+	void* data = variableArrayToVoidArray(values, numberOfEntries, type);
 			
-			PyObject* pMatrix = PyArray_SimpleNewFromData(rows, pColumns, type, data);
+	PyObject* pMatrix = PyArray_SimpleNewFromData(rows, pColumns, type, data);
 			
-			return CPythonObjectNew(pMatrix);
-		}
+	return CPythonObjectNew(pMatrix);
 }
 
 CPythonObjectNew PythonObjectBuilder::setGenericDataStructList(ot::GenericDataStructList& values)
