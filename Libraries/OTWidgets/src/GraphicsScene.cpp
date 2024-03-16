@@ -74,10 +74,12 @@ void ot::GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 		m_lastSelection = this->selectedItems();
 		m_mouseIsPressed = true;
 	}
-	
+	QGraphicsScene::mousePressEvent(_event);
 }
 
 void ot::GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	QGraphicsScene::mouseReleaseEvent(_event);
+
 	if (_event->button() == Qt::LeftButton) {
 		m_mouseIsPressed = false;
 		QList<QGraphicsItem*> currentSel = this->selectedItems();
