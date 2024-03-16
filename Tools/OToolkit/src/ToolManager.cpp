@@ -157,9 +157,10 @@ void ToolManager::runToolTriggered(void) {
 		m_ignoreEvents = true;
 		std::list<QWidget*> status;
 		QSettings settings("OpenTwin", "OToolkit");
-		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status, settings));
+		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status));
 		it->second->setRunning();
 		m_statusManager->addTool(it->first, status);
+		it->second->tool()->restoreToolSettings(settings);
 		m_ignoreEvents = false;
 	}
 }

@@ -155,7 +155,9 @@ public:
 	virtual QString toolName(void) const override;
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
-	virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) override;
+	virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) override;
+
+	virtual void restoreToolSettings(QSettings& _settings) override;
 
 	//! @brief Stop all the logic of this tool
 	virtual bool prepareToolShutdown(QSettings& _settings) override;
@@ -189,7 +191,9 @@ private:
 	void workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter);
 	void workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter);
 
-	FilterGroup createFilterGroup(const QString& _labelText, const QString& _settingsKey, QSettings& _settings, QGridLayout* _layout, int _row);
+	FilterGroup createFilterGroup(const QString& _labelText, QGridLayout* _layout, int _row);
+	void restoreFilterGroupSettings(FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);
+
 	void saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);
 
 	QSplitter* m_centralSplitter;
