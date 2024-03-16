@@ -77,8 +77,14 @@ void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 }
 
 void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	QGraphicsItemGroup::paint(_painter, _opt, _widget);
-	this->paintGeneralGraphics(_painter, _opt, _widget);
+	this->paintStateBackground(_painter, _opt, _widget);
+
+	for (QGraphicsItem* c : this->childItems()) {
+		//c->paint(_painter, _opt, _widget);
+	}
+
+	//QGraphicsItemGroup::paint(_painter, _opt, _widget);
+	this->paintStateForeground(_painter, _opt, _widget);
 }
 
 void ot::GraphicsGroupItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {

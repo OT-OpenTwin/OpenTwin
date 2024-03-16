@@ -29,6 +29,8 @@ namespace ot {
 		virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* _event) override;
 		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 
+		virtual QRectF boundingRect(void) const override;
+
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;

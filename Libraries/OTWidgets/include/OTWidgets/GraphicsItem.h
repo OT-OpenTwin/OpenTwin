@@ -97,7 +97,9 @@ namespace ot {
 		void handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event);
 		void handleToolTip(QGraphicsSceneHoverEvent* _event);
 		void handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event);
-		void paintGeneralGraphics(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
+		
+		void paintStateBackground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
+		void paintStateForeground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 
 		//! @brief Will expand the size according to the margins
 		QSizeF handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const;
@@ -165,7 +167,6 @@ namespace ot {
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
 		virtual bool graphicsItemRequiresHover(void) const { return !m_toolTip.empty(); };
-
 
 		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
