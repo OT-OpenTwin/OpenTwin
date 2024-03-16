@@ -18,7 +18,7 @@
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr), m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine) 
 {
-	
+	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
 
 ot::GraphicsScene::~GraphicsScene() {}
@@ -67,6 +67,44 @@ void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 		m_connectionPreview->setDestPos(_event->scenePos());
 	}
 	QGraphicsScene::mouseMoveEvent(_event);
+}
+
+void ot::GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	if (_event->button() == Qt::LeftButton) {
+		m_lastSelection = this->selectedItems();
+		m_mouseIsPressed = true;
+	}
+	
+}
+
+void ot::GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	if (_event->button() == Qt::LeftButton) {
+		m_mouseIsPressed = false;
+		QList<QGraphicsItem*> currentSel = this->selectedItems();
+		if (currentSel.size() != m_lastSelection.size()) {
+			emit selectionChangeFinished();
+		}
+		else {
+			for (QGraphicsItem* itm : currentSel) {
+				bool found = false;
+				for (QGraphicsItem* itmCheck : m_lastSelection) {
+					if (itm == itmCheck) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					emit selectionChangeFinished();
+					return;
+				}
+			}
+		}
+	}
+}
+
+void ot::GraphicsScene::slotSelectionChanged(void) {
+	if (m_mouseIsPressed) return;
+	emit selectionChangeFinished();
 }
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
