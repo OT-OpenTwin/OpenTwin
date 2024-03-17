@@ -28,10 +28,11 @@
 
 namespace ot {
 
-	class GraphicsItemDrag;
-	class GraphicsConnectionItem;
-	class GraphicsItemCfg;
 	class GraphicsScene;
+	class GraphicsItemCfg;
+	class GraphicsItemDrag;
+	class GraphicsHighlightItem;
+	class GraphicsConnectionItem;
 
 	//! @brief Base class for all OpenTwin GraphicsItems
 	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
@@ -99,8 +100,7 @@ namespace ot {
 		void handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event);
 		
 		void paintStateBackground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
-		void paintStateForeground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
-
+		
 		//! @brief Will expand the size according to the margins
 		QSizeF handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const;
 
@@ -170,6 +170,10 @@ namespace ot {
 
 		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
+		void createHighlightItem(void);
+		void setHighlightItem(GraphicsHighlightItem* _item);
+		GraphicsHighlightItem* highlightItem(void) const { return m_highlightItem; };
+
 	private:
 		bool m_isLayoutOrStack;
 		
@@ -184,6 +188,7 @@ namespace ot {
 		GraphicsItemCfg::GraphicsItemFlag m_flags;
 		GraphicsItemContext m_context;
 		ot::ConnectionDirection m_connectionDirection;
+		GraphicsHighlightItem* m_highlightItem;
 
 		QPointF m_moveStartPt; //! @brief Item move origin
 		GraphicsItem* m_parent; //! @brief Parent graphics item

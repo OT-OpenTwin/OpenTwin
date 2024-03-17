@@ -17,6 +17,7 @@
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/GraphicsItemDrag.h"
 #include "OTWidgets/GraphicsStackItem.h"
+#include "OTWidgets/GraphicsHighlightItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 
 // Qt header
@@ -87,7 +88,7 @@ QRectF ot::GraphicsItem::calculateInnerRect(const QRectF& _outerRect, const QSiz
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItemCfg::NoFlags), m_context(NoContext), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_state(NoState), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
-	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny), m_uid(0)
+	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny), m_uid(0), m_highlightItem(nullptr)
 {
 
 }
@@ -204,6 +205,9 @@ void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
 	this->m_state |= GraphicsItem::HoverState;
 	this->getQGraphicsItem()->update();
+	if (m_highlightItem) {
+		m_highlightItem->handleHoverEnterEvent(_event);
+	}
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
@@ -223,6 +227,9 @@ void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	ToolTipHandler::hideToolTip();
 	this->m_state &= (~GraphicsItem::HoverState);
 	this->getQGraphicsItem()->update();
+	if (m_highlightItem) {
+		m_highlightItem->handleHoverLeaveEvent(_event);
+	}
 }
 
 void ot::GraphicsItem::paintStateBackground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -236,21 +243,6 @@ void ot::GraphicsItem::paintStateBackground(QPainter* _painter, const QStyleOpti
 		QPen p(QColor(255, 255, 0));
 		_painter->setPen(p);
 		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(255, 255, 0));
-	}
-}
-
-void ot::GraphicsItem::paintStateForeground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_state & HoverState) {
-		QPen p(QColor(0, 0, 255));
-		_painter->setPen(p);
-		_painter->setBrush(QBrush(QColor(0, 0, 255)));
-		_painter->drawRect(this->getQGraphicsItem()->boundingRect());
-	}
-	else if (m_state & SelectedState) {
-		QPen p(QColor(255, 255, 0));
-		_painter->setPen(p);
-		_painter->setBrush(QBrush(QColor(255, 255, 0)));
-		_painter->drawRect(this->getQGraphicsItem()->boundingRect());
 	}
 }
 
@@ -294,11 +286,19 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 	switch (_change)
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
-		if (this->getQGraphicsItem()->isSelected()) {
+		if (this->getQGraphicsItem()->isSelected() && !(m_state & SelectedState)) {
 			m_state |= SelectedState;
+			if (m_highlightItem) {
+				m_highlightItem->setStateFlags(m_highlightItem->stateFlags() | SelectedState);
+				m_highlightItem->update();
+			}
 		}
-		else {
+		else if (!this->getQGraphicsItem()->isSelected() && (m_state & SelectedState)) {
 			m_state &= (~SelectedState);
+			if (m_highlightItem) {
+				m_highlightItem->setStateFlags(m_highlightItem->stateFlags() & (~SelectedState));
+				m_highlightItem->update();
+			}
 		}
 		break;
 	case QGraphicsItem::ItemScenePositionHasChanged:
@@ -425,7 +425,6 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	}
 }
 
-
 std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs() 
 {
 	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
@@ -443,4 +442,15 @@ std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs()
 		}
 	}
 	return graphicConnectionCfgList;
+}
+
+void ot::GraphicsItem::createHighlightItem(void) {
+	GraphicsHighlightItem* newItem = new GraphicsHighlightItem;
+	newItem->setGraphicsItemFlags(ot::GraphicsItemCfg::NoFlags);
+	this->setHighlightItem(newItem);
+}
+
+void ot::GraphicsItem::setHighlightItem(GraphicsHighlightItem* _item) {
+	if (m_highlightItem) delete m_highlightItem;
+	m_highlightItem = _item;
 }

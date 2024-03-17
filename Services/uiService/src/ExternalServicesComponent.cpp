@@ -2914,7 +2914,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::GraphicsView * editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (auto graphicsItemCfg : pckg.items()) {
-					ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg);
+					ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg, true);
 					if (graphicsItem != nullptr) {
 						graphicsItem->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
 						const double xCoordinate = graphicsItemCfg->position().x();

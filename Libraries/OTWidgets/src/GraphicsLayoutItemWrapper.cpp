@@ -63,7 +63,6 @@ void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOp
 void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintStateBackground(_painter, _opt, _widget);
 	QGraphicsWidget::paint(_painter, _opt, _widget);
-	this->paintStateForeground(_painter, _opt, _widget);
 }
 
 void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {

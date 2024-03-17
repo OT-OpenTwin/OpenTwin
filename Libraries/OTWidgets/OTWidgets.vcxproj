@@ -34,6 +34,7 @@
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
     <ClCompile Include="src\GraphicsFactory.cpp" />
+    <ClCompile Include="src\GraphicsHighlightItem.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsGroupItem.cpp" />
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsHighlightItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsHBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.h" />

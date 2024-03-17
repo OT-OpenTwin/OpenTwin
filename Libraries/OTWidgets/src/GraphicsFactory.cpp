@@ -7,12 +7,13 @@
 // OpenTwin header
 #include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
-#include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/GraphicsStackItem.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/GraphicsStackItem.h"
+#include "OTWidgets/GraphicsHighlightItem.h"
 
-ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration) {
+ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration, bool _isRoot) {
 	OTAssertNullptr(_configuration);
 
 	if (!ot::GlobalKeyMap::instance().contains(_configuration->simpleFactoryObjectKey())) {
@@ -35,6 +36,28 @@ ot::GraphicsItem* ot::GraphicsFactory::itemFromConfig(ot::GraphicsItemCfg* _conf
 		OT_LOG_EA("Setup from configuration failed");
 		delete itm;
 		return nullptr;
+	}
+
+	// Create frame
+	if (_isRoot) {
+		ot::GraphicsStackItem* stck = dynamic_cast<ot::GraphicsStackItem*>(itm);
+		if (stck) {
+			stck->createHighlightItem();
+			stck->addItem(stck->highlightItem(), false, true);
+		}
+		else {
+			stck = new GraphicsStackItem;
+			stck->setGraphicsItemFlags(itm->graphicsItemFlags());
+			stck->setGraphicsItemName(itm->graphicsItemName());
+
+			itm->setGraphicsItemName(itm->graphicsItemName() + "_oldRoot");
+
+			stck->createHighlightItem();
+			stck->addItem(itm, true, false);
+			stck->addItem(stck->highlightItem(), false, true);
+
+			itm = stck;
+		}
 	}
 
 	return itm;

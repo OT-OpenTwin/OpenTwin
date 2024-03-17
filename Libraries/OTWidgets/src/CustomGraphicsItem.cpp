@@ -70,7 +70,6 @@ QRectF ot::CustomGraphicsItem::boundingRect(void) const {
 void ot::CustomGraphicsItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintStateBackground(_painter, _opt, _widget);
 	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getPreferredGraphicsItemSize()));
-	this->paintStateForeground(_painter, _opt, _widget);
 }
 
 QVariant ot::CustomGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
