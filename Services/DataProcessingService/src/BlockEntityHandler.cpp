@@ -13,6 +13,7 @@
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
 #include "EntityBlockConnection.h"
+#include "EntityBlockDisplay.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -186,6 +187,12 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	{
 		storage->createProperties();
 	}
+
+	EntityBlockDisplay* display = dynamic_cast<EntityBlockDisplay*>(blockEntity.get());
+	if(display)
+	{
+		display->createProperties();
+	}
 }
 
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
@@ -197,6 +204,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	//ot::GraphicsCollectionCfg* mathBlockCollection = new ot::GraphicsCollectionCfg("Mathematical Operations", "Mathematical Operations");
 	ot::GraphicsCollectionCfg* customizedBlockCollection = new ot::GraphicsCollectionCfg("Customized Blocks", "Customized Blocks");
+	
 
 	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
@@ -209,6 +217,9 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockPlot1D plotBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockVisualizationCollection->addItem(plotBlock.CreateBlockCfg());
+
+	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
+	controlBlockVisualizationCollection->addItem(displayBlock.CreateBlockCfg());
 
 	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(dimensionReducer.CreateBlockCfg());

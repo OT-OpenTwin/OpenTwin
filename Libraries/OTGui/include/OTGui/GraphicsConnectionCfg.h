@@ -33,6 +33,7 @@ namespace ot {
 		virtual ~GraphicsConnectionCfg();
 
 		GraphicsConnectionCfg& operator = (const GraphicsConnectionCfg& _other);
+		bool operator==(const GraphicsConnectionCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

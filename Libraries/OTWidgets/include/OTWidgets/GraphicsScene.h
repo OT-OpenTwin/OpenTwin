@@ -36,6 +36,8 @@ namespace ot {
 
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 
 		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin
 		//! @param _item Origin item
@@ -47,6 +49,12 @@ namespace ot {
 		void setConnectionPreviewStyle(GraphicsConnectionCfg::ConnectionStyle _style) { m_connectionPreviewStyle = _style; };
 		GraphicsConnectionCfg::ConnectionStyle connectionPreviewStyle(void) const { return m_connectionPreviewStyle; };
 
+	signals:
+		void selectionChangeFinished(void);
+
+	private slots:
+		void slotSelectionChanged(void);
+
 	protected:
 		virtual void drawBackground(QPainter* _painter, const QRectF& _rect) override;
 
@@ -56,6 +64,9 @@ namespace ot {
 		GraphicsItem* m_connectionOrigin;
 		GraphicsConnectionPreviewItem* m_connectionPreview;
 		ot::GraphicsConnectionCfg::ConnectionStyle m_connectionPreviewStyle;
+		QList<QGraphicsItem*> m_lastSelection;
+		bool m_mouseIsPressed;
+
 		GraphicsScene() = delete;
 	};
 

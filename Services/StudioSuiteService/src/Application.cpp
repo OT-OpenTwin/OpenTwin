@@ -24,6 +24,9 @@
 #include "EntityUnits.h"
 #include "EntityMaterial.h"
 #include "EntityProperties.h"
+#include "EntityGeometry.h"
+
+#include "boost/algorithm/string.hpp"
 
 #include <thread>
 #include <map>
@@ -88,6 +91,13 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 	{
 		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 		shapeInformation(content);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_TRIANGLES)
+	{
+		std::list<std::string> names = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Name);
+		std::list<std::string> triangles = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
+		shapeTriangles(names, triangles);
 		return "";
 	}
 
@@ -487,5 +497,162 @@ void Application::readDoubleTriple(const std::string& line, double& a, double& b
 
 void Application::shapeInformation(const std::string &content)
 {
+	std::stringstream data(content);
 
+	while (!data.eof())
+	{
+		std::string name, material;
+
+		data >> name;
+		data >> material;
+
+		if (!name.empty())
+		{
+			shapeMaterials[name] = material;
+		}
+	}
 }
+
+void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles)
+{
+	std::string materialsFolder = "Materials";
+
+	std::list<std::string> entityList{ materialsFolder };
+	std::list<ot::EntityInformation> entityInfo;
+
+	modelComponent()->getEntityInformation(entityList, entityInfo);
+
+	assert(entityInfo.size() == 1);
+	assert(entityInfo.front().getName() == materialsFolder);
+
+	ot::UID materialsFolderID = entityInfo.front().getID();
+
+	auto triangles = shapeTriangles.begin();
+
+	for (auto name : shapeNames)
+	{
+		storeShape(name, *triangles, materialsFolder, materialsFolderID);
+		triangles++;
+	}
+}
+
+void Application::storeShape(const std::string& name, const std::string& triangles, 
+							 const std::string &materialsFolder, ot::UID materialsFolderID)
+{
+	std::string otName = "Geometry\\" + name;
+	std::replace(otName.begin(), otName.end(), '\\', '/');
+
+	std::string material = shapeMaterials[name];
+	std::tuple<double, double, double> rgb = materialColors[material];
+
+	int colorR = (int) (255 * std::get<0>(rgb));
+	int colorG = (int) (255 * std::get<1>(rgb));
+	int colorB = (int) (255 * std::get<2>(rgb));
+
+	ot::UID entityID = modelComponent()->createEntityUID();
+	ot::UID facetsID = modelComponent()->createEntityUID();
+
+	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	entityGeom->setName(otName);
+	entityGeom->setEditable(false);
+
+	entityGeom->createProperties(colorR, colorG, colorB, materialsFolder, materialsFolderID);
+
+	EntityPropertiesEntityList* materialProp = dynamic_cast<EntityPropertiesEntityList*> (entityGeom->getProperties().getProperty("Material"));
+	assert(materialProp != nullptr);
+	if (materialProp != nullptr)
+	{
+		materialProp->setValueName(material);
+	}
+
+	entityGeom->getFacets()->setEntityID(facetsID);
+
+	createFacets(triangles, entityGeom->getFacets()->getNodeVector(), entityGeom->getFacets()->getTriangleList(), entityGeom->getFacets()->getEdgeList());
+
+	entityGeom->getFacets()->StoreToDataBase();
+	entityGeom->StoreToDataBase();
+
+	modelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
+	modelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
+
+	delete entityGeom;
+	entityGeom = nullptr;
+}
+
+void Application::createFacets(const std::string& data, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges)
+{
+	// Process the STL data
+	std::stringstream stlData(data);
+
+	ot::UID vertex[3];
+	Geometry::Node node[3];
+	int vertexID = 0;
+	size_t vertexCount = 0;
+
+	std::list<Geometry::Node> nodesList;
+
+	while (!stlData.eof())
+	{
+		std::string line;
+		std::getline(stlData, line);
+
+		boost::trim_left(line);
+		boost::to_lower(line);
+
+		std::stringstream lineBuffer(line);
+
+		std::string keyword;
+		lineBuffer >> keyword;
+
+		if (keyword == "vertex")
+		{
+			double pX(0.0), pY(0.0), pZ(0.0);
+
+			lineBuffer >> pX >> pY >> pZ;
+
+			node[vertexID].setCoords(pX, pY, pZ);
+
+			vertex[vertexID] = vertexCount;
+			vertexCount++;
+			vertexID++;
+
+			if (vertexID == 3)
+			{
+				// We need to calculate the facet normal, since this information can be incorrect in Studio Suite generated STL files
+
+				double vector1[] = { node[1].getCoord(0) - node[0].getCoord(0), node[1].getCoord(1) - node[0].getCoord(1), node[1].getCoord(2) - node[0].getCoord(2) };
+				double vector2[] = { node[2].getCoord(0) - node[0].getCoord(0), node[2].getCoord(1) - node[0].getCoord(1), node[2].getCoord(2) - node[0].getCoord(2) };
+
+				double normalX = vector1[1] * vector2[2] - vector1[2] * vector2[1];
+				double normalY = vector1[2] * vector2[0] - vector1[0] * vector2[2];
+				double normalZ = vector1[0] * vector2[1] - vector1[1] * vector2[0];
+
+				double abs = sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+
+				normalX /= abs;
+				normalY /= abs;
+				normalZ /= abs;
+
+				node[0].setNormals(normalX, normalY, normalZ);
+				node[1].setNormals(normalX, normalY, normalZ);
+				node[2].setNormals(normalX, normalY, normalZ);
+
+				nodesList.push_back(node[0]);
+				nodesList.push_back(node[1]);
+				nodesList.push_back(node[2]);
+
+				// Three vertices were added, so we have a new facet
+				triangles.push_back(Geometry::Triangle(vertex[0], vertex[1], vertex[2], 0));
+				vertexID = 0;
+			}
+		}
+	}
+
+	// Finally we need to store the list of nodes in the nodes array
+	nodes.reserve(nodesList.size());
+	for (auto n : nodesList)
+	{
+		nodes.push_back(n);
+	}
+}
+

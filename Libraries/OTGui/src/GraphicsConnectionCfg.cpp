@@ -73,6 +73,11 @@ ot::GraphicsConnectionCfg& ot::GraphicsConnectionCfg::operator = (const Graphics
 	return *this;
 }
 
+bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other)
+{
+	return m_uid == _other.m_uid;
+}
+
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_JSON_Member_Uid, m_uid, _allocator);
 	_object.AddMember(OT_JSON_Member_SourceUid, m_originUID, _allocator);

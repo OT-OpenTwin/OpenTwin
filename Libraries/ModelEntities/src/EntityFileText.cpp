@@ -33,8 +33,14 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 	}
 	else
 	{
-		throw std::exception("Property \"Text Encoding\" could not be loaded");
+		return ot::TextEncoding::UNKNOWN;
 	}
+}
+
+std::string EntityFileText::getText()
+{
+	const std::vector<char> plainData = getData()->getData();
+	return std::string(plainData.begin(),plainData.end());
 }
 
 void EntityFileText::setSpecializedProperties()

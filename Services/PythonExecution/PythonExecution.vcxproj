@@ -145,7 +145,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -156,7 +156,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python39.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -170,7 +170,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_PYTHON_INC);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_PYTHON_INC);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -186,7 +186,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python39.lib;BlockEntities.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -200,7 +200,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASEDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -230,7 +230,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASEDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -263,7 +263,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(MONGO_BOOST_ROOT);$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MONGO_BOOST_ROOT);$(OT_DEFAULT_SERVICE_INCR);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>

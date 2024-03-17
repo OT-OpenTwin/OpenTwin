@@ -103,9 +103,6 @@
     <ClCompile Include="src\QWidgetInterface.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\Dialog.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextEditor.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -184,6 +181,15 @@
     <ClCompile Include="src\PropertyGridItemDelegate.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="src\Dialog.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageDialog.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsHighlightItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -209,6 +215,12 @@
     </Filter>
     <Filter Include="src\Properties">
       <UniqueIdentifier>{2f24509f-ba9f-4e5f-9b4e-d42b24aad0f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Dialogs">
+      <UniqueIdentifier>{8200fa46-282a-459f-b528-b72191483a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Dialogs">
+      <UniqueIdentifier>{4b680142-85e1-482d-92b4-00e0ef2aa38c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -293,9 +305,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\Dialog.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PlainTextEdit.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -337,6 +346,15 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
       <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Dialog.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageDialog.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsHighlightItem.h">
+      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -182,6 +182,14 @@ void ot::TextEditor::setSyntaxHighlighter(QSyntaxHighlighter * _highlighter) {
 	m_syntaxHighlighter = _highlighter;
 }
 
+bool ot::TextEditor::requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion)
+{
+	bool refreshingNeeded = displayedTextEntityID != m_displayedTextEntityID || m_displayedTextEntityVersion != displayedTextEntityVersion;
+	m_displayedTextEntityID = displayedTextEntityID;
+	m_displayedTextEntityVersion = displayedTextEntityVersion;
+	return refreshingNeeded;
+}
+
 void ot::TextEditor::resizeEvent(QResizeEvent * _event) {
 	PlainTextEdit::resizeEvent(_event);
 

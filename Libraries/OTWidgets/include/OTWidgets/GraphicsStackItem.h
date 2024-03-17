@@ -41,6 +41,8 @@ namespace ot {
 
 		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
+		virtual QRectF boundingRect(void) const override;
+
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
 		void addItem(ot::GraphicsItem* _item, bool _isMaster, bool _isSlave);

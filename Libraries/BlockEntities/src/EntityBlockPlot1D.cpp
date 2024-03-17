@@ -137,7 +137,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	block.setBackgroundImagePath("Images/Graph.svg");
 	//block.setToolTip("Plots the X and Y values in a 1D plot");
 	AddConnectors(block);
-
+	
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
 }

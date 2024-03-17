@@ -24,6 +24,10 @@
 #include <qlabel.h>
 #include <qmovie.h>
 #include <qscreen.h>
+#include <qlayout.h>
+#include <QOpenGLWidget>
+
+
 
 ak::aWindow::aWindow()
 	: QMainWindow(), aPaintable(otMainWindow), m_waitingWidget(nullptr), m_centralWidget(nullptr)
@@ -112,4 +116,25 @@ void ak::aWindow::setWaitingAnimation(
 	QMovie *							_movie
 ) {
 	m_centralWidget->setWaitingAnimation(_movie);
+}
+
+void ak::aWindow::showEvent(QShowEvent* event)
+{
+	// Since Qt6, there is the following change (from Qt documentation):
+	//    When dynamically adding a QOpenGLWidget into a widget hierarchy, e.g.by parenting a 
+	//    new QOpenGLWidget to a widget where the corresponding top - level widget is already 
+	//    shown on screen, the associated native window may get implicitly destroyed and recreated 
+	//    if the QOpenGLWidget is the first of its kind within its window.This is because the window 
+	//    type changes from RasterSurface to OpenGLSurface and that has platform - specific 
+	//    implications.This behavior is new in Qt 6.4.
+
+	// This meand that the top window disappears and re-appears when the 3D view tab is added to the
+	// scene and therefore an OpenGL view is activated for the first time. In order to fix this,
+	// we add a dummy OpenGL window to the main window when it is shown for the very first time and delete
+	// it again right away. This fixes the flickering of the main window.
+
+	QOpenGLWidget w;
+
+	layout()->addWidget(&w);
+	layout()->removeWidget(&w);
 }

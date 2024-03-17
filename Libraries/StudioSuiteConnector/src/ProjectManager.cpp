@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <sstream>
 
 #include <QFileDialog>					// QFileDialog
 #include <qdir.h>						// QDir
@@ -50,14 +51,9 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		// Create the cache folder
 		cacheFolderName = createCacheFolder(baseProjectName);
 
-		// Open the cst project in a studio suite instance
+		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-
-		studioObject.openProject(fileName);
-
-		// Now save the project (if needed) and extract the data 
-		studioObject.saveProject();
-		studioObject.extractInformation();
+		studioObject.searchProjectAndExtractData(fileName);
 
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName);
@@ -372,15 +368,82 @@ void ProjectManager::sendShapeInformationAndTriangulation(const std::string& pro
 	// Send the message to the service
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
 
-	// Determine checksums and send them to the service
+	// Read the list of shape names and assign them the index of the STL file
+	std::map<std::string, int> allShapesMap = determineAllShapes(std::stringstream(fileContent));
+	 
+	// Determine which triangulation need to be sent (either different checksum or new)
+	std::map<std::string, int> modifiedShapesMap = allShapesMap;  // TODO: Implement check
 
+	// Now send the modified triangulations (one by one)
+	sendTriangulations(projectRoot, modifiedShapesMap);
+}
 
+void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap)
+{
+	std::list<std::string> shapeNames;
+	std::list<std::string> shapeTriangles;
 
-	// Now send the triangulations (one by one)
+	// We combine potentially several triangulations into a single message in order to avoid sending an excessive number of 
+	// messages in case of many small objects.
+	size_t dataSize = 0;
 
+	for (auto shape : trianglesMap)
+	{
+		std::string fileContent;
+		readFileContent(projectRoot + "/Temp/Upload/stl" + std::to_string(shape.second) + ".stl", fileContent);
 
+		shapeNames.push_back(shape.first);
+		shapeTriangles.push_back(fileContent);
 
+		dataSize += (shape.first.size() + fileContent.size());
 
+		if (dataSize > 10000000)
+		{
+			sendTriangleLists(shapeNames, shapeTriangles);
+			dataSize = 0;
+			shapeNames.clear();
+			shapeTriangles.clear();
+		}
+	}
+
+	if (dataSize > 0)
+	{
+		sendTriangleLists(shapeNames, shapeTriangles);
+	}
+}
+
+void ProjectManager::sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_TRIANGLES, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonArray(shapeNames, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonArray(shapeTriangles, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
+}
+
+std::map<std::string, int> ProjectManager::determineAllShapes(std::stringstream fileContent)
+{
+	std::map<std::string, int> shapeNameToIdMap;
+
+	int id = 0; 
+
+	while (!fileContent.eof())
+	{
+		std::string name, material;
+
+		fileContent >> name;
+		fileContent >> material;
+
+		if (!name.empty())
+		{
+			shapeNameToIdMap[name] = id;
+			id++;
+		}
+	}
+
+	return shapeNameToIdMap;
 }
 
 void ProjectManager::readFileContent(const std::string &fileName, std::string &content)

@@ -26,6 +26,7 @@
     <ClInclude Include="include\ClassFactoryHandler.h" />
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
+    <ClInclude Include="include\EntityInterfaceText.h" />
     <ClInclude Include="include\EntityMetadataSeries.h" />
     <ClInclude Include="include\EntityMetadataCampaign.h" />
     <ClInclude Include="include\EntityResultUnstructuredMesh.h" />

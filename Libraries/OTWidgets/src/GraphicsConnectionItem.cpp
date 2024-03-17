@@ -15,9 +15,10 @@
 #include <QtGui/qpainter.h>
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
-	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine)
+	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine), m_state(NoState), m_uid(0)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	this->setAcceptHoverEvents(true);
 }
 
 ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
@@ -60,8 +61,6 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 }
 
 void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	_painter->setPen(m_pen);
-
 	switch (m_style)
 	{
 	case ot::GraphicsConnectionCfg::DirectLine:
@@ -69,6 +68,19 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 		QPointF orig;
 		QPointF dest;
 		this->calculateDirectLinePoints(orig, dest);
+
+		if (m_state & HoverState) {
+			QPen p(QBrush(QColor(0, 0, 255)), m_pen.widthF() + 2.f);
+			_painter->setPen(p);
+			_painter->drawLine(orig, dest);
+		}
+		else if (m_state & SelectedState) {
+			QPen p(QBrush(QColor(255, 255, 0)), m_pen.widthF() + 2.f);
+			_painter->setPen(p);
+			_painter->drawLine(orig, dest);
+		}
+
+		_painter->setPen(m_pen);
 		_painter->drawLine(orig, dest);
 	}
 		break;
@@ -81,6 +93,19 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 		this->calculateSmoothLinePoints(orig, c1, c2, dest);
 		QPainterPath path(orig);
 		path.cubicTo(c1, c2, dest);
+
+		if (m_state & HoverState) {
+			QPen p(QBrush(QColor(0, 0, 255)), m_pen.widthF() + 2.f);
+			_painter->setPen(p);
+			_painter->drawPath(path);
+		}
+		else if (m_state & SelectedState) {
+			QPen p(QBrush(QColor(255, 255, 0)), m_pen.widthF() + 2.f);
+			_painter->setPen(p);
+			_painter->drawPath(path);
+		}
+
+		_painter->setPen(m_pen);
 		_painter->drawPath(path);
 	}
 		break;
@@ -91,15 +116,38 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 }
 
 QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	switch (_change)
+	{
+	case QGraphicsItem::ItemSelectedHasChanged:
+		if (this->isSelected()) {
+			m_state |= SelectedState;
+		}
+		else {
+			m_state &= (~SelectedState);
+		}
+		break;
+	default:
+		break;
+	}
 	return QGraphicsItem::itemChange(_change, _value);
 }
 
 void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-
+	this->setSelected(true);
 }
 
 void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 
+}
+
+void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	m_state |= HoverState;
+	this->update(this->boundingRect());
+}
+
+void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	m_state &= (~HoverState);
+	this->update(this->boundingRect());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

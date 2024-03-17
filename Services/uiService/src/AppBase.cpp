@@ -65,6 +65,8 @@
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/TextEditor.h"
 #include "DataBase.h"
+#include "OTGui/MessageDialogCfg.h"
+#include "OTWidgets/MessageDialog.h"
 
 // C++ header
 #include <thread>
@@ -434,7 +436,8 @@ void AppBase::notify(
 				m_graphicsPickerDock->setVisible(true);
 			}
 			else {
-				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow);
+				// We want to maintain the size of the application window
+				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow, false);
 			}
 			saveState();
 
@@ -529,6 +532,10 @@ bool AppBase::closeEvent() {
 	if (m_mainWindow != invalidUID) {
 		if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) != 0) {
 			m_currentStateWindow = uiAPI::window::saveState(m_mainWindow);
+		}
+		else
+		{
+			m_currentStateWindow = uiAPI::window::saveState(m_mainWindow, m_currentStateWindow);
 		}
 	}
 
@@ -2115,7 +2122,7 @@ ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, con
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor, &ot::GraphicsView::itemMoved, this, &AppBase::slotGraphicsItemMoved);
-	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChanged, this, &AppBase::slotGraphicsSelectionChanged);
+	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
 	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _name  + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
@@ -2151,6 +2158,7 @@ ot::TextEditor* AppBase::createNewTextEditor(const std::string& _name, const QSt
 
 	newEditor = new ot::TextEditor;
 	newEditor->setTextEditorName(_name);
+	newEditor->setTextEditorTitle(_title);
 
 	this->addTabToCentralView(_title, newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
@@ -2180,6 +2188,56 @@ ot::TextEditor* AppBase::findOrCreateTextEditor(const std::string& _name, const 
 
 	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewTextEditor(_name, _title, _serviceInfo);
+}
+
+void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_textEditors.contains(_serviceInfo)) {
+		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+		std::list<ot::TextEditor*> tmp = lst;
+		lst.clear();
+
+		for (auto v : tmp) {
+			if (v->textEditorName() == _name) {
+				QString title = v->textEditorTitle();
+				delete v;
+				ak::ID tabId = uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, title);
+				if (tabId != ak::invalidID) {
+					uiAPI::tabWidget::closeTab(m_tabViewWidget, tabId);
+				}
+				else {
+					OT_LOG_EA("Invalid tab ID");
+				}
+			}
+			else {
+				lst.push_back(v);
+			}
+		}
+	}
+	else {
+		OT_LOG_WA("Text editors not found for given service");
+	}
+}
+
+void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_textEditors.contains(_serviceInfo)) {
+		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+
+		for (auto v : lst) {
+			QString title = v->textEditorTitle();
+			delete v;
+			ak::ID tabId = uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, title);
+			if (tabId != ak::invalidID) {
+				uiAPI::tabWidget::closeTab(m_tabViewWidget, tabId);
+			}
+			else {
+				OT_LOG_EA("Invalid tab ID");
+			}
+		}
+		lst.clear();
+	}
+	else {
+		OT_LOG_WA("Text editors not found for given service");
+	}
 }
 
 std::list<ot::GraphicsView*> AppBase::getAllGraphicsEditors(void) {
@@ -2383,36 +2441,47 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		OT_LOG_E("GraphicsScene cast failed");
 		return;
 	}
+	ot::GraphicsView* graphicsView =scene->getGraphicsView();
+	if (graphicsView->getStateChangeInProgress())
+	{
+		return;
+	}
 
-	ot::UIDList selectedBlockItemIDs; 
+	ot::UIDList selectedGraphicSceneItemIDs; 
+	auto selectedItems = scene->selectedItems();
+	if (selectedItems.size() == 0)
+	{
+		return;
+	}
 
-	for (auto s : scene->selectedItems()) {
-		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
-		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
-
-		if (itm) {
-			// Item selected
-			selectedBlockItemIDs.push_back(itm->graphicsItemUid());
+	for (auto selectedItem : selectedItems) 
+	{
+		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
+		if (selectedGraphicsItem) 
+		{
+			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->graphicsItemUid());
+			continue;
 		}
-		else if (citm) {
-			// Connection selected
-			selectedBlockItemIDs.push_back(citm->uid());
+		
+		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
+		if (selectedConnection) 
+		{
+			selectedGraphicSceneItemIDs.push_back(selectedConnection->uid());
+			continue;
 		}
-		else {
+
+		if(selectedConnection == nullptr && selectedGraphicsItem == nullptr)
+		{
 			// Unknown selected
 			OTAssert(0, "Unknown graphics item selected");
 		}
 	}
-
-	if (selectedBlockItemIDs.empty()) {
-		return;
-	}
 	
 	clearNavigationTreeSelection();
 	
-	for (ot::UID selectedBlockItemID : selectedBlockItemIDs)
+	for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
 	{
-		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedBlockItemID);
+		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
 		setNavigationTreeItemSelected(treeID, true);	
 	}
 }
@@ -2452,31 +2521,41 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+	ot::MessageDialogCfg cfg;
 
-	try {
-		ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->textEditorName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	cfg.setButtons(ot::MessageDialogCfg::BasicButton::Cancel | ot::MessageDialogCfg::BasicButton::Save);
+	//cfg.setButtons(ot::MessageDialogCfg::BasicButton::Save);
+	//cfg.setButtons(ot::MessageDialogCfg::BasicButton::No);
+	cfg.setTitle("Save changed text?");
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+	if (result == ot::MessageDialogCfg::BasicButton::Save)
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
-		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-			OT_LOG_EA("Failed to send http request");
-			return;
+		try {
+			ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->textEditorName(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+
+			std::string response;
+			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+				OT_LOG_EA("Failed to send http request");
+				return;
+			}
+
+			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+			if (rMsg != ot::ReturnMessage::Ok) {
+				OT_LOG_E("Request failed: " + rMsg.getWhat());
+				return;
+			}
 		}
-
-		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-		if (rMsg != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Request failed: " + rMsg.getWhat());
-			return;
+		catch (const std::exception& _e) {
+			OT_LOG_EAS(_e.what());
 		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		catch (...) {
+			OT_LOG_EA("[FATAL] Unknown error");
+		}
 	}
 }
 

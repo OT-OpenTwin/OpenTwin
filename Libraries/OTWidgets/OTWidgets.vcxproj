@@ -34,6 +34,7 @@
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
     <ClCompile Include="src\GraphicsFactory.cpp" />
+    <ClCompile Include="src\GraphicsHighlightItem.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsGroupItem.cpp" />
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
+    <ClCompile Include="src\MessageDialog.cpp" />
     <ClCompile Include="src\OnePropertyDialog.cpp" />
     <ClCompile Include="src\OTQtConverter.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
@@ -96,6 +98,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsFactory.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsHighlightItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsHBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.h" />
@@ -113,6 +116,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsVBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.h" />
     <ClInclude Include="include\OTWidgets\LineEdit.h" />
+    <ClInclude Include="include\OTWidgets\MessageDialog.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputBool.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h" />

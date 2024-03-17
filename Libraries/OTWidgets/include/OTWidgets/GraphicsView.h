@@ -18,6 +18,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <atomic>
 
 namespace ot {
 
@@ -40,6 +41,8 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
 
+		const bool getStateChangeInProgress() const { return m_stateChangeInProgress; }
+
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
 		GraphicsItem* getItem(const ot::UID& _itemUid);
@@ -53,10 +56,11 @@ namespace ot {
 		const std::string& graphicsViewName(void) const { return m_viewName; };
 
 		void addItem(ot::GraphicsItem* _item);
-		void removeItem(const ot::UID& _itemUid);
+		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
 		std::list<ot::UID> selectedItems(void) const;
 
-		void addConnection(const GraphicsConnectionCfg& _config);
+		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
+
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const ot::UID& _connectionInformation);
 		ot::UIDList selectedConnections(void) const;
@@ -95,6 +99,8 @@ namespace ot {
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
 	private:
+		std::atomic_bool m_stateChangeInProgress = false;
+		
 		std::string m_viewName;
 		GraphicsScene* m_scene;
 		bool m_isPressed;
@@ -104,6 +110,10 @@ namespace ot {
 
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
 		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
-		std::list<GraphicsConnectionCfg> m_connectionBuffer;
+		std::list<GraphicsConnectionCfg> m_connectionCreationBuffer;
+		std::list<GraphicsConnectionCfg> m_itemRemovalConnectionBuffer;
+
+		void addConnection(const GraphicsConnectionCfg& _config);
+		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 	};
 }

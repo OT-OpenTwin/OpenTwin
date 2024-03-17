@@ -467,7 +467,7 @@ QString FAR::toolName(void) const {
 	return "FAR";
 }
 
-QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
+QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	m_centralSplitter = new QSplitter;
 
 	// Filter
@@ -481,10 +481,10 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSe
 	f.setBold(true);
 	m_leftTitle->setFont(f);
 
-	m_whitelistFiles = this->createFilterGroup("Whitelist Files:", "FAR.WLF", _settings, m_leftGrid, 1);
-	m_blacklistFiles = this->createFilterGroup("Blacklist Files:", "FAR.BLF", _settings, m_leftGrid, 2);
-	m_whitelistDirectories = this->createFilterGroup("Whitelist Directories:", "FAR.WLD", _settings, m_leftGrid, 3);
-	m_blacklistDirectories = this->createFilterGroup("Blacklist Directories:", "FAR.BLD", _settings, m_leftGrid, 4);
+	m_whitelistFiles = this->createFilterGroup("Whitelist Files:", m_leftGrid, 1);
+	m_blacklistFiles = this->createFilterGroup("Blacklist Files:", m_leftGrid, 2);
+	m_whitelistDirectories = this->createFilterGroup("Whitelist Directories:", m_leftGrid, 3);
+	m_blacklistDirectories = this->createFilterGroup("Blacklist Directories:", m_leftGrid, 4);
 
 	m_whitelistFiles.label->setToolTip("The full path of a file must contain at least one of the entries (entries separated by newline). Disabled if no entries are provided.");
 	m_whitelistFiles.label->setToolTipDuration(5000);
@@ -595,7 +595,15 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSe
 	this->connect(m_replaceTextBtn, &QPushButton::clicked, this, &FAR::slotReplaceText);
 	m_findModeTab->addTab(m_replaceTextLayoutW, FAR_SEARCHMODE_ReplaceText);
 
-	// Restore settings
+	return m_centralSplitter;
+}
+
+void FAR::restoreToolSettings(QSettings& _settings) {
+	this->restoreFilterGroupSettings(m_whitelistFiles, "FAR.WLF", _settings);
+	this->restoreFilterGroupSettings(m_blacklistFiles, "FAR.BLF", _settings);
+	this->restoreFilterGroupSettings(m_whitelistDirectories, "FAR.WLD", _settings);
+	this->restoreFilterGroupSettings(m_blacklistDirectories, "FAR.BLD", _settings);
+
 	m_rootDir->setText(_settings.value("FAR.RootDir", QString()).toString());
 
 	m_findText->setText(_settings.value("FAR.FindTxt", QString()).toString());
@@ -608,8 +616,6 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSe
 	m_replaceText->setText(_settings.value("FAR.ReplaceTxt.Txt", QString()).toString());
 	m_replaceTextCaseSensitive->setChecked(_settings.value("FAR.ReplaceTxt.C", false).toBool());
 	m_replaceWithText->setText(_settings.value("FAR.ReplaceTxt.WTxt", QString()).toString());
-
-	return m_centralSplitter;
 }
 
 bool FAR::prepareToolShutdown(QSettings& _settings) {
@@ -697,28 +703,23 @@ FARFilter::FilterFlag FAR::filterFlagsFromGroup(const FilterGroup& _group) const
 	return flags;
 }
 
-FAR::FilterGroup FAR::createFilterGroup(const QString& _labelText, const QString& _settingsKey, QSettings& _settings, QGridLayout* _layout, int _row) {
+FAR::FilterGroup FAR::createFilterGroup(const QString& _labelText, QGridLayout* _layout, int _row) {
 	FAR::FilterGroup group;
 	group.label = new QLabel(_labelText);
 	group.edit = new QPlainTextEdit;
 	group.layout = new QVBoxLayout;
-	group.edit->setPlainText(_settings.value(_settingsKey, QString()).toString());
+	
 	group.checkCase = new QCheckBox("Case sensitive");
-	group.checkCase->setChecked(_settings.value(_settingsKey + ".C", false).toBool());
 	group.starts = new QCheckBox("Starts with");
-	group.starts->setChecked(_settings.value(_settingsKey + ".S", false).toBool());
 	group.starts->setToolTip("If active the entries will be checked as path starts with. If no option selected the filter will be ignored.");
 	group.starts->setToolTipDuration(5000);
 	group.contains = new QCheckBox("Contains");
-	group.contains->setChecked(_settings.value(_settingsKey + ".H", false).toBool());
 	group.contains->setToolTip("If active the entries will be checked as path contains. If no option selected the filter will be ignored.");
 	group.contains->setToolTipDuration(5000);
 	group.ends = new QCheckBox("Ends with");
-	group.ends->setChecked(_settings.value(_settingsKey + ".E", false).toBool());
 	group.ends->setToolTip("If active the entries will be checked as path ends with. If no option selected the filter will be ignored.");
 	group.ends->setToolTipDuration(5000);
 	group.regex = new QCheckBox("Regex");
-	group.regex->setChecked(_settings.value(_settingsKey + ".R", false).toBool());
 	group.regex->setToolTip("If active the entries will interpreted as a regex. If no option selected the filter will be ignored.");
 	group.regex->setToolTipDuration(5000);
 
@@ -733,6 +734,15 @@ FAR::FilterGroup FAR::createFilterGroup(const QString& _labelText, const QString
 	_layout->addLayout(group.layout, _row, 3);
 	
 	return group;
+}
+
+void FAR::restoreFilterGroupSettings(FilterGroup& _group, const QString& _settingsKey, QSettings& _settings) {
+	_group.edit->setPlainText(_settings.value(_settingsKey, QString()).toString());
+	_group.checkCase->setChecked(_settings.value(_settingsKey + ".C", false).toBool());
+	_group.starts->setChecked(_settings.value(_settingsKey + ".S", false).toBool());
+	_group.contains->setChecked(_settings.value(_settingsKey + ".H", false).toBool());
+	_group.ends->setChecked(_settings.value(_settingsKey + ".E", false).toBool());
+	_group.regex->setChecked(_settings.value(_settingsKey + ".R", false).toBool());
 }
 
 void FAR::saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey, QSettings& _settings) {

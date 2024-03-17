@@ -542,6 +542,7 @@ void Model::modelSelectionChangedNotification(std::list<ot::UID> &selectedEntity
 	// Since we are performing notifications in a parallel thread, we need to make sure that all notifications are done before
 	// we send the next round of notifications
 	using namespace std::chrono_literals;
+
 	while (modelSelectionChangedNotificationInProgress) std::this_thread::sleep_for(1ms);
 
 	// It might happen that the UI still has some reference to entitires which have already been deleted.
@@ -838,6 +839,9 @@ void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool ke
 	{
 		getStateManager()->removeEntity(entity->getEntityID(),considerChildren);
 	}
+
+	selectedModelEntityIDs.remove(entity->getEntityID());
+	selectedVisibleModelEntityIDs.remove(entity->getEntityID());
 
 	setModified();
 }
@@ -1498,7 +1502,6 @@ void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const s
 	{
 		EntityBase* entity = getEntity(entityID);
 		assert(entity != nullptr);
-
 		for (auto prop : allProperties)
 		{
 			EntityPropertiesBase* newProperty = prop->createCopy();
@@ -1507,7 +1510,7 @@ void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const s
 			anyPropertyAdded = true;
 		}
 	}
-
+	
 	if (anyPropertyAdded)
 	{
 		updatePropertyGrid();
@@ -2117,6 +2120,9 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 		entity->addVisualizationNodes();
 	}
 
+	VisualizeRelatedBlockConnections(topLevelEntities);
+
+
 	// Here we need to ensure that the entities with the force visible flag are visible
 
 	ot::UIDList visibleEntityID;
@@ -2285,6 +2291,26 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 		setEntityOutdated(entity);
 	}
 	return entitiesForRemoval;
+}
+
+void Model::VisualizeRelatedBlockConnections(std::list<EntityBase*>& entities)
+{
+	std::list<EntityBase*> topLevelBlockEntities = FindTopLevelBlockEntities(entities);
+	if (topLevelBlockEntities.size() == 0)
+	{
+		return;
+	}
+	for (EntityBase* blockEntityBase : topLevelBlockEntities)
+	{
+		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(blockEntityBase);
+		ot::UIDList connectionUIDs = entityBlock->getAllConnections();
+		for (ot::UID connectionUID : connectionUIDs)
+		{
+			EntityBase* connectionEntityBase = entityMap[connectionUID];
+			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(connectionEntityBase);
+			connectionEntity->addVisualizationNodes();
+		}
+	}
 }
 
 void Model::removeParentsOfProtected(std::list<EntityBase*>& unprotectedEntities, const std::list<EntityBase*>& protectedEntities)
@@ -2952,7 +2978,11 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		setParameter(entity->getName(), dynamic_cast<EntityParameter*>(entity)->getNumericValue(), dynamic_cast<EntityParameter*>(entity));
 		return;
 	}
-
+	else if (dynamic_cast<EntityBlock*>(entity) != nullptr)
+	{
+		/*std::list<EntityBase*> blockEntities{ entity };
+		VisualizeRelatedBlockConnections(blockEntities)*/;
+	}
 }
 
 void Model::performEntityMeshUpdate(EntityMeshTet *entity)

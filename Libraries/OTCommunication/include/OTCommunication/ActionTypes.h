@@ -154,6 +154,8 @@
 #define OT_ACTION_CMD_UI_ContextMenuItemClicked "UI.ContextMenu.Item.Clicked"
 #define OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged "UI.ContextMenu.Item.CheckedChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_MessageDialog "UI.MessageDialog"
+#define OT_ACTION_CMD_UI_MessageDialogValue "UI.MessageDialogValue"
 #define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialog "UI.OnePropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialogValue "UI.OnePropertyDialogValue"
@@ -171,6 +173,7 @@
 #define OT_ACTION_CMD_UI_SS_UNITS "StudioSuite.UnitsInformation"
 #define OT_ACTION_CMD_UI_SS_MATERIALS "StudioSuite.MaterialsInformation"
 #define OT_ACTION_CMD_UI_SS_SHAPEINFO "StudioSuite.ShapesInformation"
+#define OT_ACTION_CMD_UI_SS_TRIANGLES "StudioSuite.ShapesTriangles"
 
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"
@@ -251,6 +254,8 @@
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest "UI.TextEditor.SaveRequest"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved "UI.TextEditor.SetSaved"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SetModified "UI.TextEditor.SetModified"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_Close "UI.TextEditor.Close"
+#define OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll "UI.TextEditor.CloseAll"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
@@ -333,6 +338,7 @@
 #define OT_ACTION_PARAM_FILE_Content_UncompressedDataLength "File.Content.DataLength.Uncompressed"
 #define OT_ACTION_PARAM_FILE_OriginalName "File.OriginalName"
 #define OT_ACTION_PARAM_FILE_LoadContent "File.LoadContent"
+#define OT_ACTION_PARAM_FILE_Type "File.Type"
 #define OT_ACTION_PARAM_SENDER_URL "Sender.URL"
 
 #define OT_ACTION_PARAM_LOG "LogMessage"

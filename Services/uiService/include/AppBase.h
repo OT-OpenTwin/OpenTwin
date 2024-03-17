@@ -473,6 +473,10 @@ public:
 
 	ot::TextEditor* findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
+	void closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+
+	void closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo);
+
 	std::list<ot::GraphicsView*> getAllGraphicsEditors(void);
 
 	// ######################################################################################################################

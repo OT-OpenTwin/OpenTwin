@@ -11,11 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FixtureNumpyAPI.cpp" />
     <ClCompile Include="src\FixturePropertyPythonObjectInterface.cpp" />
     <ClCompile Include="src\FixturePythonAPI.cpp" />
     <ClCompile Include="src\FixturePythonObjectBuilder.cpp" />
     <ClCompile Include="src\FixturePythonWrapper.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TestEnvironment.cpp" />
+    <ClCompile Include="src\TestNumpyAPI.cpp" />
     <ClCompile Include="src\TestPropertyPythonObjectInterface.cpp" />
     <ClCompile Include="src\TestPythonAPI.cpp" />
     <ClCompile Include="src\TestPythonObjectBuilder.cpp" />
@@ -23,6 +26,7 @@
     <ClCompile Include="src\Tets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\FixtureNumpyAPI.h" />
     <ClInclude Include="include\FixturePropertyPythonObjectInterface.h" />
     <ClInclude Include="include\FixturePythonAPI.h" />
     <ClInclude Include="include\FixturePythonObjectBuilder.h" />
@@ -55,7 +59,7 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);$(OT_PYTHON_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(GOOGLE_TEST_INC);$(OT_PYTHON_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
@@ -73,7 +77,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(OT_PYTHON_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include;$(OT_PYTHON_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCR);$(MONGO_BOOST_ROOT);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -84,8 +88,8 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(GOOGLE_TEST_LIBPATHR);$(SolutionDir)$(OT_LIBTESTR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);PythonExecution.lib;python39.lib;$(GOOGLE_TEST_LIB);BlockEntities.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(GOOGLE_TEST_LIBPATHR);$(SolutionDir)$(OT_LIBTESTR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);PythonExecution.lib;python39.lib;$(GOOGLE_TEST_LIB);BlockEntities.lib;Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

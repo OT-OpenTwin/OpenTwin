@@ -65,7 +65,7 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 	try {
 		// Write log message to logger service
 		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE, doc.toJson(), response, 3000, false, false)) {
-			assert(0);
+			//assert(0);
 		}
 	}
 

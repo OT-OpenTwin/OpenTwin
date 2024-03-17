@@ -55,7 +55,7 @@ Randomizer::~Randomizer() {
 
 // API base functions
 
-QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
+QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	// Root
 	m_root = new QWidget;
 	m_rootLayout = new QVBoxLayout(m_root);
@@ -68,11 +68,8 @@ QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidge
 	m_boolLayout = new QVBoxLayout(m_boolGroup);
 	m_boolTypeLayout = new QHBoxLayout;
 	m_zeroOneRB = new QRadioButton("0/1");
-	m_zeroOneRB->setChecked(_settings.value("Rand.BZO", false).toBool());
 	m_boolRB = new QRadioButton("true/false");
-	m_boolRB->setChecked(_settings.value("Rand.BTF", true).toBool());
 	m_yesNoRB = new QRadioButton("Yes/No");
-	m_yesNoRB->setChecked(_settings.value("Rand.BYN", false).toBool());
 	m_boolResult = new QLabel("<Result>");
 	m_boolRun = new QPushButton("Run");
 
@@ -93,19 +90,14 @@ QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidge
 	m_textLayout = new QVBoxLayout(m_textGroup);
 	m_textTopLayout = new QHBoxLayout;
 	m_upperCaseCB = new QCheckBox("\"abc\"");
-	m_upperCaseCB->setChecked(_settings.value("Rand.TUP", true).toBool());
 	m_lowerCaseCB = new QCheckBox("\"ABC\"");
-	m_lowerCaseCB->setChecked(_settings.value("Rand.TDN", true).toBool());
 	m_numbersCB = new QCheckBox("\"012\"");
-	m_numbersCB->setChecked(_settings.value("Rand.TNU", true).toBool());
 	m_symbolsCB = new QCheckBox("Symbols:");
-	m_symbolsCB->setChecked(_settings.value("Rand.TSY", true).toBool());
-	m_symbolsEdit = new QLineEdit(_settings.value("Rand.SYM", QString("~'! @#$%^&*()_-+={}[]|\\:;\"<,>.?/")).toString());
+	m_symbolsEdit = new QLineEdit;
 	m_textBottomLayout = new QHBoxLayout;
 	m_textLengthL = new QLabel("Text length:");
 	m_textLength = new QSpinBox;
 	m_textLength->setRange(1, 1024);
-	m_textLength->setValue(_settings.value("Rand.TLE", 16).toInt());
 	m_textRun = new QPushButton("     Run     ");
 	m_textResult = new QLineEdit;
 	m_textResult->setReadOnly(true);
@@ -144,6 +136,27 @@ QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidge
 	m_listLayout->addWidget(m_runList);
 	m_listLayout->addWidget(m_listResult);
 
+	
+
+	m_rootLayout->addWidget(m_listGroup, 1);
+
+	this->connect(m_addListBtn, &QPushButton::clicked, this, &Randomizer::slotAddList);
+	this->connect(m_runList, &QPushButton::clicked, this, &Randomizer::slotRunList);
+
+	return m_root;
+}
+
+void Randomizer::restoreToolSettings(QSettings& _settings) {
+	m_zeroOneRB->setChecked(_settings.value("Rand.BZO", false).toBool());
+	m_boolRB->setChecked(_settings.value("Rand.BTF", true).toBool());
+	m_yesNoRB->setChecked(_settings.value("Rand.BYN", false).toBool());
+	m_upperCaseCB->setChecked(_settings.value("Rand.TUP", true).toBool());
+	m_lowerCaseCB->setChecked(_settings.value("Rand.TDN", true).toBool());
+	m_numbersCB->setChecked(_settings.value("Rand.TNU", true).toBool());
+	m_symbolsCB->setChecked(_settings.value("Rand.TSY", true).toBool());
+	m_symbolsEdit->setText(_settings.value("Rand.SYM", QString("~'! @#$%^&*()_-+={}[]|\\:;\"<,>.?/")).toString());
+	m_textLength->setValue(_settings.value("Rand.TLE", 16).toInt());
+
 	QJsonParseError err;
 	QJsonDocument doc = QJsonDocument::fromJson(_settings.value("Rand.LST", QByteArray()).toByteArray(), &err);
 
@@ -180,13 +193,6 @@ QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidge
 	else {
 		RAND_LOGE(err.errorString());
 	}
-
-	m_rootLayout->addWidget(m_listGroup, 1);
-
-	this->connect(m_addListBtn, &QPushButton::clicked, this, &Randomizer::slotAddList);
-	this->connect(m_runList, &QPushButton::clicked, this, &Randomizer::slotRunList);
-
-	return m_root;
 }
 
 bool Randomizer::prepareToolShutdown(QSettings& _settings) {

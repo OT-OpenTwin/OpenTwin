@@ -387,7 +387,7 @@ QString Terminal::toolName(void) const {
 	return "OTerminal";
 }
 
-QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
+QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
@@ -506,10 +506,6 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	m_shortcutDelete = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Delete), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
 	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
 
-	// Restore settings
-	m_receiverUrl->setText(_settings.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
-	m_messageEdit->setPlainText(_settings.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
-
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
 	m_requestsRootFilter->setFlags(m_requestsRootFilter->flags() & (~Qt::ItemIsEditable));
@@ -534,6 +530,11 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	TERMINAL_LOG("Terminal initialization completed");
 
 	return m_splitter;
+}
+
+void Terminal::restoreToolSettings(QSettings& _settings) {
+	m_receiverUrl->setText(_settings.value("Terminal.Receiver", "127.0.0.1:XXXX").toString());
+	m_messageEdit->setPlainText(_settings.value("Terminal.Message", "{\n\t\"action\": \"Ping\"\n}").toString());
 }
 
 bool Terminal::prepareToolShutdown(QSettings& _settings) {

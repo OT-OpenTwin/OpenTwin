@@ -19,9 +19,10 @@
 #include "SelectEntitiesDialog.h"
 
 // Qt header
-#include <QFileDialog>					// QFileDialog
-#include <qdir.h>						// QDir
-#include <qeventloop.h>
+#include <QtCore/qdir.h>						// QDir
+#include <QtCore/qeventloop.h>
+#include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
@@ -46,6 +47,7 @@
 
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
@@ -58,6 +60,7 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/TextEditor.h"
+#include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/OnePropertyDialog.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -1822,9 +1825,10 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			{
 				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
 				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+				std::string entityType = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Type);
 				try
 				{
-					const std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
+					std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
 
 					if (absoluteFilePaths.size() != 0)
 					{
@@ -1854,7 +1858,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 						std::string entityPath = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
 						std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 						std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath));
+						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath), entityType);
 					}
 				}
 				catch (std::exception& e)
@@ -2909,13 +2913,14 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				ot::GraphicsView * editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
-				for (auto itm : pckg.items()) {
-					ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm);
-					if (i) {
-						i->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
-						//i->setGraphicsItemFlags(i->graphicsItemFlags() | ot::GraphicsItem::ItemIsMoveable | ot::GraphicsItem::ItemNetworkContext);
-						i->getQGraphicsItem()->setPos(QPointF(itm->position().x(), itm->position().y()));
-						editor->addItem(i);
+				for (auto graphicsItemCfg : pckg.items()) {
+					ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg, true);
+					if (graphicsItem != nullptr) {
+						graphicsItem->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
+						const double xCoordinate = graphicsItemCfg->position().x();
+						const double yCoordinate = graphicsItemCfg->position().y();
+						graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));
+						editor->addItem(graphicsItem);
 					}
 				}
 			}
@@ -2959,7 +2964,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 				
 				for (const auto& connection : pckg.connections()) {
-					editor->addConnection(connection);
+					editor->addConnectionIfConnectedItemsExist(connection);
 				}
 
 			}
@@ -2996,6 +3001,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
 				std::string editorText = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
+
 				std::string editorTitle = editorName;
 				if (_doc.HasMember(OT_ACTION_PARAM_TEXTEDITOR_Title)) {
 					editorTitle = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Title);
@@ -3026,6 +3032,19 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				if (editor) {
 					editor->setContentChanged(true);
 				}
+			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_Close) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
+				AppBase::instance()->closeTextEditor(editorName, info);
+			}
+			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				AppBase::instance()->closeAllTextEditors(info);
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
 
@@ -3111,22 +3130,41 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				info.setFromJsonObject(_doc.GetConstObject());
 
 				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-
+				const std::string subsequentFunction = ot::json::getString(_doc,OT_ACTION_PARAM_MODEL_FunctionName);
 				ot::OnePropertyDialogCfg pckg;
 				pckg.setFromJsonObject(cfgObj);
 
 				ot::OnePropertyDialog dia(pckg, nullptr);
 				dia.showDialog();
 
-				if (dia.dialogResult() == ot::Dialog::Ok && dia.valueHasChanged()) {
+				if (dia.dialogResult() == ot::Dialog::Ok) {
 					ot::JsonDocument responseDoc;
-					responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OnePropertyDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-					responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(dia.dialogName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+					responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+					responseDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 					dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
-
+					
 					std::string response;
 					sendHttpRequest(EXECUTE, info, responseDoc, response);
 				}
+			}
+			else if (action == OT_ACTION_CMD_UI_MessageDialog) {
+				ot::BasicServiceInformation info;
+				info.setFromJsonObject(_doc.GetConstObject());
+
+				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
+
+				ot::MessageDialogCfg cfg;
+				cfg.setFromJsonObject(cfgObj);
+
+				ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+
+				ot::JsonDocument responseDoc;
+				responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MessageDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+				responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(cfg.name(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+				responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(ot::MessageDialogCfg::buttonToString(result), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+				std::string response;
+				sendHttpRequest(EXECUTE, info, responseDoc, response);
 			}
 			else
 			{

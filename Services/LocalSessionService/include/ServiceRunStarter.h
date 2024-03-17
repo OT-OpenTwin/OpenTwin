@@ -23,6 +23,7 @@ private:
 
 	bool queueEmpty(void);
 	void worker(void);
+	void sendRunMessageToService(std::string serviceURL, std::string messageOut, std::string serviceName, std::string serviceType, std::string serviceId);
 
 	struct startupInformation {
 		std::string sessionId;

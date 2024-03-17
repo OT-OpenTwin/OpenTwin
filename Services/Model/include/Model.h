@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <atomic>
 
 #include "EntityContainer.h"
 #include "Geometry.h"
@@ -290,6 +291,7 @@ private:
 	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, std::string>& entityProperties);
 	void addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible);
 	std::list<ot::UID> RemoveBlockConnections(std::list<EntityBase*>& entityID);
+	void VisualizeRelatedBlockConnections(std::list<EntityBase*>& entityID);
 	void removeParentsOfProtected(std::list<EntityBase*>& unprotectedEntities, const std::list<EntityBase*>& protectedEntities);
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);
@@ -322,7 +324,8 @@ private:
 	bool						   versionGraphCreated;
 	std::string					   newTableItemName;
 	std::map<ot::UID, bool>		   meshingActive;
-	bool						   modelSelectionChangedNotificationInProgress;
+
+	std::atomic_bool				modelSelectionChangedNotificationInProgress;
 	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;
 
 

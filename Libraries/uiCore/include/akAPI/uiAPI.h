@@ -2645,7 +2645,8 @@ namespace ak {
 
 			//! @brief Will return the state of the window so it can be restored
 			UICORE_API_EXPORT std::string saveState(
-				UID												_windowUID
+				UID												_windowUID,
+				std::string										_currentState = ""
 			);
 
 			//! @brief Will return the state of the window so it can be restored

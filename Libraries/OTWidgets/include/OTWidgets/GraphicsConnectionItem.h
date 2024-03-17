@@ -23,6 +23,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
 	public:
+		enum GraphicsItemState {
+			NoState = 0x00, //! @brief Default state
+			HoverState = 0x01, //! @brief Item is hovered over by user
+			SelectedState = 0x02  //! @brief Item is selected
+		};
+
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();
 
@@ -35,6 +41,8 @@ namespace ot {
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* _event) override;
+		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -64,6 +72,8 @@ namespace ot {
 		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
 
+		GraphicsItemState m_state;
+
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
 
@@ -78,3 +88,5 @@ namespace ot {
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsConnectionItem::GraphicsItemState)

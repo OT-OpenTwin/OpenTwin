@@ -5,7 +5,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/TextEncoding.h"
 #include "OTCore/EncodingGuesser.h"
-
+#include "ClassFactory.h"
 
 std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fileName)
 {
@@ -45,7 +45,7 @@ ot::JsonDocument FileHandler::StoreFileInDataBase(const ot::UIDList& entityIDs, 
 		std::string documentType = documentName.substr(documentName.find(".") + 1);
 		documentName = documentName.substr(0, documentName.find("."));
 
-		auto newFile = CreateNewSourceEntity(documentType, *uid, _senderName);
+		auto newFile = CreateNewSourceEntity(*uid, _senderName);
 		topoID.push_back(*uid);
 		uid++;
 		std::string entityName = CreateNewUniqueTopologyName(documentName);
@@ -102,7 +102,7 @@ std::string FileHandler::ExtractFileNameFromPath(const std::string& absoluteFile
 	return std::string();
 }
 
-void FileHandler::SetNewFileImportRequest(const std::string&& senderURL, const std::string&& subsequentFunction, const std::string&& senderName, const std::list<std::string>&& takenNames, const std::list<std::string>&& filePaths, const std::string&& entityPath)
+void FileHandler::SetNewFileImportRequest(const std::string&& senderURL, const std::string&& subsequentFunction, const std::string&& senderName, const std::list<std::string>&& takenNames, const std::list<std::string>&& filePaths, const std::string&& entityPath, const std::string& entityType)
 {
 	_senderURL				= senderURL;
 	_subsequentFunction		= subsequentFunction;
@@ -110,20 +110,17 @@ void FileHandler::SetNewFileImportRequest(const std::string&& senderURL, const s
 	_takenNames				= takenNames;
 	_filePaths				= filePaths;
 	_entityPath				= entityPath;
+	_entityType				= entityType;
 }
 
-std::shared_ptr<EntityFile> FileHandler::CreateNewSourceEntity(const std::string& dataType, ot::UID entityID, const std::string& owner)
+std::shared_ptr<EntityFile> FileHandler::CreateNewSourceEntity(ot::UID entityID, const std::string& owner)
 {
-	EntityFile* newSource = nullptr;
-	if (dataType == "txt" || dataType == "csv" || dataType == "CSV")
-	{
-		newSource = new EntityFileCSV(entityID, nullptr, nullptr, nullptr, nullptr, owner);
-	}
-	else
-	{
-		newSource = new EntityFile(entityID, nullptr, nullptr, nullptr, nullptr, owner);
-	}
-	return std::shared_ptr<EntityFile>(newSource);
+	ClassFactory classFactory;
+	EntityBase* newFileBase = classFactory.CreateEntity(_entityType);
+	newFileBase->setEntityID(entityID);
+	newFileBase->setOwningService(owner);
+	EntityFile*	newFile = dynamic_cast<EntityFile*>(newFileBase);
+	return std::shared_ptr<EntityFile>(newFile);
 }
 
 ot::JsonDocument FileHandler::CreateReplyMessage(const ot::UIDList& topoID, const ot::UIDList& topoVers, const ot::UIDList& dataID, const ot::UIDList& dataVers)

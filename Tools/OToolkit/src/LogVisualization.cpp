@@ -66,7 +66,7 @@ LogVisualization::LogVisualization()
 }
 
 LogVisualization::~LogVisualization() {
-	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
+	/*otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
 	settings->setValue("LogVisualization.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
 
@@ -91,14 +91,14 @@ LogVisualization::~LogVisualization() {
 	for (int i = 0; i < m_table->columnCount(); i++) {
 		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
 	}
-	settings->setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);
+	settings->setValue("LogVisualization.Table.ColumnWidth", tableColumnWidths);*/
 }
 
 QString LogVisualization::toolName(void) const {
 	return QString("Log Visualization");
 }
 
-QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets, QSettings& _settings) {
+QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
@@ -207,47 +207,11 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	splitter->setStretchFactor(1, 1);
 
 	// Restore settings
-	QString tableColumnWidths = _settings.value("LogVisualization.Table.ColumnWidth", "").toString();
-	QStringList tableColumnWidthsList = tableColumnWidths.split(";", Qt::SkipEmptyParts);
-	if (tableColumnWidthsList.count() == m_table->columnCount()) {
-		int column = 0;
-		for (auto w : tableColumnWidthsList) {
-			m_table->setColumnWidth(column++, w.toInt());
-		}
-	}
+	
 
-	m_autoScrollToBottom->setChecked(_settings.value("LogVisualization.AutoScrollToBottom", true).toBool());
+	
 
-	m_msgTypeFilterDetailed->setChecked(_settings.value("LogVisualization.FilterActive.Detailed", true).toBool());
-	m_msgTypeFilterInfo->setChecked(_settings.value("LogVisualization.FilterActive.Info", true).toBool());
-	m_msgTypeFilterWarning->setChecked(_settings.value("LogVisualization.FilterActive.Warning", true).toBool());
-	m_msgTypeFilterError->setChecked(_settings.value("LogVisualization.FilterActive.Error", true).toBool());
-	m_msgTypeFilterMsgIn->setChecked(_settings.value("LogVisualization.FilterActive.Message.In", false).toBool());
-	m_msgTypeFilterMsgOut->setChecked(_settings.value("LogVisualization.FilterActive.Message.Out", false).toBool());
-
-	QByteArray serviceFilter = _settings.value("LogVisualization.ServiceFilter.List", QByteArray()).toByteArray();
-	if (!serviceFilter.isEmpty()) {
-		QJsonDocument serviceFilterDoc = QJsonDocument::fromJson(serviceFilter);
-		if (serviceFilterDoc.isArray()) {
-			QJsonArray serviceFilterArr = serviceFilterDoc.array();
-
-			for (int i = 0; i < serviceFilterArr.count(); i++) {
-				if (serviceFilterArr[i].isObject()) {
-					QJsonObject serviceObj = serviceFilterArr[i].toObject();
-
-					if (serviceObj.contains("Name") && serviceObj.contains("Active")) {
-						if (serviceObj["Name"].isString() && serviceObj["Active"].isBool()) {
-							QListWidgetItem* nItm = new QListWidgetItem(serviceObj["Name"].toString());
-							nItm->setFlags(nItm->flags() | Qt::ItemIsUserCheckable);
-							nItm->setCheckState((serviceObj["Active"].toBool() ? Qt::Checked : Qt::Unchecked));
-							m_serviceFilter->addItem(nItm);
-						}
-					}
-				}
-			}
-			m_serviceFilter->sortItems(Qt::SortOrder::AscendingOrder);
-		}
-	}
+	
 
 	// Initialize colors and text
 	this->slotUpdateCheckboxColors();
@@ -283,9 +247,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	// Create menu bar
 	m_connectButton = _rootMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
 	m_autoConnect = _rootMenu->addAction("Auto-Connect");
-	bool needAutoConnect = _settings.value("LogVisualization.AutoConnect", false).toBool();
-	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
-
+	
 	_rootMenu->addSeparator();
 	m_importButton = _rootMenu->addAction(QIcon(":images/Import.png"), "Import");
 	m_exportButton = _rootMenu->addAction(QIcon(":images/Export.png"), "Export");
@@ -295,14 +257,61 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	connect(m_importButton, &QAction::triggered, this, &LogVisualization::slotImport);
 	connect(m_exportButton, &QAction::triggered, this, &LogVisualization::slotExport);
 
+	LOGVIS_LOG("Initialization completed");
+
+	return splitter;
+}
+
+void LogVisualization::restoreToolSettings(QSettings& _settings) {
+	m_autoScrollToBottom->setChecked(_settings.value("LogVisualization.AutoScrollToBottom", true).toBool());
+
+	m_msgTypeFilterDetailed->setChecked(_settings.value("LogVisualization.FilterActive.Detailed", true).toBool());
+	m_msgTypeFilterInfo->setChecked(_settings.value("LogVisualization.FilterActive.Info", true).toBool());
+	m_msgTypeFilterWarning->setChecked(_settings.value("LogVisualization.FilterActive.Warning", true).toBool());
+	m_msgTypeFilterError->setChecked(_settings.value("LogVisualization.FilterActive.Error", true).toBool());
+	m_msgTypeFilterMsgIn->setChecked(_settings.value("LogVisualization.FilterActive.Message.In", false).toBool());
+	m_msgTypeFilterMsgOut->setChecked(_settings.value("LogVisualization.FilterActive.Message.Out", false).toBool());
+
+	QString tableColumnWidths = _settings.value("LogVisualization.Table.ColumnWidth", "").toString();
+	QStringList tableColumnWidthsList = tableColumnWidths.split(";", Qt::SkipEmptyParts);
+	if (tableColumnWidthsList.count() == m_table->columnCount()) {
+		int column = 0;
+		for (auto w : tableColumnWidthsList) {
+			m_table->setColumnWidth(column++, w.toInt());
+		}
+	}
+
+	QByteArray serviceFilter = _settings.value("LogVisualization.ServiceFilter.List", QByteArray()).toByteArray();
+	if (!serviceFilter.isEmpty()) {
+		QJsonDocument serviceFilterDoc = QJsonDocument::fromJson(serviceFilter);
+		if (serviceFilterDoc.isArray()) {
+			QJsonArray serviceFilterArr = serviceFilterDoc.array();
+
+			for (int i = 0; i < serviceFilterArr.count(); i++) {
+				if (serviceFilterArr[i].isObject()) {
+					QJsonObject serviceObj = serviceFilterArr[i].toObject();
+
+					if (serviceObj.contains("Name") && serviceObj.contains("Active")) {
+						if (serviceObj["Name"].isString() && serviceObj["Active"].isBool()) {
+							QListWidgetItem* nItm = new QListWidgetItem(serviceObj["Name"].toString());
+							nItm->setFlags(nItm->flags() | Qt::ItemIsUserCheckable);
+							nItm->setCheckState((serviceObj["Active"].toBool() ? Qt::Checked : Qt::Unchecked));
+							m_serviceFilter->addItem(nItm);
+						}
+					}
+				}
+			}
+			m_serviceFilter->sortItems(Qt::SortOrder::AscendingOrder);
+		}
+	}
+
+	bool needAutoConnect = _settings.value("LogVisualization.AutoConnect", false).toBool();
+	m_autoConnect->setIcon(needAutoConnect ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
+
 	if (needAutoConnect) {
 		LOGVIS_LOG("Auto connect requested, request queued");
 		QMetaObject::invokeMethod(this, &LogVisualization::slotAutoConnect, Qt::QueuedConnection);
 	}
-
-	LOGVIS_LOG("Initialization completed");
-
-	return splitter;
 }
 
 //QList<QWidget *> LogVisualization::statusBarWidgets(void) const {

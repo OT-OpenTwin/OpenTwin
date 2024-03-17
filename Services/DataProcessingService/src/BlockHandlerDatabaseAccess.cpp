@@ -159,7 +159,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 							rowCounter++;
 						}
 					}
-					_dataPerPort[connectorName].push_back(dataBlock);
+					_dataPerPort[connectorName].push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
 				}
 				else
 				{
@@ -167,7 +167,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 					ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
 					dataBlock->setValue(value);
 					const std::string connectorName = _connectorNames[count];
-					_dataPerPort[connectorName].push_back(dataBlock);
+					_dataPerPort[connectorName].push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
 					count++;
 				}
 			}

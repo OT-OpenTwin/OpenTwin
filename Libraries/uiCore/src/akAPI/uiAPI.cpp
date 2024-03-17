@@ -2941,9 +2941,10 @@ void ak::uiAPI::window::resize(
 ) { object::get<aWindowManager>(_windowUID)->resize(_width, _height); }
 
 std::string ak::uiAPI::window::saveState(
-	UID												_windowUID
+	UID												_windowUID,
+	std::string										_currentState
 ) {
-	return object::get<aWindowManager>(_windowUID)->saveState();
+	return object::get<aWindowManager>(_windowUID)->saveState(_currentState);
 }
 
 bool ak::uiAPI::window::restoreState(

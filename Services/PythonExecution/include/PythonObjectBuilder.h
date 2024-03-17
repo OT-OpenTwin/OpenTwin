@@ -27,7 +27,7 @@
 class PythonObjectBuilder
 {
 public:
-	PythonObjectBuilder() : _assembly(nullptr) {};
+	PythonObjectBuilder() ;
 	~PythonObjectBuilder() { Py_XDECREF(_assembly); };
 	void StartTupleAssemply(int size);
 	void operator<<(CPythonObject* newEntry);
@@ -77,6 +77,9 @@ private:
 	PyObject* _assembly = nullptr;
 	int _assemblySize = 0;
 	int _currentSize = 0;
+
+	void* variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, int& pType);
+	const ot::Variable* voidArrayToVariableArray(void* data, const uint32_t size, int pType);
 };
 
 

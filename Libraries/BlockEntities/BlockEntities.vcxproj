@@ -171,6 +171,7 @@
     <ClInclude Include="include\EntityBlockConnection.h" />
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityBlockDataDimensionReducer.h" />
+    <ClInclude Include="include\EntityBlockDisplay.h" />
     <ClInclude Include="include\EntityBlockPlot1D.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\EntityBlockStorage.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="src\EntityBlockConnection.cpp" />
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
     <ClCompile Include="src\EntityBlockDataDimensionReducer.cpp" />
+    <ClCompile Include="src\EntityBlockDisplay.cpp" />
     <ClCompile Include="src\EntityBlockPlot1D.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />
     <ClCompile Include="src\EntityBlockStorage.cpp" />

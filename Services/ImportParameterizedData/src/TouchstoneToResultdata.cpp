@@ -24,25 +24,35 @@ TouchstoneToResultdata::~TouchstoneToResultdata()
 {
 }
 
-void TouchstoneToResultdata::CreateResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength)
+int TouchstoneToResultdata::getAssumptionOfPortNumber(const std::string& fileName)
 {
-	
+	return TouchstoneHandler::deriveNumberOfPorts(fileName);
+}
+
+void TouchstoneToResultdata::SetResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength)
+{
+	_fileName = fileName;
+	_fileContent = fileContent;
+	_uncompressedLength = uncompressedLength;
+}
+
+void TouchstoneToResultdata::CreateResultdata(int numberOfPorts)
+{	
 	if (_collectionName == "")
 	{
 		_collectionName = DataBase::GetDataBase()->getProjectName();
 	}
-	const std::string seriesName = CreateSeriesName(fileName);
+	const std::string seriesName = CreateSeriesName(_fileName);
 	const bool seriesAlreadyExists = SeriesAlreadyExists(seriesName);
 	if (!seriesAlreadyExists)
 	{
-		TouchstoneHandler handler = std::move(ImportTouchstoneFile(fileName, fileContent, uncompressedLength));
+		TouchstoneHandler handler = std::move(ImportTouchstoneFile(_fileName, _fileContent, _uncompressedLength, numberOfPorts));
 		ot::UID seriesID = _modelComponent->createEntityUID();
 		MetadataSeries newSeriesMetadata(seriesName, seriesID);
 		BuildSeriesMetadataFromTouchstone(handler, newSeriesMetadata);
 		ResultCollectionExtender resultCollectionExtender(_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		resultCollectionExtender.AddSeries(std::move(newSeriesMetadata));
 
-		uint32_t numberOfPorts = handler.getNumberOfPorts();
 		resultCollectionExtender.setBucketSize(numberOfPorts * numberOfPorts);
 		const std::list<ts::PortData>& allPortData = handler.getPortData();
 
@@ -75,6 +85,11 @@ void TouchstoneToResultdata::CreateResultdata(const std::string& fileName, const
 	{
 		_uiComponent->displayMessage("Series metadata with the name: " + seriesName + " already exists.");
 	}
+	
+	_fileContent = "";
+	_fileName = "";
+	_uncompressedLength = 0;
+	_collectionName = "";
 }
 
 const std::string TouchstoneToResultdata::CreateSeriesName(const std::string& fileName)
@@ -98,7 +113,7 @@ bool TouchstoneToResultdata::SeriesAlreadyExists(const std::string& seriesName)
 	return false;
 }
 
-TouchstoneHandler TouchstoneToResultdata::ImportTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength)
+TouchstoneHandler TouchstoneToResultdata::ImportTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts)
 {
 	// Decode the encoded string into binary data
 	int decoded_compressed_data_length = Base64decode_len(fileContent.c_str());
@@ -119,7 +134,7 @@ TouchstoneHandler TouchstoneToResultdata::ImportTouchstoneFile(const std::string
 	TouchstoneHandler handler(fileName);
 	try
 	{
-		handler.AnalyseFile(unpackedFileContent);
+		handler.AnalyseFile(unpackedFileContent, numberOfPorts);
 	}
 	catch (const std::exception& e)
 	{

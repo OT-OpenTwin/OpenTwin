@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\BlockHandling">
-      <UniqueIdentifier>{031a1c64-1cf3-426f-b9f8-0022d3323f52}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\BlockFunctionality">
       <UniqueIdentifier>{89e29ce9-6af8-450f-8a78-e27680275438}</UniqueIdentifier>
     </Filter>
@@ -28,6 +25,9 @@
     <Filter Include="Header Files\Buffer">
       <UniqueIdentifier>{6f7eba01-17fb-4ea8-9fc6-58a19a1fbb3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\BlockFunctionality">
+      <UniqueIdentifier>{031a1c64-1cf3-426f-b9f8-0022d3323f52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -43,10 +43,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp">
-      <Filter>Source Files\BlockHandling</Filter>
+      <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandlerPlot1D.cpp">
-      <Filter>Source Files\BlockHandling</Filter>
+      <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockEntityHandler.cpp">
       <Filter>Source Files</Filter>
@@ -70,7 +70,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandler.cpp">
-      <Filter>Source Files\BlockHandling</Filter>
+      <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
     <ClCompile Include="src\PipelineHandler.cpp">
       <Filter>Source Files</Filter>
@@ -82,7 +82,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandlerDataDimensionReducer.cpp">
-      <Filter>Source Files\BlockHandling</Filter>
+      <Filter>Source Files\BlockFunctionality</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockHandlerDisplay.cpp">
+      <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +141,9 @@
       <Filter>Header Files\Buffer</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandlerDataDimensionReducer.h">
+      <Filter>Header Files\BlockFunctionality</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandlerDisplay.h">
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
   </ItemGroup>
