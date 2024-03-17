@@ -15,7 +15,8 @@
 #include <QtGui/qpainter.h>
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
-	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine), m_state(NoState), m_uid(0)
+	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine), m_state(NoState), m_uid(0),
+	m_hoverPen(QBrush(QColor(0, 0, 255)), 2.f), m_selectedPen(QBrush(QColor(255, 255, 0)), 2.f)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
@@ -40,7 +41,10 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 		QPointF orig;
 		QPointF dest;
 		this->calculateDirectLinePoints(orig, dest);
-		return QRectF(QPointF(std::min(orig.x(), dest.x()), std::min(orig.y(), dest.y())), QPointF(std::max(orig.x(), dest.x()), std::max(orig.y(), dest.y())));
+		qreal marg = std::max(m_hoverPen.widthF(), m_selectedPen.widthF());
+		return QRectF(
+			QPointF(std::min(orig.x(), dest.x()), std::min(orig.y(), dest.y())), 
+			QPointF(std::max(orig.x(), dest.x()), std::max(orig.y(), dest.y()))).marginsAdded(QMarginsF(marg, marg, marg, marg));
 	}
 	case ot::GraphicsConnectionCfg::SmoothLine:
 	{
@@ -49,8 +53,9 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 		QPointF c2;
 		QPointF dest;
 		this->calculateSmoothLinePoints(orig, c1, c2, dest);
+		qreal marg = std::max(m_hoverPen.widthF(), m_selectedPen.widthF());
 		return QRectF(QPointF(std::min({ orig.x(), c1.x(), c2.x(), dest.x() }), std::min({ orig.y(), c1.y(), c2.y(), dest.y() })),
-			QPointF(std::max({ orig.x(), c1.x(), c2.x(), dest.x() }), std::max({ orig.y(), c1.y(), c2.y(), dest.y() })));
+			QPointF(std::max({ orig.x(), c1.x(), c2.x(), dest.x() }), std::max({ orig.y(), c1.y(), c2.y(), dest.y() }))).marginsAdded(QMarginsF(marg, marg, marg, marg));
 	}
 	break;
 	default:
@@ -70,13 +75,11 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 		this->calculateDirectLinePoints(orig, dest);
 
 		if (m_state & HoverState) {
-			QPen p(QBrush(QColor(0, 0, 255)), m_pen.widthF() + 2.f);
-			_painter->setPen(p);
+			_painter->setPen(m_hoverPen);
 			_painter->drawLine(orig, dest);
 		}
 		else if (m_state & SelectedState) {
-			QPen p(QBrush(QColor(255, 255, 0)), m_pen.widthF() + 2.f);
-			_painter->setPen(p);
+			_painter->setPen(m_selectedPen);
 			_painter->drawLine(orig, dest);
 		}
 
@@ -95,13 +98,11 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 		path.cubicTo(c1, c2, dest);
 
 		if (m_state & HoverState) {
-			QPen p(QBrush(QColor(0, 0, 255)), m_pen.widthF() + 2.f);
-			_painter->setPen(p);
+			_painter->setPen(m_hoverPen);
 			_painter->drawPath(path);
 		}
 		else if (m_state & SelectedState) {
-			QPen p(QBrush(QColor(255, 255, 0)), m_pen.widthF() + 2.f);
-			_painter->setPen(p);
+			_painter->setPen(m_selectedPen);
 			_painter->drawPath(path);
 		}
 
@@ -157,6 +158,9 @@ bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg
 	this->m_style = _cfg.style();
 	m_pen.setWidth(_cfg.lineWidth());
 	m_pen.setColor(ot::OTQtConverter::toQt(_cfg.color()));
+
+	m_hoverPen.setWidth(m_pen.width() + 2);
+	m_selectedPen.setWidth(m_hoverPen.width());
 
 	m_connectionKey = _cfg.createConnectionKey();
 	return true;

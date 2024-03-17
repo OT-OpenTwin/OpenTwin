@@ -85,6 +85,8 @@ namespace ot {
 
 		ot::GraphicsConnectionCfg::ConnectionStyle m_style;
 		QPen m_pen;
+		QPen m_hoverPen;
+		QPen m_selectedPen;
 	};
 
 }
