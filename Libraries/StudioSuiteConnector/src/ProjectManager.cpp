@@ -397,7 +397,7 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 
 		dataSize += (shape.first.size() + fileContent.size());
 
-		if (dataSize > 1000000)
+		if (dataSize > 10000000)
 		{
 			sendTriangleLists(shapeNames, shapeTriangles);
 			dataSize = 0;
@@ -433,9 +433,14 @@ std::map<std::string, int> ProjectManager::determineAllShapes(std::stringstream 
 	{
 		std::string name, material;
 
-		shapeNameToIdMap[name] = id;
+		fileContent >> name;
+		fileContent >> material;
 
-		id++;
+		if (!name.empty())
+		{
+			shapeNameToIdMap[name] = id;
+			id++;
+		}
 	}
 
 	return shapeNameToIdMap;

@@ -11,6 +11,7 @@
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTServiceFoundation/EntityInformation.h"
+#include "EntityGeometry.h"
 
 // C++ header
 #include <string>
@@ -121,6 +122,8 @@ public:
 	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed);
 	void readDoubleTriple(const std::string& line, double& a, double& b, double& c);
 	void shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
+	void storeShape(const std::string& name, const std::string& triangles, const std::string& materialsFolder, ot::UID materialsFolderID);
+	void createFacets(const std::string& data, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
@@ -130,4 +133,5 @@ private:
 	ot::UID					visualizationModelID;
 
 	std::map<std::string, std::tuple<double, double, double>> materialColors;
+	std::map<std::string, std::string> shapeMaterials;
 };
