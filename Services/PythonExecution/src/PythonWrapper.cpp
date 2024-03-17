@@ -128,10 +128,20 @@ std::string PythonWrapper::DeterminePythonRootDirectory()
 	assert(pythonRoot != nullptr);
 	return std::string(pythonRoot);
 #else
-	//Execution from deployment folder
-	return ".\\Python";
-#endif
+	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
+	const char* devEnvRoot = ot::os::getEnvironmentVariable(devEnvRootName.c_str());
 
+	if (devEnvRoot != nullptr)
+	{
+		// Execution from deployment folder
+		return std::string(devEnvRoot) + "\\Deployment\\Python";
+	}
+	else
+	{		
+		// Execution from current working directory folder
+		return ".\\Python";
+	}
+#endif
 }
 
 std::string PythonWrapper::DeterminePythonSitePackageDirectory()
@@ -148,8 +158,19 @@ std::string PythonWrapper::DeterminePythonSitePackageDirectory()
 		assert(pythonRoot != nullptr);
 		path = pythonRoot;
 #else
-		path = ".\\Python";
+		std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
+		const char* devEnvRoot = ot::os::getEnvironmentVariable(devEnvRootName.c_str());
 
+		if (devEnvRoot != nullptr)
+		{
+			// Execution from deployment folder
+			path = std::string(devEnvRoot) + "\\Deployment\\Python";
+		}
+		else
+		{
+			// Execution from current working directory folder
+			path = ".\\Python";
+		}
 #endif
 
 	}
