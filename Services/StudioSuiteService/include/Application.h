@@ -120,6 +120,7 @@ public:
 	void processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed);
 	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed);
 	void readDoubleTriple(const std::string& line, double& a, double& b, double& c);
+	void shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);

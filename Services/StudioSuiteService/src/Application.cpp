@@ -90,6 +90,13 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		shapeInformation(content);
 		return "";
 	}
+	else if (_action == OT_ACTION_CMD_UI_SS_TRIANGLES)
+	{
+		std::list<std::string> names = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Name);
+		std::list<std::string> triangles = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
+		shapeTriangles(names, triangles);
+		return "";
+	}
 
 	return OT_ACTION_RETURN_UnknownAction;
 }
@@ -486,6 +493,11 @@ void Application::readDoubleTriple(const std::string& line, double& a, double& b
 }
 
 void Application::shapeInformation(const std::string &content)
+{
+
+}
+
+void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles)
 {
 
 }

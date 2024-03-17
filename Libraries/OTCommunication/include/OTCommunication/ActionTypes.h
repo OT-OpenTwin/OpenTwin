@@ -173,6 +173,7 @@
 #define OT_ACTION_CMD_UI_SS_UNITS "StudioSuite.UnitsInformation"
 #define OT_ACTION_CMD_UI_SS_MATERIALS "StudioSuite.MaterialsInformation"
 #define OT_ACTION_CMD_UI_SS_SHAPEINFO "StudioSuite.ShapesInformation"
+#define OT_ACTION_CMD_UI_SS_TRIANGLES "StudioSuite.ShapesTriangles"
 
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"

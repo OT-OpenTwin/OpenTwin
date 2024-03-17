@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <sstream>
 
 #include "OTCore/CoreTypes.h"
 
@@ -28,17 +29,20 @@ private:
     ProjectManager() {};
     ~ProjectManager() {};
 
-    std::string             getBaseProjectName(const std::string& cstFileName);
-    std::string             createCacheFolder(const std::string& baseProjectName);
-    std::list<std::string>  determineUploadFiles(const std::string& baseProjectName);
-    void                    uploadFiles(const std::string& projectRoot, std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
-    void                    commitNewVersion(const std::string& changeMessage);
-    void                    copyCacheFiles(const std::string& baseProjectName, const std::string& newVersion, const std::string& cacheFolderName);
-    void                    writeVersionFile(const std::string& baseProjectName, const std::string &projectName, const std::string& newVersion, const std::string& cacheFolderName);
-    void                    sendUnitsInformation(const std::string& projectRoot);
-    void                    sendMaterialInformation(const std::string& projectRoot);
-    void                    sendShapeInformationAndTriangulation(const std::string& projectRoot);
-    void                    readFileContent(const std::string& fileName, std::string& content);
+    std::string                getBaseProjectName(const std::string& cstFileName);
+    std::string                createCacheFolder(const std::string& baseProjectName);
+    std::list<std::string>     determineUploadFiles(const std::string& baseProjectName);
+    void                       uploadFiles(const std::string& projectRoot, std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
+    void                       commitNewVersion(const std::string& changeMessage);
+    void                       copyCacheFiles(const std::string& baseProjectName, const std::string& newVersion, const std::string& cacheFolderName);
+    void                       writeVersionFile(const std::string& baseProjectName, const std::string &projectName, const std::string& newVersion, const std::string& cacheFolderName);
+    void                       sendUnitsInformation(const std::string& projectRoot);
+    void                       sendMaterialInformation(const std::string& projectRoot);
+    void                       sendShapeInformationAndTriangulation(const std::string& projectRoot);
+    void                       readFileContent(const std::string& fileName, std::string& content);
+    std::map<std::string, int> determineAllShapes(std::stringstream fileContent);
+    void                       sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap);
+    void                       sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
 
     std::list<std::string> uploadFileList;
     std::string projectName;
