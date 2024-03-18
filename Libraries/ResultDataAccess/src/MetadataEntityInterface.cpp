@@ -24,6 +24,95 @@ MetadataCampaign MetadataEntityInterface::CreateCampaign(std::shared_ptr<EntityM
 	return measurementCampaign;
 }
 
+MetadataSeries MetadataEntityInterface::CreateSeries(std::shared_ptr<EntityMetadataSeries> seriesMetadataEntity)
+{
+	std::string entityName = seriesMetadataEntity->getName();
+	const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
+	MetadataSeries seriesMetadata(name);
+
+	const GenericDocument* parameterTopLevel = seriesMetadataEntity->getDocument(seriesMetadataEntity->getParameterDocumentName());
+	const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();
+	for (const GenericDocument* parameterDocument : allParameterDocuments)
+	{
+		MetadataParameter parameter;
+		parameter.parameterAbbreviation = parameterDocument->getDocumentName();
+		auto parameterFields = ExtractMetadataFields(*parameterDocument);
+		for (std::shared_ptr<MetadataEntry> entry : parameterFields)
+		{
+			if (entry->getEntryName() == _nameField)
+			{
+				auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				parameter.parameterName = nameEntry->getValue().getConstCharPtr();
+			}
+			else if (entry->getEntryName() == _valuesField)
+			{
+				auto valueEntry = dynamic_cast<MetadataEntryArray*>(entry.get());
+				parameter.values = valueEntry->getValues();
+				parameter.typeName = valueEntry->getValues().begin()->getTypeName();
+			}
+			else
+			{
+				parameter.metaData[entry->getEntryName()] = entry;
+			}
+		}
+
+		auto objectList = ExtractMetadataObjects(*parameterDocument);
+		for (auto& object : objectList)
+		{
+			parameter.metaData[object->getEntryName()] = object;
+		}
+		seriesMetadata.AddParameter(std::move(parameter));
+	}
+
+
+	const GenericDocument* quantityTopLevel = seriesMetadataEntity->getDocument(seriesMetadataEntity->getQuantityDocumentName());
+	const std::vector<const GenericDocument*> allQuantityDocuments = quantityTopLevel->getSubDocuments();
+	for (const GenericDocument* quantityDocument : allQuantityDocuments)
+	{
+		MetadataQuantity quantity;
+		quantity.quantityAbbreviation = quantityDocument->getDocumentName();
+		const std::string abbrev = quantity.quantityAbbreviation;
+		quantity.quantityIndex = std::stoull(abbrev.substr(abbrev.find("_") + 1, abbrev.size()));
+		auto quantityFields = ExtractMetadataFields(*quantityDocument);
+		for (std::shared_ptr<MetadataEntry> entry : quantityFields)
+		{
+			if (entry->getEntryName() == _datatypeField)
+			{
+				auto typeEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				quantity.typeName = typeEntry->getValue().getConstCharPtr();
+			}
+			else if (entry->getEntryName() == _nameField)
+			{
+				auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				quantity.quantityName = nameEntry->getValue().getConstCharPtr();
+			}
+			else if (entry->getEntryName() == _dataRowsField)
+			{
+				auto dataRowsEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				quantity.dataRows = static_cast<uint32_t>(dataRowsEntry->getValue().getInt32());
+			}
+			else if (entry->getEntryName() == _dataColumnsField)
+			{
+				auto dataColumnEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				quantity.dataColumns = static_cast<uint32_t>(dataColumnEntry->getValue().getInt32());
+			}
+			else
+			{
+				quantity.metaData[entry->getEntryName()] = entry;
+			}
+		}
+
+		auto objectList = ExtractMetadataObjects(*quantityDocument);
+		for (auto& object : objectList)
+		{
+			quantity.metaData[object->getEntryName()] = object;
+		}
+		seriesMetadata.AddQuantity(std::move(quantity));
+	}
+
+	return seriesMetadata;
+}
+
 void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign)
 {
 	EntityMetadataCampaign entityCampaign(modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, _ownerServiceName);
@@ -141,89 +230,7 @@ void MetadataEntityInterface::ExtractSeriesMetadata(MetadataCampaign& measuremen
 {
 	for (auto msmd : msmds)
 	{
-		std::string entityName = msmd->getName();
-		const std::string name = entityName.substr(entityName.find_last_of("/") +1);
-		MetadataSeries seriesMetadata (name);
-		
-		const GenericDocument* parameterTopLevel = msmd->getDocument(msmd->getParameterDocumentName());
-		const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();
-		for (const GenericDocument* parameterDocument : allParameterDocuments)
-		{
-			MetadataParameter parameter;
-			parameter.parameterAbbreviation = parameterDocument->getDocumentName();
-			auto parameterFields = ExtractMetadataFields(*parameterDocument);
-			for (std::shared_ptr<MetadataEntry> entry : parameterFields)
-			{
-				if (entry->getEntryName() == _nameField)
-				{
-					auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
-					parameter.parameterName = nameEntry->getValue().getConstCharPtr();
-				}
-				else if (entry->getEntryName() == _valuesField)
-				{
-					auto valueEntry = dynamic_cast<MetadataEntryArray*>(entry.get());
-					parameter.values = valueEntry->getValues();
-					parameter.typeName = valueEntry->getValues().begin()->getTypeName();
-				}
-				else
-				{
-					parameter.metaData[entry->getEntryName()] = entry;
-				}
-			}
-
-			auto objectList = ExtractMetadataObjects(*parameterDocument);
-			for (auto& object : objectList)
-			{
-				parameter.metaData[object->getEntryName()] = object;
-			}
-			seriesMetadata.AddParameter(std::move(parameter));
-		}
-		
-		
-		const GenericDocument* quantityTopLevel = msmd->getDocument(msmd->getQuantityDocumentName());
-		const std::vector<const GenericDocument*> allQuantityDocuments = quantityTopLevel->getSubDocuments();
-		for (const GenericDocument* quantityDocument : allQuantityDocuments)
-		{
-			MetadataQuantity quantity;
-			quantity.quantityAbbreviation = quantityDocument->getDocumentName();
-			const std::string abbrev = quantity.quantityAbbreviation;
-			quantity.quantityIndex = std::stoull(abbrev.substr(abbrev.find("_") + 1, abbrev.size()));
-			auto quantityFields = ExtractMetadataFields(*quantityDocument);
-			for (std::shared_ptr<MetadataEntry> entry : quantityFields)
-			{
-				if (entry->getEntryName() == _datatypeField)
-				{
-					auto typeEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
-					quantity.typeName = typeEntry->getValue().getConstCharPtr();
-				}
-				else if (entry->getEntryName() == _nameField)
-				{
-					auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
-					quantity.quantityName = nameEntry->getValue().getConstCharPtr();
-				}
-				else if (entry->getEntryName() == _dataRowsField)
-				{
-					auto dataRowsEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
-					quantity.dataRows = static_cast<uint32_t>(dataRowsEntry->getValue().getInt32());
-				}
-				else if (entry->getEntryName() == _dataColumnsField)
-				{
-					auto dataColumnEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
-					quantity.dataColumns = static_cast<uint32_t>(dataColumnEntry->getValue().getInt32());
-				}
-				else
-				{
-					quantity.metaData[entry->getEntryName()] = entry;
-				}
-			}
-
-			auto objectList = ExtractMetadataObjects(*quantityDocument);
-			for (auto& object : objectList)
-			{
-				quantity.metaData[object->getEntryName()] = object;
-			}
-			seriesMetadata.AddQuantity(std::move(quantity));
-		}
+		MetadataSeries seriesMetadata = CreateSeries(msmd);
 		measurementCampaign.AddSeriesMetadata(std::move(seriesMetadata));
 	}
 }

@@ -12,5 +12,5 @@ private:
 	ot::Connector _input;
 	std::string _description;
 
-	std::string variableToString(const ot::Variable& var);
+
 };

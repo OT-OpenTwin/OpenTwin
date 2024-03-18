@@ -41,8 +41,9 @@ public:
 	void AddSelectionsAsQuantity(std::list<ot::UID> selectedEntities);
 	void StoreSelectionRanges(ot::UID tableEntityID, ot::UID tableEntityVersion, std::vector<ot::TableRange> ranges);
 	void CreateNewScriptDescribedMSMD();
-	
+
 	std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
+	ot::GenericDataStruct* getDatasetTableView(ot::EntityInformation& entityInfo);
 
 	void SetColourOfRanges(std::string tableName);
 

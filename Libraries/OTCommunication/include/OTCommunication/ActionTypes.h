@@ -224,6 +224,7 @@
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_SetTable "UI.VIEW.Table.Set"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow "UI.VIEW.Table.ADDROW"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow "UI.VIEW.TableDELETEROW"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn "UI.VIEW.TableADDCOLUMN"

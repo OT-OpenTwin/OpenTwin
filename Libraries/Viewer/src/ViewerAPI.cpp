@@ -14,6 +14,8 @@
 #include "Factory.h"
 
 #include "TableViewer.h"
+#include "OTCore/VariableToStringConverter.h"
+
 
 ot::UID modelCount = 0;
 std::map<ot::UID, Model*> osgModelManager;
@@ -802,6 +804,40 @@ QWidget * ViewerAPI::getTable(ot::UID _viewerID)
 	}
 	else {
 		return nullptr;
+	}
+}
+
+void ViewerAPI::showTable(ot::UID _viewerID,  const ot::GenericDataStructMatrix& data)
+{
+	Viewer* v = viewerManager[_viewerID];
+	if (v != nullptr)
+	{
+		Table* activeTable = v->getTableViewer()->getTable();
+		activeTable->clear();
+
+		uint32_t numberOfRows =	data.getNumberOfRows();
+		uint32_t numberOfColumns = data.getNumberOfColumns();
+		activeTable->setRowCount(numberOfRows);
+		activeTable->setColumnCount(numberOfColumns);
+
+		ot::VariableToStringConverter converter;
+		for (uint32_t row = 0; row < numberOfRows; row++)
+		{
+			for (uint32_t column = 0; column < numberOfColumns; column++)
+			{
+				ot::Variable value = data.getValue(column, row);
+				const std::string valueAsString = converter(value);
+				QString text = QString::fromStdString(valueAsString);
+				QTableWidgetItem* item = new QTableWidgetItem(text);
+				activeTable->setItem(row, column, item);
+			}
+		}
+		activeTable->resizeColumnsToContents();
+		activeTable->resizeRowsToContents();
+	}
+	else
+	{
+		assert(false);
 	}
 }
 

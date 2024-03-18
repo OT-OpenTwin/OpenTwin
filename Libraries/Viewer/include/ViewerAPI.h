@@ -7,6 +7,7 @@
 #include "OTCore/Color.h"
 #include "OTServiceFoundation/ContextMenu.h"
 #include "OTServiceFoundation/TableRange.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 #include <list>
 #include <vector>
@@ -207,6 +208,7 @@ namespace ViewerAPI
 
 	/***************************************** Table API *****************************************/
 	__declspec(dllexport) QWidget* getTable (ot::UID _viewerID);
+	__declspec(dllexport) void showTable(ot::UID _viewerID,const ot::GenericDataStructMatrix& data);
 	__declspec(dllexport) bool setTable (ot::UID _viewerID, ot::UID tableEntityID, ot::UID tableEntityVersion);
 	__declspec(dllexport) void setTableSelection (ot::UID _viewerID, std::vector<ot::TableRange> ranges);
 	__declspec(dllexport) std::vector<ot::TableRange> GetSelectedTableRange(ot::UID _viewerID);

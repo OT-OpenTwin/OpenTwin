@@ -1,4 +1,7 @@
 #include "DataCategorizationHandler.h"
+#include "MetadataEntityInterface.h"
+#include "OTCore/GenericDataStructMatrix.h"
+#include "MetadataEntrySingle.h"
 
 #include "ClassFactory.h"
 #include "Application.h"
@@ -406,6 +409,196 @@ std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInfo
 		return newTableIdentifier;
 	}
 
+}
+
+ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::EntityInformation& entityInfo)
+{
+	
+	EntityBase * baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(),Application::instance()->getClassFactory());
+	std::shared_ptr<EntityMetadataCampaign> campaignEntity (dynamic_cast<EntityMetadataCampaign*>(baseEntity));
+	MetadataEntityInterface metadataFactory;
+	if (campaignEntity != nullptr)
+	{
+		std::list<std::string> folderItems = _modelComponent->getListOfFolderItems(ot::FolderNames::DatasetFolder);
+		std::list<ot::EntityInformation> entityInfos;
+		_modelComponent->getEntityInformation(folderItems, entityInfos);
+		Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+		std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities;
+		for (ot::EntityInformation entityInfo : entityInfos)
+		{
+			EntityBase* baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
+			EntityMetadataSeries*  seriesMetadataEntity =dynamic_cast<EntityMetadataSeries*>(baseEntity);
+			if (seriesMetadataEntity != nullptr)
+			{
+				seriesMetadataEntities.push_back(std::shared_ptr<EntityMetadataSeries>(seriesMetadataEntity));
+			}
+			else
+			{
+				delete baseEntity;
+				baseEntity = nullptr;
+			}
+		}
+		MetadataCampaign campaign =	metadataFactory.CreateCampaign(campaignEntity, seriesMetadataEntities);
+
+		auto& parametersByName = campaign.getMetadataParameterByName();
+		auto& quantitiesByName = campaign.getMetadataQuantitiesByName();
+		auto& metadataByName = campaign.getMetaData();
+		const uint32_t numberOfRows = 4 + parametersByName.size() * 5 + quantitiesByName.size() * 2 + metadataByName.size(); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
+		const uint32_t numberOfColumns = 4;
+		ot::GenericDataStructMatrix* data = new ot::GenericDataStructMatrix(numberOfColumns, numberOfRows);
+		std::vector<ot::Variable> defaultValues;
+		const uint32_t numberOfEntriesTotal = numberOfColumns * numberOfRows;
+		defaultValues.reserve(numberOfEntriesTotal);
+		for (uint32_t i = 0; i < numberOfEntriesTotal;i++)
+		{
+			defaultValues.push_back( ot::Variable(""));
+		}
+
+		data->setValues(&defaultValues[0], numberOfEntriesTotal);
+
+		uint32_t rowPointer(0);
+		data->setValue(0, rowPointer, ot::Variable("Campaign name"));
+		const std::string name = campaign.getCampaignName();
+		data->setValue(1, rowPointer, ot::Variable(name));
+		rowPointer++;
+
+		for (const auto& metadataEntryByName : metadataByName)
+		{
+			MetadataEntrySingle* singleEntry = dynamic_cast<MetadataEntrySingle*>(metadataEntryByName.second.get());
+			if (singleEntry != nullptr)
+			{
+				ot::Variable key(metadataEntryByName.first);
+				const ot::Variable& value = singleEntry->getValue();
+				data->setValue(0, rowPointer, key);
+				data->setValue(1, rowPointer, value);
+				rowPointer++;
+			}
+		}
+		
+		data->setValue(0, rowPointer, ot::Variable("Parameter"));
+		rowPointer++;
+
+		for (const auto& parameterByName : parametersByName)
+		{
+			ot::Variable key(parameterByName.second.parameterName);
+			data->setValue(1, rowPointer, key);
+			rowPointer++;
+			
+			std::list<ot::Variable> values = parameterByName.second.values;
+			
+			ot::Variable numberOfEntries (static_cast<int64_t>(values.size()));
+			data->setValue(2, rowPointer, ot::Variable("Number of values"));
+			data->setValue(3, rowPointer, numberOfEntries);
+			rowPointer++;
+			
+			data->setValue(2, rowPointer, ot::Variable("First value"));
+			ot::Variable firstValue(values.front());
+			data->setValue(3, rowPointer, firstValue);
+			rowPointer++;
+
+			data->setValue(2, rowPointer, ot::Variable("Last value"));
+			ot::Variable lastValue(values.back());
+			data->setValue(3, rowPointer, lastValue);
+			rowPointer++;
+
+		}
+		
+		data->setValue(0, rowPointer, ot::Variable("Quantities"));
+		rowPointer++;
+		
+		for (const auto& quantityByName : quantitiesByName)
+		{
+			data->setValue(1, rowPointer, ot::Variable(quantityByName.second.quantityName));
+			rowPointer++;
+			data->setValue(2, rowPointer, ot::Variable("Type"));
+			data->setValue(3, rowPointer, ot::Variable(quantityByName.second.typeName));
+			rowPointer++;
+		}
+		return data;
+	}
+	else
+	{
+		std::shared_ptr<EntityMetadataSeries> seriesEntity(dynamic_cast<EntityMetadataSeries*>(baseEntity));
+		MetadataSeries series =	metadataFactory.CreateSeries(seriesEntity);
+
+		const std::list<MetadataParameter>& parameter = series.getParameter();
+		const std::list<MetadataQuantity>& quantities= series.getQuantities();
+		const auto& metadataByName= series.getMetadata();
+		const uint32_t numberOfRows = 4 + parameter.size() * 5 + quantities.size() * 2 + metadataByName.size(); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
+		const uint32_t numberOfColumns = 4;
+		ot::GenericDataStructMatrix* data = new ot::GenericDataStructMatrix(numberOfColumns, numberOfRows);
+		std::vector<ot::Variable> defaultValues;
+		const uint32_t numberOfEntriesTotal = numberOfColumns * numberOfRows;
+		defaultValues.reserve(numberOfEntriesTotal);
+		for (uint32_t i = 0; i < numberOfEntriesTotal; i++)
+		{
+			defaultValues.push_back(ot::Variable(""));
+		}
+
+		data->setValues(&defaultValues[0], numberOfEntriesTotal);
+		uint32_t rowPointer(0);
+
+		const std::string name = series.getName();
+		data->setValue(0, rowPointer, ot::Variable("Series name"));
+		data->setValue(1, rowPointer, ot::Variable(name));
+		rowPointer++;
+
+
+		for (const auto& metadataEntryByName : metadataByName)
+		{
+			MetadataEntrySingle* singleEntry = dynamic_cast<MetadataEntrySingle*>(metadataEntryByName.second.get());
+			if (singleEntry != nullptr)
+			{
+				ot::Variable key(metadataEntryByName.first);
+				const ot::Variable& value = singleEntry->getValue();
+				data->setValue(0, rowPointer, key);
+				data->setValue(1, rowPointer, value);
+				rowPointer++;
+			}
+		}
+
+		data->setValue(0, rowPointer, ot::Variable("Parameter"));
+		rowPointer++;
+
+		for (const auto& parameterByName : parameter)
+		{
+			ot::Variable key(parameterByName.parameterName);
+			data->setValue(1, rowPointer, key);
+			rowPointer++;
+
+			std::list<ot::Variable> values = parameterByName.values;
+
+			ot::Variable numberOfEntries(static_cast<int64_t>(values.size()));
+			data->setValue(2, rowPointer, ot::Variable("Number of values"));
+			data->setValue(3, rowPointer, numberOfEntries);
+			rowPointer++;
+
+			data->setValue(2, rowPointer, ot::Variable("First value"));
+			ot::Variable firstValue(values.front());
+			data->setValue(3, rowPointer, firstValue);
+			rowPointer++;
+
+			data->setValue(2, rowPointer, ot::Variable("Last value"));
+			ot::Variable lastValue(values.back());
+			data->setValue(3, rowPointer, lastValue);
+			rowPointer++;
+
+		}
+
+		data->setValue(0, rowPointer, ot::Variable("Quantities"));
+		rowPointer++;
+
+		for (const auto& quantityByName : quantities)
+		{
+			data->setValue(1, rowPointer, ot::Variable(quantityByName.quantityName));
+			rowPointer++;
+			data->setValue(2, rowPointer, ot::Variable("Type"));
+			data->setValue(3, rowPointer, ot::Variable(quantityByName.typeName));
+			rowPointer++;
+		}
+		return data;
+
+	}
 }
 
 void DataCategorizationHandler::FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges)

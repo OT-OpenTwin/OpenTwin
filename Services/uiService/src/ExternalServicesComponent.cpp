@@ -34,6 +34,7 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/SimpleFactory.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
@@ -2490,6 +2491,14 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				{
 					displayInfoMessage("Table could not be shown due to exception: " + std::string(e.what()));
 				}
+			}
+			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_SetTable)
+			{
+				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+				auto tableContent= ot::json::getObject(_doc, OT_ACTION_PARAM_Value);
+				ot::GenericDataStructMatrix data;
+				data.setFromJsonObject(tableContent);
+				ViewerAPI::showTable(visualizationModelID, data);
 			}
 			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges)
 			{

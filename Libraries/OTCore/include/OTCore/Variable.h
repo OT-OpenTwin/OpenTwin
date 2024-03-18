@@ -65,7 +65,8 @@ namespace ot
 				_ptr = nullptr;
 			}
 			size_t length = strlen(other._ptr) + 1;
-			memmove_s(_ptr, length, other._ptr, length - 1);
+			_ptr = new char[length] {};
+			memmove_s(_ptr, length, other._ptr, length);
 			other._ptr = nullptr;
 			return *this;
 		}

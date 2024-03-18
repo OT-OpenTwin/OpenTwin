@@ -50,6 +50,7 @@
     <ClCompile Include="src\Variable.cpp" />
     <ClCompile Include="src\VariableToBSONStringConverter.cpp" />
     <ClCompile Include="src\VariableToJSONConverter.cpp" />
+    <ClCompile Include="src\VariableToStringConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="include\OTCore\Variable.h" />
     <ClInclude Include="include\OTCore\VariableToBSONStringConverter.h" />
     <ClInclude Include="include\OTCore\VariableToJSONConverter.h" />
+    <ClInclude Include="include\OTCore\VariableToStringConverter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

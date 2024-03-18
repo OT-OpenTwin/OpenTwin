@@ -235,3 +235,14 @@ TEST(StringToVariable, StringToBoolVariable)
 	EXPECT_TRUE(actualValue.isBool());
 	EXPECT_EQ(actualValue.getBool(), expectedValue);
 }
+
+TEST(VariableTest, StringMove)
+{
+	std::vector<ot::Variable> var;
+	var.reserve(1);
+	var.push_back(ot::Variable("initial value"));
+
+	var[0] = ot::Variable("new Value");
+
+	EXPECT_TRUE(true);
+}

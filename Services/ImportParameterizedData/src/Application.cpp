@@ -632,6 +632,21 @@ void Application::HandleSelectionChanged()
 				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(fileContent, uiRequest.GetAllocator()), uiRequest.GetAllocator());
 				uiComponent()->sendMessage(true, uiRequest);
 			}
+			else if (entityName.find(ot::FolderNames::DatasetFolder) != std::string::npos)
+			{
+				if (_visualizationModel == -1)
+				{
+					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
+				}
+				ot::GenericDataStruct* data =	_parametrizedDataHandler->getDatasetTableView(*selectedEntityInfo.begin());
+				ot::JsonDocument doc;
+				ot::JsonObject dataObject;
+				data->addToJsonObject(dataObject, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_Value, dataObject, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
+				uiComponent()->sendMessage(true, doc);
+			}
 			else
 			{
 				SetControlstateTableFunctions(false);
