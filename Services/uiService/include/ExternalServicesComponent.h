@@ -339,6 +339,8 @@ private:
 	
 	void removeServiceFromList(std::vector<ot::ServiceBase *> &list, ot::ServiceBase *service);
 
+	void handleTableChange(ot::JsonDocument& doc);
+
 	ak::UID getServiceUiUid(ot::ServiceBase * _service);
 
 	ot::ServiceBase * getService(ot::serviceID_t _serviceID);

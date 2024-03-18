@@ -443,7 +443,7 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 		auto& parametersByName = campaign.getMetadataParameterByName();
 		auto& quantitiesByName = campaign.getMetadataQuantitiesByName();
 		auto& metadataByName = campaign.getMetaData();
-		const uint32_t numberOfRows = 4 + parametersByName.size() * 5 + quantitiesByName.size() * 2 + metadataByName.size(); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
+		const uint32_t numberOfRows = 4 + static_cast<uint32_t>(parametersByName.size()) * 5 + static_cast<uint32_t>(quantitiesByName.size()) * 2 + static_cast<uint32_t>(metadataByName.size()); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
 		const uint32_t numberOfColumns = 4;
 		ot::GenericDataStructMatrix* data = new ot::GenericDataStructMatrix(numberOfColumns, numberOfRows);
 		std::vector<ot::Variable> defaultValues;
@@ -524,7 +524,7 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 		const std::list<MetadataParameter>& parameter = series.getParameter();
 		const std::list<MetadataQuantity>& quantities= series.getQuantities();
 		const auto& metadataByName= series.getMetadata();
-		const uint32_t numberOfRows = 4 + parameter.size() * 5 + quantities.size() * 2 + metadataByName.size(); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
+		const uint32_t numberOfRows = 4 + static_cast<uint32_t>(parameter.size()) * 5 + static_cast<uint32_t>(quantities.size()) * 2 + static_cast<uint32_t>(metadataByName.size()); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
 		const uint32_t numberOfColumns = 4;
 		ot::GenericDataStructMatrix* data = new ot::GenericDataStructMatrix(numberOfColumns, numberOfRows);
 		std::vector<ot::Variable> defaultValues;

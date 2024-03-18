@@ -225,9 +225,10 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SetTable "UI.VIEW.Table.Set"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change "UI.VIEW.Table.Change"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow "UI.VIEW.Table.ADDROW"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow "UI.VIEW.TableDELETEROW"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn "UI.VIEW.TableADDCOLUMN"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow "UI.VIEW.Table.DELETEROW"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn "UI.VIEW.Table.ADDCOLUMN"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn "UI.VIEW.Table.DELETECOLUMN"
 
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection "UI.VIEW.ColourSelection"

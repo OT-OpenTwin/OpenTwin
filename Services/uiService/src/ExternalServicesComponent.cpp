@@ -1885,29 +1885,10 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				selectFileForStoring(dialogTitle, fileMask, subsequentFunction, senderURL);
 			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
+			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change)
 			{
-				bool insertAbove = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
-				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-				ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
-			{
-				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-				ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
-			{
-				bool insertLeft = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
-				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-				ViewerAPI::AddToSelectedTableColumn(insertLeft,visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn)
-			{
-				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-				ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
-			}
-			
+				handleTableChange(_doc);
+			}			
 			else if (action == OT_ACTION_CMD_UI_FillPropertyGrid)
 			{
 				std::string settings = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);
@@ -4722,6 +4703,32 @@ void ExternalServicesComponent::removeServiceFromList(std::vector<ot::ServiceBas
 	{
 		list.erase(item);
 		item = std::find(list.begin(), list.end(), service);
+	}
+}
+
+void ExternalServicesComponent::handleTableChange(ot::JsonDocument& _doc)
+{
+	ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
+	const std::string functionName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
+	if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
+	{
+		bool insertLeft = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
+		ViewerAPI::AddToSelectedTableColumn(insertLeft, visualizationModelID);
+	}
+	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
+	{
+		bool insertAbove = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
+		
+		ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
+	}
+	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
+	{
+		ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
+	}
+	else 
+	{
+		assert(functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
+		ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
 	}
 }
 
