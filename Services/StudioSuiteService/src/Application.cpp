@@ -573,6 +573,7 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	entityGeom->StoreToDataBase();
 
 	modelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
+	modelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
 	modelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
 
 	delete entityGeom;
