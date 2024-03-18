@@ -31,7 +31,65 @@ std::string StudioConnector::searchProjectAndExtractData(const std::string& file
 	// 4. Save the project
 	// 5. Execute a VBA script to extract the necessary information
 
-	std::string script = generateScript(studioPath, fileName, studioPidList);
+	std::string script = generateExtractScript(studioPath, fileName, studioPidList);
+
+	ot::ReturnMessage returnMessage = executeCommand(script);
+
+	if (returnMessage.getStatus() == ot::ReturnMessage::Ok)
+	{
+		return "";
+	}
+	else
+	{
+		return returnMessage.getWhat();
+	}
+}
+
+std::string StudioConnector::closeProject(const std::string& fileName)
+{
+	// First, we need to ensure that the python subservice is running
+	startSubprocess();
+
+	// Get the latest version of Studio Suite and the installpath
+	int version = 0;
+	std::string studioPath;
+	determineStudioSuiteInstallation(version, studioPath);
+
+	// Now we need to get a list of all process ids of running CST STUDIO SUITE DESIGN ENVIRONMENTS
+	std::list<long long> studioPidList = getRunningDesignEnvironmentProcesses();
+
+	// Now we execute a python script which performs the following tasks:
+	// 1. Iterate through all pids and try connecting the DE. 
+	// 2. If a DE was found, check whether the file is opened there. If so, close this file
+
+	std::string script = generateCloseScript(studioPath, fileName, studioPidList);
+
+	ot::ReturnMessage returnMessage = executeCommand(script);
+
+	if (returnMessage.getStatus() == ot::ReturnMessage::Ok)
+	{
+		return "";
+	}
+	else
+	{
+		return returnMessage.getWhat();
+	}
+}
+
+std::string StudioConnector::openProject(const std::string& fileName)
+{
+	// First, we need to ensure that the python subservice is running
+	startSubprocess();
+
+	// Get the latest version of Studio Suite and the installpath
+	int version = 0;
+	std::string studioPath;
+	determineStudioSuiteInstallation(version, studioPath);
+
+	// Now we execute a python script which performs the following tasks:
+	// 1. Instantiate a new DE and open the selected project 
+
+	std::string script = generateOpenScript(studioPath, fileName);
 
 	ot::ReturnMessage returnMessage = executeCommand(script);
 
@@ -81,7 +139,7 @@ std::list<long long> StudioConnector::getRunningDesignEnvironmentProcesses()
 	return processIDs;
 }
 
-std::string StudioConnector::generateScript(const std::string &studioPath, std::string fileName, std::list<long long> studioPidList)
+std::string StudioConnector::generateExtractScript(const std::string &studioPath, std::string fileName, std::list<long long> studioPidList)
 {
 	std::replace(fileName.begin(), fileName.end(), '/', '\\');
 
@@ -268,6 +326,73 @@ std::string StudioConnector::generateScript(const std::string &studioPath, std::
 
 	script << "print('execute VBA code')\n";
 	script << "prj.schematic.execute_vba_code(vbaCode)\n";
+
+	return script.str();
+}
+
+std::string StudioConnector::generateCloseScript(const std::string& studioPath, std::string fileName, std::list<long long> studioPidList)
+{
+	std::replace(fileName.begin(), fileName.end(), '/', '\\');
+
+	std::stringstream script;
+
+	script << "fileName = r'" << fileName << "'\n";
+	script << "idlist = [";
+	while (!studioPidList.empty())
+	{
+		script << studioPidList.front();
+		studioPidList.pop_front();
+
+		if (!studioPidList.empty()) script << ",";
+	}
+	script << "]\n";
+
+	script << "import sys\n";
+	script << "sys.path.append(r'" << studioPath << "\\AMD64\\python_cst_libraries')\n";
+
+	script << "from cst.interface import DesignEnvironment\n";
+
+	script << "de = None\n";
+	script << "prj = None\n";
+
+	script << "for id in idlist:\n";
+	script << "    try:\n";
+	script << "       print('trying to connect...')\n";
+	script << "       de = DesignEnvironment.connect(id)\n";
+	script << "       if de.is_connected():\n";
+	script << "          print('connected.')\n";
+	script << "          prj = de.get_open_project(fileName)\n";
+	script << "          prj.close()\n";
+	script << "          if len(de.list_open_projects()) == 0:\n";
+	script << "             de.close()\n";
+	script << "          break\n";
+	script << "    except:\n";
+	script << "       de = None\n";
+
+	return script.str();
+}
+
+std::string StudioConnector::generateOpenScript(const std::string& studioPath, std::string fileName)
+{
+	std::replace(fileName.begin(), fileName.end(), '/', '\\');
+
+	std::stringstream script;
+
+	script << "fileName = r'" << fileName << "'\n";
+
+	script << "import sys\n";
+	script << "sys.path.append(r'" << studioPath << "\\AMD64\\python_cst_libraries')\n";
+
+	script << "from cst.interface import DesignEnvironment\n";
+
+	script << "de = DesignEnvironment.new()\n";
+	script << "try:\n";
+	script << "   prj = de.open_project(fileName)\n";
+	script << "   prj.save();\n";
+	script << "   print('project found')\n";
+	script << "except:\n";
+	script << "   de.close();\n";
+	script << "   raise Exception('Unable to open project')\n";
 
 	return script.str();
 }

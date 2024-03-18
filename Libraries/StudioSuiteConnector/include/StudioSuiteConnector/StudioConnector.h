@@ -18,7 +18,9 @@ public:
     StudioConnector() {};
     ~StudioConnector();
 
-    std::string searchProjectAndExtractData(const std::string &fileName);
+    std::string searchProjectAndExtractData(const std::string& fileName);
+    std::string closeProject(const std::string& fileName);
+    std::string openProject(const std::string& fileName);
 
 private:
     void startSubprocess();
@@ -37,7 +39,9 @@ private:
 
     void determineStudioSuiteInstallation(int& version, std::string& studioPath);
     std::list<long long> getRunningDesignEnvironmentProcesses();
-    std::string generateScript(const std::string& studioPath, std::string fileName, std::list<long long> studioPidList);
+    std::string generateExtractScript(const std::string& studioPath, std::string fileName, std::list<long long> studioPidList);
+    std::string generateOpenScript(const std::string& studioPath, std::string fileName);
+    std::string generateCloseScript(const std::string& studioPath, std::string fileName, std::list<long long> studioPidList);
 
     bool subProcessRunning = false;
     std::string serverName;

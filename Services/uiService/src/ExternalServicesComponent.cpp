@@ -3099,7 +3099,31 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName(), changeComment);
 				workerThread.detach();
 			}
+			else if (action == OT_ACTION_CMD_UI_SS_GET) {
 
+				// TODO: Get file name from list
+				QString fileName = QFileDialog::getOpenFileName(
+					nullptr,
+					"Commit CST File",
+					QDir::currentPath(),
+					QString("*.cst ;; All files (*.*)"));
+
+				if (fileName == "") return "";
+
+				ot::Flags<ot::ui::lockType> lockFlags;
+				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+				lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+				lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+				m_lockManager->lock(nullptr, lockFlags);
+
+				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+				std::string version = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
+
+				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+
+				std::thread workerThread(StudioSuiteConnectorAPI::getProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName(), version);
+				workerThread.detach();
+			}
 			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD) {
 
 				std::list<ot::UID> entityIDList = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);

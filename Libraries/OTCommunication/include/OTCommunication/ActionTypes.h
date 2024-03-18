@@ -167,6 +167,7 @@
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
 #define OT_ACTION_CMD_UI_SS_COMMIT "StudioSuite.Commit"
+#define OT_ACTION_CMD_UI_SS_GET "StudioSuite.Get"
 #define OT_ACTION_CMD_UI_SS_UPLOAD "StudioSuite.Upload"
 #define OT_ACTION_CMD_UI_SS_COPY "StudioSuite.Copy"
 #define OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED "StudioSuite.UploadNeeded"
@@ -394,6 +395,7 @@
 #define OT_ACTION_PARAM_VIEW_ID "View.ID"
 #define OT_ACTION_PARAM_MODEL_FunctionName "Model.Event.Functions.Name"
 #define OT_ACTION_PARAM_MODEL_ITM_Description "Model.Item.Description"
+#define OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation "Model.Item.AskForBranchCreation"
 #define OT_ACTION_PARAM_MODEL_PropertyList "Model.Properties.List"
 #define OT_ACTION_PARAM_MODEL_Update "Model.Action.Update"
 #define OT_ACTION_PARAM_MODEL_ItemsVisible "Model.Action.ItemsVisible"

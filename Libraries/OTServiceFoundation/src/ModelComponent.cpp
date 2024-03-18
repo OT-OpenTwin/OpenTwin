@@ -210,9 +210,9 @@ void ot::components::ModelComponent::addNewDataEntity(UID entityID, UID entityVe
 	dataEntityParentList.push_back(entityParentID);
 }
 
-void ot::components::ModelComponent::storeNewEntities(const std::string &description)
+void ot::components::ModelComponent::storeNewEntities(const std::string &description, bool askForBranchCreation)
 {
-	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description);
+	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, askForBranchCreation);
 	clearNewEntityList();
 }
 

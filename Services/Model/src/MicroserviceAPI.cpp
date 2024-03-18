@@ -718,10 +718,16 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			std::list<ot::UID> dataEntityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
 			std::list<ot::UID> dataEntityParentList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_DataEntityParentList);
 			std::string changeComment = getStringFromDocument(doc, OT_ACTION_PARAM_MODEL_ITM_Description);
+			
+			bool askForBranchCreation = true;
+			if (ot::json::exists(doc, OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation))
+			{
+				askForBranchCreation = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation);
+			}
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			globalModel->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, true);
+			globalModel->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, true, askForBranchCreation);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdateTopologyEntity)
 		{

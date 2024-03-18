@@ -153,7 +153,7 @@ public:
 
 	void enableQueuingHttpRequests(bool flag);
 
-	void modelChangeOperationCompleted(const std::string &description);
+	void modelChangeOperationCompleted(const std::string &description, bool askForCreationOfBranch = true);
 
 	void uiIsAvailable(void);
 
@@ -161,7 +161,7 @@ public:
 
 	std::string getCurrentModelVersion(void);
 	void activateVersion(const std::string &version);
-	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel);
+	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel, bool askForCreationOfBranch);
 	void addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion, const std::string &geomEntityName, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, std::list<std::string> &childrenList, const std::string &description);
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
 	void deleteCurves(std::list<std::string> &entityNameList);

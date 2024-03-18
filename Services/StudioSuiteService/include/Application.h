@@ -113,6 +113,7 @@ public:
 
 	void importProject(void);
 	void commitChanges(void);
+	void getChanges(void);
 
 	void EnsureVisualizationModelIDKnown(void);
 

@@ -15,6 +15,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <cstdio>
 
 #include <QFileDialog>					// QFileDialog
 #include <qdir.h>						// QDir
@@ -138,6 +139,70 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
 
 		ServiceConnector::getInstance().sendExecuteRequest(doc);
+	}
+	catch (std::string& error)
+	{
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().showError(error);
+		ProgressInfo::getInstance().unlockGui();
+	}
+}
+
+void ProjectManager::getProject(const std::string& fileName, const std::string& prjName, const std::string& version)
+{
+	try
+	{
+		uploadFileList.clear();
+		projectName.clear();
+		baseProjectName.clear();
+		cacheFolderName.clear();
+		newOrModifiedFiles.clear();
+		dependentDataFiles.clear();
+		deletedFiles.clear();
+
+		projectName = prjName;
+
+		ProgressInfo::getInstance().setProgressState(true, "Getting project", false);
+		ProgressInfo::getInstance().setProgressValue(0);
+
+		// Determine the base project name (without .cst extension)
+		baseProjectName = getBaseProjectName(fileName);
+
+		// Set the name of the cache folder
+		cacheFolderName = baseProjectName + ".cache";
+
+		// Make sure to close the cst project in a studio suite instance
+		StudioConnector studioObject;
+		studioObject.closeProject(fileName);
+
+		// Delete project files
+		deleteLocalProjectFiles(baseProjectName);
+
+		// Check whether version is in the cache
+		if (!restoreFromCache(baseProjectName, cacheFolderName, version))
+		{
+			// The project was not found in the cache. Therefore, the files need to be retrieved from the repo
+
+		}
+		else
+		{
+			// We have successfully restored the project data, so we can now open the project
+			studioObject.openProject(fileName);
+
+			ProgressInfo::getInstance().setProgressState(false, "", false);
+			ProgressInfo::getInstance().unlockGui();
+		}
+
+		//// Get the files to be uploaded
+		//uploadFileList = determineUploadFiles(baseProjectName);
+
+		//ProgressInfo::getInstance().setProgressValue(10);
+
+		//ot::JsonDocument doc;
+		//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+		//doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
+
+		//ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}
 	catch (std::string& error)
 	{
@@ -533,3 +598,40 @@ void ProjectManager::readFileContent(const std::string &fileName, std::string &c
 	content.assign((std::istreambuf_iterator<char>(t)),
 					std::istreambuf_iterator<char>());
 }
+
+void ProjectManager::deleteLocalProjectFiles(const std::string &baseProjectName)
+{
+	std::string cstFileName = baseProjectName + ".cst";
+	std::remove(cstFileName.c_str());
+
+	std::filesystem::remove_all(baseProjectName);
+}
+
+bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version)
+{
+	try
+	{
+		std::string cacheDirectory = cacheFolderName + "/" + version;
+
+		// Check whether current version is in cache
+		if (std::filesystem::is_directory(cacheDirectory))
+		{
+			std::string cstCacheFileName = cacheDirectory + "/" + "xxx.cst";
+
+			// We have a corresponding cache entry -> restore the data
+			std::filesystem::create_directory(baseProjectName);
+
+			std::filesystem::copy(cstCacheFileName, baseProjectName + ".cst");
+			std::filesystem::copy(cacheDirectory + "/Result", baseProjectName + "/Result", std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+
+			return true;
+		}
+	}
+	catch (std::exception)
+	{
+
+	}
+
+	return false;
+}
+

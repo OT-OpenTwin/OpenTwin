@@ -122,7 +122,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
 
 	_ui->addMenuButton("Project", "Import", "CST File", "CST File", modelWrite, "Import", "Default");
-	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "Add", "Default");
+	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
+	_ui->addMenuButton("Project", "Versions", "Get", "Get", modelWrite, "ArrowGreenDown", "Default");
 
 	modelSelectionChangedNotification();
 
@@ -174,6 +175,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (     action == "Project:Import:CST File")			  importProject();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
+	else if (action == "Project:Versions:Get")			      getChanges();
 	//else if (action == "Model:Sources:Add Terminal")	      addTerminal();
 	//else if (action == "ElmerFEM:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
@@ -246,6 +248,26 @@ void Application::commitChanges(void)
 
 	uiComponent()->sendMessage(true, doc);
 }
+
+void Application::getChanges(void)
+{
+	modelComponent()->clearNewEntityList();
+
+	// TODO: Check whether the project has already been initialized
+
+
+	// Get the current model version
+	std::string version = modelComponent()->getCurrentModelVersion();
+
+	// Send the commit message to the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
+
+	uiComponent()->sendMessage(true, doc);
+}
+
 void Application::uploadNeeded(ot::JsonDocument& _doc)
 {
 	size_t count = ot::json::getInt64(_doc, OT_ACTION_PARAM_COUNT);
@@ -293,7 +315,7 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
 
-	modelComponent()->storeNewEntities(changeMessage);
+	modelComponent()->storeNewEntities(changeMessage, false);
 
 	// Determine the new version
 	std::string newVersion = modelComponent()->getCurrentModelVersion();

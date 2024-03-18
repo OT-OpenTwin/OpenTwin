@@ -23,7 +23,8 @@ public:
 
     void importProject(const std::string& fileName, const std::string& prjName);
     std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);
-    void commitProject(const std::string& fileName, const std::string& prjName, const std::string &changeComment);
+    void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment);
+    void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
     void copyFiles(const std::string& newVersion);
 
@@ -45,6 +46,8 @@ private:
     std::map<std::string, int> determineAllShapes(std::stringstream fileContent);
     void                       sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap);
     void                       sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
+    void                       deleteLocalProjectFiles(const std::string& baseProjectName);
+    bool                       restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

@@ -4010,9 +4010,9 @@ void Model::resetModified(void)
 	}
 }
 
-void Model::modelChangeOperationCompleted(const std::string &description)
+void Model::modelChangeOperationCompleted(const std::string &description, bool askForCreationOfBranch)
 {
-	projectSave(description, false);
+	projectSave(description, !askForCreationOfBranch);
 }
 
 bool Model::isUIAvailable(void)
@@ -4240,7 +4240,7 @@ std::list<ot::UID> Model::getIDsOfFolderItemsOfType(const std::string &folder, c
 
 void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible,
 							   std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList,
-							   const std::string &description, bool saveModel)
+							   const std::string &description, bool saveModel, bool askForCreationOfBranch)
 {
 	enableQueuingHttpRequests(true);
 
@@ -4316,7 +4316,7 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 
 	if (saveModel)
 	{
-		modelChangeOperationCompleted(description);
+		modelChangeOperationCompleted(description, askForCreationOfBranch);
 	}
 }
 
@@ -4437,7 +4437,7 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 	std::list<ot::UID> topologyEntityIDList = {geomEntityID};
 	std::list<ot::UID> topologyEntityVersionList = {geomEntityVersion};
 	std::list<bool> topologyEntityForceVisible = {false};
-	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, false);
+	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, false, true);
 
 	// for all children, change the name and the names of the children
 
