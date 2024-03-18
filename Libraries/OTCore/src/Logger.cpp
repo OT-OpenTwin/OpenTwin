@@ -249,7 +249,7 @@ ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!"
 
 ot::LogDispatcher::~LogDispatcher() {
 	for (auto r : m_messageReceiver) {
-		if (!r->isDeleteLater()) { delete r; }
+		if (!r->isDeleteLogNotifierLater()) { delete r; }
 	}
 	m_messageReceiver.clear();
 }

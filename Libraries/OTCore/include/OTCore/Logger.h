@@ -378,10 +378,10 @@ namespace ot {
 
 		//! @brief Will set the delete later flag
 		//! If delete later is set, the creator keeps ownership of this object even after it is added to the LogDispatcher
-		void deleteLater(bool _deleteLater = true) { m_deleteLater = _deleteLater; };
+		void deleteLogNotifierLater(bool _deleteLater = true) { m_deleteLater = _deleteLater; };
 
 		//! @brief Returns true if the delete later mode is set
-		bool isDeleteLater(void) const { return m_deleteLater; };
+		bool isDeleteLogNotifierLater(void) const { return m_deleteLater; };
 
 		//! @brief Called when the a log message was created
 		virtual void log(const LogMessage& _message) = 0;
