@@ -1,4 +1,4 @@
-#include "EntityBlockCircuitElement.h"
+#include "EntityBlockCircuitVoltageSource.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
@@ -9,12 +9,12 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 
 
-EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 	_navigationTreeIconName = "Icon";
 	_navigationTreeIconNameHidden = "Icon";
-	_blockTitle = "Circuit Element";
+	_blockTitle = "Voltage Source";
 
 	const std::string connectorNameLeft = "Left";
 	m_LeftConnector = { ot::ConnectorType::In,connectorNameLeft,connectorNameLeft };
@@ -26,12 +26,12 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 
 }
 
-void EntityBlockCircuitElement::createProperties()
+void EntityBlockCircuitVoltageSource::createProperties()
 {
 	EntityPropertiesString::createProperty("Element Property", "ElementType", "100", "default", getProperties());
 }
 
-std::string EntityBlockCircuitElement::getElementType()
+std::string EntityBlockCircuitVoltageSource::getElementType()
 {
 	auto propertyBase = getProperties().getProperty("ElementType");
 	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
@@ -40,11 +40,11 @@ std::string EntityBlockCircuitElement::getElementType()
 	return elementType->getValue();
 }
 
-ot::GraphicsItemCfg* EntityBlockCircuitElement::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 {
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-	myStack->setName("EntityBlockCircuitElement");
-	myStack->setTitle("EntityBlockCircuitElement");
+	myStack->setName("EntityBlockCircuitVoltageSource");
+	myStack->setTitle("EntityBlockCircuitVoltageSource");
 	myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
 	ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
@@ -87,12 +87,12 @@ ot::GraphicsItemCfg* EntityBlockCircuitElement::CreateBlockCfg()
 	return myStack;
 }
 
-void EntityBlockCircuitElement::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitVoltageSource::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::AddStorageData(storage);
 }
 
-void EntityBlockCircuitElement::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitVoltageSource::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

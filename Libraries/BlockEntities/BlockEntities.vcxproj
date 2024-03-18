@@ -163,7 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\EntityBlockCircuitElement.h" />
+    <ClInclude Include="include\EntityBlockCircuitVoltageSource.h" />
     <ClInclude Include="include\ClassFactoryBlock.h" />
     <ClInclude Include="include\Connector.h" />
     <ClInclude Include="include\EntityBlock.h" />
@@ -179,7 +179,7 @@
     <ClInclude Include="include\ValueComparisionDefinition.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\EntityBlockCircuitElement.cpp" />
+    <ClCompile Include="src\EntityBlockCircuitVoltageSource.cpp" />
     <ClCompile Include="src\ClassFactoryBlock.cpp" />
     <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\EntityBlock.cpp" />

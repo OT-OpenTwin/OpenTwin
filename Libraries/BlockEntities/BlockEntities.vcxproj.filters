@@ -42,7 +42,7 @@
     <ClInclude Include="include\PythonHeaderInterpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityBlockCircuitElement.h">
+    <ClInclude Include="include\EntityBlockCircuitVoltageSource.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityBlockCircuitResistor.h">
@@ -86,7 +86,7 @@
     <ClCompile Include="src\PythonHeaderInterpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityBlockCircuitElement.cpp">
+    <ClCompile Include="src\EntityBlockCircuitVoltageSource.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockCircuitResistor.cpp">

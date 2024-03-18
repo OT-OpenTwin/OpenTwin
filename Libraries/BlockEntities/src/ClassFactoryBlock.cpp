@@ -5,7 +5,7 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
-#include "EntityBlockCircuitElement.h"
+#include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
@@ -26,9 +26,9 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	{
 		return new EntityBlockPython(0, nullptr, nullptr, nullptr, this, "");
 	}
-	else if (entityType == "EntityBlockCircuitElement")
+	else if (entityType == "EntityBlockCircuitVoltageSource")
 	{
-		return new EntityBlockCircuitElement(0, nullptr, nullptr, nullptr, this, "");
+		return new EntityBlockCircuitVoltageSource(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else if (entityType == "EntityBlockCircuitResistor")
 	{

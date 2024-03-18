@@ -9,7 +9,7 @@
 #include "Application.h"
 #include "ClassFactoryBlock.h"
 #include "ClassFactory.h"
-#include "EntityBlockCircuitElement.h"
+#include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
 // Third Party Header
@@ -273,7 +273,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity)
 {
-	EntityBlockCircuitElement* CircuitElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 	if (CircuitElement != nullptr)
 	{
 		CircuitElement->createProperties();
@@ -295,7 +295,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
 	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
 	a->addChildCollection(a1);
-	EntityBlockCircuitElement element(0, nullptr, nullptr, nullptr,nullptr, "");
+	EntityBlockCircuitVoltageSource element(0, nullptr, nullptr, nullptr,nullptr, "");
 	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
 	a1->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");

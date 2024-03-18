@@ -4,7 +4,7 @@
 #include "Connection.h"
 #include "CircuitElement.h"
 //Open Twin Header
-#include "EntityBlockCircuitElement.h"
+#include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
 //Third Party Header
@@ -41,12 +41,12 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		element.setItemName(blockEntity->getBlockTitle());
 		element.setUID(blockEntity->getEntityID());
 
-		if (blockEntity->getBlockTitle() == "Circuit Element")
+		if (blockEntity->getBlockTitle() == "Voltage Source")
 		{
-			auto myElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
 		}
-		else if (blockEntity->getBlockTitle() == "Circuit Element Resistor")
+		else if (blockEntity->getBlockTitle() == "Resistor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
@@ -141,12 +141,12 @@ std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlo
 		std::string netlistValue = element.getValue();
 		std::string netlistNodeNumbers;
 
-		if (element.getItemName() == "Circuit Element")
+		if (element.getItemName() == "Voltage Source")
 		{
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
 			netlistLine += netlistElementName + " ";
 		}
-		else if (element.getItemName() == "Circuit Element Resistor")
+		else if (element.getItemName() == "Resistor")
 		{
 			netlistElementName = "R" + std::to_string(++Numbers::resistorNetlistNumber);
 			netlistLine += netlistElementName + " ";

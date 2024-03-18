@@ -14,7 +14,7 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 {
 	_navigationTreeIconName = "Icon";
 	_navigationTreeIconNameHidden = "Icon";
-	_blockTitle = "Circuit Element Resistor";
+	_blockTitle = "Resistor";
 
 	const std::string connectorNameLeft = "Left";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
