@@ -162,12 +162,23 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
+	else if (m_flags & GraphicsItemCfg::ItemIsConnectable) {
+		OTAssertNullptr(m_scene);
+		m_scene->startConnection(this);
+	}
 	else {
-		if (m_flags & GraphicsItemCfg::ItemIsConnectable) {
-			OTAssertNullptr(m_scene);
-			m_scene->startConnection(this);
+		OTAssertNullptr(m_scene);
+		if (_event->modifiers() != Qt::ControlModifier) {
+			m_scene->setIgnoreEvents(true);
+			m_scene->clearSelection();
+			m_scene->setIgnoreEvents(false);
 		}
-		else if (m_flags & GraphicsItemCfg::ItemIsMoveable) {
+		this->getQGraphicsItem()->setSelected(true);
+		this->handleItemChange(QGraphicsItem::ItemSelectedHasChanged, QVariant());
+
+		m_scene->handleSelectionChanged();
+
+		if ((m_flags & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 			auto qitm = this->getQGraphicsItem();
 			OTAssertNullptr(qitm);
 			m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
@@ -179,15 +190,13 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else {
-		if (m_flags & GraphicsItemCfg::ItemIsMoveable) {
-			auto qitm = this->getQGraphicsItem();
-			OTAssertNullptr(qitm);
-			// Check if the item has moved after the user released the mouse
-			if (qitm->pos() != m_moveStartPt) {
-				OTAssertNullptr(m_scene);
-				m_scene->getGraphicsView()->notifyItemMoved(this);
-			}
+	else if ((m_flags & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+		auto qitm = this->getQGraphicsItem();
+		OTAssertNullptr(qitm);
+		// Check if the item has moved after the user released the mouse
+		if (qitm->pos() != m_moveStartPt) {
+			OTAssertNullptr(m_scene);
+			m_scene->getGraphicsView()->notifyItemMoved(this);
 		}
 	}
 }
@@ -228,9 +237,9 @@ void ot::GraphicsItem::paintStateBackground(QPainter* _painter, const QStyleOpti
 		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(0, 0, 255));
 	}
 	else if (m_state & SelectedState) {
-		QPen p(QColor(255, 255, 0));
+		QPen p(QColor(0, 255, 0));
 		_painter->setPen(p);
-		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(255, 255, 0));
+		_painter->fillRect(this->getQGraphicsItem()->boundingRect(), QColor(0, 255, 0));
 	}
 }
 

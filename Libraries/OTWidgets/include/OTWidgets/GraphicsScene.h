@@ -49,16 +49,21 @@ namespace ot {
 		void setConnectionPreviewStyle(GraphicsConnectionCfg::ConnectionStyle _style) { m_connectionPreviewStyle = _style; };
 		GraphicsConnectionCfg::ConnectionStyle connectionPreviewStyle(void) const { return m_connectionPreviewStyle; };
 
+		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
+		bool ignoreEvents(void) const { return m_ignoreEvents; };
+
 	signals:
 		void selectionChangeFinished(void);
 
-	private slots:
+	public slots:
 		void slotSelectionChanged(void);
+		void handleSelectionChanged(void);
 
 	protected:
 		virtual void drawBackground(QPainter* _painter, const QRectF& _rect) override;
 
 	private:
+		bool m_ignoreEvents;
 		int m_gridSize;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;

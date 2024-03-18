@@ -16,7 +16,8 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
-	: m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr), m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine) 
+	: m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
+	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
@@ -82,31 +83,35 @@ void ot::GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 
 	if (_event->button() == Qt::LeftButton) {
 		m_mouseIsPressed = false;
-		QList<QGraphicsItem*> currentSel = this->selectedItems();
-		if (currentSel.size() != m_lastSelection.size()) {
-			emit selectionChangeFinished();
-		}
-		else {
-			for (QGraphicsItem* itm : currentSel) {
-				bool found = false;
-				for (QGraphicsItem* itmCheck : m_lastSelection) {
-					if (itm == itmCheck) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					emit selectionChangeFinished();
-					return;
-				}
-			}
-		}
 	}
 }
 
 void ot::GraphicsScene::slotSelectionChanged(void) {
-	if (m_mouseIsPressed) return;
-	emit selectionChangeFinished();
+	if (m_ignoreEvents || m_mouseIsPressed) return;
+	this->handleSelectionChanged();
+}
+
+void ot::GraphicsScene::handleSelectionChanged(void) {
+	QList<QGraphicsItem*> tmp = m_lastSelection;
+	m_lastSelection = this->selectedItems();
+	if (tmp.size() != m_lastSelection.size()) {
+		emit selectionChangeFinished();
+	}
+	else {
+		for (QGraphicsItem* itm : m_lastSelection) {
+			bool found = false;
+			for (QGraphicsItem* itmCheck : tmp) {
+				if (itm == itmCheck) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				emit selectionChangeFinished();
+				return;
+			}
+		}
+	}
 }
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {

@@ -9,14 +9,16 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/OTQtConverter.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
+#include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
 	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine), m_state(NoState), m_uid(0),
-	m_hoverPen(QBrush(QColor(0, 0, 255)), 2.f), m_selectedPen(QBrush(QColor(255, 255, 0)), 2.f)
+	m_hoverPen(QBrush(QColor(0, 0, 255)), 2.f), m_selectedPen(QBrush(QColor(0, 255, 0)), 2.f)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
@@ -134,7 +136,24 @@ QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChang
 }
 
 void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	this->setSelected(true);
+	if (_event->button() == Qt::LeftButton) {
+		GraphicsScene* sc = dynamic_cast<GraphicsScene*>(this->scene());
+		if (sc) {
+			if (_event->modifiers() != Qt::ControlModifier) {
+				sc->setIgnoreEvents(true);
+				sc->clearSelection();
+				sc->setIgnoreEvents(false);
+			}
+			this->setSelected(true);
+			this->update();
+
+			sc->handleSelectionChanged();
+		}
+		else {
+			OT_LOG_EA("Scene cast failed");
+		}
+		
+	}
 }
 
 void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {

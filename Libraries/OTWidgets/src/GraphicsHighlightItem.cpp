@@ -36,13 +36,13 @@ bool ot::GraphicsHighlightItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 void ot::GraphicsHighlightItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	if (this->stateFlags() & HoverState) {
-		QPen p(QColor(0, 0, 255));
+		QPen p(QBrush(QColor(0, 0, 255)), 2.f);
 		_painter->setPen(p);
 		_painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
 		_painter->drawRect(this->boundingRect());
 	}
 	else if (this->stateFlags() & SelectedState) {
-		QPen p(QColor(255, 255, 0));
+		QPen p(QBrush(QColor(0, 255, 0)), 2.f);
 		_painter->setPen(p);
 		_painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
 		_painter->drawRect(this->boundingRect());
