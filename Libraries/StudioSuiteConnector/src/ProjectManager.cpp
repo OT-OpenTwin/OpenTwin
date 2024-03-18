@@ -74,6 +74,79 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 	}
 }
 
+std::string ProjectManager::getCurrentVersion(const std::string& fileName, const std::string& prjName)
+{
+	baseProjectName = getBaseProjectName(fileName);
+
+	// Set the name of the cache folder
+	cacheFolderName = baseProjectName + ".cache";
+	if (!std::filesystem::is_directory(cacheFolderName))
+	{
+		throw std::string("The cache folder does not exist. This project does not seem to be initialized or connected to version control.");
+	}
+
+	// Load the version data
+	VersionFile version(cacheFolderName + "\\version.info");
+	version.read();
+
+	// We need to ensure that the local cache diretory actually belongs to the open project.
+	if (version.getProjectName() != prjName)
+	{
+		// This cache folder does not belong to the right project
+		throw std::string("The local file data does not belong to the project.");
+	}
+
+	// We need to ensure that the model is at the right version in OT
+	return version.getVersion();
+}
+
+void ProjectManager::commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment)
+{
+	try
+	{
+		uploadFileList.clear();
+		projectName.clear();
+		baseProjectName.clear();
+		cacheFolderName.clear();
+		newOrModifiedFiles.clear();
+		dependentDataFiles.clear();
+		deletedFiles.clear();
+
+		projectName = prjName;
+		changeMessage = changeComment;
+
+		ProgressInfo::getInstance().setProgressState(true, "Committing project changes", false);
+		ProgressInfo::getInstance().setProgressValue(0);
+
+		// Determine the base project name (without .cst extension)
+		baseProjectName = getBaseProjectName(fileName);
+
+		// Set the name of the cache folder
+		cacheFolderName = baseProjectName + ".cache";
+
+		// Open the cst project in a studio suite instance, save it and extract the data
+		StudioConnector studioObject;
+		studioObject.searchProjectAndExtractData(fileName);
+
+		// Get the files to be uploaded
+		uploadFileList = determineUploadFiles(baseProjectName);
+
+		ProgressInfo::getInstance().setProgressValue(10);
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
+
+		ServiceConnector::getInstance().sendExecuteRequest(doc);
+	}
+	catch (std::string& error)
+	{
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().showError(error);
+		ProgressInfo::getInstance().unlockGui();
+	}
+}
+
 void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList)
 {
 	ProgressInfo::getInstance().setProgressValue(10);

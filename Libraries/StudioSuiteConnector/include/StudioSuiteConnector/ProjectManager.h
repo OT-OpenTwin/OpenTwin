@@ -22,6 +22,8 @@ public:
     void setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject);
 
     void importProject(const std::string& fileName, const std::string& prjName);
+    std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);
+    void commitProject(const std::string& fileName, const std::string& prjName, const std::string &changeComment);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
     void copyFiles(const std::string& newVersion);
 

@@ -112,6 +112,7 @@ public:
 	void modelSelectionChangedNotification(void);
 
 	void importProject(void);
+	void commitChanges(void);
 
 	void EnsureVisualizationModelIDKnown(void);
 

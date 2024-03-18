@@ -116,11 +116,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage("Project");
 	
 	_ui->addMenuGroup("Project", "Import");
+	_ui->addMenuGroup("Project", "Versions");
 
 	ot::Flags<ot::ui::lockType> modelWrite;
 	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
 
 	_ui->addMenuButton("Project", "Import", "CST File", "CST File", modelWrite, "Import", "Default");
+	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "Add", "Default");
 
 	modelSelectionChangedNotification();
 
@@ -171,7 +173,7 @@ bool Application::startAsRelayService(void) const
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (     action == "Project:Import:CST File")			  importProject();
-	//else if (action == "ElmerFEM:Solver:Run Solver")		  runSolver();
+	else if (action == "Project:Versions:Commit")			  commitChanges();
 	//else if (action == "Model:Sources:Add Terminal")	      addTerminal();
 	//else if (action == "ElmerFEM:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
@@ -230,6 +232,20 @@ void Application::importProject(void)
 	uiComponent()->sendMessage(true, doc);
 }
 
+void Application::commitChanges(void)
+{
+	modelComponent()->clearNewEntityList();
+
+	// TODO: Check whether the project has already been initialized
+
+
+	// Send the commit message to the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COMMIT, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	uiComponent()->sendMessage(true, doc);
+}
 void Application::uploadNeeded(ot::JsonDocument& _doc)
 {
 	size_t count = ot::json::getInt64(_doc, OT_ACTION_PARAM_COUNT);

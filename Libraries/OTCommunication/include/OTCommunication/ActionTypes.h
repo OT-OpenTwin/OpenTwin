@@ -166,6 +166,7 @@
 #define OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion "UI.AddActivateGraph.Version"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
+#define OT_ACTION_CMD_UI_SS_COMMIT "StudioSuite.Commit"
 #define OT_ACTION_CMD_UI_SS_UPLOAD "StudioSuite.Upload"
 #define OT_ACTION_CMD_UI_SS_COPY "StudioSuite.Copy"
 #define OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED "StudioSuite.UploadNeeded"

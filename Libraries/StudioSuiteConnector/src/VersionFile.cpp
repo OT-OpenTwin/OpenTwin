@@ -44,10 +44,11 @@ void VersionFile::read()
 	projectFiles.clear();
 
 	std::ifstream file(versionFilePath);
-	int fileVersion = 0;
 
 	// Check whether the file version is supported
-	file >> fileVersion;
+	std::string line;
+	std::getline(file, line);
+	int fileVersion = std::atoi(line.c_str());
 	if (fileVersion != 1) throw (std::string("Unsupported file version of version information file."));
 
 	// Read the project name and version

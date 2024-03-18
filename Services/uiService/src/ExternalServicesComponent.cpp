@@ -3068,6 +3068,38 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
 				workerThread.detach();
 			}
+			else if (action == OT_ACTION_CMD_UI_SS_COMMIT) {
+
+				// TODO: Get change comment from dialog
+				std::string changeComment = "Project updated";
+
+				// TODO: Get file name from list
+				QString fileName = QFileDialog::getOpenFileName(
+					nullptr,
+					"Commit CST File",
+					QDir::currentPath(),
+					QString("*.cst ;; All files (*.*)"));
+
+				if (fileName == "") return "";
+
+				ot::Flags<ot::ui::lockType> lockFlags;
+				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+				lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+				lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+				m_lockManager->lock(nullptr, lockFlags);
+
+				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+
+				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+
+				// We need to make sure that the project is at the correct version in OT
+				std::string currentVersion = StudioSuiteConnectorAPI::getCurrentVersion(fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
+				activateVersion(currentVersion);
+
+				std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName(), changeComment);
+				workerThread.detach();
+			}
+
 			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD) {
 
 				std::list<ot::UID> entityIDList = getListFromDocument(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);

@@ -13,6 +13,16 @@ void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string pr
 	ProjectManager::getInstance().importProject(fileName, projectName);
 }
 
+std::string StudioSuiteConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
+{
+	return ProjectManager::getInstance().getCurrentVersion(fileName, projectName);
+}
+
+void StudioSuiteConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment)
+{
+	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment);
+}
+
 void StudioSuiteConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
 {
 	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList);
