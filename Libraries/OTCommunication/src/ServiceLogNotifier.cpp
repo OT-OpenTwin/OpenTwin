@@ -47,7 +47,9 @@ void ot::ServiceLogNotifier::setLoggingServiceURL(const std::string& _url) {
 			}
 		}
 		else {
-			OTAssert(0, "Failed to ping Logging Service: Ping not delivered");
+#ifdef _DEBUG
+			std::cout << std::endl << "Logger service not connected" << std::endl << std::endl;
+#endif // _DEBUG
 		}
 	}
 }
