@@ -32,6 +32,8 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 {
 	try
 	{
+		currentOperation = OPERATION_IMPORT;
+
 		uploadFileList.clear();
 		projectName.clear();
 		baseProjectName.clear();
@@ -105,6 +107,8 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 {
 	try
 	{
+		currentOperation = OPERATION_COMMIT;
+
 		uploadFileList.clear();
 		projectName.clear();
 		baseProjectName.clear();
@@ -152,6 +156,8 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 {
 	try
 	{
+		currentOperation = OPERATION_GET;
+
 		uploadFileList.clear();
 		projectName.clear();
 		baseProjectName.clear();
@@ -259,7 +265,19 @@ void ProjectManager::copyFiles(const std::string &newVersion)
 		writeVersionFile(baseProjectName, projectName, newVersion, cacheFolderName);
 
 		ProgressInfo::getInstance().setProgressValue(100);
-		ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been imported successfully.");
+
+		if (currentOperation == OPERATION_IMPORT)
+		{
+			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been imported successfully.");
+		}
+		else if (currentOperation == OPERATION_COMMIT)
+		{
+			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been commited successfully (version: " + newVersion + ").");
+		}
+		else
+		{
+			assert(0); // Unexpected operation
+		}
 	}
 	catch (std::string& error)
 	{

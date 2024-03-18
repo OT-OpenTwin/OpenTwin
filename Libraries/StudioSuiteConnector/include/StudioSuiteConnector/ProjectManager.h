@@ -29,7 +29,9 @@ public:
     void copyFiles(const std::string& newVersion);
 
 private:
-    ProjectManager() {};
+    enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};
+
+    ProjectManager() : currentOperation(OPERATION_NONE) {};
     ~ProjectManager() {};
 
     std::string                getBaseProjectName(const std::string& cstFileName);
@@ -57,4 +59,5 @@ private:
     std::map<std::string, std::pair<ot::UID, ot::UID>> dependentDataFiles;
     std::list<std::string> deletedFiles;
     std::string changeMessage;
+    operationType currentOperation;
 };
