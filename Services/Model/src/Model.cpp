@@ -409,7 +409,7 @@ void Model::setupUIControls()
 	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_Y));
 	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::ui::keySequenceToString(ot::ui::Key_Delete));
 	
-	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Icon", "Default");
+	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Result1DVisible", "Default");
 
 	addMenuGroup("View", "Visibility");
 
