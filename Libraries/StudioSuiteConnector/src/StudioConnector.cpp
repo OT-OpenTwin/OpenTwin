@@ -327,6 +327,8 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 	script << "print('execute VBA code')\n";
 	script << "prj.schematic.execute_vba_code(vbaCode)\n";
 
+	script << "de.set_quiet_mode(False)\n";
+
 	return script.str();
 }
 
@@ -390,6 +392,7 @@ std::string StudioConnector::generateOpenScript(const std::string& studioPath, s
 	script << "   prj = de.open_project(fileName)\n";
 	script << "   prj.save();\n";
 	script << "   print('project found')\n";
+	script << "   de.set_quiet_mode(False)\n";
 	script << "except:\n";
 	script << "   de.close();\n";
 	script << "   raise Exception('Unable to open project')\n";
