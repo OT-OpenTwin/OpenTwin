@@ -20,7 +20,7 @@ namespace ak { class aAbstractOptionsItem; }
 
 class SettingsItemOwner {
 public:
-	SettingsItemOwner() : m_item(nullptr), m_owner(nullptr), m_uiItem(nullptr) {}
+	SettingsItemOwner() : m_item(nullptr), m_owner(nullptr), m_uiItem(nullptr), m_isInternal(false) {}
 	SettingsItemOwner(const SettingsItemOwner& _other);
 	SettingsItemOwner(ot::ServiceBase * _owner, ot::AbstractSettingsItem * _item, ak::aAbstractOptionsItem * _uiItem);
 	virtual ~SettingsItemOwner() {}
