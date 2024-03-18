@@ -29,6 +29,19 @@ MetadataSeries MetadataEntityInterface::CreateSeries(std::shared_ptr<EntityMetad
 	std::string entityName = seriesMetadataEntity->getName();
 	const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
 	MetadataSeries seriesMetadata(name);
+	const GenericDocument* topLevel = seriesMetadataEntity->getDocumentTopLevel();
+	
+	//for (const GenericDocument* subDocument : topLevel->getFields())
+	//{
+	//	if (subDocument->getDocumentName() != seriesMetadataEntity->getParameterDocumentName())
+	//	{
+	//		const auto listOfMetadata = ExtractMetadataFields(*subDocument);
+	//		for (const auto& metadata : listOfMetadata)
+	//		{
+	//			seriesMetadata.AddMetadata(metadata);
+	//		}
+	//	}
+	//}
 
 	const GenericDocument* parameterTopLevel = seriesMetadataEntity->getDocument(seriesMetadataEntity->getParameterDocumentName());
 	const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();

@@ -31,6 +31,7 @@ public:
 	TableViewer& operator=(TableViewer& other) = delete;
 
 	Table* getTable() const { return _table; }
+	void clearActiveTableEntity() { _activeTable.reset(); _activeTable = nullptr; };
 	ot::UID getTableID() const { return _activeTable->getEntityID(); }
 	ot::UID getTableVersion() const { return _activeTable->getEntityStorageVersion(); }
 	std::string getTableName() const { return _activeTable->getName(); }

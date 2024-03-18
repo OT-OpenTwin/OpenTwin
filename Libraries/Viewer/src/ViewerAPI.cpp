@@ -814,12 +814,13 @@ void ViewerAPI::showTable(ot::UID _viewerID,  const ot::GenericDataStructMatrix&
 	{
 		Table* activeTable = v->getTableViewer()->getTable();
 		activeTable->clear();
+		v->getTableViewer()->clearActiveTableEntity();
 
 		uint32_t numberOfRows =	data.getNumberOfRows();
 		uint32_t numberOfColumns = data.getNumberOfColumns();
 		activeTable->setRowCount(numberOfRows);
 		activeTable->setColumnCount(numberOfColumns);
-
+		
 		ot::VariableToStringConverter converter;
 		for (uint32_t row = 0; row < numberOfRows; row++)
 		{
