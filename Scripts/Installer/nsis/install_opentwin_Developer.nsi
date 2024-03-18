@@ -8,17 +8,11 @@
 
 */
 
-
 !include "MUI.nsh"
 !include LogicLib.nsh
 !include nsDialogs.nsh
 !include FileFunc.nsh
-#!insertmacro Locate
-
-#Var /GLOBAL switch_overwrite
-#StrCpy $switch_overwrite 0
-#!include "custom_headers\MoveFileFolder.nsh"
-
+!include x64.nsh
 
 #=================================================================
 #							VARIABLES
@@ -43,9 +37,6 @@
 	Var DirHandleCert
 	Var PUBLIC_CERT_PATH
 	Var STANDARD_CERT_PATH
-
-	#Var MongoDBCustomPortChckBox
-	#Var MongoDBCustomPortChckBox_state
 
 	#port variables
 	Var auth_port
@@ -83,6 +74,7 @@
 	Var MONGODB_INSTALL_PATH
 	Var MONGODB_DB_PATH
 	Var MONGODB_LOG_PATH
+	Var UNINSTALL_MONGODB_FLAG
 
 	Var OPEN_TWIN_SERVICES_ADDRESS
 
@@ -90,11 +82,12 @@
 
 	Var DevRootDirRequest
 	Var DEV_ROOT
-	Var OPEN_TWIN_DEV_ROOT
+	Var OPENTWIN_DEV_ROOT
 	Var OPENTWIN_THIRDPARTY_ROOT
-
+	
 	Var GitInstallPath
 	Var TempToolChain
+
 #=================================================================
 #						END OF VARIABLES
 #=================================================================
@@ -128,6 +121,7 @@
 	!define DEFAULT_MONGODB_STORAGE_PATH '"$DEV_ROOT\OpenTwin\Deployment\DataStorage\data"'
 	!define DEFAULT_MONGODB_LOG_PATH '"$DEV_ROOT\OpenTwin\Deployment\DataStorage\log"'
 	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
+	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 
 	!define OPENTWIN_REPO_GITADDRESS "git@github.com:OT-OpenTwin/OpenTwin.git"
 	!define THIRDPARTY_REPO_GITADDRESS "git@github.com:OT-OpenTwin/ThirdParty.git"
@@ -213,6 +207,22 @@ Function .onInit
 				${EndIf}
 		${EndIf}
 
+	#check for 64-bit system
+	${If} ${RunningX64}
+        SetRegView 64
+    ${EndIf}	
+	ReadRegStr $1 HKLM "SOFTWARE\GitForWindows" "InstallPath"
+		${If} $1 != ""
+			Goto +5
+		${Else}
+			MessageBox MB_ICONSTOP|MB_OK "Git for Windows does not seem to be installed. This installer requires a fully set up Git installation before proceeding!"
+			Abort
+		${EndIf}
+
+	#reset regView to standard 32bit
+	SetRegView 32
+
+	MessageBox MB_ICONINFORMATION|MB_OK "Microsoft Visual Studio and C++ need to be installed for a full OpenTwin Development environment"
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
@@ -806,11 +816,11 @@ FunctionEnd
 		DEV_ROOT_init:
 			CreateDirectory "$DEV_ROOT"
 		skip_dev_root_init:
-			StrCpy $OPEN_TWIN_DEV_ROOT "$DEV_ROOT\OpenTwin"
+			StrCpy $OPENTWIN_DEV_ROOT "$DEV_ROOT\OpenTwin"
 			StrCpy $OPENTWIN_THIRDPARTY_ROOT "$DEV_ROOT\ThirdParty"
 				#assign variable paths but don't create them yet!
 				#git wouldn't clone if a path already exists!
-			StrCpy $INSTDIR "$OPEN_TWIN_DEV_ROOT\Deployment"
+			StrCpy $INSTDIR "$OPENTWIN_DEV_ROOT\Deployment"
 			StrCpy "$TempToolChain" ${TEMP_TOOLCHAIN_DIR}
 	FunctionEnd
 
@@ -877,43 +887,28 @@ OutFile "Install_OpenTwin_dev.exe"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
 ShowUnInstDetails hide
+
 Section "-Extract Installer Tools (Required)" SEC01
 	SectionIn RO ;read only section
-	#SetOutPath "$INSTDIR"
 	SetOutPath ${TEMP_TOOLCHAIN_DIR}
 
 	DetailPrint "Extracting toolchain..."
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
+	File /r "..\python\dist\*.*"
+	File /r "..\javascript\*.*"
 
 SectionEnd
 
-SectionGroup /e "Git" 
-
-	Section "Install Git" SEC02
-		AddSize 403000
-		ExpandEnvStrings $0 %COMSPEC%
-			#ExecWait '"$0" /c "START /MIN cmd.exe /k ""$INSTDIR\Installer_Tools\ThirdParty\Git-2.44.0-64-bit.exe" /VERYSILENT""'
-			ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\Git-2.44.0-64-bit.exe" /VERYSILENT"'
-	SectionEnd
-	
-	Section "Git GUI Frontend" SEC02_1
-		AddSize 613000
-		DetailPrint "Installing Github Desktop Environment"
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait 'msiexec.exe /i "$TempToolChain\Installer_Tools\ThirdParty\GitHubDesktopSetup-x64.msi" /quiet'
-		ExecWait '"$GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION\GitHubDesktopDeploymentTool.exe" /silent'
-	SectionEnd
-SectionGroupEnd 
 
 SectionGroup /e "OpenTwin"
-	Section "!Clone OpenTwin Repository" SEC03
+	Section "!Clone OpenTwin Repository" SEC02
 		MessageBox MB_ICONINFORMATION|MB_OK "This step of the installation will clone the OpenTwin repository on GitHub. Press OK to continue."
 
-		#start git bash
 		SetRegView 64
 		ReadRegStr $0 HKLM "SOFTWARE\GitForWindows" "InstallPath"
 		StrCpy $GitInstallPath $0
-		MessageBox MB_ICONINFORMATION|MB_OK "GitHub Path: $GitInstallPath" #debug
+		#MessageBox MB_ICONINFORMATION|MB_OK "GitHub Path: $GitInstallPath" #debug
 		SetRegView 32
 
 		IfFileExists "$DEV_ROOT" DEV_ROOT_Exists DEV_ROOT_NotExists
@@ -921,20 +916,19 @@ SectionGroup /e "OpenTwin"
 		DEV_ROOT_Exists:
 			DetailPrint "Cloning repositories..."
 			ExpandEnvStrings $0 %COMSPEC%
-				#ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
-				ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && exit"'
-			#ExecWait '"$GitInstallPath\git-bash.exe" -c "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
+				ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && git clone ${THIRDPARTY_REPO_GITADDRESS} && exit"'
+				#ExecWait '"$0" /k "cd "$DEV_ROOT" && git clone ${OPENTWIN_REPO_GITADDRESS} && exit"'
 			Goto done_cloning
 		
 		DEV_ROOT_NotExists:
-			DetailPrint "DEV_ROOT path doesn't exist yet! Creating path..."
+			DetailPrint "DEV_ROOT path doesn't exist yet! Creating path..." #if for some reason this ever happens
 				CreateDirectory $DEV_ROOT
 			Goto DEV_ROOT_Exists
 		
 		done_cloning:
 	SectionEnd
 
-	Section "OpenTwin Deployment Files (Required)" SEC04
+	Section "OpenTwin Deployment Files (Required)" SEC03
 		SectionIn RO ;read only section
 		SetOutPath "$INSTDIR"
 		SetOverwrite ifnewer
@@ -947,29 +941,20 @@ SectionGroup /e "OpenTwin"
 			#    "..\" 	 = one directory up
 			#    "..\..\"  = two directories up etc.
 
+		#try with refreshenv.cmd
 		${If} $PublicIpSet <> 0 #public IP was set
 			ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate_custom.cmd" "$NetworkModeSelection" "$PUBLIC_CERT_PATH"" '
-
+				ExecWait '"$0" /c "START /MIN cmd.exe /c ""$TempToolChain\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
 		${Else}
 			Goto +2
 		${EndIf}
 
 		DetailPrint "Installing VC Redistributable..."
-		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\VC_redist.x64" /silent'
+		ExecWait '"$TempToolChain\VC_redist.x64" /silent'
 
 		DetailPrint "Setting environment variables..."
-		
-		#		
-		#SET OPEN_TWIN_DEV_ROOT on C:\OT\OpenTwin
-		#EXTRACT FILES TO: C:\OT\OpenTwin\Deployment
-		#OPENTWIN_THIRDPARTY_ROOT on C:\OT\ThirdParty
-		#CLONE REPO
-		# on C:\
-		# clone all 3 repos
-		# 
 
-		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DEV_ROOT" "$OPEN_TWIN_DEV_ROOT"
+		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_DEV_ROOT" "$OPENTWIN_DEV_ROOT"
 			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_THIRDPARTY_ROOT" "$OPENTWIN_THIRDPARTY_ROOT"
@@ -984,7 +969,7 @@ SectionGroup /e "OpenTwin"
 	SectionEnd
 
 
-	Section "MongoDB Setup" SEC05
+	Section "MongoDB Setup" SEC04
 		AddSize 738000
 		; /i = package to install
 		; /qn = quiet install
@@ -995,7 +980,7 @@ SectionGroup /e "OpenTwin"
 		
 		DetailPrint "Running MongoDB installation scripts..."
 
-		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\Installer_Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="1" ADDLOCAL="ServerService,Client"'		
+		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="1" ADDLOCAL="ServerService,Client"'		
 		
 		##########################################
 		# call for python scripts via $INSTDIR
@@ -1003,10 +988,10 @@ SectionGroup /e "OpenTwin"
 
 		DetailPrint "Running scripts..."
 		# mongoDB_storage_script_noAuth.py
-		ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
+		ExecWait '"$TempToolChain\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
 
 		#set directory permissions for the mongoDB service
-		ExecWait '"$TempToolChain\Installer_Tools\Python\dist\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
+		ExecWait '"$TempToolChain\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
 		# restarting mongoDB service
 		nsExec::ExecToLog 'net stop "MongoDB"'	
@@ -1016,15 +1001,15 @@ SectionGroup /e "OpenTwin"
 
 		# call for js script to paste admin user creation
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\Installer_Tools\javascript\db_admin.js" " "'
+			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\db_admin.js" " "'
 
 		# mongoDB_storage_script_wauth.py
 		${If} $PublicIpSet <> 0
-			ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+			ExecWait '"$TempToolChain\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 			ExpandEnvStrings $0 %COMSPEC%
 				ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 		${Else}
-			ExecWait '"$TempToolChain\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$STANDARD_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+			ExecWait '"$TempToolChain\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$STANDARD_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 			ExpandEnvStrings $0 %COMSPEC%
 				ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$STANDARD_CERT_PATH\ca.pem"""" '
 		${EndIf}
@@ -1032,55 +1017,57 @@ SectionGroup /e "OpenTwin"
 	SectionEnd
 SectionGroupEnd
 
+SectionGroup /e "Git" 	
+	Section "Git GUI Frontend" SEC05
+		AddSize 613000
+		DetailPrint "Installing Github Desktop Environment"
+		ExpandEnvStrings $0 %COMSPEC%
+			ExecWait 'msiexec.exe /i "$TempToolChain\GitHubDesktopSetup-x64.msi" /quiet'
+		ExecWait '"$GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION\GitHubDesktopDeploymentTool.exe" /silent'
+		
+	SectionEnd
+SectionGroupEnd
+
 #Visual studio is a lenghty online installer that runs its own set of operations - might be problematic during installer runtime
 #requires internet
-SectionGroup /e "Visual Studio & Rust"
-	Section "Microsoft Visual Studio 2022" SEC06
-	AddSize 4500000
-		#Installing Microsoft Visual Studio 2022
-		DetailPrint "Installing Microsoft Visual Studio 2022 with C++ compilers..."
 
-		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\VisualStudioSetup.exe"' 	#not running this silently, because the installation is very lenghty
-																						#this package here already contains all required C++ compilers
-	SectionEnd
+Section "Install Rust" SEC06_1
+	AddSize 114000
+	DetailPrint "Installing Rust..."
+	ExecWait '"$TempToolChain\rustup-init.exe" -y'	#run rustup setup without confirmation prompt
 
-	Section "Install Rust" SEC06_1
-		AddSize 114000
-		DetailPrint "Installing Rust..."
-		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\rustup-init.exe" -y'	#run rustup setup without confirmation prompt
+	DetailPrint "Running Rust commands..."
+	ExpandEnvStrings $0 %COMSPEC%
+			ExecWait '"$0" /c "START /MIN cmd.exe /c "rustup install stable latest" && "rustup default stable latest" && "rustup update" " '
+SectionEnd
 
-		DetailPrint "Running Rust commands..."
-		ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c "rustup install stable latest" && "rustup default stable latest" && "rustup update" " '
-	SectionEnd
 
-SectionGroupEnd
 
 Section "Install PostMan 64-bit" SEC07
 	AddSize 535000
 	DetailPrint "Installing PostMan..."
-		ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\Postman-win64-Setup.exe" /silent'	#silent installs postman - postman installation is mostly silent already
-																								#the '/silent' switch surpresses the automatic app launch after installation
+		ExecWait '"$TempToolChain\Postman-win64-Setup.exe" /silent'	#silent installs postman - postman installation is mostly silent already
+																	#the '/silent' switch surpresses the automatic app launch after installation
 SectionEnd
 
 Section "Install Node.js and yarn" SEC08
 	AddSize 83100
 	DetailPrint "Installing Node.js"
-		ExecWait 'msiexec.exe /i "$TempToolChain\Installer_Tools\ThirdParty\node-v20.11.1-x64.msi" /quiet'
-		#ExecWait 'msiexec.exe /i "$INSTDIR\Installer_Tools\ThirdParty\node-v20.11.1-x64.msi" /passive' 	# '/passive' includes a progress bar but doesn't need any input 
-																											# use "INSTALLDIR="path\to\NodeJS" to install to a specific location 
+		ExecWait 'msiexec.exe /i "$TempToolChain\node-v20.11.1-x64.msi" /quiet'
+		#ExecWait 'msiexec.exe /i "$TempToolChain\node-v20.11.1-x64.msi" /passive' 	# '/passive' includes a progress bar but doesn't need any input 
+																					# use "INSTALLDIR="path\to\NodeJS" to install to a specific location 
 	DetailPrint "Installing yarn..."
 		ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$TempToolChain\Installer_Tools\cmd" && RefreshEnv.cmd && npm install --global yarn" " '
+				ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && npm install --global yarn" " '
 SectionEnd
 
 SectionGroup /e "Python & Sphinx"
 	Section "Install Python 3.9" SEC09
 		AddSize 151000
 		DetailPrint "Installing Python 3.9..."
-			#replace with python 3.9
-			ExecWait '"$TempToolChain\Installer_Tools\ThirdParty\python-3.9.0-amd64.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0'
+			ExecWait '"$TempToolChain\python-3.9.0-amd64.exe" /passive InstallAllUsers=0 PrependPath=1 Include_test=0'
 			# /quiet 			- installs python silently
+			# /passive			- install with only a progress bar
 			# InstallAllUsers	- installs python for all users
 			# PrependPath 		- Prepend install and scripts directories to PATH and add .PY to PATHEXT
 			# Include_test 		- Install standard library test suite
@@ -1092,8 +1079,14 @@ SectionGroup /e "Python & Sphinx"
 		AddSize 22000
 		DetailPrint "Installing Sphinx..."
 			ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$TempToolChain\Installer_Tools\cmd" && RefreshEnv.cmd && pip install -U sphinx && pip install -U sphinx_rtd_theme" " '
-			#ExecWait '"$0" /c "START /MIN cmd.exe /c "pip install -U sphinx_rtd_theme" " '
+			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme" " '
+	SectionEnd
+
+	Section "Install Pyinstaller" SEC09_2
+		AddSize 106
+		DetailPrint "Installing Pyinstaller..."
+			ExpandEnvStrings $0 %COMSPEC%
+			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
 	SectionEnd
 SectionGroupEnd
 
@@ -1102,6 +1095,10 @@ Section "-CleanupTasks"
 	DetailPrint "Cleaning up..."
 	RMDir /r ${TEMP_TOOLCHAIN_DIR}
 	RMDir /r $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION
+	
+	DetailPrint "Refreshing Environment..."
+		ExpandEnvStrings $0 %COMSPEC%
+			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd"'
 SectionEnd
 
 Section -AdditionalIcons
@@ -1124,16 +1121,13 @@ SectionEnd
 
 #Section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Extracts all needed installer toolchain executables to be able to install all further dependencies."
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Install Git"
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02_1} "Additionally to GIT, install its graphical UI"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Clones both required GitHub repositories under https://github.com/OT-OpenTwin into the OpenTwin Developer directory"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Clones both required GitHub repositories under https://github.com/OT-OpenTwin into the OpenTwin Developer directory"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "OpenTwin Deployment Files - Install all required OpenTwin files"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "MongoDB Setup - Install MongoDB and set up all configurations for OpenTwin"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "OpenTwin Deployment Files - Install all required OpenTwin files"
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "MongoDB Setup - Install MongoDB and set up all configurations for OpenTwin"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "Install Git's graphical UI"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} "Install Microsoft Visual Studio 2022 IDE and C++ Compilers"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06_1} "Install Rust (only in combination with Visual Studio 2022)"
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} "Install the 64-bit version of PostMan"
@@ -1141,6 +1135,7 @@ SectionEnd
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} "Install a standard, system wide installation of Python 3"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_1} "Install Sphinx via pip and the 'Read the docs' theme required for building the documentation"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_2} "Install Pyinstaller via pip required for building OpenTwin Installer scripts"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
@@ -1152,7 +1147,13 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
+  	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +1 IDNO AbortUninstall
+  	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you also want to uninstall MongoDB and all of its components?" IDYES +1 IDNO +3
+	StrCpy $UNINSTALL_MONGODB_FLAG 1
+		Goto +5
+	StrCpy $UNINSTALL_MONGODB_FLAG 0
+		Goto +3
+AbortUninstall:
   Abort
 FunctionEnd
 
@@ -1182,25 +1183,36 @@ Section Uninstall
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS"
 		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
+	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_DEV_ROOT"
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+
+	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_THIRDPARTY_ROOT"
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000	
+
 #===============================================================================================================================	
 	
-
+${If} $UNINSTALL_MONGODB_FLAG != 0
 	nsExec::ExecToLog 'net stop "MongoDB"'
 	ExecWait 'sc delete MongoDB'
 
-	ExecWait 'msiexec /x "$INSTDIR\Tools\mongodb-windows-x86_64-4.4.28-signed.msi" /qn'
+	Delete "$MONGODB_INSTALL_PATH\*.*"
 	RMDir /r "$MONGODB_INSTALL_PATH"
+	RMDir /r ${MONGODB_DELETION_PATH}
+${EndIf}
+
 
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
   Delete "$INSTDIR\*.*"
   RMDir /r "$INSTDIR"
+
+  Delete "$PUBLIC_CERT_PATH\*.*"
+  RMDir /r "$PUBLIC_CERT_PATH"
 
   Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
   Delete "$DESKTOP\OpenTwin.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\OpenTwin.lnk"
 
   RMDir "$SMPROGRAMS\$ICONS_GROUP"
-  RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
