@@ -31,7 +31,7 @@ private:
 	const std::string _tableFolder;
 	const std::string _dbURL;
 	
-	const std::string _rmdEntityName = "ResearchMetadata";
+	const std::string _rmdEntityName = "Campaign Metadata";
 
 	std::map<std::string, MetadataAssemblyData> GetAllMetadataAssemblies();
 	void AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables);

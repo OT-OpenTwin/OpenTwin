@@ -344,7 +344,11 @@ void TabledataToResultdataHandler::ExtractRMDAndAllMSMD(std::map<std::string, Me
 
 	if(!rmdHasSelections)
 	{
-		std::string rmdAssemblyName = _baseFolder + "/" + _rmdEntityName;
+		auto firstSelectionRange = *allRangeEntities.begin();
+		const std::string fullName = firstSelectionRange->getName();
+		size_t secondDelimiter = fullName.find("/", fullName.find_first_of("/") + 1);
+		std::string rmdAssemblyName = fullName.substr(0,secondDelimiter);
+
 		allMetadataAssembliesByName[rmdAssemblyName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
 	}
 }

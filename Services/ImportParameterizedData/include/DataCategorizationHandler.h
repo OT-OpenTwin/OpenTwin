@@ -62,7 +62,7 @@ private:
 	const std::string _quantityFolder;
 	const std::string _tableFolder;
 	const std::string _previewTableName;
-	const std::string _msmdFolder = "Measurementseries Metadata";
+	const std::string _msmdFolder = "Series Metadata";
 	const std::string _scriptFolder = "Scripts";
 	ot::UID _scriptFolderUID = -1;
 	std::string _rmdPath;
