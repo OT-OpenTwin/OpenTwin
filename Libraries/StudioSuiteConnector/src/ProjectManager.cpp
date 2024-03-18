@@ -200,6 +200,8 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 
 			ProgressInfo::getInstance().setProgressState(false, "", false);
 			ProgressInfo::getInstance().unlockGui();
+
+			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
 		}
 
 		//// Get the files to be uploaded
