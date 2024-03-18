@@ -301,23 +301,8 @@ private:
 	// ###################################################################################################
 
 	// JSON helper functions
-
-	void AddUIDListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<ModelUIDtype> &list);
-	void AddStringListToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::list<std::string> &list);
-	void AddUIDVectorToJsonDoc(ot::JsonDocument &doc, const std::string &itemName, const std::vector<ModelUIDtype> &vector);
-
-	std::string getReturnJSONFromVector(std::vector<ModelUIDtype> idList);
-	std::string getReturnJSONFromString(std::string fileName);
-
-	std::list<ModelUIDtype> getListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	std::list<std::string> getStringListFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	double *getDoubleFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	std::vector<ModelUIDtype> getVectorFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	std::vector<double> getVectorDoubleFromDocument(ot::JsonDocument &doc, const std::string &itemName);
-	std::vector<int> getVectorIntFromDocument(ot::JsonDocument &doc, const std::string &itemName);
 	std::vector<std::array<double, 3>> getVectorDoubleArrayFromDocument(ot::JsonDocument &doc, const std::string &name);
 	TreeIcon getTreeIconsFromDocument(ot::JsonDocument &doc);
-
 	void getVectorNodeFromDocument(ot::JsonDocument &doc, const std::string &name, std::vector<Geometry::Node> &result);
 	void getListTriangleFromDocument(ot::JsonDocument &doc, const std::string &name, std::list<Geometry::Triangle> &result);
 	void getListEdgeFromDocument(ot::JsonDocument &doc, const std::string &name, std::list<Geometry::Edge> &result);

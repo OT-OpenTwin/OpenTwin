@@ -31,6 +31,19 @@ for (rapidjson::SizeType i = 0; i < lclit->value.Size(); i++) { \
 } \
 return ___list
 
+#define OT_JSON_getArrayFromObject(___object, ___memberName, ___entryType, ___entryTypeJson, ___sizeMember) \
+___entryType* ret = nullptr; \
+OT_JSON_checkMemberExists(___object, ___memberName, return ret); \
+OT_JSON_createMemberIterator(___object, ___memberName, lclit); \
+OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, return ret); \
+___sizeMember = lclit->value.Size(); \
+ret = new ___entryType[___sizeMember]; \
+for (JsonSizeType i = 0; i < ___sizeMember; i++) { \
+	if (!lclit->value[i].Is##___entryTypeJson()) { OT_LOG_EAS("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryTypeJson); delete[]ret; return ret; } \
+	ret[i] = lclit->value[i].Get##___entryTypeJson(); \
+} \
+return ret;
+
 #define OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction) if (!_value[_ix].Is##___entryType()) { OT_LOG_EAS("Array entry \"" + std::to_string(_ix) + "\" is not a " #___entryType); ___errorAction; }
 
 #define OT_JSON_getFromArray(___array, ___ix, ___entryType, ___errorAction) \
@@ -442,6 +455,62 @@ std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonObject& _value, const char* _member) {
 	std::vector<ot::ConstJsonArray> ret;
 	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+}
+
+bool* ot::json::getBoolArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, bool, Bool, _size);
+}
+
+bool* ot::json::getBoolArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, bool, Bool, _size);
+}
+
+int32_t* ot::json::getIntArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, int32_t, Int, _size);
+}
+
+int32_t* ot::json::getIntArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, int32_t, Int, _size);
+}
+
+uint32_t* ot::json::getUIntArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, uint32_t, Uint, _size);
+}
+
+uint32_t* ot::json::getUIntArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, uint32_t, Uint, _size);
+}
+
+int64_t* ot::json::getInt64Array(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, int64_t, Int64, _size);
+}
+
+int64_t* ot::json::getInt64Array(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, int64_t, Int64, _size);
+}
+
+uint64_t* ot::json::getUInt64Array(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, uint64_t, Uint64, _size);
+}
+
+uint64_t* ot::json::getUInt64Array(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, uint64_t, Uint64, _size);
+}
+
+float* ot::json::getFloatArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, float, Float, _size);
+}
+
+float* ot::json::getFloatArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, float, Float, _size);
+}
+
+double* ot::json::getDoubleArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, double, Double, _size);
+}
+
+double* ot::json::getDoubleArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member, double, Double, _size);
 }
 
 bool ot::json::isNull(const JsonValue& _value, unsigned int _ix) {

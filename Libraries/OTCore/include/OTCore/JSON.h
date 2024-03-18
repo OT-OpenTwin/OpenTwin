@@ -513,6 +513,41 @@ namespace ot {
 		OT_CORE_API_EXPORT std::vector<ConstJsonArray> getArrayVector(const JsonValue& _value, const char* _member);
 		OT_CORE_API_EXPORT std::vector<ConstJsonArray> getArrayVector(const ConstJsonObject& _value, const char* _member);
 
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT bool* getBoolArray(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT bool* getBoolArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT int32_t* getIntArray(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT int32_t* getIntArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT uint32_t* getUIntArray(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT uint32_t* getUIntArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT int64_t* getInt64Array(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT int64_t* getInt64Array(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT uint64_t* getUInt64Array(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT uint64_t* getUInt64Array(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT float* getFloatArray(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT float* getFloatArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
+		//! @brief Check and return the requested value
+		//! Asserts, logs and returns default when the provided member does not exist or is invalid type
+		OT_CORE_API_EXPORT double* getDoubleArray(const JsonValue& _value, const char* _member, JsonSizeType& _size);
+		OT_CORE_API_EXPORT double* getDoubleArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// ###########################################################################################################################################################################################################################################################################################################################
