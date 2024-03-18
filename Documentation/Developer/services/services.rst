@@ -15,6 +15,7 @@ The following sections describe the purpose and operation of the individual serv
    logger_service
    python_service
    studio_suite_service
+   import_parameterized_data_service
 
 .. toctree::
    :maxdepth: 3

@@ -7,3 +7,4 @@ User Interface API
    properties
    text_editor
    graphics_editor
+   view_handling
