@@ -36,19 +36,10 @@ public:
 		return this->nodeNumber;
 	}
 
-	void setID(std::string id)
-	{
-		this->id = id;
-	}
-
-	std::string getID()
-	{
-		return this->id;
-	}
 private:
 	
 	std::string nodeNumber;
-	std::string id;
+
 	
 
 

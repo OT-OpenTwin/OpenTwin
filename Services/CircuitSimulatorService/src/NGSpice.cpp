@@ -14,7 +14,6 @@ namespace Numbers
 	static unsigned long long nodeNumber = 0;
 	static unsigned long long voltageSourceNetlistNumber = 0;
 	static unsigned long long resistorNetlistNumber = 0;
-	static unsigned long long id = 0;
 	
 }
 
@@ -24,7 +23,7 @@ void NGSpice::clearBufferStructure(std::string name)
 
 }
 
-void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	if ( it == Application::instance()->getNGSpice().getMapOfCircuits().end())
@@ -67,20 +66,17 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlock>
 		{
 			
 			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
-			std::shared_ptr<EntityBlock> blockEntity = allEntitiesByBlockID.at(connectionID);
-			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(blockEntity.get());
+			std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
 			Connection conn(connectionCfg);
-			conn.setID(std::to_string(++Numbers::id));
 			conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
 
-			// if the adding doesingt work because it already added the connection than it counts the Nodenumber++ but i dont need that to do it
+			// if the adding doesnt work because it already added the connection than it counts the Nodenumber++ but i dont need that to do it
 			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), conn);
 			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), conn);
 			if (res1 == false && res2 == false )
 			{
-				--Numbers::id;
 				Numbers::nodeNumber--;
 			}
 						
@@ -125,37 +121,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlock>
 
 
 
-std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
+std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
 {
-	/*std::string Title = "*Test";
-	outfile << Title << std::endl;
-
-	int DiodeCounter = 0;
-	int TransistorCounter = 0;*/
-
-	// Note: The connector is not yet added to the netlist, and the transistor values along with the model are missing.
-	// Additionally, appropriate simulation settings for the transistor are still pending.
-	
-	/*std::string VoltageSourceNetlistLine = "";
-	std::string ResistorNetlsitLine = "";
-
-	for (auto it : mapOfConnections)
-	{
-		if (getBlockEntityTitleByUID(it.first,allEntitiesByBlockID) == "Circuit Element")
-		{
-			VoltageSourceNetlistLine += "V" +std::to_string( Numbers::resistorNetlistNumber++);
-			VoltageSourceNetlistLine += it.second.getNodeNumber();
-
-
-		}
-		else if (getBlockEntityTitleByUID(it.first,allEntitiesByBlockID) == "Circuit Element Resistor")
-		{
-				
-		}
-	}*/
-
-	
-
 
 	// Now I write the informations to the File
 	// Here i get the Circuit and the map of Elements
@@ -197,59 +164,6 @@ std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlo
 	}
 
 
-	//for (auto& blockEntityByID : allEntitiesByBlockID)
-	//{
-	//	//This is just for element Entity (VoltageSource)
-	//	//when having resistor we need to cast it to other Entity before get Properties
-	//	std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
-	//	std::cout << blockEntity->getBlockTitle() << std::endl;
-	//	std::cout << blockEntity->getBlockID() << std::endl;
-	//	std::string TitleLine = "circbyline *Test";
-	//	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
-	//
-	//	if (blockEntity->getBlockTitle() == "Circuit Element")
-	//	{
-	//		std::string myLine = "circbyline ";
-	//		auto myElement = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
-	//		std::string value = myElement->getElementType();
-	//		std::string elementName = "V";
-	//		
-	//		std::string elementNumber = std::to_string(Numbers::voltageSourceNetlistNumber++);
-	//		std::string netlistElement = elementName + elementNumber;
-	//		std::string connectionNumbers="";
-
-	//		
-	//		
-
-
-	//		std::string netlistLine = "";
-	//		netlistLine = netlistElement + " " + connectionNumbers + " " + value + "\n";
-
-	//		myLine += netlistLine;
-	//		ngSpice_Command(const_cast<char*>(myLine.c_str()));
-	//	}
-	//	else if (blockEntity->getBlockTitle() == "Circuit Element Resistor")
-	//	{
-	//		auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
-	//		std::string myLine="circbyline ";
-	//		std::string value = myElement->getElementType();
-	//		std::string elementName = "R";
-	//		std::string elementNumber = std::to_string(Numbers::resistorNetlistNumber++);
-	//		std::string netlistElement = elementName + elementNumber;
-	//		std::string connectionNumbers = "";
-
-
-	//		std::string netlistLine = "";
-	//		netlistLine = netlistElement + " " + connectionNumbers + " " + value + "\n";
-
-	//		myLine += netlistLine;
-	//		ngSpice_Command(const_cast<char*>(myLine.c_str()));
-	//	}
-	//	else
-	//	{
-	//		OT_LOG_E("No EntityBlock found!");
-	//	}
-	//}
 	simulationType = "circbyline " + simulationType;
 	printSettings = "circbyline " + printSettings;
 
@@ -267,7 +181,7 @@ std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlo
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
+std::string NGSpice::ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -296,11 +210,10 @@ std::string NGSpice::ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<Entity
 
 	/* Some simulation*/
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
-	 updateBufferClasses(allEntitiesByBlockID,editorname);
-	 generateNetlist(allEntitiesByBlockID,simulationType,printSettings,editorname);
+	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
+	 generateNetlist(allConnectionEntities,allEntitiesByBlockID,simulationType,printSettings,editorname);
 
 	 Numbers::nodeNumber = 0;
-	 Numbers::id = 0;
 	 Numbers::resistorNetlistNumber = 0;
 	 Numbers::voltageSourceNetlistNumber = 0;
 	// clearBufferStructure(); // Must be corrected
