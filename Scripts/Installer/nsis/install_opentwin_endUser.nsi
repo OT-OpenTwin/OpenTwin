@@ -71,6 +71,7 @@
 	Var MONGODB_INSTALL_PATH
 	Var MONGODB_DB_PATH
 	Var MONGODB_LOG_PATH
+	Var UNINSTALL_MONGODB_FLAG
 
 	Var OPEN_TWIN_SERVICES_ADDRESS
 
@@ -105,6 +106,7 @@
 	!define DEFAULT_MONGODB_STORAGE_PATH '"$INSTDIR\DataStorage\data"'
 	!define DEFAULT_MONGODB_LOG_PATH '"$INSTDIR\DataStorage\log"'
 	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
+	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 	!define LICENSE_FILE_PATH '"..\..\..\LICENSE.md"'
 
 	!define MONGODB_STANDARD_PORT "27017"
@@ -199,7 +201,7 @@ FunctionEnd
 
 Function NetworkModePage
 	StrCpy $PublicIpSet 0
-	!insertmacro MUI_HEADER_TEXT "OpenTwin Server Settings" "Select your desired network configuration for OpenTwin. Select between a local runtime via your localhost_radio_btn adress or a remote server setup via a public IP adress"		
+	!insertmacro MUI_HEADER_TEXT "OpenTwin Server Settings" "Select your desired network configuration for OpenTwin. Select between a local runtime via your localhost adress or a remote server setup via a public IP adress"		
 		nsDialogs::Create 1018
 		Pop $Dialog
 
@@ -736,6 +738,7 @@ FunctionEnd
 	FunctionEnd
 */
 
+
 ; MUI Settings
 	
 	!define MUI_ABORTWARNING
@@ -763,6 +766,7 @@ FunctionEnd
 	; Directory page
 	!insertmacro MUI_PAGE_DIRECTORY
 	Page custom DatabaseEntry
+
 	; Start menu page
 	var ICONS_GROUP
 	!define MUI_STARTMENUPAGE_NODISABLE
@@ -794,7 +798,23 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
 ShowUnInstDetails hide
 
-Section "OpenTwin Main Files (Required)" SEC01
+Section "-Extract Installer Tools (Required)" SEC01
+	SectionIn RO ;read only section
+	SetOutPath "$INSTDIR\Tools\ThirdParty"
+	DetailPrint "Extracting toolchain..."
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
+
+	DetailPrint "Extracting python scripts..."
+	SetOutPath "$INSTDIR\Tools\python"
+	File /r "..\python\dist\*.*"
+
+	DetailPrint "Extracting javascript files..."
+	SetOutPath "$INSTDIR\Tools\javascript"
+	File /r "..\javascript\*.*"
+
+SectionEnd
+
+Section "OpenTwin Main Files (Required)" SEC02
 	SectionIn RO ;read only section
 	SetOutPath "$INSTDIR"
 	SetOverwrite ifnewer
@@ -802,7 +822,6 @@ Section "OpenTwin Main Files (Required)" SEC01
 	DetailPrint "Extracting..."
 
 	File /r "..\..\..\Deployment\*.*"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\*.*"
 		#relative to script location
 		#    ".\" 	 = the script location itself
 		#    "..\" 	 = one directory up
@@ -810,14 +829,13 @@ Section "OpenTwin Main Files (Required)" SEC01
 
 	${If} $PublicIpSet <> 0 #public IP was set
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate_custom.cmd" "$NetworkModeSelection" "$PUBLIC_CERT_PATH"" '
-
+			ExecWait '"$0" /c "START /MIN cmd.exe /c ""$INSTDIR\Tools\ThirdParty\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
 	${Else}
 		Goto +2
 	${EndIf}
 
 	DetailPrint "Installing VC Redistributable..."
-	ExecWait '"$INSTDIR\Installer_Tools\ThirdParty\VC_redist.x64" /silent'					
+	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x64" /silent'					
 
 	; Shortcuts
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
@@ -828,7 +846,7 @@ Section "OpenTwin Main Files (Required)" SEC01
 SectionEnd
 
 
-Section "MongoDB installation and setup" SEC02
+Section "MongoDB Setup" SEC03
 	AddSize 738000
 	; /i = package to install
 	; /qn = quiet install
@@ -839,7 +857,7 @@ Section "MongoDB installation and setup" SEC02
 	
 	DetailPrint "Running MongoDB installation scripts..."
 
-	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Installer_Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
+	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
 	
 	##########################################
 	# call for python scripts via $INSTDIR
@@ -847,29 +865,29 @@ Section "MongoDB installation and setup" SEC02
 
 	DetailPrint "Running scripts..."
 	# mongoDB_storage_script_noAuth.py
-	ExecWait '"$INSTDIR\Installer_Tools\Python\dist\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
+	ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
 
 	#set directory permissions for the mongoDB service
-	ExecWait '"$INSTDIR\Installer_Tools\Python\dist\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
+	ExecWait '"$INSTDIR\Tools\python\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
 	# restarting mongoDB service
 	nsExec::ExecToLog 'net stop "MongoDB"'	
 	nsExec::ExecToLog 'net start "MongoDB"'
+
 	# 'net' command waits for the service to be stopped/started automatically
 	# no additional checks needed
 
 	# call for js script to paste admin user creation
-	#File "/oname=$INSTDIR\Tools\db_admin.js" "..\javascript\db_admin.js"
 	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$INSTDIR\Installer_Tools\javascript\db_admin.js" " "'
+		ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$INSTDIR\Tools\javascript\db_admin.js" " "'
 
 	# mongoDB_storage_script_wauth.py
 	${If} $PublicIpSet <> 0
-		ExecWait '"$INSTDIR\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+		ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 		ExpandEnvStrings $0 %COMSPEC%
 			ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 	${Else}
-		ExecWait '"$INSTDIR\Installer_Tools\Python\dist\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+		ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 		ExpandEnvStrings $0 %COMSPEC%
 			ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '
 	${EndIf}
@@ -896,8 +914,8 @@ SectionEnd
 
 #Section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Install all required OpenTwin files"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Install MongoDB and set up all configurations for OpenTwin"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Install all required OpenTwin files"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Install MongoDB and set up all configurations for OpenTwin"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
@@ -909,7 +927,13 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
+  	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +1 IDNO AbortUninstall
+  	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you also want to uninstall MongoDB and all of its components?" IDYES +1 IDNO +3
+	StrCpy $UNINSTALL_MONGODB_FLAG 1
+		Goto +5
+	StrCpy $UNINSTALL_MONGODB_FLAG 0
+		Goto +3
+AbortUninstall:
   Abort
 FunctionEnd
 
@@ -940,23 +964,29 @@ Section Uninstall
 		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 #===============================================================================================================================	
 	
-
+${If} $UNINSTALL_MONGODB_FLAG != 0
 	nsExec::ExecToLog 'net stop "MongoDB"'
 	ExecWait 'sc delete MongoDB'
 
 	ExecWait 'msiexec /x "$INSTDIR\Tools\mongodb-windows-x86_64-4.4.28-signed.msi" /qn'
+	Delete "$MONGODB_INSTALL_PATH\*.*"
 	RMDir /r "$MONGODB_INSTALL_PATH"
+	RMDir /r ${MONGODB_DELETION_PATH}
+${EndIf}
+
 
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
   Delete "$INSTDIR\*.*"
   RMDir /r "$INSTDIR"
+
+  Delete "$PUBLIC_CERT_PATH\*.*"
+  RMDir /r "$PUBLIC_CERT_PATH"
 
   Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
   Delete "$DESKTOP\OpenTwin.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\OpenTwin.lnk"
 
   RMDir "$SMPROGRAMS\$ICONS_GROUP"
-  RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
