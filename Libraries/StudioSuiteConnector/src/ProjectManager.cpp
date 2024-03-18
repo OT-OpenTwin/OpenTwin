@@ -195,6 +195,9 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 			// We have successfully restored the project data, so we can now open the project
 			studioObject.openProject(fileName);
 
+			// Update the version file
+			writeVersionFile(baseProjectName, projectName, version, cacheFolderName);
+
 			ProgressInfo::getInstance().setProgressState(false, "", false);
 			ProgressInfo::getInstance().unlockGui();
 		}
