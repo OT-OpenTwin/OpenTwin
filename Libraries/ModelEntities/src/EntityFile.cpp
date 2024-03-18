@@ -97,6 +97,7 @@ void EntityFile::setData(ot::UID dataID, ot::UID dataVersion)
 {
 	_dataUID = dataID;
 	_dataVersion = dataVersion;
+	setModified();
 }
 
 void EntityFile::AddStorageData(bsoncxx::builder::basic::document & storage)

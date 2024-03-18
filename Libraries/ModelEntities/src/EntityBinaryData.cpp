@@ -76,6 +76,7 @@ void EntityBinaryData::setData(const char *dat, size_t length)
 	{
 		data.push_back(dat[index]);
 	}
+	setModified();
 }
 
 void EntityBinaryData::clearData(void)

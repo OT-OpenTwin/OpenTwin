@@ -414,25 +414,25 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow, doc.GetAllocator()), doc.GetAllocator());
 				uiComponent()->sendMessage(true, doc);
 			}
-			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
-			{
-				const std::string entityName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
-				const std::string text = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
-				ot::EntityInformation entityInfo;
-				m_modelComponent->getEntityInformation(entityName, entityInfo);
-				EntityBase* entityBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), getClassFactory());
-				std::unique_ptr<EntityFileText> entityTextFile (dynamic_cast<EntityFileText*>(entityBase));
-				auto textFileData = entityTextFile->getData();
-				textFileData->setData(&text[0], text.size());
-				textFileData->StoreToDataBase();
-				entityTextFile->setData(textFileData->getEntityID(), textFileData->getEntityStorageVersion());
-				entityTextFile->StoreToDataBase();
-				m_modelComponent->addEntitiesToModel({ entityTextFile->getEntityID() }, { entityTextFile->getEntityStorageVersion() }, { false }, { textFileData->getEntityID() }, { textFileData->getEntityStorageVersion() }, { entityTextFile->getEntityID() }, "Updated text file.");
-			}
 			else
 			{
 				throw std::exception(OT_ACTION_RETURN_UnknownAction);
 			}
+		}
+		else if (_action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
+		{
+			const std::string entityName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
+			const std::string text = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
+			ot::EntityInformation entityInfo;
+			m_modelComponent->getEntityInformation(entityName, entityInfo);
+			EntityBase* entityBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), getClassFactory());
+			std::unique_ptr<EntityFileText> entityTextFile(dynamic_cast<EntityFileText*>(entityBase));
+			auto textFileData = entityTextFile->getData();
+			textFileData->setData(&text[0], text.size());
+			textFileData->StoreToDataBase();
+			entityTextFile->setData(textFileData->getEntityID(), textFileData->getEntityStorageVersion());
+			entityTextFile->StoreToDataBase();
+			m_modelComponent->addEntitiesToModel({ entityTextFile->getEntityID() }, { entityTextFile->getEntityStorageVersion() }, { false }, { textFileData->getEntityID() }, { textFileData->getEntityStorageVersion() }, { entityTextFile->getEntityID() }, "Updated text file.");
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 		{
