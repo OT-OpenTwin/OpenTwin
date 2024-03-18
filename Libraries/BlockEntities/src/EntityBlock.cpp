@@ -55,6 +55,13 @@ void EntityBlock::RemoveConnection(const ot::UID idForRemoval)
 	setModified();
 }
 
+std::string EntityBlock::CreateBlockHeadline()
+{
+	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
+	//const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
+	if (nameWithoutRootDirectory.empty()) return _blockTitle;
+	else return nameWithoutRootDirectory;
+}
 
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
@@ -113,14 +120,6 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	}
 
 	
-}
-
-std::string EntityBlock::CreateBlockHeadline()
-{
-	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
-	//const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
-	if (nameWithoutRootDirectory.empty()) return _blockTitle;
-	else return nameWithoutRootDirectory;
 }
 
 void EntityBlock::CreateNavigationTreeEntry()

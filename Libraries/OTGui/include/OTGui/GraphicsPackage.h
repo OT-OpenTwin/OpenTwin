@@ -17,15 +17,16 @@
 namespace ot {
 
 	class GraphicsItemCfg;
-	class GraphicsCollectionCfg;
+	class GraphicsPickerCollectionCfg;
 	
 	//! @brief Package that will be used to fill the graphics picker
 	//! The name of the editor must be unique. If an editor with the given name already exists, the creation will fail.
 	//! Note that the request to the UI must be send manually by providing this object (serialized) as the package
-	class OT_GUI_API_EXPORT GraphicsCollectionPackage : public ot::Serializable {
+	class OT_GUI_API_EXPORT GraphicsPickerCollectionPackage : public ot::Serializable {
+		OT_DECL_NOCOPY(GraphicsPickerCollectionPackage)
 	public:
-		GraphicsCollectionPackage();
-		virtual ~GraphicsCollectionPackage();
+		GraphicsPickerCollectionPackage();
+		virtual ~GraphicsPickerCollectionPackage();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -37,16 +38,13 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		void addCollection(GraphicsCollectionCfg* _collection);
-		const std::list<GraphicsCollectionCfg*>& collections(void) const { return m_collections; };
+		void addCollection(GraphicsPickerCollectionCfg* _collection);
+		const std::list<GraphicsPickerCollectionCfg*>& collections(void) const { return m_collections; };
 
 	private:
 		void memFree(void);
 
-		std::list<GraphicsCollectionCfg*> m_collections;
-
-		GraphicsCollectionPackage(const GraphicsCollectionPackage&) = delete;
-		GraphicsCollectionPackage& operator = (const GraphicsCollectionPackage&) = delete;
+		std::list<GraphicsPickerCollectionCfg*> m_collections;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -58,7 +56,7 @@ namespace ot {
 	//! @brief Package that will be used to create a new graphics editor
 	//! The name of the editor must be unique. If an editor with the given name already exists, the creation will fail.
 	//! Note that the request to the UI must be send manually by providing this object (serialized) as the package
-	class OT_GUI_API_EXPORT GraphicsNewEditorPackage : public ot::GraphicsCollectionPackage {
+	class OT_GUI_API_EXPORT GraphicsNewEditorPackage : public ot::GraphicsPickerCollectionPackage {
 	public:
 		//! @brief Constructor
 		//! @param _editorName The unique name for the editor.

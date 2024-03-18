@@ -2888,7 +2888,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				ot::BasicServiceInformation info;
 				info.setFromJsonObject(_doc.GetConstObject());
 
-				ot::GraphicsCollectionPackage pckg;
+				ot::GraphicsPickerCollectionPackage pckg;
 				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
 				AppBase::instance()->globalGraphicsPicker()->add(pckg);
@@ -2916,7 +2916,6 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				for (auto graphicsItemCfg : pckg.items()) {
 					ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg, true);
 					if (graphicsItem != nullptr) {
-						graphicsItem->setGraphicsItemContext(ot::GraphicsItem::ItemNetworkContext);
 						const double xCoordinate = graphicsItemCfg->position().x();
 						const double yCoordinate = graphicsItemCfg->position().y();
 						graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));

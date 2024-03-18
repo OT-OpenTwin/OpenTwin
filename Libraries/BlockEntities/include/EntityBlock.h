@@ -7,7 +7,7 @@
 
 #include "Connector.h"
 
-#include "OTGui/GraphicsCollectionCfg.h"
+#include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsItemCfg.h"
@@ -39,6 +39,9 @@ public:
 	void RemoveConnection(const ot::UID idForRemoval);
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
+
+	std::string CreateBlockHeadline();
+
 protected:
 	std::string _blockTitle = "";
 	ot::UID _coordinate2DEntityID = 0;
@@ -54,8 +57,6 @@ protected:
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
-
-	std::string CreateBlockHeadline();
 
 	void CreateNavigationTreeEntry();
 	void CreateBlockItem();

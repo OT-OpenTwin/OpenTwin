@@ -11,13 +11,13 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
+#include "OTWidgets/GraphicsItemPreviewDrag.h"
 
 // Qt header
 #include <QtGui/qevent.h>
 #include <QtCore/qmimedata.h>
 #include <QtWidgets/qscrollbar.h>
 #include <QtWidgets/qgraphicsproxywidget.h>
-//#include <QtWidgets/qgraphicsscene.h>
 
 ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false) {
 	m_scene = new GraphicsScene(this);
@@ -359,7 +359,7 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 
 void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
+	if (!_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
 		_event->acceptProposedAction();
 	}
 	else {
@@ -371,7 +371,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	if (!m_dropEnabled) {
 		return;
 	}
-	QString itemName = _event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_ItemName);
+	QString itemName = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName);
 	if (itemName.isEmpty()) {
 		OT_LOG_W("Drop event reqected: MimeData not matching");
 		return;
@@ -383,7 +383,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 
 void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEM_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
+	if (!_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
 		_event->acceptProposedAction();
 	}
 	else {

@@ -292,13 +292,13 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
 	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
-	ot::GraphicsCollectionCfg* a = new ot::GraphicsCollectionCfg("CircuitElements", "Circuit Elements");
-	ot::GraphicsCollectionCfg* a1 = new ot::GraphicsCollectionCfg("PassiveElements", "Passive Elements");
+	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
+	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
 	a->addChildCollection(a1);
 	EntityBlockCircuitElement element(0, nullptr, nullptr, nullptr,nullptr, "");
 	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
-	a1->addItem(element.CreateBlockCfg());
-	a1->addItem(resistor.CreateBlockCfg());
+	a1->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
+	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
 
 	pckg->addCollection(a);
 

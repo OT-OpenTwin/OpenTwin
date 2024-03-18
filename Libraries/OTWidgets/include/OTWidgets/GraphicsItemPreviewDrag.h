@@ -1,4 +1,4 @@
-//! @file GraphicsItemDrag.h
+//! @file GraphicsItemPreviewDrag.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -12,18 +12,18 @@
 // Qt header
 #include <QtCore/qobject.h>
 
+#define OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName "GraphicsItem.Name"
+
 class QWidget;
 
 namespace ot {
 
-	class GraphicsItem;
-
-	class OT_WIDGETS_API_EXPORT GraphicsItemDrag : public QObject {
+	class OT_WIDGETS_API_EXPORT GraphicsItemPreviewDrag : public QObject {
 		Q_OBJECT
-		OT_DECL_NOCOPY(GraphicsItemDrag)
+		OT_DECL_NOCOPY(GraphicsItemPreviewDrag)
 	public:
-		GraphicsItemDrag(GraphicsItem* _owner);
-		virtual ~GraphicsItemDrag();
+		GraphicsItemPreviewDrag(const std::string& _itemName);
+		virtual ~GraphicsItemPreviewDrag();
 
 		void queue(QWidget* _widget);
 
@@ -32,8 +32,8 @@ namespace ot {
 
 	private:
 		QWidget* m_widget;
-		GraphicsItem* m_owner;
 		int m_queueCount;
+		std::string m_itemName;
 	};
 
 }

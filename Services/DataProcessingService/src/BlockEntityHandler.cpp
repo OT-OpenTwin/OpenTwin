@@ -198,34 +198,34 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
 	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
-	ot::GraphicsCollectionCfg* controlBlockCollection = new ot::GraphicsCollectionCfg("Control Blocks", "Control Blocks");
-	ot::GraphicsCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsCollectionCfg("Database", "Database");
-	ot::GraphicsCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsCollectionCfg("Visualization", "Visualization");
+	ot::GraphicsPickerCollectionCfg* controlBlockCollection = new ot::GraphicsPickerCollectionCfg("Control Blocks", "Control Blocks");
+	ot::GraphicsPickerCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsPickerCollectionCfg("Database", "Database");
+	ot::GraphicsPickerCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsPickerCollectionCfg("Visualization", "Visualization");
 
 	//ot::GraphicsCollectionCfg* mathBlockCollection = new ot::GraphicsCollectionCfg("Mathematical Operations", "Mathematical Operations");
-	ot::GraphicsCollectionCfg* customizedBlockCollection = new ot::GraphicsCollectionCfg("Customized Blocks", "Customized Blocks");
+	ot::GraphicsPickerCollectionCfg* customizedBlockCollection = new ot::GraphicsPickerCollectionCfg("Customized Blocks", "Customized Blocks");
 	
 
 	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
 
 	EntityBlockPython pythonBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	customizedBlockCollection->addItem(pythonBlock.CreateBlockCfg());
+	customizedBlockCollection->addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), "Default/Python.png");
 
 	EntityBlockDatabaseAccess dbAccessBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dbAccessBlock.CreateBlockCfg());
+	controlBlockDatabaseCollection->addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), "Default/database.png");
 
 	EntityBlockPlot1D plotBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockVisualizationCollection->addItem(plotBlock.CreateBlockCfg());
+	controlBlockVisualizationCollection->addItem(plotBlock.getClassName(), plotBlock.CreateBlockHeadline(), "Images/Graph.jpg");
 
 	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockVisualizationCollection->addItem(displayBlock.CreateBlockCfg());
+	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), "Default/chardevice.png");
 
 	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dimensionReducer.CreateBlockCfg());
+	controlBlockDatabaseCollection->addItem(dimensionReducer.getClassName(), dimensionReducer.CreateBlockHeadline(), "Default/database.png");
 
 	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(storage.CreateBlockCfg());
+	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), "Default/database.png");
 
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);

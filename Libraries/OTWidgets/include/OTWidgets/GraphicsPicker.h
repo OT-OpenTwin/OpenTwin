@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -25,11 +26,10 @@ class QTreeWidgetItem;
 
 namespace ot {
 
-	class GraphicsCollectionPackage;
-	class GraphicsCollectionCfg;
 	class GraphicsItemCfg;
-	class GraphicsView;
 	class TreeWidgetFilter;
+	class GraphicsItemPreview;
+	class GraphicsPickerCollectionPackage;
 
 	class OT_WIDGETS_API_EXPORT GraphicsPicker : public QObject {
 		Q_OBJECT
@@ -42,9 +42,9 @@ namespace ot {
 		void setOrientation(Qt::Orientation _orientation);
 		Qt::Orientation orientation(void) const;
 
-		void add(const ot::GraphicsCollectionPackage& _pckg);
-		void add(ot::GraphicsCollectionCfg* _topLevelCollection);
-		void add(const std::list<ot::GraphicsCollectionCfg*>& _topLevelCollections);
+		void add(const ot::GraphicsPickerCollectionPackage& _pckg);
+		void add(ot::GraphicsPickerCollectionCfg* _topLevelCollection);
+		void add(const std::list<ot::GraphicsPickerCollectionCfg*>& _topLevelCollections);
 
 		void clear(void);
 
@@ -55,18 +55,18 @@ namespace ot {
 		void slotSelectionChanged(void);
 
 	private:
-		void addCollection(ot::GraphicsCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem);
-		void addCollections(const std::list<ot::GraphicsCollectionCfg*>& _categories, QTreeWidgetItem* _parentNavigationItem);
+		void addCollection(ot::GraphicsPickerCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem);
+		void addCollections(const std::list<ot::GraphicsPickerCollectionCfg*>& _categories, QTreeWidgetItem* _parentNavigationItem);
 
-		void addItem(ot::GraphicsItemCfg* _item, QTreeWidgetItem* _parentNavigationItem);
-		void addItems(const std::list<ot::GraphicsItemCfg*>& _items, QTreeWidgetItem* _parentNavigationItem);
+		void addItem(const GraphicsPickerCollectionCfg::ItemInformation& _info, QTreeWidgetItem* _parentNavigationItem);
+		void addItems(const std::list<GraphicsPickerCollectionCfg::ItemInformation>& _info, QTreeWidgetItem* _parentNavigationItem);
 
-		void storePreviewData(QTreeWidgetItem* _item, GraphicsItemCfg* _config);
+		void storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerCollectionCfg::ItemInformation& _info);
 
 		struct PreviewBox {
 			QWidget* layoutWidget;
 			QVBoxLayout* layout;
-			GraphicsView* view;
+			GraphicsItemPreview* view;
 			QLabel* label;
 		};
 
@@ -80,7 +80,7 @@ namespace ot {
 		QWidget* m_viewLayoutW;
 		QGridLayout* m_viewLayout;
 
-		std::map<QTreeWidgetItem*, std::list<GraphicsItemCfg*> *> m_previewData;
+		std::map<QTreeWidgetItem*, std::list<GraphicsPickerCollectionCfg::ItemInformation>*> m_previewData;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

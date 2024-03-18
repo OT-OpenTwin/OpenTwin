@@ -9,7 +9,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsCollectionCfg.h"
+#include "OTGui/GraphicsPickerCollectionCfg.h"
 
 #define OT_JSON_Member_Name "Name"
 #define OT_JSON_Member_Title "Title"
@@ -17,19 +17,19 @@
 #define OT_JSON_Member_Collections "Collections"
 #define OT_JSON_Member_Connections "Connections"
 
-ot::GraphicsCollectionPackage::GraphicsCollectionPackage() {
+ot::GraphicsPickerCollectionPackage::GraphicsPickerCollectionPackage() {
 
 }
 
-ot::GraphicsCollectionPackage::~GraphicsCollectionPackage() {
+ot::GraphicsPickerCollectionPackage::~GraphicsPickerCollectionPackage() {
 	this->memFree();
 }
 
-void ot::GraphicsCollectionPackage::addCollection(GraphicsCollectionCfg* _collection) {
+void ot::GraphicsPickerCollectionPackage::addCollection(GraphicsPickerCollectionCfg* _collection) {
 	m_collections.push_back(_collection);
 }
 
-void ot::GraphicsCollectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+void ot::GraphicsPickerCollectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	JsonArray collectionArr;
 	for (auto c : m_collections) {
 		JsonObject collectionObj;
@@ -39,12 +39,12 @@ void ot::GraphicsCollectionPackage::addToJsonObject(JsonValue& _object, JsonAllo
 	_object.AddMember(OT_JSON_Member_Collections, collectionArr, _allocator);
 }
 
-void ot::GraphicsCollectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
+void ot::GraphicsPickerCollectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
 	this->memFree();
 
 	std::list<ConstJsonObject> collectionArr = json::getObjectList(_object, OT_JSON_Member_Collections);
 	for (auto c : collectionArr) {
-		GraphicsCollectionCfg* newCollection = new GraphicsCollectionCfg;
+		GraphicsPickerCollectionCfg* newCollection = new GraphicsPickerCollectionCfg;
 		try {
 			newCollection->setFromJsonObject(c);
 			m_collections.push_back(newCollection);
@@ -57,7 +57,7 @@ void ot::GraphicsCollectionPackage::setFromJsonObject(const ConstJsonObject& _ob
 	}
 }
 
-void ot::GraphicsCollectionPackage::memFree(void) {
+void ot::GraphicsPickerCollectionPackage::memFree(void) {
 	for (auto c : m_collections) delete c;
 	m_collections.clear();
 }
@@ -76,14 +76,14 @@ ot::GraphicsNewEditorPackage::~GraphicsNewEditorPackage() {
 }
 
 void ot::GraphicsNewEditorPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	ot::GraphicsCollectionPackage::addToJsonObject(_object, _allocator);
+	ot::GraphicsPickerCollectionPackage::addToJsonObject(_object, _allocator);
 
 	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_Title, JsonString(m_title, _allocator), _allocator);
 }
 
 void ot::GraphicsNewEditorPackage::setFromJsonObject(const ConstJsonObject& _object) {
-	ot::GraphicsCollectionPackage::setFromJsonObject(_object);
+	ot::GraphicsPickerCollectionPackage::setFromJsonObject(_object);
 	m_name = json::getString(_object, OT_JSON_Member_Name);
 	m_title = json::getString(_object, OT_JSON_Member_Title);
 }

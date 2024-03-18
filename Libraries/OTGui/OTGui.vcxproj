@@ -27,7 +27,7 @@
     <ClInclude Include="include\OTGui\GradientPainter2D.h" />
     <ClInclude Include="include\OTGui\GradientPainterStop2D.h" />
     <ClInclude Include="include\OTGui\GraphicsBoxLayoutItemCfg.h" />
-    <ClInclude Include="include\OTGui\GraphicsCollectionCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsConnectionCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsEllipseItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsGridLayoutItemCfg.h" />
@@ -77,7 +77,7 @@
     <ClCompile Include="src\GradientPainter2D.cpp" />
     <ClCompile Include="src\GradientPainterStop2D.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItemCfg.cpp" />
-    <ClCompile Include="src\GraphicsCollectionCfg.cpp" />
+    <ClCompile Include="src\GraphicsPickerCollectionCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCfg.cpp" />
     <ClCompile Include="src\GraphicsEllipseItemCfg.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItemCfg.cpp" />

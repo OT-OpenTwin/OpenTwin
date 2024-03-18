@@ -24,13 +24,10 @@
 #include <list>
 #include <string>
 
-#define OT_GRAPHICSITEM_MIMETYPE_ItemName "GraphicsItem.Name"
-
 namespace ot {
 
 	class GraphicsScene;
 	class GraphicsItemCfg;
-	class GraphicsItemDrag;
 	class GraphicsHighlightItem;
 	class GraphicsConnectionItem;
 
@@ -41,12 +38,6 @@ namespace ot {
 		enum GraphicsItemEvent {
 			ItemMoved,
 			ItemResized
-		};
-
-		enum GraphicsItemContext {
-			NoContext, //! @brief Item is not placed anywhere
-			ItemPreviewContext, //! @brief Item is placed in a preview
-			ItemNetworkContext  //! @brief Item is placed in a network
 		};
 
 		enum GraphicsItemState {
@@ -119,9 +110,6 @@ namespace ot {
 		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlag _flags);
 		ot::GraphicsItemCfg::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
 
-		void setGraphicsItemContext(GraphicsItem::GraphicsItemContext _context) { m_context = _context; };
-		GraphicsItem::GraphicsItemContext graphicsItemContext(void) const { return m_context; };
-
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void);
 
@@ -186,13 +174,11 @@ namespace ot {
 		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
 		GraphicsItemCfg::GraphicsItemFlag m_flags;
-		GraphicsItemContext m_context;
 		ot::ConnectionDirection m_connectionDirection;
 		GraphicsHighlightItem* m_highlightItem;
 
 		QPointF m_moveStartPt; //! @brief Item move origin
 		GraphicsItem* m_parent; //! @brief Parent graphics item
-		GraphicsItemDrag* m_drag; //! @brief Drag instance
 		GraphicsScene* m_scene; //! @brief Graphics scene
 
 		QSizeF m_requestedSize;

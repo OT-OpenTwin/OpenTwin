@@ -15,7 +15,6 @@
 #include "OTWidgets/ToolTipHandler.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/Painter2DFactory.h"
-#include "OTWidgets/GraphicsItemDrag.h"
 #include "OTWidgets/GraphicsStackItem.h"
 #include "OTWidgets/GraphicsHighlightItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
@@ -86,7 +85,7 @@ QRectF ot::GraphicsItem::calculateInnerRect(const QRectF& _outerRect, const QSiz
 // Constructor / Destructor
 
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
-	: m_flags(GraphicsItemCfg::NoFlags), m_context(NoContext), m_drag(nullptr), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
+	: m_flags(GraphicsItemCfg::NoFlags), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_state(NoState), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
 	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny), m_uid(0), m_highlightItem(nullptr)
 {
@@ -94,7 +93,7 @@ ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 }
 
 ot::GraphicsItem::~GraphicsItem() {
-	if (m_drag) delete m_drag;
+
 }
 
 // ###############################################################################################################################################
@@ -163,15 +162,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else if (m_context == ItemPreviewContext) {
-		if (_event->button() == Qt::LeftButton) {
-			if (m_drag == nullptr) {
-				m_drag = new GraphicsItemDrag(this);
-			}
-			m_drag->queue(_event->widget());
-		}
-	}
-	else if (m_context == ItemNetworkContext) {
+	else {
 		if (m_flags & GraphicsItemCfg::ItemIsConnectable) {
 			OTAssertNullptr(m_scene);
 			m_scene->startConnection(this);
@@ -188,7 +179,7 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else if (m_context == ItemNetworkContext) {
+	else {
 		if (m_flags & GraphicsItemCfg::ItemIsMoveable) {
 			auto qitm = this->getQGraphicsItem();
 			OTAssertNullptr(qitm);
@@ -211,9 +202,6 @@ void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
-	// Check if the item is in a network
-	if (this->getRootItem()->graphicsItemContext() != ItemNetworkContext) return;
-
 	if (!m_toolTip.empty())
 	{
 		ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(m_toolTip), 1500);
