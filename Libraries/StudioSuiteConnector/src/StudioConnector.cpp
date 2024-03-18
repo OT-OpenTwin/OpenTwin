@@ -260,6 +260,8 @@ std::string StudioConnector::generateScript(const std::string &studioPath, std::
 		"\"	Open baseFolder + \\\"/units.info\\\" For Output As #1\\n\"\n"
 		"\"	ExportUnits()\\n\"\n"
 		"\"	Close #1\\n\"\n"
+		"\"\\n\"\n"
+		"\"	SetLock(False)\\n\"\n"
 		"\"End Sub\\n\"\n";
 		
 	script << ")\n";
