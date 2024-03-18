@@ -19,7 +19,7 @@ class __declspec(dllexport) ResultMetadataAccess
 {
 public:
 	ResultMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory);
-	ResultMetadataAccess(const std::string& crossProjectName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
+	ResultMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
 	ResultMetadataAccess(ResultMetadataAccess&& other);
 	ResultMetadataAccess& operator=(ResultMetadataAccess&& other) noexcept;
 
@@ -36,7 +36,10 @@ public:
 	const MetadataCampaign& getMetadataCampaign() const { return _metadataCampaign; }
 
 	const std::string& getCollectionName() const { return _collectionName; }
+
+	bool collectionHasMetadata() const { return _metadataExistInProject; }
 protected:
+	bool _metadataExistInProject = false;
 	std::string _collectionName;
 	ot::components::ModelComponent* _modelComponent;
 	MetadataCampaign _metadataCampaign;

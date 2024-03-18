@@ -178,6 +178,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
+	PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)

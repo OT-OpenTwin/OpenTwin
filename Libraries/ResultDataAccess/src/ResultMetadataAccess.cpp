@@ -20,11 +20,13 @@ ResultMetadataAccess::ResultMetadataAccess(const std::string& crossCollectionNam
 {
 	CrossCollectionAccess crossCollectionAccess(crossCollectionName, sessionServiceURL, modelComponent->serviceURL());
 	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent, classFactory);
-	std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent, classFactory);
-
-	MetadataEntityInterface campaignFactory;
-	_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
-	
+	if (campaignMetadataEntity != nullptr)
+	{
+		_metadataExistInProject = true;
+		std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent, classFactory);
+		MetadataEntityInterface campaignFactory;
+		_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
+	}
 }
 
 ResultMetadataAccess::ResultMetadataAccess(ResultMetadataAccess&& other)

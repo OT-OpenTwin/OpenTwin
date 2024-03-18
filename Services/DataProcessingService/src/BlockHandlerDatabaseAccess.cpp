@@ -25,6 +25,12 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	//First get a handle of the selected project.
 	std::shared_ptr<ResultMetadataAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
 
+	
+	if (!resultCollectionAccess->collectionHasMetadata())
+	{
+		const std::string errorMessage = "Database Access not possible. The selected collection has no meta data.";
+		throw std::exception(errorMessage.c_str());
+	}
 	const std::string dbURL = "Projects";
 	_dataStorageAccess = new DataStorageAPI::ResultDataStorageAPI(dbURL, resultCollectionAccess->getCollectionName());
 		

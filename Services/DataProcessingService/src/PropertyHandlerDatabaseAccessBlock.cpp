@@ -69,6 +69,11 @@ EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependenci
 {
 	std::shared_ptr<ResultMetadataAccess>resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(dbAccessEntity.get());
 	
+	if (!resultCollectionAccess->collectionHasMetadata())
+	{
+		_uiComponent->displayMessage("Selected collection has no meta data and cannot be used by a database access block.\n");
+	}
+
 	UpdateBuffer(dbAccessEntity, resultCollectionAccess->getMetadataCampaign());
 
 	const std::string propertyNameMSMD = dbAccessEntity->getPropertyNameMeasurementSeries();

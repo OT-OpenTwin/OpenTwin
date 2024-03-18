@@ -482,6 +482,14 @@ void EntityPropertiesSelection::resetOptions(std::list<std::string>& _options)
 	{
 		addOption(item);
 	}
+	if (options.size() == 0)
+	{
+		value = "";
+	}
+	else
+	{
+		value = options.front();
+	}
 }
 
 bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase *other)
