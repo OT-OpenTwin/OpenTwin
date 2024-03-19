@@ -129,6 +129,7 @@ public:
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
+	void downloadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);
 	
 	std::list<ot::UID>		selectedEntities;

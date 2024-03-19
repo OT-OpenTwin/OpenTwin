@@ -204,16 +204,13 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
 		}
 
-		//// Get the files to be uploaded
-		//uploadFileList = determineUploadFiles(baseProjectName);
 
-		//ProgressInfo::getInstance().setProgressValue(10);
+		ProgressInfo::getInstance().setProgressValue(10);
 
-		//ot::JsonDocument doc;
-		//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
-		//doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 
-		//ServiceConnector::getInstance().sendExecuteRequest(doc);
+		ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}
 	catch (std::string& error)
 	{
