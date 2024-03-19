@@ -968,7 +968,6 @@ ${If} $UNINSTALL_MONGODB_FLAG != 0
 	nsExec::ExecToLog 'net stop "MongoDB"'
 	ExecWait 'sc delete MongoDB'
 
-	ExecWait 'msiexec /x "$INSTDIR\Tools\mongodb-windows-x86_64-4.4.28-signed.msi" /qn'
 	Delete "$MONGODB_INSTALL_PATH\*.*"
 	RMDir /r "$MONGODB_INSTALL_PATH"
 	RMDir /r ${MONGODB_DELETION_PATH}
