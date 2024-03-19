@@ -6,3 +6,4 @@ python/*.spec
 python/build/
 python/dist/
 
+Build_Installers.bat
