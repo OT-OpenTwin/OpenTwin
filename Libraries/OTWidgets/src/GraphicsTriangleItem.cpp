@@ -114,7 +114,7 @@ void ot::GraphicsTriangleItem::paintTriangle(QPainter* _painter, const QStyleOpt
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottomRight().y()));
 		break;
 	default:
-		OT_LOG_EA("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(m_direction) + ")");
 		break;
 	}
 
@@ -157,7 +157,7 @@ void ot::GraphicsTriangleItem::paintKite(QPainter* _painter, const QStyleOptionG
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
 		break;
 	default:
-		OT_LOG_EA("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(m_direction) + ")");
 		break;
 	}
 
@@ -196,7 +196,7 @@ void ot::GraphicsTriangleItem::paintIceCone(QPainter* _painter, const QStyleOpti
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
 		break;
 	default:
-		OT_LOG_EA("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(m_direction) + ")");
 		break;
 	}
 
