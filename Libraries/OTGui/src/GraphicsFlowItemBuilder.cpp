@@ -89,10 +89,18 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem(void) {
 	{
 	case ot::GraphicsFlowItemConnector::Square: return this->createSquareItem();
 	case ot::GraphicsFlowItemConnector::Circle: return this->createCircleItem();
-	case ot::GraphicsFlowItemConnector::TriangleLeft: return this->createLeftTriangleItem();
-	case ot::GraphicsFlowItemConnector::TriangleRight: return this->createRightTriangleItem();
-	case ot::GraphicsFlowItemConnector::TriangleUp: return this->createUpTriangleItem();
-	case ot::GraphicsFlowItemConnector::TriangleDown: return this->createDownTriangleItem();
+	case ot::GraphicsFlowItemConnector::TriangleLeft: return this->createTriangleItem(GraphicsTriangleItemCfg::Left, GraphicsTriangleItemCfg::Triangle);
+	case ot::GraphicsFlowItemConnector::TriangleRight: return this->createTriangleItem(GraphicsTriangleItemCfg::Right, GraphicsTriangleItemCfg::Triangle);
+	case ot::GraphicsFlowItemConnector::TriangleUp: return this->createTriangleItem(GraphicsTriangleItemCfg::Up, GraphicsTriangleItemCfg::Triangle);
+	case ot::GraphicsFlowItemConnector::TriangleDown: return this->createTriangleItem(GraphicsTriangleItemCfg::Down, GraphicsTriangleItemCfg::Triangle);
+	case ot::GraphicsFlowItemConnector::KiteLeft: return this->createTriangleItem(GraphicsTriangleItemCfg::Left, GraphicsTriangleItemCfg::Kite);
+	case ot::GraphicsFlowItemConnector::KiteRight: return this->createTriangleItem(GraphicsTriangleItemCfg::Right, GraphicsTriangleItemCfg::Kite);
+	case ot::GraphicsFlowItemConnector::KiteUp: return this->createTriangleItem(GraphicsTriangleItemCfg::Up, GraphicsTriangleItemCfg::Kite);
+	case ot::GraphicsFlowItemConnector::KiteDown: return this->createTriangleItem(GraphicsTriangleItemCfg::Down, GraphicsTriangleItemCfg::Kite);
+	case ot::GraphicsFlowItemConnector::IceConeLeft: return this->createTriangleItem(GraphicsTriangleItemCfg::Left, GraphicsTriangleItemCfg::IceCone);
+	case ot::GraphicsFlowItemConnector::IceConeRight: return this->createTriangleItem(GraphicsTriangleItemCfg::Right, GraphicsTriangleItemCfg::IceCone);
+	case ot::GraphicsFlowItemConnector::IceConeUp: return this->createTriangleItem(GraphicsTriangleItemCfg::Up, GraphicsTriangleItemCfg::IceCone);
+	case ot::GraphicsFlowItemConnector::IceConeDown: return this->createTriangleItem(GraphicsTriangleItemCfg::Down, GraphicsTriangleItemCfg::IceCone);
 	default:
 		OT_LOG_EA("Unknown connector type");
 		throw std::exception("Unknown connector type");
@@ -118,38 +126,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createLeftTriangleItem(void) {
-	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Left);
-	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
-	itm->setMaximumSize(ot::Size2DD(10., 10.));
-	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::Border(m_secondaryColor, 1));
-
-	return itm;
-}
-
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createRightTriangleItem(void) {
-	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Right);
-	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
-	itm->setMaximumSize(ot::Size2DD(10., 10.));
-	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::Border(m_secondaryColor, 1));
-
-	return itm;
-}
-
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createUpTriangleItem(void) {
-	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Up);
-	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
-	itm->setMaximumSize(ot::Size2DD(10., 10.));
-	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::Border(m_secondaryColor, 1));
-
-	return itm;
-}
-
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createDownTriangleItem(void) {
-	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(ot::GraphicsTriangleItemCfg::Down);
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape) {
+	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(_direction, _shape);
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));

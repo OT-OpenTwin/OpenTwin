@@ -19,6 +19,7 @@ public:
         return instance;
     }
 
+    void openProject(std::string newProjectName);
     void setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject);
 
     void importProject(const std::string& fileName, const std::string& prjName);
@@ -26,7 +27,11 @@ public:
     void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment);
     void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
+    void downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version);
     void copyFiles(const std::string& newVersion);
+    std::string getLocalFileName() { return localProjectFileName; }
+    void setLocalFileName(std::string projectName, std::string fileName);
+    bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
 
 private:
     enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};
@@ -50,6 +55,9 @@ private:
     void                       sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
     void                       deleteLocalProjectFiles(const std::string& baseProjectName);
     bool                       restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version);
+    bool                       downloadFile(const std::string& cacheFolderVersion, ot::UID entityID, ot::UID version);
+    std::string                readLocalProjectNameFromRegistry(const std::string& projectName);
+    void                       saveLocalProjectNameToRegistry(const std::string& projectName, const std::string& fileName);
 
     std::list<std::string> uploadFileList;
     std::string projectName;
@@ -60,4 +68,5 @@ private:
     std::list<std::string> deletedFiles;
     std::string changeMessage;
     operationType currentOperation;
+    std::string localProjectFileName;
 };

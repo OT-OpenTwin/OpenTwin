@@ -40,9 +40,6 @@
     <ClCompile Include="src\OTQtConverter.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsItemDrag.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsGroupItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -188,6 +185,12 @@
       <Filter>src\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsHighlightItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemPreview.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemPreviewDrag.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -356,6 +359,9 @@
     <ClInclude Include="include\OTWidgets\GraphicsHighlightItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsItemPreview.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -368,9 +374,6 @@
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsPicker.h">
-      <Filter>include\Graphics</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\GraphicsItemDrag.h">
       <Filter>include\Graphics</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TabWidget.h">
@@ -417,6 +420,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ColorPickButton.h">
       <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\GraphicsItemPreviewDrag.h">
+      <Filter>include\Graphics</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

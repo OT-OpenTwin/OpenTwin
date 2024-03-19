@@ -9,6 +9,7 @@
 #include "EntityBinaryData.h"
 #include "EntityFile.h"
 #include "DataBase.h"
+#include "ClassFactory.h"
 
 #include <filesystem>
 #include <algorithm>
@@ -19,6 +20,29 @@
 
 #include <QFileDialog>					// QFileDialog
 #include <qdir.h>						// QDir
+#include <qsettings>
+
+void ProjectManager::openProject(std::string newProjectName)
+{
+	uploadFileList.clear();
+	projectName.clear();
+	baseProjectName.clear();
+	cacheFolderName.clear();
+	newOrModifiedFiles.clear();
+	dependentDataFiles.clear();
+	deletedFiles.clear();
+	changeMessage.clear();
+	currentOperation = OPERATION_NONE;
+
+	localProjectFileName = readLocalProjectNameFromRegistry(newProjectName);
+}
+
+void ProjectManager::setLocalFileName(std::string projectName, std::string fileName)
+{ 
+	localProjectFileName = fileName; 
+
+	saveLocalProjectNameToRegistry(projectName, fileName);
+}
 
 void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject)
 {
@@ -188,7 +212,12 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		if (!restoreFromCache(baseProjectName, cacheFolderName, version))
 		{
 			// The project was not found in the cache. Therefore, the files need to be retrieved from the repo
+			ProgressInfo::getInstance().setProgressValue(10);
 
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+
+			ServiceConnector::getInstance().sendExecuteRequest(doc);
 		}
 		else
 		{
@@ -203,17 +232,6 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 
 			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
 		}
-
-		//// Get the files to be uploaded
-		//uploadFileList = determineUploadFiles(baseProjectName);
-
-		//ProgressInfo::getInstance().setProgressValue(10);
-
-		//ot::JsonDocument doc;
-		//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
-		//doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
-
-		//ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}
 	catch (std::string& error)
 	{
@@ -639,7 +657,10 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 		// Check whether current version is in cache
 		if (std::filesystem::is_directory(cacheDirectory))
 		{
-			std::string cstCacheFileName = cacheDirectory + "/" + "xxx.cst";
+			std::filesystem::path basePath(baseProjectName);
+			std::string simpleFileName = basePath.filename().string() + ".cst";
+
+			std::string cstCacheFileName = cacheDirectory + "/" + simpleFileName;
 
 			// We have a corresponding cache entry -> restore the data
 			std::filesystem::create_directory(baseProjectName);
@@ -656,5 +677,182 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 	}
 
 	return false;
+}
+
+bool ProjectManager::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists)
+{
+	std::string baseProjectName;
+
+	try
+	{
+		baseProjectName = getBaseProjectName(fileName);
+	}
+	catch (std::string)
+	{
+		// We were unable to extract the project name from the file -> invalid file name
+		return false;
+	}
+
+	// Set the name of the cache folder
+	std::string cacheFolderName = baseProjectName + ".cache";
+
+	bool cstFileExists = std::filesystem::is_regular_file(fileName);
+	if (!cstFileExists && ensureProjectExists) return false; // We need an existing project, but this one did not exist
+
+	// Now we check whether the associated directory is ok
+	if (cstFileExists)
+	{
+		// The directory also needs to exist in this case
+		if (!std::filesystem::is_directory(baseProjectName))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		// The directory must not exist in this case (and the cache folder must not exist as well
+		if (std::filesystem::is_directory(baseProjectName))
+		{
+			return false;
+		}
+
+		if (std::filesystem::is_directory(cacheFolderName))
+		{
+			return false;
+		}
+
+		// We have a new project name
+		return true;
+	}
+
+	// In this case, we have an existing project
+	if (!std::filesystem::is_directory(cacheFolderName))
+	{
+		return false;
+	}
+
+	// Load the version data
+	VersionFile version(cacheFolderName + "\\version.info");
+	version.read();
+
+	// We need to ensure that the local cache diretory actually belongs to the open project.
+	return (version.getProjectName() == projectName);
+}
+
+void ProjectManager::downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version)
+{
+	// Determine the base project name (without .cst extension)
+	baseProjectName = getBaseProjectName(fileName);
+
+	// Set the name of the cache folder
+	cacheFolderName = baseProjectName + ".cache";
+
+	// Create the cache folder if it does not exist
+	if (!std::filesystem::exists(cacheFolderName))
+	{
+		std::filesystem::create_directory(cacheFolderName);
+	}
+
+	std::string cacheFolderVersion = cacheFolderName + "/" + version;
+
+	// Now download the files into the cache directory
+	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
+	auto versionID = entityVersionList.begin();
+	for (auto entityID : entityIDList)
+	{
+		prefetchIDs.push_back(std::pair<unsigned long long, unsigned long long>(entityID, *versionID));
+		versionID++;
+	}
+
+	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+
+	bool success = true;
+
+	for (auto entity : prefetchIDs)
+	{
+		// Download a single cache file
+		success &= downloadFile(cacheFolderVersion, entity.first, entity.second);
+	}
+
+	if (!success)
+	{
+		ProgressInfo::getInstance().showError("The CST Studio Suite project could not be restored to version " + version + ".");
+
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().unlockGui();
+
+		return;
+	}
+	
+	// Finally restore the project from the cache
+	if (!restoreFromCache(baseProjectName, cacheFolderName, version))
+	{
+		ProgressInfo::getInstance().showError("The CST Studio Suite project could not be restored to version " + version + ".");
+
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().unlockGui();
+
+		return;
+	}
+
+	// We have successfully restored the project data, so we can now open the project
+	StudioConnector studioObject;
+	studioObject.openProject(fileName);
+
+	// Update the version file
+	writeVersionFile(baseProjectName, projectName, version, cacheFolderName);
+
+	ProgressInfo::getInstance().setProgressState(false, "", false);
+	ProgressInfo::getInstance().unlockGui();
+
+	ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
+}
+
+bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID entityID, ot::UID version)
+{
+	bool success = true;
+
+	ClassFactory classFactory;
+	EntityFile* fileEntity = dynamic_cast<EntityFile*> (DataBase::GetDataBase()->GetEntityFromEntityIDandVersion(entityID, version, &classFactory));
+
+	if (fileEntity != nullptr)
+	{
+		size_t size = fileEntity->getData()->getData().size();
+
+		std::string entityPath = fileEntity->getPath();
+		size_t index = entityPath.find('/');
+
+		std::string fileName = cacheFolderVersion + "/" + entityPath.substr(index+1);
+
+		std::filesystem::path path(fileName);
+		std::string parentFolder = path.parent_path().string();
+
+		std::filesystem::create_directories(parentFolder);
+
+		std::ofstream dataFile(fileName, std::ios::binary);
+		dataFile.write(fileEntity->getData()->getData().data(), size);
+		dataFile.close();
+
+		delete fileEntity;
+		fileEntity = nullptr;
+	}
+	else
+	{
+		success = false;
+	}
+
+	return success;
+}
+
+std::string ProjectManager::readLocalProjectNameFromRegistry(const std::string& projectName)
+{
+	QSettings settings("OpenTwin", "StudioSuiteProjects");
+	return settings.value(projectName, "").toString().toStdString();
+}
+
+void ProjectManager::saveLocalProjectNameToRegistry(const std::string& projectName, const std::string& fileName)
+{
+	QSettings settings("OpenTwin", "StudioSuiteProjects");
+	settings.setValue(projectName, fileName.c_str());
 }
 

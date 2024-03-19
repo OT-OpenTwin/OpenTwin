@@ -17,6 +17,7 @@
 #include "ContextMenuManager.h"
 #include "UiPluginManager.h"
 #include "SelectEntitiesDialog.h"
+#include "CommitMessageDialog.h"
 
 // Qt header
 #include <QtCore/qdir.h>						// QDir
@@ -76,6 +77,7 @@
 // AK header
 #include <akAPI/uiAPI.h>
 #include <akGui/aColor.h>
+#include <akCore/akCore.h>
 
 #include "base64.h"
 #include "zlib.h"
@@ -3073,23 +3075,20 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
 
 				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+				StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), fileName.toStdString());
 
 				std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
 				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_COMMIT) {
 
-				// TODO: Get change comment from dialog
-				std::string changeComment = "Project updated";
+				std::string fileName = getStudioSuiteFileNameForCommit();
+				if (fileName.empty()) return "";
 
-				// TODO: Get file name from list
-				QString fileName = QFileDialog::getOpenFileName(
-					nullptr,
-					"Commit CST File",
-					QDir::currentPath(),
-					QString("*.cst ;; All files (*.*)"));
-
-				if (fileName == "") return "";
+				CommitMessageDialog commitMessageDialog;
+				commitMessageDialog.exec();
+				if (!commitMessageDialog.wasConfirmed()) return "";
+				std::string changeComment = commitMessageDialog.changeMessage().toStdString();
 
 				ot::Flags<ot::ui::lockType> lockFlags;
 				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
@@ -3102,22 +3101,20 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
 
 				// We need to make sure that the project is at the correct version in OT
-				std::string currentVersion = StudioSuiteConnectorAPI::getCurrentVersion(fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
+				std::string currentVersion = StudioSuiteConnectorAPI::getCurrentVersion(fileName, AppBase::instance()->getCurrentProjectName());
 				activateVersion(currentVersion);
 
-				std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName(), changeComment);
+				std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName, AppBase::instance()->getCurrentProjectName(), changeComment);
 				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_GET) {
 
-				// TODO: Get file name from list
-				QString fileName = QFileDialog::getOpenFileName(
-					nullptr,
-					"Commit CST File",
-					QDir::currentPath(),
-					QString("*.cst ;; All files (*.*)"));
+				ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
+																	    "Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
+				if (result != ak::dialogResult::resultYes) { return ""; }
 
-				if (fileName == "") return "";
+				std::string fileName = getStudioSuiteFileNameForGet();
+				if (fileName.empty()) return "";
 
 				ot::Flags<ot::ui::lockType> lockFlags;
 				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
@@ -3130,7 +3127,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
 
-				std::thread workerThread(StudioSuiteConnectorAPI::getProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName(), version);
+				std::thread workerThread(StudioSuiteConnectorAPI::getProject, fileName, AppBase::instance()->getCurrentProjectName(), version);
 				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD) {
@@ -3139,6 +3136,17 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
 
 				std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList);
+				workerThread.detach();
+				}
+			else if (action == OT_ACTION_CMD_UI_SS_DOWNLOAD) {
+
+				std::list<ot::UID> entityIDList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+				std::string version = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
+
+				std::string fileName = StudioSuiteConnectorAPI::getLocalFileName();
+
+				std::thread workerThread(StudioSuiteConnectorAPI::downloadFiles, fileName, AppBase::instance()->getCurrentProjectName(), entityIDList, entityVersionList, version);
 				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_COPY) {
@@ -3255,6 +3263,76 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 #endif // _DEBUG
 		return OT_ACTION_RETURN_UnknownError;
 	}
+}
+
+std::string ExternalServicesComponent::getStudioSuiteFileNameForCommit()
+{
+	std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
+
+	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, AppBase::instance()->getCurrentProjectName(), true))
+	{
+		localFileName.clear();
+	}
+
+	if (localFileName.empty())
+	{
+		QFileDialog fileBrowser;
+		QString fileName = fileBrowser.getOpenFileName(
+			nullptr,
+			"Commit CST File",
+			QDir::currentPath(),
+			QString("*.cst ;; All files (*.*)"));
+
+		localFileName = fileName.toStdString();
+	}
+
+	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, AppBase::instance()->getCurrentProjectName(), true))
+	{
+		localFileName.clear();
+	}
+
+	if (!localFileName.empty())
+	{
+		StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), localFileName);
+	}
+
+	return localFileName;
+}
+
+std::string ExternalServicesComponent::getStudioSuiteFileNameForGet()
+{
+	std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
+
+	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, AppBase::instance()->getCurrentProjectName(), false))
+	{
+		localFileName.clear();
+	}
+
+	if (localFileName.empty())
+	{
+		QFileDialog fileBrowser;
+		QString fileName = fileBrowser.getSaveFileName(
+			nullptr,
+			"Get CST File",
+			QDir::currentPath(),
+			QString("*.cst ;; All files (*.*)"),
+			nullptr,
+			QFileDialog::DontConfirmOverwrite);
+
+		localFileName = fileName.toStdString();
+	}
+
+	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, AppBase::instance()->getCurrentProjectName(), false))
+	{
+		localFileName.clear();
+	}
+
+	if (!localFileName.empty())
+	{
+		StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), localFileName);
+	}
+
+	return localFileName;
 }
 
 void ExternalServicesComponent::prefetchDataThread(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs)
@@ -3622,6 +3700,8 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		OT_LOG_D("Open project requested (Project name = \"" + projectName + ")");
 
 		m_lockManager->lock(app, ot::ui::tlAll);
+
+		StudioSuiteConnectorAPI::openProject(projectName);
 
 		m_currentSessionID = projectName;
 		m_currentSessionID.append(":").append(collectionName);

@@ -70,6 +70,11 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		uploadNeeded(_doc);
 		return "";
 	}
+	else if (_action == OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED)
+	{
+		downloadNeeded(_doc);
+		return "";
+	}
 	else if (_action == OT_ACTION_CMD_UI_SS_FILES_UPLOADED)
 	{
 		filesUploaded(_doc);
@@ -285,6 +290,37 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	
+	uiComponent()->sendMessage(true, doc);
+}
+
+void Application::downloadNeeded(ot::JsonDocument& _doc)
+{
+	// Determine all files in the Files folder
+	std::list<std::string> fileNames = modelComponent()->getListOfFolderItems("Files", true);
+
+	std::list<ot::EntityInformation> fileInfo;
+	modelComponent()->getEntityInformation(fileNames, fileInfo);
+
+	ot::UIDList entityID, versionID;
+
+	for (auto file : fileInfo)
+	{
+		if (file.getType() == "EntityFile")
+		{
+			entityID.push_back(file.getID());
+			versionID.push_back(file.getVersion());
+		}
+	}
+
+	// Get the current model version
+	std::string version = modelComponent()->getCurrentModelVersion();
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
+
 	uiComponent()->sendMessage(true, doc);
 }
 

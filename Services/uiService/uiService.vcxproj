@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(BASE64_ROOT)\base64.c" />
+    <ClCompile Include="src\CommitMessageDialog.cpp" />
     <ClCompile Include="src\ContextMenuManager.cpp" />
     <ClCompile Include="src\debugNotifier.cpp" />
     <ClCompile Include="src\DevLogger.cpp">
@@ -55,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
+    <QtMoc Include="include\CommitMessageDialog.h" />
     <ClInclude Include="include\ContextMenuManager.h" />
     <ClInclude Include="include\debugNotifier.h" />
     <QtMoc Include="include\WebsocketClient.h" />

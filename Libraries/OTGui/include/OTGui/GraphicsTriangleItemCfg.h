@@ -26,10 +26,19 @@ namespace ot {
 			Down
 		};
 
+		enum TriangleShape {
+			Triangle,
+			Kite,
+			IceCone
+		};
+
 		static std::string triangleDirectionToString(TriangleDirection _direction);
 		static TriangleDirection stringToTriangleDirection(const std::string& _str);
 
-		GraphicsTriangleItemCfg(TriangleDirection _direction = Right);
+		static std::string triangleShapeToString(TriangleShape _shape);
+		static TriangleShape stringToTriangleShape(const std::string& _shape);
+
+		GraphicsTriangleItemCfg(TriangleDirection _direction = Right, TriangleShape _shape = Triangle);
 		virtual ~GraphicsTriangleItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -54,6 +63,9 @@ namespace ot {
 		void setSize(const ot::Size2DD& _size) { m_size = _size; };
 		const ot::Size2DD& size(void) const { return m_size; };
 
+		void setTriangleShape(TriangleShape _shape) { m_shape = _shape; };
+		TriangleShape triangleShape(void) const { return m_shape; };
+
 		void setTriangleDirection(TriangleDirection _direction) { m_direction = _direction; };
 		TriangleDirection triangleDirection(void) const { return m_direction; };
 
@@ -62,6 +74,7 @@ namespace ot {
 		ot::Size2DD m_size;
 		ot::Painter2D* m_backgroundPainter;
 		TriangleDirection m_direction;
+		TriangleShape m_shape;
 	};
 
 }
