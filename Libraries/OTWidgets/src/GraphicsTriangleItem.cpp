@@ -20,7 +20,7 @@ static ot::SimpleFactoryRegistrar<ot::GraphicsTriangleItem> triaItem(OT_SimpleFa
 static ot::GlobalKeyMapRegistrar triaItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItem);
 
 ot::GraphicsTriangleItem::GraphicsTriangleItem()
-	: ot::CustomGraphicsItem(false), m_size(10, 10), m_direction(ot::GraphicsTriangleItemCfg::Right)
+	: ot::CustomGraphicsItem(false), m_size(10, 10), m_direction(GraphicsTriangleItemCfg::Right), m_shape(GraphicsTriangleItemCfg::Triangle)
 {
 
 }
@@ -45,6 +45,7 @@ bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
+	m_shape = cfg->triangleShape();
 	m_direction = cfg->triangleDirection();
 	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
 	m_pen.setWidth(cfg->outline().top()); // ToDo: Add seperate borders on all 4 sides
@@ -65,6 +66,24 @@ void ot::GraphicsTriangleItem::paintCustomItem(QPainter* _painter, const QStyleO
 	_painter->setBrush(m_brush);
 	_painter->setPen(m_pen);
 
+	switch (m_shape)
+	{
+	case ot::GraphicsTriangleItemCfg::Triangle: 
+		this->paintTriangle(_painter, _opt, _widget, _rect);
+		break;
+	case ot::GraphicsTriangleItemCfg::Kite:
+		this->paintKite(_painter, _opt, _widget, _rect);
+		break;
+	case ot::GraphicsTriangleItemCfg::IceCone:
+		this->paintIceCone(_painter, _opt, _widget, _rect);
+		break;
+	default:
+		OT_LOG_EAS("Unknown triangle shape (" + std::to_string((int)m_shape) + ")");
+		break;
+	}
+}
+
+void ot::GraphicsTriangleItem::paintTriangle(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	// Set path depending on the direction
 	QPainterPath path;
 
@@ -95,7 +114,89 @@ void ot::GraphicsTriangleItem::paintCustomItem(QPainter* _painter, const QStyleO
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottomRight().y()));
 		break;
 	default:
-		OT_LOG_EA("Unknown triangle direction");
+		OT_LOG_EA("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		break;
+	}
+
+	_painter->fillPath(path, m_brush);
+	_painter->drawPath(path);
+}
+
+void ot::GraphicsTriangleItem::paintKite(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+	// Set path depending on the direction
+	QPainterPath path;
+
+	switch (m_direction)
+	{
+	case ot::GraphicsTriangleItemCfg::Left:
+		path.moveTo(QPointF(_rect.left(), _rect.center().y()));
+		path.lineTo(QPointF(_rect.right() - _rect.width() / 3.f, _rect.top() + _rect.height() / 6.f));
+		path.lineTo(QPointF(_rect.right(), _rect.center().y()));
+		path.lineTo(QPointF(_rect.right() - _rect.width() / 3.f, _rect.bottom() - _rect.height() / 6.f));
+		path.lineTo(QPointF(_rect.left(), _rect.center().y()));
+		break;
+	case ot::GraphicsTriangleItemCfg::Up:
+		path.moveTo(QPointF(_rect.center().x(), _rect.top()));
+		path.lineTo(QPointF(_rect.right() - _rect.width() / 6.f, _rect.bottom() - _rect.height() / 3.f));
+		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
+		path.lineTo(QPointF(_rect.left() + _rect.width() / 6.f, _rect.bottom() - _rect.height() / 3.f));
+		path.lineTo(QPointF(_rect.center().x(), _rect.top()));
+		break;
+	case ot::GraphicsTriangleItemCfg::Right:
+		path.moveTo(QPointF(_rect.right(), _rect.center().y()));
+		path.lineTo(QPointF(_rect.left() + _rect.width() / 3.f, _rect.bottom() - _rect.height() / 6.f));
+		path.lineTo(QPointF(_rect.left(), _rect.center().y()));
+		path.lineTo(QPointF(_rect.left() + _rect.width() / 3.f, _rect.top() + _rect.height() / 6.f));
+		path.lineTo(QPointF(_rect.right(), _rect.center().y()));
+		break;
+	case ot::GraphicsTriangleItemCfg::Down:
+		path.moveTo(QPointF(_rect.center().x(), _rect.bottom()));
+		path.lineTo(QPointF(_rect.left() + _rect.width() / 6.f, _rect.top() + _rect.height() / 3.f));
+		path.lineTo(QPointF(_rect.center().x(), _rect.top()));
+		path.lineTo(QPointF(_rect.right() - _rect.width() / 6.f, _rect.top() + _rect.height() / 3.f));
+		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
+		break;
+	default:
+		OT_LOG_EA("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		break;
+	}
+
+	_painter->fillPath(path, m_brush);
+	_painter->drawPath(path);
+}
+
+void ot::GraphicsTriangleItem::paintIceCone(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+	// Set path depending on the direction
+	QPainterPath path;
+
+	switch (m_direction)
+	{
+	case ot::GraphicsTriangleItemCfg::Left:
+		path.moveTo(QPointF(_rect.left(), _rect.center().y()));
+		path.lineTo(QPointF(_rect.right() - _rect.width() / 3.f, _rect.top() + _rect.height() / 6.f));
+		path.cubicTo(QPointF(_rect.right(), _rect.center().y() - _rect.height() / 6.f), QPointF(_rect.right(), _rect.center().y() + _rect.height() / 6.f), QPointF(_rect.right() - _rect.width() / 3.f, _rect.bottom() - _rect.height() / 6.f));
+		path.lineTo(QPointF(_rect.left(), _rect.center().y()));
+		break;
+	case ot::GraphicsTriangleItemCfg::Up:
+		path.moveTo(QPointF(_rect.center().x(), _rect.top()));
+		path.lineTo(QPointF(_rect.right() - _rect.width() / 6.f, _rect.bottom() - _rect.height() / 3.f));
+		path.cubicTo(QPointF(_rect.center().x() + _rect.width() / 6.f, _rect.bottom()), QPointF(_rect.center().x() - _rect.width() / 6.f, _rect.bottom()), QPointF(_rect.left() + _rect.width() / 6.f, _rect.bottom() - _rect.height() / 3.f));
+		path.lineTo(QPointF(_rect.center().x(), _rect.top()));
+		break;
+	case ot::GraphicsTriangleItemCfg::Right:
+		path.moveTo(QPointF(_rect.right(), _rect.center().y()));
+		path.lineTo(QPointF(_rect.left() + _rect.width() / 3.f, _rect.bottom() - _rect.height() / 6.f));
+		path.cubicTo(QPointF(_rect.left(), _rect.center().y() + _rect.height() / 6.f), QPointF(_rect.left(), _rect.center().y() - _rect.height() / 6.f), QPointF(_rect.left() + _rect.width() / 3.f, _rect.top() + _rect.height() / 6.f));
+		path.lineTo(QPointF(_rect.right(), _rect.center().y()));
+		break;
+	case ot::GraphicsTriangleItemCfg::Down:
+		path.moveTo(QPointF(_rect.center().x(), _rect.bottom()));
+		path.lineTo(QPointF(_rect.left() + _rect.width() / 6.f, _rect.top() + _rect.height() / 3.f));
+		path.cubicTo(QPointF(_rect.center().x() - _rect.width() / 6.f, _rect.top()), QPointF(_rect.center().x() + _rect.width() / 6.f, _rect.top()), QPointF(_rect.right() - _rect.width() / 6.f, _rect.top() + _rect.height() / 3.f));
+		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
+		break;
+	default:
+		OT_LOG_EA("Unknown triangle direction (" + std::to_string(m_direction) + ")");
 		break;
 	}
 

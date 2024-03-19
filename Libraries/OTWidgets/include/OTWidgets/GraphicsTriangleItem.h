@@ -44,6 +44,11 @@ namespace ot {
 		//! @brief Paint the item inside the provided rect
 		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
 
+	private:
+		void paintTriangle(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect);
+		void paintKite(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect);
+		void paintIceCone(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
@@ -59,6 +64,9 @@ namespace ot {
 		void setRectanglePen(const QPen& _pen) { m_pen = _pen; };
 		const QPen& rectanglePen(void) const { return m_pen; };
 
+		void setTriangleShape(ot::GraphicsTriangleItemCfg::TriangleShape _shape) { m_shape = _shape; };
+		ot::GraphicsTriangleItemCfg::TriangleShape triangleShape(void) const { return m_shape; };
+
 		void setTriangleDirection(ot::GraphicsTriangleItemCfg::TriangleDirection _direction) { m_direction = _direction; };
 		ot::GraphicsTriangleItemCfg::TriangleDirection trianlgeDirection(void) const { return m_direction; };
 
@@ -66,6 +74,7 @@ namespace ot {
 		QSizeF m_size;
 		QBrush m_brush;
 		QPen m_pen;
+		ot::GraphicsTriangleItemCfg::TriangleShape m_shape;
 		ot::GraphicsTriangleItemCfg::TriangleDirection m_direction;
 	};
 

@@ -10,6 +10,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsTriangleItemCfg.h"
 #include "OTGui/Margins.h"
 
 namespace ot {
@@ -26,6 +27,14 @@ namespace ot {
 			TriangleLeft,
 			TriangleUp,
 			TriangleDown,
+			KiteRight,
+			KiteLeft,
+			KiteUp,
+			KiteDown,
+			IceConeRight,
+			IceConeLeft,
+			IceConeUp,
+			IceConeDown,
 			Circle
 		};
 
@@ -64,10 +73,7 @@ namespace ot {
 		ot::GraphicsItemCfg* createConnectorItem(void);
 		ot::GraphicsItemCfg* createSquareItem(void);
 		ot::GraphicsItemCfg* createCircleItem(void);
-		ot::GraphicsItemCfg* createLeftTriangleItem(void);
-		ot::GraphicsItemCfg* createRightTriangleItem(void);
-		ot::GraphicsItemCfg* createUpTriangleItem(void);
-		ot::GraphicsItemCfg* createDownTriangleItem(void);
+		ot::GraphicsItemCfg* createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape);
 
 		std::string m_name;
 		std::string m_text;

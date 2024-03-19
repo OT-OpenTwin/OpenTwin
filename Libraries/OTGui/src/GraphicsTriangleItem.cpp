@@ -11,6 +11,7 @@
 #include "OTGui/FillPainter2D.h"
 
 #define OT_JSON_MEMBER_Size "Size"
+#define OT_JSON_MEMBER_Shape "Shape"
 #define OT_JSON_MEMBER_Outline "Outline"
 #define OT_JSON_MEMBER_Direction "Direction"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
@@ -41,8 +42,30 @@ ot::GraphicsTriangleItemCfg::TriangleDirection ot::GraphicsTriangleItemCfg::stri
 	}
 }
 
-ot::GraphicsTriangleItemCfg::GraphicsTriangleItemCfg(TriangleDirection _direction)
-	: m_direction(_direction)
+std::string ot::GraphicsTriangleItemCfg::triangleShapeToString(TriangleShape _shape) {
+	switch (_shape)
+	{
+	case ot::GraphicsTriangleItemCfg::Triangle: return "Triangle";
+	case ot::GraphicsTriangleItemCfg::Kite: return "Kite";
+	case ot::GraphicsTriangleItemCfg::IceCone: return "IceCone";
+	default:
+		OT_LOG_WA("Unknown triangle shape");
+		return "Triangle";
+	}
+}
+
+ot::GraphicsTriangleItemCfg::TriangleShape ot::GraphicsTriangleItemCfg::stringToTriangleShape(const std::string& _shape) {
+	if (_shape == triangleShapeToString(GraphicsTriangleItemCfg::Triangle)) return GraphicsTriangleItemCfg::Triangle;
+	else if (_shape == triangleShapeToString(GraphicsTriangleItemCfg::Kite)) return GraphicsTriangleItemCfg::Kite;
+	else if (_shape == triangleShapeToString(GraphicsTriangleItemCfg::IceCone)) return GraphicsTriangleItemCfg::IceCone;
+	else {
+		OT_LOG_WA("Unknown triangle shape");
+		return GraphicsTriangleItemCfg::Triangle;
+	}
+}
+
+ot::GraphicsTriangleItemCfg::GraphicsTriangleItemCfg(TriangleDirection _direction, TriangleShape _shape)
+	: m_direction(_direction), m_shape(_shape)
 {
 	m_backgroundPainter = new ot::FillPainter2D(ot::Color(0, 0, 0, 0));
 }
@@ -68,12 +91,14 @@ void ot::GraphicsTriangleItemCfg::addToJsonObject(JsonValue& _object, JsonAlloca
 	m_outline.addToJsonObject(outlineObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Outline, outlineObj, _allocator);
 
+	_object.AddMember(OT_JSON_MEMBER_Shape, JsonString(this->triangleShapeToString(m_shape), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Direction, JsonString(this->triangleDirectionToString(m_direction), _allocator), _allocator);
 }
 
 void ot::GraphicsTriangleItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 
+	m_shape = this->stringToTriangleShape(json::getString(_object, OT_JSON_MEMBER_Shape));
 	m_direction = this->stringToTriangleDirection(json::getString(_object, OT_JSON_MEMBER_Direction));
 
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
