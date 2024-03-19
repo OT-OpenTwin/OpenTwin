@@ -1,2 +1,7 @@
 # Deployment Directory
 Deployment
+
+# Installer python files build artefacts
+Scripts/Installer/python/*.spec
+Scripts/Installer/python/build/
+Scripts/Installer/python/dist/
