@@ -1,7 +1,11 @@
 # Deployment Directory
 Deployment
 
+# compiled installer executables
+Scripts/Installer/nsis/*.exe
+
 # Installer python files build artefacts
 Scripts/Installer/python/*.spec
 Scripts/Installer/python/build/
 Scripts/Installer/python/dist/
+
