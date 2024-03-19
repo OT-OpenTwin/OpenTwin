@@ -17,6 +17,7 @@
 #include "ContextMenuManager.h"
 #include "UiPluginManager.h"
 #include "SelectEntitiesDialog.h"
+#include "CommitMessageDialog.h"
 
 // Qt header
 #include <QtCore/qdir.h>						// QDir
@@ -76,6 +77,7 @@
 // AK header
 #include <akAPI/uiAPI.h>
 #include <akGui/aColor.h>
+#include <akCore/akCore.h>
 
 #include "base64.h"
 #include "zlib.h"
@@ -3079,9 +3081,6 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_COMMIT) {
 
-				// TODO: Get change comment from dialog
-				std::string changeComment = "Project updated";
-
 				// TODO: Get file name from list
 				QString fileName = QFileDialog::getOpenFileName(
 					nullptr,
@@ -3090,6 +3089,11 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 					QString("*.cst ;; All files (*.*)"));
 
 				if (fileName == "") return "";
+
+				CommitMessageDialog commitMessageDialog;
+				commitMessageDialog.exec();
+				if (!commitMessageDialog.wasConfirmed()) return "";
+				std::string changeComment = commitMessageDialog.changeMessage().toStdString();
 
 				ot::Flags<ot::ui::lockType> lockFlags;
 				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
@@ -3109,6 +3113,10 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_GET) {
+
+				ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
+																	    "Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
+				if (result != ak::dialogResult::resultYes) { return ""; }
 
 				// TODO: Get file name from list
 				QString fileName = QFileDialog::getOpenFileName(
