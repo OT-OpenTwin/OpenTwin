@@ -1,8 +1,8 @@
 # compiled installer executables
-Scripts/Installer/nsis/*.exe
+nsis/*.exe
 
 # Installer python files build artefacts
-Scripts/Installer/python/*.spec
-Scripts/Installer/python/build/
-Scripts/Installer/python/dist/
+python/*.spec
+python/build/
+python/dist/
 
