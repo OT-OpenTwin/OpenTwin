@@ -3,6 +3,11 @@
 
 #include <QFileDialog>					// QFileDialog
 
+void StudioSuiteConnectorAPI::openProject(std::string newProjectName)
+{
+	ProjectManager::getInstance().openProject(newProjectName);
+}
+
 void StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL, QObject* mainObject)
 {
 	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL, mainObject);
@@ -48,9 +53,9 @@ std::string StudioSuiteConnectorAPI::getLocalFileName()
 	return ProjectManager::getInstance().getLocalFileName();
 }
 
-void StudioSuiteConnectorAPI::setLocalFileName(std::string fileName)
+void StudioSuiteConnectorAPI::setLocalFileName(std::string projectName, std::string fileName)
 {
-	ProjectManager::getInstance().setLocalFileName(fileName);
+	ProjectManager::getInstance().setLocalFileName(projectName, fileName);
 }
 
 bool StudioSuiteConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists)

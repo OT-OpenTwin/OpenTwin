@@ -3075,7 +3075,7 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
 
 				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
-				StudioSuiteConnectorAPI::setLocalFileName(fileName.toStdString());
+				StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), fileName.toStdString());
 
 				std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
 				workerThread.detach();
@@ -3293,7 +3293,7 @@ std::string ExternalServicesComponent::getStudioSuiteFileNameForCommit()
 
 	if (!localFileName.empty())
 	{
-		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
+		StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), localFileName);
 	}
 
 	return localFileName;
@@ -3329,7 +3329,7 @@ std::string ExternalServicesComponent::getStudioSuiteFileNameForGet()
 
 	if (!localFileName.empty())
 	{
-		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
+		StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), localFileName);
 	}
 
 	return localFileName;
@@ -3700,6 +3700,8 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		OT_LOG_D("Open project requested (Project name = \"" + projectName + ")");
 
 		m_lockManager->lock(app, ot::ui::tlAll);
+
+		StudioSuiteConnectorAPI::openProject(projectName);
 
 		m_currentSessionID = projectName;
 		m_currentSessionID.append(":").append(collectionName);

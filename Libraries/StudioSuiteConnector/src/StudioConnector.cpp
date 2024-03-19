@@ -227,6 +227,7 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 		"\"		    .Name (solidName)\\n\"\n"
 		"\"	   		.Component (componentName)\\n\"\n"
 		"\"    		.ExportFromActiveCoordinateSystem (False)\\n\"\n"
+		"\"    		.ExportFileUnits(Units.GetUnit(\\\"Length\\\"))\\n\"\n"
 		"\"    		.Write\\n\"\n"
 		"\"		End With\\n\"\n"
 		"\"\\n\"\n"

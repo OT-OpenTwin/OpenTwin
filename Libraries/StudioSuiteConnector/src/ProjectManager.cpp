@@ -20,6 +20,29 @@
 
 #include <QFileDialog>					// QFileDialog
 #include <qdir.h>						// QDir
+#include <qsettings>
+
+void ProjectManager::openProject(std::string newProjectName)
+{
+	uploadFileList.clear();
+	projectName.clear();
+	baseProjectName.clear();
+	cacheFolderName.clear();
+	newOrModifiedFiles.clear();
+	dependentDataFiles.clear();
+	deletedFiles.clear();
+	changeMessage.clear();
+	currentOperation = OPERATION_NONE;
+
+	localProjectFileName = readLocalProjectNameFromRegistry(newProjectName);
+}
+
+void ProjectManager::setLocalFileName(std::string projectName, std::string fileName)
+{ 
+	localProjectFileName = fileName; 
+
+	saveLocalProjectNameToRegistry(projectName, fileName);
+}
 
 void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject)
 {
@@ -819,5 +842,17 @@ bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID
 	}
 
 	return success;
+}
+
+std::string ProjectManager::readLocalProjectNameFromRegistry(const std::string& projectName)
+{
+	QSettings settings("OpenTwin", "StudioSuiteProjects");
+	return settings.value(projectName, "").toString().toStdString();
+}
+
+void ProjectManager::saveLocalProjectNameToRegistry(const std::string& projectName, const std::string& fileName)
+{
+	QSettings settings("OpenTwin", "StudioSuiteProjects");
+	settings.setValue(projectName, fileName.c_str());
 }
 
