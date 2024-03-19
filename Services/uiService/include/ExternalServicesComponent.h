@@ -332,6 +332,8 @@ private:
 	ot::ServiceBase * getService(const ot::BasicServiceInformation& _serviceInfo);
 
 	void determineViews(const std::string& modelServiceURL);
+	std::string getStudioSuiteFileNameForCommit();
+	std::string getStudioSuiteFileNameForGet();
 
 	// #################################################################
 

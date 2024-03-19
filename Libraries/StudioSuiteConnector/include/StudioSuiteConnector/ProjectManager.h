@@ -27,6 +27,9 @@ public:
     void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
     void copyFiles(const std::string& newVersion);
+    std::string getLocalFileName() { return localProjectFileName; }
+    void setLocalFileName(std::string fileName) { localProjectFileName = fileName; }
+    bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
 
 private:
     enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};
@@ -60,4 +63,5 @@ private:
     std::list<std::string> deletedFiles;
     std::string changeMessage;
     operationType currentOperation;
+    std::string localProjectFileName;
 };

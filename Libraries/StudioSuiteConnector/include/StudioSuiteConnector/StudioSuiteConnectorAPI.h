@@ -15,6 +15,9 @@ namespace StudioSuiteConnectorAPI
 	__declspec(dllexport) std::string getCurrentVersion(std::string fileName, std::string projectName);
 	__declspec(dllexport) void uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList);
 	__declspec(dllexport) void copyFiles(std::string newVersion);
+	__declspec(dllexport) std::string getLocalFileName();
+	__declspec(dllexport) void setLocalFileName(std::string fileName);
+	__declspec(dllexport) bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
 
 
 

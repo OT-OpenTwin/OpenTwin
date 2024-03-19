@@ -658,3 +658,62 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 	return false;
 }
 
+bool ProjectManager::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists)
+{
+	std::string baseProjectName;
+
+	try
+	{
+		baseProjectName = getBaseProjectName(fileName);
+	}
+	catch (std::string)
+	{
+		// We were unable to extract the project name from the file -> invalid file name
+		return false;
+	}
+
+	// Set the name of the cache folder
+	std::string cacheFolderName = baseProjectName + ".cache";
+
+	bool cstFileExists = std::filesystem::is_regular_file(fileName);
+	if (!cstFileExists && ensureProjectExists) return false; // We need an existing project, but this one did not exist
+
+	// Now we check whether the associated directory is ok
+	if (cstFileExists)
+	{
+		// The directory also needs to exist in this case
+		if (!std::filesystem::is_directory(baseProjectName))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		// The directory must not exist in this case (and the cache folder must not exist as well
+		if (std::filesystem::is_directory(baseProjectName))
+		{
+			return false;
+		}
+
+		if (std::filesystem::is_directory(cacheFolderName))
+		{
+			return false;
+		}
+
+		// We have a new project name
+		return true;
+	}
+
+	// In this case, we have an existing project
+	if (!std::filesystem::is_directory(cacheFolderName))
+	{
+		return false;
+	}
+
+	// Load the version data
+	VersionFile version(cacheFolderName + "\\version.info");
+	version.read();
+
+	// We need to ensure that the local cache diretory actually belongs to the open project.
+	return (version.getProjectName() == projectName);
+}

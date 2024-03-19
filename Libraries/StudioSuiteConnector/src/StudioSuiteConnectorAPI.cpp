@@ -37,3 +37,18 @@ void StudioSuiteConnectorAPI::copyFiles(std::string newVersion)
 {
 	ProjectManager::getInstance().copyFiles(newVersion);
 }
+
+std::string StudioSuiteConnectorAPI::getLocalFileName()
+{
+	return ProjectManager::getInstance().getLocalFileName();
+}
+
+void StudioSuiteConnectorAPI::setLocalFileName(std::string fileName)
+{
+	ProjectManager::getInstance().setLocalFileName(fileName);
+}
+
+bool StudioSuiteConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists)
+{
+	return ProjectManager::getInstance().checkValidLocalFile(fileName, projectName, ensureProjectExists);
+}
