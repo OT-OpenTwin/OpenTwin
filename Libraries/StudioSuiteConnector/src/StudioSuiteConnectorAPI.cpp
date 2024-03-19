@@ -23,7 +23,7 @@ void StudioSuiteConnectorAPI::commitProject(std::string fileName, std::string pr
 	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment);
 }
 
-void StudioSuiteConnectorAPI::getProject(std::string fileName, std::string projectName, const std::string& version)
+void StudioSuiteConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)
 {
 	ProjectManager::getInstance().getProject(fileName, projectName, version);
 }
@@ -31,6 +31,11 @@ void StudioSuiteConnectorAPI::getProject(std::string fileName, std::string proje
 void StudioSuiteConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
 {
 	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList);
+}
+
+void StudioSuiteConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)
+{
+	ProjectManager::getInstance().downloadFiles(fileName, projectName, entityIDList, entityVersionList, version);
 }
 
 void StudioSuiteConnectorAPI::copyFiles(std::string newVersion)

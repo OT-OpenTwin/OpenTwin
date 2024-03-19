@@ -26,6 +26,7 @@ public:
     void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment);
     void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
+    void downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version);
     void copyFiles(const std::string& newVersion);
     std::string getLocalFileName() { return localProjectFileName; }
     void setLocalFileName(std::string fileName) { localProjectFileName = fileName; }
@@ -53,6 +54,7 @@ private:
     void                       sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
     void                       deleteLocalProjectFiles(const std::string& baseProjectName);
     bool                       restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version);
+    bool                       downloadFile(const std::string& cacheFolderVersion, ot::UID entityID, ot::UID version);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

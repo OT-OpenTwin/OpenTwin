@@ -9,6 +9,7 @@
 #include "EntityBinaryData.h"
 #include "EntityFile.h"
 #include "DataBase.h"
+#include "ClassFactory.h"
 
 #include <filesystem>
 #include <algorithm>
@@ -188,7 +189,12 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		if (!restoreFromCache(baseProjectName, cacheFolderName, version))
 		{
 			// The project was not found in the cache. Therefore, the files need to be retrieved from the repo
+			ProgressInfo::getInstance().setProgressValue(10);
 
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+
+			ServiceConnector::getInstance().sendExecuteRequest(doc);
 		}
 		else
 		{
@@ -203,14 +209,6 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 
 			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
 		}
-
-
-		ProgressInfo::getInstance().setProgressValue(10);
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
-
-		ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}
 	catch (std::string& error)
 	{
@@ -714,3 +712,109 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 	// We need to ensure that the local cache diretory actually belongs to the open project.
 	return (version.getProjectName() == projectName);
 }
+
+void ProjectManager::downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version)
+{
+	// Determine the base project name (without .cst extension)
+	baseProjectName = getBaseProjectName(fileName);
+
+	// Set the name of the cache folder
+	cacheFolderName = baseProjectName + ".cache";
+
+	// Create the cache folder if it does not exist
+	if (!std::filesystem::exists(cacheFolderName))
+	{
+		std::filesystem::create_directory(cacheFolderName);
+	}
+
+	std::string cacheFolderVersion = cacheFolderName + "/" + version;
+
+	// Now download the files into the cache directory
+	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
+	auto versionID = entityVersionList.begin();
+	for (auto entityID : entityIDList)
+	{
+		prefetchIDs.push_back(std::pair<unsigned long long, unsigned long long>(entityID, *versionID));
+		versionID++;
+	}
+
+	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+
+	bool success = true;
+
+	for (auto entity : prefetchIDs)
+	{
+		// Download a single cache file
+		success &= downloadFile(cacheFolderVersion, entity.first, entity.second);
+	}
+
+	if (!success)
+	{
+		ProgressInfo::getInstance().showError("The CST Studio Suite project could not be restored to version " + version + ".");
+
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().unlockGui();
+
+		return;
+	}
+	
+	// Finally restore the project from the cache
+	if (!restoreFromCache(baseProjectName, cacheFolderName, version))
+	{
+		ProgressInfo::getInstance().showError("The CST Studio Suite project could not be restored to version " + version + ".");
+
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().unlockGui();
+
+		return;
+	}
+
+	// We have successfully restored the project data, so we can now open the project
+	StudioConnector studioObject;
+	studioObject.openProject(fileName);
+
+	// Update the version file
+	writeVersionFile(baseProjectName, projectName, version, cacheFolderName);
+
+	ProgressInfo::getInstance().setProgressState(false, "", false);
+	ProgressInfo::getInstance().unlockGui();
+
+	ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
+}
+
+bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID entityID, ot::UID version)
+{
+	bool success = true;
+
+	ClassFactory classFactory;
+	EntityFile* fileEntity = dynamic_cast<EntityFile*> (DataBase::GetDataBase()->GetEntityFromEntityIDandVersion(entityID, version, &classFactory));
+
+	if (fileEntity != nullptr)
+	{
+		size_t size = fileEntity->getData()->getData().size();
+
+		std::string entityPath = fileEntity->getPath();
+		size_t index = entityPath.find('/');
+
+		std::string fileName = cacheFolderVersion + "/" + entityPath.substr(index+1);
+
+		std::filesystem::path path(fileName);
+		std::string parentFolder = path.parent_path().string();
+
+		std::filesystem::create_directories(parentFolder);
+
+		std::ofstream dataFile(fileName, std::ios::binary);
+		dataFile.write(fileEntity->getData()->getData().data(), size);
+		dataFile.close();
+
+		delete fileEntity;
+		fileEntity = nullptr;
+	}
+	else
+	{
+		success = false;
+	}
+
+	return success;
+}
+

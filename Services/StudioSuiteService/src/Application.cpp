@@ -305,8 +305,11 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	for (auto file : fileInfo)
 	{
-		entityID.push_back(file.getID());
-		versionID.push_back(file.getVersion());
+		if (file.getType() == "EntityFile")
+		{
+			entityID.push_back(file.getID());
+			versionID.push_back(file.getVersion());
+		}
 	}
 
 	// Get the current model version

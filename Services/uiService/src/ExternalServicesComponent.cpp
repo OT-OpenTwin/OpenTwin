@@ -3137,6 +3137,17 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 
 				std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList);
 				workerThread.detach();
+				}
+			else if (action == OT_ACTION_CMD_UI_SS_DOWNLOAD) {
+
+				std::list<ot::UID> entityIDList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+				std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+				std::string version = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
+
+				std::string fileName = StudioSuiteConnectorAPI::getLocalFileName();
+
+				std::thread workerThread(StudioSuiteConnectorAPI::downloadFiles, fileName, AppBase::instance()->getCurrentProjectName(), entityIDList, entityVersionList, version);
+				workerThread.detach();
 			}
 			else if (action == OT_ACTION_CMD_UI_SS_COPY) {
 
