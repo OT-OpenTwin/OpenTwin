@@ -634,7 +634,10 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 		// Check whether current version is in cache
 		if (std::filesystem::is_directory(cacheDirectory))
 		{
-			std::string cstCacheFileName = cacheDirectory + "/" + "xxx.cst";
+			std::filesystem::path basePath(baseProjectName);
+			std::string simpleFileName = basePath.filename().string() + ".cst";
+
+			std::string cstCacheFileName = cacheDirectory + "/" + simpleFileName;
 
 			// We have a corresponding cache entry -> restore the data
 			std::filesystem::create_directory(baseProjectName);
