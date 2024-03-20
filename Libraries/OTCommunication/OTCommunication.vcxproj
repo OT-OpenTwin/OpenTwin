@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ActionDispatcher.cpp" />
+    <ClCompile Include="src\ActionHandlerBase.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
@@ -28,6 +30,9 @@
     <ClCompile Include="src\UiTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTCommunication\ActionDispatcher.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandler.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandlerBase.h" />
     <ClInclude Include="include\OTCommunication\ActionTypes.h" />
     <ClInclude Include="include\OTCommunication\CommunicationAPIExport.h" />
     <ClInclude Include="include\OTCommunication\CommunicationTypes.h" />

@@ -13,8 +13,9 @@
 
 // Open twin header
 #include "OTCore/ServiceBase.h"		// Base class
+#include "OTCore/OTObjectBase.h"	// Base class
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/OTObject.h"	// Base class
+#include "OTCommunication/ActionHandler.h"
 
 // C++ header
 #include <string>
@@ -31,7 +32,7 @@ namespace ot {
 //! Short form to get the Application instance
 #define LDS_APP Application::instance()
 
-class Application : public ot::ServiceBase, public ot::OTObject {
+class Application : public ot::ServiceBase, public ot::OTObjectBase {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

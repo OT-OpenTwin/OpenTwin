@@ -12,8 +12,9 @@
 
 // Open twin header
 #include "OTCore/ServiceBase.h"		// Base class
-#include "OTServiceFoundation/OTObject.h"		// Base class
+#include "OTCore/OTObjectBase.h"		// Base class
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/IDManager.h"
 
 // C++ header
@@ -31,7 +32,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ServiceBase, public ot::OTObject {
+class Application : public ot::ServiceBase, public ot::OTObjectBase {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

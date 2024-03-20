@@ -97,6 +97,9 @@
     <ClCompile Include="src\VariableToStringConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
+    <ClCompile Include="src\OTObjectBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -239,6 +242,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\VariableToStringConverter.h">
       <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTObjectBase.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

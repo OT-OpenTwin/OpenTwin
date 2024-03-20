@@ -10,9 +10,6 @@
     <ClCompile Include="src\BusinessLogicHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Dispatcher.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\dllmain.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -29,9 +26,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ModelServiceAPI.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OTObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PythonServiceInterface.cpp">
@@ -58,6 +52,9 @@
     <ClCompile Include="src\UserCredentials.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Foundation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTServiceFoundation\AbstractModelNotifier.h">
@@ -73,9 +70,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\ContextMenu.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\Dispatcher.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\Encryption.h">
@@ -123,9 +117,6 @@
     <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\OTObject.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -145,6 +136,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTServiceFoundation\Foundation.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

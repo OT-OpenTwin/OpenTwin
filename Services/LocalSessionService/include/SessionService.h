@@ -15,8 +15,9 @@
 #include "GlobalDirectoryService.h"
 
 #include "OTCore/ServiceBase.h"
+#include "OTCore/OTObjectBase.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/OTObject.h"
+#include "OTCommunication/ActionHandler.h"
 
 // C++ header
 #include <string>
@@ -28,7 +29,7 @@ class Session;
 class RelayService;
 class GlobalSessionService;
 
-class SessionService : public ot::OTObject {
+class SessionService : public ot::OTObjectBase {
 public:
 	SessionService();
 	virtual ~SessionService() {}; // todo: add cleanup

@@ -6,11 +6,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/ServiceBase.h"
 #include "OTCore/Flags.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/OTObjectBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/OTObject.h"
+#include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/IDManager.h"
 
 // C++ header
@@ -21,7 +22,7 @@
 
 class LocalSessionService;
 
-class GlobalSessionService : public ot::OTObject, public ot::ServiceBase {
+class GlobalSessionService : public ot::OTObjectBase, public ot::ServiceBase {
 public:
 	static GlobalSessionService * instance(void);
 	static bool hasInstance(void);

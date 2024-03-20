@@ -42,7 +42,7 @@
 #define OT_PROPERTY_NOSET(___type, ___name, ___getter) private: OT_PROPERTYBASE_MEMBER(___type___name); public: OT_PROPERTYBASE_GET(___type, ___name, ___getter);
 
 //! @brief Removes the default copy constructor and assignment operator
-#define OT_DECL_NOCOPY(___class) ___class(const ___class&) = delete; ___class(const ___class&&) = delete; ___class& operator = (const ___class&) = delete;
+#define OT_DECL_NOCOPY(___class) ___class(const ___class&) = delete; ___class& operator = (const ___class&) = delete;
 
 //! @brief Removes the default copy constructor and assignment operator
 #define OT_DECL_NODEFAULT(___class) ___class(void) = delete;

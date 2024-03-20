@@ -10,7 +10,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/OTObjectBase.h"
 #include "OTCore/OTClassHelper.h"
 
 // std header
@@ -21,7 +21,7 @@ namespace ot {
 
 	//! @brief Default OpenTwin object with a uid and a parent child relationship
 	//! If the item is destroyed it will destroy all child items where "deleteOtObjectLater" is false
-	class OT_CORE_API_EXPORTONLY OTObject {
+	class OT_CORE_API_EXPORTONLY OTObject : public OTObjectBase {
 
 		OT_DECL_NOCOPY(OTObject)
 
@@ -31,9 +31,9 @@ namespace ot {
 		OT_PROPERTY(bool, deleteOtObjectLater, setDeleteOtObjectLater, isDeleteOtObjectLater)
 
 	public:
-		OTObject() : m_parentOtObject(nullptr), deleteOtObjectLater(false) {};
-		OTObject(OTObject* _parentObject) : m_parentOtObject(_parentObject), deleteOtObjectLater(false) {};
-		OTObject(const std::string& _otuid, OTObject* _parentObject = (OTObject*)nullptr) : m_otuid(_otuid), m_parentOtObject(_parentObject), deleteOtObjectLater(false) {};
+		OTObject() : m_parentOtObject(nullptr), m_deleteOtObjectLater(false) {};
+		OTObject(OTObject* _parentObject) : m_parentOtObject(_parentObject), m_deleteOtObjectLater(false) {};
+		OTObject(const std::string& _otuid, OTObject* _parentObject = (OTObject*)nullptr) : m_otuid(_otuid), m_parentOtObject(_parentObject), m_deleteOtObjectLater(false) {};
 		virtual ~OTObject() {
 			if (m_parentOtObject) 
 			{

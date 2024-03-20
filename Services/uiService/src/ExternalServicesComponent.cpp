@@ -38,12 +38,12 @@
 #include "OTCore/GenericDataStructMatrix.h"
 
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/UiTypes.h"
 
 #include "OTServiceFoundation/SettingsData.h"
-#include "OTServiceFoundation/Dispatcher.h"
 #include "OTServiceFoundation/TableRange.h"
 #include "OTServiceFoundation/ContextMenu.h"
 

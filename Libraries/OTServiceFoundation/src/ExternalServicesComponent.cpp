@@ -16,9 +16,9 @@
 #include "OTCommunication/IpConverter.h"						// extract IP information from sender information
 #include "OTCommunication/Msg.h"								// message sending
 #include "OTCommunication/ServiceLogNotifier.h"				// logging
+#include "OTCommunication/ActionDispatcher.h"
 
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "OTServiceFoundation/Dispatcher.h"
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTServiceFoundation/UiPluginComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -27,7 +27,6 @@
 #include <DataBase.h>
 
 // std header
-
 #include <exception>									// error handling
 #include <cassert>										// assert
 #include <fstream>										// read from file
@@ -35,8 +34,6 @@
 #include <Windows.h>
 #include <algorithm>
 #include <cctype>
-
-static ot::intern::ExternalServicesComponent * g_component{ nullptr };
 
 namespace ot {
 	namespace intern {
@@ -77,7 +74,6 @@ namespace ot {
 
 			OT_LOG_D("Removing external services component and calling exit()");
 
-			ot::intern::ExternalServicesComponent::deleteInstance();
 			exit(_exitCode);
 		}
 
@@ -88,7 +84,7 @@ namespace ot {
 void initChecker(void) {
 	using namespace std::chrono_literals;
 	std::this_thread::sleep_for(30s);
-	if (ot::intern::ExternalServicesComponent::instance()->componentState() != ot::intern::ExternalServicesComponent::Ready) {
+	if (ot::intern::ExternalServicesComponent::instance().componentState() != ot::intern::ExternalServicesComponent::Ready) {
 		OT_LOG_E("The component was not initialized after 30 seconds. Shutting down service");
 		exit(0);
 	}
@@ -103,18 +99,9 @@ ot::intern::ExternalServicesComponent::~ExternalServicesComponent()
 	
 }
 
-ot::intern::ExternalServicesComponent * ot::intern::ExternalServicesComponent::instance() {
-	if (g_component == nullptr) g_component = new ExternalServicesComponent;
+ot::intern::ExternalServicesComponent& ot::intern::ExternalServicesComponent::instance() {
+	static ExternalServicesComponent g_component;
 	return g_component;
-}
-
-bool ot::intern::ExternalServicesComponent::hasInstance(void) {
-	return (bool)g_component;
-}
-
-void ot::intern::ExternalServicesComponent::deleteInstance(void) {
-	if (g_component) delete g_component;
-	g_component = nullptr;
 }
 
 // ##########################################################################################################################################
@@ -351,8 +338,6 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-
-
 std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	const std::string &					_json,
 	const std::string &					_sender,
@@ -370,7 +355,7 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 		std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
 		
 		bool hasHandler{ false };
-		std::string result = ot::Dispatcher::instance()->dispatch(action, actionDoc, hasHandler, _messageType);
+		std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, hasHandler, _messageType);
 
 		if (!hasHandler) {
 			result = m_application->processActionWithModalCommands(action, actionDoc);
@@ -565,234 +550,4 @@ std::string ot::intern::ExternalServicesComponent::handleUIPluginConnected(JsonD
 	m_application->__addUiPlugin(component);
 	m_application->uiPluginConnected(component);
 	return std::string();
-}
-
-// #####################################################################################################################################
-
-// #####################################################################################################################################
-
-// #####################################################################################################################################
-
-// Microservice calls
-
-//! @brief This function is used to wrap the code that is required to forward a message to the dispatch in the external services component
-const char * dispatchActionWrapper(const std::string& _json, const std::string& _senderUrl, ot::MessageType _messageType) {
-	std::string response;
-	try {
-		if (ot::intern::ExternalServicesComponent::hasInstance()) {
-			response = ot::intern::ExternalServicesComponent::instance()->dispatchAction(_json, _senderUrl, _messageType);
-		}
-		else {
-			OT_LOG_EA("Component not initialized");
-
-			response = OT_ACTION_RETURN_INDICATOR_Error "Component not initialized";
-		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-
-		response = OT_ACTION_RETURN_INDICATOR_Error;
-		response.append(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EAS("[FATAL] Unknown error occured");
-
-		response = OT_ACTION_RETURN_INDICATOR_Error "[FATAL] Unknown error occured";
-	}
-
-	// Copy the return value.The memory of this value will be deallocated in the deallocateData function
-	char * retVal = new char[response.length() + 1];
-	strcpy_s(retVal, response.length() + 1, response.c_str());
-
-	return retVal;
-}
-
-const char * ot::foundation::performAction(const std::string & _json, const std::string & _senderIP)
-{
-	return dispatchActionWrapper(_json, _senderIP, ot::EXECUTE);
-};
-
-const char * ot::foundation::performActionOneWayTLS(const std::string & _json, const std::string & _senderIP)
-{
-	return dispatchActionWrapper(_json, _senderIP, ot::EXECUTE_ONE_WAY_TLS);
-};
-
-const char * ot::foundation::queueAction(const std::string & _json, const std::string & _senderIP)
-{
-	return dispatchActionWrapper(_json, _senderIP, ot::QUEUE);
-};
-
-const char * ot::foundation::getServiceURL(void)
-{
-	try {
-		std::string serviceURL = ot::intern::ExternalServicesComponent::instance()->application()->serviceURL();
-
-		char * retVal = new char[serviceURL.length() + 1];
-		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());
-		return retVal;
-	}
-	catch (const std::exception& _e) {
-		std::cout << "[ERROR] [FOUNDATION]: getServiceURL: " << _e.what() << std::endl;
-	}
-	catch (...) {
-		std::cout << "[ERROR] [FOUNDATION]: getServiceURL: Unknown error" << std::endl;
-	}
-	char * retVal = new char[1]{ 0 };
-	return retVal;
-}
-
-int ot::foundation::init(
-	const std::string &					_localDirectoryServiceURL,
-	const std::string &					_ownIP,
-	const std::string &					_sessionServiceIP,
-	const std::string &					_sessionID,
-	ApplicationBase *					_application
-) {
-	try {
-		// Setup logger
-#ifdef _DEBUG
-		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", true);
-		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", true);
-#else
-		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", false);
-		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", false);
-#endif
-
-		// The following code is used to make the service lauchable in debug mode in the editor when the session service is requesting the service to start
-		// In addition, if an empty siteID is passed to the service, it also reads its information from the config file. This allows for debugging services
-		// which are built in release mode.
-
-#ifdef _DEBUG
-		// Get file path
-		std::string deplyomentPath = _application->deploymentPath();
-		if (deplyomentPath.empty()) return -20;
-
-		std::string data = _application->serviceName();
-		std::transform(data.begin(), data.end(), data.begin(),
-			[](unsigned char c) { return std::tolower(c); });
-
-		deplyomentPath.append(data + ".cfg");
-
-		// Read file
-		std::ifstream stream(deplyomentPath);
-		char inBuffer[512];
-		stream.getline(inBuffer, 512);
-		std::string info(inBuffer);
-
-		if (info.empty()) {
-			std::cout << "No configuration found" << std::endl;
-			assert(0);
-			return -21;
-		}
-		// Parse doc
-		JsonDocument params;
-		params.fromJson(info);
-
-		OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
-
-		std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-		std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-		std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-		std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
-		// Initialize the service with the parameters from the file
-
-		int startupResult = intern::ExternalServicesComponent::instance()->startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
-		if (startupResult != 0) {
-			return startupResult;
-		}
-
-		std::string initResult = intern::ExternalServicesComponent::instance()->init(actualSessionServiceURL, actualSessionID);
-		if (initResult != OT_ACTION_RETURN_VALUE_OK) {
-			return -22;
-		}
-		else {
-			return 0;
-		}
-#else
-		return intern::ExternalServicesComponent::instance()->startup(_application, _localDirectoryServiceURL, _ownIP);
-#endif
-	}
-	catch (const std::exception & e) {
-		std::cout << "[INIT] ERROR: " << e.what() << std::endl;
-		return -1;
-	}
-	catch (...) {
-		std::cout << "[INIT] ERROR: Unknown error" << std::endl;
-		return -2;
-	}
-}
-
-
-int ot::foundation::initDebugExplicit(
-	const std::string& _localDirectoryServiceURL,
-	const std::string& _ownIP,
-	const std::string& _sessionServiceIP,
-	const std::string& _sessionID,
-	ApplicationBase* _application
-) {
-	try {
-		// Setup logger
-		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", true);
-		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", true);
-
-
-		// The following code is used to make the service lauchable in debug mode in the editor when the session service is requesting the service to start
-		// In addition, if an empty siteID is passed to the service, it also reads its information from the config file. This allows for debugging services
-		// which are built in release mode.
-
-		// Get file path
-		std::string deplyomentPath = _application->deploymentPath();
-		if (deplyomentPath.empty()) return -20;
-
-		std::string data = _application->serviceName();
-		std::transform(data.begin(), data.end(), data.begin(),
-			[](unsigned char c) { return std::tolower(c); });
-
-		deplyomentPath.append(data + ".cfg");
-
-		// Read file
-		std::ifstream stream(deplyomentPath);
-		char inBuffer[512];
-		stream.getline(inBuffer, 512);
-		std::string info(inBuffer);
-
-		if (info.empty()) {
-			std::cout << "No configuration found" << std::endl;
-			assert(0);
-			return -21;
-		}
-		// Parse doc
-		JsonDocument params;
-		params.fromJson(info);
-
-		OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
-
-		std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-		std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-		std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-		std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
-		// Initialize the service with the parameters from the file
-
-		int startupResult = intern::ExternalServicesComponent::instance()->startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
-		if (startupResult != 0) {
-			return startupResult;
-		}
-
-		std::string initResult = intern::ExternalServicesComponent::instance()->initDebugExplicit(actualSessionServiceURL, actualSessionID);
-		if (initResult != OT_ACTION_RETURN_VALUE_OK) {
-			return -22;
-		}
-		else {
-			return 0;
-		}
-
-	}
-	catch (const std::exception& e) {
-		OT_LOG_EAS(e.what());
-		return -1;
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error occured");
-		return -2;
-	}
 }

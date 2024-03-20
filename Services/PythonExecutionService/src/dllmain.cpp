@@ -6,7 +6,7 @@
 #include <Windows.h>
 
 // OpenTwin header
-#include "OTServiceFoundation/ExternalServicesComponent.h"
+#include "OTServiceFoundation/Foundation.h"
 
 // Service header
 #include "Application.h"

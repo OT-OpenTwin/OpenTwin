@@ -21,10 +21,10 @@
 #include "GlobalSessionService.h"
 
 #include "OTCore/Logger.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-#include "OTServiceFoundation/Dispatcher.h"
 
 std::ofstream *logfile = nullptr;
 
@@ -168,18 +168,18 @@ extern "C"
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
-		return ot::Dispatcher::instance()->dispatchWrapper(_json, _senderIP, ot::EXECUTE);
+		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::EXECUTE);
 	};
 
 	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP)
 	{
-		return ot::Dispatcher::instance()->dispatchWrapper(_json, _senderIP, ot::EXECUTE_ONE_WAY_TLS);
+		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::EXECUTE_ONE_WAY_TLS);
 	};
 
 	// The session service is not queueing actions
 	_declspec(dllexport) const char *queueAction(const char *_json, const char *_senderIP)
 	{
-		return ot::Dispatcher::instance()->dispatchWrapper(_json, _senderIP, ot::QUEUE);
+		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::QUEUE);
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void)

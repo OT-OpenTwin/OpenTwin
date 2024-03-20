@@ -1,23 +1,21 @@
-/*
- *  ApplicationBase.h
- *
- *  Created on: 01/02/2021
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2021, OpenTwin
- */
+//! @file ApplicationBase.h
+//!
+//! @author Alexander Kuester (alexk95)
+//! @date February 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 #pragma warning(disable : 4251)
 
 // OpenTwin header
-#include "OTCore/ServiceBase.h"	// Base class
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/OTObjectBase.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/FoundationAPIExport.h"
-#include "OTServiceFoundation/OTObject.h"
+#include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/EntityInformation.h"
-#include "OTServiceFoundation/ExternalServicesComponent.h"
+#include "OTServiceFoundation/FoundationAPIExport.h"
 
 #include "ClassFactory.h"
 
@@ -29,20 +27,25 @@
 namespace ot {
 
 	namespace components {
-		class ModelComponent;
 		class UiComponent;
+		class ModelComponent;
 		class UiPluginComponent;
 	}
 	
+	namespace intern {
+		class ExternalServicesComponent;
+	}
+
 	class SettingsData;
-	class AbstractSettingsItem;
-	class AbstractUiNotifier;
-	class AbstractModelNotifier;
 	class AbstractUIPlugin;
 	class ModalCommandBase;
+	class AbstractUiNotifier;
+	class AbstractSettingsItem;
+	class AbstractModelNotifier;
 
-	class OT_SERVICEFOUNDATION_API_EXPORT ApplicationBase : public ServiceBase, public OTObject
+	class OT_SERVICEFOUNDATION_API_EXPORT ApplicationBase : public ServiceBase, public OTObjectBase
 	{
+		OT_DECL_NOCOPY(ApplicationBase)
 	public:
 		ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier, AbstractModelNotifier * _modelNotifier);
 		virtual ~ApplicationBase();
@@ -320,7 +323,7 @@ namespace ot {
 		void __serviceConnected(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id);
 
 	private:
-		friend intern::ExternalServicesComponent;
+		friend class intern::ExternalServicesComponent;
 
 		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
@@ -336,8 +339,6 @@ namespace ot {
 		ClassFactory classFactory;
 
 		ApplicationBase() = delete;
-		ApplicationBase(ApplicationBase &) = delete;
-		ApplicationBase& operator = (ApplicationBase &) = delete;
 	};
 
 }

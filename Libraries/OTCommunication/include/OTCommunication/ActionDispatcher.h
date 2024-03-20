@@ -1,9 +1,16 @@
+//! @file ActionDispatcher.h
+//! 
+//! @author Alexander Kuester (alexk95)
+//! @date March 2024
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
-#include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTCore/JSON.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTCommunication/CommunicationTypes.h"
+#include "OTCommunication/CommunicationAPIExport.h"
 
 // std header
 #include <string>
@@ -15,24 +22,20 @@
 
 namespace ot {
 
-	class AbstractDispatchItem;
+	class ActionHandlerBase;
 
-	class OT_SERVICEFOUNDATION_API_EXPORT Dispatcher {
+	class OT_COMMUNICATION_API_EXPORT ActionDispatcher {
+		OT_DECL_NOCOPY(ActionDispatcher)
 	public:
-		// todo: rework to reference instead of pointer
-		static Dispatcher * instance(void);
-		static Dispatcher * uiPluginInstance(void);
-		static void deleteAllInstances(void);
-		static void deleteInstance(void);
-		static void deleteUiPluginInstance(void);
+		static ActionDispatcher& instance(void);
 
-		void add(AbstractDispatchItem * _item);
-		void remove(AbstractDispatchItem * _item);
+		void add(ActionHandlerBase* _item, bool _overwrite = false);
+		void remove(ActionHandlerBase* _item);
 
 		//! @brief This function may be called from the main external API that is receiving the perform/ queue messages
 		//! This function will forward the call to the dispatch function and will create a C-String copy of the result so
 		//! the string can be directy returned out of the dll/application
-		const char * dispatchWrapper(const char * _json, const char * _senderUrl, ot::MessageType _messageType);
+		const char* dispatchWrapper(const char* _json, const char* _senderUrl, ot::MessageType _messageType);
 
 		//! @brief Will get and forward the action to all registered handlers
 		std::string dispatch(const std::string& _json, ot::MessageType _messageType);
@@ -54,12 +57,10 @@ namespace ot {
 
 	private:
 
-		std::map<std::string, std::list<AbstractDispatchItem *> *>	m_data;
-		std::mutex													m_mutex;
+		std::map<std::string, ActionHandlerBase*> m_data;
+		std::mutex                                m_mutex;
 
-		Dispatcher();
-		virtual ~Dispatcher();
-		Dispatcher(Dispatcher&) = delete;
-		Dispatcher& operator = (Dispatcher&) = delete;
+		ActionDispatcher();
+		virtual ~ActionDispatcher();
 	};
 }

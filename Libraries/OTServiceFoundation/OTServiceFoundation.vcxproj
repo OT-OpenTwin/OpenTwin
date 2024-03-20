@@ -196,15 +196,14 @@
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
+    <ClCompile Include="src\Foundation.cpp" />
     <ClCompile Include="src\ModelServiceAPI.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
-    <ClCompile Include="src\Dispatcher.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ExternalServicesComponent.cpp" />
     <ClCompile Include="src\ModalCommandBase.cpp" />
     <ClCompile Include="src\ModelComponent.cpp" />
-    <ClCompile Include="src\OTObject.cpp" />
     <ClCompile Include="src\SettingsData.cpp" />
     <ClCompile Include="src\TableRange.cpp" />
     <ClCompile Include="src\TypeConverter.cpp" />
@@ -218,10 +217,10 @@
     <ClInclude Include="include\OTServiceFoundation\ApplicationBase.h" />
     <ClInclude Include="include\OTServiceFoundation\BusinessLogicHandler.h" />
     <ClInclude Include="include\OTServiceFoundation\ContextMenu.h" />
-    <ClInclude Include="include\OTServiceFoundation\Dispatcher.h" />
     <ClInclude Include="include\OTServiceFoundation\Encryption.h" />
     <ClInclude Include="include\OTServiceFoundation\EntityInformation.h" />
     <ClInclude Include="include\OTServiceFoundation\ExternalServicesComponent.h" />
+    <ClInclude Include="include\OTServiceFoundation\Foundation.h" />
     <ClInclude Include="include\OTServiceFoundation\FoundationAPIExport.h" />
     <ClInclude Include="include\OTServiceFoundation\FoundationTypes.h" />
     <ClInclude Include="include\OTServiceFoundation\IDManager.h" />
@@ -233,7 +232,6 @@
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h" />
-    <ClInclude Include="include\OTServiceFoundation\OTObject.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
     <ClInclude Include="include\OTServiceFoundation\SettingsData.h" />
     <ClInclude Include="include\OTServiceFoundation\TableRange.h" />

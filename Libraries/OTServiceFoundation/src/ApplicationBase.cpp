@@ -1,10 +1,8 @@
-/*
- *  ApplicationBase.cpp
- *
- *  Created on: 01/02/2021
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2021, OpenTwin
- */
+//! @file ApplicationBase.cpp
+//!
+//! @author Alexander Kuester (alexk95)
+//! @date February 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
 #include "OTCore/OTAssert.h"

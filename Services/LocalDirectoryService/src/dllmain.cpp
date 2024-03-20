@@ -8,8 +8,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTServiceFoundation/Dispatcher.h"
-#include "OTServiceFoundation/ExternalServicesComponent.h"
+#include "OTServiceFoundation/Foundation.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
 // Service header
@@ -38,12 +38,12 @@ extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderURL)
 	{
-		return ot::Dispatcher::instance()->dispatchWrapper(_json, _senderURL, ot::EXECUTE);
+		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderURL, ot::EXECUTE);
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderURL)
 	{
-		return ot::Dispatcher::instance()->dispatchWrapper(_json, _senderURL, ot::QUEUE);
+		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderURL, ot::QUEUE);
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void)

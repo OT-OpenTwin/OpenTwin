@@ -1,20 +1,18 @@
-/*
- *  ExternalServicesComponent.h
- *
- *  Created on: 01/02/2021
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2021, OpenTwin
- */
+//! @file ExternalServicesComponent.h
+//! 
+//! @author Alexander Kuester (alexk95)
+//! @date February 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTServiceFoundation/OTObject.h"
-#include "OTCommunication/actionTypes.h"
+#include "OTCore/OTObjectBase.h"
+#include "OTCommunication/ActionTypes.h"
 
 // std header
-#include <string>		// string
-#include <mutex>		// mutex
+#include <string> // string
+#include <mutex>  // mutex
 
 namespace ot {
 
@@ -24,7 +22,8 @@ namespace ot {
 
 		//! This is the main class interacting with external services.
 		//! Use the static instance() function to get the global component that should be used in this service
-		class ExternalServicesComponent : public OTObject {
+		class ExternalServicesComponent : public OTObjectBase {
+			OT_DECL_NOCOPY(ExternalServicesComponent)
 		public:
 			enum ComponentState {
 				WaitForStartup,
@@ -34,12 +33,7 @@ namespace ot {
 
 			//! @brief Will return the global instance of this component since it should exist only once in the service.
 			//todo: replace with reference instead of pointer
-			static ExternalServicesComponent * instance();
-
-			static bool hasInstance(void);
-
-			//! @brief Will delete the instance of this component
-			static void deleteInstance();
+			static ExternalServicesComponent& instance(void);
 
 			// ##########################################################################################################################################
 
@@ -107,48 +101,8 @@ namespace ot {
 
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();
-
-			ExternalServicesComponent(ExternalServicesComponent&) = delete;
-			ExternalServicesComponent& operator = (ExternalServicesComponent&) = delete;
-
 		}; // Class external services component
 
 	} // namespace intern
-
-	namespace foundation {
-
-		__declspec (dllexport) const char * performAction(
-			const std::string &					_json,
-			const std::string &					_senderURL
-		);
-
-		__declspec (dllexport) const char * performActionOneWayTLS(
-			const std::string &					_json,
-			const std::string &					_senderURL
-		);
-
-		__declspec (dllexport) const char * queueAction(
-			const std::string &					_json,
-			const std::string &					_senderURL
-		);
-
-		__declspec (dllexport) const char * getServiceURL();
-
-		__declspec (dllexport) int init(
-			const std::string &					_localDirectoryServiceURL,
-			const std::string &					_ownURL,
-			const std::string &					_sessionServiceURL,
-			const std::string &					_sessionID,
-			ApplicationBase *					_application
-		);
-
-		__declspec (dllexport) int initDebugExplicit(
-			const std::string& _localDirectoryServiceURL,
-			const std::string& _ownURL,
-			const std::string& _sessionServiceURL,
-			const std::string& _sessionID,
-			ApplicationBase* _application
-		);
-	} // namespace foundation
 
 } // namespace ot

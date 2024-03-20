@@ -9,10 +9,10 @@
 #undef max
 
 // OpenTwin header
-#include "OTCore/ServiceBase.h"
 #include "OTCore/Logger.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-#include "OTServiceFoundation/ExternalServicesComponent.h"
 
 // Service header
 #include "ServiceBase.h"

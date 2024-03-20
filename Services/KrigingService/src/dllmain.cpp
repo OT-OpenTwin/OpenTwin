@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTServiceFoundation/ExternalServicesComponent.h"
+#include "OTServiceFoundation/Foundation.h"
 
 // Service header
 #include "Application.h"
