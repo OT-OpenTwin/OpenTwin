@@ -24,12 +24,10 @@ class QMouseEvent;
 class QVBoxLayout;
 class QHBoxLayout;
 
-class lineEdit;
-
 class CommitMessageDialog : public QDialog {
 	Q_OBJECT
 public:
-	CommitMessageDialog();
+	CommitMessageDialog(const QIcon& windowIcon);
 	virtual ~CommitMessageDialog();
 
 	QString changeMessage(void);
@@ -61,7 +59,7 @@ private:
 
 	QPushButton* my_buttonConfirm;
 	QPushButton* my_buttonCancel;
-	lineEdit* my_input;
+	QLineEdit* my_input;
 	QLabel* my_label;
 	QVBoxLayout* my_layout;
 

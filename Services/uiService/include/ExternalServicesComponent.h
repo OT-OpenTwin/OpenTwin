@@ -325,9 +325,11 @@ public slots:
 	void sendExecuteRequest(const char *url, const char *message);
 	void setProgressState(bool visible, const char* message, bool continuous);
 	void setProgressValue(int percentage);
+	void lockGui(void);
 	void unlockGui(void);
 	void showError(const char* message);
 	void showInformation(const char* message);
+	void activateModelVersion(const char* version);
 
 private:
 	// ###################################################################################################

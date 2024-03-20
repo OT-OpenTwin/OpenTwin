@@ -5,9 +5,12 @@
 #include <qobject.h>
 
 #include "OTCore/CoreTypes.h"
+#include "OTCore/JSON.h"
 
 namespace StudioSuiteConnectorAPI
 {
+	__declspec(dllexport) std::string processAction(std::string action, ot::JsonDocument& doc, std::string projectName, QObject* mainObject, const QIcon& windowIcon);
+
 	__declspec(dllexport) void openProject(std::string newProjectName);
 	__declspec(dllexport) void setStudioServiceData(std::string studioSuiteServiceURL, QObject* mainObject);
 	__declspec(dllexport) void importProject(std::string fileName, std::string projectName);
@@ -21,6 +24,8 @@ namespace StudioSuiteConnectorAPI
 	__declspec(dllexport) void setLocalFileName(std::string projectName, std::string fileName);
 	__declspec(dllexport) bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
 
+	std::string getStudioSuiteFileNameForCommit(const std::string &projectName);
+	std::string getStudioSuiteFileNameForGet(const std::string &projectName);
 
 
 }

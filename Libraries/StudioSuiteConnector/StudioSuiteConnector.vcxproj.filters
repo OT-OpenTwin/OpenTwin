@@ -22,6 +22,9 @@
     <ClCompile Include="src\ProgressInfo.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\CommitMessageDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -50,5 +53,10 @@
     <ClInclude Include="include\StudioSuiteConnector\ProgressInfo.h">
       <Filter>include</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\StudioSuiteConnector\CommitMessageDialog.h">
+      <Filter>include</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

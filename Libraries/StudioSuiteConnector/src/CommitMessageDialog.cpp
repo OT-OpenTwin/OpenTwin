@@ -1,5 +1,5 @@
-#include "CommitMessageDialog.h"
-#include "AppBase.h"
+#include "StudioSuiteConnector/CommitMessageDialog.h"
+//#include "AppBase.h"
 
 #include <qwidget.h>
 #include <qlayout.h>
@@ -17,14 +17,14 @@
 // AK header
 #include <akAPI/uiAPI.h>
 
-CommitMessageDialog::CommitMessageDialog()
+CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon)
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
 	// Create controls
 	my_buttonCancel = new QPushButton{ "Cancel" };
 	my_buttonConfirm = new QPushButton{ "Commit" };
-	my_input = new lineEdit;
+	my_input = new QLineEdit;
 	my_label = new QLabel("Change message");
 	my_label->setBuddy(my_input);
 
@@ -46,7 +46,7 @@ CommitMessageDialog::CommitMessageDialog()
 	my_layout->addWidget(my_widgetButtons);
 
 	setWindowTitle("Commit Project");
-	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+	setWindowIcon(windowIcon);
 
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
