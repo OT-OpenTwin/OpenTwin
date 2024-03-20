@@ -58,6 +58,14 @@ namespace ot {
 		//! @param _handlerFound Will be set to true if at least one handler was found to dispatch this action to
 		std::string dispatch(const std::string& _action, JsonDocument& _document, bool& _handlerFound, ot::MessageType _messageType);
 
+		//! @brief !! Unsafe, only call from a handler when the mutex is already locked !!
+		//! Will return the result of the last handler
+		//! The mutex is not used at this place
+		//! @param _action The action to dispatch
+		//! @param _document The document containing the action parameter
+		//! @param _handlerFound Will be set to true if at least one handler was found to dispatch this action to
+		std::string dispatchLocked(const std::string& _action, JsonDocument& _document, bool& _handlerFound, ot::MessageType _messageType);
+
 	private:
 
 		std::map<std::string, ActionHandlerBase*> m_data;

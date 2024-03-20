@@ -2159,7 +2159,7 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 	AppBase::instance()->setNavigationTreeSortingEnabled(false);
 	AppBase::instance()->setNavigationTreeMultiselectionEnabled(false);
 
-
+	bool tmp;
 	for (long i = 0; i < numberActions; i++)
 	{
 		rapidjson::Value subdoc = documents[i].GetObject();
@@ -2167,7 +2167,9 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 		ot::JsonDocument d;
 		d.CopyFrom(subdoc, d.GetAllocator());
 
-		ot::ActionDispatcher::instance().dispatch(d, ot::ALL_MESSAGE_TYPES);
+		std::string action = ot::json::getString(d, OT_ACTION_MEMBER);
+
+		ot::ActionDispatcher::instance().dispatchLocked(action, d, tmp, ot::ALL_MESSAGE_TYPES);
 	}
 
 	// Re enable tree sorting

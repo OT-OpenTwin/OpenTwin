@@ -104,6 +104,13 @@ std::string ot::ActionDispatcher::dispatch(const std::string& _action, JsonDocum
 
 	m_mutex.lock();
 
+	std::string result = this->dispatchLocked(_action, _document, _handlerFound, _messageType);
+
+	m_mutex.unlock();
+	return result;
+}
+
+std::string ot::ActionDispatcher::dispatchLocked(const std::string& _action, JsonDocument& _document, bool& _handlerFound, ot::MessageType _messageType) {
 	std::string result;
 
 	OT_LOG("Dispatching: \"" + _action + "\"", ot::messageTypeToLogFlag(_messageType));
@@ -137,6 +144,5 @@ std::string ot::ActionDispatcher::dispatch(const std::string& _action, JsonDocum
 		OT_LOG("..... Completed: Dispatching: \"" + _action + "\". FAILED: No handler found. Returning: \"" + result + "\"", ot::messageTypeToLogFlag(_messageType));
 	}
 
-	m_mutex.unlock();
 	return result;
 }
