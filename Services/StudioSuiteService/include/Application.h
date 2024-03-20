@@ -112,6 +112,7 @@ public:
 	void modelSelectionChangedNotification(void);
 
 	void importProject(void);
+	void showInformation(void);
 	void commitChanges(void);
 	void getChanges(void);
 

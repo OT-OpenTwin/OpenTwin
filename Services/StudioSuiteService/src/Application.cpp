@@ -127,6 +127,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
 
 	_ui->addMenuButton("Project", "Import", "CST File", "CST File", modelWrite, "Import", "Default");
+	_ui->addMenuButton("Project", "Versions", "Information", "Information", modelWrite, "Information", "Default");
 	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("Project", "Versions", "Get", "Get", modelWrite, "ArrowGreenDown", "Default");
 
@@ -179,6 +180,7 @@ bool Application::startAsRelayService(void) const
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (     action == "Project:Import:CST File")			  importProject();
+	else if (action == "Project:Versions:Information")		  showInformation();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
 	else if (action == "Project:Versions:Get")			      getChanges();
 	//else if (action == "Model:Sources:Add Terminal")	      addTerminal();
@@ -250,6 +252,18 @@ void Application::commitChanges(void)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COMMIT, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	uiComponent()->sendMessage(true, doc);
+}
+
+void Application::showInformation(void)
+{
+	std::string currentVersion = modelComponent()->getCurrentModelVersion();
+
+	// Send the information message to the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_INFORMATION, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(currentVersion, doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }

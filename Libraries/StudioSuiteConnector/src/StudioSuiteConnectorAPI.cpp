@@ -1,6 +1,7 @@
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "StudioSuiteConnector/ProjectManager.h"
 #include "StudioSuiteConnector/CommitMessageDialog.h"
+#include "StudioSuiteConnector/ProjectInformationDialog.h"
 
 #include "akAPI/uiAPI.h"
 
@@ -104,6 +105,25 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 
 		std::thread workerThread(StudioSuiteConnectorAPI::copyFiles, newVersion);
 		workerThread.detach();
+	}
+	else if (action == OT_ACTION_CMD_UI_SS_INFORMATION) {
+
+		std::string serverVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
+		std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
+
+		std::string localVersion;
+
+		try
+		{
+			localVersion = getCurrentVersion(localFileName, projectName);
+		}
+		catch (std::string)
+		{
+			localVersion.clear();
+		}
+
+		ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
+		projectInformationDialog.exec();
 	}
 
 	return "";

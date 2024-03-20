@@ -2338,7 +2338,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				|| action == OT_ACTION_CMD_UI_SS_GET
 				|| action == OT_ACTION_CMD_UI_SS_UPLOAD
 				|| action == OT_ACTION_CMD_UI_SS_DOWNLOAD
-				|| action == OT_ACTION_CMD_UI_SS_COPY) {
+				|| action == OT_ACTION_CMD_UI_SS_COPY
+				|| action == OT_ACTION_CMD_UI_SS_INFORMATION) {
 
 					return StudioSuiteConnectorAPI::processAction(action, _doc, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 			}

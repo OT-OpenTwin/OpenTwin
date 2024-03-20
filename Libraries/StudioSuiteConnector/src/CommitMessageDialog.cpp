@@ -48,6 +48,8 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon)
 	setWindowTitle("Commit Project");
 	setWindowIcon(windowIcon);
 
+	my_input->setMinimumWidth(300);
+
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 

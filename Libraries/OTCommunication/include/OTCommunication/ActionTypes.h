@@ -171,6 +171,7 @@
 #define OT_ACTION_CMD_UI_SS_UPLOAD "StudioSuite.Upload"
 #define OT_ACTION_CMD_UI_SS_DOWNLOAD "StudioSuite.Download"
 #define OT_ACTION_CMD_UI_SS_COPY "StudioSuite.Copy"
+#define OT_ACTION_CMD_UI_SS_INFORMATION "StudioSuite.Information"
 #define OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED "StudioSuite.UploadNeeded"
 #define OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED "StudioSuite.DownloadNeeded"
 #define OT_ACTION_CMD_UI_SS_FILES_UPLOADED "StudioSuite.FilesUploaded"
