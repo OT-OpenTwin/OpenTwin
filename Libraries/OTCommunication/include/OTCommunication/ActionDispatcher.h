@@ -35,10 +35,13 @@ namespace ot {
 		//! @brief This function may be called from the main external API that is receiving the perform/ queue messages
 		//! This function will forward the call to the dispatch function and will create a C-String copy of the result so
 		//! the string can be directy returned out of the dll/application
-		const char* dispatchWrapper(const char* _json, const char* _senderUrl, ot::MessageType _messageType);
+		char* dispatchWrapper(const char* _json, const char* _senderUrl, ot::MessageType _messageType);
 
 		//! @brief Will get and forward the action to all registered handlers
 		std::string dispatch(const std::string& _json, ot::MessageType _messageType);
+
+		//! @brief Will get and forward the action to all registered handlers
+		std::string dispatch(JsonDocument& _document, MessageType _messageType);
 
 		//! @brief Will forward the action to all registered handlers
 		//! Will return the result of the last handler

@@ -40,8 +40,11 @@
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/OTObjectBase.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCommunication/UiTypes.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionHandler.h"
 
 class WebsocketClient;
 class ControlsManager;
@@ -50,7 +53,7 @@ class AppBase;
 class KeyboardCommandHandler;
 namespace ot { class ServiceBase; }
 
-class ExternalServicesComponent : public QObject, public ak::aNotifier
+class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::OTObjectBase
 {
 	Q_OBJECT
 public:
@@ -93,97 +96,13 @@ public:
 
 	// UI Element creation
 	
-	void addMenuPage(ot::ServiceBase * _sender, const std::string &pageName);
-	void addMenuGroup(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName);
-	void addMenuSubgroup(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName, const std::string &subgroupName);
-	ak::UID addMenuPushButton(ot::ServiceBase * _sender, const std::string & _pageName, const std::string & _groupName, const std::string &_subgroupName, const std::string & _buttonName,
-		const std::string & _text, const std::string & _iconName, const std::string & _iconFolder, const ot::Flags<ot::ui::lockType> & _lockFlags);
-	void addMenuCheckBox(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &boxName, const std::string &boxText, bool checked, const ot::Flags<ot::ui::lockType> & _lockFlags);
-	void addMenuLineEdit(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, const ot::Flags<ot::ui::lockType> & _lockFlags);
 	KeyboardCommandHandler * addShortcut(ot::ServiceBase * _sender, const std::string& _keySequence);
-
-	void removeUIElements(const std::list<std::string> & _itemList);
-
-	// ###################################################################################################
-
-	// UI Element manipulation
-
-	void fillPropertyGrid(const std::string &settings);
-
-	void setCheckBoxValues(ot::ServiceBase * _sender, const std::string & _controlName, bool checked);
-	void setLineEditValues(ot::ServiceBase * _sender, const std::string & _controlName, const std::string &editText, bool error);
-
-	void enableDisableControls(ot::ServiceBase * _sender, std::list<std::string> &enabled, std::list<std::string> &disabled);
-	void setTooltipText(ot::ServiceBase * _sender, const std::string &item, const std::string &text);
-
-	void displayInfoMessage(const std::string & _message);
-	void displayDebugMessage(const std::string& _message);
 
 	// ###################################################################################################
 
 	// 3D View
 
-	void resetAllViews3D(ModelUIDtype visualizationModelID);
-	void refreshAllViews(ModelUIDtype visualizationModelID);
-	void clearSelection(ModelUIDtype visualizationModelID);
-	void refreshSelection(ModelUIDtype visualizationModelID);
-	void selectObject(ModelUIDtype visualizationModelID, ak::UID entityID);
-	void addVisualizationNodeFromFacetData(ModelUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3],
-		ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles,
-		std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
-	void addVisualizationNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
-		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-	void addVisualizationContainerNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool editable);
-	void addVisualizationAnnotationNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-		const double edgeColorRGB[3],
-		const std::vector<std::array<double, 3>> &points,
-		const std::vector<std::array<double, 3>> &points_rgb,
-		const std::vector<std::array<double, 3>> &triangle_p1,
-		const std::vector<std::array<double, 3>> &triangle_p2,
-		const std::vector<std::array<double, 3>> &triangle_p3,
-		const std::vector<std::array<double, 3>> &triangle_rgb);
-
-	void addVisualizationVis2D3DNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ak::UID visualizationDataID, ak::UID visualizationDataVersion);
-	void updateVisualizationVis2D3DNode(ModelUIDtype visModelID, ModelUIDtype modelEntityID, const std::string &projectName, ak::UID visualizationDataID, ak::UID visualizationDataVersion);
-
-	void addVisualizationAnnotationNodeDataBase(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, ak::UID entityID, ak::UID entityVersion);
-	void addVisualizationMeshNodeFromFacetDataBase(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, ak::UID entityID, ak::UID entityVersion);
-	void addVisualizationCartesianMeshNode(ModelUIDtype visModelID, const std::string &name, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ, 
-												   const std::string &projectName, ak::UID faceListEntityID, ak::UID faceListEntityVersion, ak::UID nodeListEntityID, ak::UID nodeListEntityVersion);
-	void visualizationCartesianMeshNodeShowLines(ModelUIDtype visModelID, ModelUIDtype modelEntityID, bool showMeshLines);
-	void visualizationTetMeshNodeTetEdges(ModelUIDtype osgModelID, ModelUIDtype modelEntityID, bool displayTetEdges);
-
-	void addVisualizationCartesianMeshItemNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
-
-	void addVisualizationMeshItemNodeFromFacetDataBase(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, long long tetEdgesID, long long tetEdgesVersion);
-	void addVisualizationPlot1DNode(ak::UID visModelID, const std::string &treeName, ak::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-										    const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-											bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ak::UID> &curvesID, std::list<ak::UID> &curvesVersions,
-										    std::list<std::string> &curvesNames);
-	void visualizationPlot1DPropertiesChanged(ak::UID visModelID, ak::UID modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-													  bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax);
-	void addVisualizationTextNode(ak::UID visModelID, const std::string &treeName, ak::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-								 		  const std::string &projectName, ak::UID textID, ak::UID textVersion);
-	void addVisualizationTableNode(ak::UID visModelID, const std::string &treeName, ak::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-										   const std::string &projectName, ak::UID tableID, ak::UID tableVersion);
-
-
-	void visualizationResult1DPropertiesChanged(ModelUIDtype visModelID, ak::UID entityID, ak::UID entityVersion);
-	void removeShapesFromVisualization(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> entityID);
-	void setTreeStateRecording(ModelUIDtype visualizationModelID, bool flag);
-	void setShapeVisibility(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> visibleID, std::list<ModelUIDtype> hiddenID);
-	void hideEntities(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> hiddenID);
-	void showBranch(ModelUIDtype visualizationModelID, const std::string &branchName);
-	void hideBranch(ModelUIDtype visualizationModelID, const std::string &branchName);
-	void updateObjectColor(ModelUIDtype visModelID, ModelUIDtype modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective);
-	void updateMeshColor(ModelUIDtype visModelID, ModelUIDtype modelEntityID, double colorRGB[3]);
-	void updateObjectFacetsFromDataBase(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, unsigned long long entityID, unsigned long long entityVersion);
-
-	void enterEntitySelectionMode(ModelUIDtype visualizationModelID, ot::serviceID_t replyTo, const std::string &selectionType, bool allowMultipleSelection,
-		const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage,
-		std::list<std::string> &optionNames, std::list<std::string> &optionValues);
-	void freeze3DView(ViewerUIDtype visModelID, bool flag);
-	void isModified(ModelUIDtype visualizationModelID, bool modifiedState);
+	std::list<std::string> GetAllUserProjects();
 
 	ModelUIDtype createModel(const std::string& _projectName, const std::string& _collectionName);
 	bool deleteModel(ModelUIDtype modelID);
@@ -202,6 +121,8 @@ public:
 
 	virtual void notify(ak::UID _senderId, ak::eventType _event, int _info1, int _info2) override;
 
+	void fillPropertyGrid(const std::string& _settings);
+
 	void modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype> &selectedEntityID, std::list<ModelUIDtype> &selectedVisibleEntityID);
 
 	void itemRenamed(ModelUIDtype modelID, const std::string &newName);
@@ -212,8 +133,6 @@ public:
 	void executeAction(ModelUIDtype modelID, ModelUIDtype buttonID);
 
 	void entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues);
-	
-	std::string dispatchAction(ot::JsonDocument & _doc, const char * _senderIP);
 	
 	void prefetchDataThread(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
 
@@ -251,26 +170,7 @@ public:
 	// File operations
 	std::list<std::string> RequestFileNames(const std::string& dialogTitle, const std::string& fileMask);
 
-	/// <summary>
-	/// Opens a file selection dialog. The path of the selected file is send to the service that created the request. Optionally, the content of the file can be send with the http response.
-	/// </summary>
-	/// <param name="dialogTitle"></param>
-	/// <param name="fileMask"> Filters the types of files that are shown in the file dialog. </param>
-	/// <param name="subsequentAction"> Info for the requesting service. </param>
-	/// <param name="senderURL"></param>
-	/// <param name="loadContent"> Option to load the files content and send it as part of the response. </param>
-	void requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentAction, const std::string &senderURL, bool loadContent);
-	/// <summary>
-	/// Opens a SAVE FILE dialog window. The path to the selected file is send back to the requesting service.
-	/// </summary>
-	/// <param name="dialogTitle"></param>
-	/// <param name="fileMask">Filters the types of files that are shown in the file dialog. </param>
-	/// <param name="subsequentFunction"></param>
-	/// <param name="senderURL"></param>
-	void selectFileForStoring(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, const std::string &senderURL);
-
 	void ReadFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength);
-	void saveFileContent(const std::string &dialogTitle, const std::string &fileName, const std::string &fileContent, ot::UID uncompressedDataLength);
 
 	// ###################################################################################################
 
@@ -285,6 +185,138 @@ public:
 
 	ot::ServiceBase* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
+	//########################################################################################################
+
+	// Action handler
+
+	OT_HANDLER(handleCompound, ExternalServicesComponent, OT_ACTION_CMD_Compound, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleModelExecuteFunction, ExternalServicesComponent, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDisplayDebugMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayDebugMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleReportInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportInformation, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handlePromptInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_PromptInformation, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRegisterForModelEvents, ExternalServicesComponent, OT_ACTION_CMD_UI_RegisterForModelEvents, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDeregisterForModelEvents, ExternalServicesComponent, OT_ACTION_CMD_UI_DeregisterForModelEvents, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGenerateUIDs, ExternalServicesComponent, OT_ACTION_CMD_UI_GenerateUIDs, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRequestFileForReading, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestFileForReading, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStoreFileInDatabase, ExternalServicesComponent, OT_Action_CMD_UI_StoreFileInDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSaveFileContent, ExternalServicesComponent, OT_ACTION_CMD_UI_SaveFileContent, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSelectFilesForStoring, ExternalServicesComponent, OT_ACTION_CMD_UI_SelectFileForStoring, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMenuPage, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuPage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMenuGroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuGroup, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMenuSubgroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuSubgroup, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMenuButton, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuButton, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMenuCheckbox, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuCheckbox, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMenuLineEdit, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuLineEdit, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleActivateToolbarTab, ExternalServicesComponent, OT_ACTION_CMD_UI_ActivateToolbarTab, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddShortcut, ExternalServicesComponent, OT_ACTION_CMD_UI_AddShortcut, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetCheckboxValue, ExternalServicesComponent, OT_ACTION_CMD_UI_SetCheckboxValues, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetLineEditValue, ExternalServicesComponent, OT_ACTION_CMD_UI_SetLineEditValues, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSwitchMenuTab, ExternalServicesComponent, OT_ACTION_CMD_UI_SwitchMenuTab, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveElements, ExternalServicesComponent, OT_ACTION_CMD_UI_RemoveElements, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetControlsEnabledState, ExternalServicesComponent, OT_ACTION_CMD_UI_EnableDisableControls, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetToolTip, ExternalServicesComponent, OT_ACTION_CMD_UI_OBJ_SetToolTip, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleResetView, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_Reset, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRefreshView, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_Refresh, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleClearSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_ClearSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRefreshSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RefreshSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSelectObject, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SelectObject, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddNodeFromFacetData, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddContainerNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddContainerNode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateMeshColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateMeshColor, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateFacetsFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateFacetsFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveShapes, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleTreeStateRecording, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetShapeVisibility, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetShapeVisibility, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleHideEntities, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_HideEntities, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleShowBranch, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleHideBranch, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddAnnotationNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddAnnotationNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMeshNodeFromFacetDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddCartesianMeshNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCartesianMeshNodeShowLines, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_CartesianMeshNodeShowLines, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddCartesianMeshItem, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleTetMeshNodeTetEdges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddMeshItemFromFacetDatabase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddText, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddText, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSelectRanges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleColorSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddPlot1D, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handlePlot1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleResult1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleEnterEntitySelectionMode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetModifiedState, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetModifiedState, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetProgressVisibility, ExternalServicesComponent, OT_ACTION_CMD_UI_SetProgressVisibility, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetProgressValue, ExternalServicesComponent, OT_ACTION_CMD_UI_SetProgressbarValue, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleFreeze3DView, ExternalServicesComponent, OT_ACTION_CMD_UI_Freeze3DView, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCreateModel, ExternalServicesComponent, OT_ACTION_CMD_UI_MODEL_Create, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCreateView, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_Create, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetEntityName, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetEntityName, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRenameEntity, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RenameEntityName, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCreateRubberband, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_CreateRubberband, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleLock, ExternalServicesComponent, OT_ACTION_CMD_UI_Lock, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleUnlock, ExternalServicesComponent, OT_ACTION_CMD_UI_Unlock, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddSettingsData, ExternalServicesComponent, OT_ACTION_CMD_UI_AddSettingsData, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddIconSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddIconSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetVersionGraph, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraph, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetVersionGraphActive, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveVersionGraphVersions, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddAndActivateVersionGraphVersion, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Graphics Editor	
+	OT_HANDLER(handleFillGraphicsPicker, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCreateGraphicsEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddGraphicsItem, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveGraphicsItem, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddGraphicsConnection, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveGraphicsConnection, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Text Editor
+	OT_HANDLER(handleSetTextEditorText, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetText, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetTextEditorSaved, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetTextEditorModified, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCloseTextEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_Close, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCloseAllTextEditors, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Studio Suite API
+	OT_HANDLER(handleStudioSuiteImport, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteGet, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_GET, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Dialogs
+	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handlePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_PropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleOnePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_OnePropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleMessageDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_MessageDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Plugin handling
+	OT_HANDLER(handlePluginSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddPluginSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRequestPlugin, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPlugin, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handlePluginMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_PluginMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	
 public slots:
 	char *performAction(const char *json, const char *senderIP);
 	void queueAction(const char *json, const char *senderIP);
@@ -318,13 +350,9 @@ private:
 
 	// Private functions
 
-	std::list<std::string> GetAllUserProjects();
-
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 	
 	void removeServiceFromList(std::vector<ot::ServiceBase *> &list, ot::ServiceBase *service);
-
-	void handleTableChange(ot::JsonDocument& doc);
 
 	ak::UID getServiceUiUid(ot::ServiceBase * _service);
 

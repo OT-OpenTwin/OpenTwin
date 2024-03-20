@@ -51,7 +51,7 @@ void ot::ActionDispatcher::remove(ActionHandlerBase* _item) {
 	m_mutex.unlock();
 }
 
-const char* ot::ActionDispatcher::dispatchWrapper(const char* _json, const char* _senderUrl, ot::MessageType _messageType) {
+char* ot::ActionDispatcher::dispatchWrapper(const char* _json, const char* _senderUrl, ot::MessageType _messageType) {
 	std::string result = dispatch(_json, _messageType);
 
 	// Return value must be copied to a memory location that will not be destroyed by the application/service
@@ -66,8 +66,12 @@ std::string ot::ActionDispatcher::dispatch(const std::string& _json, ot::Message
 	JsonDocument doc;
 	doc.fromJson(_json);
 
+	return this->dispatch(doc, _messageType);
+}
+
+std::string ot::ActionDispatcher::dispatch(JsonDocument& _document, MessageType _messageType) {
 	// Get the action and dispatch it
-	std::string action = json::getString(doc, OT_ACTION_MEMBER);
+	std::string action = json::getString(_document, OT_ACTION_MEMBER);
 
 	if (action.empty()) {
 		OT_LOG_EA("Action member not found");
@@ -75,7 +79,7 @@ std::string ot::ActionDispatcher::dispatch(const std::string& _json, ot::Message
 	}
 
 	bool handlerFound = false;
-	std::string result = dispatch(action, doc, handlerFound, _messageType);
+	std::string result = dispatch(action, _document, handlerFound, _messageType);
 
 	// Check if a handler was found or an error occured (non empty result);
 	if (!handlerFound && result.empty()) {

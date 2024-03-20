@@ -145,7 +145,6 @@ extern "C"
 		return retval;
 	};
 
-
 	_declspec(dllexport) void deallocateData(const char *data)
 	{
 		try {
@@ -238,691 +237,34 @@ void ExternalServicesComponent::setMessagingRelay(const std::string &relayAddres
 
 // UI Element creation
 
-void ExternalServicesComponent::addMenuPage(ot::ServiceBase * _sender, const std::string &pageName)
-{
-	try {
-		ak::UID p = AppBase::instance()->getToolBar()->addPage(getServiceUiUid(_sender), pageName.c_str());
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::uiAPI::object::setObjectUniqueName(p, pageName.c_str());
-		m_controlsManager->uiElementCreated(_sender, p, false);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addMenuGroup(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName)
-{
-	try {
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::UID pageUID{ ak::uiAPI::object::getUidFromObjectUniqueName(pageName.c_str()) };
-		//NOTE, add error handling
-		assert(pageUID != ak::invalidUID);
-
-		ak::UID g = AppBase::instance()->getToolBar()->addGroup(getServiceUiUid(_sender), pageUID, groupName.c_str());
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::uiAPI::object::setObjectUniqueName(g, (pageName + ":" + groupName).c_str());
-		m_controlsManager->uiElementCreated(_sender, g, false);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addMenuSubgroup(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName, const std::string &subgroupName) {
-	try {
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::UID groupUID{ ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str()) };
-		//NOTE, add error handling
-		assert(groupUID != ak::invalidUID);
-
-		ak::UID sg = AppBase::instance()->getToolBar()->addSubGroup(getServiceUiUid(_sender), groupUID, subgroupName.c_str());
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::uiAPI::object::setObjectUniqueName(sg, (pageName + ":" + groupName + ":" + subgroupName).c_str());
-		m_controlsManager->uiElementCreated(_sender, sg, false);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-ak::UID ExternalServicesComponent::addMenuPushButton(ot::ServiceBase * _sender, const std::string & _pageName, const std::string & _groupName, const std::string &_subgroupName, const std::string & _buttonName,
-	const std::string & _text, const std::string & _iconName, const std::string & _iconFolder, const ot::Flags<ot::ui::lockType> & _lockFlags)
-{
-	try {
-		ak::UID parentUID;
-		if (_subgroupName.length() == 0) {
-			parentUID = ak::uiAPI::object::getUidFromObjectUniqueName((_pageName + ":" + _groupName).c_str());
+KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ot::ServiceBase* _sender, const std::string& _keySequence) {
+	if (_keySequence.length() > 0) {
+		ShortcutManager* manager = AppBase::instance()->shortcutManager();
+		if (manager) {
+			KeyboardCommandHandler* oldHandler = manager->handlerFromKeySequence(_keySequence.c_str());
+			if (oldHandler) {
+				OT_LOG_WAS("Shortcut for key sequence \"" + _keySequence + "\" already occupied by service \"" + oldHandler->creator()->serviceName() +
+					" (ID: " + std::to_string(oldHandler->creator()->serviceID()) + ")\"\n");
+				return nullptr;
+			}
+			KeyboardCommandHandler* newHandler = new KeyboardCommandHandler(_sender, AppBase::instance(), _keySequence.c_str());
+			manager->addHandler(newHandler);
+			return newHandler;
 		}
 		else {
-			parentUID = ak::uiAPI::object::getUidFromObjectUniqueName((_pageName + ":" + _groupName + ":" + _subgroupName).c_str());
-		}
-		//NOTE, add error handling
-		assert(parentUID != ak::invalidUID);
-
-		// Here we need to pass the iconName as string once the functionality is added to the uiManager
-		ak::UID buttonID = AppBase::instance()->getToolBar()->addToolButton(getServiceUiUid(_sender), parentUID, _iconName.c_str(), _iconFolder.c_str(), _text.c_str());
-
-		if (_subgroupName.length() == 0) {
-			ak::uiAPI::object::setObjectUniqueName(buttonID, (_pageName + ":" + _groupName + ":" + _buttonName).c_str());
-		}
-		else {
-			ak::uiAPI::object::setObjectUniqueName(buttonID, (_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _buttonName).c_str());
-		}
-		m_controlsManager->uiElementCreated(_sender, buttonID);
-		m_lockManager->uiElementCreated(_sender, buttonID, _lockFlags);
-
-		ak::uiAPI::registerUidNotifier(buttonID, this);
-
-		return buttonID;
-	}
-	catch (const std::exception& _e) {
-		assert(0);
-		return ak::invalidUID;
-	}
-	catch (...) {
-		assert(0); // Error handling
-		return ak::invalidUID;
-	}
-}
-
-void ExternalServicesComponent::addMenuCheckBox(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &boxName, const std::string &boxText, bool checked, const ot::Flags<ot::ui::lockType> & _lockFlags)
-{
-	try {
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::UID parentID;
-		if (subgroupName.length() > 0) {
-			parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName + ":" + subgroupName).c_str());
-		}
-		else {
-			parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str());
-		}
-
-		//NOTE, add error handling
-		assert(parentID != ak::invalidUID);
-		if (parentID == ak::invalidUID) return;
-
-		// Here we need to pass the iconName as string once the functionality is added to the uiManager
-		ak::UID boxID = AppBase::instance()->getToolBar()->addCheckBox(getServiceUiUid(_sender), parentID, boxText.c_str(), checked);
-
-		//NOTE, add corresponding functions in uiServiceAPI
-		if (subgroupName.length() > 0) {
-			ak::uiAPI::object::setObjectUniqueName(boxID, (pageName + ":" + groupName + ":" + subgroupName + ":" + boxName).c_str());
-		}
-		else {
-			ak::uiAPI::object::setObjectUniqueName(boxID, (pageName + ":" + groupName + ":" + boxName).c_str());
-		}
-
-		m_controlsManager->uiElementCreated(_sender, boxID);
-		m_lockManager->uiElementCreated(_sender, boxID, _lockFlags);
-
-		ak::uiAPI::registerUidNotifier(boxID, this);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addMenuLineEdit(ot::ServiceBase * _sender, const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, const ot::Flags<ot::ui::lockType> & _lockFlags)
-{
-	try {
-		//NOTE, add corresponding functions in uiServiceAPI
-		ak::UID parentID;
-		if (subgroupName.length() > 0) {
-			parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName + ":" + subgroupName).c_str());
-		}
-		else {
-			parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str());
-		}
-
-		//NOTE, add error handling
-		assert(parentID != ak::invalidUID);
-
-		// Here we need to pass the iconName as string once the functionality is added to the uiManager
-		ak::UID editID = AppBase::instance()->getToolBar()->addNiceLineEdit(getServiceUiUid(_sender), parentID, editLabel.c_str(), editText.c_str());
-
-		//NOTE, add corresponding functions in uiServiceAPI
-		if (subgroupName.length() > 0) {
-			ak::uiAPI::object::setObjectUniqueName(editID, (pageName + ":" + groupName + ":" + subgroupName + ":" + editName).c_str());
-		}
-		else {
-			ak::uiAPI::object::setObjectUniqueName(editID, (pageName + ":" + groupName + ":" + editName).c_str());
-		}
-		m_controlsManager->uiElementCreated(_sender, editID);
-		m_lockManager->uiElementCreated(_sender, editID, _lockFlags);
-
-		ak::uiAPI::registerUidNotifier(editID, this);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-KeyboardCommandHandler * ExternalServicesComponent::addShortcut(ot::ServiceBase * _sender, const std::string& _keySequence) {
-	ShortcutManager * manager = AppBase::instance()->shortcutManager();
-	if (manager) {
-		KeyboardCommandHandler * oldHandler = manager->handlerFromKeySequence(_keySequence.c_str());
-		if (oldHandler) {
-			std::string msg{ "Shortcut for key sequence \"" };
-			msg.append(_keySequence).append("\" already occupied by service \"");
-			msg.append(oldHandler->creator()->serviceName()).append(" (ID: ").append(std::to_string(oldHandler->creator()->serviceID())).append(")\"\n");
-			displayInfoMessage(msg);
+			assert(0);
 			return nullptr;
 		}
-		KeyboardCommandHandler * newHandler = new KeyboardCommandHandler(_sender, AppBase::instance(), _keySequence.c_str());
-		manager->addHandler(newHandler);
-		return newHandler;
 	}
 	else {
-		assert(0);
+		OT_LOG_EA("No key sequence provided for shortcut");
 		return nullptr;
 	}
-}
-
-void ExternalServicesComponent::removeUIElements(const std::list<std::string> & _itemList)
-{
-	try {
-		std::vector<ak::UID> uidList;
-		for (auto itm : _itemList) {
-			uidList.push_back(ak::uiAPI::object::getUidFromObjectUniqueName(itm.c_str()));
-		}
-		m_controlsManager->destroyUiControls(uidList);
-
-		for (auto itm : uidList) {
-			m_lockManager->uiElementDestroyed(itm);
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-// ###################################################################################################
-
-// UI Element manipulation
-
-void ExternalServicesComponent::fillPropertyGrid(const std::string &settings)
-{
-	try {
-		AppBase * app{ AppBase::instance() };
-		app->clearPropertyGrid();
-
-		// Read settings into JSOC Doc
-		ot::JsonDocument doc;
-
-		// Parse the document with the json string we have "received"
-		doc.Parse(settings.c_str());
-
-		// Check if the document is an object
-		assert(doc.IsObject()); // Doc is not an object
-
-		std::map<std::string, bool> groupMap;
-
-		std::vector<std::vector<int>> groupColors = { {164, 147, 133}, {143, 128, 154}, {117, 139, 154}, {166, 135, 148}, {141, 158, 161} };
-		int groupColorIndex = 0;
-
-		for (rapidjson::Value::ConstMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
-		{
-			std::string name = i->name.GetString();
-			assert(i->value.IsObject());
-
-			rapidjson::Value &item = doc[name.c_str()];
-
-			std::string type = item["Type"].GetString();
-			bool multipleValues = item["MultipleValues"].GetBool();
-			bool readOnly = item["ReadOnly"].GetBool();
-			bool protectedProperty = item["Protected"].GetBool();
-			bool errorState = item["ErrorState"].GetBool();
-			std::string group = item["Group"].GetString();
-
-			if (!group.empty())
-			{
-				if (groupMap.find(group) == groupMap.end())
-				{
-					//double r = groupColors[groupColorIndex % groupColors.size()][0] / 255.0;
-					//double g = groupColors[groupColorIndex % groupColors.size()][1] / 255.0;
-					//double b = groupColors[groupColorIndex % groupColors.size()][2] / 255.0;
-					int r = groupColors[groupColorIndex % groupColors.size()][0];
-					int g = groupColors[groupColorIndex % groupColors.size()][1];
-					int b = groupColors[groupColorIndex % groupColors.size()][2];
-
-					app->addPropertyGroup(group.c_str(), ak::aColor(r, g, b), ak::aColor(0, 0, 0), ak::aColor(255, 0, 0));
-					groupMap[group] = true;
-
-					groupColorIndex++;
-				}
-			}
-
-			if (type == "double")
-			{
-				double value = item["Value"].GetDouble();
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-			}
-			else if (type == "integer")
-			{
-				long value = (long)(item["Value"].GetInt64());
-				long min = INT_MIN;
-				long max = INT_MAX;
-				if (item.HasMember("ValueMin")) min = (long)item["ValueMin"].GetInt64();
-				if (item.HasMember("ValueMax")) max = (long)item["ValueMax"].GetInt64();
-				//if (item.HasMember("NumberInputMode")) app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, value, min, max);
-				//else app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, value);
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value, min, max);
-			}
-			else if (type == "boolean")
-			{
-				bool value = item["Value"].GetBool();
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-			}
-			else if (type == "string")
-			{
-				QString value = item["Value"].GetString();
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-			}
-			else if (type == "selection")
-			{
-				std::vector<QString> selection;
-
-				rapidjson::Value options = item["Options"].GetArray();
-
-				for (int i = 0; i < options.Size(); i++)
-				{
-					selection.push_back(QString(options[i].GetString()));
-				}
-
-				QString value = item["Value"].GetString();
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-			}
-			else if (type == "color")
-			{
-				double colorR = item["ValueR"].GetDouble();
-				double colorG = item["ValueG"].GetDouble();
-				double colorB = item["ValueB"].GetDouble();
-
-				ak::aColor value(colorR * 255, colorG * 255, colorB * 255, 0);
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-			}
-			else if (type == "entitylist")
-			{
-				std::vector<QString> selection;
-
-				rapidjson::Value options = item["Options"].GetArray();
-
-				for (int i = 0; i < options.Size(); i++)
-				{
-					selection.push_back(QString(options[i].GetString()));
-				}
-
-				QString value = item["ValueName"].GetString();
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-			}
-			else if (type == "projectlist")
-			{
-				std::vector<QString> selection;
-
-				std::list<std::string> userProjects = GetAllUserProjects();
-
-				for (auto& project : userProjects)
-				{
-					selection.push_back(QString(project.c_str()));
-				}
-
-				QString value = item["Value"].GetString();
-				app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-			}
-			else
-			{
-				assert(0); // Unsupported type
-			}
-		}
-	}
-	catch (const std::exception & e) {
-		AppBase::instance()->showErrorPrompt(e.what(), "Error");
-	}
-	catch (...) {
-		AppBase::instance()->showErrorPrompt("Unknown error", "Fatal error");
-	}
-}
-
-void ExternalServicesComponent::setCheckBoxValues(ot::ServiceBase * _sender, const std::string & _controlName, bool checked)
-{
-	try {
-		ak::UID objectID = ak::uiAPI::object::getUidFromObjectUniqueName(_controlName.c_str());
-
-		assert(objectID != ak::invalidUID);
-		if (objectID == ak::invalidUID) return;
-
-		ak::uiAPI::checkBox::setChecked(objectID, checked);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::setLineEditValues(ot::ServiceBase * _sender, const std::string & _controlName, const std::string &editText, bool error)
-{
-	try {
-		ak::UID objectID = ak::uiAPI::object::getUidFromObjectUniqueName(_controlName.c_str());
-
-		assert(objectID != ak::invalidUID);
-		if (objectID == ak::invalidUID) return;
-
-		if (ak::uiAPI::object::type(objectID) == ak::otLineEdit) {
-			ak::uiAPI::lineEdit::setText(objectID, editText.c_str());
-			ak::uiAPI::lineEdit::setErrorState(objectID, error);
-		}
-		else if (ak::uiAPI::object::type(objectID) == ak::otNiceLineEdit) {
-			ak::uiAPI::niceLineEdit::setText(objectID, editText.c_str());
-			ak::uiAPI::niceLineEdit::setErrorState(objectID, error);
-		}
-		else {
-			assert(0); // Invalid object type
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::enableDisableControls(ot::ServiceBase * _sender, std::list<std::string> &enabled, std::list<std::string> &disabled)
-{
-	try {
-		for (auto controlName : enabled)
-		{
-			//NOTE, add functionallity to uiServiceAPI
-			auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
-			if (uid != ak::invalidUID)
-			{
-				m_lockManager->enable(_sender, uid, true);
-			}
-		}
-
-		for (auto controlName : disabled)
-		{
-			//NOTE, add functionallity to uiServiceAPI
-			auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
-			if (uid != ak::invalidUID)
-			{
-				m_lockManager->disable(_sender, uid);
-			}
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::setTooltipText(ot::ServiceBase * _sender, const std::string &item, const std::string &text)
-{
-	try
-	{
-		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(item.c_str());
-		if (uid != ak::invalidUID)
-		{
-			ak::uiAPI::object::setToolTip(uid, text.c_str());
-		}
-	}
-	catch (...)
-	{
-		assert(0);
-	}
-}
-
-void ExternalServicesComponent::displayInfoMessage(const std::string& _message)
-{
-	AppBase::instance()->appendInfoMessage(_message.c_str());
-};
-
-void ExternalServicesComponent::displayDebugMessage(const std::string& _message) {
-	AppBase::instance()->appendDebugMessage(_message.c_str());
 }
 
 // ###################################################################################################
 
 // 3D View
-
-void ExternalServicesComponent::resetAllViews3D(ModelUIDtype visualizationModelID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->resetAllViews3D(visualizationModelID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::refreshAllViews(ModelUIDtype visualizationModelID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->refreshAllViews(visualizationModelID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::clearSelection(ModelUIDtype visualizationModelID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->clearSelection(visualizationModelID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::refreshSelection(ModelUIDtype visualizationModelID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->refreshSelection(visualizationModelID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::selectObject(ModelUIDtype visualizationModelID, ak::UID entityID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->selectObject(visualizationModelID, entityID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addVisualizationNodeFromFacetData(ModelUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3],
-	double edgeColorRGB[3], ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
-	std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->addNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, 
-																		offsetFactor, isEditable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addVisualizationNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
-	double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
-{
-	AppBase::instance()->getViewerComponent()->addNodeFromFacetDataBase(visModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective, 
-																		modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, isEditable, projectName, entityID, 
-																		entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected,  transformation);
-}
-
-void ExternalServicesComponent::addVisualizationContainerNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool editable)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable);
-	}
-	catch (const std::exception &e) {
-		int x = 1;
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addVisualizationVis2D3DNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ak::UID visualizationDataID, ak::UID visualizationDataVersion)
-{
-	AppBase::instance()->getViewerComponent()->addVisualizationVis2D3DNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, editable, projectName, visualizationDataID, visualizationDataVersion);
-}
-
-void ExternalServicesComponent::updateVisualizationVis2D3DNode(ModelUIDtype visModelID, ModelUIDtype modelEntityID, const std::string &projectName, ak::UID visualizationDataID, ak::UID visualizationDataVersion)
-{
-	AppBase::instance()->getViewerComponent()->updateVisualizationVis2D3DNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion);
-}
-
-void ExternalServicesComponent::addVisualizationAnnotationNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-	const double edgeColorRGB[3],
-	const std::vector<std::array<double, 3>> &points,
-	const std::vector<std::array<double, 3>> &points_rgb,
-	const std::vector<std::array<double, 3>> &triangle_p1,
-	const std::vector<std::array<double, 3>> &triangle_p2,
-	const std::vector<std::array<double, 3>> &triangle_p3,
-	const std::vector<std::array<double, 3>> &triangle_rgb)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->addVisualizationAnnotationNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, edgeColorRGB,
-			points, points_rgb,
-			triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::addVisualizationAnnotationNodeDataBase(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, ak::UID entityID, ak::UID entityVersion)
-{
-	ViewerAPI::addVisualizationAnnotationNodeDataBase(visModelID, treeName, modelEntityID, treeIcons, isHidden, projectName, entityID, entityVersion);
-}
-
-void ExternalServicesComponent::addVisualizationMeshNodeFromFacetDataBase(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, ak::UID entityID, ak::UID entityVersion)
-{
-	ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(visModelID, treeName, modelEntityID, treeIcons, edgeColorRGB, displayTetEdges, projectName, entityID, entityVersion);
-}
-
-void ExternalServicesComponent::addVisualizationCartesianMeshNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
-																  const std::string &projectName, ak::UID faceListEntityID, ak::UID faceListEntityVersion, ak::UID nodeListEntityID, ak::UID nodeListEntityVersion)
-{
-	ViewerAPI::addVisualizationCartesianMeshNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, projectName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
-}
-
-void ExternalServicesComponent::visualizationCartesianMeshNodeShowLines(ModelUIDtype visModelID, ModelUIDtype modelEntityID, bool showMeshLines)
-{
-	ViewerAPI::visualizationCartesianMeshNodeShowLines(visModelID, modelEntityID, showMeshLines);
-}
-
-void ExternalServicesComponent::visualizationTetMeshNodeTetEdges(ModelUIDtype visModelID, ModelUIDtype modelEntityID, bool displayTetEdges)
-{
-	ViewerAPI::visualizationTetMeshNodeTetEdges(visModelID, modelEntityID, displayTetEdges);
-}
-
-void ExternalServicesComponent::addVisualizationMeshItemNodeFromFacetDataBase(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, long long tetEdgesID, long long tetEdgesVersion)
-{
-	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, treeName, modelEntityID, treeIcons, isHidden, projectName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
-}
-
-void ExternalServicesComponent::addVisualizationCartesianMeshItemNode(ModelUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
-{
-	ViewerAPI::addVisualizationCartesianMeshItemNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, facesList, color);
-}
-
-void ExternalServicesComponent::addVisualizationTextNode(ak::UID visModelID, const std::string &treeName, ak::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-	const std::string &projectName, ak::UID textID, ak::UID textVersion)
-{
-	ViewerAPI::addVisualizationTextNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, projectName, textID, textVersion);
-}
-
-void ExternalServicesComponent::addVisualizationTableNode(ak::UID visModelID, const std::string &treeName, ak::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-														  const std::string &projectName, ak::UID tableID, ak::UID tableVersion)
-{
-	ViewerAPI::addVisualizationTableNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, projectName, tableID, tableVersion);
-}
-
-
-
-void ExternalServicesComponent::addVisualizationPlot1DNode(ak::UID visModelID, const std::string &treeName, ak::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-														   const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-														   bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ak::UID> &curvesID, std::list<ak::UID> &curvesVersions,
-														   std::list<std::string> &curvesNames)
-{
-	ViewerAPI::addVisualizationPlot1DNode(visModelID, treeName, modelEntityID, treeIcons, isHidden,	projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
-}
-
-void ExternalServicesComponent::visualizationPlot1DPropertiesChanged(ak::UID visModelID, ak::UID modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-															bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax)
-{
-	ViewerAPI::visualizationPlot1DPropertiesChanged(visModelID, modelEntityID, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
-}
-
-void ExternalServicesComponent::visualizationResult1DPropertiesChanged(ModelUIDtype visModelID, ak::UID entityID, ak::UID entityVersion)
-{
-	ViewerAPI::visualizationResult1DPropertiesChanged(visModelID, entityID, entityVersion);
-}
-
-void ExternalServicesComponent::updateObjectColor(ModelUIDtype visModelID, ModelUIDtype modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->updateObjectColor(visModelID, modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::updateMeshColor(ModelUIDtype visModelID, ModelUIDtype modelEntityID, double colorRGB[3])
-{
-	try {
-		AppBase::instance()->getViewerComponent()->updateMeshColor(visModelID, modelEntityID, colorRGB);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::updateObjectFacetsFromDataBase(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, unsigned long long entityID, unsigned long long entityVersion)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->updateObjectFacetsFromDataBase(visModelID, modelEntityID, entityID, entityVersion);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::enterEntitySelectionMode(ModelUIDtype visualizationModelID, ot::serviceID_t replyTo, const std::string &selectionType, bool allowMultipleSelection, const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage,
-														 std::list<std::string> &optionNames, std::list<std::string> &optionValues)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->enterEntitySelectionMode(visualizationModelID, replyTo, selectionType, allowMultipleSelection, selectionFilter, selectionAction, selectionMessage, optionNames, optionValues);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::freeze3DView(ViewerUIDtype visModelID, bool flag)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->freeze3DView(visModelID, flag);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::isModified(ModelUIDtype visualizationModelID, bool modifiedState)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->isModified(visualizationModelID, modifiedState);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
 
 std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 {
@@ -958,75 +300,6 @@ std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 void ExternalServicesComponent::prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs)
 {
 	AppBase::instance()->getViewerComponent()->prefetchDocumentsFromStorage(projectName, prefetchIDs);
-}
-
-void ExternalServicesComponent::removeShapesFromVisualization(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> entityID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->removeShapes(visualizationModelID, entityID);
-		
-		//If entity is has a block item associated, it gets removed from all editors.
-		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
-		for (auto view : views) {
-			for (auto uid : entityID) {
-				view->removeItem(uid);
-				view->removeConnection(uid);
-			}
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::setTreeStateRecording(ModelUIDtype visualizationModelID, bool flag)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->setTreeStateRecording(visualizationModelID, flag);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::setShapeVisibility(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> visibleID, std::list<ModelUIDtype> hiddenID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->setShapeVisibility(visualizationModelID, visibleID, hiddenID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::hideEntities(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> hiddenID)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->hideEntities(visualizationModelID, hiddenID);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::showBranch(ModelUIDtype visualizationModelID, const std::string &branchName)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->showBranch(visualizationModelID, branchName);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
-void ExternalServicesComponent::hideBranch(ModelUIDtype visualizationModelID, const std::string &branchName)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->hideBranch(visualizationModelID, branchName);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
 }
 
 ModelUIDtype ExternalServicesComponent::createModel(
@@ -1277,6 +550,10 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 	catch (...) {
 		OT_LOG_EA("Unknown error");
 	}
+}
+
+void ExternalServicesComponent::fillPropertyGrid(const std::string& _settings) {
+
 }
 
 void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype> &selectedEntityID, std::list<ModelUIDtype> &selectedVisibleEntityID)
@@ -1568,1700 +845,6 @@ void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype
 	}
 	catch (...) {
 		assert(0); // Error handling
-	}
-}
-
-std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, const char * _senderIP)
-{
-	std::string action;
-	try {
-		if (_doc.HasMember(OT_ACTION_MEMBER)) {
-			action = ot::json::getString(_doc, OT_ACTION_MEMBER);
-
-#ifdef _DEBUG
-			std::cout << ">>> Dispatch action: " << action << std::endl;
-			{
-				std::string msg{ "Dispatch action: " };
-				msg.append(action).append("\n");
-				OutputDebugStringA(msg.c_str());
-			}
-			//ot::Dispatcher::instance()->dispatch(action, _doc);
-#endif // _DEBUG
-
-			if (action == OT_ACTION_CMD_Compound)
-			{
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				rapidjson::Value documents = _doc[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
-				rapidjson::Value prefetchID = _doc[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
-				rapidjson::Value prefetchVersion = _doc[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
-
-				ot::Flags<ot::ui::lockType> lockFlags(ot::ui::tlAll);
-				m_lockManager->lock(nullptr, lockFlags);
-
-				std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
-				size_t numberPrefetch = prefetchID.Size();
-				assert(prefetchVersion.Size() == numberPrefetch);
-
-				for (size_t i = 0; i < numberPrefetch; i++)
-				{
-					prefetchIDs.push_back(std::pair<unsigned long long, unsigned long long>(prefetchID[i].GetInt64(), prefetchVersion[i].GetInt64()));
-				}
-
-				if (!prefetchIDs.empty())
-				{
-					m_prefetchingDataCompleted = false;
-					std::thread workerThread(&ExternalServicesComponent::prefetchDataThread, this, projectName, prefetchIDs);
-
-					while (!m_prefetchingDataCompleted)
-					{
-						QApplication::processEvents();
-						Sleep(25);
-					}
-
-					workerThread.join();
-					QApplication::processEvents();
-				}
-
-				int numberActions = documents.Size();
-
-				// Nofify the viewer about the bulk processing (this e.g. avoids sending of unnecessary selection changed messages)
-				AppBase::instance()->getViewerComponent()->setProcessingGroupOfMessages(true);
-
-				// Disable tree sorting for better performance
-				AppBase::instance()->setNavigationTreeSortingEnabled(false);
-				AppBase::instance()->setNavigationTreeMultiselectionEnabled(false);
-
-
-				for (long i = 0; i < numberActions; i++)
-				{
-					rapidjson::Value subdoc = documents[i].GetObject();
-
-					ot::JsonDocument d;
-					d.CopyFrom(subdoc, d.GetAllocator());
-					dispatchAction(d, _senderIP);
-				}
-
-				// Re enable tree sorting
-				AppBase::instance()->setNavigationTreeSortingEnabled(true);
-				AppBase::instance()->setNavigationTreeMultiselectionEnabled(true);
-
-				// Nofify the viewer about the end of the bulk processing
-				AppBase::instance()->getViewerComponent()->setProcessingGroupOfMessages(false);
-
-				m_lockManager->unlock(nullptr, lockFlags);
-			}
-			else if (action == OT_ACTION_CMD_MODEL_ExecuteFunction)
-			{
-				const std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-
-				ot::UIDList entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-				ot::UIDList entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-				
-				if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
-				{
-					ot::JsonDocument  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
-					std::string response;
-					sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
-					// Check if response is an error or warning
-					OT_ACTION_IF_RESPONSE_ERROR(response) {
-						assert(0); // ERROR
-					}
-					else OT_ACTION_IF_RESPONSE_WARNING(response) {
-						assert(0); // WARNING
-					}
-					}
-			}		
-			else if (action == OT_ACTION_CMD_UI_DisplayMessage)
-			{
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				displayInfoMessage(message);
-			}
-			else if (action == OT_ACTION_CMD_UI_DisplayDebugMessage) {
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				displayDebugMessage(message);
-			}
-			else if (action == OT_ACTION_CMD_UI_ReportError)
-			{
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
-			}
-			else if (action == OT_ACTION_CMD_UI_ReportWarning)
-			{
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
-			}
-			else if (action == OT_ACTION_CMD_UI_ReportInformation)
-			{
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
-			}
-			else if (action == OT_ACTION_CMD_UI_PromptInformation)
-			{
-#pragma message("Invalid Service Information (sender type missing)")
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				std::string icon = ot::json::getString(_doc, OT_ACTION_PARAM_ICON);
-				std::string options = ot::json::getString(_doc, OT_ACTION_PARAM_OPTIONS);
-				std::string promptResponse = ot::json::getString(_doc, OT_ACTION_PARAM_RESPONSE);
-				std::string sender = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER);
-				std::string parameter1 = ot::json::getString(_doc, OT_ACTION_PARAM_PARAMETER1);
-
-				ak::promptType promptType = ak::promptIconLeft;
-
-				if (options == "YesNo")
-				{
-					promptType = ak::promptType::promptYesNoIconLeft;
-				}
-				else if (options == "YesNoCancel")
-				{
-					promptType = ak::promptType::promptYesNoCancelIconLeft;
-				}
-				else if (options == "OkCancel")
-				{
-					promptType = ak::promptType::promptOkCancelIconLeft;
-				}
-				else if (options == "Ok")
-				{
-					promptType = ak::promptType::promptOkIconLeft;
-				}
-				else
-				{
-					assert(0); // Unknown options
-				}
-
-				ak::dialogResult result = ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", promptType, icon.c_str(), "Default", AppBase::instance()->mainWindow());
-
-				std::string queryResult;
-
-				switch (result)
-				{
-				case ak::dialogResult::resultCancel: queryResult = "Cancel"; break;
-				case ak::dialogResult::resultIgnore: queryResult = "Ignore"; break;
-				case ak::dialogResult::resultNo:     queryResult = "No"; break;
-				case ak::dialogResult::resultYes:    queryResult = "Yes"; break;
-				case ak::dialogResult::resultNone:   queryResult = "None"; break;
-				case ak::dialogResult::resultOk:     queryResult = "Ok"; break;
-				case ak::dialogResult::resultRetry:  queryResult = "Retry"; break;
-				default:
-					assert(0); // Unknown type
-				}
-
-				ot::JsonDocument docOut;
-				docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
-				docOut.AddMember(OT_ACTION_PARAM_RESPONSE, ot::JsonString(promptResponse, docOut.GetAllocator()), docOut.GetAllocator());
-				docOut.AddMember(OT_ACTION_PARAM_ANSWER, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
-				docOut.AddMember(OT_ACTION_PARAM_PARAMETER1, ot::JsonString(parameter1, docOut.GetAllocator()), docOut.GetAllocator());
-
-				if (this->getServiceFromNameType(sender, sender) != nullptr)
-				{
-					std::string senderUrl = this->getServiceFromNameType(sender, sender)->serviceURL();
-
-					std::string response;
-					if (!sendHttpRequest(QUEUE, senderUrl, docOut, response)) {
-						throw std::exception("Failed to send http request");
-					}
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_RegisterForModelEvents) {
-				ot::serviceID_t senderID(ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
-				auto s = m_serviceIdMap.find(senderID);
-
-				// Check if the service was registered before
-				if (s == m_serviceIdMap.end()) {
-					std::string ex{ "A service with the id \"" };
-					ex.append(std::to_string(senderID));
-					ex.append("\" was not registered before");
-					throw std::exception(ex.c_str());
-				}
-				if (s->second->serviceName() == OT_INFO_SERVICE_TYPE_MODEL)
-				{
-					m_modelServiceURL = s->second->serviceURL();
-				}
-
-				m_modelViewNotifier.push_back(s->second);
-
-				std::cout << "Service with ID \"" << s->second->serviceID() << "\" was registered from model view events" << std::endl;
-			}
-			else if (action == OT_ACTION_CMD_UI_DeregisterForModelEvents) {
-				ot::serviceID_t senderID(ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
-				auto s = m_serviceIdMap.find(senderID);
-
-				// Check if the service was registered before
-				if (s == m_serviceIdMap.end()) {
-					std::string ex("A service with the id \"");
-					ex.append(std::to_string(senderID));
-					ex.append("\" was not registered before");
-					throw std::exception(ex.c_str());
-				}
-
-				removeServiceFromList(m_modelViewNotifier, s->second);
-
-				std::cout << "Service with ID \"" << s->second->serviceID() << "\" was deregistered from model view events" << std::endl;
-			}
-			else if (action == OT_ACTION_CMD_ServiceShutdown) {
-				std::cout << "Shutdown from session service" << std::endl;
-				AppBase::instance()->showErrorPrompt("Shutdown requested by session service.", "Error");
-				exit(0);	//NOTE, Add external shutdown
-			}
-			else if (action == OT_ACTION_CMD_ServicePreShutdown) {
-				std::cout << "Pre shutdown from session service" << std::endl;
-			}
-			else if (action == OT_ACTION_CMD_UI_GenerateUIDs)
-			{
-				int count = _doc[OT_ACTION_PARAM_COUNT].GetInt();
-				// empty id list
-				std::vector<ak::UID> idList;
-				for (int i = 0; i < count; i++) { idList.push_back(ak::uiAPI::createUid()); }
-				// json object contains the list
-
-				ot::JsonDocument returnDoc;
-				ot::JsonArray uidArray;
-				for (ot::UID id : idList)
-				{
-					uidArray.PushBack(id, returnDoc.GetAllocator());
-				}
-				returnDoc.AddMember("idList", uidArray, returnDoc.GetAllocator());
-
-				return returnDoc.toJson();
-			}
-			else if (action == OT_ACTION_CMD_UI_RequestFileForReading)
-			{
-				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-				bool loadContent = ot::json::getBool(_doc, OT_ACTION_PARAM_FILE_LoadContent);
-
-				requestFileForReading(dialogTitle, fileMask, subsequentFunction, senderURL, loadContent);
-			}
-			else if (action == OT_Action_CMD_UI_StoreFileInDataBase)
-			{
-				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-				std::string entityType = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Type);
-				try
-				{
-					std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
-
-					if (absoluteFilePaths.size() != 0)
-					{
-						ot::JsonDocument sendingDoc;
-
-						int requiredIdentifierPairsPerFile = 2;
-						const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPairsPerFile;
-
-						sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs, sendingDoc.GetAllocator());
-						const std::string url = uiServiceURL();
-						sendingDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(url, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-						sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(m_fileHandler.GetStoreFileFunctionName(), sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-						sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-						
-						std::string response;
-						sendHttpRequest(QUEUE, m_modelServiceURL, sendingDoc, response);
-						// Check if response is an error or warning
-						OT_ACTION_IF_RESPONSE_ERROR(response) {
-							assert(0); // ERROR
-						}
-						else OT_ACTION_IF_RESPONSE_WARNING(response) {
-							assert(0); // WARNING
-						}
-
-						std::list<std::string> takenNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
-						std::string senderName = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER);
-						std::string entityPath = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
-						std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-						std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-						m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath), entityType);
-					}
-				}
-				catch (std::exception& e)
-				{
-					displayInfoMessage("Failed to load file due to: " + std::string(e.what()));
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_SaveFileContent)
-			{
-				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-
-				saveFileContent(dialogTitle, fileName, fileContent, uncompressedDataLength);
-			}
-			else if (action == OT_ACTION_CMD_UI_SelectFileForStoring)
-			{
-				std::string dialogTitle = ot::json::getString(_doc, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-				std::string fileMask = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-
-				selectFileForStoring(dialogTitle, fileMask, subsequentFunction, senderURL);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change)
-			{
-				handleTableChange(_doc);
-			}			
-			else if (action == OT_ACTION_CMD_UI_FillPropertyGrid)
-			{
-				std::string settings = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);
-				fillPropertyGrid(settings);
-			}
-			else if (action == OT_ACTION_CMD_UI_AddMenuPage)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				addMenuPage(getService(serviceId), pageName);
-			}
-			else if (action == OT_ACTION_CMD_UI_AddMenuGroup)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				addMenuGroup(getService(serviceId), pageName, groupName);
-			}
-			else if (action == OT_ACTION_CMD_UI_AddMenuSubgroup)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				std::string subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				addMenuSubgroup(getService(serviceId), pageName, groupName, subgroupName);
-			}
-			else if (action == OT_ACTION_CMD_UI_AddMenuButton)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				std::string subgroupName = "";
-				if (_doc.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName))
-				{
-					subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
-				}
-				std::string buttonName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string text = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				std::string iconName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconName);
-				std::string iconFolder = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				ot::ContextMenu contextMenu("");
-				if (_doc.HasMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu)) {
-					ot::ConstJsonObject contextMenuData = ot::json::getObject(_doc, OT_ACTION_PARAM_UI_CONTROL_ContextMenu);
-					contextMenu.setFromJsonObject(contextMenuData);
-				}
-				ot::ServiceBase * senderService = getService(serviceId);
-				ak::UID btnUid;
-
-				if (_doc.HasMember(OT_ACTION_PARAM_ElementLockTypes)) {
-					auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
-					flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external push buttons
-					btnUid = addMenuPushButton(senderService, pageName, groupName, subgroupName, buttonName, text, iconName, iconFolder, flags);
-				}
-				else {
-					btnUid = addMenuPushButton(senderService, pageName, groupName, subgroupName, buttonName, text, iconName, iconFolder, ot::Flags<ot::ui::lockType>(ot::ui::lockType::tlAll));
-				}
-
-				if (btnUid != ak::invalidUID) {
-					if (_doc.HasMember(OT_ACTION_PARAM_UI_KeySequence)) {
-						std::string keySquence = ot::json::getString(_doc, OT_ACTION_PARAM_UI_KeySequence);
-						if (keySquence.length() > 0) {
-							KeyboardCommandHandler * newHandler = addShortcut(senderService, keySquence.c_str());
-							if (newHandler) {
-								newHandler->attachToEvent(btnUid, ak::etClicked);
-								text.append(" (").append(keySquence).append(")");
-								ak::uiAPI::toolButton::setToolTip(btnUid, text.c_str());
-							}
-						}
-					}
-
-					if (contextMenu.hasItems()) {
-						AppBase::instance()->contextMenuManager()->createItem(senderService, getServiceUiUid(senderService), btnUid, contextMenu);
-					}
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_ActivateToolbarTab)
-			{
-				std::string tabName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_TabName);
-
-				AppBase::instance()->activateToolBarTab(tabName.c_str());
-			}
-			else if (action == OT_ACTION_CMD_UI_AddMenuCheckbox)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				std::string subgroupName = ""; // Subgroup is optional
-				try { subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
-				catch (...) {}
-				std::string boxName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string boxText = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				bool checked = _doc[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
-				flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
-
-				addMenuCheckBox(getService(serviceId), pageName, groupName, subgroupName, boxName, boxText, checked, flags);
-			}
-			else if (action == OT_ACTION_CMD_UI_AddShortcut) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string keySequence = ot::json::getString(_doc, OT_ACTION_PARAM_UI_KeySequence);
-				if (keySequence.length() > 0) {
-					addShortcut(getService(serviceId), keySequence);
-				}
-				else {
-					assert(0);
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_AddMenuLineEdit)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				std::string groupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_GroupName);
-				std::string subgroupName = ""; // Subgroup is optional
-				try { subgroupName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SubgroupName); }
-				catch (...) {}
-				std::string editName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string editText = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				std::string editLabel = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
-				flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
-
-				addMenuLineEdit(getService(serviceId), pageName, groupName, subgroupName, editName, editText, editLabel, flags);
-			}
-			else if (action == OT_ACTION_CMD_UI_SetCheckboxValues)
-			{
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string controlName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				bool checked = _doc[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
-
-				setCheckBoxValues(getService(serviceId), controlName, checked);
-			}
-			else if (action == OT_ACTION_CMD_UI_SetLineEditValues)
-			{
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string controlName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string editText = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				bool error = _doc[OT_ACTION_PARAM_UI_CONTROL_ErrorState].GetBool();
-
-				setLineEditValues(getService(serviceId), controlName, editText, error);
-			}
-			else if (action == OT_ACTION_CMD_UI_SwitchMenuTab)
-			{
-				std::string pageName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_PageName);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				AppBase::instance()->switchToTab(pageName);
-			}
-			else if (action == OT_ACTION_CMD_UI_RemoveElements)
-			{
-				std::list<std::string> itemList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectNames);
-				removeUIElements(itemList);
-			}
-			else if (action == OT_ACTION_CMD_UI_EnableDisableControls)
-			{
-				std::list<std::string> enabled = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_EnabledControlsList);
-				std::list<std::string> disabled = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_DisabledControlsList);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-
-				enableDisableControls(getService(serviceId), enabled, disabled);
-			}
-			else if (action == OT_ACTION_CMD_UI_OBJ_SetToolTip)
-			{
-				std::string item = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				std::string text = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-
-				setTooltipText(getService(serviceId), item, text);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_Reset)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				resetAllViews3D(visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_Refresh)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				refreshAllViews(visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_ClearSelection)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				clearSelection(visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_RefreshSelection)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				refreshSelection(visualizationModelID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_SelectObject)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				selectObject(visualizationModelID, entityID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData)
-			{
-				ot::JsonSizeType tmp;
-
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
-				double *surfaceColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
-				double *edgeColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
-				ak::UID modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				bool backFaceCulling = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling);
-				double offsetFactor = _doc[OT_ACTION_PARAM_MODEL_ITM_OffsetFactor].GetDouble();
-				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-				bool selectChildren = _doc[OT_ACTION_PARAM_MODEL_ITM_SelectChildren].GetBool();
-				bool manageParentVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
-				bool manageChildVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
-				bool showWhenSelected = _doc[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
-				std::vector<Geometry::Node> nodes;
-				getVectorNodeFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Nodes, nodes);
-				std::list<Geometry::Triangle> triangles;
-				getListTriangleFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Triangles, triangles);
-				std::list<Geometry::Edge> edges;
-				getListEdgeFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Edges, edges);
-				std::string errors = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Errors);
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				addVisualizationNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, editable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase)
-			{
-				ot::JsonSizeType tmp;
-
-				ViewerUIDtype visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
-				double *surfaceColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
-				double *edgeColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
-				std::string materialType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
-				std::string textureType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
-				bool reflective = _doc[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				bool backFaceCulling = _doc[OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling].GetBool();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				double offsetFactor = _doc[OT_ACTION_PARAM_MODEL_ITM_OffsetFactor].GetDouble();
-				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-				bool selectChildren = _doc[OT_ACTION_PARAM_MODEL_ITM_SelectChildren].GetBool();
-				bool manageParentVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
-				bool manageChildVisibility = _doc[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
-				bool showWhenSelected = _doc[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ModelUIDtype entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ModelUIDtype entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				std::vector<double> transformation;
-				try
-				{
-					transformation = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_MODEL_ITM_Transformation);
-				}
-				catch (std::exception)
-				{
-					// There is no transformation attached. Set up a unity transform
-					transformation.resize(16, 0.0);
-					transformation[0] = transformation[5] = transformation[10] = transformation[15] = 1.0;
-				}
-
-				addVisualizationNodeFromFacetDataBase(visModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, editable, projectName, entityID, entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_AddContainerNode)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-				addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string treeName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_TREE_Name);
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				bool editable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-
-				ak::UID visualizationDataID = _doc[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
-				ak::UID visualizationDataVersion = _doc[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
-
-				addVisualizationVis2D3DNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, editable, projectName, visualizationDataID, visualizationDataVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-
-				ak::UID visualizationDataID = _doc[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
-				ak::UID visualizationDataVersion = _doc[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
-
-				updateVisualizationVis2D3DNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor)
-			{
-				ot::JsonSizeType tmp;
-
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				double *surfaceColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
-				double *edgeColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
-				std::string materialType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
-				std::string textureType = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_TextureType);
-				bool reflective = _doc[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
-				updateObjectColor(visModelID, modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_UpdateMeshColor)
-			{
-				ot::JsonSizeType tmp;
-
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				double* colorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
-				updateMeshColor(visModelID, modelEntityID, colorRGB);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_UpdateFacetsFromDataBase)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ModelUIDtype modelEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				ModelUIDtype entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ModelUIDtype entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-
-				updateObjectFacetsFromDataBase(visModelID, modelEntityID, entityID, entityVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes)
-			{
-				///NOTE
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<ak::UID> entityID = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_ID);
-				removeShapesFromVisualization(visualizationModelID, entityID);
-
-				std::list<std::string> curveNames= ViewerAPI::getSelectedCurves(visualizationModelID);
-				ViewerAPI::removeSelectedCurveNodes(visualizationModelID);
-
-				ot::JsonDocument requestDoc;
-				ot::JsonArray jCurveNames;
-				for (auto& curveName : curveNames)
-				{
-					jCurveNames.PushBack(ot::JsonString(curveName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-				}
-				requestDoc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, jCurveNames, requestDoc.GetAllocator());
-				requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-				std::string response;
-				sendHttpRequest(QUEUE, m_modelServiceURL, requestDoc, response);
-				OT_ACTION_IF_RESPONSE_ERROR(response) {
-					assert(0); // ERROR
-				}
-				else OT_ACTION_IF_RESPONSE_WARNING(response)
-				{
-					assert(0); // WARNING
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				bool flag = _doc[OT_ACTION_PARAM_MODEL_State].GetBool();
-				setTreeStateRecording(visualizationModelID, flag);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_SetShapeVisibility)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<ak::UID> visibleID = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_ID_Visible);
-				std::list<ak::UID> hiddenID = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden);
-				setShapeVisibility(visualizationModelID, visibleID, hiddenID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_HideEntities)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<ak::UID> hiddenID = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden);
-
-				hideEntities(visualizationModelID, hiddenID);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string branchName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
-
-				showBranch(visualizationModelID, branchName);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string branchName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
-
-				hideBranch(visualizationModelID, branchName);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode)
-			{
-				ot::JsonSizeType tmp;
-
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				double *edgeColorRGB = ot::json::getDoubleArray(_doc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
-				std::vector<std::array<double, 3>> points = getVectorDoubleArrayFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Points);
-				std::vector<std::array<double, 3>> points_rgb = getVectorDoubleArrayFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Points_Colors);
-				std::vector<std::array<double, 3>> triangle_p1 = getVectorDoubleArrayFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p1);
-				std::vector<std::array<double, 3>> triangle_p2 = getVectorDoubleArrayFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p2);
-				std::vector<std::array<double, 3>> triangle_p3 = getVectorDoubleArrayFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p3);
-				std::vector<std::array<double, 3>> triangle_rgb = getVectorDoubleArrayFromDocument(_doc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_Color);
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				addVisualizationAnnotationNode(visModelID, name, UID, treeIcons, isHidden, edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				addVisualizationAnnotationNodeDataBase(visModelID, name, UID, treeIcons, isHidden, projectName, entityID, entityVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				double edgeColorRGB[3];
-				edgeColorRGB[0] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
-				edgeColorRGB[1] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
-				edgeColorRGB[2] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-				bool displayTetEdges = _doc[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				addVisualizationMeshNodeFromFacetDataBase(visModelID, name, UID, treeIcons, edgeColorRGB, displayTetEdges, projectName, entityID, entityVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				double edgeColorRGB[3];
-				edgeColorRGB[0] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
-				edgeColorRGB[1] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
-				edgeColorRGB[2] = _doc[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
-				double meshLineColorRGB[3];
-				meshLineColorRGB[0] = _doc[OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_R].GetDouble();
-				meshLineColorRGB[1] = _doc[OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_G].GetDouble();
-				meshLineColorRGB[2] = _doc[OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_B].GetDouble();
-				std::vector<double> meshCoordsX = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_MESH_CartesianCoordX);
-				std::vector<double> meshCoordsY = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_MESH_CartesianCoordY);
-				std::vector<double> meshCoordsZ = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_MESH_CartesianCoordZ);
-				bool showMeshLines = _doc[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ak::UID faceListEntityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ak::UID faceListEntityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-				ak::UID nodeListEntityID = _doc[OT_ACTION_PARAM_MESH_NODE_ID].GetUint64();
-				ak::UID nodeListEntityVersion = _doc[OT_ACTION_PARAM_MESH_NODE_VERSION].GetUint64();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				addVisualizationCartesianMeshNode(visModelID, name, UID, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, projectName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_CartesianMeshNodeShowLines)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool showMeshLines = _doc[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
-				visualizationCartesianMeshNodeShowLines(visModelID, UID, showMeshLines);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::vector<int> facesList = ot::json::getIntVector(_doc, OT_ACTION_PARAM_MODEL_ITM_FacesList);
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				double colorRGB[3];
-				colorRGB[0] = _doc[OT_ACTION_PARAM_MESH_ITEM_COLOR_R].GetDouble();
-				colorRGB[1] = _doc[OT_ACTION_PARAM_MESH_ITEM_COLOR_G].GetDouble();
-				colorRGB[2] = _doc[OT_ACTION_PARAM_MESH_ITEM_COLOR_B].GetDouble();
-				addVisualizationCartesianMeshItemNode(visModelID, name, UID, treeIcons, isHidden, facesList, colorRGB);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool displayMeshEdges = _doc[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
-				visualizationTetMeshNodeTetEdges(visModelID, UID, displayMeshEdges);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				ak::UID entityVersion = _doc[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-				long long tetEdgesID = _doc[OT_ACTION_PARAM_MODEL_TETEDGES_ID].GetUint64();;
-				long long tetEdgesVersion = _doc[OT_ACTION_PARAM_MODEL_TETEDGES_Version].GetUint64();
-
-				addVisualizationMeshItemNodeFromFacetDataBase(visModelID, name, UID, treeIcons, isHidden, projectName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddText)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				bool isEditable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ak::UID textID = _doc[OT_ACTION_PARAM_TEXT_ID].GetUint64();
-				ak::UID textVersion = _doc[OT_ACTION_PARAM_TEXT_VERSION].GetUint64();
-
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-
-				addVisualizationTextNode(visModelID, name, UID, treeIcons, isHidden, projectName, textID, textVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddTable)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				bool isEditable = _doc[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-				ak::UID tableID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				ak::UID tableVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-
-				addVisualizationTableNode(visModelID, name, UID, treeIcons, isHidden, projectName, tableID, tableVersion);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				ot::ConstJsonObject serializedColor = ot::json::getObject(_doc, OT_ACTION_PARAM_COLOUR_BACKGROUND);
-
-				try {
-					ot::Color colour;
-					colour.setFromJsonObject(serializedColor);
-					std::pair<ot::UID, ot::UID> activeTableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visualizationModelID);
-
-					if (activeTableIdentifyer.first != -1)
-					{
-						SetColourOfSelectedRange(visualizationModelID, colour);
-						RequestTableSelection(visualizationModelID, senderURL, subsequentFunction);
-					}
-
-				}
-				catch (std::exception& e)
-				{
-					displayInfoMessage("Table selection request could not be handled due to exception: " + std::string(e.what()));
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ak::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				ak::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SENDER_URL);
-				std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-				try
-				{
-					bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
-
-					if (refreshColouring && subsequentFunction != "")
-					{
-						std::string tableName = ViewerAPI::getTableName(visualizationModelID);
-
-						ot::JsonDocument doc;
-						doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
-						doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
-						doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(tableName, doc.GetAllocator()), doc.GetAllocator());
-
-						std::string response;
-						sendHttpRequest(EXECUTE, senderURL, doc, response);
-						OT_ACTION_IF_RESPONSE_ERROR(response) {
-							displayInfoMessage("Response while refreshing colour was false");
-							//assert(0); // ERROR
-						}
-						else OT_ACTION_IF_RESPONSE_WARNING(response)
-						{
-							displayInfoMessage("Response while refreshing colour was false");
-							assert(0); // WARNING
-						}
-					}
-				}
-				catch (std::exception& e)
-				{
-					displayInfoMessage("Table could not be shown due to exception: " + std::string(e.what()));
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_SetTable)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				auto tableContent= ot::json::getObject(_doc, OT_ACTION_PARAM_Value);
-				ot::GenericDataStructMatrix data;
-				data.setFromJsonObject(tableContent);
-				ViewerAPI::showTable(visualizationModelID, data);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges)
-			{
-				ak::UID visualizationModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				
-				auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
-				std::vector<ot::TableRange> ranges;
-				ranges.reserve(listOfSerializedRanges.size());
-				for (auto range : listOfSerializedRanges)
-				{
-					ot::TableRange tableRange;
-					tableRange.setFromJsonObject(range);
-					ranges.push_back(tableRange);
-				}
-				try
-				{
-					ViewerAPI::setTableSelection(visualizationModelID, ranges);
-				}
-				catch(std::exception& e)
-				{
-					displayInfoMessage("Table selection could not be executed due to exception: " + std::string(e.what()));
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection)
-			{
-				ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-				ot::ConstJsonObject serializedColor = ot::json::getObject(_doc, OT_ACTION_PARAM_COLOUR_BACKGROUND);
-				
-				try
-				{
-					ot::Color colour;
-					colour.setFromJsonObject(serializedColor);
-					ViewerAPI::ChangeColourOfSelection(visualizationModelID, colour);
-				}
-				catch (std::exception& e)
-				{
-					displayInfoMessage("Setting colour of table selection could not be executed due to exception: " + std::string(e.what()));
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-				ak::UID UID = _doc[OT_ACTION_PARAM_UI_UID].GetUint64();
-				bool isHidden = _doc[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-				std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-
-				int gridColor[3] = { 0, 0, 0 };
-				std::string title = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_Title);
-				std::string plotType = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
-				std::string plotQuantity = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
-				bool grid = _doc[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
-				bool legend = _doc[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
-				bool logscaleX = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
-				bool logscaleY = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleY].GetBool();
-				bool autoscaleX = _doc[OT_ACTION_PARAM_VIEW1D_AutoscaleX].GetBool();
-				bool autoscaleY = _doc[OT_ACTION_PARAM_VIEW1D_AutoscaleY].GetBool();
-				double xmin = _doc[OT_ACTION_PARAM_VIEW1D_Xmin].GetDouble();
-				double xmax = _doc[OT_ACTION_PARAM_VIEW1D_Xmax].GetDouble();
-				double ymin = _doc[OT_ACTION_PARAM_VIEW1D_Ymin].GetDouble();
-				double ymax = _doc[OT_ACTION_PARAM_VIEW1D_Ymax].GetDouble();
-				gridColor[0] = _doc[OT_ACTION_PARAM_VIEW1D_GridColorR].GetInt();
-				gridColor[1] = _doc[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
-				gridColor[2] = _doc[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
-
-				std::list<ak::UID> curvesID = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_VIEW1D_CurveIDs);
-				std::list<ak::UID> curvesVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_VIEW1D_CurveVersions);
-				std::list<std::string> curvesNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_VIEW1D_CurveNames);
-
-				TreeIcon treeIcons = getTreeIconsFromDocument(_doc);
-
-				addVisualizationPlot1DNode(visModelID, name, UID, treeIcons, isHidden, projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY,
-					autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged)
-			{
-				int gridColor[3] = { 0, 0, 0 };
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				ak::UID UID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				std::string title = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_Title);
-				std::string plotType = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotType);
-				std::string plotQuantity = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
-				bool grid = _doc[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
-				bool legend = _doc[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
-				bool logscaleX = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
-				bool logscaleY = _doc[OT_ACTION_PARAM_VIEW1D_LogscaleY].GetBool();
-				bool autoscaleX = _doc[OT_ACTION_PARAM_VIEW1D_AutoscaleX].GetBool();
-				bool autoscaleY = _doc[OT_ACTION_PARAM_VIEW1D_AutoscaleY].GetBool();
-				double xmin = _doc[OT_ACTION_PARAM_VIEW1D_Xmin].GetDouble();
-				double xmax = _doc[OT_ACTION_PARAM_VIEW1D_Xmax].GetDouble();
-				double ymin = _doc[OT_ACTION_PARAM_VIEW1D_Ymin].GetDouble();
-				double ymax = _doc[OT_ACTION_PARAM_VIEW1D_Ymax].GetDouble();
-				gridColor[0] = _doc[OT_ACTION_PARAM_VIEW1D_GridColorR].GetInt();
-				gridColor[1] = _doc[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
-				gridColor[2] = _doc[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
-
-				visualizationPlot1DPropertiesChanged(visModelID, UID, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged)
-			{
-				ak::UID visModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-				ot::UIDList entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_ID);
-				ot::UIDList entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_ITM_Version);
-				auto entityVersion = entityVersions.begin();
-				for (ot::UID entityID : entityIDs)
-				{
-					visualizationResult1DPropertiesChanged(visModelID, entityID, *entityVersion);
-					entityVersion++;
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string selectionType = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_SelectionType);
-				bool allowMultipleSelection = _doc[OT_ACTION_PARAM_MODEL_ITM_Selection_AllowMultipleSelection].GetBool();
-				std::string selectionFilter = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Filter);
-				std::string selectionAction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Action);
-				std::string selectionMessage = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_Message);
-				ot::serviceID_t replyToService = ot::json::getUInt(_doc, OT_ACTION_PARAM_MODEL_REPLYTO);
-				std::list<std::string> optionNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
-				std::list<std::string> optionValues = ot::json::getStringList(_doc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
-				enterEntitySelectionMode(visModelID, replyToService, selectionType, allowMultipleSelection, selectionFilter, selectionAction, selectionMessage, optionNames, optionValues);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_SetModifiedState)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				bool modifiedState = _doc[OT_ACTION_PARAM_MODEL_ModifiedState].GetBool();
-
-				isModified(visModelID, modifiedState);
-			}
-			else if (action == OT_ACTION_CMD_UI_SetProgressVisibility)
-			{
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				bool visible = ot::json::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_VisibleState);
-				bool continuous = ot::json::getBool(_doc, OT_ACTION_PARAM_UI_CONTROL_ContinuousState);
-
-				AppBase * app = AppBase::instance();
-				assert(app != nullptr);
-				if (app != nullptr) app->setProgressBarVisibility(message.c_str(), visible, continuous);
-			}
-			else if (action == OT_ACTION_CMD_UI_SetProgressbarValue)
-			{
-				int percentage = ot::json::getInt(_doc, OT_ACTION_PARAM_PERCENT);
-
-				AppBase * app = AppBase::instance();
-				assert(app != nullptr);
-				if (app != nullptr) app->setProgressBarValue(percentage);
-			}
-			else if (action == OT_ACTION_CMD_UI_Freeze3DView)
-			{
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				bool flag = _doc[OT_ACTION_PARAM_UI_CONTROL_BOOLEAN_STATE].GetBool();
-
-				freeze3DView(visModelID, flag);
-			}
-			else if (action == OT_ACTION_CMD_ServiceConnected) {
-				ot::serviceID_t senderID = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-				std::string senderName = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
-				std::string senderType = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_TYPE);
-				ot::ServiceBase * connectedService = new ot::ServiceBase(senderName, senderType, senderURL, senderID);
-				m_serviceIdMap.insert_or_assign(senderID, connectedService);
-			}
-			else if (action == OT_ACTION_CMD_ServiceDisconnected) {
-				ot::serviceID_t senderID = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string senderURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-				std::string senderName = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
-				std::string senderType = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_TYPE);
-				auto itm = m_serviceIdMap.find(senderID);
-				if (itm != m_serviceIdMap.end()) {
-					ot::ServiceBase * actualService = itm->second;
-					assert(actualService != nullptr);
-
-					// Clean up elements
-					m_lockManager->cleanService(actualService, false, true);
-					m_controlsManager->serviceDisconnected(actualService);
-					m_owner->uiPluginManager()->unloadPlugins(actualService);
-					AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
-					AppBase::instance()->contextMenuManager()->serviceDisconnected(actualService);
-
-					// Clean up entry
-					m_serviceIdMap.erase(actualService->serviceID());
-					removeServiceFromList(m_modelViewNotifier, actualService);
-
-					delete actualService;
-				}
-			}
-			else if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
-				assert(0);	// Add external shutdown
-			}
-			else if (action == OT_ACTION_CMD_Message) {
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				ot::serviceID_t senderID = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				//NOTE, add shutdown and pre shutdown requests
-				std::string msg("Message from ");
-				msg.append(std::to_string(senderID)).append(": ").append(message);
-				std::cout << msg << std::endl;
-			}
-			else if (action == OT_ACTION_CMD_UI_MODEL_Create) {
-				AppBase * app = AppBase::instance();
-
-				// Create a model and a view
-				ModelUIDtype modelID = app->createModel();
-				ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectName());
-				app->getViewerComponent()->activateModel(modelID);
-
-				auto service = m_serviceIdMap.find(ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID));
-				if (service == m_serviceIdMap.end()) { throw std::exception("Sender service was not registered"); }
-
-				// Write data to JSON string
-				ot::JsonDocument docOut;
-				docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, docOut.GetAllocator()), docOut.GetAllocator());
-				docOut.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, docOut.GetAllocator());
-				docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
-
-				std::string response;
-				if (!sendHttpRequest(QUEUE, service->second->serviceURL(), docOut, response)) {
-					throw std::exception("Failed to send http request");
-				}
-				OT_ACTION_IF_RESPONSE_ERROR(response) {
-					std::string ex(OT_ACTION_RETURN_INDICATOR_Error "From ");
-					ex.append(service->second->serviceURL()).append(": ").append(response);
-					throw std::exception(ex.c_str());
-				}
-				else OT_ACTION_IF_RESPONSE_WARNING(response) {
-					std::string ex(OT_ACTION_RETURN_INDICATOR_Error "From ");
-					ex.append(service->second->serviceURL()).append(": ").append(response);
-					throw std::exception(ex.c_str());
-				}
-
-				app->switchToViewTab();
-				app->lockWelcomeScreen(false);
-
-				//NOTE, check the better location for this
-				//ak::uiAPI::window::setWaitingAnimationVisible(AppBase::instance()->getDefaultObjectUID(uiServiceAPI::defaultObject::doMainWindow), false);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_Create) {
-				auto manager = AppBase::instance();
-
-				ot::JsonDocument docOut;
-				docOut.SetObject();
-				docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, manager->createView(ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID),
-					AppBase::instance()->getCurrentProjectName()), docOut.GetAllocator());
-
-				return docOut.toJson();
-			}
-			else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
-
-				QString msg("An unexpected error occurred and the session needs to be closed.");
-				ak::uiAPI::promptDialog::show(msg, "Open Twin", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
-				exit(1);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_SetEntityName) {
-				ak::UID entityID = _doc[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-				std::string entityName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ITM_Name);
-
-				ViewerAPI::setEntityName(entityID, entityName);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_RenameEntityName) {
-				std::string fromPath = ot::json::getString(_doc, OT_ACTION_PARAM_PATH_FROM);
-				std::string toPath = ot::json::getString(_doc, OT_ACTION_PARAM_PATH_To);
-
-				ViewerAPI::renameEntityPath(fromPath, toPath);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_CreateRubberband) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string note = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
-				std::string cfg = ot::json::getString(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Document);
-
-				ViewerAPI::createRubberband(AppBase::instance()->getViewerComponent()->getActiveViewerModel(), serviceId, note, cfg);
-			}
-			else if (action == OT_ACTION_CMD_UI_Lock) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
-				m_lockManager->lock(getService(serviceId), flags);
-			}
-			else if (action == OT_ACTION_CMD_UI_Unlock) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				auto flags = ot::ui::toLockType(ot::json::getStringList(_doc, OT_ACTION_PARAM_ElementLockTypes));
-				m_lockManager->unlock(getService(serviceId), flags);
-			}
-			else if (action == OT_ACTION_CMD_UI_AddSettingsData) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				ot::ServiceBase * service = getService(serviceId);
-				if (service) {
-					UserSettings::instance()->addFromService(service, _doc);
-				}
-				else {
-					AppBase::instance()->appendInfoMessage("[ERROR] Dispatch: " OT_ACTION_CMD_UI_AddSettingsData ": Service not registered");
-
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_AddIconSearchPath) {
-#ifdef _DEBUG
-				std::string iconPath = ot::json::getString(_doc, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
-				try {
-					ak::uiAPI::addIconSearchPath(iconPath.c_str());
-					AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
-				}
-				catch (...) {
-					AppBase::instance()->appendInfoMessage("[ERROR] Failed to add icon search path: Path not found");
-				}
-#endif // _DEBUG
-			}
-			else if (action == OT_ACTION_CMD_UI_AddPluginSearchPath) {
-#ifdef _DEBUG
-				std::string pluginPath = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-				m_owner->uiPluginManager()->addPluginSearchPath(pluginPath.c_str());
-				AppBase::instance()->appendDebugMessage("[ERROR] Added UI plugin search path: " + QString::fromStdString(pluginPath));
-#endif // _DEBUG
-			}
-			else if (action == OT_ACTION_CMD_UI_RequestPlugin) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string pluginName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-				std::string pluginPath = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-				ot::ServiceBase * service = getService(serviceId);
-				ak::UID pluginUid = m_owner->uiPluginManager()->loadPlugin(pluginName.c_str(), pluginPath.c_str(), service);
-
-				if (pluginUid) {
-					AppBase * app = AppBase::instance();
-
-					ot::JsonDocument doc;
-					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestPluginSuccess, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->serviceID(), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(app->serviceName(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(app->serviceType(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, ot::JsonString(pluginName, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, pluginUid, doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, ot::JsonString(pluginPath, doc.GetAllocator()), doc.GetAllocator());
-
-					std::string response;
-					sendHttpRequest(EXECUTE, service->serviceURL(), doc, response);
-
-					// Check if response is an error or warning
-					OT_ACTION_IF_RESPONSE_ERROR(response) { assert(0); }
-				else OT_ACTION_IF_RESPONSE_WARNING(response) { assert(0); }
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_PluginMessage) {
-				ot::serviceID_t serviceId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
-				std::string pluginAction = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER);
-				std::string message = ot::json::getString(_doc, OT_ACTION_PARAM_MESSAGE);
-				std::string pluginName = ot::json::getString(_doc, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-				unsigned long long pluginUID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_UI_PLUGIN_UID);
-				ot::ServiceBase * service = getService(serviceId);
-				if (!AppBase::instance()->uiPluginManager()->forwardMessageToPlugin(pluginUID, pluginAction, message)) {
-					return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_SetVersionGraph) {
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<std::string> versionList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-				std::list<std::string> parentList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_PARENT);
-				std::list<std::string> descriptionList = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
-				std::string activeVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
-				std::string activeBranch = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-
-				std::list<std::tuple<std::string, std::string, std::string>> versionGraph;
-
-				auto description = descriptionList.begin();
-				auto parent = parentList.begin();
-
-				for (auto version : versionList)
-				{
-					versionGraph.push_back(std::tuple<std::string, std::string, std::string>(version, *parent, *description));
-					parent++;
-					description++;
-				}
-
-				ViewerAPI::setVersionGraph(visModelID, versionGraph, activeVersion, activeBranch);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive) {
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string activeVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
-				std::string activeBranch = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-
-				ViewerAPI::setVersionGraphActive(visModelID, activeVersion, activeBranch);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions) {
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::list<std::string> versions = ot::json::getStringList(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-
-				ViewerAPI::removeVersionGraphVersions(visModelID, versions);
-			}
-			else if (action == OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion) {
-				ak::UID visModelID = _doc[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-				std::string newVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-				std::string parentVersion = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_PARENT);
-				std::string description = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
-				std::string activeBranch = ot::json::getString(_doc, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-
-				ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
-			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::GraphicsPickerCollectionPackage pckg;
-				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-				AppBase::instance()->globalGraphicsPicker()->add(pckg);
-			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-								
-				ot::GraphicsNewEditorPackage pckg("", "");
-				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-				AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
-
-				AppBase::instance()->globalGraphicsPicker()->add(pckg);
-			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::GraphicsScenePackage pckg("");
-				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-				ot::GraphicsView * editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
-				
-				for (auto graphicsItemCfg : pckg.items()) {
-					ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg, true);
-					if (graphicsItem != nullptr) {
-						const double xCoordinate = graphicsItemCfg->position().x();
-						const double yCoordinate = graphicsItemCfg->position().y();
-						graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));
-						editor->addItem(graphicsItem);
-					}
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::UIDList itemUids = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
-
-				if (_doc.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName)) {
-					// Specific view
-
-					std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
-
-					if (editor) {
-						for (auto itemUID : itemUids) {
-							editor->removeItem(itemUID);
-						}
-					}
-				}
-				else {
-					// Any view
-
-					std::list<ot::GraphicsView *> views = AppBase::instance()->getAllGraphicsEditors();
-					for (auto v : views) {
-						for (auto uid : itemUids) {
-							v->removeItem(uid);
-						}
-					}
-				}
-				
-			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::GraphicsConnectionPackage pckg;
-				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-				ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
-				
-				for (const auto& connection : pckg.connections()) {
-					editor->addConnectionIfConnectedItemsExist(connection);
-				}
-
-			}
-			else if (action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::GraphicsConnectionPackage pckg;
-				pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-				if (!pckg.name().empty()) {
-					// Specific editor
-
-					ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
-
-					for (auto connection : pckg.connections()) {
-						editor->removeConnection(connection.getUid());
-					}
-				}
-				else {
-					// Any editor
-
-					std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
-					for (auto view : views) {
-						for (auto connection : pckg.connections()) {
-							view->removeConnection(connection.getUid());
-						}
-					}
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SetText) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
-				std::string editorText = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
-
-				std::string editorTitle = editorName;
-				if (_doc.HasMember(OT_ACTION_PARAM_TEXTEDITOR_Title)) {
-					editorTitle = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Title);
-				}
-
-				ot::TextEditor* editor = AppBase::instance()->findOrCreateTextEditor(editorName, QString::fromStdString(editorTitle), info);
-				editor->setPlainText(QString::fromStdString(editorText));
-				editor->setContentChanged(false);
-			}
-			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
-				ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
-
-				if (editor) {
-					editor->setContentChanged(false);
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_SetModified) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
-				ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
-
-				if (editor) {
-					editor->setContentChanged(true);
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_Close) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
-				AppBase::instance()->closeTextEditor(editorName, info);
-			}
-			else if (action == OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				AppBase::instance()->closeAllTextEditors(info);
-			}
-			else if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
-
-				QString fileName = QFileDialog::getOpenFileName(
-					nullptr,
-					"Import CST File",
-					QDir::currentPath(),
-					QString("*.cst ;; All files (*.*)"));
-
-				if (fileName == "") return "";
-
-				ot::Flags<ot::ui::lockType> lockFlags;
-				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-				lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-				lockFlags.setFlag(ot::ui::lockType::tlModelRead);
-				m_lockManager->lock(nullptr, lockFlags);
-
-				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-
-				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
-				StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), fileName.toStdString());
-
-				std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
-				workerThread.detach();
-			}
-			else if (action == OT_ACTION_CMD_UI_SS_COMMIT) {
-
-				std::string fileName = getStudioSuiteFileNameForCommit();
-				if (fileName.empty()) return "";
-
-				CommitMessageDialog commitMessageDialog;
-				commitMessageDialog.exec();
-				if (!commitMessageDialog.wasConfirmed()) return "";
-				std::string changeComment = commitMessageDialog.changeMessage().toStdString();
-
-				ot::Flags<ot::ui::lockType> lockFlags;
-				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-				lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-				lockFlags.setFlag(ot::ui::lockType::tlModelRead);
-				m_lockManager->lock(nullptr, lockFlags);
-
-				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-
-				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
-
-				// We need to make sure that the project is at the correct version in OT
-				std::string currentVersion = StudioSuiteConnectorAPI::getCurrentVersion(fileName, AppBase::instance()->getCurrentProjectName());
-				activateVersion(currentVersion);
-
-				std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName, AppBase::instance()->getCurrentProjectName(), changeComment);
-				workerThread.detach();
-			}
-			else if (action == OT_ACTION_CMD_UI_SS_GET) {
-
-				ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
-																	    "Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
-				if (result != ak::dialogResult::resultYes) { return ""; }
-
-				std::string fileName = getStudioSuiteFileNameForGet();
-				if (fileName.empty()) return "";
-
-				ot::Flags<ot::ui::lockType> lockFlags;
-				lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-				lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-				lockFlags.setFlag(ot::ui::lockType::tlModelRead);
-				m_lockManager->lock(nullptr, lockFlags);
-
-				std::string studioSuiteServiceURL = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
-				std::string version = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
-
-				StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
-
-				std::thread workerThread(StudioSuiteConnectorAPI::getProject, fileName, AppBase::instance()->getCurrentProjectName(), version);
-				workerThread.detach();
-			}
-			else if (action == OT_ACTION_CMD_UI_SS_UPLOAD) {
-
-				std::list<ot::UID> entityIDList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-				std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-
-				std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList);
-				workerThread.detach();
-				}
-			else if (action == OT_ACTION_CMD_UI_SS_DOWNLOAD) {
-
-				std::list<ot::UID> entityIDList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-				std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-				std::string version = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
-
-				std::string fileName = StudioSuiteConnectorAPI::getLocalFileName();
-
-				std::thread workerThread(StudioSuiteConnectorAPI::downloadFiles, fileName, AppBase::instance()->getCurrentProjectName(), entityIDList, entityVersionList, version);
-				workerThread.detach();
-			}
-			else if (action == OT_ACTION_CMD_UI_SS_COPY) {
-
-				std::string newVersion = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_Version);
-
-				std::thread workerThread(StudioSuiteConnectorAPI::copyFiles, newVersion);
-				workerThread.detach();
-			}
-			else if (action == OT_ACTION_CMD_UI_EntitySelectionDialog) {
-				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-				const ot::UID entityToBeExtended = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_EntityID);
-								
-				ot::SelectEntitiesDialogCfg pckg;
-				pckg.setFromJsonObject(cfgObj);
-
-				SelectEntitiesDialog dia(pckg, nullptr);
-				dia.showDialog();
-
-				if (dia.dialogResult() == ot::Dialog::Ok && dia.selectionHasChanged()) {
-					std::list<std::string> selectedItems = dia.selectedItemPaths();
-					if (selectedItems.size() != 0)
-					{
-						ot::JsonDocument responseDoc;
-						ot::JsonArray jSelectedItemsNames;
-						for (const std::string& selectedItem : selectedItems)
-						{
-							jSelectedItemsNames.PushBack(ot::JsonString(selectedItem, responseDoc.GetAllocator()),responseDoc.GetAllocator());
-						}
-						responseDoc.AddMember(OT_ACTION_PARAM_UI_TREE_SelectedItems, jSelectedItemsNames, responseDoc.GetAllocator());
-						responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityToBeExtended ,responseDoc.GetAllocator());
-						responseDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, responseDoc.GetAllocator());
-						std::string response;
-						sendHttpRequest(QUEUE, m_modelServiceURL, responseDoc, response);
-					}
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_PropertyDialog) {
-				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-
-				ot::PropertyDialogCfg pckg;
-				pckg.setFromJsonObject(cfgObj);
-
-				ot::PropertyDialog dia(pckg, nullptr);
-				dia.showDialog();
-
-				if (dia.dialogResult() == ot::Dialog::Ok) {
-					
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_OnePropertyDialog) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-				const std::string subsequentFunction = ot::json::getString(_doc,OT_ACTION_PARAM_MODEL_FunctionName);
-				ot::OnePropertyDialogCfg pckg;
-				pckg.setFromJsonObject(cfgObj);
-
-				ot::OnePropertyDialog dia(pckg, nullptr);
-				dia.showDialog();
-
-				if (dia.dialogResult() == ot::Dialog::Ok) {
-					ot::JsonDocument responseDoc;
-					responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-					responseDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-					dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
-					
-					std::string response;
-					sendHttpRequest(EXECUTE, info, responseDoc, response);
-				}
-			}
-			else if (action == OT_ACTION_CMD_UI_MessageDialog) {
-				ot::BasicServiceInformation info;
-				info.setFromJsonObject(_doc.GetConstObject());
-
-				ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-
-				ot::MessageDialogCfg cfg;
-				cfg.setFromJsonObject(cfgObj);
-
-				ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
-
-				ot::JsonDocument responseDoc;
-				responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MessageDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-				responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(cfg.name(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
-				responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(ot::MessageDialogCfg::buttonToString(result), responseDoc.GetAllocator()), responseDoc.GetAllocator());
-
-				std::string response;
-				sendHttpRequest(EXECUTE, info, responseDoc, response);
-			}
-			else
-			{
-				return OT_ACTION_RETURN_INDICATOR_Error "Unknown action";
-			}
-			return "";
-		}
-		else { return OT_ACTION_RETURN_INDICATOR_Error "Invalid command provided"; }
-	}
-	catch (const std::exception & e) {
-		std::string ex(OT_ACTION_RETURN_INDICATOR_Error "When executing action \"");
-		ex.append(action).append("\": ").append(e.what());
-		std::cout << ex << std::endl;
-#ifdef _DEBUG
-		ex.append("\n");
-		{ OutputDebugStringA(ex.c_str()); }
-#endif // _DEBUG
-		return ex.c_str();
-	}
-	catch (...) {
-		std::cout << OT_ACTION_RETURN_UnknownError << std::endl;
-#ifdef _DEBUG
-		{ OutputDebugStringA("Unknown error occured\n"); }
-#endif // _DEBUG
-		return OT_ACTION_RETURN_UnknownError;
 	}
 }
 
@@ -4093,41 +1676,6 @@ void ExternalServicesComponent::saveProject() {
 // ###################################################################################################
 
 // File operations
-void ExternalServicesComponent::selectFileForStoring(const std::string & dialogTitle, const std::string & fileMask, const std::string & subsequentFunction, const std::string & senderURL)
-{
-	try {
-		QString fileName = QFileDialog::getSaveFileName(
-			nullptr,
-			dialogTitle.c_str(),
-			QDir::currentPath(),
-			QString(fileMask.c_str()) + " ;; All files (*.*)");
-
-		if (fileName != "")
-		{
-			ot::JsonDocument inDoc;
-			inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-
-			std::string response;
-
-			sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
-		}
-
-	}
-	catch (...)
-	{
-		assert(0); // Error handling
-	}
-}
 
 std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::string& dialogTitle, const std::string& fileMask)
 {
@@ -4156,52 +1704,6 @@ std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::st
 	}
 
 	return selectedFilesStd; // This is just to keep the compiler happy.
-}
-
-void ExternalServicesComponent::requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, const std::string &senderURL, bool loadContent)
-{
-	try {
-		QString fileName = QFileDialog::getOpenFileName(
-			nullptr,
-			dialogTitle.c_str(),
-			QDir::currentPath(),
-			QString(fileMask.c_str()) + " ;; All files (*.*)");
-
-		if (fileName != "")
-		{
-			ot::JsonDocument inDoc;
-			inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-			
-			if (loadContent)
-			{
-				std::string fileContent;
-				unsigned long long uncompressedDataLength{ 0 };
-
-				// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-				ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
-				// We need to send the file content
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
-			}
-			inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-
-			std::string response;
-			sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
-			}
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
 }
 
 void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength)
@@ -4240,36 +1742,6 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 	delete[] base64_string;
 	base64_string = nullptr;
-}
-
-void ExternalServicesComponent::saveFileContent(const std::string &dialogTitle, const std::string &fileName, const std::string &fileContent, ot::UID uncompressedDataLength)
-{
-	// Decode the encoded string into binary data
-	int decoded_compressed_data_length = Base64decode_len(fileContent.c_str());
-	char* decodedCompressedString = new char[decoded_compressed_data_length];
-
-	Base64decode(decodedCompressedString, fileContent.c_str());
-
-	// Decompress the data
-	char* decodedString = new char[uncompressedDataLength];
-	uLongf destLen = (uLongf)uncompressedDataLength;
-	uLong  sourceLen = decoded_compressed_data_length;
-	uncompress((Bytef *)decodedString, &destLen, (Bytef *)decodedCompressedString, sourceLen);
-
-	delete[] decodedCompressedString;
-	decodedCompressedString = nullptr;
-
-	// Store the data with the given file name
-
-	std::ofstream file(fileName, std::ios::binary);
-	file.write(decodedString, uncompressedDataLength);
-	file.close();
-
-	delete[] decodedString;
-	decodedString = nullptr;
-
-	// Show a success message
-	ak::uiAPI::promptDialog::show(std::string("The file has been successfully saved:\n" + fileName).c_str(), dialogTitle.c_str(), ak::promptOkIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
 }
 
 // ###################################################################################################
@@ -4323,40 +1795,16 @@ char *ExternalServicesComponent::performAction(const char *json, const char *sen
 	lock = true;
 
 	try {
-		// std::cout << "Entered: ExternalServicesComponent::performAction " << json << std::endl;
-
-		// Build a json document from the string
-		ot::JsonDocument doc;
-
-		// Parse the document with the json string we have "received"
-		doc.Parse(json);
-
-		// Check if the document is an object
-		assert(doc.IsObject()); // Doc is not an object
-
-		//if (doc.HasMember(OT_ACTION_MEMBER)) {
-		//	std::string action = ot::json::getString(doc, "action");
-		//	std::cout << "EXECUTE message: " << action << std::endl;
-		//}
-
-		std::string result = dispatchAction(doc, senderIP);
-
-		// Send the response back
-		char *retval = new char[result.length() + 1];
-		strcpy(retval, result.c_str());
-
-		// std::cout << " return: " << retval << std::endl;
-
+		char *retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::SECURE_MESSAGE_TYPES);
+		
 		lock = false;
 		return retval;
 	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_EA("[FATAL] Unknown error occured");
 		lock = false;
 		return nullptr;
 	}
-
-	lock = false;
 }
 
 void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction)
@@ -4384,29 +1832,7 @@ void ExternalServicesComponent::queueAction(const char *json, const char *sender
 	lock = true;
 
 	try {
-		// std::cout << "Entered: ExternalServicesComponent::queueAction " << json << std::endl;
-
-		// Build a json document from the string
-		ot::JsonDocument doc;
-
-		//std::string info(json);
-
-		// Parse the document with the json string we have "received"
-		doc.Parse(json);
-
-		// In this function, we got a copy of the originally created data, so we need to delete it here again
-		delete[] json;
-		json = nullptr;
-
-		// Check if the document is an object
-		assert(doc.IsObject()); // Doc is not an object
-
-		//if (doc.HasMember(OT_ACTION_MEMBER)) {
-		//	std::string action = ot::json::getString(doc, "action");
-		//	std::cout << "QUEUE message: " << action << std::endl;
-		//}
-
-		dispatchAction(doc, senderIP);
+		ot::ActionDispatcher::instance().dispatch(json, ot::SECURE_MESSAGE_TYPES);
 
 		delete[] senderIP;
 		senderIP = nullptr;
@@ -4638,32 +2064,6 @@ void ExternalServicesComponent::removeServiceFromList(std::vector<ot::ServiceBas
 	}
 }
 
-void ExternalServicesComponent::handleTableChange(ot::JsonDocument& _doc)
-{
-	ak::UID visualizationModelID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_MODEL_ID);
-	const std::string functionName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-	if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
-	{
-		bool insertLeft = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
-		ViewerAPI::AddToSelectedTableColumn(insertLeft, visualizationModelID);
-	}
-	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
-	{
-		bool insertAbove = ot::json::getBool(_doc, OT_ACTION_PARAM_BASETYPE_Bool);
-		
-		ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
-	}
-	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
-	{
-		ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
-	}
-	else 
-	{
-		assert(functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
-		ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
-	}
-}
-
 ak::UID ExternalServicesComponent::getServiceUiUid(ot::ServiceBase * _service) {
 	auto itm = m_serviceToUidMap.find(_service->serviceName());
 	if (itm == m_serviceToUidMap.end()) {
@@ -4711,6 +2111,2240 @@ ot::ServiceBase* ExternalServicesComponent::getServiceFromNameType(const std::st
 
 	OT_LOG_WAS("Failed to find service { \"Service.Name\": \"" + _serviceName + "\"; \"Service.Type\": \"" + _serviceType + "\" }");
 	return nullptr;
+}
+
+// ###################################################################################################
+
+// Action handler
+
+std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _document) {
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	rapidjson::Value documents = _document[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
+	rapidjson::Value prefetchID = _document[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
+	rapidjson::Value prefetchVersion = _document[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
+
+	ot::Flags<ot::ui::lockType> lockFlags(ot::ui::tlAll);
+	m_lockManager->lock(nullptr, lockFlags);
+
+	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
+	size_t numberPrefetch = prefetchID.Size();
+	assert(prefetchVersion.Size() == numberPrefetch);
+
+	for (size_t i = 0; i < numberPrefetch; i++)
+	{
+		prefetchIDs.push_back(std::pair<unsigned long long, unsigned long long>(prefetchID[i].GetInt64(), prefetchVersion[i].GetInt64()));
+	}
+
+	if (!prefetchIDs.empty())
+	{
+		m_prefetchingDataCompleted = false;
+		std::thread workerThread(&ExternalServicesComponent::prefetchDataThread, this, projectName, prefetchIDs);
+
+		while (!m_prefetchingDataCompleted)
+		{
+			QApplication::processEvents();
+			Sleep(25);
+		}
+
+		workerThread.join();
+		QApplication::processEvents();
+	}
+
+	int numberActions = documents.Size();
+
+	// Nofify the viewer about the bulk processing (this e.g. avoids sending of unnecessary selection changed messages)
+	AppBase::instance()->getViewerComponent()->setProcessingGroupOfMessages(true);
+
+	// Disable tree sorting for better performance
+	AppBase::instance()->setNavigationTreeSortingEnabled(false);
+	AppBase::instance()->setNavigationTreeMultiselectionEnabled(false);
+
+
+	for (long i = 0; i < numberActions; i++)
+	{
+		rapidjson::Value subdoc = documents[i].GetObject();
+
+		ot::JsonDocument d;
+		d.CopyFrom(subdoc, d.GetAllocator());
+
+		ot::ActionDispatcher::instance().dispatch(d, ot::ALL_MESSAGE_TYPES);
+	}
+
+	// Re enable tree sorting
+	AppBase::instance()->setNavigationTreeSortingEnabled(true);
+	AppBase::instance()->setNavigationTreeMultiselectionEnabled(true);
+
+	// Nofify the viewer about the end of the bulk processing
+	AppBase::instance()->getViewerComponent()->setProcessingGroupOfMessages(false);
+
+	m_lockManager->unlock(nullptr, lockFlags);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleMessage(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	
+	std::string msg("Message from ");
+	msg.append(std::to_string(senderID)).append(": ").append(message);
+
+	OT_LOG_I(msg);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleShutdown(ot::JsonDocument& _document) {
+	OT_LOG_D("Showdown received");
+	AppBase::instance()->showErrorPrompt("Shutdown requested by session service.", "Error");
+	exit(0);	//NOTE, Add external shutdown
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _document) {
+	OT_LOG_D("Pre shutdown received");
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
+	QString msg("An unexpected error occurred and the session needs to be closed.");
+	ak::uiAPI::promptDialog::show(msg, "Open Twin", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	exit(1);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& _document) {
+	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+	ot::ServiceBase* connectedService = new ot::ServiceBase(senderName, senderType, senderURL, senderID);
+	m_serviceIdMap.insert_or_assign(senderID, connectedService);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocument& _document) {
+	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+
+	auto itm = m_serviceIdMap.find(senderID);
+	if (itm != m_serviceIdMap.end()) {
+		ot::ServiceBase* actualService = itm->second;
+		assert(actualService != nullptr);
+
+		// Clean up elements
+		m_lockManager->cleanService(actualService, false, true);
+		m_controlsManager->serviceDisconnected(actualService);
+		m_owner->uiPluginManager()->unloadPlugins(actualService);
+		AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
+		AppBase::instance()->contextMenuManager()->serviceDisconnected(actualService);
+
+		// Clean up entry
+		m_serviceIdMap.erase(actualService->serviceID());
+		removeServiceFromList(m_modelViewNotifier, actualService);
+
+		delete actualService;
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleShutdownRequestedByService(ot::JsonDocument& _document) {
+	OTAssert(0, "External shutdown not supported");	// Add external shutdown
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleModelExecuteFunction(ot::JsonDocument& _document) {
+	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+
+	ot::UIDList entityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+	ot::UIDList entityVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityVersionList);
+
+	if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
+	{
+		ot::JsonDocument  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
+		std::string response;
+		sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			OT_LOG_EAS(response);
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_WAS(response);
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleDisplayMessage(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	
+	AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleDisplayDebugMessage(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	
+	AppBase::instance()->appendDebugMessage(QString::fromStdString(message));
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleReportWarning(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleReportInformation(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	std::string icon = ot::json::getString(_document, OT_ACTION_PARAM_ICON);
+	std::string options = ot::json::getString(_document, OT_ACTION_PARAM_OPTIONS);
+	std::string promptResponse = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
+	std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
+	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
+
+	ak::promptType promptType = ak::promptIconLeft;
+
+	if (options == "YesNo")
+	{
+		promptType = ak::promptType::promptYesNoIconLeft;
+	}
+	else if (options == "YesNoCancel")
+	{
+		promptType = ak::promptType::promptYesNoCancelIconLeft;
+	}
+	else if (options == "OkCancel")
+	{
+		promptType = ak::promptType::promptOkCancelIconLeft;
+	}
+	else if (options == "Ok")
+	{
+		promptType = ak::promptType::promptOkIconLeft;
+	}
+	else
+	{
+		assert(0); // Unknown options
+	}
+
+	ak::dialogResult result = ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", promptType, icon.c_str(), "Default", AppBase::instance()->mainWindow());
+
+	std::string queryResult;
+
+	switch (result)
+	{
+	case ak::dialogResult::resultCancel: queryResult = "Cancel"; break;
+	case ak::dialogResult::resultIgnore: queryResult = "Ignore"; break;
+	case ak::dialogResult::resultNo:     queryResult = "No"; break;
+	case ak::dialogResult::resultYes:    queryResult = "Yes"; break;
+	case ak::dialogResult::resultNone:   queryResult = "None"; break;
+	case ak::dialogResult::resultOk:     queryResult = "Ok"; break;
+	case ak::dialogResult::resultRetry:  queryResult = "Retry"; break;
+	default:
+		assert(0); // Unknown type
+	}
+
+	ot::JsonDocument docOut;
+	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_RESPONSE, ot::JsonString(promptResponse, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_ANSWER, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_PARAMETER1, ot::JsonString(parameter1, docOut.GetAllocator()), docOut.GetAllocator());
+
+	if (this->getServiceFromNameType(sender, sender) != nullptr)
+	{
+		std::string senderUrl = this->getServiceFromNameType(sender, sender)->serviceURL();
+
+		std::string response;
+		if (!sendHttpRequest(QUEUE, senderUrl, docOut, response)) {
+			throw std::exception("Failed to send http request");
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocument& _document) {
+	ot::serviceID_t senderID(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
+	auto s = m_serviceIdMap.find(senderID);
+
+	// Check if the service was registered before
+	if (s == m_serviceIdMap.end()) {
+		std::string ex{ "A service with the id \"" };
+		ex.append(std::to_string(senderID));
+		ex.append("\" was not registered before");
+		throw std::exception(ex.c_str());
+	}
+	if (s->second->serviceName() == OT_INFO_SERVICE_TYPE_MODEL)
+	{
+		m_modelServiceURL = s->second->serviceURL();
+	}
+
+	m_modelViewNotifier.push_back(s->second);
+
+	OT_LOG_D("Service with ID \"" + std::to_string(s->second->serviceID()) + "\" was registered from model view events");
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleDeregisterForModelEvents(ot::JsonDocument& _document) {
+	ot::serviceID_t senderID(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
+	auto s = m_serviceIdMap.find(senderID);
+
+	// Check if the service was registered before
+	if (s == m_serviceIdMap.end()) {
+		std::string ex("A service with the id \"");
+		ex.append(std::to_string(senderID));
+		ex.append("\" was not registered before");
+		throw std::exception(ex.c_str());
+	}
+
+	this->removeServiceFromList(m_modelViewNotifier, s->second);
+
+	OT_LOG_D("Service with ID \"" + std::to_string(s->second->serviceID()) + "\" was deregistered from model view events");
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleGenerateUIDs(ot::JsonDocument& _document) {
+	int count = _document[OT_ACTION_PARAM_COUNT].GetInt();
+	// empty id list
+	std::vector<ak::UID> idList;
+	for (int i = 0; i < count; i++) { idList.push_back(ak::uiAPI::createUid()); }
+	// json object contains the list
+
+	ot::JsonDocument returnDoc;
+	ot::JsonArray uidArray;
+	for (ot::UID id : idList)
+	{
+		uidArray.PushBack(id, returnDoc.GetAllocator());
+	}
+	returnDoc.AddMember("idList", uidArray, returnDoc.GetAllocator());
+
+	return returnDoc.toJson();
+}
+
+std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _document) {
+	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	bool loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
+
+	QString fileName = QFileDialog::getOpenFileName(
+		nullptr,
+		dialogTitle.c_str(),
+		QDir::currentPath(),
+		QString(fileMask.c_str()) + " ;; All files (*.*)");
+
+	if (fileName != "")
+	{
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+
+		if (loadContent)
+		{
+			std::string fileContent;
+			unsigned long long uncompressedDataLength{ 0 };
+
+			// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+			ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
+			// We need to send the file content
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+		}
+		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+
+		std::string response;
+		sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			assert(0); // ERROR
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			assert(0); // WARNING
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleStoreFileInDatabase(ot::JsonDocument& _document) {
+	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+	std::string entityType = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Type);
+	try
+	{
+		std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
+
+		if (absoluteFilePaths.size() != 0)
+		{
+			ot::JsonDocument sendingDoc;
+
+			int requiredIdentifierPairsPerFile = 2;
+			const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPairsPerFile;
+
+			sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs, sendingDoc.GetAllocator());
+			const std::string url = uiServiceURL();
+			sendingDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(url, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+			sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(m_fileHandler.GetStoreFileFunctionName(), sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+			sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+
+			std::string response;
+			sendHttpRequest(QUEUE, m_modelServiceURL, sendingDoc, response);
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				assert(0); // ERROR
+			}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			assert(0); // WARNING
+		}
+
+		std::list<std::string> takenNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
+		std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
+		std::string entityPath = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+		std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+		std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+		m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath), entityType);
+		}
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Failed to load file due to: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _document) {
+	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+	std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileContent = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
+	ot::UID uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+
+	// Decode the encoded string into binary data
+	int decoded_compressed_data_length = Base64decode_len(fileContent.c_str());
+	char* decodedCompressedString = new char[decoded_compressed_data_length];
+
+	Base64decode(decodedCompressedString, fileContent.c_str());
+
+	// Decompress the data
+	char* decodedString = new char[uncompressedDataLength];
+	uLongf destLen = (uLongf)uncompressedDataLength;
+	uLong  sourceLen = decoded_compressed_data_length;
+	uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
+
+	delete[] decodedCompressedString;
+	decodedCompressedString = nullptr;
+
+	// Store the data with the given file name
+
+	std::ofstream file(fileName, std::ios::binary);
+	file.write(decodedString, uncompressedDataLength);
+	file.close();
+
+	delete[] decodedString;
+	decodedString = nullptr;
+
+	// Show a success message
+	ak::uiAPI::promptDialog::show(std::string("The file has been successfully saved:\n" + fileName).c_str(), dialogTitle.c_str(), ak::promptOkIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _document) {
+	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
+	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+
+	QString fileName = QFileDialog::getSaveFileName(
+		nullptr,
+		dialogTitle.c_str(),
+		QDir::currentPath(),
+		QString(fileMask.c_str()) + " ;; All files (*.*)");
+
+	if (fileName != "")
+	{
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+
+		std::string response;
+
+		sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			assert(0); // ERROR
+		}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		assert(0); // WARNING
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	const std::string functionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
+	{
+		bool insertLeft = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
+		ViewerAPI::AddToSelectedTableColumn(insertLeft, visualizationModelID);
+	}
+	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
+	{
+		bool insertAbove = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
+
+		ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
+	}
+	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
+	{
+		ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
+	}
+	else
+	{
+		assert(functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
+		ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
+	std::string settings = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);
+	AppBase::instance()->fillPropertyGrid(settings);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMenuPage(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+
+	ot::ServiceBase* service = getService(serviceId);
+
+	ak::UID p = AppBase::instance()->getToolBar()->addPage(getServiceUiUid(service), pageName.c_str());
+	//NOTE, add corresponding functions in uiServiceAPI
+	ak::uiAPI::object::setObjectUniqueName(p, pageName.c_str());
+	m_controlsManager->uiElementCreated(service, p, false);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMenuGroup(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	std::string groupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+
+	ot::ServiceBase* service = getService(serviceId);
+
+	//NOTE, add corresponding functions in uiServiceAPI
+	ak::UID pageUID{ ak::uiAPI::object::getUidFromObjectUniqueName(pageName.c_str()) };
+	//NOTE, add error handling
+	assert(pageUID != ak::invalidUID);
+
+	ak::UID g = AppBase::instance()->getToolBar()->addGroup(getServiceUiUid(service), pageUID, groupName.c_str());
+	//NOTE, add corresponding functions in uiServiceAPI
+	ak::uiAPI::object::setObjectUniqueName(g, (pageName + ":" + groupName).c_str());
+	m_controlsManager->uiElementCreated(service, g, false);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMenuSubgroup(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	std::string groupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+	std::string subgroupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	
+	ot::ServiceBase* service = getService(serviceId);
+
+	//NOTE, add corresponding functions in uiServiceAPI
+	ak::UID groupUID{ ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str()) };
+	//NOTE, add error handling
+	assert(groupUID != ak::invalidUID);
+
+	ak::UID sg = AppBase::instance()->getToolBar()->addSubGroup(getServiceUiUid(service), groupUID, subgroupName.c_str());
+	//NOTE, add corresponding functions in uiServiceAPI
+	ak::uiAPI::object::setObjectUniqueName(sg, (pageName + ":" + groupName + ":" + subgroupName).c_str());
+	m_controlsManager->uiElementCreated(service, sg, false);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	std::string groupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+	std::string subgroupName = "";
+	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName))
+	{
+		subgroupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+	}
+	std::string buttonName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	std::string text = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+	std::string iconName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconName);
+	std::string iconFolder = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	ot::ContextMenu contextMenu("");
+	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu)) {
+		ot::ConstJsonObject contextMenuData = ot::json::getObject(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenu);
+		contextMenu.setFromJsonObject(contextMenuData);
+	}
+	ot::ServiceBase* senderService = getService(serviceId);
+	
+	ot::Flags<ot::ui::lockType> flags = (ot::ui::lockType::tlAll);
+
+	if (_document.HasMember(OT_ACTION_PARAM_ElementLockTypes)) {
+		flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+		flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external push buttons
+	}
+
+	ak::UID parentUID;
+	if (subgroupName.length() == 0) {
+		parentUID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str());
+	}
+	else {
+		parentUID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName + ":" + subgroupName).c_str());
+	}
+	//NOTE, add error handling
+	assert(parentUID != ak::invalidUID);
+
+	// Here we need to pass the iconName as string once the functionality is added to the uiManager
+	ak::UID buttonID = AppBase::instance()->getToolBar()->addToolButton(getServiceUiUid(senderService), parentUID, iconName.c_str(), iconFolder.c_str(), text.c_str());
+
+	if (subgroupName.length() == 0) {
+		ak::uiAPI::object::setObjectUniqueName(buttonID, (pageName + ":" + groupName + ":" + buttonName).c_str());
+	}
+	else {
+		ak::uiAPI::object::setObjectUniqueName(buttonID, (pageName + ":" + groupName + ":" + subgroupName + ":" + buttonName).c_str());
+	}
+	m_controlsManager->uiElementCreated(senderService, buttonID);
+	m_lockManager->uiElementCreated(senderService, buttonID, flags);
+
+	ak::uiAPI::registerUidNotifier(buttonID, this);
+
+	if (buttonID != ak::invalidUID) {
+		if (_document.HasMember(OT_ACTION_PARAM_UI_KeySequence)) {
+			std::string keySquence = ot::json::getString(_document, OT_ACTION_PARAM_UI_KeySequence);
+			if (keySquence.length() > 0) {
+				KeyboardCommandHandler* newHandler = addShortcut(senderService, keySquence.c_str());
+				if (newHandler) {
+					newHandler->attachToEvent(buttonID, ak::etClicked);
+					text.append(" (").append(keySquence).append(")");
+					ak::uiAPI::toolButton::setToolTip(buttonID, text.c_str());
+				}
+			}
+		}
+
+		if (contextMenu.hasItems()) {
+			AppBase::instance()->contextMenuManager()->createItem(senderService, getServiceUiUid(senderService), buttonID, contextMenu);
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	std::string groupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+	std::string subgroupName = ""; // Subgroup is optional
+	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName)) {
+		subgroupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+	}
+	std::string boxName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	std::string boxText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+	bool checked = _document[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
+
+	ot::ServiceBase* service = getService(serviceId);
+
+	//NOTE, add corresponding functions in uiServiceAPI
+	ak::UID parentID;
+	if (subgroupName.length() > 0) {
+		parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName + ":" + subgroupName).c_str());
+	}
+	else {
+		parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str());
+	}
+
+	//NOTE, add error handling
+	assert(parentID != ak::invalidUID);
+	if (parentID == ak::invalidUID) return "";
+
+	// Here we need to pass the iconName as string once the functionality is added to the uiManager
+	ak::UID boxID = AppBase::instance()->getToolBar()->addCheckBox(getServiceUiUid(service), parentID, boxText.c_str(), checked);
+
+	//NOTE, add corresponding functions in uiServiceAPI
+	if (subgroupName.length() > 0) {
+		ak::uiAPI::object::setObjectUniqueName(boxID, (pageName + ":" + groupName + ":" + subgroupName + ":" + boxName).c_str());
+	}
+	else {
+		ak::uiAPI::object::setObjectUniqueName(boxID, (pageName + ":" + groupName + ":" + boxName).c_str());
+	}
+
+	m_controlsManager->uiElementCreated(service, boxID);
+	m_lockManager->uiElementCreated(service, boxID, flags);
+
+	ak::uiAPI::registerUidNotifier(boxID, this);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMenuLineEdit(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	std::string groupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName);
+	std::string subgroupName = "";
+	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName)) {
+		subgroupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
+	}
+	std::string editName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	std::string editText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+	std::string editLabel = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
+
+	ot::ServiceBase* service = getService(serviceId);
+	
+	ak::UID parentID;
+	if (subgroupName.length() > 0) {
+		parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName + ":" + subgroupName).c_str());
+	}
+	else {
+		parentID = ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str());
+	}
+
+	//NOTE, add error handling
+	assert(parentID != ak::invalidUID);
+
+	// Here we need to pass the iconName as string once the functionality is added to the uiManager
+	ak::UID editID = AppBase::instance()->getToolBar()->addNiceLineEdit(getServiceUiUid(service), parentID, editLabel.c_str(), editText.c_str());
+
+	//NOTE, add corresponding functions in uiServiceAPI
+	if (subgroupName.length() > 0) {
+		ak::uiAPI::object::setObjectUniqueName(editID, (pageName + ":" + groupName + ":" + subgroupName + ":" + editName).c_str());
+	}
+	else {
+		ak::uiAPI::object::setObjectUniqueName(editID, (pageName + ":" + groupName + ":" + editName).c_str());
+	}
+	m_controlsManager->uiElementCreated(service, editID);
+	m_lockManager->uiElementCreated(service, editID, flags);
+
+	ak::uiAPI::registerUidNotifier(editID, this);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleActivateToolbarTab(ot::JsonDocument& _document) {
+	std::string tabName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_TabName);
+
+	AppBase::instance()->activateToolBarTab(tabName.c_str());
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddShortcut(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string keySequence = ot::json::getString(_document, OT_ACTION_PARAM_UI_KeySequence);
+
+	ot::ServiceBase* service = getService(serviceId);
+
+	this->addShortcut(service, keySequence);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetCheckboxValue(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string controlName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	bool checked = _document[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
+
+	ak::UID objectID = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
+
+	assert(objectID != ak::invalidUID);
+	if (objectID == ak::invalidUID) return "";
+
+	ak::uiAPI::checkBox::setChecked(objectID, checked);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetLineEditValue(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string controlName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	std::string editText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+	bool error = _document[OT_ACTION_PARAM_UI_CONTROL_ErrorState].GetBool();
+
+	ak::UID objectID = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
+
+	assert(objectID != ak::invalidUID);
+	if (objectID == ak::invalidUID) return "";
+
+	if (ak::uiAPI::object::type(objectID) == ak::otLineEdit) {
+		ak::uiAPI::lineEdit::setText(objectID, editText.c_str());
+		ak::uiAPI::lineEdit::setErrorState(objectID, error);
+	}
+	else if (ak::uiAPI::object::type(objectID) == ak::otNiceLineEdit) {
+		ak::uiAPI::niceLineEdit::setText(objectID, editText.c_str());
+		ak::uiAPI::niceLineEdit::setErrorState(objectID, error);
+	}
+	else {
+		assert(0); // Invalid object type
+	}
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSwitchMenuTab(ot::JsonDocument& _document) {
+	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	AppBase::instance()->switchToTab(pageName);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveElements(ot::JsonDocument& _document) {
+	std::list<std::string> itemList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectNames);
+	
+	std::vector<ak::UID> uidList;
+	for (auto itm : itemList) {
+		uidList.push_back(ak::uiAPI::object::getUidFromObjectUniqueName(itm.c_str()));
+	}
+	m_controlsManager->destroyUiControls(uidList);
+
+	for (auto itm : uidList) {
+		m_lockManager->uiElementDestroyed(itm);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDocument& _document) {
+	std::list<std::string> enabled = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_EnabledControlsList);
+	std::list<std::string> disabled = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_DisabledControlsList);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+
+	ot::ServiceBase* service = getService(serviceId);
+	
+	for (auto controlName : enabled)
+	{
+		//NOTE, add functionallity to uiServiceAPI
+		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
+		if (uid != ak::invalidUID)
+		{
+			m_lockManager->enable(service, uid, true);
+		}
+	}
+
+	for (auto controlName : disabled)
+	{
+		//NOTE, add functionallity to uiServiceAPI
+		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
+		if (uid != ak::invalidUID)
+		{
+			m_lockManager->disable(service, uid);
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetToolTip(ot::JsonDocument& _document) {
+	std::string item = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	std::string text = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+
+	auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(item.c_str());
+	if (uid != ak::invalidUID)
+	{
+		ak::uiAPI::object::setToolTip(uid, text.c_str());
+	}
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleResetView(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	
+	AppBase::instance()->getViewerComponent()->resetAllViews3D(visualizationModelID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRefreshView(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+
+	AppBase::instance()->getViewerComponent()->refreshAllViews(visualizationModelID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleClearSelection(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	
+	AppBase::instance()->getViewerComponent()->clearSelection(visualizationModelID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRefreshSelection(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	
+	AppBase::instance()->getViewerComponent()->refreshSelection(visualizationModelID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSelectObject(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	
+	AppBase::instance()->getViewerComponent()->selectObject(visualizationModelID, entityID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddNodeFromFacetData(ot::JsonDocument& _document) {
+	ot::JsonSizeType tmp;
+
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
+	double* surfaceColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
+	double* edgeColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
+	ak::UID modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	bool backFaceCulling = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling);
+	double offsetFactor = _document[OT_ACTION_PARAM_MODEL_ITM_OffsetFactor].GetDouble();
+	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+	bool selectChildren = _document[OT_ACTION_PARAM_MODEL_ITM_SelectChildren].GetBool();
+	bool manageParentVisibility = _document[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
+	bool manageChildVisibility = _document[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
+	bool showWhenSelected = _document[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
+	std::vector<Geometry::Node> nodes;
+	getVectorNodeFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Nodes, nodes);
+	std::list<Geometry::Triangle> triangles;
+	getListTriangleFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Triangles, triangles);
+	std::list<Geometry::Edge> edges;
+	getListEdgeFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Edges, edges);
+	std::string errors = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Errors);
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	AppBase::instance()->getViewerComponent()->addNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling,
+		offsetFactor, editable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddNodeFromDataBase(ot::JsonDocument& _document) {
+	ot::JsonSizeType tmp;
+
+	ViewerUIDtype visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
+	double* surfaceColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
+	double* edgeColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
+	std::string materialType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
+	std::string textureType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_TextureType);
+	bool reflective = _document[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	bool backFaceCulling = _document[OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling].GetBool();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	double offsetFactor = _document[OT_ACTION_PARAM_MODEL_ITM_OffsetFactor].GetDouble();
+	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+	bool selectChildren = _document[OT_ACTION_PARAM_MODEL_ITM_SelectChildren].GetBool();
+	bool manageParentVisibility = _document[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
+	bool manageChildVisibility = _document[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
+	bool showWhenSelected = _document[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ModelUIDtype entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	ModelUIDtype entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	std::vector<double> transformation;
+	try
+	{
+		transformation = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MODEL_ITM_Transformation);
+	}
+	catch (std::exception)
+	{
+		// There is no transformation attached. Set up a unity transform
+		transformation.resize(16, 0.0);
+		transformation[0] = transformation[5] = transformation[10] = transformation[15] = 1.0;
+	}
+
+	AppBase::instance()->getViewerComponent()->addNodeFromFacetDataBase(visModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective,
+		modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, editable, projectName, entityID,
+		entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+
+	AppBase::instance()->getViewerComponent()->addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+
+	ak::UID visualizationDataID = _document[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
+	ak::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
+
+	AppBase::instance()->getViewerComponent()->addVisualizationVis2D3DNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, editable, projectName, visualizationDataID, visualizationDataVersion);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleUpdateVis2D3DNode(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+
+	ak::UID visualizationDataID = _document[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
+	ak::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
+
+	AppBase::instance()->getViewerComponent()->updateVisualizationVis2D3DNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleUpdateColor(ot::JsonDocument& _document) {
+	ot::JsonSizeType tmp;
+
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	double* surfaceColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
+	double* edgeColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
+	std::string materialType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_MaterialType);
+	std::string textureType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_TextureType);
+	bool reflective = _document[OT_ACTION_PARAM_MODEL_ITM_TextureReflective].GetBool();
+	
+	AppBase::instance()->getViewerComponent()->updateObjectColor(visModelID, modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleUpdateMeshColor(ot::JsonDocument& _document) {
+	ot::JsonSizeType tmp;
+
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	double* colorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, tmp);
+	
+	AppBase::instance()->getViewerComponent()->updateMeshColor(visModelID, modelEntityID, colorRGB);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleUpdateFacetsFromDataBase(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	ModelUIDtype entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	ModelUIDtype entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
+
+	AppBase::instance()->getViewerComponent()->updateObjectFacetsFromDataBase(visModelID, modelEntityID, entityID, entityVersion);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveShapes(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::list<ak::UID> entityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
+	
+	AppBase::instance()->getViewerComponent()->removeShapes(visualizationModelID, entityID);
+
+	//If entity is has a block item associated, it gets removed from all editors.
+	std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+	for (auto view : views) {
+		for (auto uid : entityID) {
+			view->removeItem(uid);
+			view->removeConnection(uid);
+		}
+	}
+	
+	std::list<std::string> curveNames = ViewerAPI::getSelectedCurves(visualizationModelID);
+	ViewerAPI::removeSelectedCurveNodes(visualizationModelID);
+
+	ot::JsonDocument requestDoc;
+	ot::JsonArray jCurveNames;
+	for (auto& curveName : curveNames)
+	{
+		jCurveNames.PushBack(ot::JsonString(curveName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	}
+	requestDoc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, jCurveNames, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	
+	std::string response;
+	sendHttpRequest(QUEUE, m_modelServiceURL, requestDoc, response);
+
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		OT_LOG_EAS(response);
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response)
+	{
+		OT_LOG_WAS(response);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleTreeStateRecording(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	bool flag = _document[OT_ACTION_PARAM_MODEL_State].GetBool();
+
+	AppBase::instance()->getViewerComponent()->setTreeStateRecording(visualizationModelID, flag);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetShapeVisibility(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::list<ak::UID> visibleID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID_Visible);
+	std::list<ak::UID> hiddenID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden);
+	
+	AppBase::instance()->getViewerComponent()->setShapeVisibility(visualizationModelID, visibleID, hiddenID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleHideEntities(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::list<ak::UID> hiddenID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden);
+
+	AppBase::instance()->getViewerComponent()->hideEntities(visualizationModelID, hiddenID);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleShowBranch(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string branchName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
+
+	AppBase::instance()->getViewerComponent()->showBranch(visualizationModelID, branchName);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleHideBranch(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string branchName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_BRANCH);
+
+	AppBase::instance()->getViewerComponent()->hideBranch(visualizationModelID, branchName);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddAnnotationNode(ot::JsonDocument& _document) {
+	ot::JsonSizeType tmp;
+
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	double* edgeColorRGB = ot::json::getDoubleArray(_document, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, tmp);
+	std::vector<std::array<double, 3>> points = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points);
+	std::vector<std::array<double, 3>> points_rgb = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Colors);
+	std::vector<std::array<double, 3>> triangle_p1 = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p1);
+	std::vector<std::array<double, 3>> triangle_p2 = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p2);
+	std::vector<std::array<double, 3>> triangle_p3 = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p3);
+	std::vector<std::array<double, 3>> triangle_rgb = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_Color);
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	AppBase::instance()->getViewerComponent()->addVisualizationAnnotationNode(visModelID, name, uid, treeIcons, isHidden, edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddAnnotationNodeFromDataBase(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	ak::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationAnnotationNodeDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMeshNodeFromFacetDataBase(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	double edgeColorRGB[3];
+	edgeColorRGB[0] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
+	edgeColorRGB[1] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
+	edgeColorRGB[2] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	ak::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
+	bool displayTetEdges = _document[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(visModelID, name, uid, treeIcons, edgeColorRGB, displayTetEdges, projectName, entityID, entityVersion);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddCartesianMeshNode(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	double edgeColorRGB[3];
+	edgeColorRGB[0] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
+	edgeColorRGB[1] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
+	edgeColorRGB[2] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
+	double meshLineColorRGB[3];
+	meshLineColorRGB[0] = _document[OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_R].GetDouble();
+	meshLineColorRGB[1] = _document[OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_G].GetDouble();
+	meshLineColorRGB[2] = _document[OT_ACTION_PARAM_MODEL_MESHLINE_COLOR_B].GetDouble();
+	std::vector<double> meshCoordsX = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MESH_CartesianCoordX);
+	std::vector<double> meshCoordsY = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MESH_CartesianCoordY);
+	std::vector<double> meshCoordsZ = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MESH_CartesianCoordZ);
+	bool showMeshLines = _document[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID faceListEntityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	ak::UID faceListEntityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
+	ak::UID nodeListEntityID = _document[OT_ACTION_PARAM_MESH_NODE_ID].GetUint64();
+	ak::UID nodeListEntityVersion = _document[OT_ACTION_PARAM_MESH_NODE_VERSION].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationCartesianMeshNode(visModelID, name, uid, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, projectName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCartesianMeshNodeShowLines(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool showMeshLines = _document[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
+
+	ViewerAPI::visualizationCartesianMeshNodeShowLines(visModelID, uid, showMeshLines);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddCartesianMeshItem(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	std::vector<int> facesList = ot::json::getIntVector(_document, OT_ACTION_PARAM_MODEL_ITM_FacesList);
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	double colorRGB[3];
+	colorRGB[0] = _document[OT_ACTION_PARAM_MESH_ITEM_COLOR_R].GetDouble();
+	colorRGB[1] = _document[OT_ACTION_PARAM_MESH_ITEM_COLOR_G].GetDouble();
+	colorRGB[2] = _document[OT_ACTION_PARAM_MESH_ITEM_COLOR_B].GetDouble();
+
+	ViewerAPI::addVisualizationCartesianMeshItemNode(visModelID, name, uid, treeIcons, isHidden, facesList, colorRGB);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleTetMeshNodeTetEdges(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool displayMeshEdges = _document[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
+	
+	ViewerAPI::visualizationTetMeshNodeTetEdges(visModelID, uid, displayMeshEdges);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddMeshItemFromFacetDatabase(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	ak::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	long long tetEdgesID = _document[OT_ACTION_PARAM_MODEL_TETEDGES_ID].GetUint64();;
+	long long tetEdgesVersion = _document[OT_ACTION_PARAM_MODEL_TETEDGES_Version].GetUint64();
+
+	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddText(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID textID = _document[OT_ACTION_PARAM_TEXT_ID].GetUint64();
+	ak::UID textVersion = _document[OT_ACTION_PARAM_TEXT_VERSION].GetUint64();
+
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationTextNode(visModelID, name, uid, treeIcons, isHidden, projectName, textID, textVersion);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddTable(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID tableID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	ak::UID tableVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
+
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationTableNode(visModelID, name, uid, treeIcons, isHidden, projectName, tableID, tableVersion);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
+
+	try {
+		ot::Color colour;
+		colour.setFromJsonObject(serializedColor);
+		std::pair<ot::UID, ot::UID> activeTableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visualizationModelID);
+
+		if (activeTableIdentifyer.first != -1)
+		{
+			SetColourOfSelectedRange(visualizationModelID, colour);
+			RequestTableSelection(visualizationModelID, senderURL, subsequentFunction);
+		}
+
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Table selection request could not be handled due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ak::UID tableEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	ak::UID tableEntityVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	try
+	{
+		bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
+
+		if (refreshColouring && subsequentFunction != "")
+		{
+			std::string tableName = ViewerAPI::getTableName(visualizationModelID);
+
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(tableName, doc.GetAllocator()), doc.GetAllocator());
+
+			std::string response;
+			sendHttpRequest(EXECUTE, senderURL, doc, response);
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				OT_LOG_E(response);
+				AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
+			}
+		else OT_ACTION_IF_RESPONSE_WARNING(response)
+		{
+			OT_LOG_W(response);
+			AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
+		}
+		}
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Table could not be shown due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetTable(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	auto tableContent = ot::json::getObject(_document, OT_ACTION_PARAM_Value);
+	ot::GenericDataStructMatrix data;
+	data.setFromJsonObject(tableContent);
+	ViewerAPI::showTable(visualizationModelID, data);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSelectRanges(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	auto listOfSerializedRanges = ot::json::getObjectList(_document, "Ranges");
+	std::vector<ot::TableRange> ranges;
+	ranges.reserve(listOfSerializedRanges.size());
+	for (auto range : listOfSerializedRanges)
+	{
+		ot::TableRange tableRange;
+		tableRange.setFromJsonObject(range);
+		ranges.push_back(tableRange);
+	}
+	try
+	{
+		ViewerAPI::setTableSelection(visualizationModelID, ranges);
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Table selection could not be executed due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleColorSelection(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
+
+	try
+	{
+		ot::Color colour;
+		colour.setFromJsonObject(serializedColor);
+		ViewerAPI::ChangeColourOfSelection(visualizationModelID, colour);
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Setting color of table selection could not be executed due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+
+	int gridColor[3] = { 0, 0, 0 };
+	std::string title = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_Title);
+	std::string plotType = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotType);
+	std::string plotQuantity = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
+	bool grid = _document[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
+	bool legend = _document[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
+	bool logscaleX = _document[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
+	bool logscaleY = _document[OT_ACTION_PARAM_VIEW1D_LogscaleY].GetBool();
+	bool autoscaleX = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleX].GetBool();
+	bool autoscaleY = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleY].GetBool();
+	double xmin = _document[OT_ACTION_PARAM_VIEW1D_Xmin].GetDouble();
+	double xmax = _document[OT_ACTION_PARAM_VIEW1D_Xmax].GetDouble();
+	double ymin = _document[OT_ACTION_PARAM_VIEW1D_Ymin].GetDouble();
+	double ymax = _document[OT_ACTION_PARAM_VIEW1D_Ymax].GetDouble();
+	gridColor[0] = _document[OT_ACTION_PARAM_VIEW1D_GridColorR].GetInt();
+	gridColor[1] = _document[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
+	gridColor[2] = _document[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
+
+	std::list<ak::UID> curvesID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveIDs);
+	std::list<ak::UID> curvesVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveVersions);
+	std::list<std::string> curvesNames = ot::json::getStringList(_document, OT_ACTION_PARAM_VIEW1D_CurveNames);
+
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationPlot1DNode(visModelID, name, uid, treeIcons, isHidden, projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handlePlot1DPropertiesChanged(ot::JsonDocument& _document) {
+	int gridColor[3] = { 0, 0, 0 };
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
+	std::string title = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_Title);
+	std::string plotType = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotType);
+	std::string plotQuantity = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
+	bool grid = _document[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
+	bool legend = _document[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
+	bool logscaleX = _document[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
+	bool logscaleY = _document[OT_ACTION_PARAM_VIEW1D_LogscaleY].GetBool();
+	bool autoscaleX = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleX].GetBool();
+	bool autoscaleY = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleY].GetBool();
+	double xmin = _document[OT_ACTION_PARAM_VIEW1D_Xmin].GetDouble();
+	double xmax = _document[OT_ACTION_PARAM_VIEW1D_Xmax].GetDouble();
+	double ymin = _document[OT_ACTION_PARAM_VIEW1D_Ymin].GetDouble();
+	double ymax = _document[OT_ACTION_PARAM_VIEW1D_Ymax].GetDouble();
+	gridColor[0] = _document[OT_ACTION_PARAM_VIEW1D_GridColorR].GetInt();
+	gridColor[1] = _document[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
+	gridColor[2] = _document[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
+
+	ViewerAPI::visualizationPlot1DPropertiesChanged(visModelID, uid, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	ot::UIDList entityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
+	ot::UIDList entityVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_Version);
+	auto entityVersion = entityVersions.begin();
+	for (ot::UID entityID : entityIDs)
+	{
+		OTAssert(entityVersion != entityVersions.end(), "List size mismatch");
+
+		ViewerAPI::visualizationResult1DPropertiesChanged(visModelID, entityID, *entityVersion);
+		entityVersion++;
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleEnterEntitySelectionMode(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string selectionType = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SelectionType);
+	bool allowMultipleSelection = _document[OT_ACTION_PARAM_MODEL_ITM_Selection_AllowMultipleSelection].GetBool();
+	std::string selectionFilter = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Selection_Filter);
+	std::string selectionAction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Selection_Action);
+	std::string selectionMessage = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Selection_Message);
+	ot::serviceID_t replyToService = ot::json::getUInt(_document, OT_ACTION_PARAM_MODEL_REPLYTO);
+	std::list<std::string> optionNames = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames);
+	std::list<std::string> optionValues = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues);
+
+	AppBase::instance()->getViewerComponent()->enterEntitySelectionMode(visModelID, replyToService, selectionType, allowMultipleSelection, selectionFilter, selectionAction, selectionMessage, optionNames, optionValues);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetModifiedState(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	bool modifiedState = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ModifiedState);
+
+	AppBase::instance()->getViewerComponent()->isModified(visModelID, modifiedState);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetProgressVisibility(ot::JsonDocument& _document) {
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	bool visible = ot::json::getBool(_document, OT_ACTION_PARAM_UI_CONTROL_VisibleState);
+	bool continuous = ot::json::getBool(_document, OT_ACTION_PARAM_UI_CONTROL_ContinuousState);
+
+	AppBase* app = AppBase::instance();
+	assert(app != nullptr);
+	if (app != nullptr) app->setProgressBarVisibility(message.c_str(), visible, continuous);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetProgressValue(ot::JsonDocument& _document) {
+	int percentage = ot::json::getInt(_document, OT_ACTION_PARAM_PERCENT);
+
+	AppBase* app = AppBase::instance();
+	assert(app != nullptr);
+	if (app != nullptr) app->setProgressBarValue(percentage);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleFreeze3DView(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	bool flag = ot::json::getBool(_document, OT_ACTION_PARAM_UI_CONTROL_BOOLEAN_STATE);
+
+	AppBase::instance()->getViewerComponent()->freeze3DView(visModelID, flag);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _document) {
+	AppBase* app = AppBase::instance();
+
+	// Create a model and a view
+	ModelUIDtype modelID = app->createModel();
+	ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectName());
+	app->getViewerComponent()->activateModel(modelID);
+
+	auto service = m_serviceIdMap.find(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
+	if (service == m_serviceIdMap.end()) { throw std::exception("Sender service was not registered"); }
+
+	// Write data to JSON string
+	ot::JsonDocument docOut;
+	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
+
+	std::string response;
+	if (!sendHttpRequest(QUEUE, service->second->serviceURL(), docOut, response)) {
+		throw std::exception("Failed to send http request");
+	}
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		std::string ex(OT_ACTION_RETURN_INDICATOR_Error "From ");
+		ex.append(service->second->serviceURL()).append(": ").append(response);
+		throw std::exception(ex.c_str());
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		std::string ex(OT_ACTION_RETURN_INDICATOR_Error "From ");
+		ex.append(service->second->serviceURL()).append(": ").append(response);
+		throw std::exception(ex.c_str());
+	}
+
+	app->switchToViewTab();
+	app->lockWelcomeScreen(false);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCreateView(ot::JsonDocument& _document) {
+	auto manager = AppBase::instance();
+
+	ot::JsonDocument docOut;
+	docOut.SetObject();
+	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, manager->createView(ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID),
+		AppBase::instance()->getCurrentProjectName()), docOut.GetAllocator());
+
+	return docOut.toJson();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetEntityName(ot::JsonDocument& _document) {
+	ak::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
+	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Name);
+
+	ViewerAPI::setEntityName(entityID, entityName);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRenameEntity(ot::JsonDocument& _document) {
+	std::string fromPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_FROM);
+	std::string toPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_To);
+
+	ViewerAPI::renameEntityPath(fromPath, toPath);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCreateRubberband(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string note = ot::json::getString(_document, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
+	std::string cfg = ot::json::getString(_document, OT_ACTION_PARAM_VIEW_RUBBERBAND_Document);
+
+	ViewerAPI::createRubberband(AppBase::instance()->getViewerComponent()->getActiveViewerModel(), serviceId, note, cfg);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	m_lockManager->lock(getService(serviceId), flags);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	m_lockManager->unlock(getService(serviceId), flags);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddSettingsData(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	ot::ServiceBase* service = getService(serviceId);
+	if (service) {
+		UserSettings::instance()->addFromService(service, _document);
+	}
+	else {
+		AppBase::instance()->appendInfoMessage("[ERROR] Dispatch: " OT_ACTION_CMD_UI_AddSettingsData ": Service not registered");
+
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument& _document) {
+#ifdef _DEBUG
+	std::string iconPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
+	try {
+		ak::uiAPI::addIconSearchPath(iconPath.c_str());
+		AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
+	}
+	catch (...) {
+		AppBase::instance()->appendInfoMessage("[ERROR] Failed to add icon search path: Path not found");
+	}
+#endif // _DEBUG
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetVersionGraph(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	std::list<std::string> versionList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+	std::list<std::string> parentList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_PARENT);
+	std::list<std::string> descriptionList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
+	std::string activeVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
+	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+
+	std::list<std::tuple<std::string, std::string, std::string>> versionGraph;
+
+	auto description = descriptionList.begin();
+	auto parent = parentList.begin();
+
+	for (auto version : versionList)
+	{
+		versionGraph.push_back(std::tuple<std::string, std::string, std::string>(version, *parent, *description));
+		parent++;
+		description++;
+	}
+
+	ViewerAPI::setVersionGraph(visModelID, versionGraph, activeVersion, activeBranch);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetVersionGraphActive(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	std::string activeVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
+	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+
+	ViewerAPI::setVersionGraphActive(visModelID, activeVersion, activeBranch);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveVersionGraphVersions(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	std::list<std::string> versions = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+
+	ViewerAPI::removeVersionGraphVersions(visModelID, versions);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(ot::JsonDocument& _document) {
+	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	std::string newVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+	std::string parentVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_PARENT);
+	std::string description = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
+	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+
+	ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
+
+	return "";
+}
+
+// Graphics Editor	
+
+std::string ExternalServicesComponent::handleFillGraphicsPicker(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::GraphicsPickerCollectionPackage pckg;
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	AppBase::instance()->globalGraphicsPicker()->add(pckg);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::GraphicsNewEditorPackage pckg("", "");
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
+
+	AppBase::instance()->globalGraphicsPicker()->add(pckg);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::GraphicsScenePackage pckg("");
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+
+	for (auto graphicsItemCfg : pckg.items()) {
+		ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg, true);
+		if (graphicsItem != nullptr) {
+			const double xCoordinate = graphicsItemCfg->position().x();
+			const double yCoordinate = graphicsItemCfg->position().y();
+			graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));
+			editor->addItem(graphicsItem);
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::UIDList itemUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+
+	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName)) {
+		// Specific view
+
+		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
+
+		if (editor) {
+			for (auto itemUID : itemUids) {
+				editor->removeItem(itemUID);
+			}
+		}
+	}
+	else {
+		// Any view
+
+		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+		for (auto v : views) {
+			for (auto uid : itemUids) {
+				v->removeItem(uid);
+			}
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::GraphicsConnectionPackage pckg;
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+
+	for (const auto& connection : pckg.connections()) {
+		editor->addConnectionIfConnectedItemsExist(connection);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::GraphicsConnectionPackage pckg;
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	if (!pckg.name().empty()) {
+		// Specific editor
+
+		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+
+		for (auto connection : pckg.connections()) {
+			editor->removeConnection(connection.getUid());
+		}
+	}
+	else {
+		// Any editor
+
+		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+		for (auto view : views) {
+			for (auto connection : pckg.connections()) {
+				view->removeConnection(connection.getUid());
+			}
+		}
+	}
+
+	return "";
+}
+
+// Text Editor
+
+std::string ExternalServicesComponent::handleSetTextEditorText(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
+	std::string editorText = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Text);
+
+	std::string editorTitle = editorName;
+	if (_document.HasMember(OT_ACTION_PARAM_TEXTEDITOR_Title)) {
+		editorTitle = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Title);
+	}
+
+	ot::TextEditor* editor = AppBase::instance()->findOrCreateTextEditor(editorName, QString::fromStdString(editorTitle), info);
+	editor->setPlainText(QString::fromStdString(editorText));
+	editor->setContentChanged(false);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
+	ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
+
+	if (editor) {
+		editor->setContentChanged(false);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetTextEditorModified(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
+	ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
+
+	if (editor) {
+		editor->setContentChanged(true);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCloseTextEditor(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
+	AppBase::instance()->closeTextEditor(editorName, info);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	AppBase::instance()->closeAllTextEditors(info);
+
+	return "";
+}
+
+// Studio Suite API
+
+std::string ExternalServicesComponent::handleStudioSuiteImport(ot::JsonDocument& _document) {
+	QString fileName = QFileDialog::getOpenFileName(
+		nullptr,
+		"Import CST File",
+		QDir::currentPath(),
+		QString("*.cst ;; All files (*.*)"));
+
+	if (fileName == "") return "";
+
+	ot::Flags<ot::ui::lockType> lockFlags;
+	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+	m_lockManager->lock(nullptr, lockFlags);
+
+	std::string studioSuiteServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+
+	StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+	StudioSuiteConnectorAPI::setLocalFileName(AppBase::instance()->getCurrentProjectName(), fileName.toStdString());
+
+	std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), AppBase::instance()->getCurrentProjectName());
+	workerThread.detach();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleStudioSuiteCommit(ot::JsonDocument& _document) {
+	std::string fileName = getStudioSuiteFileNameForCommit();
+	if (fileName.empty()) return "";
+
+	CommitMessageDialog commitMessageDialog;
+	commitMessageDialog.exec();
+	if (!commitMessageDialog.wasConfirmed()) return "";
+	std::string changeComment = commitMessageDialog.changeMessage().toStdString();
+
+	ot::Flags<ot::ui::lockType> lockFlags;
+	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+	m_lockManager->lock(nullptr, lockFlags);
+
+	std::string studioSuiteServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+
+	StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+
+	// We need to make sure that the project is at the correct version in OT
+	std::string currentVersion = StudioSuiteConnectorAPI::getCurrentVersion(fileName, AppBase::instance()->getCurrentProjectName());
+	activateVersion(currentVersion);
+
+	std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName, AppBase::instance()->getCurrentProjectName(), changeComment);
+	workerThread.detach();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleStudioSuiteGet(ot::JsonDocument& _document) {
+	ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
+		"Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
+	if (result != ak::dialogResult::resultYes) { return ""; }
+
+	std::string fileName = getStudioSuiteFileNameForGet();
+	if (fileName.empty()) return "";
+
+	ot::Flags<ot::ui::lockType> lockFlags;
+	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
+	lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+	m_lockManager->lock(nullptr, lockFlags);
+
+	std::string studioSuiteServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, this);
+
+	std::thread workerThread(StudioSuiteConnectorAPI::getProject, fileName, AppBase::instance()->getCurrentProjectName(), version);
+	workerThread.detach();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleStudioSuiteUpload(ot::JsonDocument& _document) {
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityVersionList);
+
+	std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList);
+	workerThread.detach();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleStudioSuiteDownload(ot::JsonDocument& _document) {
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::list<ot::UID> entityVersionList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	std::string fileName = StudioSuiteConnectorAPI::getLocalFileName();
+
+	std::thread workerThread(StudioSuiteConnectorAPI::downloadFiles, fileName, AppBase::instance()->getCurrentProjectName(), entityIDList, entityVersionList, version);
+	workerThread.detach();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleStudioSuiteCopy(ot::JsonDocument& _document) {
+	std::string newVersion = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	std::thread workerThread(StudioSuiteConnectorAPI::copyFiles, newVersion);
+	workerThread.detach();
+
+	return "";
+}
+
+// Dialogs
+
+std::string ExternalServicesComponent::handleEntitySelectionDialog(ot::JsonDocument& _document) {
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	const ot::UID entityToBeExtended = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+
+	ot::SelectEntitiesDialogCfg pckg;
+	pckg.setFromJsonObject(cfgObj);
+
+	SelectEntitiesDialog dia(pckg, nullptr);
+	dia.showDialog();
+
+	if (dia.dialogResult() == ot::Dialog::Ok && dia.selectionHasChanged()) {
+		std::list<std::string> selectedItems = dia.selectedItemPaths();
+		if (selectedItems.size() != 0)
+		{
+			ot::JsonDocument responseDoc;
+			ot::JsonArray jSelectedItemsNames;
+			for (const std::string& selectedItem : selectedItems)
+			{
+				jSelectedItemsNames.PushBack(ot::JsonString(selectedItem, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			}
+			responseDoc.AddMember(OT_ACTION_PARAM_UI_TREE_SelectedItems, jSelectedItemsNames, responseDoc.GetAllocator());
+			responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityToBeExtended, responseDoc.GetAllocator());
+			responseDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, responseDoc.GetAllocator());
+			std::string response;
+			sendHttpRequest(QUEUE, m_modelServiceURL, responseDoc, response);
+		}
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document) {
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+
+	ot::PropertyDialogCfg pckg;
+	pckg.setFromJsonObject(cfgObj);
+
+	ot::PropertyDialog dia(pckg, nullptr);
+	dia.showDialog();
+
+	if (dia.dialogResult() == ot::Dialog::Ok) {
+
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	ot::OnePropertyDialogCfg pckg;
+	pckg.setFromJsonObject(cfgObj);
+
+	ot::OnePropertyDialog dia(pckg, nullptr);
+	dia.showDialog();
+
+	if (dia.dialogResult() == ot::Dialog::Ok) {
+		ot::JsonDocument responseDoc;
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
+
+		std::string response;
+		sendHttpRequest(EXECUTE, info, responseDoc, response);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+
+	ot::MessageDialogCfg cfg;
+	cfg.setFromJsonObject(cfgObj);
+
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MessageDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(cfg.name(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(ot::MessageDialogCfg::buttonToString(result), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	std::string response;
+	sendHttpRequest(EXECUTE, info, responseDoc, response);
+
+	return "";
+}
+
+// Plugin handling
+
+std::string ExternalServicesComponent::handlePluginSearchPath(ot::JsonDocument& _document) {
+#ifdef _DEBUG
+	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
+	m_owner->uiPluginManager()->addPluginSearchPath(pluginPath.c_str());
+	AppBase::instance()->appendDebugMessage("[ERROR] Added UI plugin search path: " + QString::fromStdString(pluginPath));
+#endif // _DEBUG
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRequestPlugin(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
+	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
+	ot::ServiceBase* service = getService(serviceId);
+	ak::UID pluginUid = m_owner->uiPluginManager()->loadPlugin(pluginName.c_str(), pluginPath.c_str(), service);
+
+	if (pluginUid) {
+		AppBase* app = AppBase::instance();
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestPluginSuccess, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->serviceID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(app->serviceName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(app->serviceType(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, ot::JsonString(pluginName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, pluginUid, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, ot::JsonString(pluginPath, doc.GetAllocator()), doc.GetAllocator());
+
+		std::string response;
+		sendHttpRequest(EXECUTE, service->serviceURL(), doc, response);
+
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) { assert(0); }
+		else OT_ACTION_IF_RESPONSE_WARNING(response) { assert(0); }
+	}
+	return "";
+}
+
+std::string ExternalServicesComponent::handlePluginMessage(ot::JsonDocument& _document) {
+	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+	std::string pluginAction = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER);
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
+	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
+	unsigned long long pluginUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
+	ot::ServiceBase* service = getService(serviceId);
+	if (!AppBase::instance()->uiPluginManager()->forwardMessageToPlugin(pluginUID, pluginAction, message)) {
+		return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
+	}
+	return "";
 }
 
 // ###################################################################################################

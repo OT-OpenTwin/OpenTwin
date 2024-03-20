@@ -334,7 +334,7 @@ void ViewerComponent::removeUIElements(std::list<ViewerUIDtype> &itemIDList)
 
 void ViewerComponent::displayText(const std::string &text)
 {
-	AppBase::instance()->getExternalServicesComponent()->displayInfoMessage(text);
+	AppBase::instance()->appendInfoMessage(QString::fromStdString(text));
 }
 
 void ViewerComponent::setCurrentVisualizationTab(const std::string & _tabName) {
