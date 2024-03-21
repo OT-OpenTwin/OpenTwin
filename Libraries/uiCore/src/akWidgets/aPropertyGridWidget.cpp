@@ -423,8 +423,12 @@ void ak::aPropertyGridGroup::setGroupColors(const aColor& _color, const aColor& 
 		bool alt = true;
 		for (auto itm : m_items) {
 			alt = !alt;
-			if (alt) { itm->setColor(m_colorForeground, m_colorAlternate, m_colorForegroundError); }
-			else { itm->setColor(m_colorForeground, m_color, m_colorForegroundError); }
+			if (alt) {
+				itm->setColor(m_colorForeground, m_colorAlternate, m_colorForegroundError); 
+			}
+			else {
+				itm->setColor(m_colorForeground, m_color, m_colorForegroundError); 
+			}
 		}
 	}
 }
@@ -745,8 +749,43 @@ void ak::aPropertyGridItem::setErrorState(bool _isError, bool _forceRepaint) {
 	if (_isError == m_isError && !_forceRepaint) { return; }
 	m_isError = _isError;
 	m_ignoreEvent = true;
-
 	
+	QString sheet;
+	sheet = "background-color: #" + m_colorBackground.toHexString();
+	if (m_isError) {
+		sheet.append("; foreground-color: #" + m_colorError.toHexString());
+	}
+	else {
+		sheet.append("; foreground-color: #" + m_colorNormal.toHexString());
+	}
+	sheet.append(";");
+
+	if (m_textItem) {  
+		m_textItem->setBackground(m_colorBackground.toQColor());
+		m_textItem->setForeground(m_isError ? m_colorError.toQColor() : m_colorNormal.toQColor());
+	}
+	if (m_cBool) {
+		m_cBool->setStyleSheet(sheet);
+	}
+	if (m_cColor) {
+		m_cColor->pushButton()->setStyleSheet(sheet);
+	}
+	if (m_cSelection) {
+		m_cSelection->setStyleSheet(sheet);
+	}
+	if (m_cTime) {
+		m_cTime->setStyleSheet(sheet);
+	}
+	if (m_cDate) {
+		m_cDate->setStyleSheet(sheet);
+	}
+	if (m_cInt) {
+		m_cInt->setStyleSheet(sheet);
+	}
+	if (m_cDelete) {
+		m_cDelete->setStyleSheet(sheet);
+	}
+
 	m_ignoreEvent = false;
 }
 
@@ -925,6 +964,7 @@ void ak::aPropertyGridItem::ini(void) {
 	m_cTime = nullptr;
 	m_cDate = nullptr;
 	m_cInt = nullptr;
+	m_cDelete = nullptr;
 
 	// Create items
 	m_nameItem = new QTableWidgetItem(m_name);
