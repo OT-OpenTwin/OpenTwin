@@ -83,8 +83,14 @@
     <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
+    <ClCompile Include="src\WidgetView.cpp" />
+    <ClCompile Include="src\WidgetViewFactory.cpp" />
+    <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\WidgetView.h" />
+    <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
+    <ClInclude Include="include\OTWidgets\WidgetViewManager.h" />
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <ClInclude Include="include\OTWidgets\CheckBox.h" />
     <QtMoc Include="include\OTWidgets\ColorPickButton.h" />
@@ -251,7 +257,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -261,8 +267,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qt6advanceddockingd.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(QT_ADS_ROOT)\x64\lib\$(Configuration);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -273,7 +279,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -294,7 +300,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
     </ClCompile>
@@ -302,8 +308,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qt6advanceddocking.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(QT_ADS_ROOT)\x64\lib\$(Configuration);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -314,7 +320,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
     </ClCompile>

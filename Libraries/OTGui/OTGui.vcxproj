@@ -66,6 +66,7 @@
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
     <ClInclude Include="include\OTGui\StyleValue.h" />
+    <ClInclude Include="include\OTGui\WidgetViewCfg.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
@@ -115,6 +116,7 @@
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />
+    <ClCompile Include="src\WidgetViewCfg.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

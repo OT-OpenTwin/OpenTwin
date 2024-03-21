@@ -193,6 +193,15 @@
     <ClCompile Include="src\GraphicsItemPreviewDrag.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\WidgetView.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetViewManager.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetViewFactory.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -361,6 +370,15 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItemPreview.h">
       <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetView.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetViewManager.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetViewFactory.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

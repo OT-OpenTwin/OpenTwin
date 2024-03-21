@@ -186,6 +186,9 @@
     <ClInclude Include="include\OTGui\DialogCfg.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetViewCfg.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -328,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="src\DialogCfg.cpp">
       <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetViewCfg.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
