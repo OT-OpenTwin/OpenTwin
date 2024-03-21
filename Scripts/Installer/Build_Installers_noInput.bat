@@ -78,9 +78,9 @@ echo +++ COMPILE TIME +++
 	
 	echo Compiling Python Scripts...
 	cd !PYTHON_PATH!
-	pyinstaller --onefile !PY_PERMISSIONS!
-	pyinstaller --onefile !PY_MONGOD_NO_AUTH!
-	pyinstaller --onefile !PY_MONGOD_AUTH!
+	pyinstaller --onefile --noconsole !PY_PERMISSIONS!
+	pyinstaller --onefile --noconsole !PY_MONGOD_NO_AUTH!
+	pyinstaller --onefile --noconsole !PY_MONGOD_AUTH!
 	cd %cd%
 	
 	echo COMPILING OPENTWIN INSTALLATION SCRIPTS
