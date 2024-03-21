@@ -24,6 +24,7 @@
 
 // Qt header
 #include <qlayout.h>
+#include <qmenu.h>
 
 #include <limits>
 
@@ -768,10 +769,12 @@ void ak::aPropertyGridItem::setErrorState(bool _isError, bool _forceRepaint) {
 		m_cBool->setStyleSheet(sheet);
 	}
 	if (m_cColor) {
+		m_cColor->widget()->setStyleSheet("#AK_ColorEditButton_Central{" + sheet + "}");
 		m_cColor->pushButton()->setStyleSheet(sheet);
 	}
 	if (m_cSelection) {
 		m_cSelection->setStyleSheet(sheet);
+		m_cSelection->getMenu()->setStyleSheet("QMenu {" + sheet + "}; QMenu::item {" + sheet + "};");
 	}
 	if (m_cTime) {
 		m_cTime->setStyleSheet(sheet);

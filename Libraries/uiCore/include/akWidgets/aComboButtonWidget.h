@@ -93,6 +93,8 @@ namespace ak {
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
 
+		QMenu* getMenu(void) { return m_menu; };
+
 	signals:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
