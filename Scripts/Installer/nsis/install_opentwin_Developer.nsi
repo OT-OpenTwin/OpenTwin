@@ -824,6 +824,35 @@ FunctionEnd
 			StrCpy "$TempToolChain" ${TEMP_TOOLCHAIN_DIR}
 	FunctionEnd
 
+Function WaitForShortcut
+	Pop $2 #application name string
+	Pop $0 #path to shortcut
+    
+    #initialize counter
+    StrCpy $1 0
+
+    loop_init:
+        IfFileExists $0 done loop
+	loop:
+        IntOp $1 $1 + 1
+        #check for timeout
+        ${If} $1 > 60
+			Goto timeout
+		${EndIf} 
+
+        Sleep 999
+        Goto loop_init
+    
+    done:
+        #file exists, return to section
+        Return
+
+    timeout:
+        #60 sec timeout
+        MessageBox MB_OK|MB_ICONEXCLAMATION "$2 Installation timed out. Proceeding with installation now but skipping this step."
+
+FunctionEnd
+
 ; MUI Settings
 	!define MUI_ABORTWARNING
 	!define MUI_ICON ${MUI_ICON_PATH}
@@ -980,8 +1009,13 @@ SectionGroup /e "OpenTwin"
 		
 		DetailPrint "Running MongoDB installation scripts..."
 
-		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="1" ADDLOCAL="ServerService,Client"'		
-		
+		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" ADDLOCAL="ServerService,Client"'		
+		DetailPrint "Waiting for MongoDB Compass Application..."
+		DetailPrint ". . ."
+			Push "$DESKTOP\MongoDBCompass.lnk"
+			Push "MongoDB Compass"
+			Call WaitForShortcut
+		DetailPrint "Done."
 		##########################################
 		# call for python scripts via $INSTDIR
 		##########################################
@@ -1024,7 +1058,13 @@ SectionGroup /e "Git"
 		ExpandEnvStrings $0 %COMSPEC%
 			ExecWait 'msiexec.exe /i "$TempToolChain\GitHubDesktopSetup-x64.msi" /quiet'
 		ExecWait '"$GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION\GitHubDesktopDeploymentTool.exe" /silent'
-		
+
+		DetailPrint "Waiting for GitHub Desktop..."
+		DetailPrint ". . ."
+			Push "$DESKTOP\GitHub Desktop.lnk"
+			Push "GitHub Desktop"
+			Call WaitForShortcut
+		DetailPrint "Done."
 	SectionEnd
 SectionGroupEnd
 
@@ -1042,12 +1082,17 @@ Section "Install Rust" SEC06_1
 SectionEnd
 
 
-
 Section "Install PostMan 64-bit" SEC07
 	AddSize 535000
 	DetailPrint "Installing PostMan..."
 		ExecWait '"$TempToolChain\Postman-win64-Setup.exe" /silent'	#silent installs postman - postman installation is mostly silent already
 																	#the '/silent' switch surpresses the automatic app launch after installation
+		DetailPrint "Waiting for Postman..."
+		DetailPrint ". . ."
+			Push "$DESKTOP\Postman.lnk"
+			Push "Postman"
+			Call WaitForShortcut
+		DetailPrint "Done."
 SectionEnd
 
 Section "Install Node.js and yarn" SEC08
@@ -1079,26 +1124,28 @@ SectionGroup /e "Python & Sphinx"
 		AddSize 22000
 		DetailPrint "Installing Sphinx..."
 			ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme" " '
+			#ExecWait '"$0" /k "START /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme" " '
+			ExecWait 'cmd.exe /c "title Installing Sphinx and ReadTheDocs Theme && "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme " '
 	SectionEnd
 
 	Section "Install Pyinstaller" SEC09_2
 		AddSize 106
 		DetailPrint "Installing Pyinstaller..."
 			ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
+			#ExecWait '"$0" /k "START /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
+			ExecWait 'cmd.exe /c "title Installing pyinstaller && "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller " '
 	SectionEnd
 SectionGroupEnd
 
 Section "-CleanupTasks"
 	SectionIn RO
+	DetailPrint "Refreshing Environment..."
+	ExpandEnvStrings $0 %COMSPEC%
+		ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd"'
 	DetailPrint "Cleaning up..."
 	RMDir /r ${TEMP_TOOLCHAIN_DIR}
 	RMDir /r $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION
 	
-	DetailPrint "Refreshing Environment..."
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd"'
 SectionEnd
 
 Section -AdditionalIcons
@@ -1128,12 +1175,12 @@ SectionEnd
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "Install Git's graphical UI"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06_1} "Install Rust (only in combination with Visual Studio 2022)"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06_1} "Install Rust (only in combination with Visual Studio 2022!)"
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} "Install the 64-bit version of PostMan"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} "Install Node.js and yarn"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} "Install a standard, system wide installation of Python 3"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} "Install a standard installation of Python 3.9"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_1} "Install Sphinx via pip and the 'Read the docs' theme required for building the documentation"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_2} "Install Pyinstaller via pip required for building OpenTwin Installer scripts"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
