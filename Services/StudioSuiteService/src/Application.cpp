@@ -114,6 +114,17 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 
 		return getLocalFileName(hostName);
 	}
+	else if (_action == OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME)
+	{
+		std::string hostName = ot::json::getString(_doc, OT_ACTION_PARAM_HOSTNAME);
+		std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Name);
+
+		setLocalFileName(hostName, fileName);
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME)
+	{
+		return getSimpleFileName();
+	}
 
 	return OT_ACTION_RETURN_UnknownAction;
 }
@@ -348,7 +359,6 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	readProjectInformation(simpleFileName, hostNamesAndFileNames);
 
 	addHostNameAndFileName(hostName, fileName, hostNamesAndFileNames);
-	hostNamesAndFileNames.push_back(std::pair<std::string, std::string>(hostName, fileName));
 
 	std::filesystem::path path(fileName);
 	if (!simpleFileName.empty())
@@ -908,6 +918,19 @@ std::string Application::getLocalFileName(const std::string &hostName)
 	return ""; // We could not find the host name in the list
 }
 
+std::string Application::getSimpleFileName()
+{
+	std::string simpleFileName;
+	std::list<std::pair<std::string, std::string>> hostNamesAndFileNames;
+
+	if (!readProjectInformation(simpleFileName, hostNamesAndFileNames))
+	{
+		return ""; // This project has not yet been initialized
+	}
+
+	return simpleFileName;
+}
+
 void Application::addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
 	for (auto item : hostNamesAndFileNames)
@@ -924,3 +947,29 @@ void Application::addHostNameAndFileName(const std::string& hostName, const std:
 	hostNamesAndFileNames.push_back(std::pair<std::string, std::string>(hostName, fileName));
 }
 
+void Application::setLocalFileName(const std::string& hostName, const std::string& fileName)
+{
+	modelComponent()->clearNewEntityList();
+
+	std::string simpleFileName;
+	std::list<std::pair<std::string, std::string>> hostNamesAndFileNames;
+
+	if (readProjectInformation(simpleFileName, hostNamesAndFileNames))
+	{
+		addHostNameAndFileName(hostName, fileName, hostNamesAndFileNames);
+
+		std::filesystem::path path(fileName);
+		if (!simpleFileName.empty())
+		{
+			assert(simpleFileName == path.filename().string());
+		}
+
+		writeProjectInformation(simpleFileName, hostNamesAndFileNames);
+
+		modelComponent()->modelChangeOperationCompleted("Changed local Studio Suite file name");
+	}
+	else
+	{
+		assert(0);
+	}
+}

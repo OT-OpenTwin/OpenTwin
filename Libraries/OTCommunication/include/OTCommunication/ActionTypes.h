@@ -181,6 +181,8 @@
 #define OT_ACTION_CMD_UI_SS_SHAPEINFO "StudioSuite.ShapesInformation"
 #define OT_ACTION_CMD_UI_SS_TRIANGLES "StudioSuite.ShapesTriangles"
 #define OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME "StudioSuite.GetLocalFileName"
+#define OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME "StudioSuite.SetLocalFileName"
+#define OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME "StudioSuite.GetSimpleFileName"
 
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"

@@ -31,7 +31,7 @@ public:
     void copyFiles(const std::string& newVersion);
     std::string getLocalFileName() { return localProjectFileName; }
     void setLocalFileName(std::string fileName);
-    bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
+    bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage);
 
 private:
     enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};

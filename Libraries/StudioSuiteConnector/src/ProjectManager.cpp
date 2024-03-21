@@ -681,8 +681,10 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 	return false;
 }
 
-bool ProjectManager::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists)
+bool ProjectManager::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string &errorMessage)
 {
+	errorMessage.clear();
+
 	std::string baseProjectName;
 
 	try
@@ -692,6 +694,7 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 	catch (std::string)
 	{
 		// We were unable to extract the project name from the file -> invalid file name
+		errorMessage = "The file path is invalid";
 		return false;
 	}
 
@@ -699,7 +702,11 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 	std::string cacheFolderName = baseProjectName + ".cache";
 
 	bool cstFileExists = std::filesystem::is_regular_file(fileName);
-	if (!cstFileExists && ensureProjectExists) return false; // We need an existing project, but this one did not exist
+	if (!cstFileExists && ensureProjectExists)
+	{
+		errorMessage = "The specified file does not exist.";
+		return false; // We need an existing project, but this one did not exist
+	}
 
 	// Now we check whether the associated directory is ok
 	if (cstFileExists)
@@ -707,6 +714,8 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 		// The directory also needs to exist in this case
 		if (!std::filesystem::is_directory(baseProjectName))
 		{
+			errorMessage = "The project exists, but does not have an associated project folder. \n"
+						   "Please open the project in CST Studio Suite to extract the project's content.";
 			return false;
 		}
 	}
@@ -715,11 +724,17 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 		// The directory must not exist in this case (and the cache folder must not exist as well
 		if (std::filesystem::is_directory(baseProjectName))
 		{
+			errorMessage = "The project file does not exist, but there is a folder with the same name. \n"
+				           "This would cause problems when the CST Studio Suite project is opened.";
+
 			return false;
 		}
 
 		if (std::filesystem::is_directory(cacheFolderName))
 		{
+			errorMessage = "The project file does not exist, but there is a cache folder with the same name. \n"
+				           "This would cause problems when the CST Studio Suite project is opened.";
+
 			return false;
 		}
 
@@ -730,6 +745,9 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 	// In this case, we have an existing project
 	if (!std::filesystem::is_directory(cacheFolderName))
 	{
+		errorMessage = "The project exists, but does not have an associated cache folder. \n"
+			           "This project does not seem to be connected to version control.";
+
 		return false;
 	}
 
@@ -738,7 +756,14 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 	version.read();
 
 	// We need to ensure that the local cache diretory actually belongs to the open project.
-	return (version.getProjectName() == projectName);
+	if (version.getProjectName() != projectName)
+	{
+		errorMessage = "Inconcistent cache information: The project cache information does not belong to the associated project.\n";
+
+		return false;
+	}
+
+	return true;
 }
 
 void ProjectManager::downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version)

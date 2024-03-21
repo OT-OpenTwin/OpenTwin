@@ -22,9 +22,12 @@ namespace StudioSuiteConnectorAPI
 	__declspec(dllexport) void copyFiles(std::string newVersion);
 	__declspec(dllexport) std::string getLocalFileName();
 	__declspec(dllexport) void setLocalFileName(std::string fileName);
-	__declspec(dllexport) bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
+	__declspec(dllexport) bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage);
+	__declspec(dllexport) void setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 
 	std::string getStudioSuiteFileNameForCommit(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 	std::string getStudioSuiteFileNameForGet(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 	std::string getLocalFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject);
+	std::string getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject);
+
 }

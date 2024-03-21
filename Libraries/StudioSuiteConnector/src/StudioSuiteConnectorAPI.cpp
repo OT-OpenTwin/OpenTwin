@@ -40,7 +40,11 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
 		std::string fileName = getStudioSuiteFileNameForCommit(projectName, studioSuiteServiceURL, mainObject);
-		if (fileName.empty()) return "";
+		if (fileName.empty())
+		{
+			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
+			return "";
+		}
 
 		CommitMessageDialog commitMessageDialog(windowIcon);
 		commitMessageDialog.exec();
@@ -72,7 +76,11 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		if (result != ak::dialogResult::resultYes) { return ""; }
 
 		std::string fileName = getStudioSuiteFileNameForGet(projectName, studioSuiteServiceURL, mainObject);
-		if (fileName.empty()) return "";
+		if (fileName.empty())
+		{
+			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
+			return "";
+		}
 
 		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
 
@@ -147,6 +155,8 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 			StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 		}
 
+		std::string simpleFileName = StudioSuiteConnectorAPI::getSimpleFileNameFromProject(studioSuiteServiceURL, mainObject);
+
 		std::filesystem::path filePath(localFileName);
 
 		std::string currentDirectory = filePath.parent_path().string();
@@ -158,28 +168,30 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		}
 
 		QFileDialog fileBrowser;
-		QString fileName = fileBrowser.getSaveFileName(
-			nullptr,
-			"Set CST File",
-			currentDirectory.c_str(),
-			QString("*.cst ;; All files (*.*)"),
-			nullptr,
-			QFileDialog::DontConfirmOverwrite);
+		fileBrowser.setFileMode(QFileDialog::Directory);
+		fileBrowser.selectFile(currentDirectory.c_str());
+		fileBrowser.setOption(QFileDialog::ShowDirsOnly, false);
 
-		localFileName = fileName.toStdString();
+		if (!fileBrowser.exec())
+		{
+			return ""; // Operation cancelled
+		}
+		localFileName = fileBrowser.selectedFiles()[0].toStdString() + "/" + simpleFileName;
 
 		if (!localFileName.empty())
 		{
-			if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false))
+			std::string errorMessage; 
+
+			if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
 			{
-				ak::uiAPI::promptDialog::show("The selected file is not a valid local project name.\n\n"
-											  "The local file name has not been changed", "Set CST File", ak::promptOkIconLeft, "DialogError", "Default");
+				errorMessage += "\n\nThe local file name has not been changed.";
+				ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set CST File", ak::promptOkIconLeft, "DialogError", "Default");
 				return "";
 			}
 
-			StudioSuiteConnectorAPI::setLocalFileName(localFileName);
+			StudioSuiteConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
 
-			ak::uiAPI::promptDialog::show("The local file name has been changed successfully.", "Set CST File", ak::promptOkIconLeft, "DialogInformation", "Default");
+			ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set CST File", ak::promptOkIconLeft, "DialogInformation", "Default");
 		}
 	}
 
@@ -197,31 +209,10 @@ std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::
 		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 	}
 
-	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, true))
+	std::string errorMessage;
+	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, true, errorMessage))
 	{
-		localFileName.clear();
-	}
-
-	if (localFileName.empty())
-	{
-		QFileDialog fileBrowser;
-		QString fileName = fileBrowser.getOpenFileName(
-			nullptr,
-			"Commit CST File",
-			QDir::currentPath(),
-			QString("*.cst ;; All files (*.*)"));
-
-		localFileName = fileName.toStdString();
-	}
-
-	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, true))
-	{
-		localFileName.clear();
-	}
-
-	if (!localFileName.empty())
-	{
-		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
+		return "";
 	}
 
 	return localFileName;
@@ -238,35 +229,11 @@ std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::str
 		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 	}
 
-	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false))
+	std::string errorMessage;
+	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
 	{
-		localFileName.clear();
+		return "";
 	}
-
-	if (localFileName.empty())
-	{
-		QFileDialog fileBrowser;
-		QString fileName = fileBrowser.getSaveFileName(
-			nullptr,
-			"Get CST File",
-			QDir::currentPath(),
-			QString("*.cst ;; All files (*.*)"),
-			nullptr,
-			QFileDialog::DontConfirmOverwrite);
-
-		localFileName = fileName.toStdString();
-	}
-
-	if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false))
-	{
-		localFileName.clear();
-	}
-
-	if (!localFileName.empty())
-	{
-		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
-	}
-
 	return localFileName;
 }
 
@@ -298,6 +265,59 @@ std::string StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::stri
 
 	return localFileName;
 }
+
+std::string StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject)
+{
+	// Send a message to the service and request the filename
+
+	std::string hostName = QHostInfo::localHostName().toStdString();
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string message = doc.toJson();
+
+	char* url = new char[studioSuiteServiceURL.length() + 1];
+	strcpy(url, studioSuiteServiceURL.c_str());
+
+	char* msg = new char[message.length() + 1];
+	strcpy(msg, message.c_str());
+
+	char* response = nullptr;
+	QMetaObject::invokeMethod(mainObject, "sendExecuteRequestWithAnswer", Qt::DirectConnection, Q_RETURN_ARG(char*, response), Q_ARG(const char*, url), Q_ARG(const char*, msg));
+
+	std::string simpleFileName = response;
+
+	delete[] response;
+	response = nullptr;
+
+	return simpleFileName;
+}
+
+void StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL, QObject* mainObject)
+{
+	// Send a message to the service and set the filename on the server to be stored in the project
+	std::string hostName = QHostInfo::localHostName().toStdString();
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string message = doc.toJson();
+
+	char* url = new char[studioSuiteServiceURL.length() + 1];
+	strcpy(url, studioSuiteServiceURL.c_str());
+
+	char* msg = new char[message.length() + 1];
+	strcpy(msg, message.c_str());
+
+	QMetaObject::invokeMethod(mainObject, "sendExecuteRequest", Qt::DirectConnection, Q_ARG(const char*, url), Q_ARG(const char*, msg));
+
+	// Now set the file name for this instance
+	ProjectManager::getInstance().setLocalFileName(fileName);
+}
+
 
 void StudioSuiteConnectorAPI::openProject()
 {
@@ -354,7 +374,7 @@ void StudioSuiteConnectorAPI::setLocalFileName(std::string fileName)
 	ProjectManager::getInstance().setLocalFileName(fileName);
 }
 
-bool StudioSuiteConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists)
+bool StudioSuiteConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage)
 {
-	return ProjectManager::getInstance().checkValidLocalFile(fileName, projectName, ensureProjectExists);
+	return ProjectManager::getInstance().checkValidLocalFile(fileName, projectName, ensureProjectExists, errorMessage);
 }

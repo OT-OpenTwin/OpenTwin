@@ -116,6 +116,7 @@ public:
 	void showInformation(void);
 	void commitChanges(void);
 	void getChanges(void);
+	void setLocalFileName(const std::string& hostName, const std::string& fileName);
 
 	void EnsureVisualizationModelIDKnown(void);
 
@@ -133,6 +134,7 @@ public:
 	bool isProjectInitialized();
 	std::string getLocalFileName(const std::string& hostName);
 	void addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
+	std::string getSimpleFileName();
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
