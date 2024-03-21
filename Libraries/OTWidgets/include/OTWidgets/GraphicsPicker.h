@@ -37,7 +37,7 @@ namespace ot {
 		GraphicsPicker(Qt::Orientation _orientation = Qt::Vertical);
 		virtual ~GraphicsPicker();
 
-		QWidget* widget(void);
+		QWidget* pickerWidget(void);
 
 		void setOrientation(Qt::Orientation _orientation);
 		Qt::Orientation orientation(void) const;

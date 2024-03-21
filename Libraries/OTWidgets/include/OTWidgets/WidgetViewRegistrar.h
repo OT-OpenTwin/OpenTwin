@@ -11,6 +11,7 @@
 namespace ot {
 
 	//! @brief Used to register a WidgetView at the WidgetViewFactory
+	//! Note that the registrar should be placed in the source file when creating static
 	template <class T>
 	class WidgetViewRegistrar {
 	public:

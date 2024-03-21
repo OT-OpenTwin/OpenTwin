@@ -45,6 +45,7 @@
     <ClCompile Include="src\GraphicsLayoutItemWrapper.cpp" />
     <ClCompile Include="src\GraphicsLineItem.cpp" />
     <ClCompile Include="src\GraphicsPicker.cpp" />
+    <ClCompile Include="src\GraphicsPickerView.cpp" />
     <ClCompile Include="src\GraphicsPixmapItem.cpp" />
     <ClCompile Include="src\GraphicsRectangularItem.cpp" />
     <ClCompile Include="src\GraphicsScene.cpp" />
@@ -89,6 +90,7 @@
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
