@@ -305,6 +305,8 @@ public:
 	OT_HANDLER(handleStudioSuiteUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleStudioSuiteDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleStudioSuiteCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Dialogs
 	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)

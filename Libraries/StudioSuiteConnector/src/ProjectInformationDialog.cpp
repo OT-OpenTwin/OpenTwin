@@ -16,12 +16,9 @@
 
 // AK header
 #include <akAPI/uiAPI.h>
-#include <akGui/aColorStyle.h>
 
 ProjectInformationDialog::ProjectInformationDialog(const QIcon &windowIcon, const std::string& localFileName, const std::string& serverVersion, const std::string& localVersion)
 {
-	ak::aColorStyle* _colorStyle = ak::uiAPI::getCurrentColorStyle();
-
 	// Create controls
 	my_buttonClose = new QPushButton{ "Close" };
 
@@ -82,8 +79,6 @@ ProjectInformationDialog::ProjectInformationDialog(const QIcon &windowIcon, cons
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_buttonClose, SIGNAL(clicked()), this, SLOT(slotButtonClosePressed()));
 }
 
@@ -107,46 +102,6 @@ ProjectInformationDialog::~ProjectInformationDialog() {
 	delete my_widgetServerVersion;
 
 	delete my_layout;
-}
-
-
-void ProjectInformationDialog::setColorStyle(ak::aColorStyle* _colorStyle) {
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_buttonClose->setStyleSheet("");
-		my_fileName->setStyleSheet("");
-		my_serverVersion->setStyleSheet("");
-		my_lLocalVersion->setStyleSheet("");
-		my_lFileName->setStyleSheet("");
-		my_lServerVersion->setStyleSheet("");
-		my_lLocalVersion->setStyleSheet("");
-	}
-	else {
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_fileName->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-		my_serverVersion->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-		my_localVersion->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonClose->setStyleSheet(sheet);
-
-		my_lFileName->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-		my_lServerVersion->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-		my_lLocalVersion->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-	}
 }
 
 void ProjectInformationDialog::slotButtonClosePressed() { Close(); }

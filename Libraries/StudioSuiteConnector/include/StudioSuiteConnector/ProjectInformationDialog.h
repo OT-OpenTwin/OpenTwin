@@ -28,8 +28,6 @@ public:
 	ProjectInformationDialog(const QIcon& windowIcon, const std::string &localFileName, const std::string& serverVersion, const std::string& localVersion);
 	virtual ~ProjectInformationDialog();
 
-	void setColorStyle(ak::aColorStyle* _colorStyle);
-
 signals:
 	void isClosing(void);
 
