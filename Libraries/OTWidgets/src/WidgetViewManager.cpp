@@ -81,8 +81,10 @@ void ot::WidgetViewManager::closeView(const BasicServiceInformation& _owner, con
 	if (map) {
 		auto it = map->find(_viewName);
 		if (it != map->end()) {
-			delete it->second;
-			map->erase(_viewName);
+			if (!it->second->viewIsProtected()) {
+				delete it->second;
+				map->erase(_viewName);
+			}
 		}
 		if (map->empty()) {
 			this->clear(_owner);
@@ -92,44 +94,14 @@ void ot::WidgetViewManager::closeView(const BasicServiceInformation& _owner, con
 
 void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 	auto map = this->findViewMap(_owner);
-	for (const auto& it : *map) {
-		delete it.second;
-	}
-	map->clear();
-	this->clear(_owner);
-}
-
-ot::WidgetView* ot::WidgetViewManager::findOrCreateDefaultView(DefaultWidgetViewType _viewType) {
-	auto it = m_defaultViews.find(_viewType);
-	if (it != m_defaultViews.end()) {
-		return it->second;
-	}
-
-	switch (_viewType)
-	{
-	case ot::WidgetViewManager::ProjectNavigationViewType:
-
-		return nullptr;
-		break;
-
-	case ot::WidgetViewManager::PropertyGridViewType:
-
-		return nullptr;
-		break;
-
-	case ot::WidgetViewManager::OutputWindowViewType:
-
-		return nullptr;
-		break;
-
-	case ot::WidgetViewManager::GraphicsPickerViewType:
-
-		return nullptr;
-		break;
-
-	default:
-		OT_LOG_EAS("Unknown default widget view type (" + std::to_string((int)_viewType) + ")");
-		return nullptr;
+	if (map) {
+		std::list<std::string> tmp;
+		for (const auto& it : *map) {
+			tmp.push_back(it.second->name());
+		}
+		for (const std::string& i : tmp) {
+			this->closeView(_owner, i);
+		}
 	}
 }
 

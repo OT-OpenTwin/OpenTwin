@@ -10,7 +10,7 @@
 #include <ads/DockWidget.h>
 
 ot::WidgetView::WidgetView()
-	: m_flags(WidgetViewCfg::NoViewFlags), m_dockLocation(WidgetViewCfg::Default)
+	: m_flags(WidgetViewCfg::NoViewFlags), m_dockLocation(WidgetViewCfg::Default), m_isProtected(false)
 {
 	m_dockWidget = new ads::CDockWidget("");
 }

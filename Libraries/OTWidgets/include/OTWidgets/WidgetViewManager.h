@@ -27,13 +27,6 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT WidgetViewManager {
 		OT_DECL_NOCOPY(WidgetViewManager)
 	public:
-		enum DefaultWidgetViewType {
-			ProjectNavigationViewType,
-			PropertyGridViewType,
-			OutputWindowViewType,
-			GraphicsPickerViewType
-		};
-
 		static WidgetViewManager& instance(void);
 
 		//! @brief Must be called upon startup, if no dock manager is provided a new one will be created
@@ -55,8 +48,6 @@ namespace ot {
 
 		void closeViews(const BasicServiceInformation& _owner);
 
-		WidgetView* findOrCreateDefaultView(DefaultWidgetViewType _viewType);
-
 	private:
 		WidgetViewManager();
 		~WidgetViewManager();
@@ -73,8 +64,6 @@ namespace ot {
 		std::map<std::string, WidgetView*>* findOrCreateViewMap(const BasicServiceInformation& _owner);
 
 		std::map<BasicServiceInformation, std::map<std::string, WidgetView*>*> m_views;
-		std::map<DefaultWidgetViewType, WidgetView*> m_defaultViews;
-
 	};
 
 }

@@ -42,6 +42,9 @@ namespace ot {
 
 		ads::CDockWidget* getViewDockWidget(void) const { return m_dockWidget; };
 
+		void setViewIsProtected(bool _protected = true) { m_isProtected = _protected; };
+		bool viewIsProtected(void) const { return m_isProtected; };
+
 		void setName(const std::string& _name);
 		const std::string& name(void) const { return m_name; };
 
@@ -57,6 +60,7 @@ namespace ot {
 	private:
 		ads::CDockWidget* m_dockWidget;
 
+		bool m_isProtected;
 		std::string m_name;
 		ot::WidgetViewCfg::ViewFlags m_flags;
 		ot::WidgetViewCfg::ViewDockLocation m_dockLocation;
