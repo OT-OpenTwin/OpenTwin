@@ -58,6 +58,9 @@ COPY "%QWTPOLAR_LIB_DLLR%\qwtpolar.dll" "%OT_DEPLOYMENT_DIR%"
 REM QtTabToolbar
 COPY "%QT_TT_DLLR%\TabToolbar.dll" "%OT_DEPLOYMENT_DIR%"
 
+REM Qt AdvancedDockingSystem
+COPY "%QT_ADS_ROOT%\x64\bin\Release\qt6advanceddocking.dll" "%OT_DEPLOYMENT_DIR%"
+
 REM OpenSceneGraph
 COPY "%OSG_DLLR%\*.dll" "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%\osgPlugins-3.6.3"
