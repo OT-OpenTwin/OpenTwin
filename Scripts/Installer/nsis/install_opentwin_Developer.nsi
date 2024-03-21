@@ -121,6 +121,7 @@
 	!define DEFAULT_MONGODB_STORAGE_PATH '"$DEV_ROOT\OpenTwin\Deployment\DataStorage\data"'
 	!define DEFAULT_MONGODB_LOG_PATH '"$DEV_ROOT\OpenTwin\Deployment\DataStorage\log"'
 	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
+	!define DEFAULT_MONGODB_COMPASS_PATH '"$PROGRAMFILES64\MongoDB Compass"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 
 	!define OPENTWIN_REPO_GITADDRESS "git@github.com:OT-OpenTwin/OpenTwin.git"
@@ -1009,17 +1010,17 @@ SectionGroup /e "OpenTwin"
 		
 		DetailPrint "Running MongoDB installation scripts..."
 
-		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" ADDLOCAL="ServerService,Client"'		
+		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
+		ExecWait 'msiexec /qb /i "$TempToolChain\mongodb-compass-1.42.3-win32-x64.msi"'
 		DetailPrint "Waiting for MongoDB Compass Application..."
-		DetailPrint ". . ."
-			Push "$DESKTOP\MongoDBCompass.lnk"
+			Push ${DEFAULT_MONGODB_COMPASS_PATH}
 			Push "MongoDB Compass"
 			Call WaitForShortcut
 		DetailPrint "Done."
+
 		##########################################
 		# call for python scripts via $INSTDIR
 		##########################################
-
 		DetailPrint "Running scripts..."
 		# mongoDB_storage_script_noAuth.py
 		ExecWait '"$TempToolChain\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
@@ -1060,7 +1061,6 @@ SectionGroup /e "Git"
 		ExecWait '"$GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION\GitHubDesktopDeploymentTool.exe" /silent'
 
 		DetailPrint "Waiting for GitHub Desktop..."
-		DetailPrint ". . ."
 			Push "$DESKTOP\GitHub Desktop.lnk"
 			Push "GitHub Desktop"
 			Call WaitForShortcut
@@ -1074,7 +1074,7 @@ SectionGroupEnd
 Section "Install Rust" SEC06_1
 	AddSize 114000
 	DetailPrint "Installing Rust..."
-	ExecWait '"$TempToolChain\rustup-init.exe" -y'	#run rustup setup without confirmation prompt
+	ExecWait '"$TempToolChain\rustup-init.exe" -y'	#run rustup setup without confirmation prompt (-y)
 
 	DetailPrint "Running Rust commands..."
 	ExpandEnvStrings $0 %COMSPEC%
@@ -1088,7 +1088,6 @@ Section "Install PostMan 64-bit" SEC07
 		ExecWait '"$TempToolChain\Postman-win64-Setup.exe" /silent'	#silent installs postman - postman installation is mostly silent already
 																	#the '/silent' switch surpresses the automatic app launch after installation
 		DetailPrint "Waiting for Postman..."
-		DetailPrint ". . ."
 			Push "$DESKTOP\Postman.lnk"
 			Push "Postman"
 			Call WaitForShortcut
@@ -1110,7 +1109,7 @@ SectionGroup /e "Python & Sphinx"
 	Section "Install Python 3.9" SEC09
 		AddSize 151000
 		DetailPrint "Installing Python 3.9..."
-			ExecWait '"$TempToolChain\python-3.9.0-amd64.exe" /passive InstallAllUsers=0 PrependPath=1 Include_test=0'
+			ExecWait '"$TempToolChain\python-3.9.0-amd64.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0'
 			# /quiet 			- installs python silently
 			# /passive			- install with only a progress bar
 			# InstallAllUsers	- installs python for all users
