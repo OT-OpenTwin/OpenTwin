@@ -46,6 +46,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\Plot.cpp" />
+    <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\polarPlot.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
@@ -71,9 +72,11 @@
     </ClCompile>
     <ClCompile Include="src\Table.cpp" />
     <ClCompile Include="src\TableViewer.cpp" />
+    <ClCompile Include="src\TableViewerView.cpp" />
     <ClCompile Include="src\TextureMapManager.cpp" />
     <ClCompile Include="src\TransformManipulator.cpp" />
     <ClCompile Include="src\VersionGraph.cpp" />
+    <ClCompile Include="src\VersionGraphView.cpp" />
     <ClCompile Include="src\Viewer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">Use</PrecompiledHeader>
@@ -84,6 +87,7 @@
     </ClCompile>
     <ClCompile Include="src\ViewerObjectSelectionHandler.cpp" />
     <ClCompile Include="src\ViewerSettings.cpp" />
+    <ClCompile Include="src\ViewerView.cpp" />
     <ClCompile Include="src\ViewManipulator.cpp" />
     <ClCompile Include="src\WorkingPlane.cpp" />
     <ClCompile Include="src\xyPlot.cpp" />
@@ -110,6 +114,7 @@
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\Plot.h" />
+    <ClInclude Include="include\PlotView.h" />
     <ClInclude Include="include\polarPlot.h" />
     <ClInclude Include="include\Rubberband.h" />
     <ClInclude Include="include\SceneNodeAnnotation.h" />
@@ -130,10 +135,13 @@
     <ClInclude Include="include\stdafx.h" />
     <QtMoc Include="include\Table.h" />
     <ClInclude Include="include\TableViewer.h" />
+    <ClInclude Include="include\TableViewerView.h" />
     <ClInclude Include="include\TextureMapManager.h" />
     <ClInclude Include="include\TransformManipulator.h" />
     <QtMoc Include="include\VersionGraph.h" />
+    <ClInclude Include="include\VersionGraphView.h" />
     <ClInclude Include="include\ViewerSettings.h" />
+    <ClInclude Include="include\ViewerView.h" />
     <ClInclude Include="include\WorkingPlane.h" />
     <ClInclude Include="include\xyPlot.h" />
     <ClInclude Include="include\Viewer.h" />

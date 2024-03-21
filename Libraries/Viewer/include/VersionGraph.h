@@ -225,11 +225,13 @@ private:
 class VersionGraph
 {
 public:
-	VersionGraph(Viewer * _viewer);
+	VersionGraph(Viewer * _viewer = (Viewer*)nullptr);
 
 	virtual ~VersionGraph();
 
 	QWidget * widget(void) const { return m_view; }
+
+	void setViewer(Viewer* _viewer) { m_viewer = _viewer; };
 
 	void addVersion(const std::string &_parentVersion, const std::string &_version, const std::string &_description);
 	void removeVersion(const std::string &_parentVersion, const std::string &_version);

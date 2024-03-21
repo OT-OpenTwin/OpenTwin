@@ -148,6 +148,18 @@
     <ClCompile Include="src\EntityHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\VersionGraphView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableViewerView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewerView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -297,6 +309,18 @@
     <ClInclude Include="include\SceneNodeVTK.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\VersionGraphView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableViewerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ViewerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\VersionGraph.h">
@@ -321,6 +345,12 @@
     </Filter>
     <Filter Include="include\SceneNodes">
       <UniqueIdentifier>{40dc3399-49f9-4bc7-9aa4-74b23c389a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\WidgetView">
+      <UniqueIdentifier>{9666d20a-8653-4100-986b-670987aeeb45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\WidgetView">
+      <UniqueIdentifier>{98463fc9-d8b8-47a9-9a36-1c785d62bce7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

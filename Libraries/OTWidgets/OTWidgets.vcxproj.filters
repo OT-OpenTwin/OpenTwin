@@ -208,6 +208,9 @@
     <ClCompile Include="src\GraphicsPickerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsViewView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -402,6 +405,9 @@
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsViewView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>

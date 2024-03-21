@@ -216,7 +216,7 @@ private:
 class Plot {
 public:
 
-	Plot(Viewer * _viewer);
+	Plot(Viewer * _viewer = (Viewer*)nullptr);
 
 	virtual ~Plot();
 
@@ -229,6 +229,8 @@ public:
 	// ###########################################################################
 
 	// Setter
+
+	void setViewer(Viewer* _viewer) { m_viewer = _viewer; };
 
 	void setPlotType(AbstractPlot::PlotType _type);
 

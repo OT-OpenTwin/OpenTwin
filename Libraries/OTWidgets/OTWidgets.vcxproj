@@ -54,6 +54,7 @@
     <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
+    <ClCompile Include="src\GraphicsViewView.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\MessageDialog.cpp" />
@@ -91,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsViewView.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />

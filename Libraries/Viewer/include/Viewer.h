@@ -43,7 +43,7 @@ namespace ot        { class AbstractSettingsItem; }
 class Viewer : public QOpenGLWidget
 {
 public:
-	Viewer();
+	Viewer() = delete;
 	Viewer(ot::UID modelID, ot::UID viewerID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
 	virtual ~Viewer();
 
