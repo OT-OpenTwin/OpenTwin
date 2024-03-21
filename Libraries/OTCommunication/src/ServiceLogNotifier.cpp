@@ -89,10 +89,12 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 
 ot::ServiceLogNotifier::ServiceLogNotifier()
 {
+	this->deleteLogNotifierLater();
+
 	char buffer[128];
 	size_t bufferLen;
 	getenv_s(&bufferLen, buffer, sizeof(buffer) - 1, "OPEN_TWIN_LOGGING_URL");
-	setLoggingServiceURL(std::string(buffer));
+	this->setLoggingServiceURL(std::string(buffer));
 }
 
 ot::ServiceLogNotifier::~ServiceLogNotifier() {

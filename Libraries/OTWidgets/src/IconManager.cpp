@@ -40,7 +40,7 @@ bool ot::IconManager::addSearchPath(const QString& _path) {
 		return true;
 	}
 	else {
-		OT_LOG_D("Icon search path does not exist. Ignoring...");
+		OT_LOG_D("Icon search path does not exist. Ignoring. Path: \"" + path.toStdString() + "\"");
 		return false;
 	}
 }

@@ -42,18 +42,18 @@ void ot::SimpleLogViewer::slotAppendLog(const ot::LogMessage& _message) {
 	cursor.setCharFormat(format);
 	cursor.insertText("] [");
 
-	if (_message.flags().flagIsSet(ot::DEFAULT_LOG)) {
+	if (_message.flags() & ot::INFORMATION_LOG) {
 		cursor.insertText("Info]     ");
 	}
-	else if (_message.flags().flagIsSet(ot::DETAILED_LOG)) {
+	else if (_message.flags() & ot::DETAILED_LOG) {
 		cursor.insertText("Detailed] ");
 	}
-	else if (_message.flags().flagIsSet(ot::WARNING_LOG)) {
+	else if (_message.flags() & ot::WARNING_LOG) {
 		cursor.setCharFormat(formatWarning);
 		cursor.insertText("Warning]  ");
 		cursor.setCharFormat(format);
 	}
-	else if (_message.flags().flagIsSet(ot::ERROR_LOG)) {
+	else if (_message.flags() & ot::ERROR_LOG) {
 		cursor.setCharFormat(formatError);
 		cursor.insertText("Error]    ");
 		cursor.setCharFormat(format);
@@ -84,7 +84,7 @@ ot::intern::UiDevLogger& ot::intern::UiDevLogger::instance(void) {
 
 void ot::intern::UiDevLogger::initialize(void) {
 	ot::intern::UiDevLogger& ref = instance();
-	ref.deleteLater();
+	ref.deleteLogNotifierLater();
 
 	ot::LogDispatcher::instance().addReceiver(&ref);
 

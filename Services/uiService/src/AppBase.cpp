@@ -218,11 +218,11 @@ int AppBase::run() {
 		// Setup icon manager
 		int iconPathCounter{ 0 };
 #ifdef _DEBUG
-		if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "\\Assets\\Icons\\"))) {
+		if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 			iconPathCounter++;
 		}
 #else
-		if (ot::IconManager::instance().addSearchPath(".\\Icons\\")) {
+		if (ot::IconManager::instance().addSearchPath(QDir::currentPath() + "/icons/")) {
 			iconPathCounter++;
 		}
 #endif // _DEBUG		
