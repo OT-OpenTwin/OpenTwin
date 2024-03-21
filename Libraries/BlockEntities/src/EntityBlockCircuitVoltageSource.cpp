@@ -12,8 +12,8 @@
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "Icon";
-	_navigationTreeIconNameHidden = "Icon";
+	_navigationTreeIconName = "VoltageSource";
+	_navigationTreeIconNameHidden = "VoltageSource";
 	_blockTitle = "Voltage Source";
 
 	const std::string connectorNameLeft = "Left";
