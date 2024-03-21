@@ -45,6 +45,7 @@ REM Test for Python Installation
 
 :PYTHON_NOT_INSTALLED
 	echo ERROR: Python is not installed on your system.
+	pause
 	GOTO EXIT
 
 	
@@ -55,6 +56,7 @@ REM Test for Python Installation
 
 if "!NSIS_REG_VALUE!"=="" (
     echo NSIS Installation not found!
+	pause
 	GOTO EXIT
 ) else (
     echo NSIS Installation verified in '!NSIS_REG_VALUE!'...
@@ -72,7 +74,7 @@ echo +++ COMPILE TIME +++
 	@REM echo !SEVENZIP_REG_DATA!
 	@REM pause
 	"!SEVENZIP_REG_DATA!\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
-	pause
+	@REM pause
 	
 	echo Compiling Python Scripts...
 	cd !PYTHON_PATH!
