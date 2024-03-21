@@ -14,23 +14,54 @@ EntitySolverCircuitSimulator::~EntitySolverCircuitSimulator()
 
 void EntitySolverCircuitSimulator::createProperties(const std::string circuitFolderName, ot::UID circuitFolderID, const std::string circuitName, ot::UID circuitID)
 {
-	//EntityPropertiesEntityList::createProperty("Circuit", "Circuit", circuitFolderName, circuitFolderID, circuitName, circuitID, "CircuitSimulator", getProperties());
-	EntityPropertiesString::createProperty("Settings", "Simulation Type", ".dc V1 0 12 1", "CircuitSimulator", getProperties());
-	EntityPropertiesString::createProperty("Settings", "Circuit Name", "Circuit Simulator", "CircuitSimulator", getProperties());
+	EntityPropertiesSelection::createProperty("Settings","Simulation Type", {".dc",".ac"},".dc","default",getProperties());
+
+	//DC Simulation Settings
+	EntityPropertiesString::createProperty("DC-Settings", "Element", "V1", "default", getProperties());
+	EntityPropertiesString::createProperty("DC-Settings", "From", "0", "default", getProperties());
+	EntityPropertiesString::createProperty("DC-Settings", "To", "100", "default", getProperties());
+	EntityPropertiesString::createProperty("DC-Settings", "Step", "10", "default", getProperties());
+
+
+	EntityPropertiesEntityList::createProperty("Settings", "Circuit", circuitFolderName, circuitFolderID, "", -1, "default", getProperties());
 	EntityPropertiesString::createProperty("Settings", "Print Settings", "print all", "CircuitSimulator", getProperties());
+
+	SetVisibleDCSimulationParameters(false);
 }
 
-bool EntitySolverCircuitSimulator::updateFromProperties(void)
+
+bool EntitySolverCircuitSimulator::SetVisibleDCSimulationParameters(bool visible)
 {
-	// Now we need to update the entity after a property change
-	assert(getProperties().anyPropertyNeedsUpdate());
+	const bool isVisible = getProperties().getProperty("Element")->getVisible();
+	const bool refresh = isVisible != visible;
+	if (refresh)
+	{
+		getProperties().getProperty("Element")->setVisible(visible);
+		getProperties().getProperty("From")->setVisible(visible);
+		getProperties().getProperty("To")->setVisible(visible);
+		getProperties().getProperty("Step")->setVisible(visible);
+		this->setModified();
+	}
+	return refresh;
+}
 
-	// Since there is a change now, we need to set the modified flag
-	setModified();
+bool EntitySolverCircuitSimulator::updateFromProperties()
+{
+	auto baseProperty = getProperties().getProperty("Simulation Type");
+	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
+	bool refresh = false;
+	if (selectionProperty->getValue() == ".dc")
+	{
+		refresh = SetVisibleDCSimulationParameters(true);
+	}
+	else
+	{
+		refresh = SetVisibleDCSimulationParameters(false);
+	}
 
-	// Here we need to update the plot (send a message to the visualization service)
-	getProperties().forceResetUpdateForAllProperties();
-
-
-	return false;
+	if (refresh)
+	{
+		getProperties().forceResetUpdateForAllProperties();
+	}
+	return refresh;
 }

@@ -225,6 +225,9 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+	//std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+
+
 	if (action == "Circuit Simulator:Edit:Add Solver")
 	{
 		addSolver();
@@ -330,15 +333,17 @@ void Application::addSolver()
 	std::string circuitFolderName, circuitName;
 	ot::UID circuitFolderID{ 0 }, circuitID{ 0 };
 
-	// Here i need my own function for getAvailableCircuits
-	//m_modelComponent->getAvailableMeshes(circuitFolderName, circuitFolderID, circuitName, circuitID);
+	
 
 	// Create the new solver item and store it in the data base
 	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 
-	solverEntity->createProperties(circuitFolderName, circuitFolderID, circuitName, circuitID);
+	ot::EntityInformation entityInfo;
+	m_modelComponent->getEntityInformation("Blocks", entityInfo);
+
+	solverEntity->createProperties("Blocks", entityInfo.getID(), circuitName, circuitID);
 	solverEntity->StoreToDataBase();
 
 	// Register the new solver item in the model
@@ -449,21 +454,35 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity)
 {
-	EntityPropertiesString* simulationType = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Simulation Type"));
+	EntityPropertiesSelection* simulationType = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationType != nullptr);
 
-	EntityPropertiesString* circuitName = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Circuit Name"));
+	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
 	EntityPropertiesString* printSettings = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
 	assert(printSettings != nullptr);
 
-	m_blockEntityHandler.setPackageName(circuitName->getValue());
+	EntityPropertiesString* element = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Element"));
+	assert(element != nullptr);
+
+	size_t pos = circuitName->getValueName().find('/');
+	std::string name = "";
+	if (pos != std::string::npos)
+	{
+		name = circuitName->getValueName().substr(pos + 1);
+	}
+	else
+	{
+		OT_LOG_E("Circuit not Found!");
+	}
+
+	m_blockEntityHandler.setPackageName(name);
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
-	m_ngSpice.ngSpice_Initialize(allConnectionEntitiesByID,allEntitiesByBlockID, circuitName->getValue(),simulationType->getValue(),printSettings->getValue());
-	m_ngSpice.clearBufferStructure(circuitName->getValue());
+	m_ngSpice.ngSpice_Initialize(allConnectionEntitiesByID,allEntitiesByBlockID, name, simulationType->getValue(), printSettings->getValue());
+	m_ngSpice.clearBufferStructure(name);
 }
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
