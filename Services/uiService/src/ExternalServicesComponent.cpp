@@ -1725,7 +1725,7 @@ char *ExternalServicesComponent::performAction(const char *json, const char *sen
 	lock = true;
 
 	try {
-		char *retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::SECURE_MESSAGE_TYPES);
+		char *retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::QUEUE);
 		
 		lock = false;
 		return retval;
@@ -1762,7 +1762,7 @@ void ExternalServicesComponent::queueAction(const char *json, const char *sender
 	lock = true;
 
 	try {
-		ot::ActionDispatcher::instance().dispatch(json, ot::SECURE_MESSAGE_TYPES);
+		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
 
 		delete[] senderIP;
 		senderIP = nullptr;
@@ -2131,7 +2131,7 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 
 		std::string action = ot::json::getString(d, OT_ACTION_MEMBER);
 
-		ot::ActionDispatcher::instance().dispatchLocked(action, d, tmp, ot::ALL_MESSAGE_TYPES);
+		ot::ActionDispatcher::instance().dispatchLocked(action, d, tmp, ot::QUEUE);
 	}
 
 	// Re enable tree sorting
