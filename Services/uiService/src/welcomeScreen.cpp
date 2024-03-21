@@ -18,7 +18,6 @@
 
 // AK header
 #include <akAPI/uiAPI.h>
-#include <akGui/aColorStyle.h>
 
 // Qt header
 #include <qwidget.h>
@@ -175,8 +174,8 @@ welcomeScreen::welcomeScreen(
 	success = my_userManager->checkConnection();		
 	assert(success);	// Failed to create connection
 
-	my_copyDialog = new copyProjectDialog{ nullptr };
-	my_renameDialog = new renameProjectDialog{ nullptr };
+	my_copyDialog = new copyProjectDialog;
+	my_renameDialog = new renameProjectDialog;
 
 	connect(my_editProjectName, SIGNAL(textChanged(const QString&)), this, SLOT(slotProjectNameChanged()));
 	connect(my_buttonCreate, SIGNAL(clicked()), this, SLOT(slotCreateClicked()));
@@ -196,46 +195,6 @@ welcomeScreen::~welcomeScreen() {
 
 QWidget * welcomeScreen::widget(void) {
 	return my_comboMain.widget;
-}
-
-void welcomeScreen::setColorStyle(
-	ak::aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr);
-	m_colorStyle = _colorStyle;
-
-	// Labels
-	QString sheet("QLabel{color:#");
-	sheet.append(m_colorStyle->getControlsFocusedBackgroundColor().toHexString(true));
-	sheet.append("; background-color: transparent}");
-
-	my_labelWelcome->setStyleSheet(sheet);
-	
-	my_labelProjectName->setStyleSheet(m_colorStyle->toStyleSheet(ak::cafForegroundColorControls, "QLabel{", "}"));
-	my_labelItemsShowing->setStyleSheet(m_colorStyle->toStyleSheet(ak::cafForegroundColorControls, "QLabel{", "}"));
-
-	// Other widgets
-	
-	// Table
-	my_tableOpenNew->setColorStyle(m_colorStyle);
-
-	// Button
-	sheet = m_colorStyle->toStyleSheet(ak::cafBackgroundColorControls |
-		ak::cafForegroundColorControls | ak::cafBorderColorControls, "QPushButton{border-width: 1px;", "}");
-	sheet.append(m_colorStyle->toStyleSheet(ak::cafBackgroundColorFocus |
-		ak::cafForegroundColorFocus, "QPushButton:hover:!pressed{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(ak::cafBackgroundColorSelected |
-		ak::cafForegroundColorSelected, "QPushButton:pressed{", "}"));
-
-	my_buttonCreate->setStyleSheet(sheet);
-	my_buttonRefresh->setStyleSheet(sheet);
-
-	// LineEdit
-	my_editProjectName->setStyleSheet(m_colorStyle->toStyleSheet(ak::cafBackgroundColorControls |
-		ak::cafForegroundColorControls, "QLineEdit{", "}"));
-	
-	my_copyDialog->setColorStyle(m_colorStyle);
-	my_renameDialog->setColorStyle(m_colorStyle);
 }
 
 // #############################################################################################################
@@ -459,9 +418,7 @@ void welcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
 			std::string projectName = my_tableOpenNew->projectName(_item->row()).toStdString();
 			ManageProjectOwner ownerManager(my_authURL, projectName, currentUser);
 
-			ak::uiAPI::addPaintable(&ownerManager);
 			ownerManager.showDialog();
-			ak::uiAPI::removePaintable(&ownerManager);
 
 			// Now we need to check whether we have no longer access to the project
 			std::string projectCollection = my_projectManager->getProjectCollection(projectName);
@@ -775,36 +732,6 @@ void table::leaveEvent(QEvent * _event) {
 	}
 }
 
-void table::setColorStyle(
-	ak::aColorStyle *				_colorStyle
-) {
-	assert(_colorStyle != nullptr);
-
-	QString sheet = _colorStyle->toStyleSheet(ak::cafBackgroundColorControls | ak::cafForegroundColorControls,
-		"QTableWidget{", "selection-color: transparent; selection-background-color: transparent;}");
-	
-	setShowGrid(false);
-	setStyleSheet(sheet);
-	my_colorBack = _colorStyle->getWindowMainBackgroundColor().toQColor();
-	my_colorFront = _colorStyle->getControlsMainForegroundColor().toQColor();
-	my_colorFocusBack = _colorStyle->getControlsFocusedBackgroundColor().toQColor();
-	my_colorFocusFront = _colorStyle->getControlsFocusedForegroundColor().toQColor();
-	my_colorSelectedBack = _colorStyle->getControlsPressedBackgroundColor().toQColor();
-	my_colorSelectedFront = _colorStyle->getControlsPressedForegroundColor().toQColor();
-
-	// Table header
-	sheet = _colorStyle->toStyleSheet(ak::cafForegroundColorHeader | ak::cafBackgroundColorHeader,
-		"QHeaderView{border: none;", "}\n");
-	sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorHeader |
-		ak::cafBackgroundColorHeader |
-		ak::cafDefaultBorderHeader | ak::cafBorderColorHeader
-		,
-		"QHeaderView::section{", "}"));
-	horizontalHeader()->setStyleSheet(sheet);
-	verticalHeader()->setStyleSheet(sheet);
-	slotSelectionChanged();
-}
-
 void table::slotSelectionChanged() {
 	disconnect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
 	QList<QTableWidgetItem *> selection = selectedItems();
@@ -833,7 +760,7 @@ void table::slotSelectionChanged() {
 
 // #############################################################################################################
 
-copyProjectDialog::copyProjectDialog(ak::aColorStyle * _colorStyle)
+copyProjectDialog::copyProjectDialog()
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
@@ -867,8 +794,6 @@ copyProjectDialog::copyProjectDialog(ak::aColorStyle * _colorStyle)
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
@@ -896,34 +821,6 @@ void copyProjectDialog::reset(const QString & _projectToCopy) {
 	my_projectToCopy = _projectToCopy;
 }
 
-void copyProjectDialog::setColorStyle(ak::aColorStyle * _colorStyle) {
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-	} else{
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-		
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-		
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-	}
-}
-
 void copyProjectDialog::slotButtonConfirmPressed() { my_confirmed = true; Close(); }
 
 void copyProjectDialog::slotButtonCancelPressed() { my_confirmed = false;  close(); }
@@ -945,7 +842,7 @@ void copyProjectDialog::Close(void) {
 
 // #############################################################################################################
 
-renameProjectDialog::renameProjectDialog(ak::aColorStyle * _colorStyle)
+renameProjectDialog::renameProjectDialog()
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
@@ -979,8 +876,6 @@ renameProjectDialog::renameProjectDialog(ak::aColorStyle * _colorStyle)
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
@@ -1008,34 +903,6 @@ void renameProjectDialog::reset(const QString & _projectToCopy) {
 	my_projectToCopy = _projectToCopy;
 }
 
-void renameProjectDialog::setColorStyle(ak::aColorStyle * _colorStyle) {
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-	} else{
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-	}
-}
-
 void renameProjectDialog::slotButtonConfirmPressed() { my_confirmed = true; Close(); }
 
 void renameProjectDialog::slotButtonCancelPressed() { my_confirmed = false;  close(); }
@@ -1059,7 +926,7 @@ void renameProjectDialog::Close(void) {
 
 // #############################################################################################################
 
-createNewAccountDialog::createNewAccountDialog(ak::aColorStyle * _colorStyle)
+createNewAccountDialog::createNewAccountDialog()
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
@@ -1097,8 +964,6 @@ createNewAccountDialog::createNewAccountDialog(ak::aColorStyle * _colorStyle)
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
@@ -1116,39 +981,6 @@ createNewAccountDialog::~createNewAccountDialog() {
 	delete my_widgetInput;
 
 	delete my_layout;
-}
-
-void createNewAccountDialog::setColorStyle(ak::aColorStyle * _colorStyle) {
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-		my_text->setStyleSheet("");
-	}
-	else {
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-
-		my_text->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-				ak::cafBackgroundColorTransparent));
-	}
 }
 
 void createNewAccountDialog::slotButtonConfirmPressed() { my_confirmed = true; Close(); }
@@ -1181,7 +1013,7 @@ void createNewAccountDialog::Close(void) {
 
 // #############################################################################################################
 
-createNewProjectDialog::createNewProjectDialog(ak::aColorStyle * _colorStyle)
+createNewProjectDialog::createNewProjectDialog()
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_template{ nullptr }, my_layoutButtons{ nullptr }, my_widgetButtons{ nullptr }
 {
@@ -1228,8 +1060,6 @@ createNewProjectDialog::createNewProjectDialog(ak::aColorStyle * _colorStyle)
 
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
 
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
@@ -1294,47 +1124,6 @@ createNewProjectDialog::~createNewProjectDialog() {
 	delete my_widgetButtons;
 
 	delete my_layout;
-}
-
-void createNewProjectDialog::setColorStyle(ak::aColorStyle * _colorStyle) {
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-		my_label2->setStyleSheet("");
-		my_label3->setStyleSheet("");
-		my_template->setStyleSheet("");
-		my_types->setStyleSheet("");
-	}
-	else {
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-		my_label2->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));		
-		my_label3->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-		my_template->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QComboBox{", "border: 1px solid #" + Color + ";}"));
-		my_types->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QComboBox{", "border: 1px solid #" + Color + ";}"));
-	}
 }
 
 void createNewProjectDialog::slotButtonConfirmPressed() { my_confirmed = true; Close(); }

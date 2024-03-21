@@ -1,6 +1,5 @@
 #pragma once
 #include <qtablewidget.h>
-#include "akGui/aColorStyle.h"
 
 class Table : public QTableWidget {
 	Q_OBJECT
@@ -23,8 +22,4 @@ public:
 	void AddRow();
 	void AddColumn();
 	void Clear(void);
-
-	void setColorStyle(
-		ak::aColorStyle *				_colorStyle
-	);
 };

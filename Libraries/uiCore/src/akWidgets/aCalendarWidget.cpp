@@ -12,7 +12,6 @@
 
  // AK header
 #include <akWidgets/aCalendarWidget.h>
-#include <akGui/aColorStyle.h>
 
 // Qt header
 #include <qtextformat.h>
@@ -32,39 +31,6 @@ ak::aCalendarWidget::~aCalendarWidget() {
 // Base class functions
 
 QWidget * ak::aCalendarWidget::widget(void) { return this; }
-
-void ak::aCalendarWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	m_colorStyle = _colorStyle;
-	assert(m_colorStyle != nullptr);	// Nullptr provided
-
-	QString sheet;
-	if (objectName().length() > 0) {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls, "#" + objectName() + "{", "}");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorHeader,
-			"#" + objectName() + " QToolTip{", "border: 1px;}"));
-	}
-	else {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls);
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorHeader,
-			"QCalendarViewWidget QToolTip{", "border: 1px;}"));
-	}
-
-	this->setStyleSheet(sheet);
-
-	// Style the aCalendarWidget header since it can not be styled by using qss
-	QBrush b(_colorStyle->getHeaderBackgroundColor().toQColor());
-	QTextCharFormat format;
-	format.setBackground(b);
-	format.setForeground(_colorStyle->getHeaderForegroundColor().toQColor());
-	QFont font;
-	font.setBold(false);
-	format.setFont(font);
-	setHeaderTextFormat(format);
-}
 
 // #############################################################################################################################
 

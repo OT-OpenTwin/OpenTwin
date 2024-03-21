@@ -207,7 +207,6 @@ QString ak::toQString(
 	case otAction: return QString("Action");
 	case otComboBox: return QString("ComboBox");
 	case otComboButton: return QString("ComboButton");
-	case otColorStyleSwitchButton: return QString("ColorStyleSwitchButton");
 	case otCheckBox: return QString("CheckBox");
 	case otDatePicker: return QString("DatePicker");
 	case otDatePickerDialog: return QString("DatePickerDialog");

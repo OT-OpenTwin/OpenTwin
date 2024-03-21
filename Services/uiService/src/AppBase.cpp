@@ -27,7 +27,6 @@
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akCore/aException.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
 #include <akWidgets/aDockWidget.h>
@@ -64,6 +63,7 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/TextEditor.h"
+#include "OTWidgets/IconManager.h"
 #include "DataBase.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTWidgets/MessageDialog.h"
@@ -94,7 +94,6 @@ const QString c_promtIcoPath = "Default";
 #define WELCOME_SCREEN_ID_NEW 2
 
 #define STATE_NAME_WINDOW "UISettings"
-#define STATE_NAME_COLORSTYLE "ColorStyle"
 #define STATE_POS_X "WindowPosX"
 #define STATE_POS_Y "WindowPosY"
 
@@ -135,7 +134,6 @@ AppBase::AppBase()
 	m_projectIsModified(false),
 	m_siteID(0),
 	m_isDebug(false),
-	m_colorStyleNotifier(nullptr),
 	m_shortcutManager(nullptr),
 	m_contextMenuManager(nullptr),
 	m_logInManager(nullptr),
@@ -220,12 +218,14 @@ int AppBase::run() {
 		// Setup icon manager
 		int iconPathCounter{ 0 };
 #ifdef _DEBUG
-		try { uiAPI::addIconSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "\\Assets\\Icons\\")); iconPathCounter++; }
+		if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "\\Assets\\Icons\\"))) {
+			iconPathCounter++;
+		}
 #else
-		try { uiAPI::addIconSearchPath(".\\Icons\\"); iconPathCounter++; }
-#endif // _DEBUG
-		catch (...) {}
-		
+		if (ot::IconManager::instance().addSearchPath(".\\Icons\\")) {
+			iconPathCounter++;
+		}
+#endif // _DEBUG		
 
 		// Check if at least one icon directory was found
 		if (iconPathCounter == 0) {
@@ -287,21 +287,15 @@ int AppBase::run() {
 
 		// Create UI
 		createUi();
-		m_colorStyleNotifier = new ColorStyleNotifier;
 		m_timerRestoreStateAfterTabChange = uiAPI::createTimer(m_uid);
 		uiAPI::registerUidNotifier(m_timerRestoreStateAfterTabChange, this);
 		
-		OT_LOG_D("Restoring settings: ColorStyle");
-		// Restore last set colorStyle
 		{
 			UserManagement uM;
 			uM.setAuthServerURL(m_authorizationServiceURL);
 			uM.setDatabaseURL(m_dataBaseURL);
 			uM.initializeNewSession();
-			m_currentStateColorStyle = uM.restoreSetting(STATE_NAME_COLORSTYLE);
 			m_currentStateWindow = uM.restoreSetting(STATE_NAME_WINDOW);
-			uiAPI::restoreStateColorStyle(m_currentStateColorStyle, APP_SETTINGS_VERSION);
-			reapplyColorStyle();
 			if (!uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow, true)) {
 				m_currentStateWindow = "";
 				uiAPI::window::showMaximized(m_mainWindow);
@@ -344,7 +338,6 @@ int AppBase::run() {
 			uM.setDatabaseURL(m_dataBaseURL);
 
 			uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow);
-			uM.storeSetting(STATE_NAME_COLORSTYLE, uiAPI::saveStateColorStyle(APP_SETTINGS_VERSION));
 		}
 		return status;
 
@@ -679,7 +672,7 @@ void AppBase::welcomeScreenEventCallback(
 			// get List of available project types
 			std::list<std::string> projectTypes = m_ExternalServicesComponent->getListOfProjectTypes();
 
-			createNewProjectDialog newProject(uiAPI::getCurrentColorStyle());
+			createNewProjectDialog newProject;
 
 			newProject.setListOfProjectTypes(projectTypes);
 			newProject.setProjectName(m_welcomeScreen->getProjectName());
@@ -962,9 +955,7 @@ void AppBase::welcomeScreenEventCallback(
 		// Show the ManageAccess Dialog box
 		ManageAccess accessManager(m_authorizationServiceURL, selectedProjectName.toStdString());
 
-		uiAPI::addPaintable(&accessManager);
 		accessManager.showDialog();
-		uiAPI::removePaintable(&accessManager);
 
 		lockUI(false);
 
@@ -1139,9 +1130,7 @@ void AppBase::manageGroups(void)
 
 	ManageGroups groupManager(m_authorizationServiceURL);
 
-	uiAPI::addPaintable(&groupManager);
 	groupManager.showDialog();
-	uiAPI::removePaintable(&groupManager);
 
 	lockUI(false);
 }
@@ -1516,14 +1505,9 @@ structModelViewInfo AppBase::createModelAndDisplay(
 	// Create DPI ratio
 	int DPIRatio = QApplication::primaryScreen()->devicePixelRatio();
 
-	const aColorStyle * cS = uiAPI::getCurrentColorStyle();
 	aColor col(255, 255, 255);
 	aColor overlayCol;
-	if (cS != nullptr) {
-		col = cS->getWindowMainBackgroundColor();
-		overlayCol = cS->getWindowMainForegroundColor();
-	}
-
+	
 	// Create viewer (view on the model)
 	ViewerUIDtype newViewerUid = m_viewerComponent->createViewer(ret.view, (double)DPIRatio, (double)DPIRatio,
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
@@ -1549,51 +1533,6 @@ structModelViewInfo AppBase::createModelAndDisplay(
 	return ret;
 }
 
-void AppBase::applyColorStyle(
-	aColorStyle *		_colorStyle
-) {
-	if (_colorStyle == nullptr) {
-		assert(0); return;
-	}
-
-	m_viewerComponent->setColors(_colorStyle->getViewBackgroundColor(), _colorStyle->getWindowMainForegroundColor());
-	std::string s = _colorStyle->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow, "QwtPlotCanvas {", "}").toStdString();
-	if (s.length() == 0) {
-		s = "QwtPlotCanvas { color: black; background-color: white; }";
-	}
-
-	m_viewerComponent->setPlotStyles(
-		_colorStyle->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow).toStdString(),
-		_colorStyle->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow, "QwtPlot {", "}").toStdString(),
-		s, 
-		_colorStyle->getViewBackgroundColor().toQColor(),
-		QPen(QBrush(_colorStyle->getWindowMainForegroundColor().toQColor()), 2)
-	);
-
-	m_viewerComponent->setVersionGraphStyles(
-		_colorStyle->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow | cafForegroundColorControls | cafBackgroundColorControls
-								  | cafForegroundColorHeader | cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow).toStdString(),
-		_colorStyle->getWindowMainForegroundColor().toQColor(),
-		_colorStyle->getWindowMainBackgroundColor().toQColor(),
-		_colorStyle->getSelectedBackgroundColor().toQColor(),
-		_colorStyle->getSelectedForegroundColor().toQColor()
-	);
-
-	m_welcomeScreen->setColorStyle(_colorStyle);
-
-	if (m_uiPluginManager) {
-		m_uiPluginManager->forwardColorStyle(_colorStyle);
-	}
-
-	QString graphicsPickerSheet = _colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QDockWidget {", "}");
-	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafForegroundColorHeader | cafBackgroundColorHeader | cafBorderColorHeader, "QDockWidget::title{border-width: 1px;", "}"));
-	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QSplitter {", "}"));
-	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QTreeWidget {", "}"));
-	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QLineEdit {", "}"));
-	graphicsPickerSheet.append(_colorStyle->toStyleSheet(cafForegroundColorControls, "QLabel {", "}"));
-	m_graphicsPickerDock->setStyleSheet(graphicsPickerSheet);
-}
-
 void AppBase::registerSession(
 	const std::string &				_projectName,
 	const std::string &				_collectionName
@@ -1616,15 +1555,8 @@ ViewerUIDtype AppBase::createView(
 	
 	int DPIRatio = uiAPI::window::devicePixelRatio();
 
-	// Get colors
-	aColorStyle * cS = uiAPI::getCurrentColorStyle();
-
 	aColor col(255, 255, 255);
 	aColor overlayCol;
-	if (cS != nullptr) {
-		col = cS->getViewBackgroundColor();
-		overlayCol = cS->getWindowMainForegroundColor();
-	}
 
 	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, (double)DPIRatio, (double)DPIRatio,
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
@@ -1665,28 +1597,6 @@ ViewerUIDtype AppBase::createView(
 	{
 		temp->setVisible(false);
 	}
-
-	std::string s = cS->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow, "QwtPlotCanvas {", "}").toStdString();
-	if (s.length() == 0) {
-		s = "QwtPlotCanvas { color: black; background-color: white; }";
-	}
-
-	m_viewerComponent->setPlotStyles(
-		cS->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow).toStdString(),
-		cS->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow, "QwtPlot {", "}").toStdString(),
-		s,
-		cS->getViewBackgroundColor().toQColor(),
-		QPen(QBrush(cS->getWindowMainForegroundColor().toQColor()), 2)
-	);
-
-	m_viewerComponent->setVersionGraphStyles(
-		cS->toStyleSheet(cafBackgroundColorView | cafForegroundColorWindow | cafForegroundColorControls | cafBackgroundColorControls
-						 | cafForegroundColorHeader | cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow).toStdString(),
-		cS->getWindowMainForegroundColor().toQColor(),
-		cS->getWindowMainBackgroundColor().toQColor(),
-		cS->getSelectedBackgroundColor().toQColor(),
-		cS->getSelectedForegroundColor().toQColor()
-	);
 
 	m_graphicsPickerDock->setVisible(getVisibleBlockPicker());
 
@@ -2700,29 +2610,4 @@ void AppBase::logInSuccessfull(void) {
 
 void AppBase::cancelLogIn(void) {
 	
-}
-
-void AppBase::reapplyColorStyle(void) {
-	auto cs = uiAPI::getCurrentColorStyle();
-	if (cs) uiAPI::setColorStyle(cs->getColorStyleName());
-}
-
-// #####################################################################################################################################################
-
-// #####################################################################################################################################################
-
-// #####################################################################################################################################################
-
-ColorStyleNotifier::ColorStyleNotifier()
-	: aPaintable(otNone)
-{
-	uiAPI::addPaintable(this);
-}
-
-ColorStyleNotifier::~ColorStyleNotifier() {
-	uiAPI::removePaintable(this);
-}
-
-void ColorStyleNotifier::setColorStyle(aColorStyle * _style) {
-	AppBase::instance()->applyColorStyle(_style);
 }

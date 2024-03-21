@@ -33,10 +33,6 @@ namespace ak {
 		//! @brief Will return the widget
 		virtual QWidget * widget(void) override;
 
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		virtual void setColorStyle(aColorStyle * _colorStyle) override;
-
 		//! @brief Emits a returnPressed signal if the return key is pressed
 		virtual void keyPressEvent(QKeyEvent * _event) override;
 

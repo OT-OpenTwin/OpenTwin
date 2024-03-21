@@ -32,10 +32,8 @@ namespace ak {
 	class aObject;
 	class aNotifierObjectManager;
 	class aMessenger;
-	class aPaintable;
 	class aUidManager;
 	class aSignalLinker;
-	class aColorStyle;
 	class aGlobalKeyListener;
 	class aToolButtonWidget;
 
@@ -46,7 +44,6 @@ namespace ak {
 		//! @brief Constructor
 		//! @param _messenger The globally used messaging system
 		//! @param _uidManager The globally used uidManager
-		//! @param _colorStyle The globally used color style
 		aObjectManager(
 			aMessenger *				_messenger,
 			aUidManager *				_uidManager
@@ -88,15 +85,6 @@ namespace ak {
 			UID												_creatorUid,
 			const aColor &								_color,
 			const QString &										_textOverride = QString("")
-		);
-
-		UID createColorStyleSwitch(
-			UID						_creatorUid,
-			const QString &			_brightModeTitle,
-			const QString &			_darkModeTitle,
-			const QIcon &			_brightModeIcon,
-			const QIcon &			_darkModeIcon,
-			bool					_isBright
 		);
 
 		//! @brief Will create a combo box and return its UID
@@ -355,67 +343,8 @@ namespace ak {
 			bool												_ignoreIfObjectHasChildObjects = false
 		);
 
-		void setIconSearchDirectories(
-			const QStringList&							_paths
-		);
-
-		void addColorStyle(
-			aColorStyle *								_colorStyle,
-			bool												_activate
-		);
-
-		void setColorStyle(
-			const QString &										_colorStyleName
-		);
-
-		void setDefaultColorStyle(void);
-
-		void setDefaultDarkColorStyle(void);
-
-		void setDefaultBlueColorStyle(void);
-
-		aColorStyle * getCurrentColorStyle(void) const;
-
-		QString getCurrentColorStyleName(void) const;
-
 		//! @brief Will destroy all objects
 		void destroyAll(void);
-
-		/*
-		//! @brief Will return the JSON settings string of all objects that have an alias set
-		std::string saveStateWindow(
-			const std::string &									_applicationVersion
-		);
-		*/
-
-		//! @brief Will return the JSON settings string of all objects that have an alias set
-		std::string saveStateColorStyle(
-			const std::string &									_applicationVersion
-		);
-
-		/*
-		//! @brief Will setup the UI with the settings provided in the settings JSON string
-		//! @param _json The JSON string containing the settings
-		//! @throw ak::Exception on syntax mismatch
-		settingsRestoreErrorCode restoreStateWindow(
-			const char *										_json,
-			const std::string &									_applicationVersion
-		);
-		*/
-
-		//! @brief Will setup the UI with the settings provided in the settings JSON string
-		//! @param _json The JSON string containing the settings
-		bool restoreStateColorStyle(
-			const char *										_json,
-			const std::string &									_applicationVersion
-		);
-
-		/*
-		void addAlias(
-			const QString &										_alias,
-			UID												_UID
-		);
-		*/
 
 		//! @brief Will set the unique name for the specified object.
 		//! With the set name the object can be accessed later instead of the unique name.
@@ -426,14 +355,6 @@ namespace ak {
 			UID												_objectUid,
 			const QString &										_uniqueName
 		);
-
-		/*
-
-		void removeAlias(
-			const QString &										_alias
-		);
-
-		*/
 
 		//! @brief Will return the creator UID of the specified object
 		//! @param _objectUID The UID of the object to get its cretor from
@@ -447,19 +368,7 @@ namespace ak {
 			UID												_objectUID
 		);
 
-		//! @brief Will add the provided object to the paintable list
-		//! @param _object The object to add
-		void addPaintable(aPaintable * _object);
-
-		//! @brief Will remove the object from the paintable list
-		//! @param _object The object to remove
-		void removePaintable(aPaintable * _object);
-
 	private:
-
-		void setColorStyle(
-			aColorStyle *								_colorStyle
-		);
 
 		//! @brief Will register the created UID for the creator
 		//! @param _creatorUid The UID of the creator
@@ -484,18 +393,11 @@ namespace ak {
 		std::map<UID, std::vector<UID> *>	m_mapCreators;				//! Contains all creators
 		std::map<UID, UID>					m_mapOwners;				//! Contains the UIDs of the owener of the objects
 
-		std::vector<aColorStyle *>			m_colorStyles;
-		
-		std::map<aPaintable *, bool>		m_externalPaintableObjects;
-
-		QStringList				m_iconSearchPaths;
-		
 		// ###############################################################################################################################################
 
 		aUidManager *						m_uidManager;									//! The globally used uidManager
 		aMessenger *						m_messenger;									//! The globally used messaging system
 		aSignalLinker *						m_signalLinker;								//! The internal signal linker
-		aColorStyle *						m_currentColorStyle;							//! The globally used color style
 		aNotifierObjectManager *			m_notifier;									//! The notifier used to catch the destroyed messages
 
 		aObjectManager() = delete;

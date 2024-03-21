@@ -11,7 +11,6 @@
  */
 
 #include <akWidgets/aDoubleSpinBoxWidget.h>
-#include <akGui/aColorStyle.h>
 
 #include <qevent.h>
 
@@ -31,23 +30,6 @@ ak::aDoubleSpinBoxWidget::~aDoubleSpinBoxWidget(void) {}
 
 QWidget * ak::aDoubleSpinBoxWidget::widget(void) {
 	return this;
-}
-
-void ak::aDoubleSpinBoxWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	if (_colorStyle == nullptr) {
-		assert(0);
-		return;
-	}
-	m_colorStyle = _colorStyle;
-	
-	QString sheet;
-	sheet = m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls, "QDoubleSpinBox{","}");
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-		"QToolTip{", "}"));
-	setStyleSheet(sheet);
 }
 
 void ak::aDoubleSpinBoxWidget::mouseReleaseEvent(QMouseEvent *event)

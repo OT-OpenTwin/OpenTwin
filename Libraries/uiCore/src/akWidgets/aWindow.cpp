@@ -11,7 +11,6 @@
  */
 
 // AK header
-#include <akGui/aColorStyle.h>
 #include <akGui/aWindowEventHandler.h>
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aAnimationOverlayWidget.h>
@@ -30,7 +29,7 @@
 
 
 ak::aWindow::aWindow()
-	: QMainWindow(), aPaintable(otMainWindow), m_waitingWidget(nullptr), m_centralWidget(nullptr)
+	: QMainWindow(), aObject(otMainWindow), m_waitingWidget(nullptr), m_centralWidget(nullptr)
 {
 	m_waitingWidget = new QLabel();
 	m_centralWidget = new aAnimationOverlayWidget();
@@ -42,36 +41,6 @@ ak::aWindow::~aWindow() { A_OBJECT_DESTROYING }
 // #######################################################################################################
 
 // Base class functions
-
-void ak::aWindow::setColorStyle(
-	aColorStyle *					_colorStyle
-) {
-	assert(_colorStyle != nullptr);		// Nullptr provided
-	m_colorStyle = _colorStyle;
-
-	/*QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow));
-
-	setStyleSheet(sheet);*/
-
-	// Double paint to not mess up the tab toolbar
-	QString sheet = m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow, "QMainWindow{", "}\n");
-
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorWindow | cafBackgroundColorWindow,
-		"QTabBar{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorHeader | cafForegroundColorHeader,
-		"QTabBar::tab{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorFocus | cafForegroundColorFocus,
-		"QTabBar::tab:hover{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorSelected | cafForegroundColorSelected,
-		"QTabBar::tab:selected{", "}"));
-
-	setStyleSheet(sheet);
-
-	auto sB = statusBar();
-	if (sB)	statusBar()->setStyleSheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow | cafBackgroundColorWindow));
-}
 
 void ak::aWindow::closeEvent(QCloseEvent * _event) {
 	for (auto handler : m_eventHandler) {

@@ -8,6 +8,7 @@
 #include "OTCore/Logger.h"
 
 // Qt header
+#include <QtCore/qdir.h>
 #include <QtCore/qfile.h>
 #include <QtGui/qicon.h>
 #include <QtGui/qpixmap.h>
@@ -18,15 +19,30 @@ ot::IconManager& ot::IconManager::instance(void) {
 	return g_instance;
 }
 
-void ot::IconManager::addSearchPath(const QString& _path) {
+bool ot::IconManager::addSearchPath(const QString& _path) {
 	if (_path.isEmpty()) {
 		OT_LOG_WA("Empty search path provided. Ignoring");
-		return;
+		return false;
 	}
+
 	QString path = _path;
 	path.replace("\\", "/");
 	if (!path.endsWith("/")) path.append("/");
-	m_searchPaths.append(path);
+
+	for (const QString& pth : m_searchPaths) {
+		if (pth == path) return true;
+	}
+
+	QDir dir(path);
+	if (dir.exists(path)) {
+		m_searchPaths.append(path);
+		OT_LOG_D("Added icon search path: \"" + path.toStdString() + "\"");
+		return true;
+	}
+	else {
+		OT_LOG_D("Icon search path does not exist. Ignoring...");
+		return false;
+	}
 }
 
 QIcon& ot::IconManager::getIcon(const QString& _subPath) {

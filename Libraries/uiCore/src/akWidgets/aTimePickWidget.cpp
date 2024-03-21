@@ -13,7 +13,6 @@
  // AK header
 #include <akWidgets/aTimePickWidget.h>
 
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aSpinBoxWidget.h>
@@ -45,21 +44,6 @@ ak::aTimePickWidget::~aTimePickWidget() {
 // #############################################################################################################################
 
 QWidget * ak::aTimePickWidget::widget(void) { return this; }
-
-void ak::aTimePickWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorButton |
-		cafBackgroundColorButton, "QPushButton{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus |
-		cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected |
-		cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-
-	this->setStyleSheet(sheet);
-}
 
 // #############################################################################################################################
 
@@ -99,8 +83,6 @@ void ak::aTimePickWidget::setMinuteStep(int _step) {
 
 void ak::aTimePickWidget::slotClicked(void) {
 	aTimePickDialog t{ m_time , this, m_timeFormat };
-
-	if (m_colorStyle != nullptr) { t.setColorStyle(m_colorStyle); }
 
 	if (t.showDialog() == ak::dialogResult::resultOk) {
 		m_time = t.selectedTime();
@@ -146,27 +128,6 @@ ak::aTimePickDialog::aTimePickDialog(const aTime & _time, aTimePickWidget * _own
 }
 
 ak::aTimePickDialog::~aTimePickDialog() {
-}
-
-// #############################################################################################################################
-
-void ak::aTimePickDialog::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	aDialog::setColorStyle(_colorStyle);
-
-	m_buttonCancel->setColorStyle(m_colorStyle);
-	m_buttonOk->setColorStyle(m_colorStyle);
-
-	m_hourInput->setColorStyle(m_colorStyle);
-	m_minInput->setColorStyle(m_colorStyle);
-
-	if (m_secInput != nullptr) {
-		m_secInput->setColorStyle(m_colorStyle);
-	}
-	if (m_msecInput != nullptr) {
-		m_msecInput->setColorStyle(m_colorStyle);
-	}
 }
 
 // #################################################################################################################################

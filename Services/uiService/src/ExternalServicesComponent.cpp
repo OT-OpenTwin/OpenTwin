@@ -68,6 +68,7 @@
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/IconManager.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 
@@ -3822,7 +3823,7 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 #ifdef _DEBUG
 	std::string iconPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	try {
-		ak::uiAPI::addIconSearchPath(iconPath.c_str());
+		ot::IconManager::instance().addSearchPath(QString::fromStdString(iconPath));
 		AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
 	}
 	catch (...) {

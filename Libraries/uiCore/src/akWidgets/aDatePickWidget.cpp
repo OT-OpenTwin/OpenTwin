@@ -14,7 +14,6 @@
 #include <akWidgets/aDatePickWidget.h>
 #include <akWidgets/aCalendarWidget.h>
 
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aPushButtonWidget.h>
 
 // QT header
@@ -45,21 +44,6 @@ ak::aDatePickWidget::~aDatePickWidget() {
 
 QWidget * ak::aDatePickWidget::widget(void) { return this; }
 
-void ak::aDatePickWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorButton |
-		cafBackgroundColorButton, "QPushButton{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus |
-		cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected |
-		cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-
-	this->setStyleSheet(sheet);
-}
-
 // #############################################################################################################################
 
 // Setter
@@ -85,7 +69,6 @@ void ak::aDatePickWidget::setDateFormat(dateFormat _dateFormat, bool _refresh) {
 
 void ak::aDatePickWidget::slotClicked(void) {
 	aDatePickDialog d{ m_date, this };
-	if (m_colorStyle != nullptr) { d.setColorStyle(m_colorStyle); }
 
 	if (d.showDialog() == ak::dialogResult::resultOk) {
 		m_date = d.selectedDate();
@@ -116,19 +99,6 @@ ak::aDatePickDialog::aDatePickDialog(const aDate & _date, aDatePickWidget * _par
 
 ak::aDatePickDialog::~aDatePickDialog() {
 
-}
-
-// #############################################################################################################################
-
-void ak::aDatePickDialog::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	aDialog::setColorStyle(_colorStyle);
-
-	m_buttonCancel->setColorStyle(m_colorStyle);
-	m_buttonOk->setColorStyle(m_colorStyle);
-
-	m_calendar->setColorStyle(m_colorStyle);
 }
 
 // #############################################################################################################################

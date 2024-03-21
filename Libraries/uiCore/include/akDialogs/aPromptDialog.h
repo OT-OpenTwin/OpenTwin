@@ -65,11 +65,6 @@ namespace ak {
 
 		virtual ~aPromptDialog();
 
-		//! @brief Will set the current color style for this dialog
-		virtual void setColorStyle(
-			aColorStyle *		_colorStyle
-		) override;
-
 		//! @brief Will translate the controls with the specified dictionary
 		//! The following translations must be present:
 		//!		-  PromptText_Ok

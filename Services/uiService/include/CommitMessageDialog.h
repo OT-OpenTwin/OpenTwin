@@ -42,8 +42,6 @@ public:
 
 	void reset(const QString& _projectToCopy);
 
-	void setColorStyle(ak::aColorStyle* _colorStyle);
-
 signals:
 	void isClosing(void);
 

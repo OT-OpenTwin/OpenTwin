@@ -20,7 +20,6 @@
 #include <akCore/aUidMangager.h>
 
 #include <akGui/aAction.h>
-#include <akGui/aColorStyle.h>
 
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
@@ -102,21 +101,6 @@ void ak::aTtbGroup::destroyAllSubContainer(void) {
 		aTtbContainer * obj = m_subContainer.at(i);
 		delete obj;
 	}
-}
-
-void ak::aTtbGroup::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	m_group->setStyleSheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow));
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorFocus | cafBackgroundColorFocus, "QToolButton:hover:!pressed{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected | cafBackgroundColorSelected, "QToolButton:pressed{", "}"));
-	//sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorControls | cafBackgroundColorControls, "QToolButton QToolTip{", "}"));
-	m_group->SetToolButtonStylesheet(sheet);
-	sheet = m_colorStyle->toStyleSheet(cafTabToolBarGroupSeperatorLine);
-	m_group->SetSeparatorStyleSheet(sheet);
 }
 
 void ak::aTtbGroup::removeChildObject(

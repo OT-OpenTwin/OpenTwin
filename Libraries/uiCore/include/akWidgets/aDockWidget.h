@@ -35,7 +35,6 @@ namespace ak {
 	public:
 		aDockWidget(
 			const QString &							_title = QString(""),
-			aColorStyle *					_colorStyle = nullptr,
 			QWidget *								_parent = nullptr,
 			Qt::WindowFlags							_flags = Qt::WindowFlags()
 		);
@@ -46,13 +45,6 @@ namespace ak {
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *					_colorStyle
-		) override;
 
 		//! @brief Will remove the child from this object (not destroy it)
 		//! This function should be called from the deconstructor of a child

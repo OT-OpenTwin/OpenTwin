@@ -43,7 +43,6 @@ namespace ak {
 	class aCheckBoxWidget;
 	class aPushButtonWidget;
 	class aColorEditButtonWidget;
-	class aCustomizableColorStyle;
 	class aSpinBoxWidget;
 
 	class aPropertyGridGroup;
@@ -61,12 +60,6 @@ namespace ak {
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override { return m_centralLayoutW; }
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		virtual void setColorStyle(
-			aColorStyle *		_colorStyle
-		) override;
 
 		// ##############################################################################################
 
@@ -433,8 +426,6 @@ namespace ak {
 
 		void updateEditability(void);
 
-		void rebuildStylesheet(void);
-
 		ID							m_id;
 		NumberInputMode				m_numberInputMode;
 		aPropertyGridGroup *		m_group;
@@ -449,9 +440,7 @@ namespace ak {
 		aColor						m_colorNormal;
 		aColor						m_colorError;
 		aColor						m_colorBackground;
-		aCustomizableColorStyle *	m_colorStyle;
-		aCustomizableColorStyle *	m_colorStyleError;
-
+		
 		// Controls
 
 		aTableWidget *				m_table;

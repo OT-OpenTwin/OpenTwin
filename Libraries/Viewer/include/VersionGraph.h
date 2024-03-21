@@ -231,8 +231,6 @@ public:
 
 	QWidget * widget(void) const { return m_view; }
 
-	void SetStyleSheets(const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor);
-
 	void addVersion(const std::string &_parentVersion, const std::string &_version, const std::string &_description);
 	void removeVersion(const std::string &_parentVersion, const std::string &_version);
 	void removeVersions(const std::list<std::string> &_versions);

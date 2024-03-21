@@ -12,7 +12,6 @@
 
 // uiCore header
 #include <akCore/aAssert.h>
-#include <akGui/aColorStyle.h>
 #include <akDialogs/aOptionsDialog.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
@@ -147,7 +146,6 @@ ak::aOptionsGroup * ak::aOptionsDialog::addGroup(const QString& _name, const QSt
 	aOptionsGroup * group = new aOptionsGroup(_name, _title);
 	m_groups.push_back(group);
 	group->attachToDialog(this);
-	if (m_colorStyle) { group->setColorStyle(m_colorStyle); }
 	m_ignoreEvents--;
 	return group;
 }
@@ -156,7 +154,6 @@ void ak::aOptionsDialog::addGroup(aOptionsGroup * _group) {
 	m_ignoreEvents++;
 	m_groups.push_back(_group);
 	_group->attachToDialog(this);
-	if (m_colorStyle) { _group->setColorStyle(m_colorStyle); }
 	m_ignoreEvents--;
 }
 
@@ -215,24 +212,6 @@ void ak::aOptionsDialog::selectGroupByLogicalName(const QString& _logicalName, c
 // #############################################################################################################
 
 // Base class functions
-
-void ak::aOptionsDialog::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	aDialog::setColorStyle(_colorStyle);
-	m_navigation->setColorStyle(m_colorStyle);
-	if (m_buttonApply) { m_buttonApply->setColorStyle(m_colorStyle); }
-	if (m_buttonSave) { m_buttonSave->setColorStyle(m_colorStyle); }
-	if (m_buttonCancel) { m_buttonCancel->setColorStyle(m_colorStyle); }
-
-	m_settingsArea->setStyleSheet("#AK_OptionsDialog_SettingsArea { background-color: #00000000; }");
-	m_settingsAreaLayoutW->setStyleSheet("#AK_OptionsDialog_SettingsAreaLayoutW { background-color: #00000000; }");
-	m_settingsLayoutW->setStyleSheet("#AK_OptionsDialog_SettingsLayoutW { background-color: #00000000; }");
-
-	for (auto g : m_groups) {
-		g->setColorStyle(m_colorStyle);
-	}
-}
 
 ak::dialogResult ak::aOptionsDialog::showDialog(void) {
 	if (m_groups.size() > 0) return showDialog(m_groups[0], nullptr);
@@ -396,7 +375,7 @@ void ak::aOptionsDialog::groupItemChanged(aAbstractOptionsItem * _item) {
 // ###################################################################################################################################
 
 ak::aOptionsGroup::aOptionsGroup(const QString& _name, const QString& _title, aOptionsGroup * _parentGroup)
-	: aPaintable(otNone), m_dialog(nullptr), m_title(_title), m_parentGroup(nullptr), m_isVisible(false),
+	: aObject(otNone), m_dialog(nullptr), m_title(_title), m_parentGroup(nullptr), m_isVisible(false),
 	m_navigationID(invalidID), m_name(_name)
 {
 	m_titleLayoutW = new QWidget;
@@ -422,58 +401,12 @@ ak::aOptionsGroup::~aOptionsGroup() {
 
 // #############################################################################################################
 
-// Base class functions
-
-void ak::aOptionsGroup::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	m_colorStyle = _colorStyle;
-
-	if (m_colorStyle) { m_titleLabel->setColorStyle(m_colorStyle); }
-
-	bool mode{ false };
-
-	if (m_parentGroup) {
-		if (!m_parentGroup->isVisible()) { mode = true; }
-	}
-	else { mode = true; }
-
-	if (mode) {
-		QFont f = m_titleLabel->font();
-		f.setPointSize(14);
-		f.setUnderline(false);
-		m_titleLabel->setFont(f);
-
-		if (m_colorStyle) {
-			QString sheet{ "#AK_OptionsGroup_TitleLayoutW { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #" };
-			sheet.append(m_colorStyle->getControlsBorderColor().toHexString(true)).append("; }");
-			m_titleLayoutW->setStyleSheet(sheet);
-		}
-		else {
-			m_titleLayoutW->setStyleSheet("#AK_OptionsGroup_TitleLayoutW { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #ff000000; }");
-		}
-	}
-	else {
-		QFont f = m_titleLabel->font();
-		f.setPointSize(12);
-		f.setUnderline(true);
-		m_titleLabel->setFont(f);
-		m_titleLayoutW->setStyleSheet("#AK_OptionsGroup_TitleLayoutW { border-bottom-width: 0px; }");
-	}
-
-	for (auto g : m_groups) { g->setColorStyle(m_colorStyle); }
-	for (auto i : m_items) { i->setColorStyle(m_colorStyle); }
-}
-
-// #############################################################################################################
-
 // View manipulation
 
 void ak::aOptionsGroup::show(aOptionsDialog * _dialog) {
 	if (m_isVisible) { return; }
 	m_isVisible = true;
 
-	if (m_colorStyle) { setColorStyle(m_colorStyle); }
 	_dialog->addWidget(m_titleLayoutW);
 
 	for (auto g : m_groups) { g->show(_dialog); }
@@ -500,20 +433,17 @@ ak::aOptionsGroup * ak::aOptionsGroup::addGroup(const QString& _name, const QStr
 	aOptionsGroup * group = new aOptionsGroup(_name, _title);
 	m_groups.push_back(group);
 	group->attachToGroup(this);
-	if (m_colorStyle) { group->setColorStyle(m_colorStyle); }
 	return group;
 }
 
 void ak::aOptionsGroup::addGroup(aOptionsGroup * _group) {
 	m_groups.push_back(_group);
 	_group->attachToGroup(this);
-	if (m_colorStyle) { _group->setColorStyle(m_colorStyle); }
 }
 
 void ak::aOptionsGroup::addItem(aAbstractOptionsItem * _item) {
 	m_items.push_back(_item);
 	_item->attachToGroup(this);
-	if (m_colorStyle) { _item->setColorStyle(m_colorStyle); }
 }
 
 void ak::aOptionsGroup::attachToDialog(aOptionsDialog * _dialog) {
@@ -795,14 +725,6 @@ ak::aBasicOptionsItem::~aBasicOptionsItem() {
 
 // Base class functions
 
-void ak::aBasicOptionsItem::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	m_colorStyle = _colorStyle;
-	m_label->setColorStyle(m_colorStyle);
-	setItemWidgetsColorStyle(m_colorStyle);
-}
-
 void ak::aBasicOptionsItem::ConstructWidget(void) {	
 	if (m_showLabel) { m_centralLayout->addWidget(m_label, 0); }
 	addItemWidgetsToLayout(m_centralLayout);
@@ -940,10 +862,6 @@ void ak::aOptionsItemCheckBox::setTristate(void) {
 
 // Protected functions
 
-void ak::aOptionsItemCheckBox::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_checkbox->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemCheckBox::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_checkbox, 1);
 }
@@ -1015,10 +933,6 @@ QString ak::aOptionsItemLineEdit::placeholderText(void) const {
 	return m_lineEdit->placeholderText();
 }
 
-void ak::aOptionsItemLineEdit::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_lineEdit->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemLineEdit::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_lineEdit, 1);
 }
@@ -1088,10 +1002,6 @@ int ak::aOptionsItemSpinBox::maxValue(void) const {
 // #############################################################################################################
 
 // Protected functions
-
-void ak::aOptionsItemSpinBox::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_spinBox->setColorStyle(_colorStyle);
-}
 
 void ak::aOptionsItemSpinBox::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_spinBox, 1);
@@ -1172,10 +1082,6 @@ int ak::aOptionsItemDoubleSpinBox::decimals(void) const {
 
 // Protected functions
 
-void ak::aOptionsItemDoubleSpinBox::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_spinBox->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemDoubleSpinBox::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_spinBox, 1);
 }
@@ -1236,10 +1142,6 @@ QString ak::aOptionsItemComboBox::text(void) const {
 
 // Protected functions
 
-void ak::aOptionsItemComboBox::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_comboBox->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemComboBox::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_comboBox, 1);
 }
@@ -1298,10 +1200,6 @@ QString ak::aOptionsItemComboButton::text(void) const {
 
 // Protected functions
 
-void ak::aOptionsItemComboButton::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_comboButton->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemComboButton::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_comboButton, 1);
 }
@@ -1355,10 +1253,6 @@ bool ak::aOptionsItemColorEdit::editAlphaChannel(void) const {
 // #############################################################################################################
 
 // Protected functions
-
-void ak::aOptionsItemColorEdit::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_colorEdit->setColorStyle(_colorStyle);
-}
 
 void ak::aOptionsItemColorEdit::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_colorEdit->widget(), 0);
@@ -1421,10 +1315,6 @@ QStringList ak::aOptionsItemList::currentSelection(void) const {
 
 // Protected functions
 
-void ak::aOptionsItemList::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_list->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemList::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_list);
 }
@@ -1475,11 +1365,6 @@ QString ak::aOptionsItemDirectorySelect::selectedDirectory(void) const {
 // #############################################################################################################
 
 // Protected functions
-
-void ak::aOptionsItemDirectorySelect::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_edit->setColorStyle(_colorStyle);
-	m_button->setColorStyle(_colorStyle);
-}
 
 void ak::aOptionsItemDirectorySelect::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_edit, 1);
@@ -1542,11 +1427,6 @@ QString ak::aOptionsItemFileSelectSave::selectedFile(void) const {
 
 // Protected functions
 
-void ak::aOptionsItemFileSelectSave::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_edit->setColorStyle(_colorStyle);
-	m_button->setColorStyle(_colorStyle);
-}
-
 void ak::aOptionsItemFileSelectSave::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_edit, 1);
 	_layout->addWidget(m_button, 0);
@@ -1607,11 +1487,6 @@ QString ak::aOptionsItemFileSelectOpen::selectedFile(void) const {
 // #############################################################################################################
 
 // Protected functions
-
-void ak::aOptionsItemFileSelectOpen::setItemWidgetsColorStyle(aColorStyle * _colorStyle) {
-	m_edit->setColorStyle(_colorStyle);
-	m_button->setColorStyle(_colorStyle);
-}
 
 void ak::aOptionsItemFileSelectOpen::addItemWidgetsToLayout(QHBoxLayout * _layout) {
 	_layout->addWidget(m_edit, 1);

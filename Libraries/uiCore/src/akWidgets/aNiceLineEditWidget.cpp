@@ -11,7 +11,6 @@
  */
 
  // AK header
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
@@ -51,14 +50,6 @@ ak::aNiceLineEditWidget::~aNiceLineEditWidget() {
 }
 
 QWidget * ak::aNiceLineEditWidget::widget(void) { return this; }
-
-void ak::aNiceLineEditWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	m_colorStyle = _colorStyle;
-	m_label->setColorStyle(m_colorStyle);
-	m_lineEdit->setColorStyle(m_colorStyle);
-}
 
 void ak::aNiceLineEditWidget::setText(const QString & _text) { m_lineEdit->setText(_text); }
 

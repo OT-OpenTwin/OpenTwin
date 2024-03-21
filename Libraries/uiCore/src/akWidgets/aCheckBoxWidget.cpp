@@ -12,7 +12,6 @@
 
 // AK header
 #include <akCore/aException.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aCheckBoxWidget.h>
 
 // Qt header
@@ -54,49 +53,9 @@ void ak::aCheckBoxWidget::keyReleaseEvent(
 
 QWidget * ak::aCheckBoxWidget::widget(void) { return this; }
 
-void ak::aCheckBoxWidget::setColorStyle(
-	aColorStyle *					_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet;
-	if (m_paintBackground) {
-		if (objectName().length() > 0) {
-			sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls | cafBackgroundColorControls, "#" + objectName() + "{", "}");
-			sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-				cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-				"QToolTip{", "}"));
-		}
-		else {
-			sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls | cafBackgroundColorControls, "QCheckBox{", "}");
-			sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-				cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-				"QToolTip{", "}"));
-		}
-	}
-	else {
-		if (objectName().length() > 0) {
-			sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls, "#" + objectName() + "{", "}");
-			sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-				cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-				"QToolTip{", "}"));
-		}
-		else {
-			sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls, "QCheckBox{", "}");
-			sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-				cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-				"QToolTip{", "}"));
-		}
-	}
-	this->setStyleSheet(sheet);
-}
-
 // #######################################################################################################
 
 void ak::aCheckBoxWidget::setPaintBackground(bool _paint) {
 	m_paintBackground = _paint;
 	setAutoFillBackground(m_paintBackground);
-	if (m_colorStyle) {
-		setColorStyle(m_colorStyle);
-	}
 }

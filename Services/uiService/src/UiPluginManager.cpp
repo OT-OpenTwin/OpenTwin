@@ -6,7 +6,6 @@
 
 #include <akAPI/uiAPI.h>
 #include <akCore/aAssert.h>
-#include <akGui/aColorStyle.h>
 
 #include <qfile.h>
 
@@ -17,12 +16,11 @@ ExternalUiPlugin::ExternalUiPlugin(
 	PluginAttachFunctionType		_attachFunctionRef,
 	PluginDetachFunctionType		_detachFunctionRef,
 	PluginMessageFunctionType		_messageFunctionRef,
-	PluginStyleFunctionType			_styleFunctionRef,
 	ot::ServiceBase *				_owner,
 	UiPluginComponent *				_component,
 	ak::UID							_uid
 )	: m_name(_name), m_path(_path), m_attachFunctionRef(_attachFunctionRef), m_detachFunctionRef(_detachFunctionRef),
-	m_messageFunctionRef(_messageFunctionRef), m_styleFunctionRef(_styleFunctionRef),
+	m_messageFunctionRef(_messageFunctionRef),
 	m_libraryInstance(_libraryInstance), m_owner(_owner), m_uid(_uid), m_component(_component)
 {
 	m_component->setPlugin(this);
@@ -30,7 +28,7 @@ ExternalUiPlugin::ExternalUiPlugin(
 
 ExternalUiPlugin::ExternalUiPlugin(const ExternalUiPlugin& _other) 
 	: m_name(_other.m_name), m_path(_other.m_path), m_attachFunctionRef(_other.m_attachFunctionRef), m_detachFunctionRef(_other.m_detachFunctionRef),
-	m_messageFunctionRef(_other.m_messageFunctionRef), m_styleFunctionRef(_other.m_styleFunctionRef),
+	m_messageFunctionRef(_other.m_messageFunctionRef),
 	m_libraryInstance(_other.m_libraryInstance), m_owner(_other.m_owner), m_uid(_other.m_uid), m_component(_other.m_component)
 {
 	m_component->setPlugin(this);
@@ -42,7 +40,6 @@ ExternalUiPlugin& ExternalUiPlugin::operator = (const ExternalUiPlugin& _other) 
 	m_attachFunctionRef = _other.m_attachFunctionRef;
 	m_detachFunctionRef = _other.m_detachFunctionRef;
 	m_messageFunctionRef = _other.m_messageFunctionRef;
-	m_styleFunctionRef = _other.m_styleFunctionRef;
 	m_libraryInstance = _other.m_libraryInstance;
 	m_owner = _other.m_owner;
 	m_uid = _other.m_uid;
@@ -55,10 +52,6 @@ ExternalUiPlugin::~ExternalUiPlugin() {}
 
 bool ExternalUiPlugin::forwardMessageToPlugin(const std::string& _action, const std::string& _message) {
 	return m_messageFunctionRef(_action.c_str(), _message.c_str());
-}
-
-void ExternalUiPlugin::forwardColorStyle(ak::aColorStyle * _colorStyle) {
-	m_styleFunctionRef(_colorStyle);
 }
 
 // #########################################################################################################################
@@ -98,12 +91,11 @@ unsigned long long UiPluginManager::loadPlugin(const QString& _pluginName, const
 			ExternalUiPlugin::PluginAttachFunctionType func_Attach = (ExternalUiPlugin::PluginAttachFunctionType)GetProcAddress(hGetProcIDDLL, "attachToUiService");
 			ExternalUiPlugin::PluginDetachFunctionType func_Detach = (ExternalUiPlugin::PluginDetachFunctionType)GetProcAddress(hGetProcIDDLL, "detachFromUiService");
 			ExternalUiPlugin::PluginMessageFunctionType func_Message = (ExternalUiPlugin::PluginMessageFunctionType)GetProcAddress(hGetProcIDDLL, "messageReceived");
-			ExternalUiPlugin::PluginStyleFunctionType func_Style = (ExternalUiPlugin::PluginStyleFunctionType)GetProcAddress(hGetProcIDDLL, "applyColorStyle");
-
-			if (func_Attach && func_Detach && func_Message && func_Style) {
+			
+			if (func_Attach && func_Detach && func_Message) {
 				logDebug("Attaching UI component to plugin...");
 				UiPluginComponent * component = new UiPluginComponent(nullptr);
-				ExternalUiPlugin * plugin = new ExternalUiPlugin(_pluginName, filename, hGetProcIDDLL, func_Attach, func_Detach, func_Message, func_Style, _owner, component, ++m_currentPluginUid);
+				ExternalUiPlugin * plugin = new ExternalUiPlugin(_pluginName, filename, hGetProcIDDLL, func_Attach, func_Detach, func_Message, _owner, component, ++m_currentPluginUid);
 
 				// Attach the plugin component to the loaded plugin
 				if (!func_Attach(component)) {
@@ -115,12 +107,6 @@ unsigned long long UiPluginManager::loadPlugin(const QString& _pluginName, const
 				}
 
 				logDebug("Plugin attached");
-
-				ak::aColorStyle * cS = ak::uiAPI::getCurrentColorStyle();
-				if (cS) {
-					logDebug("Forwarding color style...");
-					func_Style(cS);
-				}
 
 				// Store information
 				m_plugins.insert_or_assign(m_currentPluginUid, plugin);
@@ -226,14 +212,6 @@ bool UiPluginManager::forwardMessageToPlugin(unsigned long long _pluginUid, cons
 		return false;
 	}
 	return it->second->forwardMessageToPlugin(_action, _message);
-}
-
-void UiPluginManager::forwardColorStyle(ak::aColorStyle * _colorStyle) {
-	if (_colorStyle) {
-		for (auto plugin : m_plugins) {
-			plugin.second->forwardColorStyle(_colorStyle);
-		}
-	}
 }
 
 // ############################################################################################

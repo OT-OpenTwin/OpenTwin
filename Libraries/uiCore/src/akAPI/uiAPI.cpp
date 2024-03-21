@@ -31,9 +31,7 @@
 // AK GUI
 #include <akGui/aAction.h>
 #include <akGui/aApplication.h>
-#include <akGui/aColorStyle.h>
 #include <akGui/aContextMenuItem.h>
-#include <akGui/aPaintable.h>
 #include <akGui/aSpecialTabBar.h>
 #include <akGui/aTtbContainer.h>
 #include <akGui/aWindowEventHandler.h>
@@ -41,7 +39,6 @@
 // AK widgets
 #include <akWidgets/aCheckBoxWidget.h>
 #include <akWidgets/aColorEditButtonWidget.h>
-#include <akWidgets/aColorStyleSwitchWidget.h>
 #include <akWidgets/aComboBoxWidget.h>
 #include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aDockWidget.h>
@@ -235,41 +232,6 @@ std::vector<ak::eventType> ak::uiAPI::enabledEventTypes(void) { return aSingleto
 
 std::vector<ak::eventType> ak::uiAPI::disabledEventTypes(void) { return aSingletonAllowedMessages::instance()->disabledMessages(); }
 
-/*
-std::string ak::uiAPI::saveStateWindow(
-	const std::string &									_applicationVersion
-) {
-	assert(m_objManager != nullptr);	// API not initialized
-	return m_objManager->saveStateWindow(_applicationVersion);
-}*/
-
-std::string ak::uiAPI::saveStateColorStyle(
-	const std::string &									_applicationVersion
-) {
-	assert(m_objManager != nullptr);	// API not initialized
-	return m_objManager->saveStateColorStyle(_applicationVersion);
-}
-
-/*
-ak::settingsRestoreErrorCode ak::uiAPI::restoreStateWindow(
-	const std::string &									_json,
-	const std::string &									_applicationVersion
-) {
-	assert(m_objManager != nullptr); // Not initialized
-	if (_json.length() == 0) { return ak::settingsRestoreErrorCode::srecEmptySettingsString; }
-	return m_objManager->restoreStateWindow(_json.c_str(), _applicationVersion);
-}
-*/
-
-bool ak::uiAPI::restoreStateColorStyle(
-	const std::string &									_json,
-	const std::string &									_applicationVersion
-) {
-	assert(m_objManager != nullptr); // Not initialized
-	if (_json.length() == 0) { return false; }
-	return m_objManager->restoreStateColorStyle(_json.c_str(), _applicationVersion);
-}
-
 QWidget * ak::uiAPI::getWidget(
 	UID												_objectUid
 ) { return object::get<aWidget>(_objectUid)->widget(); }
@@ -288,16 +250,6 @@ ak::aObjectManager * ak::uiAPI::getObjectManager(void) {
 
 ak::aApplication * ak::uiAPI::getApplication(void) {
 	return m_apiManager.app();
-}
-
-void ak::uiAPI::addPaintable(aPaintable * _object) {
-	assert(m_objManager != nullptr);	// API not initialized
-	m_objManager->addPaintable(_object);
-}
-
-void ak::uiAPI::removePaintable(aPaintable * _object) {
-	assert(m_objManager != nullptr);	// API not initialized
-	m_objManager->removePaintable(_object);
 }
 
 // ###############################################################################################################################################
@@ -394,35 +346,6 @@ ak::UID ak::uiAPI::createColorEditButton(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createColorEditButton(_creatorUid, _color, _textOverride);
-}
-
-ak::UID ak::uiAPI::createColorStyleSwitch(
-	UID						_creatorUid,
-	const QString &			_brightModeTitle,
-	const QString &			_darkModeTitle,
-	const QIcon &			_brightModeIcon,
-	const QIcon &			_darkModeIcon,
-	bool					_isBright
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createColorStyleSwitch(_creatorUid, _brightModeTitle, _darkModeTitle, _brightModeIcon, _darkModeIcon, _isBright);
-}
-
-ak::UID ak::uiAPI::createColorStyleSwitch(
-	UID						_creatorUid,
-	const QString &			_brightModeTitle,
-	const QString &			_darkModeTitle,
-	const QString &			_brightModeIconName,
-	const QString &			_brightModeIconFolder,
-	const QString &			_darkModeIconName,
-	const QString &			_darkModeIconFolder,
-	bool					_isBright
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return createColorStyleSwitch(_creatorUid, _brightModeTitle, _darkModeTitle,
-		ot::IconManager::instance().getIcon(_brightModeIconFolder + "/" + _brightModeIconName + ".png"),
-		ot::IconManager::instance().getIcon(_darkModeIconFolder + "/" + _darkModeIconName + ".png"),
-		_isBright);
 }
 
 ak::UID ak::uiAPI::createComboBox(
@@ -728,36 +651,6 @@ bool ak::uiAPI::checkBox::isChecked(
 bool ak::uiAPI::checkBox::isEnabled(
 	UID												_checkBoxUID
 ) { return object::get<aCheckBoxWidget>(_checkBoxUID)->isEnabled(); }
-
-// ###############################################################################################################################################
-
-// colorSwitchWidget
-
-void ak::uiAPI::colorStyleSwitch::setAutoSetColorStyle(
-	UID				_switchUid,
-	bool			_enabled
-) {
-	object::get<aColorStyleSwitchWidget>(_switchUid)->setAutoSetColorStyle(_enabled);
-}
-
-bool ak::uiAPI::colorStyleSwitch::isAutoSetColorStyle(
-	UID				_switchUid
-) {
-	return object::get<aColorStyleSwitchWidget>(_switchUid)->isAutoSetColorStyle();
-}
-
-void ak::uiAPI::colorStyleSwitch::setCurrentIsBright(
-	UID				_switchUid,
-	bool			_isBright
-) {
-	object::get<aColorStyleSwitchWidget>(_switchUid)->setCurrentIsBright(_isBright);
-}
-
-bool ak::uiAPI::colorStyleSwitch::isCurrentBright(
-	UID				_switchUid
-) {
-	return object::get<aColorStyleSwitchWidget>(_switchUid)->isCurrentBright();
-}
 
 // ###############################################################################################################################################
 
@@ -1284,7 +1177,6 @@ void ak::uiAPI::object::setEnabled(
 	{
 	case otAction: akCastObject<aAction>(obj)->setEnabled(_enabled); return;
 	case otColorEditButton: akCastObject<aColorEditButtonWidget>(obj)->SetEnabled(_enabled); return;
-	case otColorStyleSwitchButton: akCastObject<aColorStyleSwitchWidget>(obj)->setEnabled(_enabled); return;
 	case otComboBox: akCastObject<aComboBoxWidget>(obj)->setEnabled(_enabled); return;
 	case otComboButton: akCastObject<aComboButtonWidget>(obj)->setEnabled(_enabled); return;
 	case otCheckBox: akCastObject<aCheckBoxWidget>(obj)->setEnabled(_enabled); return;
@@ -1324,7 +1216,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	{
 	case otAction: return akCastObject<aAction>(obj)->isEnabled();
 	case otColorEditButton: return akCastObject<aColorEditButtonWidget>(obj)->Enabled();
-	case otColorStyleSwitchButton: return akCastObject<aColorStyleSwitchWidget>(obj)->isEnabled();
 	case otComboBox: return akCastObject<aComboBoxWidget>(obj)->isEnabled();
 	case otComboButton: return akCastObject<aComboButtonWidget>(obj)->isEnabled();
 	case otCheckBox: return akCastObject<aCheckBoxWidget>(obj)->isEnabled();
@@ -1401,8 +1292,6 @@ ak::dialogResult ak::uiAPI::promptDialog::show(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	aPromptDialog dialog(_message, _title, _type, _icon, _parentWidget);
-	auto cs{ m_objManager->getCurrentColorStyle() };
-	if (cs != nullptr) { dialog.setColorStyle(cs); }
 	return dialog.showDialog(_parentWidget);
 }
 
@@ -1414,8 +1303,6 @@ ak::dialogResult ak::uiAPI::promptDialog::show(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	aPromptDialog dialog(_message, _title, _type, _parentWidget);
-	auto cs{ m_objManager->getCurrentColorStyle() };
-	if (cs != nullptr) { dialog.setColorStyle(cs); }
 	return dialog.showDialog(_parentWidget);
 }
 
@@ -2984,55 +2871,7 @@ void ak::uiAPI::creatorDestroyed(
 	m_objManager->creatorDestroyed(_creatorUid);
 }
 
-void ak::uiAPI::addColorStyle(
-	aColorStyle *								_colorStyle,
-	bool												_activate
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	m_objManager->addColorStyle(_colorStyle, _activate);
-}
-
-void ak::uiAPI::setColorStyle(
-	const QString &				_colorStyleName
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	m_objManager->setColorStyle(_colorStyleName);
-}
-
-ak::aColorStyle *  ak::uiAPI::getCurrentColorStyle(void) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->getCurrentColorStyle();
-}
-
-QString ak::uiAPI::getCurrentColorStyleName(void) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->getCurrentColorStyleName();
-}
-
-void ak::uiAPI::setDefaultDarkColorStyle() {
-	assert(m_objManager != nullptr); // API not initialized
-	m_objManager->setDefaultDarkColorStyle();
-}
-
-void ak::uiAPI::setDefaultBlueColorStyle() {
-	assert(m_objManager != nullptr); // API not initialized
-	m_objManager->setDefaultBlueColorStyle();
-}
-
-void ak::uiAPI::setDefaultColorStyle() {
-	assert(m_objManager != nullptr); // API not initialized
-	m_objManager->setDefaultColorStyle();
-}
-
 // ###############################################################################################################################################
-
-void ak::uiAPI::addIconSearchPath(
-	const QString &										_path
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	ot::IconManager::instance().addSearchPath(_path);
-	m_objManager->setIconSearchDirectories(ot::IconManager::instance().searchPaths());
-}
 
 ak::UID ak::uiAPI::createUid(void) {
 	assert(m_uidManager != nullptr); // API not initialized

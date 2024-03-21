@@ -12,13 +12,11 @@
 
 // AK header
 #include <akWidgets/aWidget.h>
-#include <akGui/aColorStyle.h>
 
 ak::aWidget::aWidget(
 	objectType				_type,
-	aColorStyle *	_colorStyle,
 	ak::UID						_UID
-) : aPaintable(_type, _colorStyle, _UID) {}
+) : aObject(_type, _UID) {}
 
 ak::aWidget::~aWidget() {}
 

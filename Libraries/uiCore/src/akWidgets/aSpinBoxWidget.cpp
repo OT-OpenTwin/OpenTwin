@@ -11,7 +11,6 @@
  */
 
 #include <akWidgets/aSpinBoxWidget.h>
-#include <akGui/aColorStyle.h>
 
 #include <qevent.h>
 
@@ -37,23 +36,6 @@ ak::aSpinBoxWidget::~aSpinBoxWidget(void) {}
 
 QWidget * ak::aSpinBoxWidget::widget(void) {
 	return this;
-}
-
-void ak::aSpinBoxWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	if (_colorStyle == nullptr) {
-		assert(0);
-		return;
-	}
-	m_colorStyle = _colorStyle;
-	
-	QString sheet;
-	sheet = m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls, "QSpinBox{", "}");
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-		"QToolTip{", "}"));
-	setStyleSheet(sheet);
 }
 
 void ak::aSpinBoxWidget::SetStepLength(int _stepLength) {

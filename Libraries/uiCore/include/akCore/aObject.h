@@ -123,9 +123,6 @@ namespace ak {
 		//! @brief Returns the objects type
 		objectType type(void) const;
 
-		//! @brief Returns true if the object is an object derived from aPaintable
-		virtual bool isPaintableType(void) const;
-
 		//! @brief Returns true if the object is an object derived from aWidget
 		virtual bool isWidgetType(void) const;
 

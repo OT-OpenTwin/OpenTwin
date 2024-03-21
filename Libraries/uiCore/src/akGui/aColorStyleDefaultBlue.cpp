@@ -10,9 +10,12 @@
  *	file 'LICENSE', which is part of this source code package.
  */
 
+/*
+
 // AK header
 #include <akGui/aColorStyleDefaultBlue.h>
 #include <akCore/aException.h>
+
 
 ak::aColorStyleDefaultBlue::aColorStyleDefaultBlue() {
 	m_controlsMainBackcolor.setRGBA(59, 68, 83);
@@ -118,3 +121,4 @@ QString ak::aColorStyleDefaultBlue::toStyleSheet(
 	ret.append(_suffix);
 	return ret;
 }
+*/

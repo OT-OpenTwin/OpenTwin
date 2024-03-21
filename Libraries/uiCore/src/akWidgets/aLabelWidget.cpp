@@ -11,7 +11,6 @@
  */
 
 // AK header
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aLabelWidget.h>
 
 #include <qevent.h>
@@ -38,29 +37,4 @@ bool ak::aLabelWidget::event(QEvent *myEvent)
 		break;
 	}
 	return QWidget::event(myEvent);
-}
-
-void ak::aLabelWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-
-	QString sheet;
-	if (objectName().isEmpty()) {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls |
-			cafBackgroundColorTransparent, "QLabel {", "} ");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorHeader,
-			"QLabel QToolTip{", "border: 1px;}"));
-	}
-	else {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls |
-			cafBackgroundColorTransparent, "#" + objectName() + "{ ", " }");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorHeader,
-			"#" + objectName() + " QToolTip{", "border: 1px;}"));
-	}
-	
-	this->setStyleSheet(sheet);
 }

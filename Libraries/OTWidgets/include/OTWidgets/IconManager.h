@@ -27,7 +27,7 @@ namespace ot {
 	public:
 		static IconManager& instance(void);
 
-		void addSearchPath(const QString& _path);
+		bool addSearchPath(const QString& _path);
 		const QStringList& searchPaths(void) const { return m_searchPaths; };
 
 		//! @brief Create and return the icon

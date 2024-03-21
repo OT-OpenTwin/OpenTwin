@@ -66,11 +66,6 @@ namespace ak {
 
 		// Base class functions
 
-		//! @brief Will set the current color style for this dialog
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
-
 		virtual dialogResult showDialog(void) override;
 
 		virtual dialogResult showDialog(QWidget * _parentWidget) override;
@@ -176,20 +171,11 @@ namespace ak {
 
 	// ###################################################################################################################################
 
-	class UICORE_API_EXPORT aOptionsGroup : public aPaintable {
+	class UICORE_API_EXPORT aOptionsGroup : public aObject {
 	public:
 		explicit aOptionsGroup(const QString& _name, const QString& _title, aOptionsGroup * _parentGroup = nullptr);
 		virtual ~aOptionsGroup();
-
-		// #############################################################################################################
-
-		// Base class functions
-
-		//! @brief Will set the current color style for this dialog
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
-		
+				
 		// #############################################################################################################
 
 		// View manipulation
@@ -309,8 +295,6 @@ namespace ak {
 
 		virtual QWidget * widget(void) override = 0;
 
-		virtual void setColorStyle(aColorStyle * _colorStyle) override = 0;
-
 		// #############################################################################################################
 
 		// View manipulation
@@ -388,11 +372,6 @@ namespace ak {
 
 		virtual QWidget * widget(void) override { return m_centralLayoutW; }
 
-		//! @brief Will set the current color style for this dialog
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
-
 		// #############################################################################################################
 
 		// Setter
@@ -412,8 +391,6 @@ namespace ak {
 	protected:
 
 		virtual void ConstructWidget(void) override;
-
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) = 0;
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) = 0;
 
@@ -469,8 +446,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override {}
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
 	private:
@@ -513,8 +488,6 @@ namespace ak {
 		aCheckBoxWidget * checkBox(void) { return m_checkbox; }
 
 	protected:
-
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 		
@@ -566,8 +539,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 		
 	private:
@@ -618,8 +589,6 @@ namespace ak {
 		aSpinBoxWidget * spinBox(void) { return m_spinBox; }
 
 	protected:
-
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
@@ -676,8 +645,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
 	private:
@@ -722,8 +689,6 @@ namespace ak {
 		aComboBoxWidget * comboBox(void) { return m_comboBox; }
 
 	protected:
-
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 		
@@ -770,8 +735,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
 	private:
@@ -817,8 +780,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
 	private:
@@ -862,8 +823,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
 	private:
@@ -906,8 +865,6 @@ namespace ak {
 		QString selectedDirectory(void) const;
 
 	protected:
-
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
@@ -960,8 +917,6 @@ namespace ak {
 
 	protected:
 
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
-
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
 	private slots:
@@ -1013,8 +968,6 @@ namespace ak {
 		QString selectedFile(void) const;
 
 	protected:
-
-		virtual void setItemWidgetsColorStyle(aColorStyle * _colorStyle) override;
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 

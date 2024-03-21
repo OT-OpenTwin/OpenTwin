@@ -12,7 +12,6 @@
 
 // uiCore header
 #include <akWidgets/aPlainTextEditWidget.h>
-#include <akGui/aColorStyle.h>
 
 #include <qevent.h>
 
@@ -28,15 +27,6 @@ ak::aPlainTextEditWidget::~aPlainTextEditWidget() {}
 
 QWidget * ak::aPlainTextEditWidget::widget(void) {
 	return this;
-}
-
-void ak::aPlainTextEditWidget::setColorStyle(aColorStyle * _colorStyle) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorControls | cafDefaultBorderWindow, "QPlainTextEdit{", "}"));
-	this->setStyleSheet(sheet);
 }
 
 void ak::aPlainTextEditWidget::keyPressEvent(QKeyEvent * _event) {

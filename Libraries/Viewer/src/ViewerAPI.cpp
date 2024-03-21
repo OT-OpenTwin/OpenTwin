@@ -704,40 +704,6 @@ void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
 }
 
-void ViewerAPI::setPlotStyles(const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen) {
-	for (auto itm : viewerManager) {
-		if (itm.second != nullptr) {
-			itm.second->get1DPlot()->SetStyleSheets(_plotBackgroundSheet, _xyPlotStyleSheet, _xyCanvasStyleSheet, _polarPlotColor, _zoomerPen);
-		}
-	}
-}
-
-void ViewerAPI::setPlotStyle(ot::UID _viewerID, const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen) {
-	auto itm = viewerManager.find(_viewerID);
-	if (itm != viewerManager.end()) {
-		if (itm->second != nullptr) {
-			itm->second->get1DPlot()->SetStyleSheets(_plotBackgroundSheet, _xyPlotStyleSheet, _xyCanvasStyleSheet, _polarPlotColor, _zoomerPen);
-		}
-	}
-}
-
-void ViewerAPI::setVersionGraphStyles(const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor) {
-	for (auto itm : viewerManager) {
-		if (itm.second != nullptr) {
-			itm.second->getVersionGraph()->SetStyleSheets(_plotBackgroundSheet, _foregroundColor, _boxColor, _highlightBoxColor, _highlightForegroundColor);
-		}
-	}
-}
-
-void ViewerAPI::setVersionGraphStyle(ot::UID _viewerID, const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor) {
-	auto itm = viewerManager.find(_viewerID);
-	if (itm != viewerManager.end()) {
-		if (itm->second != nullptr) {
-			itm->second->getVersionGraph()->SetStyleSheets(_plotBackgroundSheet, _foregroundColor, _boxColor, _highlightBoxColor, _highlightForegroundColor);
-		}
-	}
-}
-
 void ViewerAPI::setVersionGraph(ot::UID _viewerID, std::list<std::tuple<std::string, std::string, std::string>> &versionGraph, const std::string &activeVersion, const std::string &activeBranch)
 {
 	auto itm = viewerManager.find(_viewerID);

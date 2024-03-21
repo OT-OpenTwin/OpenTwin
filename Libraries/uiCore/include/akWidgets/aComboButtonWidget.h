@@ -30,9 +30,6 @@ class QKeyEvent;
 
 namespace ak {
 
-	// Forward declaration
-	class aColorStyle;
-
 	//! @brief This class represents a combo button which consists of a QPushButton and it's Menu
 	//! This class behaves like a combo box
 	class UICORE_API_EXPORT aComboButtonWidget : public QPushButton, public aWidget
@@ -41,12 +38,10 @@ namespace ak {
 	public:
 		//! @brief Constructor
 		//! @param _initialText The initial text of this combo button
-		//! @param _colorStyle The color style used for this combo button
 		//! @param _parent The parent QWidget for this combo button
 		//! @throw ak::Exception if the creation of the menu failed
 		aComboButtonWidget(
 			const QString &									_initialText = QString(""),
-			aColorStyle *								_colorStyle = nullptr,
 			QWidget *										_parent = (QWidget *) nullptr
 		);
 
@@ -97,13 +92,6 @@ namespace ak {
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
 
 	signals:
 		void keyPressed(QKeyEvent *);

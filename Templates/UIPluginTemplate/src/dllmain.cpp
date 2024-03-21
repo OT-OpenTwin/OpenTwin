@@ -1,6 +1,5 @@
 #include <Windows.h>
 
-#include <akGui/aColorStyle.h>
 #include <openTwin/AbstractUIWidgetInterface.h>
 
 #include "PluginCore.h"
@@ -33,10 +32,6 @@ extern "C" {
 
 	__declspec(dllexport) bool messageReceived(const char * _action, const char * _msg) {
 		return PluginCore::instance()->dispatchAction(_action, _msg);
-	}
-
-	__declspec(dllexport) void applyColorStyle(ak::aColorStyle * _colorStyle) {
-		if (_colorStyle) PluginCore::instance()->setColorstye(_colorStyle);
 	}
 }
 

@@ -17,14 +17,12 @@ namespace ak {
 	class aLineEditWidget;
 	class aChecklistWidget;
 
-	class UICORE_API_EXPORT aChecklistItem : public QObject, public aPaintable {
+	class UICORE_API_EXPORT aChecklistItem : public QObject, public aObject {
 		Q_OBJECT
 	public:
 		aChecklistItem(aChecklistWidget * _owner = (aChecklistWidget *)nullptr);
 		aChecklistItem(const QString& _text, bool _isChecked, aChecklistWidget * _owner);
 		virtual ~aChecklistItem();
-
-		virtual void setColorStyle(ak::aColorStyle * _colorStyle) override;
 
 		A_PROPERTY(int, Index);
 		A_PROPERTY_POINTER(aCheckBoxWidget *, CheckBox);
@@ -90,8 +88,7 @@ namespace ak {
 		virtual ~aChecklistWidget();
 
 		virtual QWidget * widget(void) override;
-		virtual void setColorStyle(aColorStyle * _colorStyle) override;
-
+		
 		void setCrossoutCheckedItemsEnabled(bool _enabled);
 		bool isCrossoutCheckedItemsEnabled(void) const { return m_crossOutCheckedItems; }
 		

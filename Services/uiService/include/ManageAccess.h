@@ -36,8 +36,6 @@ public:
 
 	virtual void leaveEvent(QEvent * _event) override;
 
-	void setColorStyle(ak::aColorStyle *_colorStyle);
-
 	void getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second);
 
 signals:
@@ -68,8 +66,6 @@ class ManageAccess : public ak::aDialog {
 public:
 	ManageAccess(const std::string &authServerURL, const std::string &projectName);
 	virtual ~ManageAccess();
-
-	virtual void setColorStyle(ak::aColorStyle *_colorStyle) override;
 
 public slots:
 	void slotClose(void);

@@ -20,12 +20,12 @@
 
 // AK header
 #include <akCore/globalDataTypes.h>
-#include <akGui/aPaintable.h>
+#include <akCore/aObject.h>
 
 namespace ak {
 
 	//! @brief This class combines the functionallity of a QAction and a ak::ui::core::aPaintable
-	class UICORE_API_EXPORT aAction : public QAction, public aPaintable
+	class UICORE_API_EXPORT aAction : public QAction, public aObject
 	{
 		Q_OBJECT
 	public:
@@ -62,13 +62,6 @@ namespace ak {
 
 		//! @brief Deconstructor
 		virtual ~aAction();
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *					_colorStyle
-		) override;
 
 		// #######################################################################################################
 

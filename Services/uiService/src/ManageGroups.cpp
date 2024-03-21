@@ -11,8 +11,6 @@
 #include <akWidgets/aCheckBoxWidget.h>
 #include <akWidgets/aPropertyGridWidget.h>
 
-#include <akGui/aColorStyle.h>
-
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -131,34 +129,6 @@ void ManageGroupsTable::leaveEvent(QEvent * _event) {
 	}
 }
 
-void ManageGroupsTable::setColorStyle(ak::aColorStyle *	_colorStyle) {
-	assert(_colorStyle != nullptr);
-
-	QString sheet = _colorStyle->toStyleSheet(ak::cafBackgroundColorControls | ak::cafForegroundColorControls,
-		"QTableWidget{", "selection-color: transparent; selection-background-color: transparent;}");
-
-	setShowGrid(false);
-	setStyleSheet(sheet);
-	my_colorBack = _colorStyle->getWindowMainBackgroundColor().toQColor();
-	my_colorFront = _colorStyle->getControlsMainForegroundColor().toQColor();
-	my_colorFocusBack = _colorStyle->getControlsFocusedBackgroundColor().toQColor();
-	my_colorFocusFront = _colorStyle->getControlsFocusedForegroundColor().toQColor();
-	my_colorSelectedBack = _colorStyle->getControlsPressedBackgroundColor().toQColor();
-	my_colorSelectedFront = _colorStyle->getControlsPressedForegroundColor().toQColor();
-
-	// Table header
-	sheet = _colorStyle->toStyleSheet(ak::cafForegroundColorHeader | ak::cafBackgroundColorHeader,
-		"QHeaderView{border: none;", "}\n");
-	sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorHeader |
-		ak::cafBackgroundColorHeader |
-		ak::cafDefaultBorderHeader | ak::cafBorderColorHeader
-		,
-		"QHeaderView::section{", "}"));
-	horizontalHeader()->setStyleSheet(sheet);
-	verticalHeader()->setStyleSheet(sheet);
-	slotSelectionChanged();
-}
-
 void ManageGroupsTable::slotSelectionChanged() {
 	my_selectedRow = -1;
 	disconnect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
@@ -196,7 +166,7 @@ void ManageGroupsTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetI
 // ####################################################################################################
 // Add group dialog
 
-addGroupDialog::addGroupDialog(ak::aColorStyle * _colorStyle, const std::string &authServerURL)
+addGroupDialog::addGroupDialog(const std::string &authServerURL)
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
@@ -235,8 +205,6 @@ addGroupDialog::addGroupDialog(ak::aColorStyle * _colorStyle, const std::string 
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
@@ -260,35 +228,6 @@ addGroupDialog::~addGroupDialog()
 }
 
 QString addGroupDialog::groupName(void) const { return my_input->text(); }
-
-void addGroupDialog::setColorStyle(ak::aColorStyle * _colorStyle) 
-{
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-	} else{
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-	}
-}
 
 void addGroupDialog::slotButtonConfirmPressed() 
 { 
@@ -364,7 +303,7 @@ void addGroupDialog::Close(void)
 // ####################################################################################################
 // Rename group dialog
 
-renameGroupDialog::renameGroupDialog(const std::string &groupName, ak::aColorStyle * _colorStyle, const std::string &authServerURL)
+renameGroupDialog::renameGroupDialog(const std::string &groupName, const std::string &authServerURL)
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
@@ -404,8 +343,6 @@ renameGroupDialog::renameGroupDialog(const std::string &groupName, ak::aColorSty
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
@@ -429,35 +366,6 @@ renameGroupDialog::~renameGroupDialog()
 QString renameGroupDialog::groupName(void) const 
 { 
 	return my_input->text(); 
-}
-
-void renameGroupDialog::setColorStyle(ak::aColorStyle * _colorStyle) 
-{
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-	} else{
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-	}
 }
 
 void renameGroupDialog::slotButtonConfirmPressed() 
@@ -697,24 +605,6 @@ ManageGroups::~ManageGroups()
 	m_centralLayout->deleteLater();
 }
 
-void ManageGroups::setColorStyle(ak::aColorStyle *_colorStyle) 
-{
-	aDialog::setColorStyle(_colorStyle);
-
-	if (m_btnClose) { m_btnClose->setColorStyle(m_colorStyle); }
-	if (m_btnAdd) { m_btnAdd->setColorStyle(m_colorStyle); }
-	if (m_btnRename) { m_btnRename->setColorStyle(m_colorStyle); }
-	if (m_btnOwner) { m_btnOwner->setColorStyle(m_colorStyle); }
-	if (m_btnDelete) { m_btnDelete->setColorStyle(m_colorStyle); }
-	if (m_labelGroups) { m_labelGroups->setColorStyle(m_colorStyle); }
-	if (m_labelMembers) { m_labelMembers->setColorStyle(m_colorStyle); }
-	if (m_filterGroups) { m_filterGroups->setColorStyle(m_colorStyle); }
-	if (m_filterMembers) { m_filterMembers->setColorStyle(m_colorStyle); }
-	if (m_groupsList) { m_groupsList->setColorStyle(m_colorStyle); }
-	if (m_membersList) { m_membersList->setColorStyle(m_colorStyle); }
-	if (m_showMembersOnly) { m_showMembersOnly->setColorStyle(m_colorStyle); }
-}
-
 // ####################################################################################################
 
 // Slots
@@ -726,7 +616,7 @@ void ManageGroups::slotClose(void)
 
 void ManageGroups::slotAddGroup(void)
 {
-	addGroupDialog dialog(aDialog::m_colorStyle, m_authServerURL);
+	addGroupDialog dialog(m_authServerURL);
 
 	dialog.exec();
 
@@ -746,7 +636,7 @@ void ManageGroups::slotRenameGroup(void)
 
 	std::string groupName = groupNameItem->text().toStdString();
 
-	renameGroupDialog dialog(groupName, aDialog::m_colorStyle, m_authServerURL);
+	renameGroupDialog dialog(groupName, m_authServerURL);
 
 	dialog.exec();
 
@@ -769,9 +659,7 @@ void ManageGroups::slotChangeGroupOwner(void)
 
 	ManageGroupOwner ownerManager(m_authServerURL, groupName, groupOwner);
 
-	ak::uiAPI::addPaintable(&ownerManager);
 	ownerManager.showDialog();
-	ak::uiAPI::removePaintable(&ownerManager);
 
 	fillGroupsList();
 }

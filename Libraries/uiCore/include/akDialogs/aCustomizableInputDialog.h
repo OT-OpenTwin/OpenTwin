@@ -33,17 +33,12 @@ namespace ak {
 	class aLabelWidget;
 	class aLineEditWidget;
 	class aTextEditWidget;
-	class aColorStyle;
-
+	
 	class UICORE_API_EXPORT aCustomizableInputDialog : public aDialog {
 		Q_OBJECT
 	public:
 		aCustomizableInputDialog(QWidget * _parent = (QWidget *) nullptr);
 		virtual ~aCustomizableInputDialog();
-
-		//! @brief Will set the current color style for this dialog and all controls
-		//! @param _style The color style to set
-		virtual void setColorStyle(aColorStyle * _style) override;
 
 		// ################################################################################################################
 

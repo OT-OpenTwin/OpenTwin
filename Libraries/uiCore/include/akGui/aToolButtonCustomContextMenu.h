@@ -14,7 +14,7 @@
 
  // AK header
 #include <akCore/globalDataTypes.h>
-#include <akGui/aPaintable.h>
+#include <akCore/aObject.h>
 
 // Qt header
 #include <qstring.h>					// QString
@@ -29,24 +29,13 @@ namespace ak {
 	class aContextMenuItem;
 	class aToolButtonWidget;
 
-	class UICORE_API_EXPORT aToolButtonCustomContextMenu : public QObject, public aPaintable {
+	class UICORE_API_EXPORT aToolButtonCustomContextMenu : public QObject, public aObject {
 		Q_OBJECT
 	public:
 
 		aToolButtonCustomContextMenu(aToolButtonWidget * _button);
 
 		virtual ~aToolButtonCustomContextMenu();
-
-		// #######################################################################################################
-
-		// Base class functions
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
 
 		// #######################################################################################################
 

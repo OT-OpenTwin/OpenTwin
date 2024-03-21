@@ -377,22 +377,6 @@ void Plot::setAxisQuantity(PlotDataset::axisQuantity _type) {
 	}
 }
 
-// ###########################################################################
-
-// Plot settings
-
-void Plot::SetStyleSheets(const std::string & _plotBackgroundSheet, const std::string & _xyPlot, const std::string & _xyCanvas, const QColor & _polarPlotColor, const QPen & _zoomerPen) {
-	m_centralWidget->setStyleSheet(_plotBackgroundSheet.c_str());
-	m_xyPlot->setStyleSheet(_xyPlot.c_str());
-	m_xyPlot->canvas()->setStyleSheet(_xyCanvas.c_str());
-	m_xyPlot->setZoomerPen(_zoomerPen);
-
-	m_polarPlot->setPlotBackground(_polarPlotColor);
-
-	m_xyPlot->RefreshWholePlot();
-	m_polarPlot->RefreshWholePlot();
-}
-
 // ########################################################################################
 
 // Private functions

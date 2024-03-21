@@ -25,7 +25,7 @@
 // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
-#include <akGui/aPaintable.h>
+#include <akCore/aObject.h>
 
 // Forward declaration
 class QWidget;
@@ -39,7 +39,6 @@ namespace tt { class TabToolbar; }
 namespace ak {
 
 	// Forward declaration
-	class aColorStyle;
 	class aIconManager;
 	class aMessenger;
 	class aObjectManager;
@@ -54,7 +53,7 @@ namespace ak {
 	//! @brief This class is used to manage a QMainWindow
 	//! It provides several functions to create and manipulate the UI
 	//! Also it will connect all created objects to the messaging system and will manage the UIDs of those objects.
-	class UICORE_API_EXPORT aWindowManager : public QObject, public aPaintable {
+	class UICORE_API_EXPORT aWindowManager : public QObject, public aObject {
 		Q_OBJECT
 	public:
 		// #############################################################################################################
@@ -64,21 +63,13 @@ namespace ak {
 		//! @brief Constructor
 		//! @param _messenger The global messenger used in this object
 		//! @param _uidManager The global UID manager used in this object
-		//! @param _colorStyle The color style for the UI
 		aWindowManager(
 			aMessenger *									_messenger,
-			aUidManager *									_uidManager,
-			aColorStyle *									_colorStyle = nullptr
+			aUidManager *									_uidManager
 		);
 
 		//! @brief Deconstructor
 		virtual ~aWindowManager();
-
-		//! @brief Will set the provided color style as the current color style and apply the changes to all childs
-		//! @param _colorStyle The color style to set
-		virtual void setColorStyle(
-			aColorStyle *								_colorStyle
-		) override;
 
 		//! @brief Will remove the child from this object (not destroy it)
 			//! This function should be called from the deconstructor of a child

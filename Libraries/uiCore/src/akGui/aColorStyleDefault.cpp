@@ -9,7 +9,7 @@
  *	This file is subject to the terms and conditions defined in
  *	file 'LICENSE', which is part of this source code package.
  */
-
+/*
 // AK header
 #include <akGui/aColorStyleDefault.h>
 #include <akCore/aException.h>
@@ -60,3 +60,4 @@ QString ak::aColorStyleDefault::getFilePath(
 ) const {
 	return "";
 }
+*/

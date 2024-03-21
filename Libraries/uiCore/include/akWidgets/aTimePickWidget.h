@@ -47,13 +47,6 @@ namespace ak {
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
 
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *	_colorStyle
-		) override;
-
 		// #############################################################################################################################
 
 		// Getter
@@ -122,17 +115,6 @@ namespace ak {
 		aTimePickDialog(aTimePickWidget * _owner, timeFormat _timeFormat = tfHHMM);
 		aTimePickDialog(const aTime & _time, aTimePickWidget * _owner, timeFormat _timeFormat = tfHHMM);
 		virtual ~aTimePickDialog();
-
-		// #############################################################################################################################
-
-		// Base Class function
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *	_colorStyle
-		) override;
 
 		// #############################################################################################################################
 

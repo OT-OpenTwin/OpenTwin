@@ -54,9 +54,7 @@ namespace ak {
 	class aNotifier;
 	class aUidManager;
 	class aFile;
-	class aPaintable;
 	class aObjectManager;
-	class aColorStyle;
 	class aIconManager;
 	class aWindowEventHandler;
 	
@@ -179,34 +177,6 @@ namespace ak {
 		//! @brief Will return the disabled event types that will be send
 		UICORE_API_EXPORT std::vector<eventType> disabledEventTypes(void);
 
-		/*
-		//! @brief Will create and return a JSON string representing the UI
-		UICORE_API_EXPORT std::string saveStateWindow(
-			const std::string &					_applicationVersion
-		);
-		*/
-
-		//! @brief Will create and return a JSON string representing the currently set ColorStyle
-		UICORE_API_EXPORT std::string saveStateColorStyle(
-			const std::string &					_applicationVersion
-		);
-
-		/*
-		//! @brief Will setup the UI with the settings provided in the settings JSON string
-		//! @param _json The JSON string containing the settings
-		UICORE_API_EXPORT settingsRestoreErrorCode restoreStateWindow(
-			const std::string &					_json,
-			const std::string &					_applicationVersion
-		);
-		*/
-
-		//! @brief Will restore tthe color style from the settings JSON string
-		//! @param _json The JSON string containing the settings
-		UICORE_API_EXPORT bool restoreStateColorStyle(
-			const std::string &					_json,
-			const std::string &					_applicationVersion
-		);
-
 		//! @brief Will return the QWidget of the specifed object
 		//! @param _objectUid The UID of the object
 		UICORE_API_EXPORT QWidget * getWidget(
@@ -224,14 +194,6 @@ namespace ak {
 
 		//! @brief Will return the application that was created by this API
 		UICORE_API_EXPORT aApplication * getApplication(void);
-
-		//! @brief Will add the provided object to the paintable list
-		//! @param _object The object to add
-		UICORE_API_EXPORT void addPaintable(aPaintable * _object);
-
-		//! @brief Will remove the object from the paintable list
-		//! @param _object The object to remove
-		UICORE_API_EXPORT void removePaintable(aPaintable * _object);
 
 		// ###############################################################################################################################################
 		
@@ -354,42 +316,6 @@ namespace ak {
 			UID									_creatorUid,
 			const aColor &						_color,
 			const QString &						_textOverride = QString("")
-		);
-
-		//! @brief Will create a new ColorStyleSwitch and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _brightModeTitle The title of the switch when the next color style is the bright mode
-		//! @param _darkModeTitle The title of the switch when the next color style is the bright mode
-		//! @param _brightModeIcon The icon of the switch when the next color style is the bright mode
-		//! @param _darkModeIcon The icon of the switch when the next color style is the bright mode
-		//! @param _isBright The current color style state
-		UICORE_API_EXPORT UID createColorStyleSwitch(
-			UID						_creatorUid,
-			const QString &			_brightModeTitle,
-			const QString &			_darkModeTitle,
-			const QIcon &			_brightModeIcon,
-			const QIcon &			_darkModeIcon,
-			bool					_isBright = true
-		);
-
-		//! @brief Will create a new ColorStyleSwitch and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _brightModeTitle The title of the switch when the next color style is the bright mode
-		//! @param _darkModeTitle The title of the switch when the next color style is the bright mode
-		//! @param _brightModeIconName The icon name of the switch when the next color style is the bright mode
-		//! @param _brightModeIconFolder The icon folder of the switch when the next color style is the bright mode
-		//! @param _darkModeIconName The icon name of the switch when the next color style is the bright mode
-		//! @param _darkModeIconFolder The icon folder of the switch when the next color style is the bright mode
-		//! @param _isBright The current color style state
-		UICORE_API_EXPORT UID createColorStyleSwitch(
-			UID						_creatorUid,
-			const QString &			_brightModeTitle,
-			const QString &			_darkModeTitle,
-			const QString &			_brightModeIconName,
-			const QString &			_brightModeIconFolder,
-			const QString &			_darkModeIconName,
-			const QString &			_darkModeIconFolder,
-			bool					_isBright = true
 		);
 
 		//! @brief Will create a new ComboBox and return its UID
@@ -721,32 +647,6 @@ namespace ak {
 
 			UICORE_API_EXPORT bool isEnabled(
 				UID								_checkBoxUID
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
-		// Color switch
-	
-		namespace colorStyleSwitch {
-
-			UICORE_API_EXPORT void setAutoSetColorStyle(
-				UID				_switchUid,
-				bool			_enabled
-			);
-
-			UICORE_API_EXPORT bool isAutoSetColorStyle(
-				UID				_switchUid
-			);
-
-			UICORE_API_EXPORT void setCurrentIsBright(
-				UID				_switchUid,
-				bool			_isBright
-			);
-
-			UICORE_API_EXPORT bool isCurrentBright(
-				UID				_switchUid
 			);
 
 		}
@@ -2690,43 +2590,9 @@ namespace ak {
 			UID									_creatorUid
 		);
 
-		//! @brief Will add the color style to the API
-		//! @param _colorStyle The color style to add
-		//! @param _activate If true, the provided color style will be set as current color style
-		UICORE_API_EXPORT void addColorStyle(
-			ak::aColorStyle *					_colorStyle,
-			bool									_activate
-		);
-
-		//! @brief Will set the color style with the specified name as current color style
-		UICORE_API_EXPORT void setColorStyle(
-			const QString &				_colorStyleName
-		);
-
-		//! @brief Will return the current color style
-		UICORE_API_EXPORT ak::aColorStyle * getCurrentColorStyle(void);
-
-		UICORE_API_EXPORT QString getCurrentColorStyleName(void);
-
-		//! @brief Will set the current color style to the default dark color style
-		UICORE_API_EXPORT void setDefaultDarkColorStyle(void);
-
-		//! @brief Will set the current color style to the default bright color style
-		UICORE_API_EXPORT void setDefaultColorStyle(void);
-
-		//! @brief Will set the current color style to the default blue color style
-		UICORE_API_EXPORT void setDefaultBlueColorStyle(void);
-
 		// ###############################################################################################################################################
 
 		// parameters
-
-		//! @brief Will add the provided search path to the icon manager
-		//! @param _path The search path to add
-		//! @throw ak::Exception if the API is not initialized
-		UICORE_API_EXPORT void addIconSearchPath(
-			const QString &											_path
-		);
 
 		//! @brief Will generate a new UID and return it
 		//! @throw ak::Exception if the API is not initialized

@@ -9,8 +9,6 @@
 #include <akWidgets/aCheckBoxWidget.h>
 #include <akWidgets/aPropertyGridWidget.h>
 
-#include <akGui/aColorStyle.h>
-
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -128,34 +126,6 @@ void ManageAccessTable::leaveEvent(QEvent * _event) {
 			}
 		}
 	}
-}
-
-void ManageAccessTable::setColorStyle(ak::aColorStyle *	_colorStyle) {
-	assert(_colorStyle != nullptr);
-
-	QString sheet = _colorStyle->toStyleSheet(ak::cafBackgroundColorControls | ak::cafForegroundColorControls,
-		"QTableWidget{", "selection-color: transparent; selection-background-color: transparent;}");
-
-	setShowGrid(false);
-	setStyleSheet(sheet);
-	my_colorBack = _colorStyle->getWindowMainBackgroundColor().toQColor();
-	my_colorFront = _colorStyle->getControlsMainForegroundColor().toQColor();
-	my_colorFocusBack = _colorStyle->getControlsFocusedBackgroundColor().toQColor();
-	my_colorFocusFront = _colorStyle->getControlsFocusedForegroundColor().toQColor();
-	my_colorSelectedBack = _colorStyle->getControlsPressedBackgroundColor().toQColor();
-	my_colorSelectedFront = _colorStyle->getControlsPressedForegroundColor().toQColor();
-
-	// Table header
-	sheet = _colorStyle->toStyleSheet(ak::cafForegroundColorHeader | ak::cafBackgroundColorHeader,
-		"QHeaderView{border: none;", "}\n");
-	sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorHeader |
-		ak::cafBackgroundColorHeader |
-		ak::cafDefaultBorderHeader | ak::cafBorderColorHeader
-		,
-		"QHeaderView::section{", "}"));
-	horizontalHeader()->setStyleSheet(sheet);
-	verticalHeader()->setStyleSheet(sheet);
-	slotSelectionChanged();
 }
 
 void ManageAccessTable::slotSelectionChanged() {
@@ -276,17 +246,6 @@ ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &
 ManageAccess::~ManageAccess() 
 {
 	m_centralLayout->deleteLater();
-}
-
-void ManageAccess::setColorStyle(ak::aColorStyle *_colorStyle) 
-{
-	aDialog::setColorStyle(_colorStyle);
-
-	if (m_btnClose) { m_btnClose->setColorStyle(m_colorStyle); }
-	if (m_labelGroups) { m_labelGroups->setColorStyle(m_colorStyle); }
-	if (m_filterGroups) { m_filterGroups->setColorStyle(m_colorStyle); }
-	if (m_groupsList) { m_groupsList->setColorStyle(m_colorStyle); }
-	if (m_showGroupsWithAccessOnly) { m_showGroupsWithAccessOnly->setColorStyle(m_colorStyle); }
 }
 
 // ####################################################################################################

@@ -10,6 +10,8 @@
  *	file 'LICENSE', which is part of this source code package.
  */
 
+/*
+
 // AK header
 #include <akGui/aColorStyleDefaultDark.h>
 #include <akCore/aException.h>
@@ -48,17 +50,6 @@ QString ak::aColorStyleDefaultDark::getColorStyleName(void) const { return aColo
 QString ak::aColorStyleDefaultDark::colorStyleName(void) {
 	return QString("Default_Dark");
 }
-
-/*
-#define _borderDefaultControl "border-style: outset;border-width: 1px; border-radius: 0px;border-color: #707070;"
-#define _borderDefaultWindow "border-style: outset;border-width: 1px; border-radius: 0px;border-color: #707070;"
-#define _borderDefaultOsgTabWidget "border-style: outset;border-width: 1px; border-radius: 0px;border-color: #707070;"
-#define _borderDefaultTabWidget "border-top: 1px solid #707070;border-bottom: 1px solid #707070;"
-#define _borderDefaultMdiSubwindow "border-style: outset;border-width: 1px;"
-#define _borderButtonNormal "border-style: outset;border-width: 1px; border-radius: 0px; border-color: #c0c0c0;padding: 2px;"
-#define _borderButtonPressed "border-style: inset;border-width: 1px; border-radius: 0px; border-color: #000000;padding: 2px;"
-#define _borderButtonFocus "border-style: outset;border-width: 1px; border-radius: 0px; border-color: #5050e0;padding: 2px;"
-*/
 
 #define STYLE_COLOR_BACK_ALTERNATE "alternate-background-color:#454545;"
 #define STYLE_COLOR_BACK_CONTROLS "background-color: #303030;"
@@ -127,3 +118,5 @@ QString ak::aColorStyleDefaultDark::toStyleSheet(
 	ret.append(_suffix);
 	return ret;
 }
+
+*/

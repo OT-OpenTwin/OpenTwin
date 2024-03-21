@@ -22,8 +22,6 @@
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aSpinBoxWidget.h>
 
-#include <akGui/aCustomizableColorStyle.h>
-
 // Qt header
 #include <qlayout.h>
 
@@ -90,46 +88,6 @@ ak::aPropertyGridWidget::~aPropertyGridWidget() {
 
 // Base class functions
 
-void ak::aPropertyGridWidget::setColorStyle(
-	aColorStyle *		_colorStyle
-) {
-	m_colorStyle = _colorStyle;
-
-	//m_table->setColorStyle(m_colorStyle);
-	m_label->setColorStyle(m_colorStyle);
-
-	for (auto group : m_groups) {
-		group.second->repaint();
-	}
-
-	if (m_items.size() == 0) {
-		QString sheet = m_colorStyle->toStyleSheet(cafDefaultBorderControls, "#AK_aPropertyGrid_CentralLayoutW {", "}");
-		if (sheet.isEmpty()) {
-			sheet = "#AK_aPropertyGrid_CentralLayoutW {border-width: 1px; border-style: solid; border-color: #";
-			sheet.append(m_colorStyle->getControlsBorderColor().toHexString(true)).append("; }");
-		}
-		m_centralLayoutW->setStyleSheet(sheet);
-	}
-	else {
-		m_centralLayoutW->setStyleSheet("#AK_aPropertyGrid_CentralLayoutW {border-width: 0px; }");
-	}
-
-	{
-		QString sheet = "QHeaderView::section { color: #";
-		sheet.append(m_colorStyle->getHeaderForegroundColor().toHexString(true));
-		sheet.append("; background-color: #");
-		sheet.append(m_colorStyle->getHeaderBackgroundColor().toHexString(true));
-		sheet.append("; }");
-		sheet.append("QHeaderView::section:selected { color: #");
-		sheet.append(m_colorStyle->getHeaderForegroundColor().toHexString(true));
-		sheet.append("; background-color: #");
-		sheet.append(m_colorStyle->getHeaderBackgroundColor().toHexString(true));
-		sheet.append("; }");
-		m_table->horizontalHeader()->setStyleSheet(sheet);
-	}
-	m_table->setColorStyle(m_colorStyle);
-}
-
 // ##############################################################################################
 
 // Item creation
@@ -141,9 +99,6 @@ void ak::aPropertyGridWidget::addGroup(const QString& _groupName, const aColor& 
 		return;
 	}
 	aPropertyGridGroup * g = new aPropertyGridGroup(this, _groupName, _groupColor, _foregroundColor, _errorColor);
-	if (m_colorStyle) {
-			
-	}
 	g->refreshStateIcons();
 
 	m_groups.insert_or_assign(_groupName, g);
@@ -374,17 +329,7 @@ void ak::aPropertyGridWidget::updateTableVisibility(void) {
 		m_centralLayout->addWidget(m_stretch, 1);
 		m_table->setVisible(false);
 
-		if (m_colorStyle) {
-			QString sheet = m_colorStyle->toStyleSheet(cafDefaultBorderControls, "#AK_aPropertyGrid_CentralLayoutW {", "}");
-			if (sheet.isEmpty()) {
-				sheet = "#AK_aPropertyGrid_CentralLayoutW {border-width: 1px; border-style: solid; border-color: #";
-				sheet.append(m_colorStyle->getControlsBorderColor().toHexString(true)).append("; }");
-			}
-			m_centralLayoutW->setStyleSheet(sheet);
-		}
-		else {
-			m_centralLayoutW->setStyleSheet("#AK_aPropertyGrid_CentralLayoutW {border-width: 1px; border-style: solid; border-color: black; }");
-		}
+		m_centralLayoutW->setStyleSheet("#AK_aPropertyGrid_CentralLayoutW {border-width: 1px; border-style: solid; border-color: black; }");
 	}
 	else if (m_items.size() > 0 && !m_table->isVisible()) {
 		m_centralLayoutW->setStyleSheet("#AK_aPropertyGrid_CentralLayoutW {border-width: 0px; }");
@@ -605,8 +550,6 @@ ak::aPropertyGridItem::~aPropertyGridItem() {
 		break;
 	}
 	delete m_nameItem;
-	delete m_colorStyle;
-	delete m_colorStyleError;
 }
 
 // ##############################################################################################
@@ -675,7 +618,6 @@ void ak::aPropertyGridItem::setColor(const aColor& _normalForeground, const aCol
 	m_nameItem->setBackground(m_colorBackground.toQColor());
 	m_nameItem->setForeground(m_colorNormal.toQColor());
 	m_ignoreEvent = false;
-	rebuildStylesheet();
 	setErrorState(m_isError, true);
 }
 
@@ -804,52 +746,7 @@ void ak::aPropertyGridItem::setErrorState(bool _isError, bool _forceRepaint) {
 	m_isError = _isError;
 	m_ignoreEvent = true;
 
-	if (m_isError) {
-		switch (m_valueType)
-		{
-		case ak::vtBool: m_cBool->setColorStyle(m_colorStyleError); break;
-		case ak::vtColor: m_cColor->setColorStyle(m_colorStyleError); break;
-		case ak::vtDate: m_cDate->setColorStyle(m_colorStyleError); break;
-		case ak::vtSelection: m_cSelection->setColorStyle(m_colorStyleError); break;
-		case ak::vtTime: m_cTime->setColorStyle(m_colorStyleError); break;
-		case ak::vtInt:
-			if (m_numberInputMode == NumericUpDown) {
-				m_cInt->setColorStyle(m_colorStyleError);
-				break;
-			}
-		case ak::vtDouble:
-		case ak::vtString:
-			m_textItem->setForeground(m_colorError.toQColor());
-			m_textItem->setBackground(m_colorBackground.toQColor());
-			break;
-		default:
-			assert(0);
-			break;
-		}
-	}
-	else {
-		switch (m_valueType)
-		{
-		case ak::vtBool: m_cBool->setColorStyle(m_colorStyle); break;
-		case ak::vtColor: m_cColor->setColorStyle(m_colorStyle); break;
-		case ak::vtDate: m_cDate->setColorStyle(m_colorStyle); break;
-		case ak::vtSelection: m_cSelection->setColorStyle(m_colorStyle); break;
-		case ak::vtTime: m_cTime->setColorStyle(m_colorStyle); break;
-		case ak::vtInt:
-			if (m_numberInputMode == NumericUpDown) {
-				m_cInt->setColorStyle(m_colorStyle);
-				break;
-			}
-		case ak::vtDouble:
-		case ak::vtString:
-			m_textItem->setForeground(m_colorNormal.toQColor());
-			m_textItem->setBackground(m_colorBackground.toQColor());
-			break;
-		default:
-			assert(0);
-			break;
-		}
-	}
+	
 	m_ignoreEvent = false;
 }
 
@@ -1017,23 +914,6 @@ void ak::aPropertyGridItem::ini(void) {
 	m_colorError.setRGBA(255, 0, 0);
 	m_colorNormal.setRGBA(0, 0, 0);
 
-	// Create color styles
-	m_colorStyle = new aCustomizableColorStyle;
-	m_colorStyleError = new aCustomizableColorStyle;
-
-	rebuildStylesheet();
-
-	// Set default color style parameter that depend on on a global color style when set
-	m_colorStyle->setSheet(cafBackgroundColorFocus, m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorSelected, m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorFocus, m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorSelected, m_colorNormal.toHexString(true));
-
-	m_colorStyleError->setSheet(cafBackgroundColorFocus, m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorSelected, m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorFocus, m_colorNormal.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorSelected, m_colorNormal.toHexString(true));
-
 	// Create new row
 	m_table->insertRow(m_row);
 
@@ -1060,7 +940,6 @@ void ak::aPropertyGridItem::ini(void) {
 		if (m_isMultipleValues) { m_cBool->setCheckState(Qt::PartiallyChecked); }
 		else { m_cBool->setChecked(m_vBool); }
 		m_cBool->setPaintBackground(true);
-		//m_cBool->setColorStyle(m_colorStyle);
 		m_table->setCellWidget(m_row, tcValue, m_cBool);
 		// Connect callback
 		connect(m_cBool, &aCheckBoxWidget::stateChanged, this, &aPropertyGridItem::slotValueBoolChanged);
@@ -1069,7 +948,6 @@ void ak::aPropertyGridItem::ini(void) {
 		// Create and setup widget
 		m_cColor = new aColorEditButtonWidget(m_vColor);
 		if (m_isMultipleValues) { m_cColor->overrideText("..."); }
-		m_cColor->setColorStyle(m_colorStyle);
 		m_table->setCellWidget(m_row, tcValue, m_cColor->widget());
 		// Connect callback
 		connect(m_cColor, &aColorEditButtonWidget::changed, this, &aPropertyGridItem::slotValueChanged);
@@ -1078,7 +956,6 @@ void ak::aPropertyGridItem::ini(void) {
 		// Create and setup widget
 		m_cDate = new aDatePickWidget(m_vDate, m_vDateFormat);
 		if (m_isMultipleValues) { m_cDate->setText("..."); }
-		m_cDate->setColorStyle(m_colorStyle);
 		m_table->setCellWidget(m_row, tcValue, m_cDate);
 		// Connect callback
 		connect(m_cDate, &aDatePickWidget::changed, this, &aPropertyGridItem::slotValueChanged);
@@ -1112,7 +989,6 @@ void ak::aPropertyGridItem::ini(void) {
 			if (m_isMultipleValues) {
 				m_cInt->setSpecialValueText("...");
 			}
-			m_cInt->setColorStyle(m_colorStyle);
 			m_table->setCellWidget(m_row, tcValue, m_cInt);
 			// Connect callback
 			connect(m_cInt, &aSpinBoxWidget::editingFinished, this, &aPropertyGridItem::slotValueChanged);
@@ -1124,7 +1000,6 @@ void ak::aPropertyGridItem::ini(void) {
 		m_cSelection = new aComboButtonWidget(m_vSelection);
 		m_cSelection->setItems(m_vSelectionPossible);
 		if (m_isMultipleValues) { m_cSelection->setText("..."); }
-		m_cSelection->setColorStyle(m_colorStyle);
 		m_table->setCellWidget(m_row, tcValue, m_cSelection);
 		// Connect callback
 		connect(m_cSelection, &aComboButtonWidget::changed, this, &aPropertyGridItem::slotValueChanged);
@@ -1143,7 +1018,6 @@ void ak::aPropertyGridItem::ini(void) {
 		// Create and setup widget
 		m_cTime = new aTimePickWidget(m_vTime, m_vTimeFormat);
 		if (m_isMultipleValues) { m_cTime->setText("..."); }
-		m_cTime->setColorStyle(m_colorStyle);
 		m_table->setCellWidget(m_row, tcValue, m_cTime);
 		// Connect callback
 		connect(m_cTime, &aTimePickWidget::changed, this, &aPropertyGridItem::slotValueChanged);
@@ -1202,73 +1076,4 @@ void ak::aPropertyGridItem::updateEditability(void) {
 	m_ignoreEvent = false;
 }
 
-void ak::aPropertyGridItem::rebuildStylesheet(void) {
-	// Normal color
-	m_colorStyle->setSheet(cafForegroundColorControls, "color: #" + m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorButton, "color: #" + m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorWindow, "color: #" + m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorDialogWindow, "color: #" + m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorError, "color: #" + m_colorError.toHexString(true));
-	m_colorStyle->setSheet(cafForegroundColorHeader, "color: #" + m_colorNormal.toHexString(true));
-	
-	m_colorStyle->setSheet(cafBackgroundColorAlternate, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorControls, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorButton, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorWindow, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorDialogWindow, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorHeader, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyle->setSheet(cafBackgroundColorTransparent, "background-color: transparent");
-
-	m_colorStyle->setSheet(cafBorderColorControls, "border-color: #" + m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafBorderColorHeader, "border-color: #" + m_colorNormal.toHexString(true));
-	m_colorStyle->setSheet(cafBorderColorWindow, "border-color: #" + m_colorNormal.toHexString(true));
-
-	// Error color
-	m_colorStyleError->setSheet(cafForegroundColorControls, "color: #" + m_colorError.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorButton, "color: #" + m_colorError.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorWindow, "color: #" + m_colorError.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorDialogWindow, "color: #" + m_colorError.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorError, "color: #" + m_colorError.toHexString(true));
-	m_colorStyleError->setSheet(cafForegroundColorHeader, "color: #" + m_colorError.toHexString(true));
-
-	m_colorStyleError->setSheet(cafBackgroundColorAlternate, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorControls, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorButton, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorWindow, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorDialogWindow, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorHeader, "background-color: #" + m_colorBackground.toHexString(true));
-	m_colorStyleError->setSheet(cafBackgroundColorTransparent, "background-color: transparent");
-
-	m_colorStyleError->setSheet(cafBorderColorControls, "border-color: #" + m_colorNormal.toHexString(true));
-	m_colorStyleError->setSheet(cafBorderColorHeader, "border-color: #" + m_colorNormal.toHexString(true));
-	m_colorStyleError->setSheet(cafBorderColorWindow, "border-color: #" + m_colorNormal.toHexString(true));
-}
-
-/*
-
-switch (m_valueType)
-	{
-	case ak::vtBool:
-		break;
-	case ak::vtColor:
-		break;
-	case ak::vtDate:
-		break;
-	case ak::vtDouble:
-		break;
-	case ak::vtInt:
-		break;
-	case ak::vtSelection:
-		break;
-	case ak::vtString:
-		break;
-	case ak::vtTime:
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-
-*/
 

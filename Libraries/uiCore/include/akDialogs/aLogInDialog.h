@@ -66,11 +66,6 @@ namespace ak {
 		//! @brief Deconstructor
 		virtual ~aLogInDialog();
 
-		//! @brief Will set the current color style for this dialog
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
-
 		virtual void paintEvent(QPaintEvent * _event) override;
 
 		void setReturnHashedPassword(bool flag) { m_returnHashedPassword = flag; };
@@ -231,11 +226,6 @@ namespace ak {
 		// #############################################################################################################
 
 		// Setter
-
-		//! @brief Will set the current color style for this combination
-		void setColorStyle(
-			aColorStyle *		_colorStyle
-		);
 
 	private:
 		aLineEditWidget *			m_input;

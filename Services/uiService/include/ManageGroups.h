@@ -38,10 +38,6 @@ public:
 
 	virtual void leaveEvent(QEvent * _event) override;
 
-	void setColorStyle(
-		ak::aColorStyle *				_colorStyle
-	);
-
 	void getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second);
 
 signals:
@@ -73,14 +69,12 @@ class QHBoxLayout;
 class addGroupDialog : public QDialog {
 	Q_OBJECT
 public:
-	addGroupDialog(ak::aColorStyle * _colorStyle, const std::string &authServerURL);
+	addGroupDialog(const std::string &authServerURL);
 	virtual ~addGroupDialog();
 
 	inline QString groupName(void) const;
 
 	bool wasConfirmed(void) const { return my_confirmed; }
-
-	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 signals:
 	void isClosing(void);
@@ -119,14 +113,12 @@ private:
 class renameGroupDialog : public QDialog {
 	Q_OBJECT
 public:
-	renameGroupDialog(const std::string &groupName, ak::aColorStyle * _colorStyle, const std::string &authServerURL);
+	renameGroupDialog(const std::string &groupName, const std::string &authServerURL);
 	virtual ~renameGroupDialog();
 
 	inline QString groupName(void) const;
 
 	bool wasConfirmed(void) const { return my_confirmed; }
-
-	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 signals:
 	void isClosing(void);
@@ -182,8 +174,6 @@ public:
 	//virtual void closeEvent(QCloseEvent * _event) override;
 
 	//void clearInvalidEntries(void);
-
-	virtual void setColorStyle(ak::aColorStyle *_colorStyle) override;
 
 public slots:
 	void slotClose(void);

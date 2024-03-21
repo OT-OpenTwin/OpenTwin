@@ -11,7 +11,6 @@
  */
 
 #include <akWidgets/aGraphicsWidget.h>
-#include <akGui/aColorStyle.h>
 #include <qevent.h>
 
 ak::aGraphicsWidget::aGraphicsWidget()
@@ -21,14 +20,6 @@ ak::aGraphicsWidget::aGraphicsWidget()
 ak::aGraphicsWidget::~aGraphicsWidget() { A_OBJECT_DESTROYING }
 
 QWidget * ak::aGraphicsWidget::widget(void) { return this; }
-
-void ak::aGraphicsWidget::setColorStyle(
-	aColorStyle *					_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	setStyleSheet(m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls));
-}
 
 void ak::aGraphicsWidget::resizeEvent(QResizeEvent *_event) {
 	if (m_heightForWidth) {

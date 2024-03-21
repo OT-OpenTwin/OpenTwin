@@ -16,9 +16,6 @@
 // AK Core header
 #include <akCore/aAbstractDictionary.h>
 
-// AK GUI header
-#include <akGui/aColorStyle.h>
-
 // AK Widgets header
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
@@ -69,19 +66,6 @@ ak::aPromptDialog::~aPromptDialog() {
 	if (m_buttonsWidget != nullptr) { delete m_buttonsWidget; }
 
 	//if (m_layout != nullptr) { delete m_layout; }
-}
-
-void ak::aPromptDialog::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	aDialog::setColorStyle(_colorStyle);
-
-	if (m_button1 != nullptr) { m_button1->setColorStyle(m_colorStyle); }
-	if (m_button2 != nullptr) { m_button2->setColorStyle(m_colorStyle); }
-	if (m_button3 != nullptr) { m_button3->setColorStyle(m_colorStyle); }
-
-	if (m_label != nullptr) { m_label->setColorStyle(m_colorStyle); }
-
 }
 
 void ak::aPromptDialog::translateControls(aAbstractDictionary * _dictionary) {

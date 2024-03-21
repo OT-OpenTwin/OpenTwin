@@ -893,22 +893,6 @@ void ViewerComponent::prefetchDocumentsFromStorage(const std::string &projectNam
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::setPlotStyles(const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen) {
-	ViewerAPI::setPlotStyles(_plotBackgroundSheet, _xyPlotStyleSheet, _xyCanvasStyleSheet, _polarPlotColor, _zoomerPen);
-}
-
-void ViewerComponent::setPlotStyle(ViewerUIDtype visualizationModelID, const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen) {
-	ViewerAPI::setPlotStyle(visualizationModelID, _plotBackgroundSheet, _xyPlotStyleSheet, _xyCanvasStyleSheet, _polarPlotColor, _zoomerPen);
-}
-
-void ViewerComponent::setVersionGraphStyles(const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor) {
-	ViewerAPI::setVersionGraphStyles(_plotBackgroundSheet, _foregroundColor, _boxColor, _highlightBoxColor, _highlightForegroundColor);
-}
-
-void ViewerComponent::setVersionGraphStyle(ViewerUIDtype visualizationModelID, const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor) {
-	ViewerAPI::setVersionGraphStyle(visualizationModelID, _plotBackgroundSheet, _foregroundColor, _boxColor, _highlightBoxColor, _highlightForegroundColor);
-}
-
 QWidget * ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getPlotWidget(_viewerID);
 }

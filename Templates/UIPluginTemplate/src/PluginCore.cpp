@@ -2,7 +2,6 @@
 
 #include <openTwin/AbstractUIWidgetInterface.h>
 
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aTextEditWidget.h>
 
 #include <qtextedit.h>
@@ -48,10 +47,6 @@ bool PluginCore::dispatchAction(const std::string& _action, const std::string& _
 
 	// Return true: Initialization successful
 	return true;
-}
-
-void PluginCore::setColorstye(ak::aColorStyle * _colorStyle) {
-	m_textEdit->setColorStyle(_colorStyle);
 }
 
 // ##############################################################################################

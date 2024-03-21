@@ -15,26 +15,22 @@
 // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
-#include <akGui/aPaintable.h>
+#include <akCore/aObject.h>
 
 // Forward declaration
 class QWidget;
 
 namespace ak {
 
-	// Forward declaration
-	class aColorStyle;
-
 	//! This class provides a interface that represents a widget.
 	//! Every class derived from this class must be able to provide a QWidget that is representing it
-	class UICORE_API_EXPORT aWidget : public aPaintable {
+	class UICORE_API_EXPORT aWidget : public aObject {
 	public:
 		//! @brief Constructor
+		//! @param _type Object type
 		//! @param _UID The initial UID of this object
-		//! @param _colorStyle The initial color style used in this paintable
 		aWidget(
 			objectType			_type = otNone,
-			aColorStyle *		_colorStyle = nullptr,
 			UID					_UID = invalidUID
 		);
 

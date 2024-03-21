@@ -13,16 +13,15 @@
 // AK header
 #include <akCore/aException.h>
 #include <akCore/aMessenger.h>
-#include <akGui/aColorStyle.h>
 #include <akGui/aTtbContainer.h>
 
 ak::aTtbContainer::aTtbContainer(
 	aMessenger *			_messenger,
 	objectType				_type,
-	aColorStyle *		_colorStyle,
 	UID						_uid
-) : aPaintable(_type, _colorStyle, _uid),
-	m_messenger(nullptr)
+) : aObject(_type, _uid),
+	m_messenger(nullptr),
+	m_isEnabled(true)
 {
 	assert(_messenger != nullptr); // Is nullptr
 	m_messenger = _messenger;

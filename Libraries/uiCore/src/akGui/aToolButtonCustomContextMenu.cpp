@@ -13,12 +13,11 @@
 #include <akGui/aToolButtonCustomContextMenu.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akGui/aContextMenuItem.h>
-#include <akGui/aColorStyle.h>
 #include <akCore/aAssert.h>
 #include <qmenu.h>
 
 ak::aToolButtonCustomContextMenu::aToolButtonCustomContextMenu(aToolButtonWidget * _button) 
-	: aPaintable(otToolButtonCustomContextMenu), m_button(_button), m_itemId(invalidID)
+	: aObject(otToolButtonCustomContextMenu), m_button(_button), m_itemId(invalidID)
 {
 	m_menu = new QMenu;
 	m_button->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -27,21 +26,6 @@ ak::aToolButtonCustomContextMenu::aToolButtonCustomContextMenu(aToolButtonWidget
 
 ak::aToolButtonCustomContextMenu::~aToolButtonCustomContextMenu() {
 
-}
-
-// #######################################################################################################
-
-// Base class functions
-
-void ak::aToolButtonCustomContextMenu::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	m_colorStyle = _colorStyle;
-	QString sheet = m_colorStyle->toStyleSheet(cafForegroundColorDialogWindow | cafBackgroundColorDialogWindow, "QMenu{", "}");
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorDialogWindow | cafBackgroundColorDialogWindow, "QMenu::item{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus | cafBackgroundColorFocus, "QMenu::item:selected{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected | cafBackgroundColorSelected, "QMenu::item:pressed{", "}"));
-	m_menu->setStyleSheet(sheet);
 }
 
 // #######################################################################################################

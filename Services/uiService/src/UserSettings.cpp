@@ -5,8 +5,6 @@
 #include "OTCore/OTAssert.h"
 
 #include <akAPI/uiAPI.h>
-#include <akGui/aColorStyleDefaultDark.h>
-#include <akGui/aColorStyleDefaultBlue.h>
 #include <akDialogs/aOptionsDialog.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aComboBoxWidget.h>
@@ -65,13 +63,9 @@ void UserSettings::showDialog(void) {
 		}
 	}
 
-	uiAPI::addPaintable(m_dialog);
-
 	connect(m_dialog, &aOptionsDialog::itemChanged, this, &UserSettings::slotItemChanged);
 	m_dialog->showDialog(AppBase::instance()->mainWindow());
 	disconnect(m_dialog, &aOptionsDialog::itemChanged, this, &UserSettings::slotItemChanged);
-
-	uiAPI::removePaintable(m_dialog);
 
 	delete m_dialog;
 	m_dialog = nullptr;
@@ -100,7 +94,6 @@ void UserSettings::showDialog(const QString& _group) {
 		}
 	}
 
-	uiAPI::addPaintable(m_dialog);
 	connect(m_dialog, &aOptionsDialog::itemChanged, this, &UserSettings::slotItemChanged);
 
 	aOptionsGroup * highlightGroup = m_dialog->findGroupByLogicalName(_group, ":");
@@ -111,8 +104,6 @@ void UserSettings::showDialog(const QString& _group) {
 		m_dialog->showDialog(AppBase::instance()->mainWindow());
 	}
 	disconnect(m_dialog, &aOptionsDialog::itemChanged, this, &UserSettings::slotItemChanged);
-
-	uiAPI::removePaintable(m_dialog);
 
 	delete m_dialog;
 	m_dialog = nullptr;
@@ -308,17 +299,7 @@ void UserSettings::slotItemChanged(ak::aAbstractOptionsItem * _item) {
 
 void UserSettings::uiServiceSettingsChanged(ot::AbstractSettingsItem * _item) {
 	std::string itemName = _item->logicalName();
-	if (itemName == "General:Appearance:ColorStyle") {
-		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
-		if (actualItem == nullptr) { OTAssert(0, "Item cast failed"); return; }
-		if (actualItem->selectedValue() == "Bright") { uiAPI::setDefaultColorStyle(); }
-		else if (actualItem->selectedValue() == "Blue") { uiAPI::setDefaultBlueColorStyle(); }
-		else { uiAPI::setDefaultDarkColorStyle(); }
-	}
-	else {
-		AppBase::instance()->viewerSettingsChanged(_item);
-	}
-	
+	AppBase::instance()->viewerSettingsChanged(_item);	
 }
 
 void UserSettings::eraseRootGroups(ot::SettingsData * _data) {
@@ -501,9 +482,4 @@ UserSettings::UserSettings() : m_dialog(nullptr), m_uiServiceSettings(nullptr), 
 	m_uiServiceSettings = new ot::SettingsData("uiServiceSettings", "1.0");
 	ot::SettingsGroup * gGeneral        = m_uiServiceSettings->addGroup("General", "General");
 	ot::SettingsGroup * gAppearance     = gGeneral->addSubgroup("Appearance", "Appearance");
-	QString CurrentColor = "Bright";
-	if (uiAPI::getCurrentColorStyleName() == aColorStyleDefaultDark::colorStyleName()) { CurrentColor = "Dark"; }
-	if (uiAPI::getCurrentColorStyleName() == aColorStyleDefaultBlue::colorStyleName()) { CurrentColor = "Blue"; }
-	ot::SettingsItemSelection * colorStyle = new ot::SettingsItemSelection("ColorStyle", "Color style", { "Bright", "Dark", "Blue" }, CurrentColor.toStdString());
-	gAppearance->addItem(colorStyle);
 }

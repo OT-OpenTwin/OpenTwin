@@ -31,6 +31,7 @@ class QWidget;
 class QMouseEvent;
 class QVBoxLayout;
 class QHBoxLayout;
+class QComboBox;
 
 class ProjectManagement;
 class UserManagement;
@@ -75,13 +76,6 @@ public:
 
 	//! @brief Will return the widgets widget to display it
 	virtual QWidget * widget(void) override;
-
-	//! @brief Will set the objects color style
-	//! @param _colorStyle The color style to set
-	//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-	virtual void setColorStyle(
-		ak::aColorStyle *			_colorStyle
-	) override;
 
 	// #############################################################################################################
 
@@ -244,10 +238,6 @@ public:
 
 	virtual void leaveEvent(QEvent * _event) override;
 
-	void setColorStyle(
-		ak::aColorStyle *				_colorStyle
-	);
-
 private slots:
 	void slotSelectionChanged();
 
@@ -276,7 +266,7 @@ private:
 class copyProjectDialog : public QDialog {
 	Q_OBJECT
 public:
-	copyProjectDialog(ak::aColorStyle * _colorStyle);
+	copyProjectDialog();
 	virtual ~copyProjectDialog();
 
 	inline QString projectName(void) const;
@@ -288,8 +278,6 @@ public:
 	void cancelClose(void) { my_cancelClose = true; }
 
 	void reset(const QString & _projectToCopy);
-
-	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 signals:
 	void isClosing(void);
@@ -320,7 +308,6 @@ private:
 	QHBoxLayout *	my_layoutInput;
 	QWidget *		my_widgetInput;
 
-	copyProjectDialog() = delete;
 	copyProjectDialog(const copyProjectDialog &) = delete;
 	copyProjectDialog & operator = (copyProjectDialog &) = delete;
 };
@@ -330,7 +317,7 @@ private:
 class renameProjectDialog : public QDialog {
 	Q_OBJECT
 public:
-	renameProjectDialog(ak::aColorStyle * _colorStyle);
+	renameProjectDialog();
 	virtual ~renameProjectDialog();
 
 	inline QString projectName(void) const;
@@ -342,8 +329,6 @@ public:
 	void cancelClose(void) { my_cancelClose = true; }
 
 	void reset(const QString & _projectToCopy);
-
-	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 signals:
 	void isClosing(void);
@@ -374,7 +359,6 @@ private:
 	QHBoxLayout *	my_layoutInput;
 	QWidget *		my_widgetInput;
 
-	renameProjectDialog() = delete;
 	renameProjectDialog(const renameProjectDialog &) = delete;
 	renameProjectDialog & operator = (renameProjectDialog &) = delete;
 };
@@ -384,7 +368,7 @@ private:
 class createNewAccountDialog : public QDialog {
 	Q_OBJECT
 public:
-	createNewAccountDialog(ak::aColorStyle * _colorStyle);
+	createNewAccountDialog();
 	virtual ~createNewAccountDialog();
 
 	void setPassword(const QString &pwd) { my_password = pwd; }
@@ -394,8 +378,6 @@ public:
 	void setNotConfirmed(void) { my_confirmed = false; }
 
 	void cancelClose(void) { my_cancelClose = true; }
-
-	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 signals:
 	void isClosing(void);
@@ -427,7 +409,6 @@ private:
 	QHBoxLayout *	my_layoutInput;
 	QWidget *		my_widgetInput;
 
-	createNewAccountDialog() = delete;
 	createNewAccountDialog(const createNewAccountDialog &) = delete;
 	createNewAccountDialog & operator = (createNewAccountDialog &) = delete;
 };
@@ -437,7 +418,7 @@ private:
 class createNewProjectDialog : public QDialog {
 	Q_OBJECT
 public:
-	createNewProjectDialog(ak::aColorStyle * _colorStyle);
+	createNewProjectDialog();
 	virtual ~createNewProjectDialog();
 
 	void setProjectName(const QString &name);
@@ -450,8 +431,6 @@ public:
 	void setNotConfirmed(void) { my_confirmed = false; }
 
 	void cancelClose(void) { my_cancelClose = true; }
-
-	void setColorStyle(ak::aColorStyle * _colorStyle);
 
 	std::string getTemplateName(void);
 	std::string getProjectType(void);
@@ -484,7 +463,6 @@ private:
 	QHBoxLayout *	my_layoutButtons;
 	QWidget *		my_widgetButtons;
 
-	createNewProjectDialog() = delete;
 	createNewProjectDialog(const createNewProjectDialog &) = delete;
 	createNewProjectDialog & operator = (createNewProjectDialog &) = delete;
 };

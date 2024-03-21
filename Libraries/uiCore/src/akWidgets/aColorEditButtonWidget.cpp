@@ -12,7 +12,6 @@
 
 // AK header
 #include <akCore/aException.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aColorEditButtonWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aGraphicsWidget.h>
@@ -24,8 +23,7 @@
 
 ak::aColorEditButtonWidget::aColorEditButtonWidget(
 	const aColor &						_color,
-	const QString &						_textOverride,
-	aColorStyle *						_colorStyle
+	const QString &						_textOverride
 )
 	: aWidget(otColorEditButton),
 	m_button(nullptr),
@@ -68,8 +66,6 @@ ak::aColorEditButtonWidget::aColorEditButtonWidget(
 	// Override the color text if required
 	if (_textOverride.length() > 0) { overrideText(_textOverride); }
 
-	if (m_colorStyle != nullptr) { setColorStyle(m_colorStyle); }
-
 	connect(m_button, &QPushButton::clicked, this, &aColorEditButtonWidget::slotButtonClicked);
 	connect(m_button, &aPushButtonWidget::resized, this, &aColorEditButtonWidget::slotButtonResized);
 }
@@ -83,15 +79,6 @@ ak::aColorEditButtonWidget::~aColorEditButtonWidget() {
 }
 
 QWidget * ak::aColorEditButtonWidget::widget(void) { return m_widget; }
-
-void ak::aColorEditButtonWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	m_button->setColorStyle(m_colorStyle);
-	m_widget->setStyleSheet(m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls, "#AK_ColorEditButton_Central{", "}"));
-}
 
 // #############################################################################################################################
 
@@ -153,15 +140,6 @@ void ak::aColorEditButtonWidget::slotButtonClicked() {
 	// Show color dialog
 	QColorDialog dia(m_color.toQColor());
 	dia.setOption(QColorDialog::ShowAlphaChannel, m_editAlpha);
-
-	if (m_colorStyle) {
-		QString sheet = m_colorStyle->toStyleSheet(cafBackgroundColorDialogWindow | cafForegroundColorDialogWindow, "QColorDialog{", "};");
-		sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls, "QColorDialog QPushButton{", "};"));
-		sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls, "QColorDialog QLabel{", "};"));
-		sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorControls | cafForegroundColorControls, "QColorDialog QSpinBox{", "}"));
-
-		//dia.setStyleSheet(sheet);
-	}
 
 	if (dia.exec() == 1) {
 		aColor newColor(dia.currentColor());

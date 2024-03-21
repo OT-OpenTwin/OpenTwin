@@ -58,13 +58,6 @@ namespace ak {
 		//! @brief Will destry all sub container created by this container
 		virtual void destroyAllSubContainer(void) override;
 
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
-
 		//! @brief Will remove the child from this object (not destroy it)
 		//! This function should be called from the deconstructor of a child
 		//! @param _child The child to remove

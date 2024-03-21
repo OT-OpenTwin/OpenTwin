@@ -416,7 +416,7 @@ void LogInManager::slotConnectToDatabaseFail(const QString& _message) {
 void LogInManager::slotConnectToDatabaseNewUser(const QString& _databaseUrl, const QString& _authURL, const QString& _username, const QString& _hashedPassword) {
 	m_dialog->hideWaitingAnimation();
 
-	createNewAccountDialog newAccount(uiAPI::getCurrentColorStyle());
+	createNewAccountDialog newAccount;
 	newAccount.setPassword(_hashedPassword);
 	newAccount.exec();
 

@@ -14,7 +14,6 @@
 #include <akCore/aException.h>
 #include <akCore/aAssert.h>
 #include <akGui/aColor.h>
-#include <akGui/aColorStyle.h>
 
 #include <akWidgets/aTreeWidget.h>
 #include <akWidgets/aLineEditWidget.h>
@@ -26,16 +25,14 @@
 
 #include <qheaderview.h>
 
-ak::aTreeWidget::aTreeWidget(
-	aColorStyle *	_colorStyle
-) : ak::aWidget(otTree, _colorStyle),
+ak::aTreeWidget::aTreeWidget() : ak::aWidget(otTree),
 	m_tree(nullptr), m_filter(nullptr), m_layout(nullptr),
 	m_filterCaseSensitive(false), m_filterRefreshOnChange(true), m_currentId(0), m_itemsAreEditable(false),
 	m_selectAndDeselectChildren(false), m_ignoreEvents(false), m_focusedItem(invalidID), m_isReadOnly(false),
 	m_displayChildsOnFilter(false)
 {
 	// Create tree
-	m_tree = new ak::aTreeWidgetBase(this, m_colorStyle);
+	m_tree = new ak::aTreeWidgetBase(this);
 	assert(m_tree != nullptr); // Failed to create
 
 	// Create filter
@@ -86,15 +83,6 @@ ak::aTreeWidget::~aTreeWidget() {
 }
 
 QWidget * ak::aTreeWidget::widget(void) { return m_widget; }
-
-void ak::aTreeWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	m_tree->setColorStyle(m_colorStyle);
-	m_filter->setColorStyle(m_colorStyle);
-}
 
 // ###########################################################################################################################
 
@@ -751,10 +739,6 @@ ak::aTreeWidgetItem * ak::aTreeWidget::createItem(
 	itm->setEditable(m_itemsAreEditable);
 	itm->setLocked(m_isReadOnly);
 
-	//if (m_colorStyle != nullptr) {
-		//itm->setTextColor(0, m_colorStyle->getControlsMainForecolor().toQColor());
-		//itm->setBackgroundColor(0, m_colorStyle->getControlsMainBackcolor().toQColor());
-	//}
 	m_currentId++;
 	return itm;
 }
@@ -801,11 +785,10 @@ void ak::aTreeWidget::clearItem(
 
 // ###########################################################################################################################################
 
-ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree, aColorStyle * _colorStyle)
-	: QTreeWidget(), ak::aWidget(otTree, _colorStyle), m_ownerTree(_ownerTree), m_moveNotifier(nullptr)
+ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree)
+	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree), m_moveNotifier(nullptr)
 {
 	setStyleSheet("");
-	if (m_colorStyle != nullptr) { setColorStyle(m_colorStyle); }
 	setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
@@ -943,56 +926,6 @@ void ak::aTreeWidgetBase::dragLeaveEvent(QDragLeaveEvent * _event) {
 // #######################################################################################################
 
 QWidget * ak::aTreeWidgetBase::widget(void) { return this; }
-
-void ak::aTreeWidgetBase::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorControls | cafDefaultBorderControls, "QTreeWidget{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorControls, "QTreeWidget::item{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus |
-		cafBackgroundColorFocus, "QTreeWidget::item:hover{", "}"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected |
-		cafBackgroundColorSelected, "QTreeWidget::item:selected:!hover{", "}"));
-
-	if (!sheet.isEmpty()) {
-		sheet.append("QTreeWidget::branch:has-siblings:!adjoins-item{border-image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_End_Root.png"));
-		sheet.append(") 0;}");
-
-		sheet.append("QTreeWidget::branch:has-siblings:adjoins-item{border-image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_HasSiblings.png"));
-		sheet.append(") 0;}");
-
-		sheet.append("QTreeWidget::branch:!has-children:!has-siblings:adjoins-item{border-image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_End.png"));
-		sheet.append(") 0;}");
-
-		sheet.append("QTreeWidget::branch:has-children:!has-siblings:closed:!hover,"
-			"QTreeWidget::branch:closed:has-children:has-siblings:!hover{border-image: none; image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_HasChildren.png"));
-		sheet.append(");}");
-
-		sheet.append("QTreeWidget::branch:has-children:!has-siblings:closed:hover,"
-			"QTreeWidget::branch:closed:has-children:has-siblings:hover{border-image: none; image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_HasChildren_Focus.png"));
-		sheet.append(");}");
-
-		sheet.append("QTreeWidget::branch:open:has-children:!has-siblings:!hover,"
-			"QTreeWidget::branch:open:has-children:has-siblings:!hover{border-image: none; image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_Open.png"));
-		sheet.append(");}");
-
-		sheet.append("QTreeWidget::branch:open:has-children:!has-siblings:hover,"
-			"QTreeWidget::branch:open:has-children:has-siblings:hover{border-image: none; image: url(");
-		sheet.append(m_colorStyle->getFilePath("Tree/Tree_Branch_Open_Focus.png"));
-		sheet.append(");}");
-	}
-	this->setStyleSheet(sheet);
-}
 
 // ####################################################################################################################################
 

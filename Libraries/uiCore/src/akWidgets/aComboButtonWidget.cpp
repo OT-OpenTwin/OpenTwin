@@ -12,7 +12,6 @@
 
 // AK header
 #include <akCore/aException.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aComboButtonWidget.h>
 
 // Qt header
@@ -20,10 +19,9 @@
 
 ak::aComboButtonWidget::aComboButtonWidget(
 	const QString &				_initialText,
-	ak::aColorStyle *			_colorStyle,
 	QWidget *					_parent
 ) : QPushButton(_initialText, _parent),
-	ak::aWidget(otComboButton, _colorStyle),
+	ak::aWidget(otComboButton),
 	m_menu(nullptr)
 {
 	try {
@@ -32,7 +30,6 @@ ak::aComboButtonWidget::aComboButtonWidget(
 		if (m_menu == nullptr) { throw aException("Failed to create", "Create menu"); }
 
 		// Apply color style and menu
-		if (m_colorStyle != nullptr) { setColorStyle(_colorStyle); }
 		setMenu(m_menu);
 		m_itemsUIDmanager.setLatestUid(1);
 		setObjectName("AK_ComboButtonWidget");
@@ -155,32 +152,6 @@ int ak::aComboButtonWidget::addItem(
 }
 
 int ak::aComboButtonWidget::getItemCount(void) const { return m_items.size(); }
-
-void ak::aComboButtonWidget::setColorStyle(
-	aColorStyle *								_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorButton | cafBorderColorControls, "#" + objectName() + "{ ", " border-width: 1px; border-style: outset; padding: 2px; }"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus |
-		cafBackgroundColorFocus | cafBorderColorControls, "#" + objectName() + "::hover::!pressed { ", " border-width: 1px; border-style: outset; }"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected |
-		cafBackgroundColorSelected | cafBorderColorControls, "#" + objectName() + "::pressed { ", " border-width: 1px; border-style: inset; }"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader | cafBorderColorHeader | cafDefaultBorderWindow,
-		"QToolTip{", "}"));
-	this->setStyleSheet(sheet);
-
-	if (m_menu != nullptr) {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorDialogWindow | cafBackgroundColorDialogWindow, "QMenu{", "}");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorDialogWindow | cafBackgroundColorDialogWindow, "QMenu::item{", "}"));
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus | cafBackgroundColorFocus, "QMenu::item:selected{", "}"));
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected | cafBackgroundColorSelected, "QMenu::item:pressed{", "}"));
-		m_menu->setStyleSheet(sheet);
-	}
-}
 
 void ak::aComboButtonWidget::slotItemTriggered() {
 	// Cast the QObject to the aComboButtonWidgetItem

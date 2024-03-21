@@ -28,7 +28,6 @@
 #include "OTServiceFoundation/UserCredentials.h"
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
-#include <akGui/aPaintable.h>
 
 // Qt header
 #include <qobject.h>
@@ -46,7 +45,6 @@ class ControlsManager;
 class LockManager;
 class ExternalServicesComponent;
 class ProjectManagement;
-class ColorStyleNotifier;
 class ShortcutManager;
 class welcomeScreen;
 class ContextMenuManager;
@@ -56,7 +54,7 @@ class UiPluginManager;
 
 // Forward declaration
 class ToolBar;
-namespace ak { class aNotifier; class aColorStyle; class aWindow; }
+namespace ak { class aNotifier; class aWindow; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsView; }
@@ -224,12 +222,6 @@ public:
 
 	structModelViewInfo createModelAndDisplay(
 		const QString &					_projectName
-	);
-
-	//! @brief Will apply the color style to external widgets
-	//! @param _colorStyle The color style to apply
-	void applyColorStyle(
-		ak::aColorStyle *	_colorStyle
 	);
 
 	void registerSession(
@@ -521,9 +513,6 @@ public slots:
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 	void slotTextEditorSaveRequested(void);
 
-private slots:
-	void reapplyColorStyle(void);
-
 private:
 
 	friend class ToolBar;
@@ -543,7 +532,6 @@ private:
 	);
 
 	debugNotifier *				m_debugNotifier;
-	ColorStyleNotifier *		m_colorStyleNotifier;
 	LogInManager *				m_logInManager;
 
 	std::string					m_uiServiceURL;
@@ -636,8 +624,7 @@ private:
 	ot::GraphicsPickerDockWidget* m_graphicsPickerDock;
 
 	std::string					m_currentStateWindow;
-	std::string					m_currentStateColorStyle;
-
+	
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsView> m_graphicsViews;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditor> m_textEditors;
 
@@ -649,11 +636,4 @@ private:
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;
 
-};
-
-class ColorStyleNotifier : public ak::aPaintable {
-public:
-	ColorStyleNotifier();
-	virtual ~ColorStyleNotifier();
-	virtual void setColorStyle(ak::aColorStyle * _style) override;
 };

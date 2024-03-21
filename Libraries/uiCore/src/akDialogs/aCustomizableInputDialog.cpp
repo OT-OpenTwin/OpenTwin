@@ -11,7 +11,6 @@
  */
 
 // uiCore header
-#include <akGui/aColorStyle.h>
 #include <akCore/akCore.h>
 #include <akDialogs/aCustomizableInputDialog.h>
 #include <akWidgets/aPushButtonWidget.h>
@@ -59,26 +58,12 @@ ak::aCustomizableInputDialog::~aCustomizableInputDialog() {
 	delete m_centralLayout;
 }
 
-void ak::aCustomizableInputDialog::setColorStyle(aColorStyle * _style) {
-	aDialog::setColorStyle(_style);
-
-	for (auto btn : m_buttons) {
-		btn->setColorStyle(_style);
-	}
-
-	for (auto input : m_inputs) {
-		input.second.first->setColorStyle(_style);
-		input.second.second->setColorStyle(_style);
-	}
-}
-
 // #####################################################################################################################################
 
 // Item adder
 
 ak::UID ak::aCustomizableInputDialog::addButton(const QString& _buttonText) {
 	aPushButtonWidget * nBtn = new aPushButtonWidget(_buttonText);
-	if (m_colorStyle) { nBtn->setColorStyle(m_colorStyle); }
 	nBtn->setUid(++m_currentUid);
 	connect(nBtn, &aPushButtonWidget::clicked, this, &aCustomizableInputDialog::slotButtonClicked);
 	m_buttons.push_back(nBtn);
@@ -144,10 +129,6 @@ ak::UID ak::aCustomizableInputDialog::addMultilineTextInput(const QString& _labe
 ak::UID ak::aCustomizableInputDialog::addCustomInput(const QString& _label, aWidget * _widget) {
 	// Create label and setup controls
 	aLabelWidget * nLabel = new aLabelWidget(_label);
-	if (m_colorStyle) { 
-		nLabel->setColorStyle(m_colorStyle);
-		_widget->setColorStyle(m_colorStyle);
-	}
 	nLabel->setBuddy(_widget->widget());
 
 	// Store data

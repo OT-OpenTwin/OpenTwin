@@ -176,17 +176,6 @@ VersionGraph::~VersionGraph()
 	m_scene = nullptr;
 }
 
-void VersionGraph::SetStyleSheets(const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor) {
-	m_view->setStyleSheet(_plotBackgroundSheet.c_str());
-
-	m_foregroundColor = _foregroundColor;
-	m_boxColor = _boxColor;
-	m_boxHighlightColor = _highlightBoxColor;
-	m_highlightForegroundColor = _highlightForegroundColor;
-
-	updateTree();
-}
-
 void VersionGraph::addVersion(const std::string &_parentVersion, const std::string &_version, const std::string &_description)
 {
 	if (_parentVersion.empty())

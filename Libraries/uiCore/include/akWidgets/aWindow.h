@@ -14,7 +14,7 @@
 
  // AK header
 #include <akCore/globalDataTypes.h>
-#include <akGui/aPaintable.h>
+#include <akCore/aObject.h>
 
 // Qt header
 #include <qmainwindow.h>				// Base class
@@ -32,11 +32,10 @@ class QResizeEvent;
 namespace ak {
 
 	// Forward declaration
-	class aColorStyle;
 	class aWindowEventHandler;
 	class aAnimationOverlayWidget;
 
-	class UICORE_API_EXPORT aWindow : public QMainWindow, public aPaintable {
+	class UICORE_API_EXPORT aWindow : public QMainWindow, public aObject {
 		Q_OBJECT
 	public:
 		aWindow();
@@ -45,12 +44,6 @@ namespace ak {
 		// #######################################################################################################
 
 		// Base class functions
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		virtual void setColorStyle(
-			aColorStyle *					_colorStyle
-		) override;
 
 		virtual void closeEvent(QCloseEvent * _event) override;
 

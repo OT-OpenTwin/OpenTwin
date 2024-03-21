@@ -18,9 +18,6 @@
 #include <akCore/aMessenger.h>
 #include <akCore/aAssert.h>
 
-// AK GUI header
-#include <akGui/aColorStyle.h>
-
 // AK Widgets header
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aLabelWidget.h>
@@ -157,25 +154,6 @@ ak::aLogInDialog::~aLogInDialog() {
 	delete m_vLayoutW;
 	delete m_animationWidget;
 	delete m_centralLayout;
-}
-
-void ak::aLogInDialog::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	aDialog::setColorStyle(_colorStyle);
-
-	m_buttonLogIn->setColorStyle(m_colorStyle);
-
-	m_inputUsername->setColorStyle(m_colorStyle);
-	m_inputPassword->setColorStyle(m_colorStyle);
-
-	m_mainLayoutW->setStyleSheet("#LogInDialogMainLayoutW{"
-		"background-color:#90000000;"
-		"border-radius:10px;"
-		"}\n"
-		"QLabel{color:#FFFFFF}\n"
-		"QCheckBox{color:#FFFFFF}\n");
-
 }
 
 void ak::aLogInDialog::paintEvent(QPaintEvent *pe)
@@ -413,15 +391,4 @@ void ak::aLogInDialogInputField::clearInput(void) {
 QString ak::aLogInDialogInputField::text(void) const {
 	assert(m_input != nullptr);
 	return m_input->text();
-}
-
-// #############################################################################################################
-
-// Setter
-
-void ak::aLogInDialogInputField::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	m_input->setColorStyle(_colorStyle);
-	m_label->setColorStyle(_colorStyle);
 }

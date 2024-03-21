@@ -24,10 +24,6 @@ void Table::Clear(void)
 {
 }
 
-void Table::setColorStyle(ak::aColorStyle * _colorStyle)
-{
-}
-
 void Table::AddRow()
 {
 }

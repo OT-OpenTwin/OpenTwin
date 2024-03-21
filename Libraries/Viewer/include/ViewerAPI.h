@@ -186,14 +186,6 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	__declspec(dllexport) void setPlotStyles(const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen);
-
-	__declspec(dllexport) void setPlotStyle(ot::UID _viewerID, const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen);
-	
-	__declspec(dllexport) void setVersionGraphStyle(ot::UID _viewerID, const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor);
-
-	__declspec(dllexport) void setVersionGraphStyles(const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor);
-
 	__declspec(dllexport) void setVersionGraph(ot::UID _viewerID, std::list<std::tuple<std::string, std::string, std::string>> &versionGraph, const std::string &activeVersion, const std::string &activeBranch);
 
 	__declspec(dllexport) void setVersionGraphActive(ot::UID _viewerID, const std::string &activeVersion, const std::string &activeBranch);

@@ -6,8 +6,6 @@
 #include <string>
 #include <qstring.h>
 
-namespace ak { class aColorStyle; }
-
 namespace ot {
 
 	class AbstractUIWidgetInterface;
@@ -36,10 +34,6 @@ namespace ot {
 		//! @param _action The action to be performed
 		//! @param _message Message containing information
 		virtual bool dispatchAction(const std::string& _action, const std::string& _message) = 0;
-
-		//! @brief Will be called when the appearance of the UI frontend has changed
-		//! In this function all UI controls should apply the colorstyle to match the UI frontend
-		virtual void setColorstye(ak::aColorStyle * _paintable) = 0;
 
 		//! @brief Will write the provided message to the UI frontend output window
 		virtual void logInfo(const std::string& _message);

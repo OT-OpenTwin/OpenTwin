@@ -35,10 +35,8 @@ namespace ak {
 	public:
 
 		//! @brief Constructor
-		//! @param _colorStyle The initial color style to set
 		//! @param _parent The parent widget
 		aTabWidget(
-			aColorStyle *			_colorStyle = (aColorStyle *) nullptr,
 			QWidget *				_parent = (QWidget *) nullptr
 		);
 
@@ -50,13 +48,6 @@ namespace ak {
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
 
 		// #######################################################################################################
 

@@ -11,7 +11,6 @@
  */
 
 // AK header
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aListWidget.h>
 
 // Qt header
@@ -28,20 +27,6 @@ ak::aListWidget::~aListWidget() {
 }
 
 QWidget * ak::aListWidget::widget(void) { return this; }
-
-void ak::aListWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet;
-	sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorControls | cafBackgroundColorAlternate, "QListWidget{", "}");
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorControls | cafDefaultBorderWindow,
-			"QToolTip{", "}"));
-	this->setStyleSheet(sheet);
-}
 
 void ak::aListWidget::keyPressEvent(QKeyEvent *_event)
 { QListWidget::keyPressEvent(_event); emit keyPressed(_event); }

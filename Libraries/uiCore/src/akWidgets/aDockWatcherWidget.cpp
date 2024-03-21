@@ -11,7 +11,6 @@
  */
 
 #include <akWidgets/aDockWatcherWidget.h>
-#include <akGui/aColorStyle.h>
 #include <akGui/aContextMenuItem.h>
 
 #include <qdockwidget.h>
@@ -42,35 +41,6 @@ ak::aDockWatcherWidget::~aDockWatcherWidget() {
 // #######################################################################################################
 
 QWidget * ak::aDockWatcherWidget::widget(void) { return this; }
-
-void ak::aDockWatcherWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorControls, "QToolButton{", "}"));
-
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus |
-		cafBackgroundColorFocus, "QToolButton:hover:!pressed{", "}"));
-
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected |
-		cafBackgroundColorSelected, "QToolButton:pressed{", "}"));
-
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader | cafBorderColorHeader,
-		"QToolTip{", "border: 1px;}"));
-	setStyleSheet(sheet);
-
-	if (m_menu != nullptr) {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorDialogWindow | cafBackgroundColorDialogWindow, "QMenu{", "}");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorDialogWindow | cafBackgroundColorDialogWindow, "QMenu::item{", "}"));
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus | cafBackgroundColorFocus, "QMenu::item:selected{", "}"));
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected | cafBackgroundColorSelected, "QMenu::item:pressed{", "}"));
-		m_menu->setStyleSheet(sheet);
-	}
-}
 
 // #######################################################################################################
 

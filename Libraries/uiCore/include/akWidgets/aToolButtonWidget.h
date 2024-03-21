@@ -62,13 +62,6 @@ namespace ak {
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override { return this; }
 
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		//! @throw ak::Exception if the provided color style is a nullptr or failed to repaint the object
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
-
 		// #######################################################################################################
 
 		//! @brief Will return the action of this tool button

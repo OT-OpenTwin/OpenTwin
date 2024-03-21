@@ -1,7 +1,6 @@
 #include <akWidgets/aChecklistWidget.h>
 
 #include <akGui/aColor.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aCheckBoxWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 
@@ -11,7 +10,7 @@
 #include <qevent.h>
 
 ak::aChecklistItem::aChecklistItem(aChecklistWidget * _owner)
-	: aPaintable(otNone), m_CheckBox(nullptr), m_TextEdit(nullptr), m_ChecklistWidget(_owner), m_Index(-1),
+	: aObject(otNone), m_CheckBox(nullptr), m_TextEdit(nullptr), m_ChecklistWidget(_owner), m_Index(-1),
 	m_shortcutChangeCheckedState(nullptr)
 {
 	m_CheckBox = new aCheckBoxWidget;
@@ -21,7 +20,7 @@ ak::aChecklistItem::aChecklistItem(aChecklistWidget * _owner)
 }
 
 ak::aChecklistItem::aChecklistItem(const QString& _text, bool _isChecked, aChecklistWidget * _owner)
-	: aPaintable(otNone), m_CheckBox(nullptr), m_TextEdit(nullptr), m_ChecklistWidget(_owner), m_Index(-1),
+	: aObject(otNone), m_CheckBox(nullptr), m_TextEdit(nullptr), m_ChecklistWidget(_owner), m_Index(-1),
 	m_shortcutChangeCheckedState(nullptr), m_text(_text)
 {
 	m_CheckBox = new aCheckBoxWidget;
@@ -33,34 +32,6 @@ ak::aChecklistItem::aChecklistItem(const QString& _text, bool _isChecked, aCheck
 ak::aChecklistItem::~aChecklistItem() {
 	delete m_CheckBox;
 	delete m_TextEdit;
-}
-
-// ################################################################################
-
-// Base class functions
-
-void ak::aChecklistItem::setColorStyle(ak::aColorStyle * _colorStyle) {
-	m_colorStyle = _colorStyle;
-	m_CheckBox->setColorStyle(m_colorStyle);
-
-	if (m_colorStyle) {
-		QString Color = m_colorStyle->getControlsBorderColor().toHexString(true);
-		QString ColorHover = m_colorStyle->getControlsFocusedBackgroundColor().toHexString(true);
-		QString ColorFocus = m_colorStyle->getControlsPressedBackgroundColor().toHexString(true);
-
-		QString sheet("QLineEdit {");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-			cafBackgroundColorControls, "", "font-weight: normal; border: 1px solid #" + Color + "; }\nQLineEdit:hover {"));
-
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-			cafBackgroundColorControls, "", "font-weight: normal; border: 1px solid #" + ColorHover + "; }\nQLineEdit:focus {"));
-		
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-			cafBackgroundColorControls, "", "font-weight: 900; border: 2px solid #" + ColorFocus + "; }"));
-		
-		m_TextEdit->setStyleSheet(sheet);
-	}
-	else m_TextEdit->setStyleSheet("");
 }
 
 // ################################################################################
@@ -207,11 +178,6 @@ ak::aChecklistWidget::~aChecklistWidget() {
 
 QWidget * ak::aChecklistWidget::widget(void) {
 	return m_centralLayoutW;
-}
-
-void ak::aChecklistWidget::setColorStyle(ak::aColorStyle * _colorStyle) {
-	m_colorStyle = _colorStyle;
-	for (auto itm : m_items) itm->setColorStyle(m_colorStyle);
 }
 
 // ################################################################################
@@ -387,8 +353,6 @@ void ak::aChecklistWidget::initializeNewItem(aChecklistItem * _item, int _index)
 	m_centralLayout->addWidget(_item->TextEdit(), _index, 1, Qt::AlignTop);
 
 	m_items.insert(m_items.begin() + _index, _item);
-
-	if (m_colorStyle) _item->setColorStyle(m_colorStyle);
 
 	_item->refreshAppearance();
 

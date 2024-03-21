@@ -16,7 +16,6 @@
 #include <akCore/aUidMangager.h>
 #include <akCore/rJSON.h>
 
-#include <akGui/aColorStyle.h>
 #include <akGui/aObjectManager.h>
 #include <akGui/aTtbContainer.h>
 
@@ -47,9 +46,8 @@
 
 ak::aWindowManager::aWindowManager(
 	aMessenger *									_messenger,
-	aUidManager *								_uidManager,
-	aColorStyle *							_colorStyle
-) : aPaintable(otMainWindow),
+	aUidManager *								_uidManager
+) : aObject(otMainWindow),
 m_window(nullptr),
 m_messenger(nullptr),
 m_uidManager(nullptr),
@@ -69,7 +67,6 @@ m_timerShowMainWindow(nullptr)
 	m_messenger = _messenger;
 	m_uidManager = _uidManager;
 	m_uid = m_uidManager->getId();
-	m_colorStyle = _colorStyle;
 
 	// Create main window
 	m_window = new aWindow();
@@ -128,8 +125,6 @@ m_timerShowMainWindow(nullptr)
 	m_timerSignalLinker->addLink(m_timerProgressShow, ak::aWindowManagerTimerSignalLinker::timerType::progressShow);
 	m_timerSignalLinker->addLink(m_timerShowMainWindow, ak::aWindowManagerTimerSignalLinker::timerType::showWindow);
 
-	if (m_colorStyle != nullptr) { setColorStyle(m_colorStyle); }
-
 	// Show main window
 	//m_timerShowMainWindow->start();
 	m_window->resize(800, 600);
@@ -141,51 +136,6 @@ ak::aWindowManager::~aWindowManager() {
 	// Delete the timer signal linker first, so all objects will be disconnected propertly
 	if (m_timerSignalLinker != nullptr) { delete m_timerSignalLinker; m_timerSignalLinker = nullptr; }
 
-}
-
-void ak::aWindowManager::setColorStyle(
-	aColorStyle *								_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-
-	m_window->setColorStyle(_colorStyle);
-
-	m_progressBar->setStyleSheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow));
-	m_statusLabel->setStyleSheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorTransparent));
-
-	// TTB
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow, "QToolBar{border: 0px;", "}"));
-	if (sheet.isEmpty()) {
-		sheet = "QToolBar{border: 0px;}";
-	}
-	m_tabToolBar->SetStylesheet(sheet);
-	
-	sheet = m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow, "QTabWidget{", "}");
-	sheet.append(m_colorStyle->toStyleSheet(cafBorderColorHeader, "QTabWidget::pane{border: 0px solid; border-top-width: 1px; border-bottom-width: 1px;", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorHeader | cafForegroundColorHeader,
-		"QTabWidget::tab-bar{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorHeader | cafForegroundColorHeader,
-		"QTabBar::tab{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorFocus | cafForegroundColorFocus,
-		"QTabBar::tab:hover{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafBackgroundColorSelected | cafForegroundColorSelected,
-		"QTabBar::tab:selected{", "}"));
-	
-	if (sheet.length() == 0) {
-		// Provide manual stylesheet to fix styling issue in toolBar
-		sheet = "QTabWidget{}\n"
-				"QTabWidget::pane{border: 0px solid #707070; border-top-width: 1px; border-bottom-width: 1px;}\n"
-			;
-	}
-
-	m_tabToolBar->SetTabBarStylesheet(sheet);
-	m_tabToolBar->SetHideButtonStylesheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow));
 }
 
 void ak::aWindowManager::removeChildObject(
@@ -580,7 +530,6 @@ ak::aTtbPage * ak::aWindowManager::createTabToolbarSubContainer(
 ) {
 	tt::Page * page = m_tabToolBar->AddPage(_text);
 	ak::aTtbPage * p = new ak::aTtbPage(m_messenger, page, _text);
-	if (m_colorStyle != nullptr) { p->setColorStyle(m_colorStyle); setColorStyle(m_colorStyle); }
 	m_tabToolBarContainer.push_back(p);
 	resortTabToolBarTabOrder();
 	return p;

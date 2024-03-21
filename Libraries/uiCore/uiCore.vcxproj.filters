@@ -123,9 +123,6 @@
     <ClCompile Include="src\akGui\aColor.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aColorStyle.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aColorStyleDefault.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
@@ -136,9 +133,6 @@
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
     <ClCompile Include="src\akGui\aObjectManager.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aPaintable.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
     <ClCompile Include="src\akGui\aSignalLinker.cpp">
@@ -252,12 +246,6 @@
     <ClCompile Include="src\akWidgets\aDockWatcherWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aColorStyleSwitchWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aCustomizableColorStyle.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akDB\aMSSQLWrapper.cpp">
       <Filter>Source Files\ak\DB</Filter>
     </ClCompile>
@@ -344,19 +332,7 @@
     <ClInclude Include="include\akGui\aColor.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
-    <ClInclude Include="include\akGui\aColorStyle.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akGui\aColorStyleDefault.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akGui\aColorStyleDefaultDark.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="include\akGui\aObjectManager.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akGui\aPaintable.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
     <ClInclude Include="include\akGui\aTtbContainer.h">
@@ -386,9 +362,6 @@
     <ClInclude Include="include\akWidgets\aCalendarWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\akGui\aCustomizableColorStyle.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="include\akDB\aMSSQLWrapper.h">
       <Filter>Header Files\ak\DB</Filter>
     </ClInclude>
@@ -409,9 +382,6 @@
     </ClInclude>
     <ClInclude Include="include\akAPI\uiAPI.h">
       <Filter>Header Files\ak\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akGui\aColorStyleDefaultBlue.h">
-      <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
     <ClInclude Include="include\akTools\aFormula.h">
       <Filter>Header Files\ak\Tools</Filter>
@@ -518,9 +488,6 @@
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aDockWatcherWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aColorStyleSwitchWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akDialogs\aCustomizableInputDialog.h">

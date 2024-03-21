@@ -86,6 +86,4 @@ ak::UID ak::aObject::uid(void) const { return m_uid; }
 
 ak::objectType ak::aObject::type(void) const { return m_objectType; }
 
-bool ak::aObject::isPaintableType(void) const { return false; }
-
 bool ak::aObject::isWidgetType(void) const { return false; }

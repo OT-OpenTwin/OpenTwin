@@ -11,7 +11,6 @@
  */
 
 // AK header
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aPushButtonWidget.h>
 
 // Qt header
@@ -48,20 +47,3 @@ void ak::aPushButtonWidget::resizeEvent(QResizeEvent * _event) {
 // #######################################################################################################
 
 QWidget * ak::aPushButtonWidget::widget(void) { return this; }
-
-void ak::aPushButtonWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorButton |
-		cafBackgroundColorButton, "QPushButton{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorFocus |
-		cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorSelected |
-		cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader | cafBorderColorHeader,
-		"QToolTip{", "border: 1px;}"));
-	this->setStyleSheet(sheet);
-}

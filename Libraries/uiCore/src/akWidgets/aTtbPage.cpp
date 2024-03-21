@@ -18,7 +18,6 @@
 #include <akCore/aException.h>
 #include <akCore/aMessenger.h>
 #include <akCore/aUidMangager.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
 
@@ -57,7 +56,6 @@ ak::aTtbContainer * ak::aTtbPage::createSubContainer(
 	const QString &				_text
 ) {
 	aTtbGroup * obj = new aTtbGroup(m_messenger, m_page->AddGroup(_text), _text);
-	if (m_colorStyle != nullptr) { obj->setColorStyle(m_colorStyle); }
 	m_subContainer.push_back(obj);
 	return obj;
 }
@@ -67,16 +65,6 @@ void ak::aTtbPage::destroyAllSubContainer(void) {
 		aTtbContainer * obj = m_subContainer.at(i);
 		delete obj;
 	}
-}
-
-void ak::aTtbPage::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	QString sheet(m_colorStyle->toStyleSheet(cafForegroundColorWindow |
-		cafBackgroundColorWindow));;
-	m_page->setStyleSheet(sheet);
 }
 
 void ak::aTtbPage::removeChildObject(

@@ -86,21 +86,13 @@ namespace ak {
 		//! @param _messenger The globally used messenger
 		//! @param _uidManager The globally used UID manager
 		//! @param _dock The dock widget to display the tree at
-		aTreeWidget(
-			aColorStyle *		_colorStyle = nullptr
-		);
+		aTreeWidget();
 
 		//! @brief Deconstructor
 		virtual ~aTreeWidget();
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		virtual void setColorStyle(
-			aColorStyle *		_colorStyle
-		) override;
 
 		// ###########################################################################################################################################
 
@@ -509,7 +501,7 @@ namespace ak {
 		Q_OBJECT
 	public:
 		//! @brief Constructor
-		aTreeWidgetBase(aTreeWidget * _ownerTree, aColorStyle * _colorStyle = nullptr);
+		aTreeWidgetBase(aTreeWidget * _ownerTree);
 
 		virtual ~aTreeWidgetBase();
 
@@ -538,12 +530,6 @@ namespace ak {
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
-
-		//! @brief Will set the objects color style
-		//! @param _colorStyle The color style to set
-		virtual void setColorStyle(
-			aColorStyle *			_colorStyle
-		) override;
 
 		// ####################################################################################################################################
 

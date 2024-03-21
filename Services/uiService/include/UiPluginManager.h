@@ -15,7 +15,6 @@
 class UiPluginComponent;
 class AppBase;
 
-namespace ak { class aColorStyle; }
 namespace ot { class ServiceBase; }
 
 class ExternalUiPlugin {
@@ -23,7 +22,6 @@ public:
 	typedef bool(__stdcall *PluginAttachFunctionType)(ot::AbstractUIWidgetInterface * _interface);
 	typedef void(__stdcall *PluginDetachFunctionType)(void);
 	typedef bool(__stdcall *PluginMessageFunctionType)(const char * _action, const char * _message);
-	typedef void(__stdcall *PluginStyleFunctionType)(ak::aColorStyle * _colorStyle);
 
 	ExternalUiPlugin(
 		const QString&					_name,
@@ -32,7 +30,6 @@ public:
 		PluginAttachFunctionType		_attachFunctionRef,
 		PluginDetachFunctionType		_detachFunctionRef,
 		PluginMessageFunctionType		_messageFunctionRef,
-		PluginStyleFunctionType			_styleFunctionRef,
 		ot::ServiceBase *				_owner,
 		UiPluginComponent *				_component,
 		ak::UID							_uid
@@ -47,12 +44,10 @@ public:
 	PluginAttachFunctionType attachFunction(void) { return m_attachFunctionRef; }
 	PluginDetachFunctionType detachFunction(void) { return m_detachFunctionRef; }
 	PluginMessageFunctionType messageFunction(void) { return m_messageFunctionRef; }
-	PluginStyleFunctionType styleFunction(void) { return m_styleFunctionRef; }
 	ot::ServiceBase * owner(void) { return m_owner; }
 	ak::UID uid(void) const { return m_uid; }
 
 	bool forwardMessageToPlugin(const std::string& _action, const std::string& _message);
-	void forwardColorStyle(ak::aColorStyle * _colorStyle);
 
 private:
 
@@ -62,7 +57,6 @@ private:
 	PluginAttachFunctionType		m_attachFunctionRef;
 	PluginDetachFunctionType		m_detachFunctionRef;
 	PluginMessageFunctionType		m_messageFunctionRef;
-	PluginStyleFunctionType			m_styleFunctionRef;
 	ot::ServiceBase *				m_owner;
 	ak::UID							m_uid;
 	UiPluginComponent *				m_component;
@@ -88,8 +82,6 @@ public:
 	void addPluginSearchPath(const QString& _path);
 
 	bool forwardMessageToPlugin(unsigned long long _pluginUid, const std::string& _action, const std::string& _message);
-
-	void forwardColorStyle(ak::aColorStyle * _colorStyle);
 
 private:
 

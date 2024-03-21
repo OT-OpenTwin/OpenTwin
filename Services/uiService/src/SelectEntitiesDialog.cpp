@@ -6,10 +6,10 @@
 
 // OpenTwin header
 #include "SelectEntitiesDialog.h"
+#include "OTCore/Logger.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PushButton.h"
-#include "OTWidgets/IconManager.h"
 
 // Qt header
 #include <QtWidgets/qlabel.h>

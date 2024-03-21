@@ -20,7 +20,6 @@
 #include <akCore/aUidMangager.h>
 
 #include <akGui/aAction.h>
-#include <akGui/aColorStyle.h>
 
 #include <akWidgets/aTtbSubGroup.h>
 #include <akWidgets/aWidget.h>
@@ -81,13 +80,6 @@ ak::aTtbContainer * ak::aTtbSubGroup::createSubContainer(
 }
 
 void ak::aTtbSubGroup::destroyAllSubContainer(void) {}
-
-void ak::aTtbSubGroup::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-		assert(_colorStyle != nullptr); // nullptr provided
-		m_colorStyle = _colorStyle;
-}
 
 void ak::aTtbSubGroup::removeChildObject(
 	aObject *								_child

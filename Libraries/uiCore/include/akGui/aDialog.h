@@ -15,7 +15,7 @@
 // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
-#include <akGui/aPaintable.h>
+#include <akCore/aObject.h>
 
 // Qt header
 #include <qdialog.h>			// Base class
@@ -26,7 +26,7 @@ class QEvent;
 
 namespace ak {
 
-	class UICORE_API_EXPORT aDialog : public QDialog, public aPaintable {
+	class UICORE_API_EXPORT aDialog : public QDialog, public aObject {
 		Q_OBJECT
 	public:
 		//! @brief Constructor
@@ -57,8 +57,6 @@ namespace ak {
 		virtual void Close(
 			dialogResult				_result
 		);
-
-		virtual void setColorStyle(aColorStyle * _colorStyle) override;
 
 		virtual bool event(QEvent * _event) override;
 

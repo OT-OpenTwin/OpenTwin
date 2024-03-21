@@ -13,7 +13,6 @@
  // AK header
 #include <akCore/aException.h>
 #include <akCore/aAssert.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aLineEditWidget.h>
 
 #include <qevent.h>
@@ -98,14 +97,6 @@ void ak::aLineEditWidget::focusOutEvent(QFocusEvent * _event) {
 
 QWidget * ak::aLineEditWidget::widget(void) { return this; }
 
-void ak::aLineEditWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	setErrorState(m_isError);
-}
-
 // #######################################################################################################
 
 // Setter
@@ -114,30 +105,13 @@ void ak::aLineEditWidget::setErrorState(bool _error) {
 	m_isError = _error;
 	if (m_isError)
 	{
-		if (m_colorStyle != nullptr) {
-			QString sheet{ "color: #" };
-			if (m_errorIsForeground) { sheet.append(m_colorStyle->getControlsErrorFrontForegroundColor().toHexString()); }
-			else { sheet.append(m_colorStyle->getControlsErrorBackForegroundColor().toHexString()); }
-			sheet.append("; background-color: #");
-			if (m_errorIsForeground) { sheet.append(m_colorStyle->getControlsMainBackgroundColor().toHexString()); }
-			else { sheet.append(m_colorStyle->getControlsErrorBackBackgroundColor().toHexString()); }
-			sheet.append("; border: 1px solid #").append(m_colorStyle->getControlsBorderColor().toHexString(true));
-			sheet.append(";}");
-			setStyleSheet(sheet);
-		}
-		else if (m_errorIsForeground) {
+		if (m_errorIsForeground) {
 			setStyleSheet("color: #ff0000;");
 		}
 		else {
 			setStyleSheet("color: #000000; background-color: #ff0000;");
 		}
 
-	}
-	else if (m_colorStyle != nullptr)
-	{
-		QString Color = m_colorStyle->getControlsBorderColor().toHexString(true);
-		setStyleSheet(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-			cafBackgroundColorControls | cafBorderColorControls, "", "border: 1px solid #" + Color + ";"));
 	}
 	else {
 		setStyleSheet("");

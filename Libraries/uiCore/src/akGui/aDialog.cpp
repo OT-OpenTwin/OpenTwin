@@ -11,7 +11,6 @@
  */
 
 #include <akGui/aDialog.h>
-#include <akGui/aColorStyle.h>
 
 #include <qwidget.h>
 #include <qevent.h>
@@ -19,7 +18,7 @@
 ak::aDialog::aDialog(
 	objectType			_objectType,
 	QWidget *			_parent
-)	: QDialog(_parent), aPaintable(_objectType), m_result(resultNone) {
+)	: QDialog(_parent), aObject(_objectType), m_result(resultNone) {
 	setModal(true);
 }
 
@@ -54,20 +53,6 @@ void ak::aDialog::Close(
 ) {
 	m_result = _result; 
 	QDialog::close();
-}
-
-void ak::aDialog::setColorStyle(aColorStyle * _colorStyle) {
-	assert(_colorStyle);
-	m_colorStyle = _colorStyle;
-
-	if (objectName().isEmpty()) {
-		setStyleSheet(m_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "QDialog {", "}"));
-	}
-	else {
-		setStyleSheet(m_colorStyle->toStyleSheet(cafBackgroundColorWindow | cafForegroundColorWindow, "#" + objectName() + " {", "}"));
-	}
-	
-
 }
 
 bool ak::aDialog::event(QEvent * _event) {

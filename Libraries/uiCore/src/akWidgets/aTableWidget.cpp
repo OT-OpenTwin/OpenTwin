@@ -11,7 +11,6 @@
  */
 
 // AK header
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aTableWidget.h>
 
 #include <qevent.h>
@@ -50,32 +49,6 @@ void ak::aTableWidget::focusOutEvent(QFocusEvent * _event) {
 // #######################################################################################################
 
 QWidget * ak::aTableWidget::widget(void) { return this; }
-
-void ak::aTableWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	
-	QString sheet{ m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorControls | cafBackgroundColorAlternate | cafDefaultBorderControls, "QTableWidget{", "}\n") };
-	
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader | cafBorderColorHeader,
-		"QToolTip{", "border: 1px;}\n"));
-
-	this->setStyleSheet(sheet);
-
-	sheet = m_colorStyle->toStyleSheet(cafForegroundColorHeader | cafBackgroundColorHeader,
-		"QHeaderView{border: none;", "}\n");
-	sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-		cafBackgroundColorHeader |
-		cafDefaultBorderHeader | cafBorderColorHeader
-		,
-		"QHeaderView::section{", "}"));
-	this->horizontalHeader()->setStyleSheet(sheet);
-	this->verticalHeader()->setStyleSheet(sheet);
-}
 
 // ##############################################################################################################
 

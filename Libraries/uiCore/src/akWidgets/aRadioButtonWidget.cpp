@@ -11,7 +11,6 @@
  */
 
  // AK header
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aRadioButtonWidget.h>
 
 ak::aRadioButtonWidget::aRadioButtonWidget(QWidget * _parent)
@@ -25,14 +24,3 @@ ak::aRadioButtonWidget::aRadioButtonWidget(const QString & _text, QWidget * _par
 ak::aRadioButtonWidget::~aRadioButtonWidget() { A_OBJECT_DESTROYING }
 
 QWidget * ak::aRadioButtonWidget::widget(void) { return this; }
-
-void ak::aRadioButtonWidget::setColorStyle(
-	aColorStyle *	_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-
-	this->setStyleSheet(m_colorStyle->toStyleSheet(cafForegroundColorControls |
-		cafBackgroundColorTransparent));
-	
-}

@@ -286,12 +286,6 @@ public:
 
 	void setAxisQuantity(PlotDataset::axisQuantity _type);
 
-	// ###########################################################################
-
-	// Plot settings
-	
-	void SetStyleSheets(const std::string & _plotBackgroundSheet, const std::string & _xyPlot, const std::string & _xyCanvas, const QColor & _polarPlotColor, const QPen & _zoomerPen);
-
 private:
 
 	void setFromDataBase(const std::string & _projectName, const std::list<PlotCurveItem> & _entitiesToImport);

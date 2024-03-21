@@ -16,14 +16,11 @@
 
 // AK header
 #include <akAPI/uiAPI.h>
-#include <akGui/aColorStyle.h>
 
 CommitMessageDialog::CommitMessageDialog()
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
-	ak::aColorStyle* _colorStyle = ak::uiAPI::getCurrentColorStyle();
-
 	// Create controls
 	my_buttonCancel = new QPushButton{ "Cancel" };
 	my_buttonConfirm = new QPushButton{ "Commit" };
@@ -54,8 +51,6 @@ CommitMessageDialog::CommitMessageDialog()
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	if (_colorStyle != nullptr) { setColorStyle(_colorStyle); }
-
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
@@ -81,35 +76,6 @@ void CommitMessageDialog::reset(const QString& _projectToCopy) {
 	my_input->setText(_projectToCopy);
 	my_confirmed = false;
 	my_projectToCopy = _projectToCopy;
-}
-
-void CommitMessageDialog::setColorStyle(ak::aColorStyle* _colorStyle) {
-	if (_colorStyle == nullptr) {
-		setStyleSheet("");
-		my_input->setStyleSheet("");
-		my_buttonCancel->setStyleSheet("");
-		my_buttonConfirm->setStyleSheet("");
-		my_label->setStyleSheet("");
-	}
-	else {
-		setStyleSheet(_colorStyle->toStyleSheet(ak::cafBackgroundColorDialogWindow | ak::cafForegroundColorDialogWindow, "QDialog {", "}"));
-
-		QString Color = _colorStyle->getControlsBorderColor().toHexString(true);
-		my_input->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorControls | ak::cafBorderColorControls, "QLineEdit{", "border: 1px solid #" + Color + ";}"));
-
-		QString sheet(_colorStyle->toStyleSheet(ak::cafForegroundColorButton |
-			ak::cafBackgroundColorButton, "QPushButton{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorFocus |
-			ak::cafBackgroundColorFocus, "QPushButton:hover:!pressed{", "}\n"));
-		sheet.append(_colorStyle->toStyleSheet(ak::cafForegroundColorSelected |
-			ak::cafBackgroundColorSelected, "QPushButton:pressed{", "}\n"));
-		my_buttonCancel->setStyleSheet(sheet);
-		my_buttonConfirm->setStyleSheet(sheet);
-
-		my_label->setStyleSheet(_colorStyle->toStyleSheet(ak::cafForegroundColorControls |
-			ak::cafBackgroundColorTransparent));
-	}
 }
 
 void CommitMessageDialog::slotButtonConfirmPressed() { my_confirmed = true; Close(); }

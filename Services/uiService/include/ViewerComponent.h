@@ -151,11 +151,6 @@ public:
 	void isModified(ViewerUIDtype viewerUID, bool modifiedState);
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	void setPlotStyles(const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen);
-	void setPlotStyle(ViewerUIDtype visualizationModelID, const std::string & _plotBackgroundSheet, const std::string & _xyPlotStyleSheet, const std::string & _xyCanvasStyleSheet, const QColor & _polarPlotColor, const QPen & _zoomerPen);
-	void setVersionGraphStyles(const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor);
-	void setVersionGraphStyle(ViewerUIDtype visualizationModelID, const std::string & _plotBackgroundSheet, const QColor & _foregroundColor, const QColor & _boxColor, const QColor &_highlightBoxColor, const QColor &_highlightForegroundColor);
-
 	QWidget* getPlotWidget(ViewerUIDtype _viewerID);
 	QWidget* getVersionGraphWidget(ViewerUIDtype _viewerID);
 	QWidget* getBlockDiagramEditorWidget(ViewerUIDtype _viewerID);

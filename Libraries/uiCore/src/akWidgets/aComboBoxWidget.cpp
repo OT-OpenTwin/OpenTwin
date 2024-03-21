@@ -12,7 +12,6 @@
 
 // AK header
 #include <akCore/aException.h>
-#include <akGui/aColorStyle.h>
 #include <akWidgets/aComboBoxWidget.h>
 
 ak::aComboBoxWidget::aComboBoxWidget(QWidget * _parent)
@@ -44,27 +43,3 @@ void ak::aComboBoxWidget::wheelEvent(QWheelEvent * _event) {
 // #######################################################################################################
 
 QWidget * ak::aComboBoxWidget::widget(void) { return this; }
-
-void ak::aComboBoxWidget::setColorStyle(
-	aColorStyle *			_colorStyle
-) {
-	assert(_colorStyle != nullptr); // nullptr provided
-	m_colorStyle = _colorStyle;
-	
-	QString sheet;
-	if (objectName().length() > 0) {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls | cafBackgroundColorControls | cafBorderColorControls, "#" + objectName() + " {", " border-width: 1px; border-style: solid; }");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorHeader,
-			"#" + objectName() + " QToolTip{", "border: 1px;}"));
-	}
-	else {
-		sheet = m_colorStyle->toStyleSheet(cafForegroundColorControls | cafBackgroundColorControls | cafBorderColorControls, "", " border-width: 1px; border-style: solid;");
-		sheet.append(m_colorStyle->toStyleSheet(cafForegroundColorHeader |
-			cafBackgroundColorHeader | cafBorderColorHeader,
-			"QComboBox QToolTip{", "border: 1px;}"));
-	}
-
-	this->setStyleSheet(sheet);
-
-}
