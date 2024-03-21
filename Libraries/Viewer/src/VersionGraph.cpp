@@ -146,6 +146,11 @@ void VersionGraphVersion::setBranchVisible(bool visible, VersionGraphVersion *&s
 
 VersionGraph::VersionGraph(Viewer * _viewer)
 {
+	m_foregroundColor.setRgb(0, 0, 0);
+	m_boxColor.setRgb(220, 220, 220);
+	m_boxHighlightColor.setRgb(200, 210, 240);
+	m_highlightForegroundColor.setRgb(0, 0, 0);
+
 	m_widthX = 100;
 	m_widthY = 50;
 
