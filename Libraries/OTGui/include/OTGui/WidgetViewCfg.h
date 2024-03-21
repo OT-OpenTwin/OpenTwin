@@ -8,15 +8,21 @@
 // OpenTwin header
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <list>
 #include <string>
 
+#pragma warning(disable:4251)
+
+#define OT_JSON_MEMBER_WidgetViewCfgType "Type"
+
 namespace ot {
 
 	class OT_GUI_API_EXPORT WidgetViewCfg : public ot::Serializable {
+		OT_DECL_NOCOPY(WidgetViewCfg)
 	public:
 		enum ViewFlags {
 			NoViewFlags     = 0x00,
@@ -75,7 +81,7 @@ namespace ot {
 		const std::string& parentViewName(void) const { return m_parentViewName; };
 
 		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& title(void) const { return m_title; };
+		const std::string& title(void) const { return (m_title.empty() ? m_name : m_title); };
 
 		void setFlags(ViewFlags _flags) { m_flags = _flags; };
 		ViewFlags flags(void) const { return m_flags; };

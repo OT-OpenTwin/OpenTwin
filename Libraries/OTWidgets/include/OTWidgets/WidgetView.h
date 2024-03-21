@@ -10,6 +10,9 @@
 #include "OTGui/WidgetViewCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+// Qt header
+#include <QtCore/qstring.h>
+
 // std header
 #include <string>
 
@@ -41,6 +44,12 @@ namespace ot {
 
 		void setName(const std::string& _name);
 		const std::string& name(void) const { return m_name; };
+
+		void setViewTitle(const QString& _title);
+		QString viewTitle(void) const;
+
+		void setInitialiDockLocation(WidgetViewCfg::ViewDockLocation _location) { m_dockLocation = _location; };
+		WidgetViewCfg::ViewDockLocation initialDockLocation(void) const { return m_dockLocation; };
 
 	protected:
 		void addWidgetToDock(QWidget* _widget);

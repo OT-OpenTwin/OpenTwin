@@ -193,14 +193,17 @@
     <ClCompile Include="src\GraphicsItemPreviewDrag.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\WidgetView.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\WidgetViewManager.cpp">
-      <Filter>src\General</Filter>
+      <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\WidgetViewFactory.cpp">
-      <Filter>src\General</Filter>
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlainTextEditView.cpp">
+      <Filter>src\WidgetView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +236,12 @@
     </Filter>
     <Filter Include="src\Dialogs">
       <UniqueIdentifier>{4b680142-85e1-482d-92b4-00e0ef2aa38c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\WidgetView">
+      <UniqueIdentifier>{7f64c36f-d652-4cba-8952-4e92a4302523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\WidgetView">
+      <UniqueIdentifier>{9f39fce1-e5be-45f5-8f19-858de2c4887c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -371,14 +380,23 @@
     <ClInclude Include="include\OTWidgets\GraphicsItemPreview.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetView.h">
-      <Filter>include\General</Filter>
+    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetViewManager.h">
-      <Filter>include\General</Filter>
+    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.hpp">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h">
-      <Filter>include\General</Filter>
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetViewManager.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlainTextEditView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

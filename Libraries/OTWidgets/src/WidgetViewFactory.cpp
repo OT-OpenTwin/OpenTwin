@@ -23,11 +23,27 @@ ot::WidgetView* ot::WidgetViewFactory::createView(WidgetViewCfg* _viewConfigurat
 }
 
 ot::WidgetView* ot::WidgetViewFactory::createView(const std::string& _viewType) {
-	if (_viewType == "") {
-
+	auto it = WidgetViewFactory::constructors().find(_viewType);
+	if (it == WidgetViewFactory::constructors().end()) {
+		OT_LOG_EAS("Unknown view type \"" + _viewType + "\"");
+		return nullptr;
 	}
 	else {
-		OT_LOG_EAS("Unknown view type \"" + _viewType + "\"");
+		return it->second();
 	}
-	return nullptr;
+}
+
+void ot::WidgetViewFactory::registerWidgetViewConstructor(const std::string& _key, const WidgetViewConstructor& _constructor) {
+	if (WidgetViewFactory::constructors().find(_key) != WidgetViewFactory::constructors().end()) {
+		OT_LOG_WAS("WidgetView constructor for key \"" + _key + "\" already exists. Ignoring...");
+		return;
+	}
+	else {
+		WidgetViewFactory::constructors().insert_or_assign(_key, _constructor);
+	}
+}
+
+std::map<std::string, ot::WidgetViewConstructor>& ot::WidgetViewFactory::constructors() {
+	static std::map<std::string, WidgetViewConstructor> g_constructors;
+	return g_constructors;
 }

@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Properties">
       <UniqueIdentifier>{936189dc-7c25-44a7-92c5-9bb66be49097}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\WidgetView">
+      <UniqueIdentifier>{8ea3a403-059a-4d8d-87a7-68918d4da351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WidgetView">
+      <UniqueIdentifier>{f11f7ae7-5318-4898-94ac-6336851832a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -187,7 +193,19 @@
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\WidgetViewCfg.h">
-      <Filter>Header Files\General</Filter>
+      <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h">
+      <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetViewCfgFactory.h">
+      <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.h">
+      <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.hpp">
+      <Filter>Header Files\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -333,7 +351,13 @@
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="src\WidgetViewCfg.cpp">
-      <Filter>Source Files\General</Filter>
+      <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlainTextEditViewCfg.cpp">
+      <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetViewCfgFactory.cpp">
+      <Filter>Source Files\WidgetView</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

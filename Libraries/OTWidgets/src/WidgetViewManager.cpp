@@ -10,35 +10,49 @@
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetViewFactory.h"
 
+// ADS header
+#include <ads/DockManager.h>
+
 ot::WidgetViewManager& ot::WidgetViewManager::instance(void) {
 	static WidgetViewManager g_instance;
 	return g_instance;
+}
+
+void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
+	if (m_dockManager) {
+		OT_LOG_WA("WidgetViewManager already initialized");
+		return;
+	}
+
+	m_dockManager = _dockManager;
+
+	if (!m_dockManager) {
+		m_dockManager = new ads::CDockManager;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	OTAssertNullptr(_view);
-	auto map = this->findOrCreateViewMap(_owner);
-	auto it = map->find(_view->name());
-	if (it == map->end()) {
-		map->insert_or_assign(_view->name(), _view);
-		return true;
-	}
-	else if (it->second != _view) {
-		OT_LOG_W("A different view with the same name and owner was already added before. Skipping add");
-		return false;
-	}
-	else {
-		return true;
-	}
+	return this->addViewImpl(_owner, _view, nullptr);
+}
+
+bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
+	return this->addViewImpl(_owner, _view, _area);
 }
 
 ot::WidgetView* ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetViewCfg* _viewConfiguration) {
 	WidgetView* newView = WidgetViewFactory::createView(_viewConfiguration);
 	if (newView) {
-		if (!this->addView(_owner, newView)) {
+		ads::CDockAreaWidget* parentArea = nullptr;
+		if (!_viewConfiguration->parentViewName().empty()) {
+			WidgetView* parentView = this->findView(_owner, _viewConfiguration->parentViewName());
+			if (parentView) {
+				parentArea = parentView->getViewDockWidget()->dockAreaWidget();
+			}
+		}
+		if (!this->addView(_owner, newView, parentArea)) {
 			delete newView;
 			newView = nullptr;
 		}
@@ -123,12 +137,50 @@ ot::WidgetView* ot::WidgetViewManager::findOrCreateDefaultView(DefaultWidgetView
 
 // Private
 
-ot::WidgetViewManager::WidgetViewManager() {
-
-}
+ot::WidgetViewManager::WidgetViewManager()
+	: m_dockManager(nullptr) 
+{}
 
 ot::WidgetViewManager::~WidgetViewManager() {
 
+}
+
+bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
+	OTAssertNullptr(_view);
+	auto map = this->findOrCreateViewMap(_owner);
+	auto it = map->find(_view->name());
+	if (it == map->end()) {
+		map->insert_or_assign(_view->name(), _view);
+		switch (_view->initialDockLocation())
+		{
+		case ot::WidgetViewCfg::Default:
+			m_dockManager->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _area);
+			break;
+		case ot::WidgetViewCfg::Left:
+			m_dockManager->addDockWidget(ads::LeftDockWidgetArea, _view->getViewDockWidget(), _area);
+			break;
+		case ot::WidgetViewCfg::Top:
+			m_dockManager->addDockWidget(ads::TopDockWidgetArea, _view->getViewDockWidget(), _area);
+			break;
+		case ot::WidgetViewCfg::Right:
+			m_dockManager->addDockWidget(ads::RightDockWidgetArea, _view->getViewDockWidget(), _area);
+			break;
+		case ot::WidgetViewCfg::Bottom:
+			m_dockManager->addDockWidget(ads::BottomDockWidgetArea, _view->getViewDockWidget(), _area);
+			break;
+		default:
+			OT_LOG_E("Unknown dock location");
+			m_dockManager->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _area);
+		}
+		return true;
+	}
+	else if (it->second != _view) {
+		OT_LOG_W("A different view with the same name and owner was already added before. Skipping add");
+		return false;
+	}
+	else {
+		return true;
+	}
 }
 
 void ot::WidgetViewManager::clear(const BasicServiceInformation& _owner) {

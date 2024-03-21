@@ -37,6 +37,14 @@ void ot::WidgetView::setName(const std::string& _name) {
 	m_dockWidget->setObjectName(_name);
 }
 
+void ot::WidgetView::setViewTitle(const QString& _title) {
+	m_dockWidget->setWindowTitle(_title);
+}
+
+QString ot::WidgetView::viewTitle(void) const {
+	return m_dockWidget->windowTitle();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected

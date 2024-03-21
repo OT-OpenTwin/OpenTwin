@@ -50,6 +50,7 @@
     <ClInclude Include="include\OTGui\OnePropertyDialogCfg.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
+    <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h" />
     <ClInclude Include="include\OTGui\Property.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
     <ClInclude Include="include\OTGui\PropertyColor.h" />
@@ -67,6 +68,9 @@
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
     <ClInclude Include="include\OTGui\StyleValue.h" />
     <ClInclude Include="include\OTGui\WidgetViewCfg.h" />
+    <ClInclude Include="include\OTGui\WidgetViewCfgFactory.h" />
+    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.h" />
+    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
@@ -100,6 +104,7 @@
     <ClCompile Include="src\NavigationTreePackage.cpp" />
     <ClCompile Include="src\OnePropertyDialogCfg.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
+    <ClCompile Include="src\PlainTextEditViewCfg.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />
     <ClCompile Include="src\PropertyColor.cpp" />
@@ -117,6 +122,7 @@
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />
     <ClCompile Include="src\WidgetViewCfg.cpp" />
+    <ClCompile Include="src\WidgetViewCfgFactory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

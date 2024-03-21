@@ -58,6 +58,7 @@
     <ClCompile Include="src\MessageDialog.cpp" />
     <ClCompile Include="src\OnePropertyDialog.cpp" />
     <ClCompile Include="src\OTQtConverter.cpp" />
+    <ClCompile Include="src\PlainTextEditView.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\PlainTextEdit.cpp" />
     <ClCompile Include="src\PropertyDialog.cpp" />
@@ -88,9 +89,12 @@
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewManager.h" />
+    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.h" />
+    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.hpp" />
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <ClInclude Include="include\OTWidgets\CheckBox.h" />
     <QtMoc Include="include\OTWidgets\ColorPickButton.h" />
