@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void openProject(std::string newProjectName);
+    void openProject();
     void setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject);
 
     void importProject(const std::string& fileName, const std::string& prjName);
@@ -30,7 +30,7 @@ public:
     void downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version);
     void copyFiles(const std::string& newVersion);
     std::string getLocalFileName() { return localProjectFileName; }
-    void setLocalFileName(std::string projectName, std::string fileName);
+    void setLocalFileName(std::string fileName);
     bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists);
 
 private:
@@ -56,8 +56,6 @@ private:
     void                       deleteLocalProjectFiles(const std::string& baseProjectName);
     bool                       restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version);
     bool                       downloadFile(const std::string& cacheFolderVersion, ot::UID entityID, ot::UID version);
-    std::string                readLocalProjectNameFromRegistry(const std::string& projectName);
-    void                       saveLocalProjectNameToRegistry(const std::string& projectName, const std::string& fileName);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

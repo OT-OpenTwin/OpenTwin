@@ -172,6 +172,7 @@
 #define OT_ACTION_CMD_UI_SS_DOWNLOAD "StudioSuite.Download"
 #define OT_ACTION_CMD_UI_SS_COPY "StudioSuite.Copy"
 #define OT_ACTION_CMD_UI_SS_INFORMATION "StudioSuite.Information"
+#define OT_ACTION_CMD_UI_SS_SETCSTFILE "StudioSuite.SetCSTFile"
 #define OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED "StudioSuite.UploadNeeded"
 #define OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED "StudioSuite.DownloadNeeded"
 #define OT_ACTION_CMD_UI_SS_FILES_UPLOADED "StudioSuite.FilesUploaded"
@@ -179,6 +180,7 @@
 #define OT_ACTION_CMD_UI_SS_MATERIALS "StudioSuite.MaterialsInformation"
 #define OT_ACTION_CMD_UI_SS_SHAPEINFO "StudioSuite.ShapesInformation"
 #define OT_ACTION_CMD_UI_SS_TRIANGLES "StudioSuite.ShapesTriangles"
+#define OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME "StudioSuite.GetLocalFileName"
 
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"
@@ -347,6 +349,7 @@
 #define OT_ACTION_PARAM_FILE_LoadContent "File.LoadContent"
 #define OT_ACTION_PARAM_FILE_Type "File.Type"
 #define OT_ACTION_PARAM_SENDER_URL "Sender.URL"
+#define OT_ACTION_PARAM_HOSTNAME "Host.Name"
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
 

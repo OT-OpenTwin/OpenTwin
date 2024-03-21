@@ -112,6 +112,7 @@ public:
 	void modelSelectionChangedNotification(void);
 
 	void importProject(void);
+	void setCSTFile(void);
 	void showInformation(void);
 	void commitChanges(void);
 	void getChanges(void);
@@ -127,6 +128,11 @@ public:
 	void shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
 	void storeShape(const std::string& name, const std::string& triangles, const std::string& materialsFolder, ot::UID materialsFolderID);
 	void createFacets(const std::string& data, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges);
+	void writeProjectInformation(const std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
+	bool readProjectInformation(std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
+	bool isProjectInitialized();
+	std::string getLocalFileName(const std::string& hostName);
+	void addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);

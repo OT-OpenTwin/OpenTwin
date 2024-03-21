@@ -25,12 +25,15 @@
 #include "EntityMaterial.h"
 #include "EntityProperties.h"
 #include "EntityGeometry.h"
+#include "EntityFile.h"
+#include "EntityBinaryData.h"
 
 #include "boost/algorithm/string.hpp"
 
 #include <thread>
 #include <map>
 #include <sstream>
+#include <filesystem>
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_STUDIOSUITE
@@ -105,6 +108,12 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		shapeTriangles(names, triangles);
 		return "";
 	}
+	else if (_action == OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME)
+	{
+		std::string hostName = ot::json::getString(_doc, OT_ACTION_PARAM_HOSTNAME);
+
+		return getLocalFileName(hostName);
+	}
 
 	return OT_ACTION_RETURN_UnknownAction;
 }
@@ -120,13 +129,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("Project");
 	
-	_ui->addMenuGroup("Project", "Import");
+	_ui->addMenuGroup("Project", "Local Project");
 	_ui->addMenuGroup("Project", "Versions");
 
 	ot::Flags<ot::ui::lockType> modelWrite;
 	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
 
-	_ui->addMenuButton("Project", "Import", "CST File", "CST File", modelWrite, "Import", "Default");
+	_ui->addMenuButton("Project", "Local Project", "Import", "Import", modelWrite, "Import", "Default");
+	_ui->addMenuButton("Project", "Local Project", "Set File", "Set File", modelWrite, "ProjectSaveAs", "Default");
 	_ui->addMenuButton("Project", "Versions", "Information", "Information", modelWrite, "Information", "Default");
 	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("Project", "Versions", "Get", "Get", modelWrite, "ArrowGreenDown", "Default");
@@ -179,7 +189,8 @@ bool Application::startAsRelayService(void) const
 
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (     action == "Project:Import:CST File")			  importProject();
+	if		(action == "Project:Local Project:Import")		  importProject();
+	else if (action == "Project:Local Project:Set File")	  setCSTFile();
 	else if (action == "Project:Versions:Information")		  showInformation();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
 	else if (action == "Project:Versions:Get")			      getChanges();
@@ -230,12 +241,33 @@ void Application::importProject(void)
 {
 	modelComponent()->clearNewEntityList();
 
-	// TODO: Check whether the project has already been initialized
+	// Check whether the project has already been initialized
+	if (isProjectInitialized())
+	{
+		uiComponent()->displayErrorPrompt("This project has already been initialized.");
+		return;
+	}
 	 
-	
 	// Send the import message to the UI
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_IMPORT, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	uiComponent()->sendMessage(true, doc);
+}
+
+void Application::setCSTFile(void)
+{
+	// Check whether the project has already been initialized
+	if (!isProjectInitialized())
+	{
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		return;
+	}
+
+	// Send the set file message to the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SETCSTFILE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
@@ -245,8 +277,12 @@ void Application::commitChanges(void)
 {
 	modelComponent()->clearNewEntityList();
 
-	// TODO: Check whether the project has already been initialized
-
+	// Check whether the project has already been initialized
+	if (!isProjectInitialized())
+	{
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		return;
+	}
 
 	// Send the commit message to the UI
 	ot::JsonDocument doc;
@@ -258,12 +294,20 @@ void Application::commitChanges(void)
 
 void Application::showInformation(void)
 {
+	// Check whether the project has already been initialized
+	if (!isProjectInitialized())
+	{
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		return;
+	}
+
 	std::string currentVersion = modelComponent()->getCurrentModelVersion();
 
 	// Send the information message to the UI
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_INFORMATION, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(currentVersion, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }
@@ -272,8 +316,12 @@ void Application::getChanges(void)
 {
 	modelComponent()->clearNewEntityList();
 
-	// TODO: Check whether the project has already been initialized
-
+	// Check whether the project has already been initialized
+	if (!isProjectInitialized())
+	{
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		return;
+	}
 
 	// Get the current model version
 	std::string version = modelComponent()->getCurrentModelVersion();
@@ -290,6 +338,27 @@ void Application::getChanges(void)
 void Application::uploadNeeded(ot::JsonDocument& _doc)
 {
 	size_t count = ot::json::getInt64(_doc, OT_ACTION_PARAM_COUNT);
+
+	std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Name);
+	std::string hostName= ot::json::getString(_doc, OT_ACTION_PARAM_HOSTNAME);
+
+	std::string simpleFileName;
+	std::list<std::pair<std::string, std::string>> hostNamesAndFileNames;
+
+	readProjectInformation(simpleFileName, hostNamesAndFileNames);
+
+	addHostNameAndFileName(hostName, fileName, hostNamesAndFileNames);
+	hostNamesAndFileNames.push_back(std::pair<std::string, std::string>(hostName, fileName));
+
+	std::filesystem::path path(fileName);
+	if (!simpleFileName.empty())
+	{
+		assert(simpleFileName == path.filename().string());
+	}
+
+	simpleFileName = path.filename().string();
+
+	writeProjectInformation(simpleFileName, hostNamesAndFileNames);
 
 	ot::UIDList entityID, versionID;
 
@@ -743,5 +812,115 @@ void Application::createFacets(const std::string& data, std::vector<Geometry::No
 	{
 		nodes.push_back(n);
 	}
+}
+
+void Application::writeProjectInformation(const std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
+{
+	std::stringstream data;
+	data << simpleFileName << std::endl;
+	for (auto item : hostNamesAndFileNames)
+	{
+		data << item.first << std::endl;
+		data << item.second << std::endl;
+	}
+
+	EntityBinaryData* dataEntity = new EntityBinaryData(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName());
+
+	std::string stringData = data.str();
+
+	dataEntity->setData(stringData.c_str(), stringData.size()+1);
+	dataEntity->StoreToDataBase();
+
+	EntityFile* projectInformation = new EntityFile(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName());
+	projectInformation->setName("Files/Information");
+	projectInformation->setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+	projectInformation->setEditable(false);
+	projectInformation->StoreToDataBase();
+
+	modelComponent()->addNewDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion(), projectInformation->getEntityID());
+	modelComponent()->addNewTopologyEntity(projectInformation->getEntityID(), projectInformation->getEntityStorageVersion(), false);
+
+	delete dataEntity;
+	dataEntity = nullptr;
+
+	delete projectInformation;
+	projectInformation = nullptr;
+}
+
+bool Application::readProjectInformation(std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
+{
+	// Check whether the Information entity exists
+	ot::EntityInformation infoEntity;
+	if (!modelComponent()->getEntityInformation("Files/Information", infoEntity))
+	{
+		return false; // This entity does not yet exist -> the project is not initialized yet
+	}
+
+	EntityFile* projectInformation = dynamic_cast<EntityFile *> (modelComponent()->readEntityFromEntityIDandVersion(infoEntity.getID(), infoEntity.getVersion(), getClassFactory()));
+	if (projectInformation == nullptr) return false;
+
+	std::stringstream content(projectInformation->getData()->getData().data());
+
+	std::getline(content, simpleFileName);
+	while (!content.eof())
+	{
+		std::string hostName, fileName;
+		std::getline(content, hostName);
+		std::getline(content, fileName);
+
+		if (!hostName.empty() && !fileName.empty())
+		{
+			hostNamesAndFileNames.push_back(std::pair<std::string, std::string>(hostName, fileName));
+		}
+	}
+
+	return true;
+}
+
+bool Application::isProjectInitialized()
+{
+	std::string simpleFileName;
+	std::list<std::pair<std::string, std::string>> hostNamesAndFileNames;
+
+	return readProjectInformation(simpleFileName, hostNamesAndFileNames);
+}
+
+std::string Application::getLocalFileName(const std::string &hostName)
+{
+	std::string simpleFileName;
+	std::list<std::pair<std::string, std::string>> hostNamesAndFileNames;
+
+	if (!readProjectInformation(simpleFileName, hostNamesAndFileNames))
+	{
+		return ""; // This project has not yet been initialized
+	}
+
+	// Try to find the Hostname in the list
+	for (auto item : hostNamesAndFileNames)
+	{
+		if (item.first == hostName)
+		{
+			// We have found this hostName
+			return item.second;
+		}
+	}
+
+	return ""; // We could not find the host name in the list
+}
+
+void Application::addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
+{
+	for (auto item : hostNamesAndFileNames)
+	{
+		if (item.first == hostName)
+		{
+			// We have found this hostName
+			item.second = fileName;
+			return;
+		}
+	}
+
+	// This host name was not yet in the list
+	hostNamesAndFileNames.push_back(std::pair<std::string, std::string>(hostName, fileName));
 }
 

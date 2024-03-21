@@ -2339,7 +2339,8 @@ std::string ExternalServicesComponent::dispatchAction(ot::JsonDocument & _doc, c
 				|| action == OT_ACTION_CMD_UI_SS_UPLOAD
 				|| action == OT_ACTION_CMD_UI_SS_DOWNLOAD
 				|| action == OT_ACTION_CMD_UI_SS_COPY
-				|| action == OT_ACTION_CMD_UI_SS_INFORMATION) {
+				|| action == OT_ACTION_CMD_UI_SS_INFORMATION
+				|| action == OT_ACTION_CMD_UI_SS_SETCSTFILE) {
 
 					return StudioSuiteConnectorAPI::processAction(action, _doc, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 			}
@@ -2818,7 +2819,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 		m_lockManager->lock(app, ot::ui::tlAll);
 
-		StudioSuiteConnectorAPI::openProject(projectName);
+		StudioSuiteConnectorAPI::openProject();
 
 		m_currentSessionID = projectName;
 		m_currentSessionID.append(":").append(collectionName);
@@ -3400,8 +3401,22 @@ void ExternalServicesComponent::sendExecuteRequest(const char* url, const char* 
 	std::string responseString;
 	sendHttpRequest(EXECUTE, url, message, responseString);
 
-	delete [] url; url = nullptr;
-	delete [] message; message = nullptr;
+	delete[] url; url = nullptr;
+	delete[] message; message = nullptr;
+}
+
+char* ExternalServicesComponent::sendExecuteRequestWithAnswer(const char* url, const char* message)
+{
+	std::string responseString;
+	sendHttpRequest(EXECUTE, url, message, responseString);
+
+	delete[] url; url = nullptr;
+	delete[] message; message = nullptr;
+
+	char* response = new char[responseString.length() + 1];
+	strcpy(response, responseString.c_str());
+
+	return response;
 }
 
 void ExternalServicesComponent::setProgressState(bool visible, const char* message, bool continuous)

@@ -21,8 +21,9 @@
 #include <QFileDialog>					// QFileDialog
 #include <qdir.h>						// QDir
 #include <qsettings>
+#include <qhostinfo>
 
-void ProjectManager::openProject(std::string newProjectName)
+void ProjectManager::openProject()
 {
 	uploadFileList.clear();
 	projectName.clear();
@@ -33,15 +34,12 @@ void ProjectManager::openProject(std::string newProjectName)
 	deletedFiles.clear();
 	changeMessage.clear();
 	currentOperation = OPERATION_NONE;
-
-	localProjectFileName = readLocalProjectNameFromRegistry(newProjectName);
+	localProjectFileName.clear();
 }
 
-void ProjectManager::setLocalFileName(std::string projectName, std::string fileName)
+void ProjectManager::setLocalFileName(std::string fileName)
 { 
 	localProjectFileName = fileName; 
-
-	saveLocalProjectNameToRegistry(projectName, fileName);
 }
 
 void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject)
@@ -87,9 +85,13 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 
 		ProgressInfo::getInstance().setProgressValue(10);
 
+		std::string hostName = QHostInfo::localHostName().toStdString();
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
+		doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 
 		ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}
@@ -843,16 +845,3 @@ bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID
 
 	return success;
 }
-
-std::string ProjectManager::readLocalProjectNameFromRegistry(const std::string& projectName)
-{
-	QSettings settings("OpenTwin", "StudioSuiteProjects");
-	return settings.value(projectName, "").toString().toStdString();
-}
-
-void ProjectManager::saveLocalProjectNameToRegistry(const std::string& projectName, const std::string& fileName)
-{
-	QSettings settings("OpenTwin", "StudioSuiteProjects");
-	settings.setValue(projectName, fileName.c_str());
-}
-
