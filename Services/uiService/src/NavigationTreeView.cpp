@@ -1,4 +1,4 @@
-//! @file TableViewerView.cpp
+//! @file NavigationTreeView.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,16 +6,16 @@
 #include "stdafx.h"
 
 // OpenTwin header
-#include "TableViewerView.h"
+#include "NavigationTreeView.h"
 #include "OTWidgets/WidgetViewRegistrar.h"
 
-//static ot::WidgetViewRegistrar<ot::TableViewerView> TableViewerViewRegistrar(OT_WIDGETTYPE_TableViewer);
+//static ot::WidgetViewRegistrar<ot::NavigationTreeView> NavigationTreeViewRegistrar(OT_WIDGETTYPE_NavigationTree);
 
-ot::TableViewerView::TableViewerView() {
-	this->addWidgetToDock(this->getTable());
+ot::NavigationTreeView::NavigationTreeView() {
+	this->addWidgetToDock(this->widget());
 }
 
-ot::TableViewerView::~TableViewerView() {
+ot::NavigationTreeView::~NavigationTreeView() {
 
 }
 
@@ -23,11 +23,11 @@ ot::TableViewerView::~TableViewerView() {
 
 // Base class functions
 
-QWidget* ot::TableViewerView::getViewWidget(void) {
-	return this->getTable();
+QWidget* ot::NavigationTreeView::getViewWidget(void) {
+	return this->widget();
 }
 
-bool ot::TableViewerView::setupFromConfig(WidgetViewCfg* _config) {
+bool ot::NavigationTreeView::setupFromConfig(WidgetViewCfg* _config) {
 	if (!WidgetView::setupFromConfig(_config)) return false;
 
 

@@ -37,6 +37,12 @@
     <Filter Include="Header Files\customWidgets">
       <UniqueIdentifier>{43562513-ec1f-4c42-b7da-a0b294b91791}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\WidgetView">
+      <UniqueIdentifier>{afa15437-274f-4c00-8540-08f4aa3adc51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WidgetView">
+      <UniqueIdentifier>{2794138f-29af-48a1-b8f7-9f6c997b2921}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -111,6 +117,12 @@
     <ClCompile Include="src\SelectEntitiesDialog.cpp">
       <Filter>Source Files\customWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\NavigationTreeView.cpp">
+      <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridView.cpp">
+      <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -151,6 +163,12 @@
     </ClInclude>
     <ClInclude Include="include\FileHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyGridView.h">
+      <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NavigationTreeView.h">
+      <Filter>Header Files\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
