@@ -1170,7 +1170,7 @@ SectionEnd
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Clones both required GitHub repositories under https://github.com/OT-OpenTwin into the OpenTwin Developer directory"
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "OpenTwin Deployment Files - Install all required OpenTwin files"
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "MongoDB Setup - Install MongoDB and set up all configurations for OpenTwin"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "MongoDB Setup - Install MongoDB and MongoDB Compass. Set up all configurations for OpenTwin"
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "Install Git's graphical UI"
 
