@@ -1013,8 +1013,12 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const 
 	std::string request(mode);
 	request.append("\n").append(url).append("\n").append(json);
 
+	OT_LOG("Sending message to (Receiver = \"" + url + "\"; Endpoint = " + (operation == EXECUTE ? "Execute" : (operation == QUEUE ? "Queue" : "Execute one way TLS")) + "). Message = \"" + json + "\"", ot::OUTGOING_MESSAGE_LOG);
+
 	// And finally send it through the websocket
 	m_websocket->sendMessage(request, response);
+
+	OT_LOG("...Sending message to (Receiver = \"" + url + "\"; Endpoint = " + (operation == EXECUTE ? "Execute" : (operation == QUEUE ? "Queue" : "Execute one way TLS")) + ") completed. Response = \"" + response + "\"", ot::OUTGOING_MESSAGE_LOG);
 
 	return true;
 }
