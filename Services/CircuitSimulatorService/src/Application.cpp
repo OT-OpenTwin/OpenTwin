@@ -225,7 +225,7 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
 {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	//std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	
 
 
 	if (action == "Circuit Simulator:Edit:Add Solver")
@@ -481,7 +481,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
-	m_ngSpice.ngSpice_Initialize(allConnectionEntitiesByID,allEntitiesByBlockID, name, simulationType->getValue(), printSettings->getValue());
+	m_ngSpice.ngSpice_Initialize(solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name, simulationType->getValue(), printSettings->getValue());
 	m_ngSpice.clearBufferStructure(name);
 }
 

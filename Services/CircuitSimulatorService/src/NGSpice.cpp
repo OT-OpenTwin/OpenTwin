@@ -121,12 +121,19 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 
 
-std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
+std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
 {
 
 	// Now I write the informations to the File
 	// Here i get the Circuit and the map of Elements
 	
+	EntityPropertiesString* element = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Element"));
+	EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
+	EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
+	EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
+
+	std::string simulationLine = simulationType + " " + element->getValue() + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
+
 
 		std::string TitleLine = "circbyline *Test";
 		ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
@@ -164,10 +171,10 @@ std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlo
 	}
 
 
-	simulationType = "circbyline " + simulationType;
+	simulationLine = "circbyline " + simulationLine;
 	printSettings = "circbyline " + printSettings;
 
-	ngSpice_Command(const_cast<char*>(simulationType.c_str()));
+	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
@@ -181,7 +188,7 @@ std::string NGSpice::generateNetlist(std::map<ot::UID, std::shared_ptr<EntityBlo
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
+std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -211,7 +218,7 @@ std::string NGSpice::ngSpice_Initialize(std::map<ot::UID, std::shared_ptr<Entity
 	/* Some simulation*/
 	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
 	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
-	 generateNetlist(allConnectionEntities,allEntitiesByBlockID,simulationType,printSettings,editorname);
+	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID,simulationType,printSettings,editorname);
 
 	 Numbers::nodeNumber = 0;
 	 Numbers::resistorNetlistNumber = 0;

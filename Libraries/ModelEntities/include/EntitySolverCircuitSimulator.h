@@ -17,11 +17,11 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntitySolverCircuitSimulator"; };
 	
-
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 
 private:
 	bool SetVisibleDCSimulationParameters(bool visible);
+	void createDCProperties();
 
 };
