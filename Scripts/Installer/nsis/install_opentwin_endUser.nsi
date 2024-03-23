@@ -548,6 +548,23 @@ FunctionEnd
 			${OrIf} $5 == ""
 				MessageBox MB_ICONSTOP|MB_OK "Please fill all port fields before proceeding."
 				Abort
+			${EndIf}
+
+			#check for valid range of inputs (1-65535)
+			${If} $0 > 65535 
+				${OrIf} $0 < 1
+			${OrIf} $1 > 65535
+				${OrIf} $1 < 1
+			${OrIf} $2 > 65535
+				${OrIf} $2 < 1
+			${OrIf} $3 > 65535
+				${OrIf} $3 < 1
+			${OrIf} $4 > 65535
+				${OrIf} $4 < 1
+			${OrIf} $5 > 65535
+				${OrIf} $5 < 1
+				MessageBox MB_ICONSTOP|MB_OK "One or more port numbers exceed the valid range of 1 - 65535."
+				Abort
 			${EndIf}	
 
 			#check for redundant entries
