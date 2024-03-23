@@ -1297,8 +1297,8 @@ void AppBase::createUi(void) {
 			uiAPI::textEdit::setAutoScrollToBottomEnabled(m_widgets.debug, true);
 			
 			uiAPI::tabWidget::setObjectName(m_tabViewWidget, "TabView");
-
-			m_widgets.properties->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"), ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"));
+			
+			m_widgets.properties->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"), ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"));
 			m_widgets.properties->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
 
 			uiAPI::contextMenu::clear(m_widgets.output);
