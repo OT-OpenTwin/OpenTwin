@@ -921,8 +921,6 @@ FunctionEnd
 
 Name "${PRODUCT_NAME}"
 OutFile "Install_OpenTwin_dev.exe"
-#InstallDir "$PROGRAMFILES\OpenTwin" ; = $INSTDIR
-#InstallDir "$DEV_ROOT" ; = $INSTDIR
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
 ShowUnInstDetails hide
@@ -930,6 +928,12 @@ ShowUnInstDetails hide
 Section "-Extract Installer Tools (Required)" SEC01
 	SectionIn RO ;read only section
 	SetOutPath ${TEMP_TOOLCHAIN_DIR}
+
+	#File command can only use relative to script location paths
+	#variables won't be recoginzed unfortunately
+	#    ".\" 	 = the script location itself
+	#    "..\" 	 = one directory up
+	#    "..\..\"  = two directories up etc.
 
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
@@ -975,10 +979,6 @@ SectionGroup /e "OpenTwin"
 		DetailPrint "Extracting OpenTwin Deployment files..."
 
 		File /r "..\..\..\Deployment\*.*"
-			#relative to script location
-			#    ".\" 	 = the script location itself
-			#    "..\" 	 = one directory up
-			#    "..\..\"  = two directories up etc.
 
 		#try with refreshenv.cmd
 		${If} $PublicIpSet <> 0 #public IP was set
