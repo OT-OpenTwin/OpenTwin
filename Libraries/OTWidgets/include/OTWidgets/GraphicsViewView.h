@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class GraphicsViewView : public GraphicsView, public WidgetView {
+	class OT_WIDGETS_API_EXPORT GraphicsViewView : public GraphicsView, public WidgetView {
 	public:
 		GraphicsViewView();
 		virtual ~GraphicsViewView();

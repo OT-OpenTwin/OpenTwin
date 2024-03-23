@@ -150,7 +150,7 @@
     <ClInclude Include="include\OTWidgets\OnePropertyDialog.h" />
     <ClInclude Include="include\OTWidgets\OTQtConverter.h" />
     <ClInclude Include="include\OTWidgets\Painter2DFactory.h" />
-    <ClInclude Include="include\OTWidgets\PlainTextEdit.h" />
+    <QtMoc Include="include\OTWidgets\PlainTextEdit.h" />
     <QtMoc Include="include\OTWidgets\PropertyGrid.h" />
     <QtMoc Include="include\OTWidgets\PropertyDialog.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItem.h" />
