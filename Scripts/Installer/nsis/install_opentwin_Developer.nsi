@@ -223,7 +223,7 @@ Function .onInit
 	#reset regView to standard 32bit
 	SetRegView 32
 
-	MessageBox MB_ICONINFORMATION|MB_OK "Microsoft Visual Studio and C++ need to be installed for a full OpenTwin Development environment"
+	MessageBox MB_ICONINFORMATION|MB_OK "Microsoft Visual Studio, C++ compilers and a full Git setup (including SSH) need to be installed for a full OpenTwin Development environment"
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
@@ -723,7 +723,6 @@ FunctionEnd
 		${NSD_CreateText} 0 145 75% 12u ${DEFAULT_MONGODB_STORAGE_PATH}
 			Pop $DirHandleDB
 			${NSD_GetText} $DirHandleDB $MONGODB_DB_PATH
-			#SendMessage $DirHandleDB ${EM_SETREADONLY} 1 0 #set DirHandleDB to read only
 		${NSD_CreateBrowseButton} 350 143 65u 15u "Browse..."
 			Pop $BrowseButton
 		${NSD_OnClick} $BrowseButton SelectDBDirectory
@@ -733,7 +732,6 @@ FunctionEnd
 		${NSD_CreateText} 0 200 75% 12u ${DEFAULT_MONGODB_LOG_PATH}
 			Pop $DirHandleLog
 			${NSD_GetText} $DirHandleLog $MONGODB_LOG_PATH
-			#SendMessage $DirHandleLog ${EM_SETREADONLY} 1 0 #set DirHandleLog to read only
 		${NSD_CreateBrowseButton} 350 198 65u 15u "Browse..."
 			Pop $BrowseButton
 		${NSD_OnClick} $BrowseButton SelectLogDirectory
@@ -879,10 +877,9 @@ FunctionEnd
 
 	; Welcome page
 	!insertmacro MUI_PAGE_WELCOME
-	#!insertmacro MUI_WELCOMEFINISHPAGE_BITMAP
 	; License page
 	!define MUI_LICENSEPAGE_CHECKBOX
-	!insertmacro MUI_PAGE_LICENSE "..\..\..\Deployment\LICENSE.txt"
+	!insertmacro MUI_PAGE_LICENSE ${LICENSE_FILE_PATH}
 
 	; Components page
 	!define MUI_COMPONENTSPAGE_SMALLDESC
@@ -891,18 +888,13 @@ FunctionEnd
 	; Page calls - order is relevant!
 	#page custom DatabaseInfo #MongoDB paths debug page
 	Page custom BrowseDevRoot OnBrowseDevRootLeave
-	; Directory page
-	!insertmacro MUI_PAGE_DIRECTORY
 	Page custom DatabaseEntry
 	Page custom NetworkModePage OnNetworkLeave
 	Page custom PublicIPCertificate OnPublicCertficateLeave
-	#Page custom NetworkInfoPage
+	#Page custom NetworkInfoPage #Network debug page
 	Page custom PortPage OnPortLeave
-	#Page custom PortInfoPage
+	#Page custom PortInfoPage #port debug page
 
-	
-	#Page custom BrowseDevRoot OnBrowseDevRootLeave
-	#Page custom DatabaseEntry
 	; Start menu page
 	var ICONS_GROUP
 	!define MUI_STARTMENUPAGE_NODISABLE

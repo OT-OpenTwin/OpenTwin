@@ -683,7 +683,6 @@ FunctionEnd
 		${NSD_CreateText} 0 145 75% 12u ${DEFAULT_MONGODB_STORAGE_PATH}
 			Pop $DirHandleDB
 			${NSD_GetText} $DirHandleDB $MONGODB_DB_PATH
-			#SendMessage $DirHandleDB ${EM_SETREADONLY} 1 0 #set DirHandleDB to read only
 		${NSD_CreateBrowseButton} 350 143 65u 15u "Browse..."
 			Pop $BrowseButton
 		${NSD_OnClick} $BrowseButton SelectDBDirectory
@@ -693,7 +692,6 @@ FunctionEnd
 		${NSD_CreateText} 0 200 75% 12u ${DEFAULT_MONGODB_LOG_PATH}
 			Pop $DirHandleLog
 			${NSD_GetText} $DirHandleLog $MONGODB_LOG_PATH
-			#SendMessage $DirHandleLog ${EM_SETREADONLY} 1 0 #set DirHandleLog to read only
 		${NSD_CreateBrowseButton} 350 198 65u 15u "Browse..."
 			Pop $BrowseButton
 		${NSD_OnClick} $BrowseButton SelectLogDirectory
@@ -766,7 +764,6 @@ FunctionEnd
 	!insertmacro MUI_PAGE_WELCOME
 	; License page
 	!define MUI_LICENSEPAGE_CHECKBOX
-	#!insertmacro MUI_PAGE_LICENSE "..\..\..\LICENSE.md"
 	!insertmacro MUI_PAGE_LICENSE ${LICENSE_FILE_PATH}
 
 	; Components page
