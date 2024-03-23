@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BasicWidgetView.cpp" />
     <ClCompile Include="src\CheckBox.cpp" />
     <ClCompile Include="src\ColorPickButton.cpp" />
     <ClCompile Include="src\ColorPreviewBox.cpp" />
@@ -91,6 +92,7 @@
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\BasicWidgetView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsViewView.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
