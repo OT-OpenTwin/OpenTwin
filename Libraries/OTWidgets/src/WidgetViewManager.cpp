@@ -33,6 +33,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// View Management
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
 	return this->addViewImpl(_owner, _view, nullptr);
@@ -103,6 +104,40 @@ void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 			this->closeView(_owner, i);
 		}
 	}
+}
+
+void ot::WidgetViewManager::closeViews(void) {
+	std::list<BasicServiceInformation> tmp;
+	for (const auto& it : m_views) {
+		tmp.push_back(it.first);
+	}
+	for (const BasicServiceInformation& i : tmp) {
+		this->closeViews(i);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// View manipulation
+
+void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
+
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Information gathering
+
+QString ot::WidgetViewManager::getCurrentViewTitle(void) const {
+	return QString();
+}
+
+bool ot::WidgetViewManager::viewExists(const std::string& _viewName) const {
+	return false;
+}
+
+bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
+	return false;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -36,6 +36,8 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// View Management
+
 		bool addView(const BasicServiceInformation& _owner, WidgetView* _view);
 
 		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area);
@@ -47,6 +49,24 @@ namespace ot {
 		void closeView(const BasicServiceInformation& _owner, const std::string& _viewName);
 
 		void closeViews(const BasicServiceInformation& _owner);
+
+		void closeViews(void);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// View manipulation
+
+		void setCurrentView(const std::string& _viewName);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Information gathering
+
+		QString getCurrentViewTitle(void) const;
+
+		bool viewExists(const std::string& _viewName) const;
+
+		bool viewTitleExists(const QString& _title) const;
 
 	private:
 		WidgetViewManager();

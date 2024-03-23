@@ -84,6 +84,7 @@
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp" />
+    <ClCompile Include="src\TextEditorView.cpp" />
     <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
@@ -96,6 +97,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsViewView.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
+    <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewManager.h" />
