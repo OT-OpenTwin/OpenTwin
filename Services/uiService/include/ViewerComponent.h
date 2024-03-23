@@ -26,6 +26,7 @@
 #include <QTableWidgetItem>
 
 class QWidget;
+namespace ak { class aTreeWidget; };
 namespace ot { class SettingsData; }
 namespace ot { class AbstractSettingsItem; }
 
@@ -178,8 +179,6 @@ public:
 
 	void shortcutActivated(const std::string &keySequence);
 
-	void setNavigationUid(ak::UID _uid) { m_navigationUid = _uid; }
-
 	void settingsItemChanged(ot::AbstractSettingsItem * _item);
 
 	void contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName);
@@ -190,7 +189,6 @@ public:
 
 private:
 	std::vector<ViewerUIDtype>		m_viewers;
-	ak::UID							m_navigationUid;
 
 	ViewerComponent(const ViewerComponent &) = delete;
 	ViewerComponent & operator = (const ViewerComponent &) = delete;

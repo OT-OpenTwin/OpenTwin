@@ -14,6 +14,8 @@
 
 // AK header
 #include <akAPI/uiAPI.h>
+#include <akWidgets/aTreeWidget.h>
+#include <akWidgets/aPropertyGridWidget.h>
 
 ControlsManager::~ControlsManager() {
 	for (auto itm : m_creatorMap) { delete itm.second; }
@@ -109,6 +111,10 @@ ot::ServiceBase * ControlsManager::objectCreator(ak::UID _itemUid) {
 
 // #######################################################################################################################
 
+LockManager::LockManager(AppBase* _owner)
+	: m_owner(_owner), m_tree(nullptr), m_prop(nullptr)
+{}
+
 LockManager::~LockManager() {
 	
 }
@@ -131,6 +137,36 @@ void LockManager::uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, con
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
 				uiElement->lock(lockLevel.second, lockLevel.first);
+			}
+		}
+	}
+}
+
+void LockManager::uiElementCreated(ot::ServiceBase* _service, ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType>& _typeFlags) {
+	// Create new entrys
+	OTAssert(m_tree == nullptr, "");
+	m_tree = new LockManagerElement{ _tree, _typeFlags };
+
+	// Check existing locks
+	for (auto itm : m_serviceToUiLockLevel) {
+		for (auto lockLevel : *itm.second) {
+			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				m_tree->lock(lockLevel.second, lockLevel.first);
+			}
+		}
+	}
+}
+
+void LockManager::uiElementCreated(ot::ServiceBase* _service, ak::aPropertyGridWidget* _propertyGrid, const ot::Flags<ot::ui::lockType>& _typeFlags) {
+	// Create new entrys
+	OTAssert(m_prop == nullptr, "");
+	m_prop = new LockManagerElement{ _propertyGrid, _typeFlags };
+
+	// Check existing locks
+	for (auto itm : m_serviceToUiLockLevel) {
+		for (auto lockLevel : *itm.second) {
+			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				m_prop->lock(lockLevel.second, lockLevel.first);
 			}
 		}
 	}
@@ -169,6 +205,9 @@ void LockManager::lock(ot::ServiceBase * _service, ot::ui::lockType _type) {
 		itm.second->lock(1, _type);
 	}
 
+	if (m_tree) m_tree->lock(1, _type);
+	if (m_prop) m_prop->lock(1, _type);
+
 	if (_type == ot::ui::tlAll) { m_owner->setWaitingAnimationVisible(true); }
 }
 
@@ -206,6 +245,10 @@ void LockManager::unlock(ot::ServiceBase * _service) {
 		for (auto itm : m_uiElements) {
 			itm.second->unlock(lockVal.second, lockVal.first);
 		}
+
+		if (m_tree) m_tree->unlock(lockVal.second, lockVal.first);
+		if (m_prop) m_prop->unlock(lockVal.second, lockVal.first);
+
 		service->insert_or_assign(lockVal.first, 0);
 	}
 
@@ -228,12 +271,15 @@ void LockManager::unlock(ot::ServiceBase * _service, ot::ui::lockType _type) {
 		for (auto itm : m_uiElements) {
 			itm.second->unlock(1, _type);
 		}
+
+		if (m_tree) m_tree->unlock(1, _type);
+		if (m_prop) m_prop->unlock(1, _type);
 	}
 	else {
 		service->insert_or_assign(_type, v);
 	}
 
-	if (_type == ot::ui::tlAll) {
+	if (_type & ot::ui::tlAll) {
 		if (lockLevel(ot::ui::tlAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
 	}
 }
@@ -320,6 +366,9 @@ void LockManager::cleanService(ot::ServiceBase * _service, bool _reenableElement
 			for (auto itm : m_uiElements) {
 				itm.second->unlock(l.second, l.first);
 			}
+			
+			if (m_tree) m_tree->unlock(l.second, l.first);
+			if (m_prop) m_prop->unlock(l.second, l.first);
 		}
 	}
 
@@ -394,7 +443,15 @@ std::map<ak::UID, int> * LockManager::serviceEnabledLevel(ot::ServiceBase * _ser
 // #######################################################################################################################
 
 LockManagerElement::LockManagerElement(ak::UID _uid, const ot::Flags<ot::ui::lockType> & _flags)
-	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ _uid }
+	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ _uid }, m_tree(nullptr), m_prop(nullptr)
+{}
+
+LockManagerElement::LockManagerElement(ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType>& _flags) 
+	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ ak::invalidUID }, m_tree(_tree), m_prop(nullptr)
+{}
+
+LockManagerElement::LockManagerElement(ak::aPropertyGridWidget* _prop, const ot::Flags<ot::ui::lockType>& _flags) 
+	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ ak::invalidUID }, m_tree(nullptr), m_prop(_prop)
 {}
 
 void LockManagerElement::enable(int _value) {
@@ -406,7 +463,15 @@ void LockManagerElement::enable(int _value) {
 	}
 
 	if (m_disabledCount == 0 && m_lockCount == 0) {
-		ak::uiAPI::object::setEnabled(m_uid, true);
+		if (m_tree) {
+			m_tree->setEnabled(true);
+		}
+		else if (m_prop) {
+			m_prop->setEnabled(true);
+		}
+		else {
+			ak::uiAPI::object::setEnabled(m_uid, true);
+		}
 	}
 }
 
@@ -414,22 +479,30 @@ void LockManagerElement::disable(int _value) {
 	m_disabledCount += _value;
 
 	if (m_disabledCount > 0) {
-		ak::uiAPI::object::setEnabled(m_uid, false);
+		if (m_tree) {
+			m_tree->setEnabled(false);
+		}
+		else if (m_prop) {
+			m_prop->setEnabled(false);
+		}
+		else {
+			ak::uiAPI::object::setEnabled(m_uid, false);
+		}
 	}
 }
 
 void LockManagerElement::lock(int _value, ot::ui::lockType _lockType) {
 	if (m_lockTypes.flagIsSet(_lockType)) {
-		bool isTreeItem = m_lockTypes.flagIsSet(ot::ui::lockType::tlNavigationWrite) || m_lockTypes.flagIsSet(ot::ui::lockType::tlNavigationAll);
-
 		m_lockCount += _value;
 
 		if (m_lockCount > 0) {
-			if (isTreeItem)
-			{
-				if (_lockType == ot::ui::lockType::tlNavigationWrite || _lockType == ot::ui::lockType::tlNavigationAll) {
-					ak::uiAPI::tree::setIsReadOnly(m_uid, true);
+			if (m_tree) {
+				if ((_lockType & ot::ui::lockType::tlNavigationWrite) || (_lockType & ot::ui::lockType::tlNavigationAll)) {
+					m_tree->setIsReadOnly(true);
 				}
+			}
+			else if (m_prop) {
+				m_prop->setEnabled(false);
 			}
 			else {
 				ak::uiAPI::object::setEnabled(m_uid, false);
@@ -440,8 +513,6 @@ void LockManagerElement::lock(int _value, ot::ui::lockType _lockType) {
 
 void LockManagerElement::unlock(int _value, ot::ui::lockType _lockType) {
 	if (m_lockTypes.flagIsSet(_lockType)) {
-		bool isTreeItem = m_lockTypes.flagIsSet(ot::ui::lockType::tlNavigationWrite) || m_lockTypes.flagIsSet(ot::ui::lockType::tlNavigationAll);
-
 		m_lockCount -= _value;
 
 		if (m_lockCount < 0)
@@ -451,11 +522,13 @@ void LockManagerElement::unlock(int _value, ot::ui::lockType _lockType) {
 		}
 
 		if (m_lockCount == 0 && m_disabledCount == 0) {
-			if (isTreeItem)
-			{
-				if (_lockType == ot::ui::lockType::tlNavigationWrite || _lockType == ot::ui::lockType::tlNavigationAll) {
-					ak::uiAPI::tree::setIsReadOnly(m_uid, false);
+			if (m_tree) {
+				if ((_lockType & ot::ui::lockType::tlNavigationWrite) || (_lockType & ot::ui::lockType::tlNavigationAll)) {
+					m_tree->setIsReadOnly(false);
 				}
+			}
+			else if (m_prop) {
+				m_prop->setEnabled(true);
 			}
 			else {
 				ak::uiAPI::object::setEnabled(m_uid, true);

@@ -158,7 +158,7 @@
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
-      <Filter>src</Filter>
+      <Filter>src\WidgetView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

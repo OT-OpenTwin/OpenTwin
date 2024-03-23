@@ -23,6 +23,8 @@
 class LockManagerElement;
 class AppBase;
 namespace ot { class ServiceBase; }
+namespace ak { class aTreeWidget; }
+namespace ak { class aPropertyGridWidget; }
 
 class ControlsManager {
 public:
@@ -52,12 +54,14 @@ private:
 
 class LockManager {
 public:
-	LockManager(AppBase * _owner) : m_owner(_owner) {}
+	LockManager(AppBase* _owner);
 	virtual ~LockManager();
 
 	//! @brief Will create a new entry for this 
 	//! This function will be called from the controls manager automatically if the lock manager was set
 	void uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, const ot::Flags<ot::ui::lockType> & _typeFlags);
+	void uiElementCreated(ot::ServiceBase * _service, ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType> & _typeFlags);
+	void uiElementCreated(ot::ServiceBase * _service, ak::aPropertyGridWidget* _propertyGrid, const ot::Flags<ot::ui::lockType> & _typeFlags);
 
 	//! @brief Will remove all the stored information about the UI element
 	//! This function will be called from the controls manager automatically if the lock manager was set
@@ -85,6 +89,8 @@ private:
 	std::map<ak::UID, int> * serviceEnabledLevel(ot::ServiceBase * _service);
 	
 	AppBase *														m_owner;
+	LockManagerElement* m_tree;
+	LockManagerElement* m_prop;
 
 	std::map<ot::ServiceBase *, std::map<ot::ui::lockType, int> *>	m_serviceToUiLockLevel;		// Contains a overview of sender to UI elements lock levels
 
@@ -99,6 +105,8 @@ private:
 class LockManagerElement {
 public:
 	LockManagerElement(ak::UID _uid, const ot::Flags<ot::ui::lockType> & _flags);
+	LockManagerElement(ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType> & _flags);
+	LockManagerElement(ak::aPropertyGridWidget* _prop, const ot::Flags<ot::ui::lockType> & _flags);
 
 	void enable(int _value);
 	void disable(int _value);
@@ -109,6 +117,8 @@ public:
 
 private:
 
+	ak::aTreeWidget* m_tree;
+	ak::aPropertyGridWidget* m_prop;
 	ak::UID							m_uid;
 	ot::Flags<ot::ui::lockType>		m_lockTypes;
 	int								m_disabledCount;

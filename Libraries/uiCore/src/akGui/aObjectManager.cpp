@@ -49,13 +49,11 @@
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aListWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPropertyGridWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aTableWidget.h>
 #include <akWidgets/aTabWidget.h>
 #include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
-#include <akWidgets/aTreeWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
 #include <akWidgets/aTtbSubgroup.h>
@@ -310,19 +308,6 @@ ak::UID ak::aObjectManager::createNiceLineEdit(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createPropertyGrid(
-	UID												_creatorUid
-) {
-	// Create object
-	aPropertyGridWidget * obj = new aPropertyGridWidget;
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createPushButton(
 	UID												_creatorUid,
 	const QString &										_text
@@ -468,19 +453,6 @@ ak::UID ak::aObjectManager::createToolButtonCustomContextMenu(
 ) {
 	// Create object
 	aToolButtonCustomContextMenu * obj = new aToolButtonCustomContextMenu(_toolButton);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createTree(
-	UID												_creatorUid
-) {
-	// Create object
-	aTreeWidget * obj = new aTreeWidget;
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data

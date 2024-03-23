@@ -194,12 +194,6 @@ namespace ak {
 			const QString &										_text = QString("")
 		);
 
-		//! @brief Will create a property grid and return its UID
-		//! @param _creatorUid The UID of the creator
-		UID createPropertyGrid(
-			UID												_creatorUid
-		);
-
 		//! @brief Will create a new options dialog and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		UID createOptionsDialog(
@@ -264,12 +258,6 @@ namespace ak {
 			UID												_creatorUid,
 			const QString &										_text,
 			const QIcon &										_icon
-		);
-
-		//! @brief Will create a tree and return its UID
-		//! @param _creatorUid The UID of the creator
-		UID createTree(
-			UID												_creatorUid
 		);
 
 		//! @brief Will create a new tab view and return its UID

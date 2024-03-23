@@ -1,10 +1,7 @@
-/*
- * uiServiceAPI.cpp
- *
- *  Created on: September 17, 2020
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
+//! @file AppBase.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // uiService header
 #include "AppBase.h"		// Corresponding header
@@ -31,6 +28,7 @@
 #include <akWidgets/aWindowManager.h>
 #include <akWidgets/aDockWidget.h>
 #include <akWidgets/aTextEditWidget.h>
+#include <akWidgets/aPropertyGridWidget.h>
 #include <akWidgets/aTreeWidget.h>
 #include <akCore/rJSON.h>
 #include <akDialogs/aLogInDialog.h>
@@ -153,8 +151,8 @@ AppBase::AppBase()
 
 	m_widgets.debug = invalidUID;
 	m_widgets.output = invalidUID;
-	m_widgets.properties = invalidUID;
-	m_widgets.projectNavigation = invalidUID;
+	m_widgets.properties = nullptr;
+	m_widgets.projectNavigation = nullptr;
 
 	m_contextMenus.output.clear = invalidID;
 
@@ -492,20 +490,6 @@ void AppBase::notify(
 				}
 			}
 		}
-		else if (_senderId == m_widgets.properties) {
-			if (_eventType == etChanged) {
-				// We first ask the viewer whether it needs to handle the property grid change.
-				if (!m_viewerComponent->propertyGridValueChanged(_info1))
-				{
-					// If not, we pass thic change on to the external services component
-					m_ExternalServicesComponent->propertyGridValueChanged(_info1);
-				}
-			}
-			else if (_eventType == etDeleted)
-			{
-				m_ExternalServicesComponent->propertyGridValueDeleted(_info1);
-			}
-		}
 	}
 	catch (const aException & e) {
 		OT_LOG_E(e.getWhat());
@@ -576,7 +560,7 @@ void AppBase::lockSelectionAndModification(bool flag)
 	}
 
 	lockWelcomeScreen(flag);
-	uiAPI::tree::setEnabled(m_widgets.projectNavigation, !flag);
+	m_widgets.projectNavigation->setEnabled(!flag);
 }
 
 void AppBase::lockUI(bool flag)
@@ -1277,8 +1261,8 @@ void AppBase::createUi(void) {
 
 			m_widgets.debug = uiAPI::createTextEdit(m_uid);
 			m_widgets.output = uiAPI::createTextEdit(m_uid, BUILD_INFO);
-			m_widgets.properties = uiAPI::createPropertyGrid(m_uid);
-			m_widgets.projectNavigation = uiAPI::createTree(m_uid);
+			m_widgets.properties = new ak::aPropertyGridWidget;
+			m_widgets.projectNavigation = new ak::aTreeWidget;
 
 			{
 				aTextEditWidget * outputTextEdit = uiAPI::object::get<aTextEditWidget>(m_widgets.output);
@@ -1288,8 +1272,7 @@ void AppBase::createUi(void) {
 				outputTextEdit->setFont(f);
 			}
 			{
-				aTreeWidget * navigationWidget = uiAPI::object::get<aTreeWidget>(m_widgets.projectNavigation);
-				navigationWidget->setChildItemsVisibleWhenApplyingFilter(true);
+				m_widgets.projectNavigation->setChildItemsVisibleWhenApplyingFilter(true);
 			}
 
 			m_tabViewWidget = uiAPI::createTabView(m_uid);
@@ -1303,10 +1286,10 @@ void AppBase::createUi(void) {
 			// Setup widgets
 			OT_LOG_D("Settings up widgets");
 
-			uiAPI::tree::setAutoSelectAndDeselectChildrenEnabled(m_widgets.projectNavigation, true);
-			uiAPI::tree::setMultiSelectionEnabled(m_widgets.projectNavigation, true);
-			uiAPI::tree::setFilterVisible(m_widgets.projectNavigation, true);
-			uiAPI::tree::setSortingEnabled(m_widgets.projectNavigation, true);
+			m_widgets.projectNavigation->setAutoSelectAndDeselectChildrenEnabled(true);
+			m_widgets.projectNavigation->setMultiSelectionEnabled(true);
+			m_widgets.projectNavigation->setFilterVisible(true);
+			m_widgets.projectNavigation->setSortingEnabled(true);
 
 			uiAPI::textEdit::setReadOnly(m_widgets.output);
 			uiAPI::textEdit::setReadOnly(m_widgets.debug);
@@ -1315,8 +1298,8 @@ void AppBase::createUi(void) {
 			
 			uiAPI::tabWidget::setObjectName(m_tabViewWidget, "TabView");
 
-			uiAPI::propertyGrid::setGroupStateIcons(m_widgets.properties, "ArrowGreenDown", "Default", "ArrowBlueRight", "Default");
-			uiAPI::propertyGrid::setDeleteIcon(m_widgets.properties, "DeleteProperty", "Default");
+			m_widgets.properties->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"), ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"));
+			m_widgets.properties->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
 
 			uiAPI::contextMenu::clear(m_widgets.output);
 			uiAPI::contextMenu::clear(m_widgets.debug);
@@ -1332,8 +1315,8 @@ void AppBase::createUi(void) {
 			// Set widgets to docks
 			uiAPI::dock::setCentralWidget(m_docks.debug, m_widgets.debug);
 			uiAPI::dock::setCentralWidget(m_docks.output, m_widgets.output);
-			uiAPI::dock::setCentralWidget(m_docks.properties, m_widgets.properties);
-			uiAPI::dock::setCentralWidget(m_docks.projectNavigation, m_widgets.projectNavigation);
+			uiAPI::dock::setCentralWidget(m_docks.properties, m_widgets.properties->widget());
+			uiAPI::dock::setCentralWidget(m_docks.projectNavigation, m_widgets.projectNavigation->widget());
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Display docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 30);
@@ -1383,7 +1366,14 @@ void AppBase::createUi(void) {
 			// Register notifier
 			uiAPI::registerUidNotifier(m_widgets.output, this);
 			uiAPI::registerUidNotifier(m_tabViewWidget, this);
-			uiAPI::registerUidNotifier(m_widgets.properties, this);
+
+			this->connect(m_widgets.properties, &ak::aPropertyGridWidget::itemChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_widgets.properties, &ak::aPropertyGridWidget::itemDeleted, this, &AppBase::slotPropertyGridValueDeleted);
+
+			this->connect(m_widgets.projectNavigation, &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
+			this->connect(m_widgets.projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
+			this->connect(m_widgets.projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
+
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 
 			uiAPI::registerUidNotifier(m_docks.output, this);
@@ -1408,8 +1398,7 @@ void AppBase::createUi(void) {
 			ViewerAPI::registerNotifier(m_viewerComponent);
 
 			m_viewerComponent->setDataBaseConnectionInformation(m_dataBaseURL, m_userName, m_userPassword);
-			m_viewerComponent->setNavigationUid(m_widgets.projectNavigation);
-
+			
 			OT_LOG_D("Reading fonts");
 			QString fontPath = QCoreApplication::applicationDirPath();
 			fontPath.append("/fonts/Vera.ttf");
@@ -1779,74 +1768,70 @@ void AppBase::activateToolBarTab(const QString& _tab) {
 // Navigation
 
 void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
-	uiAPI::tree::setSortingEnabled(m_widgets.projectNavigation, _enabled);
+	m_widgets.projectNavigation->setSortingEnabled(_enabled);
 }
 
 void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
-	uiAPI::tree::setMultiSelectionEnabled(m_widgets.projectNavigation, _enabled);
+	m_widgets.projectNavigation->setMultiSelectionEnabled(_enabled);
 }
 
 void AppBase::clearNavigationTree(void) {
-	uiAPI::tree::clear(m_widgets.projectNavigation);
-}
-
-void AppBase::registerNavigationTreeNotifier(aNotifier * _notifier) {
-	uiAPI::registerUidNotifier(m_widgets.projectNavigation, _notifier);
+	m_widgets.projectNavigation->clear();
 }
 
 ID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren) {
-	ID id = uiAPI::tree::addItem(m_widgets.projectNavigation, _treePath, _delimiter);
-	uiAPI::tree::setItemIsEditable(m_widgets.projectNavigation, id, _isEditable);
-	uiAPI::tree::setItemSelectChildren(m_widgets.projectNavigation, id, selectChildren);
+	ID id = m_widgets.projectNavigation->add(_treePath, _delimiter);
+	m_widgets.projectNavigation->setItemIsEditable(id, _isEditable);
+	m_widgets.projectNavigation->setItemSelectChildren(id, selectChildren);
 	return id;
 }
 
 void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, const QString & _iconPath) {
-	uiAPI::tree::setItemIcon(m_widgets.projectNavigation, _itemID, _iconName, _iconPath);
+	m_widgets.projectNavigation->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName + ".png"));
 }
 
 void AppBase::setNavigationTreeItemText(ID _itemID, const QString & _itemName) {
-	uiAPI::tree::setItemText(m_widgets.projectNavigation, _itemID, _itemName);
+	m_widgets.projectNavigation->setItemText(_itemID, _itemName);
 }
 
 void AppBase::setNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
-	uiAPI::tree::setItemSelected(m_widgets.projectNavigation, _itemID, _isSelected, false);
+	m_widgets.projectNavigation->setItemSelected(_itemID, _isSelected);
 }
 
 void AppBase::setSingleNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
-	uiAPI::tree::setItemSelected(m_widgets.projectNavigation, _itemID, _isSelected, true);
+	m_widgets.projectNavigation->setSingleItemSelected(_itemID, _isSelected);
 }
 
 void AppBase::expandSingleNavigationTreeItem(ID _itemID, bool _isExpanded) {
-	uiAPI::tree::expandItem(m_widgets.projectNavigation, _itemID, _isExpanded);
+	m_widgets.projectNavigation->expandItem(_itemID, _isExpanded);
 }
 
 bool AppBase::isTreeItemExpanded(ID _itemID) {
-	return uiAPI::tree::isItemExpanded(m_widgets.projectNavigation, _itemID);
+	return m_widgets.projectNavigation->isItemExpanded(_itemID);
 }
 
 void AppBase::toggleNavigationTreeItemSelection(ID _itemID, bool _considerChilds) {
-	bool autoConsiderChilds = uiAPI::tree::getAutoSelectAndDeselectChildrenEnabled(m_widgets.projectNavigation);
+	bool autoConsiderChilds = m_widgets.projectNavigation->getAutoSelectAndDeselectChildrenEnabled();
 
-	uiAPI::tree::setAutoSelectAndDeselectChildrenEnabled(m_widgets.projectNavigation, _considerChilds);
-	uiAPI::tree::toggleItemSelection(m_widgets.projectNavigation, _itemID);
-	uiAPI::tree::setAutoSelectAndDeselectChildrenEnabled(m_widgets.projectNavigation, autoConsiderChilds);
+	m_widgets.projectNavigation->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
+	m_widgets.projectNavigation->toggleItemSelection(_itemID);
+	m_widgets.projectNavigation->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
 }
 
 void AppBase::removeNavigationTreeItems(const std::vector<ID> & itemIds) {
-	uiAPI::tree::deleteItems(m_widgets.projectNavigation, itemIds);
+	m_widgets.projectNavigation->deleteItems(itemIds);
 }
 
 void AppBase::clearNavigationTreeSelection(void) {
-	uiAPI::tree::deselectAllItems(m_widgets.projectNavigation);
+	m_widgets.projectNavigation->deselectAllItems(true);
 }
 
 QString AppBase::getNavigationTreeItemText(ID _itemID) {
-	return uiAPI::tree::getItemText(m_widgets.projectNavigation, _itemID);
+	return m_widgets.projectNavigation->getItemText(_itemID);
 }
 
 std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
-	return uiAPI::tree::selectedItems(m_widgets.projectNavigation);
+	return m_widgets.projectNavigation->selectedItems();
 }
 
 void AppBase::fillPropertyGrid(const std::string &settings) {
@@ -1879,7 +1864,7 @@ void AppBase::fillPropertyGrid(const std::string &settings) {
 		bool protectedProperty = item["Protected"].GetBool();
 		bool errorState = item["ErrorState"].GetBool();
 		std::string group = item["Group"].GetString();
-
+		
 		if (!group.empty())
 		{
 			if (groupMap.find(group) == groupMap.end())
@@ -2012,132 +1997,233 @@ void AppBase::appendDebugMessage(const QString & _message) {
 
 void AppBase::lockPropertyGrid(bool flag)
 {
-	uiAPI::propertyGrid::setEnabled(m_widgets.properties, flag);
+	m_widgets.properties->setEnabled(flag);
 }
 
 QString AppBase::getPropertyName(ID _itemID) {
-	return uiAPI::propertyGrid::getItemName(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->name();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return "";
+	}
 }
 
 valueType AppBase::getPropertyType(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueType(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getValueType();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return ak::vtNull;
+	}
 }
 
 bool AppBase::getPropertyValueBool(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueBool(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getBool();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return false;
+	}
 }
 
 int AppBase::getPropertyValueInt(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueInteger(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getInt();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return 0;
+	}
 }
 
 double AppBase::getPropertyValueDouble(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueDouble(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getDouble();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return 0.;
+	}
 }
 
 QString AppBase::getPropertyValueString(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueString(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getString();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return "";
+	}
 }
 
 QString AppBase::getPropertyValueSelection(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueSelection(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getSelection();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return "";
+	}
 }
 
 std::vector<QString> AppBase::getPropertyPossibleSelection(ID _itemID) {
+	auto itm = m_widgets.properties->item(_itemID);
 	std::vector<QString> lst;
-	for (auto s : uiAPI::propertyGrid::getItemPossibleSelection(m_widgets.properties, _itemID)) {
-		lst.push_back(s);
+	if (itm) {
+		for (const QString& s : itm->getPossibleSelection()) {
+			lst.push_back(s);
+		}
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
 	}
 	return lst;
 }
 
 aColor AppBase::getPropertyValueColor(ID _itemID) {
-	return uiAPI::propertyGrid::getItemValueColor(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->getColor();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return aColor();
+	}
 }
 
 bool AppBase::getPropertyIsDeletable(ID _itemID) {
-	return uiAPI::propertyGrid::getItemIsDeletable(m_widgets.properties, _itemID);
+	auto itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		return itm->isDeletable();
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+		return false;
+	}
 }
 
 // Setter
 
 void AppBase::clearPropertyGrid(void) {
-	uiAPI::propertyGrid::clear(m_widgets.properties, false);
+	m_widgets.properties->clear(false);
 }
 
 void AppBase::addPropertyGroup(const QString & _groupName, const aColor & _color, const aColor& _foregroundColor, const aColor& _errorColor) {
-	uiAPI::propertyGrid::addGroup(m_widgets.properties, _groupName, _color, _foregroundColor, _errorColor);
+	m_widgets.properties->addGroup(_groupName, _color, _foregroundColor, _errorColor);
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, bool _value) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _value);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _value);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value, int _min, int _max) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _value, _min, _max);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);	
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _min, _max, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, double _value) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _value);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const char * _value) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, QString(_value));
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, QString(_value), _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const QString & _value) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _value);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const aColor & _value) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _value);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const std::vector<QString> & _possibleSelection, const QString & _initialSelection) {
-	ak::ID id = uiAPI::propertyGrid::addItem(m_widgets.properties, _isMultipleValues, _groupName, _propertyName, _possibleSelection, _initialSelection);
-	uiAPI::propertyGrid::setItemIsReadOnly(m_widgets.properties, id, _isReadOnly);
-	uiAPI::propertyGrid::setItemIsDeletable(m_widgets.properties, id, _isDeletable);
-	if (_hasError) uiAPI::propertyGrid::showItemAsError(m_widgets.properties, id);
+	QStringList pos;
+	for (const QString& p : _possibleSelection) pos.append(p);
+	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, pos, _initialSelection, _isMultipleValues);
+	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
+	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	if (_hasError) {
+		m_widgets.properties->item(id)->setErrorState(true);
+	}
 	return id;
 }
 
 void AppBase::setPropertyValueDouble(ak::ID _itemID, double _value) {
-	uiAPI::propertyGrid::setItemValueDouble(m_widgets.properties, _itemID, _value);
+	ak::aPropertyGridItem* itm = m_widgets.properties->item(_itemID);
+	if (itm) {
+		itm->setDouble(_value);
+	}
+	else {
+		OT_LOG_EA("Invalid item id");
+	}
 }
 
 int AppBase::findPropertyID(const QString & _propertyName) {
-	return uiAPI::propertyGrid::findItemID(m_widgets.properties, _propertyName);
+	ak::aPropertyGridItem* item = m_widgets.properties->findItem(_propertyName);
+	if (item) {
+		return item->id();
+	}
+	else {
+		OT_LOG_EA("Invalid item name");
+		return ak::invalidID;
+	}
 }
 
 ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
@@ -2598,7 +2684,55 @@ void AppBase::slotTextEditorSaveRequested(void) {
 	}
 }
 
-// #######################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Property grid slots
+
+void AppBase::slotPropertyGridValueChanged(int _id) {
+	// We first ask the viewer whether it needs to handle the property grid change.
+	if (!m_viewerComponent->propertyGridValueChanged(_id))
+	{
+		// If not, we pass thic change on to the external services component
+		m_ExternalServicesComponent->propertyGridValueChanged(_id);
+	}
+}
+
+void AppBase::slotPropertyGridValueDeleted(int _id) {
+	m_ExternalServicesComponent->propertyGridValueDeleted(_id);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Tree slots
+
+void AppBase::slotTreeItemSelectionChanged(void) {
+	m_viewerComponent->sendSelectionChangedNotification();
+}
+
+void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {
+	ak::aTreeWidgetItem* actualItem = dynamic_cast<ak::aTreeWidgetItem*>(_item);
+	if (actualItem) {
+		QString newName = actualItem->text(0);
+		unsigned long long modelEntityID = ViewerAPI::getModelEntityIDFromTreeID(actualItem->id());
+		m_ExternalServicesComponent->itemRenamed(modelEntityID, newName.toStdString());
+	}
+	else {
+		OT_LOG_EA("Item cast failed");
+	}
+}
+
+void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
+	ak::aTreeWidgetItem* actualItem = dynamic_cast<ak::aTreeWidgetItem*>(_item);
+	if (actualItem) {
+		ViewerAPI::setHoverTreeItem(actualItem->id());
+	}
+	else {
+		OT_LOG_EA("Item cast failed");
+	}
+	
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Asynchronous callbacks
 

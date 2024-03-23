@@ -30,18 +30,10 @@
 #include <akAPI/uiAPI.h>
 #include <akCore/aException.h>
 
+
 ViewerComponent::ViewerComponent()
-	: ot::ServiceBase("ViewerComponent", "Viewer", "127.0.0.1", ot::invalidServiceID), processingGroupCounter(0), treeSelectionReceived(false), m_navigationUid(ak::invalidUID)
+	: ot::ServiceBase("ViewerComponent", "Viewer", "127.0.0.1", ot::invalidServiceID), processingGroupCounter(0), treeSelectionReceived(false)
 {
-	try {
-		try { AppBase::instance()->registerNavigationTreeNotifier(this); }
-		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::ViewerComponent()"); }
-		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::ViewerComponent()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::ViewerComponent()"); }
-	}
-	catch (const ak::aException & _e) {
-		AppBase::instance()->showErrorPrompt(_e.what(), "Error");
-	}
 }
 
 ViewerComponent::~ViewerComponent() {}
@@ -454,23 +446,7 @@ void ViewerComponent::notify(
 {
 	try {
 		try {
-			if (_senderId == m_navigationUid) {
-				if (_event == ak::etSelectionChanged)
-				{
-					sendSelectionChangedNotification();
-				}
-				else if (_event == ak::etFocused)
-				{
-					ViewerAPI::setHoverTreeItem(_info1);
-				}
-				else if (_event == ak::etItemTextChanged)
-				{
-					QString newName = AppBase::instance()->getNavigationTreeItemText(_info1);
-					unsigned long long modelEntityID = ViewerAPI::getModelEntityIDFromTreeID(_info1);
-					AppBase::instance()->getExternalServicesComponent()->itemRenamed(modelEntityID, newName.toStdString());
-				}
-			}
-			else  if (_event == ak::etClicked)
+			if (_event == ak::etClicked)
 			{
 				ViewerAPI::executeAction(_senderId);
 			}

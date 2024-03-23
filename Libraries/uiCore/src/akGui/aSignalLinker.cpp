@@ -33,13 +33,11 @@
 #include <akWidgets/aDockWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPropertyGridWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aTableWidget.h>
 #include <akWidgets/aTabWidget.h>
 #include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
-#include <akWidgets/aTreeWidget.h>
 
 // Qt header
 #include <qmessagebox.h>			// QMessageBox
@@ -338,20 +336,6 @@ ak::UID ak::aSignalLinker::addLink(
 }
 
 ak::UID ak::aSignalLinker::addLink(
-	aPropertyGridWidget *							_object,
-	UID												_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otPropertyGrid });
-	_object->connect(_object, &aPropertyGridWidget::cleared, this, &aSignalLinker::slotCleared);
-	_object->connect(_object, &aPropertyGridWidget::itemChanged, this, &aSignalLinker::slotItemChanged);
-	_object->connect(_object, &aPropertyGridWidget::itemDeleted, this, &aSignalLinker::slotItemDeleted);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
 	aPushButtonWidget *									_object,
 	UID													_objectUid
 ) {
@@ -458,31 +442,6 @@ ak::UID ak::aSignalLinker::addLink(
 	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otToolButtonCustomContextMenu });
 	_object->connect(_object, &aToolButtonCustomContextMenu::menuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
 	_object->connect(_object, &aToolButtonCustomContextMenu::menuItemCheckedChanged, this, &aSignalLinker::slotContextMenuItemCheckedChanged);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aTreeWidget *										_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otTree });
-	_object->connect(_object, &aTreeWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aTreeWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	_object->connect(_object, &aTreeWidget::cleared, this, &aSignalLinker::slotCleared);
-	_object->connect(_object, &aTreeWidget::focusLost, this, &aSignalLinker::slotFocusLost);
-	_object->connect(_object, &aTreeWidget::selectionChanged, this, &aSignalLinker::slotSelectionChanged);
-	_object->connect(_object, &aTreeWidget::itemActivated, this, &aSignalLinker::slotTreeItemActivated);
-	_object->connect(_object, &aTreeWidget::itemChanged, this, &aSignalLinker::slotTreeItemChanged);
-	_object->connect(_object, &aTreeWidget::itemTextChanged, this, &aSignalLinker::slotTreeItemTextChanged);
-	_object->connect(_object, &aTreeWidget::itemClicked, this, &aSignalLinker::slotTreeItemClicked);
-	_object->connect(_object, &aTreeWidget::itemCollapsed, this, &aSignalLinker::slotTreeItemCollapsed);
-	_object->connect(_object, &aTreeWidget::itemDoubleClicked, this, &aSignalLinker::slotTreeItemDoubleClicked);
-	_object->connect(_object, &aTreeWidget::itemFocused, this, &aSignalLinker::slotTreeItemFocused);
-	_object->connect(_object, &aTreeWidget::itemExpanded, this, &aSignalLinker::slotTreeItemExpanded);
-	_object->connect(_object, &aTreeWidget::itemLocationChanged, this, &aSignalLinker::slotTreeItemLocationChanged);
 	return _objectUid;
 }
 
@@ -669,53 +628,6 @@ void ak::aSignalLinker::tableCellDoubleClicked(int _row, int _coloumn) {
 void ak::aSignalLinker::tableCellEntered(int _row, int _coloumn) {
 	if (!aSingletonAllowedMessages::instance()->focusedEvent()) { return; }
 	raiseEvent(getSenderUid(sender()), etFocused, _row, _coloumn);
-}
-
-// ##### Tree
-
-void ak::aSignalLinker::slotTreeItemActivated(QTreeWidgetItem * _item, int _column) {
-	if (!aSingletonAllowedMessages::instance()->activatedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etActivated, aTreeWidgetBase::getItemId(_item), _column);
-}
-
-void ak::aSignalLinker::slotTreeItemChanged(QTreeWidgetItem * _item, int _column) {
-	if (!aSingletonAllowedMessages::instance()->changedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etItemChanged, aTreeWidgetBase::getItemId(_item), _column);
-}
-
-void ak::aSignalLinker::slotTreeItemTextChanged(QTreeWidgetItem * _item, int _column) {
-	if (!aSingletonAllowedMessages::instance()->textChangedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etItemTextChanged, aTreeWidgetBase::getItemId(_item), _column);
-}
-
-void ak::aSignalLinker::slotTreeItemClicked(QTreeWidgetItem * _item, int _column) {
-	if (!aSingletonAllowedMessages::instance()->clickedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etClicked, aTreeWidgetBase::getItemId(_item), _column);
-}
-
-void ak::aSignalLinker::slotTreeItemCollapsed(QTreeWidgetItem * _item) {
-	if (!aSingletonAllowedMessages::instance()->collapsedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etCollpased, aTreeWidgetBase::getItemId(_item), 0);
-}
-
-void ak::aSignalLinker::slotTreeItemDoubleClicked(QTreeWidgetItem * _item, int _column) {
-	if (!aSingletonAllowedMessages::instance()->doubleClickedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etDoubleClicked, aTreeWidgetBase::getItemId(_item), _column);
-}
-
-void ak::aSignalLinker::slotTreeItemExpanded(QTreeWidgetItem * _item) {
-	if (!aSingletonAllowedMessages::instance()->expandedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etExpanded, aTreeWidgetBase::getItemId(_item), 0);
-}
-
-void ak::aSignalLinker::slotTreeItemFocused(QTreeWidgetItem * _item) {
-	if (!aSingletonAllowedMessages::instance()->focusedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etFocused, aTreeWidgetBase::getItemId(_item), 0);
-}
-
-void ak::aSignalLinker::slotTreeItemLocationChanged(QTreeWidgetItem * _item) {
-	if (!aSingletonAllowedMessages::instance()->locationChangedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etLocationChanged, aTreeWidgetBase::getItemId(_item), 0);
 }
 
 // ###################################################################################

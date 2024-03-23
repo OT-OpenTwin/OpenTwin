@@ -1,10 +1,7 @@
-/*
- * uiServiceAPI.h
- *
- *  Created on: September 17, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file AppBase.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
@@ -39,6 +36,7 @@
 
 // Forward declaration
 class QWidget;
+class QTreeWidgetItem;
 class debugNotifier;
 class ViewerComponent;
 class ControlsManager;
@@ -55,6 +53,7 @@ class UiPluginManager;
 // Forward declaration
 class ToolBar;
 namespace ak { class aNotifier; class aWindow; }
+namespace ak { class aTreeWidget; class aPropertyGridWidget; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsView; }
@@ -349,8 +348,6 @@ public:
 
 	void clearNavigationTree(void);
 
-	void registerNavigationTreeNotifier(ak::aNotifier * _notifier);
-
 	ak::ID addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren);
 
 	void setNavigationTreeItemIcon(ak::ID _itemID, const QString & _iconName, const QString & _iconPath);
@@ -513,6 +510,23 @@ public slots:
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 	void slotTextEditorSaveRequested(void);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Property grid slots
+
+private slots:
+
+	void slotPropertyGridValueChanged(int _id);
+	void slotPropertyGridValueDeleted(int _id);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Tree slots
+
+	void slotTreeItemSelectionChanged(void);
+	void slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column);
+	void slotTreeItemFocused(QTreeWidgetItem* _item);
+
 private:
 
 	friend class ToolBar;
@@ -588,8 +602,8 @@ private:
 	};
 
 	struct structWidgets {
-		ak::UID				projectNavigation;
-		ak::UID				properties;
+		ak::aTreeWidget*    projectNavigation;
+		ak::aPropertyGridWidget* properties;
 		ak::UID				output;
 		ak::UID				debug;
 	};
