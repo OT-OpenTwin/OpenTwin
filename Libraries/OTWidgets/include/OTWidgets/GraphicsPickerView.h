@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class GraphicsPickerView : public GraphicsPicker, public WidgetView {
+	class OT_WIDGETS_API_EXPORT GraphicsPickerView : public GraphicsPicker, public WidgetView {
 	public:
 		GraphicsPickerView();
 		virtual ~GraphicsPickerView();

@@ -15,10 +15,10 @@
 
 #include <qcolor.h>
 
-class QWidget;
 class Model;
 class QPen;
 namespace ot { class SettingsData; }
+namespace ot { class WidgetView; }
 namespace ot { class AbstractSettingsItem; }
 
 namespace ViewerAPI
@@ -92,7 +92,7 @@ namespace ViewerAPI
 	__declspec(dllexport) ot::UID getActiveViewerModel(void);
 
 	__declspec(dllexport) ot::UID createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
-	__declspec(dllexport) QWidget* getViewerWidget(ot::UID viewer);
+	__declspec(dllexport) ot::WidgetView* getViewerWidget(ot::UID viewer);
 
 	__declspec(dllexport) void resetAllViews1D(ot::UID osgModelID);
 	__declspec(dllexport) void resetAllViews3D(ot::UID osgModelID);
@@ -196,10 +196,10 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
-	__declspec(dllexport) QWidget * getPlotWidget(ot::UID _viewerID);
+	__declspec(dllexport) ot::WidgetView* getPlotWidget(ot::UID _viewerID);
 
 	/***************************************** Table API *****************************************/
-	__declspec(dllexport) QWidget* getTable (ot::UID _viewerID);
+	__declspec(dllexport) ot::WidgetView* getTable (ot::UID _viewerID);
 	__declspec(dllexport) void showTable(ot::UID _viewerID,const ot::GenericDataStructMatrix& data);
 	__declspec(dllexport) bool setTable (ot::UID _viewerID, ot::UID tableEntityID, ot::UID tableEntityVersion);
 	__declspec(dllexport) void setTableSelection (ot::UID _viewerID, std::vector<ot::TableRange> ranges);
@@ -215,7 +215,7 @@ namespace ViewerAPI
 
 	/********************************************************************************************/
 
-	__declspec(dllexport) QWidget * getVersionGraphWidget(ot::UID _viewerID);
+	__declspec(dllexport) ot::WidgetView* getVersionGraphWidget(ot::UID _viewerID);
 
 	__declspec(dllexport) void viewerTabChanged(const std::string & _tabTitle);
 

@@ -58,9 +58,9 @@
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/TextEditor.h"
+#include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/OnePropertyDialog.h"
@@ -1567,13 +1567,13 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		if (m_websocket != nullptr) { delete m_websocket; m_websocket = nullptr; }
 
-		std::cout << "Closing project: Done" << std::endl;
+		OT_LOG_D("Close project done");
 	}
 	catch (const std::exception & e) {
-		assert(0); // Error handling
+		OT_LOG_E(e.what());
 	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_E("Unknown error");
 	}
 }
 
@@ -3165,7 +3165,7 @@ std::string ExternalServicesComponent::handleRemoveShapes(ot::JsonDocument& _doc
 	AppBase::instance()->getViewerComponent()->removeShapes(visualizationModelID, entityID);
 
 	//If entity is has a block item associated, it gets removed from all editors.
-	std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 	for (auto view : views) {
 		for (auto uid : entityID) {
 			view->removeItem(uid);
@@ -3926,7 +3926,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 	else {
 		// Any view
 
-		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto v : views) {
 			for (auto uid : itemUids) {
 				v->removeItem(uid);
@@ -3972,7 +3972,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 	else {
 		// Any editor
 
-		std::list<ot::GraphicsView*> views = AppBase::instance()->getAllGraphicsEditors();
+		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto view : views) {
 			for (auto connection : pckg.connections()) {
 				view->removeConnection(connection.getUid());
@@ -3997,7 +3997,7 @@ std::string ExternalServicesComponent::handleSetTextEditorText(ot::JsonDocument&
 		editorTitle = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Title);
 	}
 
-	ot::TextEditor* editor = AppBase::instance()->findOrCreateTextEditor(editorName, QString::fromStdString(editorTitle), info);
+	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(editorName, QString::fromStdString(editorTitle), info);
 	editor->setPlainText(QString::fromStdString(editorText));
 	editor->setContentChanged(false);
 
@@ -4009,7 +4009,7 @@ std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument
 	info.setFromJsonObject(_document.GetConstObject());
 
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, info);
 
 	if (editor) {
 		editor->setContentChanged(false);
@@ -4023,7 +4023,7 @@ std::string ExternalServicesComponent::handleSetTextEditorModified(ot::JsonDocum
 	info.setFromJsonObject(_document.GetConstObject());
 
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	ot::TextEditor* editor = AppBase::instance()->findTextEditor(editorName, info);
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, info);
 
 	if (editor) {
 		editor->setContentChanged(true);

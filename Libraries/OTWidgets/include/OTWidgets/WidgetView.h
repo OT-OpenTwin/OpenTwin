@@ -24,6 +24,8 @@ namespace ads {
 
 namespace ot {
 
+	class WidgetViewManager;
+
 	class OT_WIDGETS_API_EXPORT WidgetView {
 		OT_DECL_NOCOPY(WidgetView)
 	public:
@@ -58,8 +60,11 @@ namespace ot {
 		void addWidgetToDock(QWidget* _widget);
 
 	private:
+		friend class WidgetViewManager;
+
 		ads::CDockWidget* m_dockWidget;
 
+		bool m_isDeletedByManager;
 		bool m_isProtected;
 		std::string m_name;
 		ot::WidgetViewCfg::ViewFlags m_flags;

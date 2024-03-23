@@ -6,7 +6,6 @@
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
 #include "Table.h"
-#include "TableViewer.h"
 
 class ViewerObjectSelectionHandler;
 class QWidget;
@@ -27,8 +26,6 @@ class ClipPlaneManipulator;
 class ViewerObjectSelectionHandler;
 class QWidget;
 class Model;
-class Plot;
-class VersionGraph;
 namespace osgGA     { class EventQueue; };
 namespace osgViewer { class Viewer; };
 namespace osgViewer { class GraphicsWindowEmbedded; };
@@ -39,6 +36,9 @@ namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class SettingsData; }
 namespace ot        { class AbstractSettingsItem; }
+namespace ot        { class VersionGraphView; }
+namespace ot        { class TableViewerView; }
+namespace ot        { class PlotView; }
 
 class Viewer : public QOpenGLWidget
 {
@@ -58,9 +58,9 @@ public:
 
 	void detachFromModel(void);
 
-	Plot * get1DPlot(void) const { return m_plot; }
-	VersionGraph * getVersionGraph(void) const { return m_versionGraph; }
-	TableViewer* getTableViewer() const { return m_tableViewer; }
+	ot::PlotView * get1DPlot(void) const { return m_plot; }
+	ot::VersionGraphView* getVersionGraph(void) const { return m_versionGraph; }
+	ot::TableViewerView* getTableViewer() const { return m_tableViewer; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
@@ -185,11 +185,11 @@ private:
 	osg::ref_ptr<osg::Switch>          handlerNode;
 	HandlerBase						  *currentHandler;
 
-	Plot *								m_plot;
+	ot::PlotView*						m_plot;
 	std::string							m_plotTabName;
 
-	VersionGraph *						m_versionGraph;
-	TableViewer*						m_tableViewer;
+	ot::VersionGraphView*				m_versionGraph;
+	ot::TableViewerView*				m_tableViewer;
 
 	std::string							m_versionGraphTabName;
 

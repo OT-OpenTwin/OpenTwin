@@ -2,18 +2,18 @@
 
 #include "ViewerAPI.h"
 #include "Model.h"
-#include "Viewer.h"
+#include "ViewerView.h"
 #include "Notifier.h"
 #include "DataBase.h"
-#include "Plot.h"
-#include "VersionGraph.h"
+#include "PlotView.h"
+#include "VersionGraphView.h"
 #include "Rubberband.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"
 #include "EntityBase.h"
 #include "Factory.h"
 
-#include "TableViewer.h"
+#include "TableViewerView.h"
 #include "OTCore/VariableToStringConverter.h"
 
 
@@ -21,7 +21,7 @@ ot::UID modelCount = 0;
 std::map<ot::UID, Model*> osgModelManager;
 
 ot::UID viewerCount = 0;
-std::map<ot::UID, Viewer*> viewerManager;
+std::map<ot::UID, ot::ViewerView*> viewerManager;
 
 ViewerAPI::Notifier *globalNotifier = nullptr;
 
@@ -116,17 +116,17 @@ ot::UID ViewerAPI::createViewer(ot::UID osgModelID, double scaleWidth, double sc
 {
 	viewerCount++;
 
-	Viewer *viewer = new Viewer(osgModelID, viewerCount, scaleWidth, scaleHeight, backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB);
+	ot::ViewerView* viewer = new ot::ViewerView(osgModelID, viewerCount, scaleWidth, scaleHeight, backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB);
 	viewerManager[viewerCount] = viewer;
 
 	return viewerCount;
 }
 
-QWidget* ViewerAPI::getViewerWidget(ot::UID viewerID)
+ot::WidgetView* ViewerAPI::getViewerWidget(ot::UID viewerID)
 {
 	try
 	{
-		Viewer *viewer = viewerManager.at(viewerID);
+		ot::WidgetView* viewer = viewerManager.at(viewerID);
 
 		return viewer;
 	}
@@ -751,10 +751,10 @@ void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabNa
 	}
 }
 
-QWidget * ViewerAPI::getPlotWidget(ot::UID _viewerID) {
+ot::WidgetView* ViewerAPI::getPlotWidget(ot::UID _viewerID) {
 	Viewer * v = viewerManager[_viewerID];
 	if (v != nullptr) {
-		return v->get1DPlot()->widget();
+		return v->get1DPlot();
 	}
 	else {
 		return nullptr;
@@ -762,11 +762,11 @@ QWidget * ViewerAPI::getPlotWidget(ot::UID _viewerID) {
 }
 
 
-QWidget * ViewerAPI::getTable(ot::UID _viewerID)
+ot::WidgetView* ViewerAPI::getTable(ot::UID _viewerID)
 {
 	Viewer * v = viewerManager[_viewerID];
 	if (v != nullptr) {
-		return v->getTableViewer()->getTable();
+		return v->getTableViewer();
 	}
 	else {
 		return nullptr;
@@ -933,10 +933,10 @@ void ViewerAPI::DeleteFromSelectedTableRow(ot::UID _viewerID)
 	}
 }
 
-QWidget * ViewerAPI::getVersionGraphWidget(ot::UID _viewerID) {
+ot::WidgetView* ViewerAPI::getVersionGraphWidget(ot::UID _viewerID) {
 	Viewer * v = viewerManager[_viewerID];
 	if (v != nullptr) {
-		return v->getVersionGraph()->widget();
+		return v->getVersionGraph();
 	}
 	else {
 		return nullptr;

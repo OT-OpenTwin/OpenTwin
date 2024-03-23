@@ -20,6 +20,8 @@
 #include <UiPluginComponent.h>
 #include <UiPluginManager.h>
 #include "DevLogger.h"
+#include "PropertyGridView.h"
+#include "NavigationTreeView.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -32,6 +34,9 @@
 #include <akWidgets/aTreeWidget.h>
 #include <akCore/rJSON.h>
 #include <akDialogs/aLogInDialog.h>
+
+// ADS header
+#include <ads/DockManager.h>
 
 // Qt header
 #include <qwidget.h>			// QWidget
@@ -55,16 +60,19 @@
 #include "OTCommunication/UiTypes.h"
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTGui/GraphicsPackage.h"
-#include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/GraphicsPickerView.h"
+#include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
-#include "OTWidgets/TextEditor.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/PlainTextEditView.h"
 #include "OTWidgets/IconManager.h"
 #include "DataBase.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTWidgets/MessageDialog.h"
+#include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetViewManager.h"
 
 // C++ header
 #include <thread>
@@ -121,7 +129,6 @@ AppBase::AppBase()
 	m_isInitialized(false),
 	m_appIsRunning(false),
 	m_uid(invalidUID),
-	m_currentTabIndex(invalidID),
 	m_modelUid(invalidUID),
 	m_viewerUid(invalidUID),
 	m_debugNotifier(nullptr),
@@ -136,24 +143,16 @@ AppBase::AppBase()
 	m_contextMenuManager(nullptr),
 	m_logInManager(nullptr),
 	m_uiPluginManager(nullptr),
-	m_graphicsPickerDock(nullptr),
+	m_graphicsPicker(nullptr),
 	m_visible3D(false),
 	m_visible1D(false),
 	m_visibleTable(false),
-	m_visibleBlockPicker(false)
+	m_visibleBlockPicker(false),
+	m_propertyGrid(nullptr),
+	m_projectNavigation(nullptr),
+	m_output(nullptr),
+	m_debug(nullptr)
 {
-	m_tabViewWidget = invalidUID;
-
-	m_docks.debug = invalidUID;
-	m_docks.output = invalidUID;
-	m_docks.properties = invalidUID;
-	m_docks.projectNavigation = invalidUID;
-
-	m_widgets.debug = invalidUID;
-	m_widgets.output = invalidUID;
-	m_widgets.properties = nullptr;
-	m_widgets.projectNavigation = nullptr;
-
 	m_contextMenus.output.clear = invalidID;
 
 	m_debugNotifier = new debugNotifier(invalidUID);
@@ -232,6 +231,9 @@ int AppBase::run() {
 			showErrorPrompt("No icon path was found. Try to reinstall the application", "Error");
 			return 3;
 		}
+
+		// Initialize Widget view manager
+		ot::WidgetViewManager::instance().initialize();
 		
 		m_logInManager = new LogInManager();
 		if (!m_logInManager->showDialog()) { return 0; }
@@ -298,17 +300,6 @@ int AppBase::run() {
 				m_currentStateWindow = "";
 				uiAPI::window::showMaximized(m_mainWindow);
 			}
-
-			m_dockVisibility.output = uiAPI::dock::isVisible(m_docks.output);
-			m_dockVisibility.projectNavigation = uiAPI::dock::isVisible(m_docks.projectNavigation);
-			m_dockVisibility.properties = uiAPI::dock::isVisible(m_docks.properties);
-
-			// Hide docks
-			uiAPI::dock::setVisible(m_docks.debug, false);
-			uiAPI::dock::setVisible(m_docks.output, false);
-			uiAPI::dock::setVisible(m_docks.properties, false);
-			uiAPI::dock::setVisible(m_docks.projectNavigation, false);
-			m_graphicsPickerDock->setVisible(false);
 		}
 
 		// Create shortcut manager
@@ -421,10 +412,7 @@ void AppBase::notify(
 
 			// Check restore state, if failed set minimum size for central widget to avoid size bug
 			if (m_currentStateWindow.empty()) {
-				uiAPI::dock::setVisible(m_docks.output, true);
-				uiAPI::dock::setVisible(m_docks.projectNavigation, true);
-				uiAPI::dock::setVisible(m_docks.properties, true);
-				m_graphicsPickerDock->setVisible(true);
+				
 			}
 			else {
 				// We want to maintain the size of the application window
@@ -432,9 +420,6 @@ void AppBase::notify(
 			}
 			saveState();
 
-			uiAPI::dock::setVisible(m_docks.debug, m_isDebug);
-
-			m_graphicsPickerDock->setVisible(getVisibleBlockPicker());
 		}
 		/*// Debug
 		else if (_senderId == m_ttb.pFile.gDebug_aDebug && _eventType == etClicked) {
@@ -454,21 +439,27 @@ void AppBase::notify(
 			}
 		}*/
 		// TabWidget
-		else if (_senderId == m_tabViewWidget && _eventType == etChanged) {
-			m_currentTabIndex = uiAPI::tabWidget::getFocusedTab(_senderId);
-			m_viewerComponent->viewerTabChanged(uiAPI::tabWidget::getTabText(m_tabViewWidget, _info1).toStdString());
-		}
+		
+
+
+
+		//else if (_senderId == m_tabViewWidget && _eventType == etChanged) {
+			//m_currentTabIndex = uiAPI::tabWidget::getFocusedTab(_senderId);
+			//m_viewerComponent->viewerTabChanged(uiAPI::tabWidget::getTabText(m_tabViewWidget, _info1).toStdString());
+		//}
+		
+
+
+
+
+
+
 		// Main window
 		else if (_senderId == m_mainWindow) {
 			if (_eventType == etTabToolbarChanged) {
 				// The clicked event occurs before the tabs are changed
 				if (_info1 == 0 && !m_widgetIsWelcome) {
 					saveState();
-					uiAPI::dock::setVisible(m_docks.output, false);
-					uiAPI::dock::setVisible(m_docks.properties, false);
-					uiAPI::dock::setVisible(m_docks.projectNavigation, false);
-					uiAPI::dock::setVisible(m_docks.debug, false);
-					m_graphicsPickerDock->setVisible(false);
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
 					m_widgetIsWelcome = true;
 					m_welcomeScreen->refreshProjectNames();
@@ -477,16 +468,9 @@ void AppBase::notify(
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
 					//restoreState();
-					uiAPI::window::setCentralWidget(m_mainWindow, m_tabViewWidget);
+					uiAPI::window::setCentralWidget(m_mainWindow, ot::WidgetViewManager::instance().getDockManager());
 					restoreState();
 					m_widgetIsWelcome = false;
-				}
-			}
-		}
-		else if (_senderId == m_widgets.output) {
-			if (_eventType == etContextMenuItemClicked) {
-				if (_info1 == m_contextMenus.output.clear) {
-					uiAPI::textEdit::appendText(m_widgets.output, BUILD_INFO);
 				}
 			}
 		}
@@ -560,7 +544,7 @@ void AppBase::lockSelectionAndModification(bool flag)
 	}
 
 	lockWelcomeScreen(flag);
-	m_widgets.projectNavigation->setEnabled(!flag);
+	m_projectNavigation->setEnabled(!flag);
 }
 
 void AppBase::lockUI(bool flag)
@@ -1204,10 +1188,6 @@ void AppBase::setWaitingAnimationVisible(bool flag)
 	ak::uiAPI::window::setWaitingAnimationVisible(m_mainWindow, flag);
 }
 
-void AppBase::addTabToCentralView(const QString& _tabTitle, QWidget * _widget) {
-	uiAPI::tabWidget::addTab(m_tabViewWidget, _widget, _tabTitle);
-}
-
 // ##############################################################################################
 
 // 
@@ -1243,13 +1223,37 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Create docks
-			OT_LOG_D("Creating dock windows");
+			OT_LOG_D("Creating views");
 
-			m_docks.debug = uiAPI::createDock(m_uid, "Debug");
-			m_docks.output = uiAPI::createDock(m_uid, TITLE_DOCK_OUTPUT);
-			m_docks.properties = uiAPI::createDock(m_uid, TITLE_DOCK_PROPERTIES);
-			m_docks.projectNavigation = uiAPI::createDock(m_uid, TITLE_DOCK_PROJECTNAVIGATION);
-			m_graphicsPickerDock = new ot::GraphicsPickerDockWidget("Block Picker");
+			m_debug = new ot::PlainTextEditView;
+			m_debug->setName("Debug");
+			m_debug->setViewTitle("OpenTwin");
+			m_debug->setViewIsProtected(true);
+			m_debug->setPlainText(BUILD_INFO);
+
+			m_output = new ot::PlainTextEditView;
+			m_output->setName(TITLE_DOCK_OUTPUT);
+			m_output->setViewTitle(TITLE_DOCK_OUTPUT);
+			m_output->setViewIsProtected(true);
+			m_output->setInitialiDockLocation(ot::WidgetViewCfg::Bottom);
+			
+			m_propertyGrid = new ot::PropertyGridView;
+			m_propertyGrid->setName(TITLE_DOCK_PROPERTIES);
+			m_propertyGrid->setViewTitle(TITLE_DOCK_PROPERTIES);
+			m_propertyGrid->setViewIsProtected(true);
+			m_propertyGrid->setInitialiDockLocation(ot::WidgetViewCfg::Right);
+			
+			m_projectNavigation = new ot::NavigationTreeView;
+			m_projectNavigation->setName(TITLE_DOCK_PROJECTNAVIGATION);
+			m_projectNavigation->setViewTitle(TITLE_DOCK_PROJECTNAVIGATION);
+			m_projectNavigation->setViewIsProtected(true);
+			m_projectNavigation->setInitialiDockLocation(ot::WidgetViewCfg::Left);
+
+			m_graphicsPicker = new ot::GraphicsPickerView;
+			m_graphicsPicker->setName("Block Picker");
+			m_graphicsPicker->setViewTitle("Block Picker");
+			m_graphicsPicker->setViewIsProtected(true);
+			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
@@ -1257,54 +1261,41 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Create widgets
-			OT_LOG_I("Creating widgets");
-
-			m_widgets.debug = uiAPI::createTextEdit(m_uid);
-			m_widgets.output = uiAPI::createTextEdit(m_uid, BUILD_INFO);
-			m_widgets.properties = new ak::aPropertyGridWidget;
-			m_widgets.projectNavigation = new ak::aTreeWidget;
+			OT_LOG_D("Seting up widgets");
 
 			{
-				aTextEditWidget * outputTextEdit = uiAPI::object::get<aTextEditWidget>(m_widgets.output);
-				QFont f = outputTextEdit->font();
+				QFont f = m_output->font();
 				f.setFamily("Courier");
 				f.setFixedPitch(true);
-				outputTextEdit->setFont(f);
-			}
-			{
-				m_widgets.projectNavigation->setChildItemsVisibleWhenApplyingFilter(true);
+				m_output->setFont(f);
+				m_debug->setFont(f);
+
+				m_output->appendPlainText(BUILD_INFO);
 			}
 
-			m_tabViewWidget = uiAPI::createTabView(m_uid);
 			m_welcomeScreen = new welcomeScreen(m_currentUser, m_dataBaseURL, m_authorizationServiceURL,
 				uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"), uiAPI::getIcon("RenameItem", "Default"), 
 				uiAPI::getIcon("Delete", "Default"), uiAPI::getIcon("Export", "Default"), uiAPI::getIcon("ManageAccess", "Default"), 
 				uiAPI::getIcon("ChangeOwner", "Default"), this);
 
-			// #######################################################################
 
-			// Setup widgets
-			OT_LOG_D("Settings up widgets");
+			m_projectNavigation->setChildItemsVisibleWhenApplyingFilter(true);
+			m_projectNavigation->setAutoSelectAndDeselectChildrenEnabled(true);
+			m_projectNavigation->setMultiSelectionEnabled(true);
+			m_projectNavigation->setFilterVisible(true);
+			m_projectNavigation->setSortingEnabled(true);
 
-			m_widgets.projectNavigation->setAutoSelectAndDeselectChildrenEnabled(true);
-			m_widgets.projectNavigation->setMultiSelectionEnabled(true);
-			m_widgets.projectNavigation->setFilterVisible(true);
-			m_widgets.projectNavigation->setSortingEnabled(true);
+			m_output->setReadOnly(true);
+			m_output->setAutoScrollToBottomEnabled(true);
 
-			uiAPI::textEdit::setReadOnly(m_widgets.output);
-			uiAPI::textEdit::setReadOnly(m_widgets.debug);
-			uiAPI::textEdit::setAutoScrollToBottomEnabled(m_widgets.output, true);
-			uiAPI::textEdit::setAutoScrollToBottomEnabled(m_widgets.debug, true);
-			
-			uiAPI::tabWidget::setObjectName(m_tabViewWidget, "TabView");
-			
-			m_widgets.properties->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"), ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"));
-			m_widgets.properties->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
+			m_debug->setReadOnly(true);
+			m_debug->setAutoScrollToBottomEnabled(true);
 
-			uiAPI::contextMenu::clear(m_widgets.output);
-			uiAPI::contextMenu::clear(m_widgets.debug);
-			m_contextMenus.output.clear = uiAPI::contextMenu::addItem(m_widgets.output, "Clear", "Clear", "Default", cmrClear);
-			uiAPI::contextMenu::addItem(m_widgets.debug, "Clear", "Clear", "Default", cmrClear);
+			m_propertyGrid->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"), ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"));
+			m_propertyGrid->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
+
+			//m_contextMenus.output.clear = uiAPI::contextMenu::addItem(m_widgets.output, "Clear", "Clear", "Default", cmrClear);
+			//uiAPI::contextMenu::addItem(m_widgets.debug, "Clear", "Clear", "Default", cmrClear);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
@@ -1313,11 +1304,6 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Set widgets to docks
-			uiAPI::dock::setCentralWidget(m_docks.debug, m_widgets.debug);
-			uiAPI::dock::setCentralWidget(m_docks.output, m_widgets.output);
-			uiAPI::dock::setCentralWidget(m_docks.properties, m_widgets.properties->widget());
-			uiAPI::dock::setCentralWidget(m_docks.projectNavigation, m_widgets.projectNavigation->widget());
-
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Display docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 30);
 
@@ -1326,22 +1312,16 @@ void AppBase::createUi(void) {
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
 
-			uiAPI::window::addDock(m_mainWindow, m_docks.output, dockBottom);
-			uiAPI::window::addDock(m_mainWindow, m_docks.projectNavigation, dockLeft);
-			uiAPI::window::addDock(m_mainWindow, m_docks.properties, dockLeft);
-			uiAPI::window::tabifyDock(m_mainWindow, m_docks.output, m_docks.debug);
-			{
-				aWindowManager* m = uiAPI::object::get<ak::aWindowManager>(m_mainWindow);
-				m->tabifyDock(uiAPI::object::get<ak::aDockWidget>(m_docks.projectNavigation), m_graphicsPickerDock);
-				m_graphicsPickerDock->setHidden(true);
-				//ot::BlockEditorAPI::setGlobalBlockPickerWidget(m_graphicsPickerDock->pickerWidget());
-			}
-			// Add docks to dock watcher
-			m_ttb->addDockWatch(m_docks.debug);
-			m_ttb->addDockWatch(m_docks.output);
-			m_ttb->addDockWatch(m_docks.properties);
-			m_ttb->addDockWatch(m_docks.projectNavigation);
-			m_ttb->addDockWatch(m_graphicsPickerDock);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
+			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
+
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
+			
+			m_debug->getViewDockWidget()->setAsCurrentTab();
+			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
 			//Note
 			uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
@@ -1355,34 +1335,20 @@ void AppBase::createUi(void) {
 
 			// Set Alias
 			uiAPI::object::get<aWindowManager>(m_mainWindow)->SetObjectName(OBJ_ALIAS_MainWindow);
-			uiAPI::object::get<aDockWidget>(m_docks.debug)->setObjectName(OBJ_ALIAS_DockDebug);
-			uiAPI::object::get<aDockWidget>(m_docks.output)->setObjectName(OBJ_ALIAS_DockOutput);
-			uiAPI::object::get<aDockWidget>(m_docks.properties)->setObjectName(OBJ_ALIAS_DockProperties);
-			uiAPI::object::get<aDockWidget>(m_docks.projectNavigation)->setObjectName(OBJ_ALIAS_DockTree);
-			m_graphicsPickerDock->setObjectName(OBJ_ALIAS_BlockPicker);
 
 			// #######################################################################
 
 			// Register notifier
-			uiAPI::registerUidNotifier(m_widgets.output, this);
-			uiAPI::registerUidNotifier(m_tabViewWidget, this);
+			this->connect(m_propertyGrid, &ak::aPropertyGridWidget::itemChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_propertyGrid, &ak::aPropertyGridWidget::itemDeleted, this, &AppBase::slotPropertyGridValueDeleted);
 
-			this->connect(m_widgets.properties, &ak::aPropertyGridWidget::itemChanged, this, &AppBase::slotPropertyGridValueChanged);
-			this->connect(m_widgets.properties, &ak::aPropertyGridWidget::itemDeleted, this, &AppBase::slotPropertyGridValueDeleted);
-
-			this->connect(m_widgets.projectNavigation, &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
-			this->connect(m_widgets.projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
-			this->connect(m_widgets.projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
+			this->connect(m_projectNavigation, &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
+			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
+			this->connect(m_projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
-
-			uiAPI::registerUidNotifier(m_docks.output, this);
-			uiAPI::registerUidNotifier(m_docks.projectNavigation, this);
-			uiAPI::registerUidNotifier(m_docks.properties, this);
-			
+						
 			uiAPI::registerAllMessagesNotifier(m_debugNotifier);
-
-			m_debugNotifier->setOutputUid(m_widgets.debug);
 
 			// #######################################################################
 
@@ -1423,18 +1389,14 @@ void AppBase::createUi(void) {
 			// Add default items to lock manager
 			auto lockManager = m_ExternalServicesComponent->lockManager();
 
-			// Objects that only get locked at all
 			ot::Flags<ot::ui::lockType> f{ ot::ui::lockType::tlAll };
-			lockManager->uiElementCreated(this, m_widgets.debug, f);
-			lockManager->uiElementCreated(this, m_widgets.output, f);
-
 			f.setFlag(ot::ui::lockType::tlProperties);
-			lockManager->uiElementCreated(this, m_widgets.properties, f);
+			lockManager->uiElementCreated(this, m_propertyGrid, f);
 
 			f.removeFlag(ot::ui::lockType::tlProperties);
 			f.setFlag(ot::ui::lockType::tlNavigationAll);
 			f.setFlag(ot::ui::lockType::tlNavigationWrite);
-			lockManager->uiElementCreated(this, m_widgets.projectNavigation, f);
+			lockManager->uiElementCreated(this, m_projectNavigation, f);
 
 			// Update status
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Done");
@@ -1470,7 +1432,7 @@ structModelViewInfo AppBase::createModelAndDisplay(
 	m_ExternalServicesComponent->closeProject(false);
 
 	// Now remove the empty tab
-	uiAPI::tabWidget::closeAllTabs(m_tabViewWidget);
+	ot::WidgetViewManager::instance().closeViews();
 
 	m_currentProjectName = _projectName.toStdString();
 	ProjectManagement pManager;
@@ -1502,14 +1464,10 @@ structModelViewInfo AppBase::createModelAndDisplay(
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
 
 	// Get created widget
-	QWidget *view = m_viewerComponent->getViewerWidget(newViewerUid);
-
-	// Display widget
-	uiAPI::tabWidget::addTab(m_tabViewWidget, view, _projectName);
+	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_viewerComponent->getViewerWidget(newViewerUid));
 
 	// Clear status
-	uiAPI::textEdit::clear(m_widgets.output);
-	uiAPI::textEdit::appendText(m_widgets.output, BUILD_INFO);
+	m_output->setPlainText(BUILD_INFO);
 
 	// Focus first tab in the tab toolbar (first after file)
 	assert(uiAPI::window::getTabToolBarTabCount(m_mainWindow) > 1);	// Components did not create any other tab
@@ -1555,39 +1513,52 @@ ViewerUIDtype AppBase::createView(
 	QString text1D = availableTabText("1D");
 	QString textVersion = availableTabText("Versions");
 	QString textBlock = availableTabText("BlockDiagram");
+	QString textTable = availableTabText("Table");
 
 	if (getVisible3D())
 	{
-		uiAPI::tabWidget::addTab(m_tabViewWidget, m_viewerComponent->getViewerWidget(viewID), text3D);
+		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
+		wv->setName(text3D.toStdString());
+		wv->setViewTitle(text3D);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
 	{
-		m_viewerComponent->getViewerWidget(viewID)->setVisible(false);
+		m_viewerComponent->getViewerWidget(viewID)->getViewWidget()->setVisible(false);
 	}
 	
 	if (getVisible1D())
 	{
-		uiAPI::tabWidget::addTab(m_tabViewWidget, m_viewerComponent->getPlotWidget(viewID), text1D);
+		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
+		wv->setName(text1D.toStdString());
+		wv->setViewTitle(text1D);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
 	{
-		m_viewerComponent->getPlotWidget(viewID)->setVisible(false);
-	}
-	
-	QWidget* temp = m_viewerComponent->getVersionGraphWidget(viewID);
-	uiAPI::tabWidget::addTab(m_tabViewWidget, temp, textVersion);
-		
-	temp = m_viewerComponent->getTableWidget(viewID);
-	if (getVisibleTable())
-	{	
-		uiAPI::tabWidget::addTab(m_tabViewWidget, temp, "Table");
-	}
-	else
-	{
-		temp->setVisible(false);
+		m_viewerComponent->getPlotWidget(viewID)->getViewWidget()->setVisible(false);
 	}
 
-	m_graphicsPickerDock->setVisible(getVisibleBlockPicker());
+	{
+		ot::WidgetView* wv = m_viewerComponent->getVersionGraphWidget(viewID);
+		wv->setName(textVersion.toStdString());
+		wv->setViewTitle(textVersion);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
+	}
+	
+	if (getVisibleTable())
+	{	
+		ot::WidgetView* wv = m_viewerComponent->getTableWidget(viewID);
+		wv->setName(textTable.toStdString());
+		wv->setViewTitle(textTable);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
+	}
+	else
+	{
+		m_viewerComponent->getTableWidget(viewID)->getViewWidget()->setVisible(false);
+	}
+
+	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
 
 	// #######################################################################
 
@@ -1616,11 +1587,11 @@ ViewerUIDtype AppBase::createView(
 }
 
 void AppBase::setCurrentVisualizationTab(const std::string & _tabName) {
-	uiAPI::tabWidget::setTabFocused(m_tabViewWidget, uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, _tabName.c_str()));
+	ot::WidgetViewManager::instance().setCurrentView(_tabName);
 }
 
 std::string AppBase::getCurrentVisualizationTab(void) {
-	return uiAPI::tabWidget::getTabText(m_tabViewWidget, uiAPI::tabWidget::getFocusedTab(m_tabViewWidget)).toStdString();
+	return ot::WidgetViewManager::instance().getCurrentViewTitle().toStdString();
 }
 
 // #################################################################################################################
@@ -1689,7 +1660,8 @@ void AppBase::switchToTab(const std::string &menu) {
 
 void AppBase::closeAllViewerTabs(void) {
 	m_graphicsViews.free();
-	uiAPI::tabWidget::closeAllTabs(m_tabViewWidget);
+	m_textEditors.free();
+	ot::WidgetViewManager::instance().closeViews();
 }
 
 void AppBase::clearSessionInformation(void) {
@@ -1703,10 +1675,6 @@ void AppBase::clearSessionInformation(void) {
 
 void AppBase::saveState() {
 	m_currentStateWindow = uiAPI::window::saveState(m_mainWindow);
-	return;
-	m_dockVisibility.output = uiAPI::dock::isVisible(m_docks.output);
-	m_dockVisibility.projectNavigation = uiAPI::dock::isVisible(m_docks.projectNavigation);
-	m_dockVisibility.properties = uiAPI::dock::isVisible(m_docks.properties);
 }
 
 void AppBase::restoreState() { uiAPI::timer::shoot(m_timerRestoreStateAfterTabChange, 0); }
@@ -1746,10 +1714,13 @@ void AppBase::setProgressBarValue(int progressPercentage)
 QString AppBase::availableTabText(
 	const QString &				_initialTabText
 ) {
-	if (!uiAPI::tabWidget::hasTab(m_tabViewWidget, _initialTabText)) { return _initialTabText; }
+	if (!ot::WidgetViewManager::instance().viewTitleExists(_initialTabText)) {
+		return _initialTabText;
+	}
+
 	int v = 1;
 	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
-	while (uiAPI::tabWidget::hasTab(m_tabViewWidget, nxt)) {
+	while (ot::WidgetViewManager::instance().viewTitleExists(nxt)) {
 		nxt = _initialTabText + " [" + QString::number(++v) + "]";
 	}
 	return nxt;
@@ -1768,70 +1739,70 @@ void AppBase::activateToolBarTab(const QString& _tab) {
 // Navigation
 
 void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
-	m_widgets.projectNavigation->setSortingEnabled(_enabled);
+	m_projectNavigation->setSortingEnabled(_enabled);
 }
 
 void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
-	m_widgets.projectNavigation->setMultiSelectionEnabled(_enabled);
+	m_projectNavigation->setMultiSelectionEnabled(_enabled);
 }
 
 void AppBase::clearNavigationTree(void) {
-	m_widgets.projectNavigation->clear();
+	m_projectNavigation->clear();
 }
 
 ID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren) {
-	ID id = m_widgets.projectNavigation->add(_treePath, _delimiter);
-	m_widgets.projectNavigation->setItemIsEditable(id, _isEditable);
-	m_widgets.projectNavigation->setItemSelectChildren(id, selectChildren);
+	ID id = m_projectNavigation->add(_treePath, _delimiter);
+	m_projectNavigation->setItemIsEditable(id, _isEditable);
+	m_projectNavigation->setItemSelectChildren(id, selectChildren);
 	return id;
 }
 
 void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, const QString & _iconPath) {
-	m_widgets.projectNavigation->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName + ".png"));
+	m_projectNavigation->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName + ".png"));
 }
 
 void AppBase::setNavigationTreeItemText(ID _itemID, const QString & _itemName) {
-	m_widgets.projectNavigation->setItemText(_itemID, _itemName);
+	m_projectNavigation->setItemText(_itemID, _itemName);
 }
 
 void AppBase::setNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
-	m_widgets.projectNavigation->setItemSelected(_itemID, _isSelected);
+	m_projectNavigation->setItemSelected(_itemID, _isSelected);
 }
 
 void AppBase::setSingleNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
-	m_widgets.projectNavigation->setSingleItemSelected(_itemID, _isSelected);
+	m_projectNavigation->setSingleItemSelected(_itemID, _isSelected);
 }
 
 void AppBase::expandSingleNavigationTreeItem(ID _itemID, bool _isExpanded) {
-	m_widgets.projectNavigation->expandItem(_itemID, _isExpanded);
+	m_projectNavigation->expandItem(_itemID, _isExpanded);
 }
 
 bool AppBase::isTreeItemExpanded(ID _itemID) {
-	return m_widgets.projectNavigation->isItemExpanded(_itemID);
+	return m_projectNavigation->isItemExpanded(_itemID);
 }
 
 void AppBase::toggleNavigationTreeItemSelection(ID _itemID, bool _considerChilds) {
-	bool autoConsiderChilds = m_widgets.projectNavigation->getAutoSelectAndDeselectChildrenEnabled();
+	bool autoConsiderChilds = m_projectNavigation->getAutoSelectAndDeselectChildrenEnabled();
 
-	m_widgets.projectNavigation->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
-	m_widgets.projectNavigation->toggleItemSelection(_itemID);
-	m_widgets.projectNavigation->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
+	m_projectNavigation->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
+	m_projectNavigation->toggleItemSelection(_itemID);
+	m_projectNavigation->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
 }
 
 void AppBase::removeNavigationTreeItems(const std::vector<ID> & itemIds) {
-	m_widgets.projectNavigation->deleteItems(itemIds);
+	m_projectNavigation->deleteItems(itemIds);
 }
 
 void AppBase::clearNavigationTreeSelection(void) {
-	m_widgets.projectNavigation->deselectAllItems(true);
+	m_projectNavigation->deselectAllItems(true);
 }
 
 QString AppBase::getNavigationTreeItemText(ID _itemID) {
-	return m_widgets.projectNavigation->getItemText(_itemID);
+	return m_projectNavigation->getItemText(_itemID);
 }
 
 std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
-	return m_widgets.projectNavigation->selectedItems();
+	return m_projectNavigation->selectedItems();
 }
 
 void AppBase::fillPropertyGrid(const std::string &settings) {
@@ -1972,21 +1943,15 @@ void AppBase::fillPropertyGrid(const std::string &settings) {
 // Info text output
 
 void AppBase::replaceInfoMessage(const QString & _message) {
-	if (m_widgets.output != invalidUID) {
-		uiAPI::textEdit::setText(m_widgets.output, _message);
-	}
+	m_output->setPlainText(_message);
 }
 
 void AppBase::appendInfoMessage(const QString & _message) {
-	if (m_widgets.output != invalidUID) {
-		uiAPI::textEdit::appendText(m_widgets.output, _message);
-	}
+	m_output->appendPlainText(_message);
 }
 
 void AppBase::appendDebugMessage(const QString & _message) {
-	if (m_widgets.debug != invalidUID) {
-		uiAPI::textEdit::appendText(m_widgets.debug, _message);
-	}
+	m_debug->appendPlainText(_message);
 }
 
 // ##############################################################################################
@@ -1997,11 +1962,11 @@ void AppBase::appendDebugMessage(const QString & _message) {
 
 void AppBase::lockPropertyGrid(bool flag)
 {
-	m_widgets.properties->setEnabled(flag);
+	m_propertyGrid->setEnabled(flag);
 }
 
 QString AppBase::getPropertyName(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->name();
 	}
@@ -2012,7 +1977,7 @@ QString AppBase::getPropertyName(ID _itemID) {
 }
 
 valueType AppBase::getPropertyType(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getValueType();
 	}
@@ -2023,7 +1988,7 @@ valueType AppBase::getPropertyType(ID _itemID) {
 }
 
 bool AppBase::getPropertyValueBool(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getBool();
 	}
@@ -2034,7 +1999,7 @@ bool AppBase::getPropertyValueBool(ID _itemID) {
 }
 
 int AppBase::getPropertyValueInt(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getInt();
 	}
@@ -2045,7 +2010,7 @@ int AppBase::getPropertyValueInt(ID _itemID) {
 }
 
 double AppBase::getPropertyValueDouble(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getDouble();
 	}
@@ -2056,7 +2021,7 @@ double AppBase::getPropertyValueDouble(ID _itemID) {
 }
 
 QString AppBase::getPropertyValueString(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getString();
 	}
@@ -2067,7 +2032,7 @@ QString AppBase::getPropertyValueString(ID _itemID) {
 }
 
 QString AppBase::getPropertyValueSelection(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getSelection();
 	}
@@ -2078,7 +2043,7 @@ QString AppBase::getPropertyValueSelection(ID _itemID) {
 }
 
 std::vector<QString> AppBase::getPropertyPossibleSelection(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	std::vector<QString> lst;
 	if (itm) {
 		for (const QString& s : itm->getPossibleSelection()) {
@@ -2092,7 +2057,7 @@ std::vector<QString> AppBase::getPropertyPossibleSelection(ID _itemID) {
 }
 
 aColor AppBase::getPropertyValueColor(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->getColor();
 	}
@@ -2103,7 +2068,7 @@ aColor AppBase::getPropertyValueColor(ID _itemID) {
 }
 
 bool AppBase::getPropertyIsDeletable(ID _itemID) {
-	auto itm = m_widgets.properties->item(_itemID);
+	auto itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		return itm->isDeletable();
 	}
@@ -2116,79 +2081,79 @@ bool AppBase::getPropertyIsDeletable(ID _itemID) {
 // Setter
 
 void AppBase::clearPropertyGrid(void) {
-	m_widgets.properties->clear(false);
+	m_propertyGrid->clear(false);
 }
 
 void AppBase::addPropertyGroup(const QString & _groupName, const aColor & _color, const aColor& _foregroundColor, const aColor& _errorColor) {
-	m_widgets.properties->addGroup(_groupName, _color, _foregroundColor, _errorColor);
+	m_propertyGrid->addGroup(_groupName, _color, _foregroundColor, _errorColor);
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, bool _value) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value, int _min, int _max) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _min, _max, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _min, _max, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, double _value) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const char * _value) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, QString(_value), _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, QString(_value), _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const QString & _value) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const aColor & _value) {
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
@@ -2196,17 +2161,17 @@ ID AppBase::addProperty(const QString & _groupName, const QString & _propertyNam
 ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const std::vector<QString> & _possibleSelection, const QString & _initialSelection) {
 	QStringList pos;
 	for (const QString& p : _possibleSelection) pos.append(p);
-	ak::ID id = m_widgets.properties->addItem(_groupName, _propertyName, pos, _initialSelection, _isMultipleValues);
-	m_widgets.properties->item(id)->setReadOnly(_isReadOnly);
-	m_widgets.properties->item(id)->setDeletable(_isDeletable);
+	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, pos, _initialSelection, _isMultipleValues);
+	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
+	m_propertyGrid->item(id)->setDeletable(_isDeletable);
 	if (_hasError) {
-		m_widgets.properties->item(id)->setErrorState(true);
+		m_propertyGrid->item(id)->setErrorState(true);
 	}
 	return id;
 }
 
 void AppBase::setPropertyValueDouble(ak::ID _itemID, double _value) {
-	ak::aPropertyGridItem* itm = m_widgets.properties->item(_itemID);
+	ak::aPropertyGridItem* itm = m_propertyGrid->item(_itemID);
 	if (itm) {
 		itm->setDouble(_value);
 	}
@@ -2216,7 +2181,7 @@ void AppBase::setPropertyValueDouble(ak::ID _itemID, double _value) {
 }
 
 int AppBase::findPropertyID(const QString & _propertyName) {
-	ak::aPropertyGridItem* item = m_widgets.properties->findItem(_propertyName);
+	ak::aPropertyGridItem* item = m_propertyGrid->findItem(_propertyName);
 	if (item) {
 		return item->id();
 	}
@@ -2227,22 +2192,25 @@ int AppBase::findPropertyID(const QString & _propertyName) {
 }
 
 ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
-	OTAssertNullptr(m_graphicsPickerDock);
-	return m_graphicsPickerDock->pickerWidget();
+	OTAssertNullptr(m_graphicsPicker);
+	return m_graphicsPicker;
 }
 
-ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
-	ot::GraphicsView* newEditor = this->findGraphicsEditor(_name, _serviceInfo);
+ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
+	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_name, _serviceInfo);
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
-	newEditor = new ot::GraphicsView;
+	newEditor = new ot::GraphicsViewView;
+	newEditor->setName(_name);
+	newEditor->setViewTitle(_title);
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setDropsEnabled(true);
+	
+	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 
-	this->addTabToCentralView(_title, newEditor);
 	m_graphicsViews.store(_serviceInfo, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
@@ -2254,9 +2222,9 @@ ot::GraphicsView* AppBase::createNewGraphicsEditor(const std::string& _name, con
 	return newEditor;
 }
 
-ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo) {
+ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo) {
 	if (m_graphicsViews.contains(_serviceInfo)) {
-		std::list<ot::GraphicsView*>& lst = m_graphicsViews[_serviceInfo];
+		const std::list<ot::GraphicsViewView*>& lst = m_graphicsViews[_serviceInfo];
 
 		for (auto v : lst) {
 			if (v->graphicsViewName() == _name) return v;
@@ -2266,26 +2234,28 @@ ot::GraphicsView* AppBase::findGraphicsEditor(const std::string& _name, ot::Basi
 	return nullptr;
 }
 
-ot::GraphicsView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::GraphicsView* v = this->findGraphicsEditor(_name, _serviceInfo);
+ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::GraphicsViewView* v = this->findGraphicsEditor(_name, _serviceInfo);
 	if (v) return v;
 
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
 }
 
-ot::TextEditor* AppBase::createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditor* newEditor = this->findTextEditor(_name, _serviceInfo);
+ot::TextEditorView* AppBase::createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TextEditorView* newEditor = this->findTextEditor(_name, _serviceInfo);
 	if (newEditor != nullptr) {
 		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
-	newEditor = new ot::TextEditor;
+	newEditor = new ot::TextEditorView;
+	newEditor->setName(_name);
+	newEditor->setViewTitle(_title);
 	newEditor->setTextEditorName(_name);
-	newEditor->setTextEditorTitle(_title);
+	//newEditor->setTextEditorTitle(_title);
 
-	this->addTabToCentralView(_title, newEditor);
+	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
 
 	connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
@@ -2295,9 +2265,9 @@ ot::TextEditor* AppBase::createNewTextEditor(const std::string& _name, const QSt
 	return newEditor;
 }
 
-ot::TextEditor* AppBase::findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
 	if (m_textEditors.contains(_serviceInfo)) {
-		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+		const std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
 			if (v->textEditorName() == _name) return v;
@@ -2307,8 +2277,8 @@ ot::TextEditor* AppBase::findTextEditor(const std::string& _name, const ot::Basi
 	return nullptr;
 }
 
-ot::TextEditor* AppBase::findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditor* v = this->findTextEditor(_name, _serviceInfo);
+ot::TextEditorView* AppBase::findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TextEditorView* v = this->findTextEditor(_name, _serviceInfo);
 	if (v) return v;
 
 	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
@@ -2317,21 +2287,13 @@ ot::TextEditor* AppBase::findOrCreateTextEditor(const std::string& _name, const 
 
 void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
 	if (m_textEditors.contains(_serviceInfo)) {
-		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
-		std::list<ot::TextEditor*> tmp = lst;
+		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
+		std::list<ot::TextEditorView*> tmp = lst;
 		lst.clear();
 
 		for (auto v : tmp) {
 			if (v->textEditorName() == _name) {
-				QString title = v->textEditorTitle();
-				delete v;
-				ak::ID tabId = uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, title);
-				if (tabId != ak::invalidID) {
-					uiAPI::tabWidget::closeTab(m_tabViewWidget, tabId);
-				}
-				else {
-					OT_LOG_EA("Invalid tab ID");
-				}
+				ot::WidgetViewManager::instance().closeView(_serviceInfo, _name);
 			}
 			else {
 				lst.push_back(v);
@@ -2345,18 +2307,11 @@ void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceIn
 
 void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo) {
 	if (m_textEditors.contains(_serviceInfo)) {
-		std::list<ot::TextEditor*>& lst = m_textEditors[_serviceInfo];
+		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
-			QString title = v->textEditorTitle();
-			delete v;
-			ak::ID tabId = uiAPI::tabWidget::getTabIDByText(m_tabViewWidget, title);
-			if (tabId != ak::invalidID) {
-				uiAPI::tabWidget::closeTab(m_tabViewWidget, tabId);
-			}
-			else {
-				OT_LOG_EA("Invalid tab ID");
-			}
+			std::string name = v->name();
+			ot::WidgetViewManager::instance().closeView(_serviceInfo, name);
 		}
 		lst.clear();
 	}
@@ -2365,7 +2320,7 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 	}
 }
 
-std::list<ot::GraphicsView*> AppBase::getAllGraphicsEditors(void) {
+std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
 	return m_graphicsViews.getAll();
 }
 
@@ -2441,7 +2396,7 @@ AppBase * AppBase::instance(void) {
 }
 
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
-	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
@@ -2482,7 +2437,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 }
 
 void AppBase::slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos) {
-	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
@@ -2522,7 +2477,7 @@ void AppBase::slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos)
 }
 
 void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
-	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
@@ -2612,7 +2567,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 }
 
 void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {
-	ot::GraphicsView* view = dynamic_cast<ot::GraphicsView*>(sender());
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
@@ -2640,7 +2595,7 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 }
 
 void AppBase::slotTextEditorSaveRequested(void) {
-	ot::TextEditor* editor = dynamic_cast<ot::TextEditor*>(sender());
+	ot::TextEditorView* editor = dynamic_cast<ot::TextEditorView*>(sender());
 	if (editor == nullptr) {
 		OT_LOG_E("GraphicsScene cast failed");
 		return;
@@ -2682,6 +2637,14 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			OT_LOG_EA("[FATAL] Unknown error");
 		}
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
+
+void AppBase::slotOutputContextMenuItemClicked() {
+	m_output->setPlainText(BUILD_INFO);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

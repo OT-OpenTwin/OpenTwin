@@ -12,6 +12,7 @@
 
 // ADS header
 #include <ads/DockManager.h>
+#include <ads/DockAreaWidget.h>
 
 ot::WidgetViewManager& ot::WidgetViewManager::instance(void) {
 	static WidgetViewManager g_instance;
@@ -28,6 +29,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 
 	if (!m_dockManager) {
 		m_dockManager = new ads::CDockManager;
+		m_dockManager->setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, false);
 	}
 }
 
@@ -36,7 +38,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 // View Management
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	return this->addViewImpl(_owner, _view, nullptr);
+	return this->addViewImpl(_owner, _view, m_dockManager->dockArea(0));
 }
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
@@ -83,7 +85,10 @@ void ot::WidgetViewManager::closeView(const BasicServiceInformation& _owner, con
 		auto it = map->find(_viewName);
 		if (it != map->end()) {
 			if (!it->second->viewIsProtected()) {
-				delete it->second;
+				it->second->m_isDeletedByManager = true;
+
+				m_dockManager->removeDockWidget(it->second->getViewDockWidget());
+				
 				map->erase(_viewName);
 			}
 		}
@@ -113,6 +118,21 @@ void ot::WidgetViewManager::closeViews(void) {
 	}
 	for (const BasicServiceInformation& i : tmp) {
 		this->closeViews(i);
+	}
+}
+
+void ot::WidgetViewManager::forgetView(WidgetView* _view) {
+	for (const auto& v : m_views) {
+		for (const auto& e : *v.second) {
+			if (e.second == _view) {
+				v.second->erase(e.first);
+
+				if (v.second->empty()) {
+					m_views.erase(v.first);
+				}
+				return;
+			}
+		}
 	}
 }
 
@@ -179,10 +199,11 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 			OT_LOG_E("Unknown dock location");
 			m_dockManager->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _area);
 		}
+
 		return true;
 	}
 	else if (it->second != _view) {
-		OT_LOG_W("A different view with the same name and owner was already added before. Skipping add");
+		OT_LOG_W("A different view with the same name and owner was already added before. Skipping add. (View name: " + _view->name() + "; View title: " + _view->viewTitle().toStdString() + ")");
 		return false;
 	}
 	else {

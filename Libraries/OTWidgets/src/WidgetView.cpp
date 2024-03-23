@@ -5,18 +5,32 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetViewManager.h"
 
 // ADS header
 #include <ads/DockWidget.h>
+#include <ads/DockAreaWidget.h>
+#include <ads/DockManager.h>
 
 ot::WidgetView::WidgetView()
-	: m_flags(WidgetViewCfg::NoViewFlags), m_dockLocation(WidgetViewCfg::Default), m_isProtected(false)
+	: m_flags(WidgetViewCfg::NoViewFlags), m_dockLocation(WidgetViewCfg::Default), m_isProtected(false), m_isDeletedByManager(false)
 {
 	m_dockWidget = new ads::CDockWidget("");
+	m_dockWidget->setFeature(ads::CDockWidget::CustomCloseHandling, true);
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
 }
 
-ot::WidgetView::~WidgetView() {
-	delete m_dockWidget;
+ot::WidgetView::~WidgetView() {	
+	m_dockWidget->takeWidget();
+
+	if (!m_isDeletedByManager) {
+		WidgetViewManager::instance().forgetView(this);
+	}
+
+	ads::CDockManager* adsManager = m_dockWidget->dockManager();
+	if (adsManager) {
+		adsManager->removeDockWidget(m_dockWidget);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

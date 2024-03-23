@@ -11,7 +11,9 @@
 
 static ot::WidgetViewRegistrar<ot::VersionGraphView> VersionGraphViewRegistrar(OT_WIDGETTYPE_VersionGraph);
 
-ot::VersionGraphView::VersionGraphView() {
+ot::VersionGraphView::VersionGraphView(Viewer* _viewer)
+	: VersionGraph(_viewer)
+{
 	this->addWidgetToDock(this->widget());
 }
 

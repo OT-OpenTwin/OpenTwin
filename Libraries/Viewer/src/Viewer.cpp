@@ -9,6 +9,7 @@
 #include "AxisCross.h"
 #include "AxisCenterCross.h"
 #include "ClipPlaneManipulator.h"
+#include "TableViewerView.h"
 
 #include "HandlerBase.h"
 #include "HandleArrow.h"
@@ -47,8 +48,8 @@
 #include "ViewManipulator.h"
 #include "ViewerObjectSelectionHandler.h"
 
-#include "Plot.h"
-#include "VersionGraph.h"
+#include "PlotView.h"
+#include "VersionGraphView.h"
 
 #include "SceneNodeVTK.h"
 
@@ -216,11 +217,11 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgAxisViewer->realize();
 
 	// Create new Plot
-	m_plot = new Plot(this);
+	m_plot = new ot::PlotView(this);
 
 	// Create new view handler
-	m_versionGraph = new VersionGraph(this);
-	m_tableViewer = new TableViewer(this);
+	m_versionGraph = new ot::VersionGraphView(this);
+	m_tableViewer = new ot::TableViewerView(this);
 
 	// Create settings
 	ot::SettingsData * dataset = createSettings();

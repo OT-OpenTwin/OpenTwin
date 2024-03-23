@@ -11,7 +11,9 @@
 
 //static ot::WidgetViewRegistrar<ot::TableViewerView> TableViewerViewRegistrar(OT_WIDGETTYPE_TableViewer);
 
-ot::TableViewerView::TableViewerView() {
+ot::TableViewerView::TableViewerView(QWidget* _parent)
+	: TableViewer(_parent)
+{
 	this->addWidgetToDock(this->getTable());
 }
 

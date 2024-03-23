@@ -41,6 +41,7 @@ void UiPluginComponent::appenDebugMessage(const QString& _message) {
 }
 
 bool UiPluginComponent::addNewTab(const QString& _tabTitle, QWidget * _widget) {
-	AppBase::instance()->addTabToCentralView(_tabTitle, _widget);
+	OT_LOG_E("NOT IMPLEMENTED");
+	//AppBase::instance()->addTabToCentralView(_tabTitle, _widget);
 	return true;
 }
