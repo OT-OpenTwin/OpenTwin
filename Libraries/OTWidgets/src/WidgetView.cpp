@@ -49,7 +49,7 @@ bool ot::WidgetView::setupFromConfig(WidgetViewCfg* _config) {
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {
 	m_isModified = _isModified;
-	m_dockWidget->setWindowTitle((m_isModified ? "*" + m_title : m_title));
+	m_dockWidget->setWindowTitle((m_isModified ? m_title + "*" : m_title));
 }
 
 void ot::WidgetView::setName(const std::string& _name) {

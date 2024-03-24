@@ -83,7 +83,7 @@ ot::WidgetView* ot::WidgetViewManager::addView(const BasicServiceInformation& _o
 	if (newView) {
 		ads::CDockAreaWidget* parentArea = nullptr;
 		if (!_viewConfiguration->parentViewName().empty()) {
-			WidgetView* parentView = this->findView(_owner, _viewConfiguration->parentViewName());
+			WidgetView* parentView = this->findView(_viewConfiguration->parentViewName());
 			if (parentView) {
 				parentArea = parentView->getViewDockWidget()->dockAreaWidget();
 			}
@@ -96,87 +96,76 @@ ot::WidgetView* ot::WidgetViewManager::addView(const BasicServiceInformation& _o
 	return newView;
 }
 
-ot::WidgetView* ot::WidgetViewManager::findView(const BasicServiceInformation& _owner, const std::string& _viewName) {
-	auto map = this->findViewMap(_owner);
-	if (map) {
-		auto it = map->find(_viewName);
-		if (it == map->end()) {
-			return nullptr;
-		}
-		else {
-			return it->second;
-		}
-	}
-	else {
-		return nullptr;
-	}
+ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _viewName) const {
+	const auto it = m_viewNameMap.find(_viewName);
+	if (it == m_viewNameMap.end()) return nullptr;
+	else return it->second.second;
 }
 
-void ot::WidgetViewManager::closeView(const BasicServiceInformation& _owner, const std::string& _viewName) {
-	auto map = this->findViewMap(_owner);
-	if (map) {
-		auto it = map->find(_viewName);
-		if (it != map->end()) {
-			if (!it->second->viewIsProtected()) {
-				it->second->m_isDeletedByManager = true;
+void ot::WidgetViewManager::closeView(const std::string& _viewName) {
+	WidgetView* view = this->findView(_viewName);
+	if (view == nullptr) return;
 
-				if (it->second == m_centralView) {
-					m_centralView = nullptr;
-				}
+	if (view->viewIsProtected()) return;
 
-				m_dockToggleRoot->menu()->removeAction(it->second->getViewDockWidget()->toggleViewAction());
+	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
+	view->m_isDeletedByManager = true;
+	this->forgetView(_viewName);
 
-				m_dockManager->removeDockWidget(it->second->getViewDockWidget());
-				
-				map->erase(_viewName);
-			}
-		}
-		if (map->empty()) {
-			this->clear(_owner);
-		}
-	}
+	// Remove the toggle dock action
+	m_dockToggleRoot->menu()->removeAction(view->getViewDockWidget()->toggleViewAction());
+
+	// Remove the dock widget itself
+	m_dockManager->removeDockWidget(view->getViewDockWidget());
 }
 
 void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
-	auto map = this->findViewMap(_owner);
-	if (map) {
-		std::list<std::string> tmp;
-		for (const auto& it : *map) {
-			tmp.push_back(it.second->name());
-		}
+	std::list<std::string>* lst = this->findViewNameList(_owner);
+	if (lst) {
+		std::list<std::string> tmp = *lst;
 		for (const std::string& i : tmp) {
-			this->closeView(_owner, i);
+			this->closeView(i);
 		}
 	}
 }
 
 void ot::WidgetViewManager::closeViews(void) {
-	std::list<BasicServiceInformation> tmp;
-	for (const auto& it : m_views) {
+	std::list<std::string> tmp;
+	for (const auto& it : m_viewNameMap) {
 		tmp.push_back(it.first);
 	}
-	for (const BasicServiceInformation& i : tmp) {
-		this->closeViews(i);
+	for (const std::string& i : tmp) {
+		this->closeView(i);
 	}
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
-	if (_view == m_centralView) {
+	OTAssertNullptr(_view);
+	this->forgetView(_view->name());
+}
+
+ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) {
+	// Find view and owner
+	auto nameIt = m_viewNameMap.find(_viewName);
+	if (nameIt == m_viewNameMap.end()) return nullptr;
+
+	ot::WidgetView* ret = nameIt->second.second;
+
+	// If the view is the current central, set current central to 0
+	if (nameIt->second.second == m_centralView) {
 		m_centralView = nullptr;
 	}
 
-	for (const auto& v : m_views) {
-		for (const auto& e : *v.second) {
-			if (e.second == _view) {
-				v.second->erase(e.first);
+	// Find name list from owner and erase the view entry
+	std::list<std::string>* lst = this->findViewNameList(nameIt->second.first);
+	auto lstIt = std::find(lst->begin(), lst->end(), _viewName);
+	if (lstIt != lst->end()) lst->erase(lstIt);
+	if (lst->empty()) m_viewOwnerMap.erase(nameIt->second.first);
 
-				if (v.second->empty()) {
-					m_views.erase(v.first);
-				}
-				return;
-			}
-		}
-	}
+	// Now remove the entry from the view name map
+	m_viewNameMap.erase(_viewName);
+
+	return ret;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -184,7 +173,10 @@ void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 // View manipulation
 
 void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
+	WidgetView* view = this->findView(_viewName);
+	if (!view) return;
 
+	view->getViewDockWidget()->setAsCurrentTab();
 }
 
 std::string ot::WidgetViewManager::saveState(int _version) const {
@@ -229,15 +221,14 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 
 // Information gathering
 
-QString ot::WidgetViewManager::getCurrentViewTitle(void) const {
-	return QString();
-}
-
 bool ot::WidgetViewManager::viewExists(const std::string& _viewName) const {
-	return false;
+	return this->findView(_viewName);
 }
 
 bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
+	for (const auto& it : m_viewNameMap) {
+		if (it.second.second->viewTitle() == _title || it.second.second->currentViewTitle() == _title) return true;
+	}
 	return false;
 }
 
@@ -255,41 +246,43 @@ ot::WidgetViewManager::~WidgetViewManager() {
 
 bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
 	OTAssertNullptr(_view);
-	auto map = this->findOrCreateViewMap(_owner);
-	auto it = map->find(_view->name());
-	if (it == map->end()) {
-		map->insert_or_assign(_view->name(), _view);
-		if (_area) {
-			m_dockManager->addDockWidget(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget(), _area);
-		}
-		else {
-			m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget());
-		}
-		
-		if (_view->getViewDockWidget()->features() & ads::CDockWidget::DockWidgetClosable) {
-			m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
-		}
-
-		return true;
-	}
-	else if (it->second != _view) {
-		OT_LOG_W("A different view with the same name and owner was already added before. Skipping add. (View name: " + _view->name() + "; View title: " + _view->viewTitle().toStdString() + ")");
+	// Ensure view does not exist
+	if (this->viewExists(_view->name())) {
+		OT_LOG_W("A widget view with the name \"" + _view->name() + "\" already exists");
 		return false;
 	}
-	else {
-		return true;
+
+	// Get view name list for given owner
+	auto lst = this->findOrCreateViewNameList(_owner);
+	auto lstIt = std::find(lst->begin(), lst->end(), _view->name());
+	if (lstIt != lst->end()) {
+		OT_LOG_E("Invalid entry");
+		return false;
 	}
+
+	// Add view
+	if (_area) {
+		m_dockManager->addDockWidget(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget(), _area);
+	}
+	else {
+		m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget());
+	}
+
+	// Add view toggle (if view is closeable)
+	if (_view->getViewDockWidget()->features() & ads::CDockWidget::DockWidgetClosable) {
+		m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
+	}
+
+	// Store information
+	lst->push_back(_view->name());
+	m_viewNameMap.insert_or_assign(_view->name(), std::pair<BasicServiceInformation, WidgetView*>(_owner, _view));
+
+	return true;
 }
 
-void ot::WidgetViewManager::clear(const BasicServiceInformation& _owner) {
-	auto map = this->findViewMap(_owner);
-	if (map) delete map;
-	m_views.erase(_owner);
-}
-
-std::map<std::string, ot::WidgetView*>* ot::WidgetViewManager::findViewMap(const BasicServiceInformation& _owner) {
-	auto it = m_views.find(_owner);
-	if (it == m_views.end()) {
+std::list<std::string>* ot::WidgetViewManager::findViewNameList(const BasicServiceInformation& _owner) {
+	auto it = m_viewOwnerMap.find(_owner);
+	if (it == m_viewOwnerMap.end()) {
 		return nullptr;
 	}
 	else {
@@ -297,11 +290,11 @@ std::map<std::string, ot::WidgetView*>* ot::WidgetViewManager::findViewMap(const
 	}
 }
 
-std::map<std::string, ot::WidgetView*>* ot::WidgetViewManager::findOrCreateViewMap(const BasicServiceInformation& _owner) {
-	std::map<std::string, ot::WidgetView*>* ret = this->findViewMap(_owner);
+std::list<std::string>* ot::WidgetViewManager::findOrCreateViewNameList(const BasicServiceInformation& _owner) {
+	std::list<std::string>* ret = this->findViewNameList(_owner);
 	if (!ret) {
-		ret = new std::map<std::string, ot::WidgetView*>;
-		m_views.insert_or_assign(_owner, ret);
+		ret = new std::list<std::string>;
+		m_viewOwnerMap.insert_or_assign(_owner, ret);
 	}
 	return ret;
 }

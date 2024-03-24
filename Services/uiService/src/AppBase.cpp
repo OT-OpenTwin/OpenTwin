@@ -1543,7 +1543,9 @@ void AppBase::setCurrentVisualizationTab(const std::string & _tabName) {
 }
 
 std::string AppBase::getCurrentVisualizationTab(void) {
-	return ot::WidgetViewManager::instance().getCurrentViewTitle().toStdString();
+	OT_LOG_W("Not implemented yet");
+	return "";
+	//return ot::WidgetViewManager::instance().getCurrentViewTitle().toStdString();
 }
 
 // #################################################################################################################
@@ -2246,7 +2248,7 @@ void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceIn
 
 		for (auto v : tmp) {
 			if (v->textEditorName() == _name) {
-				ot::WidgetViewManager::instance().closeView(_serviceInfo, _name);
+				ot::WidgetViewManager::instance().closeView(_name);
 			}
 			else {
 				lst.push_back(v);
@@ -2264,7 +2266,7 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 
 		for (auto v : lst) {
 			std::string name = v->name();
-			ot::WidgetViewManager::instance().closeView(_serviceInfo, name);
+			ot::WidgetViewManager::instance().closeView(name);
 		}
 		lst.clear();
 	}
