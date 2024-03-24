@@ -67,6 +67,8 @@ namespace ot {
 
 		bool restoreState(std::string _state, int _version = 0);
 
+		void setCentralView(WidgetView* _centralView) { m_centralView = _centralView; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Information gathering
@@ -88,6 +90,7 @@ namespace ot {
 		void clear(const BasicServiceInformation& _owner);
 
 		ads::CDockManager* m_dockManager;
+		WidgetView* m_centralView;
 
 		std::map<std::string, WidgetView*>* findViewMap(const BasicServiceInformation& _owner);
 		std::map<std::string, WidgetView*>* findOrCreateViewMap(const BasicServiceInformation& _owner);

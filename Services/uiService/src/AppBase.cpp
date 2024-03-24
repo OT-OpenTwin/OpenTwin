@@ -1320,6 +1320,7 @@ void AppBase::createUi(void) {
 
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
 			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
+			ot::WidgetViewManager::instance().setCentralView(m_debug);
 
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);

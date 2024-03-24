@@ -59,7 +59,12 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 // View Management
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	return this->addViewImpl(_owner, _view, nullptr);
+	if (m_centralView) {
+		return this->addViewImpl(_owner, _view, m_centralView->getViewDockWidget()->dockAreaWidget());
+	}
+	else {
+		return this->addViewImpl(_owner, _view, nullptr);
+	}
 }
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
@@ -108,6 +113,10 @@ void ot::WidgetViewManager::closeView(const BasicServiceInformation& _owner, con
 			if (!it->second->viewIsProtected()) {
 				it->second->m_isDeletedByManager = true;
 
+				if (it->second == m_centralView) {
+					m_centralView = nullptr;
+				}
+
 				m_dockManager->removeDockWidget(it->second->getViewDockWidget());
 				
 				map->erase(_viewName);
@@ -143,6 +152,10 @@ void ot::WidgetViewManager::closeViews(void) {
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
+	if (_view == m_centralView) {
+		m_centralView = nullptr;
+	}
+
 	for (const auto& v : m_views) {
 		for (const auto& e : *v.second) {
 			if (e.second == _view) {
@@ -224,7 +237,7 @@ bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 // Private
 
 ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr) 
+	: m_dockManager(nullptr), m_centralView(nullptr)
 {}
 
 ot::WidgetViewManager::~WidgetViewManager() {
@@ -237,7 +250,6 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	auto it = map->find(_view->name());
 	if (it == map->end()) {
 		map->insert_or_assign(_view->name(), _view);
-
 		if (_area) {
 			m_dockManager->addDockWidget(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget(), _area);
 		}
