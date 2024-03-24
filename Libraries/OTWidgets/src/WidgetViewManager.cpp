@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTGui/WidgetViewCfg.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetViewManager.h"
@@ -162,6 +163,44 @@ void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 
 void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
 
+}
+
+std::string ot::WidgetViewManager::saveState(int _version) const {
+	QByteArray tmp = m_dockManager->saveState(_version);
+	if (tmp.isEmpty()) return std::string();
+
+	std::string ret;
+	ret.reserve((tmp.size() * 3) - 1);
+
+	for (char c : tmp) {
+		if (!ret.empty()) ret.push_back(';');
+		ret.append(std::to_string((int)c));
+	}
+
+	return ret;
+}
+
+bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
+	if (_state.empty()) return false;
+	QByteArray tmp;
+
+	size_t ix = _state.find(';');
+	bool convertFail = false;
+	while (ix != std::string::npos) {
+		tmp.append((char)ot::stringToNumber<int>(_state.substr(0, ix), convertFail));
+		if (convertFail) {
+			OT_LOG_E("State contains invalid characters");
+			return false;
+		}
+		_state.erase(0, ix + 1);
+		ix = _state.find(';');
+	}
+
+	if (!_state.empty()) {
+		tmp.append((char)ot::stringToNumber<int>(_state, convertFail));
+	}
+
+	return m_dockManager->restoreState(tmp, _version);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

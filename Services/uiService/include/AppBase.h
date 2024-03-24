@@ -222,10 +222,6 @@ public:
 
 	void setDebugOutputUid(ak::UID _uid);
 
-	structModelViewInfo createModelAndDisplay(
-		const QString &					_projectName
-	);
-
 	void registerSession(
 		const std::string &				_projectName,
 		const std::string &				_collectionName
@@ -613,7 +609,11 @@ private:
 	ak::UID						m_modelUid;					//! The UID of the model
 	ak::UID						m_timerRestoreStateAfterTabChange;
 	
-	std::string					m_currentStateWindow;
+	struct StateInformation {
+		std::string window;
+		std::string view;
+	};
+	StateInformation			m_currentStateWindow;
 	
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsViewView> m_graphicsViews;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditorView> m_textEditors;

@@ -10,6 +10,9 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+// Qt header
+#include <QtCore/qbytearray.h>
+
 // std header
 #include <map>
 #include <string>
@@ -59,6 +62,10 @@ namespace ot {
 		// View manipulation
 
 		void setCurrentView(const std::string& _viewName);
+
+		std::string saveState(int _version = 0) const;
+
+		bool restoreState(std::string _state, int _version = 0);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

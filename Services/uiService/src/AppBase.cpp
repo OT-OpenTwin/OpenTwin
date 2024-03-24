@@ -100,6 +100,7 @@ const QString c_promtIcoPath = "Default";
 #define WELCOME_SCREEN_ID_NEW 2
 
 #define STATE_NAME_WINDOW "UISettings"
+#define STATE_NAME_VIEW "ViewSettings"
 #define STATE_POS_X "WindowPosX"
 #define STATE_POS_Y "WindowPosY"
 
@@ -295,11 +296,13 @@ int AppBase::run() {
 			uM.setAuthServerURL(m_authorizationServiceURL);
 			uM.setDatabaseURL(m_dataBaseURL);
 			uM.initializeNewSession();
-			m_currentStateWindow = uM.restoreSetting(STATE_NAME_WINDOW);
-			if (!uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow, true)) {
-				m_currentStateWindow = "";
+			m_currentStateWindow.window = uM.restoreSetting(STATE_NAME_WINDOW);
+			m_currentStateWindow.view = uM.restoreSetting(STATE_NAME_VIEW);
+			if (!uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow.window, true)) {
+				m_currentStateWindow.window = "";
 				uiAPI::window::showMaximized(m_mainWindow);
 			}
+			ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
 		}
 
 		// Create shortcut manager
@@ -326,7 +329,8 @@ int AppBase::run() {
 			uM.setAuthServerURL(m_authorizationServiceURL);
 			uM.setDatabaseURL(m_dataBaseURL);
 
-			uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow);
+			uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow.window);
+			uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
 		}
 		return status;
 
@@ -411,12 +415,13 @@ void AppBase::notify(
 			OT_LOG_D("Restoring window state");
 
 			// Check restore state, if failed set minimum size for central widget to avoid size bug
-			if (m_currentStateWindow.empty()) {
+			if (m_currentStateWindow.window.empty()) {
 				
 			}
 			else {
 				// We want to maintain the size of the application window
-				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow, false);
+				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow.window, false);
+				ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
 			}
 			saveState();
 
@@ -492,12 +497,13 @@ void AppBase::notify(
 bool AppBase::closeEvent() {
 	if (m_mainWindow != invalidUID) {
 		if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) != 0) {
-			m_currentStateWindow = uiAPI::window::saveState(m_mainWindow);
+			m_currentStateWindow.window = uiAPI::window::saveState(m_mainWindow);
 		}
 		else
 		{
-			m_currentStateWindow = uiAPI::window::saveState(m_mainWindow, m_currentStateWindow);
+			m_currentStateWindow.window = uiAPI::window::saveState(m_mainWindow, m_currentStateWindow.window);
 		}
+		m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
 	}
 
 	if (m_projectIsModified) {
@@ -1422,63 +1428,6 @@ bool AppBase::debug(void) const { return m_isDebug; }
 
 void AppBase::setDebugOutputUid(UID _uid) { m_debugNotifier->setOutputUid(_uid); }
 
-structModelViewInfo AppBase::createModelAndDisplay(
-	const QString &					_projectName
-) {
-	assert(0); //NOTE, not in use anymore
-	structModelViewInfo ret;
-
-	m_ExternalServicesComponent->closeProject(false);
-
-	// Now remove the empty tab
-	ot::WidgetViewManager::instance().closeViews();
-
-	m_currentProjectName = _projectName.toStdString();
-	ProjectManagement pManager;
-	pManager.setDataBaseURL(m_dataBaseURL);
-	pManager.setAuthServerURL(m_authorizationServiceURL);
-
-	assert(pManager.InitializeConnection()); // Failed to connect
-	
-	// Creates data entry in the viewer to store model data
-	ret.view = m_viewerComponent->createModel();
-
-	ret.model = m_ExternalServicesComponent->createModel(
-		m_currentProjectName,
-		pManager.getProjectCollection(m_currentProjectName)
-	);
-
-	m_viewerComponent->setDataModel(ret.view, ret.model);
-	m_ExternalServicesComponent->setVisualizationModel(ret.model, ret.view);
-	m_viewerComponent->activateModel(ret.view);
-
-	// Create DPI ratio
-	int DPIRatio = QApplication::primaryScreen()->devicePixelRatio();
-
-	aColor col(255, 255, 255);
-	aColor overlayCol;
-	
-	// Create viewer (view on the model)
-	ViewerUIDtype newViewerUid = m_viewerComponent->createViewer(ret.view, (double)DPIRatio, (double)DPIRatio,
-		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
-
-	// Get created widget
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_viewerComponent->getViewerWidget(newViewerUid));
-
-	// Clear status
-	m_output->setPlainText(BUILD_INFO);
-
-	// Focus first tab in the tab toolbar (first after file)
-	assert(uiAPI::window::getTabToolBarTabCount(m_mainWindow) > 1);	// Components did not create any other tab
-
-	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
-
-	// Will also refresh the window title
-	setCurrentProjectIsModified(false);
-
-	return ret;
-}
-
 void AppBase::registerSession(
 	const std::string &				_projectName,
 	const std::string &				_collectionName
@@ -1673,7 +1622,8 @@ void AppBase::clearSessionInformation(void) {
 // Private functions
 
 void AppBase::saveState() {
-	m_currentStateWindow = uiAPI::window::saveState(m_mainWindow);
+	m_currentStateWindow.window = uiAPI::window::saveState(m_mainWindow);
+	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
 }
 
 void AppBase::restoreState() { uiAPI::timer::shoot(m_timerRestoreStateAfterTabChange, 0); }
