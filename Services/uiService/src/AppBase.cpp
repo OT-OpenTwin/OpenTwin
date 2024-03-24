@@ -1320,7 +1320,6 @@ void AppBase::createUi(void) {
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
 			
-			m_debug->getViewDockWidget()->setAsCurrentTab();
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
 			//Note

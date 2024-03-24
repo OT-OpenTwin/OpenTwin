@@ -23,10 +23,6 @@
 #include <qlabel.h>
 #include <qmovie.h>
 #include <qscreen.h>
-#include <qlayout.h>
-#include <QOpenGLWidget>
-
-
 
 ak::aWindow::aWindow()
 	: QMainWindow(), aObject(otMainWindow), m_waitingWidget(nullptr), m_centralWidget(nullptr)

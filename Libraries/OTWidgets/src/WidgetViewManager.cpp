@@ -14,6 +14,26 @@
 #include <ads/DockManager.h>
 #include <ads/DockAreaWidget.h>
 
+namespace ot {
+	namespace intern {
+
+		ads::DockWidgetArea convertDockArea(ot::WidgetViewCfg::ViewDockLocation _dockLocation) {
+			switch (_dockLocation)
+			{
+			case ot::WidgetViewCfg::Default: return ads::CenterDockWidgetArea;
+			case ot::WidgetViewCfg::Left: return ads::LeftDockWidgetArea;
+			case ot::WidgetViewCfg::Top: return ads::TopDockWidgetArea;
+			case ot::WidgetViewCfg::Right: return ads::RightDockWidgetArea;
+			case ot::WidgetViewCfg::Bottom: return ads::BottomDockWidgetArea;
+			default:
+				OT_LOG_E("Unknown dock location (" + std::to_string((int)_dockLocation) + ")");
+				return ads::CenterDockWidgetArea;
+			}
+		}
+
+	}
+}
+
 ot::WidgetViewManager& ot::WidgetViewManager::instance(void) {
 	static WidgetViewManager g_instance;
 	return g_instance;
@@ -38,7 +58,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 // View Management
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	return this->addViewImpl(_owner, _view, m_dockManager->dockArea(0));
+	return this->addViewImpl(_owner, _view, nullptr);
 }
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
@@ -178,28 +198,14 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	auto it = map->find(_view->name());
 	if (it == map->end()) {
 		map->insert_or_assign(_view->name(), _view);
-		switch (_view->initialDockLocation())
-		{
-		case ot::WidgetViewCfg::Default:
-			m_dockManager->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _area);
-			break;
-		case ot::WidgetViewCfg::Left:
-			m_dockManager->addDockWidget(ads::LeftDockWidgetArea, _view->getViewDockWidget(), _area);
-			break;
-		case ot::WidgetViewCfg::Top:
-			m_dockManager->addDockWidget(ads::TopDockWidgetArea, _view->getViewDockWidget(), _area);
-			break;
-		case ot::WidgetViewCfg::Right:
-			m_dockManager->addDockWidget(ads::RightDockWidgetArea, _view->getViewDockWidget(), _area);
-			break;
-		case ot::WidgetViewCfg::Bottom:
-			m_dockManager->addDockWidget(ads::BottomDockWidgetArea, _view->getViewDockWidget(), _area);
-			break;
-		default:
-			OT_LOG_E("Unknown dock location");
-			m_dockManager->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _area);
-		}
 
+		if (_area) {
+			m_dockManager->addDockWidget(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget(), _area);
+		}
+		else {
+			m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget());
+		}
+		
 		return true;
 	}
 	else if (it->second != _view) {
