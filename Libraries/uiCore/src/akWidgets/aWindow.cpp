@@ -102,8 +102,11 @@ void ak::aWindow::showEvent(QShowEvent* event)
 	// we add a dummy OpenGL window to the main window when it is shown for the very first time and delete
 	// it again right away. This fixes the flickering of the main window.
 
-	QOpenGLWidget w;
+	//QOpenGLWidget w;
+	//QWidget* currentCentral = this->takeCentralWidget();
+	//this->setCentralWidget(&w);
+	//this->takeCentralWidget();
+	//this->setCentralWidget(currentCentral);
 
-	layout()->addWidget(&w);
-	layout()->removeWidget(&w);
+	QMainWindow::showEvent(event);
 }
