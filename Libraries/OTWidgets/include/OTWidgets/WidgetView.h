@@ -25,7 +25,7 @@ namespace ads {
 namespace ot {
 
 	class WidgetViewManager;
-
+	
 	class OT_WIDGETS_API_EXPORT WidgetView {
 		OT_DECL_NOCOPY(WidgetView)
 	public:
@@ -47,11 +47,15 @@ namespace ot {
 		void setViewIsProtected(bool _protected = true) { m_isProtected = _protected; };
 		bool viewIsProtected(void) const { return m_isProtected; };
 
+		void setViewContentModified(bool _isModified);
+		bool isViewContentModified(void) const { return m_isModified; };
+
 		void setName(const std::string& _name);
 		const std::string& name(void) const { return m_name; };
 
 		void setViewTitle(const QString& _title);
-		QString viewTitle(void) const;
+		QString viewTitle(void) const { return m_title; };
+		QString currentViewTitle(void) const;
 
 		void setInitialiDockLocation(WidgetViewCfg::ViewDockLocation _location) { m_dockLocation = _location; };
 		WidgetViewCfg::ViewDockLocation initialDockLocation(void) const { return m_dockLocation; };
@@ -66,7 +70,9 @@ namespace ot {
 
 		bool m_isDeletedByManager;
 		bool m_isProtected;
+		bool m_isModified;
 		std::string m_name;
+		QString m_title;
 		ot::WidgetViewCfg::ViewFlags m_flags;
 		ot::WidgetViewCfg::ViewDockLocation m_dockLocation;
 	};

@@ -15,6 +15,9 @@
 #include <ads/DockManager.h>
 #include <ads/DockAreaWidget.h>
 
+// Qt header
+#include <QtWidgets/qmenu.h>
+
 namespace ot {
 	namespace intern {
 
@@ -52,6 +55,10 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 		m_dockManager = new ads::CDockManager;
 		m_dockManager->setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, false);
 	}
+
+	m_dockToggleRoot = new QAction("Windows");
+	QMenu* newMenu = new QMenu;
+	m_dockToggleRoot->setMenu(newMenu);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -116,6 +123,8 @@ void ot::WidgetViewManager::closeView(const BasicServiceInformation& _owner, con
 				if (it->second == m_centralView) {
 					m_centralView = nullptr;
 				}
+
+				m_dockToggleRoot->menu()->removeAction(it->second->getViewDockWidget()->toggleViewAction());
 
 				m_dockManager->removeDockWidget(it->second->getViewDockWidget());
 				
@@ -237,7 +246,7 @@ bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 // Private
 
 ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr), m_centralView(nullptr)
+	: m_dockManager(nullptr), m_centralView(nullptr), m_dockToggleRoot(nullptr)
 {}
 
 ot::WidgetViewManager::~WidgetViewManager() {
@@ -257,6 +266,10 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 			m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget());
 		}
 		
+		if (_view->getViewDockWidget()->features() & ads::CDockWidget::DockWidgetClosable) {
+			m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
+		}
+
 		return true;
 	}
 	else if (it->second != _view) {

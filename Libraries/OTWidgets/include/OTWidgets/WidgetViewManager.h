@@ -17,6 +17,8 @@
 #include <map>
 #include <string>
 
+class QAction;
+
 namespace ads {
 	class CDockManager;
 	class CDockAreaWidget;
@@ -79,6 +81,8 @@ namespace ot {
 
 		bool viewTitleExists(const QString& _title) const;
 
+		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
+
 	private:
 		WidgetViewManager();
 		~WidgetViewManager();
@@ -91,6 +95,7 @@ namespace ot {
 
 		ads::CDockManager* m_dockManager;
 		WidgetView* m_centralView;
+		QAction* m_dockToggleRoot;
 
 		std::map<std::string, WidgetView*>* findViewMap(const BasicServiceInformation& _owner);
 		std::map<std::string, WidgetView*>* findOrCreateViewMap(const BasicServiceInformation& _owner);

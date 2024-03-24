@@ -1236,30 +1236,35 @@ void AppBase::createUi(void) {
 			m_debug->setViewTitle("OpenTwin");
 			m_debug->setViewIsProtected(true);
 			m_debug->setPlainText(BUILD_INFO);
+			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
 			m_output->setName(TITLE_DOCK_OUTPUT);
 			m_output->setViewTitle(TITLE_DOCK_OUTPUT);
 			m_output->setViewIsProtected(true);
 			m_output->setInitialiDockLocation(ot::WidgetViewCfg::Bottom);
+			m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_propertyGrid = new ot::PropertyGridView;
 			m_propertyGrid->setName(TITLE_DOCK_PROPERTIES);
 			m_propertyGrid->setViewTitle(TITLE_DOCK_PROPERTIES);
 			m_propertyGrid->setViewIsProtected(true);
 			m_propertyGrid->setInitialiDockLocation(ot::WidgetViewCfg::Right);
+			m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_projectNavigation = new ot::NavigationTreeView;
 			m_projectNavigation->setName(TITLE_DOCK_PROJECTNAVIGATION);
 			m_projectNavigation->setViewTitle(TITLE_DOCK_PROJECTNAVIGATION);
 			m_projectNavigation->setViewIsProtected(true);
 			m_projectNavigation->setInitialiDockLocation(ot::WidgetViewCfg::Left);
+			m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
 			m_graphicsPicker->setName("Block Picker");
 			m_graphicsPicker->setViewTitle("Block Picker");
 			m_graphicsPicker->setViewIsProtected(true);
 			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
+			m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
@@ -1319,14 +1324,12 @@ void AppBase::createUi(void) {
 			OT_LOG_D("Settings up dock window visibility");
 
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
-			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 			ot::WidgetViewManager::instance().setCentralView(m_debug);
 
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
-			
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
 			//Note

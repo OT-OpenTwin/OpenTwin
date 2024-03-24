@@ -29,6 +29,9 @@
  // TTB header (TabToolbar library)
 #include <TabToolbar/Group.h>			// tt::Group
 
+// Qt header
+#include <QtWidgets/qaction.h>
+
 ak::aTtbGroup::aTtbGroup(
 	aMessenger *				_messenger,
 	tt::Group *					_group,
@@ -134,4 +137,8 @@ void ak::aTtbGroup::setEnabled(
 ) {
 	aTtbContainer::setEnabled(_enabled);
 	m_group->setEnabled(m_isEnabled);
+}
+
+void ak::aTtbGroup::addAction(QAction* _action) {
+	m_group->AddAction(QToolButton::InstantPopup, _action);
 }
