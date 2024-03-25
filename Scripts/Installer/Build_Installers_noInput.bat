@@ -24,7 +24,8 @@ for /f "tokens=2,*" %%a in ('reg query "%NSIS_REG_KEY%" /ve 2^>nul') do (
 )
 
 for /f "tokens=2*" %%a in ('reg query "%SEVENZIP_REG_KEY%" /v "%SEVENZIP_VALUE%" 2^>nul') do set SEVENZIP_REG_DATA=%%b
-
+REM install pyinstaller
+REM 7zip check
 
 Set MAKENSIS_PATH="!NSIS_REG_VALUE!\makensis.exe"
 Set ENDUSER_NSI="!OPENTWIN_DEV_ROOT!\Scripts\Installer\nsis\install_opentwin_endUser.nsi"
@@ -52,6 +53,16 @@ REM Test for Python Installation
 :PYTHON_INSTALLED
 	for /f "delims=" %%V in ('python -V') do @set ver=%%V
 	echo Python installation %ver% verified...
+	echo Running pyinstaller installation...
+		pip install -U pyinstaller
+
+if "!SEVENZIP_REG_DATA!"=="" (
+	echo ERROR: 7Zip is not installed on your system!
+	pause
+)	else (
+	echo 7Zip Installation verified in '!SEVENZIP_REG_DATA!'...
+)
+
 
 
 if "!NSIS_REG_VALUE!"=="" (
@@ -64,6 +75,7 @@ if "!NSIS_REG_VALUE!"=="" (
 	echo Script compilation will take a few minutes, please be patient!
 	echo Ready to compile!
 	echo -------------------------------------------------------------
+	pause
     GOTO COMPILE
 )
 
