@@ -1133,7 +1133,7 @@ SectionGroup /e "Python & Sphinx"
 		DetailPrint "Installing Sphinx..."
 			ExpandEnvStrings $0 %COMSPEC%
 			#ExecWait '"$0" /k "START /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme" " '
-			ExecWait 'cmd.exe /c "title Installing Sphinx and ReadTheDocs Theme && "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme " '
+			ExecWait 'cmd.exe /c "title Installing Sphinx and ReadTheDocs Theme && "$TempToolChain\RefreshEnv.cmd" && pip install -U sphinx && pip install -U sphinx_rtd_theme " '
 	SectionEnd
 
 	Section "Install Pyinstaller" SEC09_2
@@ -1141,7 +1141,7 @@ SectionGroup /e "Python & Sphinx"
 		DetailPrint "Installing Pyinstaller..."
 			ExpandEnvStrings $0 %COMSPEC%
 			#ExecWait '"$0" /k "START /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
-			ExecWait 'cmd.exe /c "title Installing pyinstaller && "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller " '
+			ExecWait 'cmd.exe /c "title Installing pyinstaller && "$TempToolChain\RefreshEnv.cmd" && pip install -U pyinstaller " '
 	SectionEnd
 SectionGroupEnd
 
