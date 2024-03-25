@@ -826,6 +826,8 @@ void Application::createFacets(const std::string& data, std::vector<Geometry::No
 
 void Application::writeProjectInformation(const std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
+	assert(!simpleFileName.empty());
+
 	std::stringstream data;
 	data << simpleFileName << std::endl;
 	for (auto item : hostNamesAndFileNames)
