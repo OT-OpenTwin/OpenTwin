@@ -33,12 +33,14 @@ public:
 	ot::UID getUID();
 	std::string getValue();
 	std::set<Connection>& getList();
+	std::string getType();
 
 	//Setter
 	void setItemName(std::string name);
 	void setEditorName(std::string name);
 	void setUID(ot::UID id);
 	void setValue(std::string name);
+	void setType(std::string type);
 
 	//Additional Functions
 	bool addConnection(const Connection& obj);
@@ -54,6 +56,7 @@ private:
 	std::string m_editorName;
 	ot::UID Uid;
 	std::string value;
+	std::string type;
 	std::set<Connection> listOfConnections;
 	
 

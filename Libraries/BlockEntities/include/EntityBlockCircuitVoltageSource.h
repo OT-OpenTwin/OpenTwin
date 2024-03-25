@@ -8,6 +8,7 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		virtual entityType getEntityType(void) override { return TOPOLOGY; };
 		void createProperties();
 		std::string getElementType();
+		std::string getType();
 		
 		virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 

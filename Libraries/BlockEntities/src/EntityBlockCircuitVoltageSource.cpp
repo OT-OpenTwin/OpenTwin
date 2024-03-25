@@ -29,6 +29,7 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 void EntityBlockCircuitVoltageSource::createProperties()
 {
 	EntityPropertiesString::createProperty("Element Property", "ElementType", "100", "default", getProperties());
+	EntityPropertiesSelection::createProperty("Element Property", "Type", { "DC","AC" }, "DC", "default", getProperties());
 }
 
 std::string EntityBlockCircuitVoltageSource::getElementType()
@@ -39,6 +40,17 @@ std::string EntityBlockCircuitVoltageSource::getElementType()
 
 	return elementType->getValue();
 }
+
+std::string EntityBlockCircuitVoltageSource::getType()
+{
+	auto propertyBase = getProperties().getProperty("Type");
+	auto elementType = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	assert(elementType != nullptr);
+
+	return elementType->getValue();
+}
+
+
 
 ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 {
