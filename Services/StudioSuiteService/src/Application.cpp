@@ -398,7 +398,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	for (auto file : fileInfo)
 	{
-		if (file.getType() == "EntityFile")
+		if (file.getType() == "EntityFile" && file.getName() != "Files/Information")
 		{
 			entityID.push_back(file.getID());
 			versionID.push_back(file.getVersion());
