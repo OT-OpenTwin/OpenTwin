@@ -164,9 +164,13 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 
 		ProgressInfo::getInstance().setProgressValue(10);
 
+		std::string hostName = QHostInfo::localHostName().toStdString();
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
+		doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 
 		ServiceConnector::getInstance().sendExecuteRequest(doc);
 	}

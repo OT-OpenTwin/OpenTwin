@@ -6,10 +6,14 @@
 // openTwin header
 #include "OTCore/Flags.h"
 #include "OTCommunication/UiTypes.h"
-
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/WidgetViewManager.h"
+#include <ads/DockManager.h>
+#include <TabToolbar/Group.h>
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akWidgets/aToolButtonWidget.h>
+#include <akWidgets/aTtbGroup.h>
 #include <akGui/aContextMenuItem.h>
 
 const QString c_icoExit = "ExitAppBlue";
@@ -48,7 +52,9 @@ ToolBar::ToolBar(AppBase * _owner)
 	m_file.gDefault_aGroup = uiAPI::createToolButton(m_owner->m_uid, "Manage Groups", c_icoGroup, c_icoPath);
 
 	m_view.gUserInterface_aSettings = uiAPI::createToolButton(m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
-	m_view.gUserInterface_aDisplayDocks = uiAPI::createDockWatcher(m_owner->m_uid, c_icoDocks, c_icoPath, "Windows");
+	QAction* toggleAction = ot::WidgetViewManager::instance().getDockToggleAction();
+	toggleAction->setIcon(ot::IconManager::instance().getIcon("Default/Docks.png"));
+	toggleAction->setToolTip(c_tipDocks);
 
 	// Add actions to groups
 	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aExit);
@@ -57,12 +63,11 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aGroup);
 
 	uiAPI::container::addObject(m_view.gUserInterface, m_view.gUserInterface_aSettings);
-	uiAPI::container::addObject(m_view.gUserInterface, m_view.gUserInterface_aDisplayDocks);
-
+	uiAPI::object::get<aTtbGroup>(m_view.gUserInterface)->addAction(toggleAction);
+	
 	// Set toolTips for toolButtons
 	uiAPI::toolButton::setToolTip(m_file.gDefault_aExit, c_tipExit);
-	uiAPI::toolButton::setToolTip(m_view.gUserInterface_aDisplayDocks, c_tipDocks);
-
+	
 	// Set unique names to TTB Elements
 	uiAPI::object::setObjectUniqueName(m_file.page, "File");
 
@@ -74,9 +79,8 @@ ToolBar::ToolBar(AppBase * _owner)
 
 	uiAPI::object::setObjectUniqueName(m_view.page, "View");
 	uiAPI::object::setObjectUniqueName(m_view.gUserInterface, "View:UI");
-	uiAPI::object::setObjectUniqueName(m_view.gUserInterface_aDisplayDocks, "View:UI:Settings");
-	uiAPI::object::setObjectUniqueName(m_view.gUserInterface_aDisplayDocks, "View:UI:DisplayDocks");
-
+	uiAPI::object::setObjectUniqueName(m_view.gUserInterface_aSettings, "View:UI:Settings");
+	
 	// Create lock flags
 	ot::Flags<ot::ui::lockType> lockFlags(ot::ui::tlAll);
 	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aImport);
@@ -115,14 +119,6 @@ void ToolBar::notify(
 	else if (_sender == m_file.gDefault_aGroup && _event == etClicked) {
 		m_owner->manageGroups();
 	}
-}
-
-void ToolBar::addDockWatch(ak::UID _uid) {
-	uiAPI::dockWatcher::addWatch(m_view.gUserInterface_aDisplayDocks, _uid);
-}
-
-void ToolBar::addDockWatch(QDockWidget * _dock) {
-	uiAPI::dockWatcher::addWatch(m_view.gUserInterface_aDisplayDocks, _dock);
 }
 
 ak::UID ToolBar::addPage(ak::UID _creator, const QString & _pageName) {
@@ -172,5 +168,4 @@ void ToolBar::addDefaultControlsToLockManager(LockManager * _lockManger, ot::Fla
 	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aSettings, _flags);
 	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aImport, _flags);
 	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aGroup, _flags);
-	_lockManger->uiElementCreated(m_owner, m_view.gUserInterface_aDisplayDocks, _flags);
 }

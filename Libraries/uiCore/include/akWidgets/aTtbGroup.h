@@ -25,6 +25,7 @@
 #include <qstring.h>					// QString
 
 // Forward declaration
+class QAction;
 namespace tt { class Group; }
 
 namespace ak {
@@ -70,6 +71,8 @@ namespace ak {
 		virtual void setEnabled(
 			bool						_enabled
 		) override;
+
+		void addAction(QAction* _action);
 
 	private:
 		tt::Group *								m_group;

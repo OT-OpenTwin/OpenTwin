@@ -45,6 +45,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
+			element.setType(myElement->getType());
 		}
 		else if (blockEntity->getBlockTitle() == "Resistor")
 		{
@@ -126,17 +127,29 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	// Now I write the informations to the File
 	// Here i get the Circuit and the map of Elements
+	std::string simulationLine = "";
+
+	if (simulationType == ".dc")
+	{
+		EntityPropertiesString* element = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Element"));
+		EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
+		EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
+		EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
+		simulationLine = simulationType + " " + element->getValue() + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
+	}
+	else if (simulationType == ".TRAN")
+	{
+		EntityPropertiesString* duration = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Duration"));
+		EntityPropertiesString* timeSteps = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("TimeSteps"));
+		simulationLine = simulationType + " " + duration->getValue() + " " + timeSteps->getValue();
+	}
 	
-	EntityPropertiesString* element = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Element"));
-	EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
-	EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
-	EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
 
-	std::string simulationLine = simulationType + " " + element->getValue() + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
+	
 
 
-		std::string TitleLine = "circbyline *Test";
-		ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
+	std::string TitleLine = "circbyline *Test";
+	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
 
 	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
@@ -147,11 +160,14 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string netlistLine="circbyline ";
 		std::string netlistValue = element.getValue();
 		std::string netlistNodeNumbers;
+		std::string netlistVoltageSourceType="";
 
 		if (element.getItemName() == "Voltage Source")
 		{
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
+			netlistVoltageSourceType = element.getType() + " ";
 			netlistLine += netlistElementName + " ";
+			/*netlistLine = "V1 13 2 0.001 AC 1 SIN (0 1 1 MEG ) ";*/
 		}
 		else if (element.getItemName() == "Resistor")
 		{
@@ -166,6 +182,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 		netlistLine += netlistNodeNumbers;
+		if (netlistVoltageSourceType != "")
+		{
+			netlistLine += netlistVoltageSourceType;
+		}
 		netlistLine += netlistValue;
 		ngSpice_Command(const_cast<char*>(netlistLine.c_str()));
 	}

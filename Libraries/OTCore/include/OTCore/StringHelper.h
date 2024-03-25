@@ -10,6 +10,7 @@
 
 // std header
 #include <string>
+#include <sstream>
 #include <list>
 
 namespace ot {
@@ -25,5 +26,20 @@ namespace ot {
 	//! @param _splitBy String to split at
 	//! @param _skipEmpty If true, all empty parts will be skipped
 	OT_CORE_API_EXPORT std::list<std::wstring> splitString(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty = false);
+
+	//! @brief Convert the provided string to a number
+	//! @param _string String representing a number
+	//! @param _failed Will be set to true if the operation failed
+	template <class T> T stringToNumber(const std::string& _string, bool& _failed) {
+		std::stringstream ss(_string);
+		T v;
+		ss >> v;
+		_failed = false;
+		if (ss.fail()) { _failed = true; }
+		std::string rest;
+		ss >> rest;
+		if (!rest.empty()) { _failed = true; }
+		return v;
+	}
 
 }

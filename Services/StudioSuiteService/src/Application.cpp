@@ -398,7 +398,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	for (auto file : fileInfo)
 	{
-		if (file.getType() == "EntityFile")
+		if (file.getType() == "EntityFile" && file.getName() != "Files/Information")
 		{
 			entityID.push_back(file.getID());
 			versionID.push_back(file.getVersion());
@@ -826,6 +826,8 @@ void Application::createFacets(const std::string& data, std::vector<Geometry::No
 
 void Application::writeProjectInformation(const std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
+	assert(!simpleFileName.empty());
+
 	std::stringstream data;
 	data << simpleFileName << std::endl;
 	for (auto item : hostNamesAndFileNames)

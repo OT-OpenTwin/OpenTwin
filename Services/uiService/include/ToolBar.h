@@ -14,7 +14,6 @@
 
 class AppBase;
 class LockManager;
-class QDockWidget;
 
 class ToolBar : public ak::aNotifier {
 public:
@@ -29,9 +28,6 @@ public:
 	) override;
 	
 	// ###################################################################################
-
-	void addDockWatch(ak::UID _uid);
-	void addDockWatch(QDockWidget * _dock);
 
 	ak::UID addPage(ak::UID _creator, const QString & _pageName);
 
@@ -57,7 +53,6 @@ private:
 		ak::UID				page;
 		ak::UID				gUserInterface;
 		ak::UID				gUserInterface_aSettings;
-		ak::UID				gUserInterface_aDisplayDocks;
 	};
 
 	struct structFile {

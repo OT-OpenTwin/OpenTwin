@@ -25,8 +25,8 @@
 #include <akGui/aColor.h>
 #include <QTableWidgetItem>
 
-class QWidget;
 namespace ak { class aTreeWidget; };
+namespace ot { class WidgetView; }
 namespace ot { class SettingsData; }
 namespace ot { class AbstractSettingsItem; }
 
@@ -152,17 +152,16 @@ public:
 	void isModified(ViewerUIDtype viewerUID, bool modifiedState);
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	QWidget* getPlotWidget(ViewerUIDtype _viewerID);
-	QWidget* getVersionGraphWidget(ViewerUIDtype _viewerID);
-	QWidget* getBlockDiagramEditorWidget(ViewerUIDtype _viewerID);
-	QWidget* getTableWidget(ViewerUIDtype _viewerID);
+	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
+	ot::WidgetView* getVersionGraphWidget(ViewerUIDtype _viewerID);
+	ot::WidgetView* getTableWidget(ViewerUIDtype _viewerID);
 
 	void viewerTabChanged(const std::string & _tabTitle);
 
 	ViewerUIDtype createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
 		int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB);
 
-	QWidget * getViewerWidget(ViewerUIDtype _viewerUID);
+	ot::WidgetView* getViewerWidget(ViewerUIDtype _viewerUID);
 	void setDataModel(ViewerUIDtype viewerUID, ModelUIDtype modelUID);
 	void activateModel(ViewerUIDtype viewerUID);
 	void deactivateCurrentlyActiveModel(void);

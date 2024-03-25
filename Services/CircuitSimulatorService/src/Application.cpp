@@ -251,7 +251,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 // Trying to create more circuits
 void Application::createNewCircuit()
 {
-	std::string circuitName = "Circuit Simulator" + std::to_string(ottest::currentEditorID);
+	std::string circuitName = "Circuit " + std::to_string(ottest::currentEditorID);
 	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
 	ot::JsonDocument doc;
 	ot::JsonObject pckgObj;
@@ -341,9 +341,9 @@ void Application::addSolver()
 	solverEntity->setEditable(true);
 
 	ot::EntityInformation entityInfo;
-	m_modelComponent->getEntityInformation("Blocks", entityInfo);
+	m_modelComponent->getEntityInformation("Circuits", entityInfo);
 
-	solverEntity->createProperties("Blocks", entityInfo.getID(), circuitName, circuitID);
+	solverEntity->createProperties("Circuits", entityInfo.getID(), circuitName, circuitID);
 	solverEntity->StoreToDataBase();
 
 	// Register the new solver item in the model
@@ -481,7 +481,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
-	m_ngSpice.ngSpice_Initialize(solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name, simulationType->getValue(), printSettings->getValue());
+	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name, simulationType->getValue(), printSettings->getValue());
 	m_ngSpice.clearBufferStructure(name);
 }
 
@@ -726,6 +726,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
+	m_blockEntityHandler.setPackageName("Circuit");
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);

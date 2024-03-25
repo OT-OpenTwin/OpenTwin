@@ -35,6 +35,7 @@
 #include "TransformManipulator.h"
 
 #include "DataBase.h"
+#include "PlotView.h"
 
 bool operator==(const FaceSelection& left, const FaceSelection& right) 
 { 

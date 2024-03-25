@@ -11,7 +11,9 @@
 
 static ot::WidgetViewRegistrar<ot::PlotView> PlotViewRegistrar(OT_WIDGETTYPE_Plot);
 
-ot::PlotView::PlotView() {
+ot::PlotView::PlotView(Viewer* _viewer)
+	: Plot(_viewer)
+{
 	this->addWidgetToDock(this->widget());
 }
 

@@ -56,10 +56,13 @@ namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; class aPropertyGridWidget; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
-namespace ot { class GraphicsView; }
+namespace ot { class GraphicsViewView; }
 namespace ot { class GraphicsItem; }
-namespace ot { class TextEditor; }
-namespace ot { class GraphicsPickerDockWidget; }
+namespace ot { class TextEditorView; }
+namespace ot { class PropertyGridView; }
+namespace ot { class NavigationTreeView; }
+namespace ot { class PlainTextEditView; }
+namespace ot { class GraphicsPickerView; }
 struct structModelViewInfo
 {
 	ViewerUIDtype	view;
@@ -219,10 +222,6 @@ public:
 
 	void setDebugOutputUid(ak::UID _uid);
 
-	structModelViewInfo createModelAndDisplay(
-		const QString &					_projectName
-	);
-
 	void registerSession(
 		const std::string &				_projectName,
 		const std::string &				_collectionName
@@ -240,8 +239,6 @@ public:
 
 	void importProject(void);
 	void manageGroups(void);
-
-	void addTabToCentralView(const QString& _tabTitle, QWidget * _widget);
 
 	// ############################################################################################
 
@@ -450,23 +447,23 @@ public:
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
-	ot::GraphicsView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
+	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
 
-	ot::GraphicsView* findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo);
+	ot::GraphicsViewView* findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo);
 
-	ot::GraphicsView * findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TextEditor* createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TextEditor* findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TextEditor* findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
 	void closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
 
 	void closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo);
 
-	std::list<ot::GraphicsView*> getAllGraphicsEditors(void);
+	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
 
 	// ######################################################################################################################
 
@@ -512,9 +509,14 @@ public slots:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Property grid slots
+	// Private: Slots
 
 private slots:
+	void slotOutputContextMenuItemClicked();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Property grid slots
 
 	void slotPropertyGridValueChanged(int _id);
 	void slotPropertyGridValueDeleted(int _id);
@@ -568,7 +570,6 @@ private:
 
 	bool						m_projectIsModified;
 
-	ak::ID						m_currentTabIndex;
 	ak::ID						m_logInDialogCustomInputID;
 
 	ViewerComponent *			m_viewerComponent;
@@ -587,12 +588,6 @@ private:
 
 	// Default UI
 
-	struct structDisplayDocks {
-		ak::ID				output;
-		ak::ID				projectNavigation;
-		ak::ID				properties;
-	};
-
 	struct contextMenuOutput {
 		ak::ID				clear;
 	};
@@ -601,46 +596,27 @@ private:
 		contextMenuOutput	output;
 	};
 
-	struct structWidgets {
-		ak::aTreeWidget*    projectNavigation;
-		ak::aPropertyGridWidget* properties;
-		ak::UID				output;
-		ak::UID				debug;
-	};
-
-	struct structDocks {
-		ak::UID				projectNavigation;
-		ak::UID				properties;
-		ak::UID				output;
-		ak::UID				debug;
-	};
-
-	struct structDockVisibility {
-		bool				projectNavigation;
-		bool				properties;
-		bool				output;
-		bool				debug;
-	};
-
-
 	ToolBar *					m_ttb;
-	structWidgets				m_widgets;
-	structDocks					m_docks;
+	ot::NavigationTreeView* m_projectNavigation;
+	ot::PropertyGridView*  m_propertyGrid;
+	ot::PlainTextEditView* m_output;
+	ot::PlainTextEditView* m_debug;
+	ot::GraphicsPickerView* m_graphicsPicker;
 	contextMenus				m_contextMenus;
-	structDisplayDocks			m_displayDockOptions;
-	structDockVisibility		m_dockVisibility;
 	ak::UID						m_uid;							//! The UID of the wrapper
 	ak::UID						m_mainWindow;
-	ak::UID						m_tabViewWidget;
 	ak::UID						m_viewerUid;					//! The UID of the viewer
 	ak::UID						m_modelUid;					//! The UID of the model
 	ak::UID						m_timerRestoreStateAfterTabChange;
-	ot::GraphicsPickerDockWidget* m_graphicsPickerDock;
-
-	std::string					m_currentStateWindow;
 	
-	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsView> m_graphicsViews;
-	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditor> m_textEditors;
+	struct StateInformation {
+		std::string window;
+		std::string view;
+	};
+	StateInformation			m_currentStateWindow;
+	
+	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsViewView> m_graphicsViews;
+	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditorView> m_textEditors;
 
 	bool m_visible3D;
 	bool m_visible1D;

@@ -156,18 +156,18 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	{
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
-		std::list<std::string> connectionItems = _modelComponent->getListOfFolderItems("Blocks/" + name + "/Connections");
+		std::list<std::string> connectionItems = _modelComponent->getListOfFolderItems("Circuits/" + name + "/Connections");
 
 
 		//Now I first create the needed parameters for entName
 		ot::UID entityID = _modelComponent->createEntityUID();
-		std::string editorName = "Circuit Simulator";
+		
 		
 		int count = 1;
 		std::string connectionName;
 		do
 		{
-			connectionName = "Blocks/" + name + "/Connections/" + "Connection" + std::to_string(count);
+			connectionName = "Circuits/" + name + "/Connections/" + "Connection" + std::to_string(count);
 			count++;
 		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
 

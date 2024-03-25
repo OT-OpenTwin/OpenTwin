@@ -38,6 +38,11 @@ std::string CircuitElement::getValue() { return this->value; }
 
 std::set<Connection>& CircuitElement::getList() { return listOfConnections; }
 
+std::string CircuitElement::getType()
+{
+	return this->type;
+}
+
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
@@ -46,6 +51,11 @@ void CircuitElement::setEditorName(std::string name)	{this->m_editorName = name;
 void CircuitElement::setUID(ot::UID id) { this->Uid = id; }
 
 void CircuitElement::setValue(std::string name) { this->value = name; }
+
+void CircuitElement::setType(std::string type)
+{
+	this->type = type;
+}
 
 //Additional Functions
 

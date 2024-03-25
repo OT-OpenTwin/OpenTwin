@@ -869,16 +869,16 @@ void ViewerComponent::prefetchDocumentsFromStorage(const std::string &projectNam
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-QWidget * ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
+ot::WidgetView* ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getPlotWidget(_viewerID);
 }
 
-QWidget * ViewerComponent::getVersionGraphWidget(ViewerUIDtype _viewerID) {
+ot::WidgetView* ViewerComponent::getVersionGraphWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getVersionGraphWidget(_viewerID);
 }
 
 
-QWidget * ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
+ot::WidgetView* ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
 {
 	return ViewerAPI::getTable(_viewerID);
 }
@@ -907,7 +907,7 @@ ViewerUIDtype ViewerComponent::createViewer(ModelUIDtype _modelUid, double _scal
 	return 0;
 }
 
-QWidget * ViewerComponent::getViewerWidget(ViewerUIDtype _viewerUID) {
+ot::WidgetView* ViewerComponent::getViewerWidget(ViewerUIDtype _viewerUID) {
 	try {
 		try { return ViewerAPI::getViewerWidget(_viewerUID); }
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::getViewerWidget()"); }

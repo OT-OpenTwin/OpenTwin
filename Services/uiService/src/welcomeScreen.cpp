@@ -33,6 +33,7 @@
 #include <qheaderview.h>
 #include <qevent.h>
 #include <qcryptographichash.h>
+#include <qopenglwidget.h>
 
 #define MY_LABELSIZE_WELCOME 24
 #define MY_LABELSIZE_HEADER 24
@@ -73,6 +74,9 @@ welcomeScreen::welcomeScreen(
 	assert(my_username.length() != 0); // No username provided
 	assert(my_app != nullptr); // Nullptr provided
 
+	QOpenGLWidget* glDummy = new QOpenGLWidget;
+	glDummy->setMaximumSize(1, 1);
+
 	// Create layout widget combos
 	my_comboInputs = createNewLayoutWidgetCombo(true);
 	my_comboHeader = createNewLayoutWidgetCombo(true);
@@ -102,6 +106,7 @@ welcomeScreen::welcomeScreen(
 
 	my_comboMain.layout->addWidget(my_comboHeader.widget);
 	my_comboMain.layout->addWidget(my_comboSplit.widget);
+	my_comboMain.layout->addWidget(glDummy);
 
 	my_comboSplit.layout->addWidget(my_comboOpenMain.widget);
 	my_comboSplit.layout->addWidget(my_comboRecentsMain.widget);
