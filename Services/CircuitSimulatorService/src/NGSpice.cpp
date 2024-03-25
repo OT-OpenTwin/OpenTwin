@@ -137,9 +137,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
 		simulationLine = simulationType + " " + element->getValue() + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
 	}
-	else if (simulationType == ".ac")
+	else if (simulationType == ".TRAN")
 	{
-
+		EntityPropertiesString* duration = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Duration"));
+		EntityPropertiesString* timeSteps = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("TimeSteps"));
+		simulationLine = simulationType + " " + duration->getValue() + " " + timeSteps->getValue();
 	}
 	
 
@@ -165,6 +167,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
 			netlistVoltageSourceType = element.getType() + " ";
 			netlistLine += netlistElementName + " ";
+			/*netlistLine = "V1 13 2 0.001 AC 1 SIN (0 1 1 MEG ) ";*/
 		}
 		else if (element.getItemName() == "Resistor")
 		{
