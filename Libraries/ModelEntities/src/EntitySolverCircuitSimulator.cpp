@@ -62,8 +62,10 @@ void EntitySolverCircuitSimulator::createDCProperties()
 	std::string elementFolder = circuit->getValueName();
 	ot::UID elementFolderID = circuit->getValueID();
 
+	EntityPropertiesEntityList::createProperty("DC-Settings", "Element", elementFolder, elementFolderID, "", -1, "default", getProperties());
+
 	
-	EntityPropertiesString::createProperty("DC-Settings", "Element","v1", "default", getProperties());
+	//EntityPropertiesString::createProperty("DC-Settings", "Element","v1", "default", getProperties());
 	EntityPropertiesString::createProperty("DC-Settings", "From", "0", "default", getProperties());
 	EntityPropertiesString::createProperty("DC-Settings", "To", "100", "default", getProperties());
 	EntityPropertiesString::createProperty("DC-Settings", "Step", "10", "default", getProperties());
@@ -83,20 +85,32 @@ void EntitySolverCircuitSimulator::createTranProperties()
 
 bool EntitySolverCircuitSimulator::updateFromProperties()
 {
+
+	bool refresh = false;
 	auto baseProperty = getProperties().getProperty("Simulation Type");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 
+	EntityPropertiesEntityList* circuit = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Circuit"));
+	std::string elementFolder = circuit->getValueName();
+	ot::UID elementFolderID = circuit->getValueID();
+	
+	EntityPropertiesEntityList* element = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Element"));
+	if (element->getEntityContainerName() != elementFolder || element->getEntityContainerID() != elementFolderID)
+	{
+		element->setEntityContainerName(elementFolder);
+		element->setEntityContainerID(elementFolderID);
+		refresh = true;
+	}
+	
 
-
-	bool refresh = false;
 	if (selectionProperty->getValue() == ".dc")
 	{
-		refresh = SetVisibleDCSimulationParameters(true);
+		refresh |= SetVisibleDCSimulationParameters(true);
 		refresh |= SetVisibleTRANSimulationParameters(false);
 	}
 	else
 	{
-		refresh = SetVisibleDCSimulationParameters(false);
+		refresh |= SetVisibleDCSimulationParameters(false);
 		refresh |= SetVisibleTRANSimulationParameters(true);
 	}
 

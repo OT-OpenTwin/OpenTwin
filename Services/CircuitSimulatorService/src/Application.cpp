@@ -341,9 +341,9 @@ void Application::addSolver()
 	solverEntity->setEditable(true);
 
 	ot::EntityInformation entityInfo;
-	m_modelComponent->getEntityInformation("Blocks", entityInfo);
+	m_modelComponent->getEntityInformation("Circuits", entityInfo);
 
-	solverEntity->createProperties("Blocks", entityInfo.getID(), circuitName, circuitID);
+	solverEntity->createProperties("Circuits", entityInfo.getID(), circuitName, circuitID);
 	solverEntity->StoreToDataBase();
 
 	// Register the new solver item in the model
