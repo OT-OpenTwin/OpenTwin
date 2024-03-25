@@ -217,6 +217,15 @@
     <ClCompile Include="src\TextEditorView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColorStyleValue.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorStyle.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GlobalColorStyle.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -419,6 +428,15 @@
     <ClInclude Include="include\OTWidgets\TextEditorView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\ColorStyleValue.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ColorStyle.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ColorStyleTypes.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -482,6 +500,9 @@
       <Filter>include\Graphics</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PlainTextEdit.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\GlobalColorStyle.h">
       <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>

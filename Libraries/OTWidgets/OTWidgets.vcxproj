@@ -23,6 +23,8 @@
     <ClCompile Include="src\CheckBox.cpp" />
     <ClCompile Include="src\ColorPickButton.cpp" />
     <ClCompile Include="src\ColorPreviewBox.cpp" />
+    <ClCompile Include="src\ColorStyle.cpp" />
+    <ClCompile Include="src\ColorStyleValue.cpp" />
     <ClCompile Include="src\ComboButton.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\Dialog.cpp" />
@@ -30,6 +32,7 @@
     <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\DoubleSpinBox.cpp" />
     <ClCompile Include="src\EventNotifier.cpp" />
+    <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
@@ -94,6 +97,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\BasicWidgetView.h" />
+    <ClInclude Include="include\OTWidgets\ColorStyle.h" />
+    <ClInclude Include="include\OTWidgets\ColorStyleTypes.h" />
+    <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
+    <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsViewView.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />

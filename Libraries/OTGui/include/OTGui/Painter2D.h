@@ -27,6 +27,9 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
+		//! @brief Creates a copy of this painter
+		Painter2D* createCopy(void) const;
+
 	private:
 		Painter2D(const Painter2D&) = delete;
 		Painter2D& operator = (const Painter2D&) = delete;
