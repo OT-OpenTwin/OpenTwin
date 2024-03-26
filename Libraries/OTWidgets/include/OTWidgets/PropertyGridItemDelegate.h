@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class PropertyGridItemDelegate : public QStyledItemDelegate
+	class OT_WIDGETS_API_EXPORT PropertyGridItemDelegate : public QStyledItemDelegate
 	{
 	public:
 		PropertyGridItemDelegate(QObject* parent = nullptr);

@@ -41,6 +41,10 @@ const QColor& ot::ColorPickButton::color(void) const {
 	return m_view->color();
 }
 
+ot::Color ot::ColorPickButton::otColor(void) const {
+	return ot::Color(m_view->color().red(), m_view->color().green(), m_view->color().blue(), m_view->color().alpha());
+}
+
 void ot::ColorPickButton::replaceButtonText(const QString& _text) {
 	m_btn->setText(_text);
 }

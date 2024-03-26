@@ -28,12 +28,19 @@ namespace ot {
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);
 
+		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& getName(void) const { return m_name; };
+
+		void setTitle(const QString& _title);
+		QString getTitle(void) const;
+
 		void addItem(PropertyGridItem* _item);
 
 		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
 		const QBrush& groupBrush(void) const { return m_groupBrush; };
 
 	private:
+		std::string m_name;
 		QBrush m_groupBrush;
 	};
 

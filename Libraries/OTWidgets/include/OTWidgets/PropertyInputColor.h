@@ -13,7 +13,7 @@ namespace ot {
 	class ColorPickButton;
 	class PropertyColor;
 
-	class PropertyInputColor : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputColor : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputColor)
 	public:
 		PropertyInputColor(const PropertyColor* _property);

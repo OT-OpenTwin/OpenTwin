@@ -38,7 +38,7 @@ namespace ot {
 
 		//! @brief Set the center point for the gradient
 		void setCenterPoint(const ot::Point2DD& _center) { m_center = _center; };
-		const ot::Point2DD& centerPoint(void) { return m_center; }
+		const ot::Point2DD& centerPoint(void) const { return m_center; }
 
 		void setCenterRadius(double _r) { m_centerRadius = _r; };
 		double centerRadius(void) const { return m_centerRadius; };

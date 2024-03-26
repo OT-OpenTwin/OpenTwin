@@ -17,7 +17,7 @@ ot::PropertyGroup::PropertyGroup()
 }
 
 ot::PropertyGroup::PropertyGroup(const std::string& _name)
-	: m_name(_name) 
+	: m_name(_name), m_title(_name)
 {
 	m_backgroundPainter = new FillPainter2D(Color(48, 48, 48));
 }

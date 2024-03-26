@@ -37,11 +37,13 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg); };
 		
-		//! @brief Set the starting point for the gradient (0.0 - 1.0)
+		//! @brief Set the starting point for the gradient.
+		//! The painted area is between 0.0 and 1.0.
 		void setStart(const ot::Point2DD& _start) { m_start = _start; };
-		const ot::Point2DD& start(void) { return m_start; }
+		const ot::Point2DD& start(void) const { return m_start; }
 
-		//! @brief Set the final stop point for the gradient (0.0 - 1.0)
+		//! @brief Set the final stop point for the gradient.
+		//! The painted area is between 0.0 and 1.0.
 		void setFinalStop(const ot::Point2DD& _finalStop) { m_finalStop = _finalStop; };
 		const ot::Point2DD& finalStop(void) const { return m_finalStop; };
 

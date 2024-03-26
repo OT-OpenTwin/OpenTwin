@@ -22,8 +22,8 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyInput : public QObject, public QWidgetInterface {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInput)
-		OT_DECL_NODEFAULT(PropertyInput)
 	public:
+		PropertyInput();
 		PropertyInput(const Property* _property);
 		virtual ~PropertyInput() {};
 

@@ -16,10 +16,11 @@ namespace ot {
 	class LineEdit;
 	class PropertyString;
 
-	class PropertyInputString : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputString : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputString)
 	public:
+		PropertyInputString(const QString& _text);
 		PropertyInputString(const PropertyString* _property);
 		virtual ~PropertyInputString();
 
@@ -33,6 +34,8 @@ namespace ot {
 	private:
 		LineEdit* m_lineEdit;
 		QString m_text;
+
+		void ini(const QString& _text);
 	};
 
 }

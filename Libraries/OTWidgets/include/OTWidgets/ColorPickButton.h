@@ -27,11 +27,12 @@ namespace ot {
 		ColorPickButton(const ot::Color& _color, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~ColorPickButton();
 
-		virtual QWidget* getQWidget(void) { return this; };
+		virtual QWidget* getQWidget(void) override { return this; };
 
 		void setColor(const ot::Color& _color);
 		void setColor(const QColor& _color);
 		const QColor& color(void) const;
+		ot::Color otColor(void) const;
 
 		void replaceButtonText(const QString& _text);
 

@@ -13,7 +13,7 @@ namespace ot {
 	class CheckBox;
 	class PropertyBool;
 
-	class PropertyInputBool : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputBool : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputBool)
 	public:
 		PropertyInputBool(const PropertyBool* _property);

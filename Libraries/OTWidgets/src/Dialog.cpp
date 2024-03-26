@@ -26,14 +26,35 @@ ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent)
 
 ot::Dialog::~Dialog() {}
 
-int ot::Dialog::showDialog(void) {
+ot::Dialog::DialogResult ot::Dialog::showDialog(void) {
 	if (this->parentWidget()) {
 		this->centerOnParent(this->parentWidget());
 	}
-	return this->exec();
+	this->exec();
+	return m_result;
 }
 
 void ot::Dialog::close(DialogResult _result) {
 	m_result = _result;
 	this->QDialog::close();
+}
+
+void ot::Dialog::closeOk(void) {
+	this->close(Dialog::Ok);
+}
+
+void ot::Dialog::closeYes(void) {
+	this->close(Dialog::Yes);
+}
+
+void ot::Dialog::closeNo(void) {
+	this->close(Dialog::No);
+}
+
+void ot::Dialog::closeRetry(void) {
+	this->close(Dialog::Retry);
+}
+
+void ot::Dialog::closeCancel(void) {
+	this->close(Dialog::Cancel);
 }

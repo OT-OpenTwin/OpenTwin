@@ -32,7 +32,8 @@ namespace ot {
 			StringListType,
 			ColorType,
 			DirectoryType,
-			FilePathType
+			FilePathType,
+			Painter2DType
 		};
 
 		enum PropertyFlags {

@@ -20,7 +20,7 @@ namespace ot {
 		CheckBox(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~CheckBox() {};
 
-		virtual QWidget* getQWidget(void);
+		virtual QWidget* getQWidget(void) override;
 	};
 
 }

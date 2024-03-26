@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp" />
+    <ClCompile Include="src\ColorStyleEditor.cpp" />
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DockManager.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="src\ToolRuntimeHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="include\ColorStyleEditor.h" />
     <ClInclude Include="include\DockManager.h" />
     <QtMoc Include="include\TabManager.h" />
     <QtMoc Include="include\ToolMenuManager.h" />

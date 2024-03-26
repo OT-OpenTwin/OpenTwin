@@ -20,23 +20,28 @@
 #include <QtGui/qbrush.h>
 
 namespace ot {
-	namespace OTQtConverter {
-
+	class OT_WIDGETS_API_EXPORT OTQtConverter {
+		OT_DECL_NOCOPY(OTQtConverter)
+	public:
 		//! @brief Convert OpenTwin Color to Qt Color
-		OT_WIDGETS_API_EXPORTONLY QColor toQt(const ot::Color& _color);
+		static QColor toQt(const ot::Color& _color);
 
-		OT_WIDGETS_API_EXPORTONLY Qt::Alignment toQt(ot::Alignment _alignment);
+		static Qt::Alignment toQt(Alignment _alignment);
 
-		OT_WIDGETS_API_EXPORTONLY QPoint toQt(const ot::Point2D& _pt);
-		OT_WIDGETS_API_EXPORTONLY QPointF toQt(const ot::Point2DF& _pt);
-		OT_WIDGETS_API_EXPORTONLY QPointF toQt(const ot::Point2DD& _pt);
-		
-		OT_WIDGETS_API_EXPORTONLY QSize toQt(const ot::Size2D& _s);
-		OT_WIDGETS_API_EXPORTONLY QSizeF toQt(const ot::Size2DF& _s);
-		OT_WIDGETS_API_EXPORTONLY QSizeF toQt(const ot::Size2DD& _s);
+		static QPoint toQt(const Point2D& _pt);
+		static QPointF toQt(const Point2DF& _pt);
+		static QPointF toQt(const Point2DD& _pt);
 
-		OT_WIDGETS_API_EXPORTONLY QGradient::Spread toQt(ot::GradientSpread _spread);
-	}
+		static QSize toQt(const Size2D& _s);
+		static QSizeF toQt(const Size2DF& _s);
+		static QSizeF toQt(const Size2DD& _s);
+
+		static QGradient::Spread toQt(ot::GradientSpread _spread);
+
+	private:
+		OTQtConverter() {};
+		~OTQtConverter() {};
+	};
 }
 
 #endif

@@ -30,12 +30,20 @@ namespace ot {
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);
 
-		PropertyInput* getInput(void) const { return m_input; };
+		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& getName(void) const { return m_name; };
 
+		void setTitle(const QString& _title);
+		QString getTitle(void) const;
+
+		void setInput(PropertyInput* _input);
+		PropertyInput* getInput(void) const { return m_input; };
+		
 		void setItemBrush(const QBrush& _brush) { m_itemBrush = _brush; };
 		const QBrush& itemBrush(void) const { return m_itemBrush; };
 
 	private:
+		std::string m_name;
 		PropertyInput* m_input;
 		QBrush m_itemBrush;
 	};

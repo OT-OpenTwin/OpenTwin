@@ -21,6 +21,7 @@ ot::PropertyGridItem::~PropertyGridItem() {
 }
 
 bool ot::PropertyGridItem::setupFromConfig(Property * _config) {
+	m_name = _config->propertyName();
 	this->setText(0, QString::fromStdString(_config->propertyTitle()));
 	if (m_input) delete m_input;
 	m_input = PropertyInputFactory::createInput(_config);
@@ -36,4 +37,28 @@ void ot::PropertyGridItem::finishSetup(void) {
 	}
 	tree->setItemWidget(this, 1, m_input->getQWidget());
 	this->setFirstColumnSpanned(false);
+}
+
+void ot::PropertyGridItem::setTitle(const QString& _title) {
+	this->setText(0, _title);
+}
+
+QString ot::PropertyGridItem::getTitle(void) const {
+	return this->text(0);
+}
+
+void ot::PropertyGridItem::setInput(PropertyInput* _input) {
+	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
+	if (!tree) {
+		OT_LOG_EA("Tree cast failed");
+		return;
+	}
+
+	if (m_input) {
+		tree->removeItemWidget(this, 1);
+		delete m_input;
+	}
+	m_input = _input;
+	
+	tree->setItemWidget(this, 1, m_input->getQWidget());
 }

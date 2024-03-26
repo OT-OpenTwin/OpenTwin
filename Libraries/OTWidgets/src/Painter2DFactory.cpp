@@ -12,31 +12,31 @@
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/OTQtConverter.h"
 
-QBrush ot::Painter2DFactory::brushFromPainter2D(ot::Painter2D* _painter) {
+QBrush ot::Painter2DFactory::brushFromPainter2D(const ot::Painter2D* _painter) {
 	OTAssertNullptr(_painter);
 	if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg) {
-		ot::FillPainter2D* painter = dynamic_cast<ot::FillPainter2D*>(_painter);
+		const FillPainter2D* painter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(painter);
-		return QBrush(QColor(ot::OTQtConverter::toQt(painter->color())));
+		return QBrush(QColor(OTQtConverter::toQt(painter->color())));
 	}
 	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg) {
-		ot::LinearGradientPainter2D* painter = dynamic_cast<ot::LinearGradientPainter2D*>(_painter);
+		const LinearGradientPainter2D* painter = dynamic_cast<const LinearGradientPainter2D*>(_painter);
 		OTAssertNullptr(painter);
 		
 		QGradientStops stops;
 		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), ot::OTQtConverter::toQt(s.color())));
+			stops.append(QGradientStop(s.pos(), OTQtConverter::toQt(s.color())));
 		}
 
-		QLinearGradient grad(ot::OTQtConverter::toQt(painter->start()), ot::OTQtConverter::toQt(painter->finalStop()));
-		grad.setSpread(ot::OTQtConverter::toQt(painter->spread()));
+		QLinearGradient grad(OTQtConverter::toQt(painter->start()), OTQtConverter::toQt(painter->finalStop()));
+		grad.setSpread(OTQtConverter::toQt(painter->spread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 		
 		return grad;
 	}
 	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_RadialGradientPainter2DCfg) {
-		ot::RadialGradientPainter2D* painter = dynamic_cast<ot::RadialGradientPainter2D*>(_painter);
+		const RadialGradientPainter2D* painter = dynamic_cast<const RadialGradientPainter2D*>(_painter);
 		OTAssertNullptr(painter);
 
 		QGradientStops stops;

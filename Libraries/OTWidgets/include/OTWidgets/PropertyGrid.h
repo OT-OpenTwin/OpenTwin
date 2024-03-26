@@ -39,6 +39,8 @@ namespace ot {
 		void addRootItem(PropertyGridItem* _item);
 		void addGroup(PropertyGridGroup* _group);
 
+		void clear(void);
+
 	private slots:
 		void slotPropertyChanged();
 		void slotItemChanged(QTreeWidgetItem* _item, int _column);

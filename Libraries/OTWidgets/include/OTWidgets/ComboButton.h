@@ -30,7 +30,7 @@ namespace ot {
 
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 
-		virtual QWidget* getQWidget(void) { return this; };
+		virtual QWidget* getQWidget(void) override { return this; };
 
 		void setItems(const QStringList& _items);
 

@@ -79,7 +79,8 @@ void mainApplicationThread()
 		AppBase::instance();
 
 		// Initialize OpenTwin API
-		ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
+		ot::LogDispatcher::instance().setLogFlags(ot::ALL_LOG_FLAGS);
+		ot::LogDispatcher::instance().addReceiver(AppBase::instance());
 
 		// Initialize OToolkit
 		AppBase::instance()->setApplicationInstance(&application);

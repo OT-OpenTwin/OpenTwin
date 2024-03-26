@@ -11,9 +11,14 @@
 // Qt header
 #include <QtCore/qdir.h>
 
+ot::GlobalColorStyle& ot::GlobalColorStyle::instance(void) {
+	static GlobalColorStyle g_instance;
+	return g_instance;
+}
+
 void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
 	if (_style.name().empty()) {
-		OT_LOG_E("Color style name may not be empty. Ignoring request...");
+		OT_LOG_E("Color style name may not be empty");
 		return;
 	}
 	if (!_replace && this->hasStyle(_style.name())) {
@@ -52,7 +57,6 @@ bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName) {
 
 const ot::ColorStyle& ot::GlobalColorStyle::getCurrentStyle(void) const {
 	if (m_currentStyle.empty()) {
-		OT_LOG_EA("No color style set");
 		return m_emptyStyle;
 	}
 	const auto& it = m_styles.find(m_currentStyle);
@@ -108,7 +112,7 @@ ot::GlobalColorStyle::GlobalColorStyle() {
 void ot::GlobalColorStyle::evaluateStyleSheetMacros(ColorStyle& _style) {
 	QString rootPath = this->styleRootPath(_style.name());
 	QString evaluatedSheet = _style.styleSheet();
-	evaluatedSheet.replace(OT_COLORSTYLETYPE_MACRO_Root, rootPath);
+	evaluatedSheet.replace(OT_COLORSTYLE_FILE_MACRO_Root, rootPath);
 
 	_style.setStyleSheet(evaluatedSheet);
 }

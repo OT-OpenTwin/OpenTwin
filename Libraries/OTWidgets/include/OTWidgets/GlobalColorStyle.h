@@ -23,8 +23,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GlobalColorStyle : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(GlobalColorStyle)
+		OT_DECL_NOMOVE(GlobalColorStyle)
 	public:
-		
+		static GlobalColorStyle& instance(void);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter/Getter

@@ -62,6 +62,7 @@
     <ClInclude Include="include\OTGui\PropertyGridCfg.h" />
     <ClInclude Include="include\OTGui\PropertyGroup.h" />
     <ClInclude Include="include\OTGui\PropertyInt.h" />
+    <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
     <ClInclude Include="include\OTGui\PropertyString.h" />
     <ClInclude Include="include\OTGui\PropertyStringList.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
@@ -116,6 +117,7 @@
     <ClCompile Include="src\PropertyGridCfg.cpp" />
     <ClCompile Include="src\PropertyGroup.cpp" />
     <ClCompile Include="src\PropertyInt.cpp" />
+    <ClCompile Include="src\PropertyPainter2D.cpp" />
     <ClCompile Include="src\PropertyString.cpp" />
     <ClCompile Include="src\PropertyStringList.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />

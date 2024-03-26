@@ -207,6 +207,9 @@
     <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.hpp">
       <Filter>Header Files\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyPainter2D.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="src\WidgetViewCfgFactory.cpp">
       <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyPainter2D.cpp">
+      <Filter>Source Files\Properties</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -35,15 +35,14 @@ protected:
 			QTreeWidgetItem* item = this->topLevelItem(_index.row());
 
 			PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(item);
+			PropertyGridItem* i = dynamic_cast<PropertyGridItem*>(item);
 			if (g) {
 				_painter->fillRect(_options.rect, g->groupBrush());
 			}
-			else {
-				PropertyGridItem* i = dynamic_cast<PropertyGridItem*>(item);
+			else if (i) {
 				_painter->fillRect(_options.rect, i->itemBrush());
 			}
 		}
-
 		TreeWidget::drawRow(_painter, opt, _index);
 	}
 };
@@ -90,6 +89,10 @@ void ot::PropertyGrid::addRootItem(PropertyGridItem* _item) {
 
 void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
 	m_tree->addTopLevelItem(_group);
+}
+
+void ot::PropertyGrid::clear(void) {
+	m_tree->clear();
 }
 
 void ot::PropertyGrid::slotPropertyChanged() {

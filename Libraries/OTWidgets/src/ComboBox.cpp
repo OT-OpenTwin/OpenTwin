@@ -1,23 +1,13 @@
-//! @file PropertyInputFactory.h
+//! @file ComboBox.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date February 2024
+//! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#pragma once
-
 // OpenTwin header
-#include "OTGui/Property.h"
-#include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/ComboBox.h"
 
-namespace ot {
-
-	class OT_WIDGETS_API_EXPORT PropertyInputFactory {
-	public:
-		static PropertyInput* createInput(const Property* _config);
-
-	private:
-		PropertyInputFactory() {};
-		~PropertyInputFactory() {};
-	};
+ot::ComboBox::ComboBox(QWidget* _parent) 
+	: QComboBox(_parent)
+{
 
 }

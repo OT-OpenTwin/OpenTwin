@@ -26,6 +26,7 @@ std::string ot::Property::toString(PropertyType _type) {
 	case ot::Property::ColorType: return "Color";
 	case ot::Property::DirectoryType: return "Directory";
 	case ot::Property::FilePathType: return "FilePath";
+	case ot::Property::Painter2DType: return "Painter2DType";
 	default:
 		OT_LOG_EA("Unknown Property Type");
 		return "<null>";
@@ -41,6 +42,7 @@ ot::Property::PropertyType ot::Property::stringToPropertyType(const std::string&
 	else if (_type == Property::toString(ColorType)) return ColorType;
 	else if (_type == Property::toString(DirectoryType)) return DirectoryType;
 	else if (_type == Property::toString(FilePathType)) return FilePathType;
+	else if (_type == Property::toString(Painter2DType)) return Painter2DType;
 	else {
 		OT_LOG_EA("Unknown Property Type");
 		return BoolType;

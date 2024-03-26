@@ -9,6 +9,9 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 #include "OToolkitAPI/Tool.h"
 
+// OpenTwin header
+#include "OTCore/Logger.h"
+
 // Qt header
 #include <QtCore/qthread.h>
 #include <QtWidgets/qmainwindow.h>
@@ -23,7 +26,7 @@ class QAction;
 class QApplication;
 class QShortcut;
 
-class AppBase : public QMainWindow, public otoolkit::APIInterface {
+class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::AbstractLogNotifier {
 	Q_OBJECT
 public:
 	// Static functions
@@ -33,6 +36,8 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// API base functions
+
+	virtual void log(const ot::LogMessage& _message) override;
 
 	virtual void log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) override;
 

@@ -1,28 +1,25 @@
-//! @file Painter2DFactory.h
+//! @file ComboBox.h
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
+#include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
-#include <QtGui/qbrush.h>
+#include <QtWidgets/qcombobox.h>
 
 namespace ot {
 
-	class Painter2D;
-
-	class OT_WIDGETS_API_EXPORT Painter2DFactory {
-		OT_DECL_NOCOPY(Painter2DFactory)
+	class OT_WIDGETS_API_EXPORT ComboBox : public QComboBox, public QWidgetInterface {
 	public:
-		static QBrush brushFromPainter2D(const ot::Painter2D* _painter);
+		ComboBox(QWidget* _parent = (QWidget*)nullptr);
+		virtual ~ComboBox() {};
 
-	private:
-		Painter2DFactory() {};
-		~Painter2DFactory() {};
+		virtual QWidget* getQWidget(void) override { return this; };
 	};
+
 }

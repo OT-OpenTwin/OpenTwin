@@ -4,16 +4,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OToolkit header
+#include "FAR.h"
 #include "AppBase.h"
+#include "Terminal.h"
 #include "TabManager.h"
+#include "Randomizer.h"
 #include "ToolManager.h"
 #include "DockManager.h"
 #include "MenuManager.h"
 #include "StatusManager.h"
+#include "ColorStyleEditor.h"
 #include "LogVisualization.h"
-#include "Randomizer.h"
-#include "Terminal.h"
-#include "FAR.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -56,6 +57,22 @@ AppBase * AppBase::instance(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // API base functions
+
+void AppBase::log(const ot::LogMessage& _message) {
+	otoolkit::APIInterface::InterfaceLogType typ = otoolkit::APIInterface::Information;
+	switch (_message.flags())
+	{
+	case ot::WARNING_LOG:
+		typ = otoolkit::APIInterface::Warning;
+		break;
+	case ot::ERROR_LOG:
+		typ = otoolkit::APIInterface::Error;
+		break;
+	default:
+		break;
+	}
+	this->log(QString::fromStdString(_message.functionName()), typ, QString::fromStdString(_message.text()));
+}
 
 void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) {
 	if (QThread::currentThreadId() == m_mainThread) {
@@ -321,6 +338,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new Terminal);
 	m_toolManager->addTool(new FAR);
 	m_toolManager->addTool(new Randomizer);
+	m_toolManager->addTool(new ColorStyleEditor);
 
 	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
 	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
@@ -339,6 +357,8 @@ void AppBase::slotRecenter(void) {
 }
 
 AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m_logger(nullptr) {
+	this->deleteLogNotifierLater(true);
+
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
 

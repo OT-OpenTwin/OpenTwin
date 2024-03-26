@@ -24,8 +24,16 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyGroup : public Serializable {
 		OT_DECL_NOCOPY(PropertyGroup)
 	public:
+		//! @brief Create empty group
 		PropertyGroup();
+
+		//! @brief Create empty group with name and title
+		//! @param _name Will be set as name and title
 		PropertyGroup(const std::string& _name);
+
+		//! @brief Create empty group with name and title
+		//! @param _name Group name
+		//! @param _title Group title
 		PropertyGroup(const std::string& _name, const std::string& _title);
 		virtual ~PropertyGroup();
 

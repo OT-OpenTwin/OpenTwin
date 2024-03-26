@@ -8,20 +8,26 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PropertyInputString.h"
 
+ot::PropertyInputString::PropertyInputString(const QString& _text) 
+	: m_text(_text)
+{
+	this->ini(m_text);
+}
+
 ot::PropertyInputString::PropertyInputString(const PropertyString* _property)
 	: PropertyInput(_property)
 {
-	m_lineEdit = new LineEdit;
-	m_lineEdit->setToolTip(QString::fromStdString(_property->propertyTip()));
-	m_lineEdit->setPlaceholderText(QString::fromStdString(_property->placeholderText()));
 	m_text = QString::fromStdString(_property->value());
+
 	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		m_lineEdit->setText("...");
+		this->ini("...");
 	}
 	else {
-		m_lineEdit->setText(QString::fromStdString(_property->value()));
+		this->ini(m_text);
 	}
-	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+
+	m_lineEdit->setToolTip(QString::fromStdString(_property->propertyTip()));
+	m_lineEdit->setPlaceholderText(QString::fromStdString(_property->placeholderText()));
 }
 
 ot::PropertyInputString::~PropertyInputString() {
@@ -45,4 +51,11 @@ void ot::PropertyInputString::lclValueChanged(void) {
 		m_text = m_lineEdit->text();
 		this->slotValueChanged();
 	}
+}
+
+void ot::PropertyInputString::ini(const QString& _text) {
+	m_lineEdit = new LineEdit;
+	m_lineEdit->setText(_text);
+
+	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 }

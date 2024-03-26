@@ -93,6 +93,9 @@
     <ClCompile Include="src\Randomizer.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColorStyleEditor.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -137,6 +140,9 @@
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
     <QtMoc Include="include\Randomizer.h">
+      <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ColorStyleEditor.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>

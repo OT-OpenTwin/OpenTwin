@@ -17,6 +17,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Dialog : public QDialog, public ot::QWidgetInterface {
+		Q_OBJECT
 		OT_DECL_NOCOPY(Dialog)
 	public:
 		enum DialogResult {
@@ -35,7 +36,7 @@ namespace ot {
 		virtual QWidget* getQWidget(void) { return this; }
 
 		//! @brief Center the dialog on parent and call exec
-		int showDialog(void);
+		DialogResult showDialog(void);
 
 		void close(DialogResult _result);
 
@@ -46,6 +47,13 @@ namespace ot {
 
 		void setDialogName(const std::string& _name) { m_dialogName = _name; };
 		const std::string& dialogName(void) const { return m_dialogName; };
+
+	public slots:
+		void closeOk(void);
+		void closeYes(void);
+		void closeNo(void);
+		void closeRetry(void);
+		void closeCancel(void);
 
 	private:
 		DialogCfg::DialogFlags m_flags;

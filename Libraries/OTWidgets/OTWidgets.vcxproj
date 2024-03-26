@@ -25,6 +25,7 @@
     <ClCompile Include="src\ColorPreviewBox.cpp" />
     <ClCompile Include="src\ColorStyle.cpp" />
     <ClCompile Include="src\ColorStyleValue.cpp" />
+    <ClCompile Include="src\ComboBox.cpp" />
     <ClCompile Include="src\ComboButton.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\Dialog.cpp" />
@@ -64,6 +65,18 @@
     <ClCompile Include="src\MessageDialog.cpp" />
     <ClCompile Include="src\OnePropertyDialog.cpp" />
     <ClCompile Include="src\OTQtConverter.cpp" />
+    <ClCompile Include="src\Painter2DEditButton.cpp" />
+    <ClCompile Include="src\Painter2DEditDialog.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DPreview.cpp" />
     <ClCompile Include="src\PlainTextEditView.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\PlainTextEdit.cpp" />
@@ -80,6 +93,7 @@
     <ClCompile Include="src\PropertyInput.cpp" />
     <ClCompile Include="src\PropertyInputFilePath.cpp" />
     <ClCompile Include="src\PropertyInputInt.cpp" />
+    <ClCompile Include="src\PropertyInputPainter2D.cpp" />
     <ClCompile Include="src\PropertyInputString.cpp" />
     <ClCompile Include="src\PropertyInputStringList.cpp" />
     <ClCompile Include="src\PushButton.cpp" />
@@ -101,9 +115,14 @@
     <ClInclude Include="include\OTWidgets\ColorStyleTypes.h" />
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
+    <ClInclude Include="include\OTWidgets\ComboBox.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsViewView.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditButton.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialog.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
+    <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
@@ -116,7 +135,7 @@
     <ClInclude Include="include\OTWidgets\ColorPreviewBox.h" />
     <QtMoc Include="include\OTWidgets\ComboButton.h" />
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
-    <ClInclude Include="include\OTWidgets\Dialog.h" />
+    <QtMoc Include="include\OTWidgets\Dialog.h" />
     <QtMoc Include="include\OTWidgets\EventNotifier.h" />
     <ClInclude Include="include\OTWidgets\DoubleSpinBox.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />

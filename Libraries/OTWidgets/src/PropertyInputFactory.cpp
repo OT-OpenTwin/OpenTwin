@@ -6,23 +6,25 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 
+#include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"
 #include "OTGui/PropertyColor.h"
-#include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyDouble.h"
 #include "OTGui/PropertyString.h"
-#include "OTGui/PropertyStringList.h"
-#include "OTGui/PropertyDirectory.h"
 #include "OTGui/PropertyFilePath.h"
+#include "OTGui/PropertyDirectory.h"
+#include "OTGui/PropertyPainter2D.h"
+#include "OTGui/PropertyStringList.h"
 
-#include "OTWidgets/PropertyInputFactory.h"
+#include "OTWidgets/PropertyInputInt.h"
 #include "OTWidgets/PropertyInputBool.h"
 #include "OTWidgets/PropertyInputColor.h"
 #include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/PropertyInputDirectory.h"
-#include "OTWidgets/PropertyInputFilePath.h"
-#include "OTWidgets/PropertyInputInt.h"
 #include "OTWidgets/PropertyInputString.h"
+#include "OTWidgets/PropertyInputFactory.h"
+#include "OTWidgets/PropertyInputFilePath.h"
+#include "OTWidgets/PropertyInputDirectory.h"
+#include "OTWidgets/PropertyInputPainter2D.h"
 #include "OTWidgets/PropertyInputStringList.h"
 
 ot::PropertyInput* ot::PropertyInputFactory::createInput(const Property* _config) {
@@ -99,6 +101,15 @@ ot::PropertyInput* ot::PropertyInputFactory::createInput(const Property* _config
 			return nullptr;
 		}
 		return new PropertyInputDirectory(prop);
+	}
+	case ot::Property::Painter2DType:
+	{
+		const ot::PropertyPainter2D* prop = dynamic_cast<const ot::PropertyPainter2D*>(_config);
+		if (!prop) {
+			OT_LOG_EA("Property cast failed");
+			return nullptr;
+		}
+		return new PropertyInputPainter2D(prop);
 	}
 	default:
 		OT_LOG_EA("Unknown property type");

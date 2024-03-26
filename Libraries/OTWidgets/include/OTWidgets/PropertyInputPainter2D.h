@@ -1,6 +1,6 @@
-//! @file PropertyInputInt.h
+//! @file PropertyInputPainter2D.h
 //! @author Alexander Kuester (alexk95)
-//! @date February 2024
+//! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -10,25 +10,21 @@
 
 namespace ot {
 
-	class SpinBox;
-	class PropertyInt;
+	class PropertyPainter2D;
+	class Painter2DEditButton;
 
-	class OT_WIDGETS_API_EXPORT PropertyInputInt : public PropertyInput {
-		Q_OBJECT
-		OT_DECL_NOCOPY(PropertyInputInt)
+	class OT_WIDGETS_API_EXPORT PropertyInputPainter2D : public PropertyInput {
+		OT_DECL_NOCOPY(PropertyInputPainter2D)
 	public:
-		PropertyInputInt(const PropertyInt* _property);
-		virtual ~PropertyInputInt();
+		PropertyInputPainter2D(const PropertyPainter2D* _property);
+		virtual ~PropertyInputPainter2D();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 
-	private slots:
-		void lclValueChanged(int);
-
 	private:
-		SpinBox* m_spinBox;
+		Painter2DEditButton* m_button;
 	};
 
 }

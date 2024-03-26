@@ -13,7 +13,7 @@ namespace ot {
 	class LineEdit;
 	class PropertyDirectory;
 
-	class PropertyInputDirectory : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputDirectory : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputDirectory)
 	public:

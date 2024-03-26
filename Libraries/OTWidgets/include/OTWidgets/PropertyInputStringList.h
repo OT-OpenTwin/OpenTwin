@@ -13,7 +13,7 @@ namespace ot {
 	class ComboButton;
 	class PropertyStringList;
 
-	class PropertyInputStringList : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputStringList : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputStringList)
 	public:
 		PropertyInputStringList(const PropertyStringList* _property);

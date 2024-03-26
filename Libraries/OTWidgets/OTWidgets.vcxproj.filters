@@ -10,15 +10,6 @@
     <ClCompile Include="src\GraphicsScene.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\TreeWidget.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LineEdit.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TreeWidgetFilter.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -70,12 +61,6 @@
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\TabWidget.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DockWatcherAction.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsPixmapItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -100,15 +85,6 @@
     <ClCompile Include="src\QWidgetInterface.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextEditor.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlainTextEdit.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PushButton.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\EventNotifier.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -127,9 +103,6 @@
     <ClCompile Include="src\OnePropertyDialog.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\SpinBox.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\PropertyInputInt.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
@@ -138,9 +111,6 @@
     </ClCompile>
     <ClCompile Include="src\PropertyInputFactory.cpp">
       <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CheckBox.cpp">
-      <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyInputBool.cpp">
       <Filter>src\Properties</Filter>
@@ -162,18 +132,6 @@
     </ClCompile>
     <ClCompile Include="src\PropertyInputDouble.cpp">
       <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DoubleSpinBox.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ColorPickButton.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ColorPreviewBox.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ComboButton.cpp">
-      <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyGridItemDelegate.cpp">
       <Filter>src\Properties</Filter>
@@ -226,6 +184,63 @@
     <ClCompile Include="src\GlobalColorStyle.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\PropertyInputPainter2D.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CheckBox.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorPickButton.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorPreviewBox.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComboButton.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DockWatcherAction.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoubleSpinBox.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LineEdit.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlainTextEdit.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PushButton.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpinBox.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditor.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeWidgetFilter.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditButton.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComboBox.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialog.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DPreview.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -264,14 +279,14 @@
     <Filter Include="src\WidgetView">
       <UniqueIdentifier>{9f39fce1-e5be-45f5-8f19-858de2c4887c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Widgets">
+      <UniqueIdentifier>{ceb2ed0a-4502-460c-a0a1-f9d81f9c0925}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Widgets">
+      <UniqueIdentifier>{ac4730ce-4c49-4235-b8ad-8a0bf52928e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTWidgets\TreeWidget.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\LineEdit.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -347,17 +362,11 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PushButton.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyGridGroup.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\OnePropertyDialog.h">
       <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\SpinBox.h">
-      <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputFactory.h">
       <Filter>include\Properties</Filter>
@@ -368,26 +377,11 @@
     <ClInclude Include="include\OTWidgets\PropertyInputStringList.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CheckBox.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\DoubleSpinBox.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\ColorPreviewBox.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItem.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
       <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\Dialog.h">
-      <Filter>include\Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\MessageDialog.h">
       <Filter>include\Dialogs</Filter>
@@ -437,6 +431,36 @@
     <ClInclude Include="include\OTWidgets\ColorStyleTypes.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItem.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CheckBox.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ColorPreviewBox.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\DoubleSpinBox.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\LineEdit.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PushButton.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SpinBox.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TreeWidget.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ComboBox.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -445,22 +469,10 @@
     <QtMoc Include="include\OTWidgets\GraphicsView.h">
       <Filter>include\Graphics</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h">
-      <Filter>include\General</Filter>
-    </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsPicker.h">
       <Filter>include\Graphics</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\TabWidget.h">
-      <Filter>include\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\DockWatcherAction.h">
-      <Filter>include\General</Filter>
-    </QtMoc>
     <QtMoc Include="include\OTWidgets\ToolTipHandler.h">
-      <Filter>include\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\TextEditor.h">
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\EventNotifier.h">
@@ -490,12 +502,6 @@
     <QtMoc Include="include\OTWidgets\PropertyInputDirectory.h">
       <Filter>include\Properties</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\ComboButton.h">
-      <Filter>include\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\ColorPickButton.h">
-      <Filter>include\General</Filter>
-    </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsItemPreviewDrag.h">
       <Filter>include\Graphics</Filter>
     </QtMoc>
@@ -504,6 +510,36 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h">
       <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ColorPickButton.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ComboButton.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\DockWatcherAction.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TabWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TextEditor.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditButton.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialog.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Dialog.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DPreview.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

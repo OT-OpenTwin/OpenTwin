@@ -13,7 +13,7 @@ namespace ot {
 	class DoubleSpinBox;
 	class PropertyDouble;
 
-	class PropertyInputDouble : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputDouble : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputDouble)
 	public:
