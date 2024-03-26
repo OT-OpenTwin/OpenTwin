@@ -4,6 +4,7 @@
 #include <map>
 #include <list>
 #include <sstream>
+#include <filesystem>
 
 #include "OTCore/CoreTypes.h"
 
@@ -56,6 +57,10 @@ private:
     void                       deleteLocalProjectFiles(const std::string& baseProjectName);
     bool                       restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version);
     bool                       downloadFile(const std::string& cacheFolderVersion, ot::UID entityID, ot::UID version);
+    void                       copyFile(const std::string& sourceFile, const std::string& destFile);
+    void                       copyDirectory(const std::string& sourceDir, const std::string& destDir);
+    void                       getCacheFileWriteTimes(const std::string& cacheFolderName, std::map<std::string, std::filesystem::file_time_type>& cacheFileWriteTimes, std::map<std::string, bool>& cacheFiles);
+    bool                       fileContentDiffers(const std::string& file1, const std::string& file2);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

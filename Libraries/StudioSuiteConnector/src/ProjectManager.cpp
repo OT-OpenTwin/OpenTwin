@@ -17,6 +17,7 @@
 #include <thread>
 #include <sstream>
 #include <cstdio>
+#include <fstream>
 
 #include <QFileDialog>					// QFileDialog
 #include <qdir.h>						// QDir
@@ -352,19 +353,143 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 
 	uploadFiles.push_back(path);
 
+	// Read file time stamp information from the corresponding cache directory
+	std::map<std::string, std::filesystem::file_time_type> cacheFileWriteTimes;
+	std::map<std::string, bool> cacheFiles;
+	std::string versionFolderName;
+
+	// Get the current version
+	try
+	{
+		VersionFile version(cacheFolderName + "\\version.info");
+		version.read();
+
+		versionFolderName = cacheFolderName + "/" + version.getVersion();
+
+		getCacheFileWriteTimes(versionFolderName, cacheFileWriteTimes, cacheFiles);
+	}
+	catch (...)
+	{
+		// The cache does not seem to exist yet
+		versionFolderName.clear();
+		cacheFileWriteTimes.clear();
+		cacheFiles.clear();
+	}
+
 	// Now add the content of the results folder
-	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(baseProjectName + "/Result"))
+	std::string resultDirName = baseProjectName + "/Result";
+	std::string cacheResultDirName = versionFolderName + "/Result";
+
+	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
 	{
 		if (!dirEntry.is_directory())
 		{
 			path = dirEntry.path().string();
 			std::replace(path.begin(), path.end(), '\\', '/');
 
-			uploadFiles.push_back(path);
+			std::string correspondingCacheFile = path.substr(resultDirName.length());
+
+			if (cacheFiles.count(correspondingCacheFile) == 0)
+			{
+				// This file does not exist in the cache
+				uploadFiles.push_back(path);
+			}
+			else
+			{
+				// This file exists in the cache
+				cacheFiles[correspondingCacheFile] = true; // This file is still present
+
+				auto cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
+				auto newFileTimeStamp = std::filesystem::last_write_time(path);
+
+				if (newFileTimeStamp > cacheFileTimeStamp)
+				{
+					// The time stamp of this file has changed. Now we need to compare the file content to determine whether 
+					// the file has indeed changed
+					if (fileContentDiffers(path, cacheResultDirName + correspondingCacheFile))
+					{
+						// This file has changed compared to the data in the cache
+						uploadFiles.push_back(path);
+					}
+				}
+			}
+		}
+	}
+
+	// Now we check whether there are any files in the cache which do not exist anymore
+	std::string fileNamePrefix = "Files/" + std::filesystem::path(baseProjectName).filename().string() + "/Result";
+	for (auto file : cacheFiles)
+	{
+		if (!file.second)
+		{
+			// This file is not present anymore
+			deletedFiles.push_back(fileNamePrefix + file.first);
 		}
 	}
 
 	return uploadFiles;
+}
+
+bool ProjectManager::fileContentDiffers(const std::string& file1, const std::string& file2)
+{
+	std::ifstream in1(file1, std::ios::binary);
+	std::ifstream in2(file2, std::ios::binary);
+
+	std::ifstream::pos_type size1, size2;
+
+	size1 = in1.seekg(0, std::ifstream::end).tellg();
+	in1.seekg(0, std::ifstream::beg);
+
+	size2 = in2.seekg(0, std::ifstream::end).tellg();
+	in2.seekg(0, std::ifstream::beg);
+
+	if (size1 != size2)
+	{
+		// The file size is different
+		return true;
+	}
+
+	static const size_t BLOCKSIZE = 4096;
+	size_t remaining = size1;
+
+	while (remaining)
+	{
+		char buffer1[BLOCKSIZE], buffer2[BLOCKSIZE];
+		size_t size = std::min(BLOCKSIZE, remaining);
+
+		in1.read(buffer1, size);
+		in2.read(buffer2, size);
+
+		if (0 != memcmp(buffer1, buffer2, size))
+		{
+			// The file content differs
+			return true;
+		}
+			
+		remaining -= size;
+	}
+
+	return false; // The files are identical
+}
+
+
+void ProjectManager::getCacheFileWriteTimes(const std::string& versionFolderName, std::map<std::string, std::filesystem::file_time_type>& cacheFileWriteTimes, std::map<std::string, bool> &cacheFiles)
+{
+	std::string resultDirName = versionFolderName + "/Result";
+
+	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
+	{
+		if (!dirEntry.is_directory())
+		{
+			std::string path = dirEntry.path().string();
+			std::replace(path.begin(), path.end(), '\\', '/');
+		
+			std::string cacheFile = path.substr(resultDirName.length());
+
+			cacheFileWriteTimes[cacheFile] = std::filesystem::last_write_time(path);
+			cacheFiles[cacheFile] = false;
+		}
+	}
 }
 
 void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const std::string &newVersion, const std::string &cacheFolderName)
@@ -396,8 +521,8 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 
 	try
 	{
-		std::filesystem::copy(cstFileName, versionFolderName);
-		std::filesystem::copy(resultFolderName, versionFolderName + "/Result", std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+		copyFile(cstFileName, versionFolderName);
+		copyDirectory(resultFolderName, versionFolderName + "/Result");
 	}
 	catch (std::exception &error)
 	{
@@ -671,8 +796,8 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 			// We have a corresponding cache entry -> restore the data
 			std::filesystem::create_directory(baseProjectName);
 
-			std::filesystem::copy(cstCacheFileName, baseProjectName + ".cst");
-			std::filesystem::copy(cacheDirectory + "/Result", baseProjectName + "/Result", std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+			copyFile(cstCacheFileName, baseProjectName + ".cst");
+			copyDirectory(cacheDirectory + "/Result", baseProjectName + "/Result");
 
 			return true;
 		}
@@ -683,6 +808,29 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 	}
 
 	return false;
+}
+
+void ProjectManager::copyFile(const std::string& sourceFile, const std::string& destFile)
+{
+	std::filesystem::copy(sourceFile, destFile, std::filesystem::copy_options::update_existing);
+
+	// Now apply the time stamp from the original file
+	auto lastWrite = std::filesystem::last_write_time(sourceFile);
+	std::filesystem::last_write_time(destFile, lastWrite);
+}
+
+void ProjectManager::copyDirectory(const std::string& sourceDir, const std::string& destDir)
+{
+	std::filesystem::copy(sourceDir, destDir, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+
+	// Now apply the time stamps from the original files
+	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(sourceDir))
+	{
+		auto lastWrite = std::filesystem::last_write_time(dirEntry.path());
+		std::string relativeFileName = dirEntry.path().string().substr(sourceDir.length());
+		std::string destFileName = destDir + relativeFileName;
+		std::filesystem::last_write_time(destFileName, lastWrite);
+	}
 }
 
 bool ProjectManager::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string &errorMessage)

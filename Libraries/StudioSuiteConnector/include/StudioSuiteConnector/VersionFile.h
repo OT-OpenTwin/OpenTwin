@@ -18,11 +18,8 @@ public:
 	std::string getVersion() { return version; }
 
 private:
-	void writeFileInfo(std::string path, std::string& projectRoot, std::ofstream& file);
-
 	std::string versionFilePath;
 	std::string projectName;
 	std::string version;
-	std::map<std::string, size_t> projectFiles;
 };
 

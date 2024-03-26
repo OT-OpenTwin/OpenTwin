@@ -16,6 +16,9 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
+#include "Connection\ConnectionAPI.h"
+#include "Document\DocumentAccessBase.h"
+
 // Application specific includes
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
@@ -398,7 +401,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	for (auto file : fileInfo)
 	{
-		if (file.getType() == "EntityFile" && file.getName() != "Files/Information")
+		if (file.getType() == "EntityFile")
 		{
 			entityID.push_back(file.getID());
 			versionID.push_back(file.getVersion());
@@ -836,42 +839,74 @@ void Application::writeProjectInformation(const std::string &simpleFileName, std
 		data << item.second << std::endl;
 	}
 
-	EntityBinaryData* dataEntity = new EntityBinaryData(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName());
-
 	std::string stringData = data.str();
 
-	dataEntity->setData(stringData.c_str(), stringData.size()+1);
-	dataEntity->StoreToDataBase();
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
 
-	EntityFile* projectInformation = new EntityFile(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName());
-	projectInformation->setName("Files/Information");
-	projectInformation->setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
-	projectInformation->setEditable(false);
-	projectInformation->StoreToDataBase();
+	long long modelVersion = getCurrentModelEntityVersion();
 
-	modelComponent()->addNewDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion(), projectInformation->getEntityID());
-	modelComponent()->addNewTopologyEntity(projectInformation->getEntityID(), projectInformation->getEntityStorageVersion(), false);
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
 
-	delete dataEntity;
-	dataEntity = nullptr;
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "ProjectInformation" << stringData
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
-	delete projectInformation;
-	projectInformation = nullptr;
+	collection.update_one(queryDoc.view(), modifyDoc.view());
+}
+
+long long Application::getCurrentModelEntityVersion(void)
+{
+	// We search for the last model entity in the database and determine its version
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result) return 0;  // No model entity found
+
+	return result->view()["Version"].get_int64();
 }
 
 bool Application::readProjectInformation(std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
-	// Check whether the Information entity exists
-	ot::EntityInformation infoEntity;
-	if (!modelComponent()->getEntityInformation("Files/Information", infoEntity))
+	// Get the project information string from the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result) return false;  // No model entity found (this project is not yet initialized)
+
+	std::string projectInformation;
+
+	try
 	{
-		return false; // This entity does not yet exist -> the project is not initialized yet
+		projectInformation = result->view()["ProjectInformation"].get_utf8().value.data();
+	}
+	catch (std::exception)
+	{
+		return false; // This project does not have project information yet (not initialized)
 	}
 
-	EntityFile* projectInformation = dynamic_cast<EntityFile *> (modelComponent()->readEntityFromEntityIDandVersion(infoEntity.getID(), infoEntity.getVersion(), getClassFactory()));
-	if (projectInformation == nullptr) return false;
-
-	std::stringstream content(projectInformation->getData()->getData().data());
+	std::stringstream content(projectInformation);
 
 	std::getline(content, simpleFileName);
 	while (!content.eof())
@@ -935,24 +970,23 @@ std::string Application::getSimpleFileName()
 
 void Application::addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
+	// First, we delete an previously existing file for the given host
 	for (auto item : hostNamesAndFileNames)
 	{
 		if (item.first == hostName)
 		{
 			// We have found this hostName
-			item.second = fileName;
-			return;
+			hostNamesAndFileNames.remove(item);
+			break;
 		}
 	}
 
-	// This host name was not yet in the list
+	// Now we add the new file for the given host name
 	hostNamesAndFileNames.push_back(std::pair<std::string, std::string>(hostName, fileName));
 }
 
 void Application::setLocalFileName(const std::string& hostName, const std::string& fileName)
 {
-	modelComponent()->clearNewEntityList();
-
 	std::string simpleFileName;
 	std::list<std::pair<std::string, std::string>> hostNamesAndFileNames;
 
@@ -967,8 +1001,6 @@ void Application::setLocalFileName(const std::string& hostName, const std::strin
 		}
 
 		writeProjectInformation(simpleFileName, hostNamesAndFileNames);
-
-		modelComponent()->modelChangeOperationCompleted("Changed local Studio Suite file name");
 	}
 	else
 	{

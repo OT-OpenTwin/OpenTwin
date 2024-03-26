@@ -135,6 +135,7 @@ public:
 	std::string getLocalFileName(const std::string& hostName);
 	void addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
 	std::string getSimpleFileName();
+	long long getCurrentModelEntityVersion(void);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
