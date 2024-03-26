@@ -177,7 +177,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 
 
-	return "succes";
+	return "success";
 
 	
 }

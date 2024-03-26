@@ -30,6 +30,10 @@ void EntityBlockCircuitVoltageSource::createProperties()
 {
 	EntityPropertiesString::createProperty("Element Property", "ElementType", "100", "default", getProperties());
 	EntityPropertiesSelection::createProperty("Element Property", "Type", { "DC","AC" }, "DC", "default", getProperties());
+
+	createACProperties();
+	SetVisibleACProperties(false);
+	
 }
 
 std::string EntityBlockCircuitVoltageSource::getElementType()
@@ -97,6 +101,46 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 
 
 	return myStack;
+}
+
+bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
+{
+	bool refresh = false;
+	auto baseProperty = getProperties().getProperty("Type");
+	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
+	if (selectionProperty->getValue() == "AC")
+	{
+		refresh = SetVisibleACProperties(true);
+	}
+	else
+	{
+		refresh = SetVisibleACProperties(false);
+	}
+
+	if (refresh)
+	{
+		getProperties().forceResetUpdateForAllProperties();
+	}
+
+	return refresh;
+
+}
+
+void EntityBlockCircuitVoltageSource::createACProperties()
+{
+	EntityPropertiesSelection::createProperty("AC-Properties", "Function", { "10 sin(0 1 1k)" }, "10 sin(0 1 1k)", "default", getProperties());
+}
+
+bool EntityBlockCircuitVoltageSource::SetVisibleACProperties(bool visible)
+{
+	const bool isVisible = getProperties().getProperty("Function")->getVisible();
+	const bool refresh = isVisible != visible;
+	if (refresh)
+	{
+		getProperties().getProperty("Function")->setVisible(visible);
+		this->setModified();
+	}
+	return refresh;
 }
 
 void EntityBlockCircuitVoltageSource::AddStorageData(bsoncxx::builder::basic::document& storage)
