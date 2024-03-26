@@ -43,6 +43,11 @@ std::string CircuitElement::getType()
 	return this->type;
 }
 
+std::string CircuitElement::getFunction()
+{
+	return this->function;
+}
+
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
@@ -55,6 +60,11 @@ void CircuitElement::setValue(std::string name) { this->value = name; }
 void CircuitElement::setType(std::string type)
 {
 	this->type = type;
+}
+
+void CircuitElement::setFunction(std::string function)
+{
+	this->function = function;
 }
 
 //Additional Functions

@@ -34,6 +34,7 @@ public:
 	std::string getValue();
 	std::set<Connection>& getList();
 	std::string getType();
+	std::string getFunction();
 
 	//Setter
 	void setItemName(std::string name);
@@ -41,7 +42,7 @@ public:
 	void setUID(ot::UID id);
 	void setValue(std::string name);
 	void setType(std::string type);
-
+	void setFunction(std::string function);
 	//Additional Functions
 	bool addConnection(const Connection& obj);
 	
@@ -57,6 +58,7 @@ private:
 	ot::UID Uid;
 	std::string value;
 	std::string type;
+	std::string function;
 	std::set<Connection> listOfConnections;
 	
 

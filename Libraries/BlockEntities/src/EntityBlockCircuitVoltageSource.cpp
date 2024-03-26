@@ -54,6 +54,15 @@ std::string EntityBlockCircuitVoltageSource::getType()
 	return elementType->getValue();
 }
 
+std::string EntityBlockCircuitVoltageSource::getFunction()
+{
+	auto propertyBase = getProperties().getProperty("Function");
+	auto function = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	assert(function != nullptr);
+
+	return function->getValue();
+}
+
 
 
 ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()

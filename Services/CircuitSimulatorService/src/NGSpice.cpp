@@ -46,6 +46,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
 			element.setType(myElement->getType());
+			element.setFunction(myElement->getFunction());
 		}
 		else if (blockEntity->getBlockTitle() == "Resistor")
 		{
@@ -140,6 +141,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
 			netlistVoltageSourceType = element.getType() + " ";
+			if (netlistVoltageSourceType == "AC ")
+			{
+				netlistVoltageSourceType += element.getFunction();
+			}
 			netlistLine += netlistElementName + " ";
 			/*netlistLine = "V1 13 2 0.001 AC 1 SIN (0 1 1 MEG ) ";*/
 		}
@@ -160,7 +165,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistLine += netlistVoltageSourceType;
 		}
-		netlistLine += netlistValue;
+		if (element.getType() != "AC")
+		{
+			netlistLine += netlistValue;
+		}
+		
 		ngSpice_Command(const_cast<char*>(netlistLine.c_str()));
 	}
 
@@ -178,8 +187,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 
 	return "success";
-
-	
 }
 
 std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
