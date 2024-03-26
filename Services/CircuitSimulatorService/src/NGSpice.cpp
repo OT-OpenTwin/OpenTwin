@@ -62,7 +62,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
 		auto connections = blockEntity->getAllConnections();
 	
-
 		for (auto connectionID : connections)
 		{
 			
@@ -73,57 +72,28 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			Connection conn(connectionCfg);
 			conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
 
-			// if the adding doesnt work because it already added the connection than it counts the Nodenumber++ but i dont need that to do it
 			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), conn);
 			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), conn);
 			if (res1 == false && res2 == false )
 			{
 				Numbers::nodeNumber--;
-			}
-						
+			}			
 		}
 	}
-
-
-
 }
 
-//
-//void NGSpice::setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
-//{
-//	for (auto it : allEntitiesByBlockID)
-//	{
-//		std::shared_ptr<EntityBlock> blockEntity = it.second;
-//		
-//			for (auto conn : blockEntity->getAllConnections())
-//			{
-//				Connection connection(conn);
-//				connection.setNodeNumber(std::to_string(Numbers::currentNodeNumber++));
-//				
-//				addConnection(connection.originUid(), connection);
-//				addConnection(connection.destUid(), connection);
-//
-//			}
-//		
-//	}
-//}
 
-//std::string NGSpice::getBlockEntityTitleByUID(std::string UID, std::map<std::string, std::shared_ptr<EntityBlock>>& list)
-//{
-//	if (list.find(UID) != list.end())
-//	{
-//		return list[UID]->getBlockTitle();
-//	}
-//	else
-//	{
-//		OT_LOG_E("Entity Title not Found");
-//	}
-//}
-
-
-
-std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string simulationType,std::string printSettings,std::string editorname)
+std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
+	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
+	assert(simulationTypeProperty != nullptr);
+
+	EntityPropertiesString* printSettingsProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
+	assert(printSettingsProperty != nullptr);
+
+	std::string simulationType = simulationTypeProperty->getValue();
+	std::string printSettings = printSettingsProperty->getValue();
+	
 
 	// Now I write the informations to the File
 	// Here i get the Circuit and the map of Elements
@@ -131,11 +101,18 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	if (simulationType == ".dc")
 	{
-		EntityPropertiesString* element = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Element"));
+		EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
+		
+		std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
+		if (element == "Voltage Source")
+		{
+			element = "V1";
+		}
+
 		EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
 		EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
 		EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
-		simulationLine = simulationType + " " + element->getValue() + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
+		simulationLine = simulationType + " " + element + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
 	}
 	else if (simulationType == ".TRAN")
 	{
@@ -144,9 +121,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		simulationLine = simulationType + " " + duration->getValue() + " " + timeSteps->getValue();
 	}
 	
-
-	
-
 
 	std::string TitleLine = "circbyline *Test";
 	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
@@ -208,7 +182,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	
 }
 
-std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname, std::string simulationType,std::string printSettings)
+std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -234,19 +208,14 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	}
 
 
-
-	/* Some simulation*/
-	/* setConnectionNodeNumbers(allEntitiesByBlockID);*/
+	
 	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
-	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID,simulationType,printSettings,editorname);
+	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
 
 	 Numbers::nodeNumber = 0;
 	 Numbers::resistorNetlistNumber = 0;
 	 Numbers::voltageSourceNetlistNumber = 0;
-	// clearBufferStructure(); // Must be corrected
-
 	 
-	
 	/*char command[1000];
 	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";
 	sprintf_s(command, sizeof(command), "source %s", netlist);
@@ -283,7 +252,3 @@ int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int
 
 }
 
-//void NGSpice::addConnection(std::string key, const Connection& obj)
-//{
-//	mapOfConnections.insert(std::make_pair(key, obj));
-//}

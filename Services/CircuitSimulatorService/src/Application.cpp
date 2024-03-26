@@ -454,35 +454,39 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity)
 {
-	EntityPropertiesSelection* simulationType = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
-	assert(simulationType != nullptr);
-
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
-	EntityPropertiesString* printSettings = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
-	assert(printSettings != nullptr);
 
-	EntityPropertiesString* element = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Element"));
-	assert(element != nullptr);
-
-	size_t pos = circuitName->getValueName().find('/');
-	std::string name = "";
-	if (pos != std::string::npos)
-	{
-		name = circuitName->getValueName().substr(pos + 1);
-	}
-	else
-	{
-		OT_LOG_E("Circuit not Found!");
-	}
+	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 
 	m_blockEntityHandler.setPackageName(name);
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
-	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name, simulationType->getValue(), printSettings->getValue());
+	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
 	m_ngSpice.clearBufferStructure(name);
+}
+
+std::string Application::extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence)
+{
+	size_t pos = 0;
+	size_t count = 0;
+
+	
+	while (count < occurrence && (pos = inputString.find(delimiter, pos)) != std::string::npos) {
+		++count;
+		++pos; 
+	}
+
+	if (count == occurrence) {
+		
+		return inputString.substr(pos);
+	}
+	else 
+	{
+		OT_LOG_E("Substring of FolderEntityName not Found!");
+	}
 }
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)

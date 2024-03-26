@@ -96,7 +96,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 
 std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections()
 {
-	std::list<std::string> connectionItemNames = _modelComponent->getListOfFolderItems("Blocks/" + _packageName + "/Connections");
+	std::list<std::string> connectionItemNames = _modelComponent->getListOfFolderItems("Circuits/" + _packageName + "/Connections");
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(connectionItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
