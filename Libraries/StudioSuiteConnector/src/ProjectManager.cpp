@@ -23,6 +23,9 @@
 #include <qdir.h>						// QDir
 #include <qsettings>
 #include <qhostinfo>
+#include <QCryptographicHash>
+
+#include "boost/algorithm/string.hpp"
 
 void ProjectManager::openProject()
 {
@@ -681,17 +684,15 @@ void ProjectManager::sendShapeInformationAndTriangulation(const std::string& pro
 	// Read the list of shape names and assign them the index of the STL file
 	std::map<std::string, int> allShapesMap = determineAllShapes(std::stringstream(fileContent));
 	 
-	// Determine which triangulation need to be sent (either different checksum or new)
-	std::map<std::string, int> modifiedShapesMap = allShapesMap;  // TODO: Implement check
-
 	// Now send the modified triangulations (one by one)
-	sendTriangulations(projectRoot, modifiedShapesMap);
+	sendTriangulations(projectRoot, allShapesMap);
 }
 
 void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap)
 {
 	std::list<std::string> shapeNames;
 	std::list<std::string> shapeTriangles;
+	std::list<std::string> shapeHash;
 
 	// We combine potentially several triangulations into a single message in order to avoid sending an excessive number of 
 	// messages in case of many small objects.
@@ -702,14 +703,19 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 		std::string fileContent;
 		readFileContent(projectRoot + "/Temp/Upload/stl" + std::to_string(shape.second) + ".stl", fileContent);
 
+		std::string hash = calculateHash(fileContent);
+
+		// TODO: Compare hash
+
 		shapeNames.push_back(shape.first);
 		shapeTriangles.push_back(fileContent);
+		shapeHash.push_back(hash);
 
-		dataSize += (shape.first.size() + fileContent.size());
+		dataSize += (shape.first.size() + fileContent.size() + shapeHash.size());
 
 		if (dataSize > 10000000)
 		{
-			sendTriangleLists(shapeNames, shapeTriangles);
+			sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
 			dataSize = 0;
 			shapeNames.clear();
 			shapeTriangles.clear();
@@ -718,16 +724,71 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 
 	if (dataSize > 0)
 	{
-		sendTriangleLists(shapeNames, shapeTriangles);
+		sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
 	}
 }
 
-void ProjectManager::sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles)
+std::string ProjectManager::calculateHash(const std::string& fileContent)
+{
+	// First, we process the file and extract each pair of three vertices in one string
+	std::stringstream stlData(fileContent);
+
+	int vertexID = 0;
+	std::string vertexData;
+	vertexData.reserve(320);
+
+	std::list<std::string> vertexList;
+
+	while (!stlData.eof())
+	{
+		std::string line;
+		std::getline(stlData, line);
+
+		size_t index = line.find("vertex");
+
+		if (index != std::string::npos)
+		{
+			// This line contains a vertex
+			vertexData += line.substr(index+6);
+			vertexID++;
+
+			if (vertexID == 3)
+			{
+				// We have collected three vertices -> next triangle
+				vertexList.push_back(vertexData);
+				vertexData.clear();
+				vertexData.reserve(320);
+				vertexID = 0;
+			}
+		}
+	}
+
+	// Now we need to sort the list with the vertex data, since the ordering of the triangles may differ from time to time
+	vertexList.sort();
+
+	// Now get the list into a string
+	std::stringstream data;
+	for (auto item : vertexList)
+	{
+		data << item;
+	}
+
+	// And finally calculate the hash
+	QCryptographicHash hashCalculator(QCryptographicHash::Md5);
+	hashCalculator.addData(data.str().c_str(), data.str().size());
+	
+	std::string hashValue = hashCalculator.result().toHex().toStdString();
+
+	return hashValue;
+}
+
+void ProjectManager::sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_TRIANGLES, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonArray(shapeNames, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonArray(shapeTriangles, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Hash, ot::JsonArray(shapeHash, doc.GetAllocator()), doc.GetAllocator());
 
 	// Send the message to the service
 	ServiceConnector::getInstance().sendExecuteRequest(doc);

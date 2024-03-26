@@ -53,7 +53,7 @@ private:
     void                       readFileContent(const std::string& fileName, std::string& content);
     std::map<std::string, int> determineAllShapes(std::stringstream fileContent);
     void                       sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap);
-    void                       sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles);
+    void                       sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash);
     void                       deleteLocalProjectFiles(const std::string& baseProjectName);
     bool                       restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version);
     bool                       downloadFile(const std::string& cacheFolderVersion, ot::UID entityID, ot::UID version);
@@ -61,6 +61,7 @@ private:
     void                       copyDirectory(const std::string& sourceDir, const std::string& destDir);
     void                       getCacheFileWriteTimes(const std::string& cacheFolderName, std::map<std::string, std::filesystem::file_time_type>& cacheFileWriteTimes, std::map<std::string, bool>& cacheFiles);
     bool                       fileContentDiffers(const std::string& file1, const std::string& file2);
+    std::string                calculateHash(const std::string& fileContent);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

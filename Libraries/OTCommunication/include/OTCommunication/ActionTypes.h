@@ -346,6 +346,7 @@
 #define OT_ACTION_PARAM_FILE_Name "File.Name"
 #define OT_ACTION_PARAM_FILE_TAKEN_NAMES "File.TakenNames"
 #define OT_ACTION_PARAM_FILE_Content "File.Content"
+#define OT_ACTION_PARAM_FILE_Hash "File.Hash"
 #define OT_ACTION_PARAM_FILE_Content_UncompressedDataLength "File.Content.DataLength.Uncompressed"
 #define OT_ACTION_PARAM_FILE_OriginalName "File.OriginalName"
 #define OT_ACTION_PARAM_FILE_LoadContent "File.LoadContent"
