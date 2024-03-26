@@ -469,7 +469,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 				visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(globalSessionID, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
 
 				std::string response;
-				if (!sendHttpRequest(QUEUE, globalSessionServiceURL, visibilityCommand, response)) {
+				if (!sendHttpRequest(EXECUTE, globalSessionServiceURL, visibilityCommand, response)) {
 					std::cout << OT_ACTION_RETURN_INDICATOR_Error "Failed to send http request" << std::endl;
 					return OT_ACTION_RETURN_INDICATOR_Error "Failed to send http request";
 				}
