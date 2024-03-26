@@ -26,6 +26,7 @@ Python Service Interface
 ------------------------
 Other services can use the PythonServiceInterface class which is part of the OTServiceFoundation. 
 So far it is possible to :
+
 1. Defining a request of executing a python script through its name and a parameter 
 2. Adding port data to an execution request
 3. Execution of a single string
@@ -85,37 +86,37 @@ OpenTwin Module
 
 The OpenTwin module provides the follwing methods to a python script:
 
-GetPropertyValue
-Method Parameter: absolute_entity_name: string, property_name: string|
-Get the value of a requested property from a requested entity. |
+| *GetPropertyValue*
+| Method Parameter: absolute_entity_name: string, property_name: string|
+| Get the value of a requested property from a requested entity. |
+ 
+| *GetTableCellValue*
+| Method Parameter: row : int, column : int
+| Get the value of a cell from a requested entity.
+ 
+| *SetPropertyValue*
+| Method Parameter:absolute_entity_name: string, property_name: string, value : variant
+| Set the property value of a requested property from a requested entity.
 
-GetTableCellValue
-Method Parameter: row : int, column : int
-Get the value of a cell from a requested entity.
+| *Flush*
+| Method Parameter: none
+| Apply all changes on entity properties and store them in the database.
 
-SetPropertyValue
-Method Parameter:absolute_entity_name: string, property_name: string, value : variant
-Set the property value of a requested property from a requested entity.
+| *FlushEntity*
+| Method Parameter:absolute_entity_name: string
+| Apply all changes on requested entity and store it in the database.
 
-Flush
-Method Parameter: none
-Apply all changes on entity properties and store them in the database.
+| *GetPythonScript*
+| Method Parameter:absolute_entity_name: string
+| Gets another python script that is stored within OpenTwin as an executable object.
 
-FlushEntity
-Method Parameter:absolute_entity_name: string
-Apply all changes on requested entity and store it in the database.
+| *GetPortData*
+| Method Parameter: portName: string
+| For Block Items. Gets datachunks from the ingoing ports.
 
-GetPythonScript
-Method Parameter:absolute_entity_name: string
-Gets another python script that is stored within OpenTwin as an executable object.
-
-GetPortData
-Method Parameter: portName: string
-For Block Items. Gets datachunks from the ingoing ports.
-
-SetPortData
-Method Parameter:portName: string, value : variant
-For Block Items. Sets datachunks from the outgoing ports.
+| *SetPortData*
+| Method Parameter:portName: string, value : variant
+| For Block Items. Sets datachunks from the outgoing ports.
 
 
 

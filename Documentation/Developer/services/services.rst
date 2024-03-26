@@ -16,6 +16,7 @@ The following sections describe the purpose and operation of the individual serv
    python_service
    studio_suite_service
    import_parameterized_data_service
+   data_processing_service
 
 .. toctree::
    :maxdepth: 3
