@@ -23,7 +23,9 @@ protected:
 private:
 	bool SetVisibleDCSimulationParameters(bool visible);
 	bool SetVisibleTRANSimulationParameters(bool visible);
+	bool SetVisibleACSimulationParameters(bool visible);
 	void createDCProperties();
 	void createTranProperties();
+	void createACProperties();
 
 };

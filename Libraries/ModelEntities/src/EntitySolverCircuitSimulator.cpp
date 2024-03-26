@@ -14,16 +14,18 @@ EntitySolverCircuitSimulator::~EntitySolverCircuitSimulator()
 
 void EntitySolverCircuitSimulator::createProperties(const std::string circuitFolderName, ot::UID circuitFolderID, const std::string circuitName, ot::UID circuitID)
 {
-	EntityPropertiesSelection::createProperty("Settings","Simulation Type", {".dc",".TRAN"},".dc","default",getProperties());
+	EntityPropertiesSelection::createProperty("Settings","Simulation Type", {".dc",".TRAN",".ac"}, ".dc", "default", getProperties());
 	EntityPropertiesEntityList::createProperty("Settings", "Circuit", circuitFolderName, circuitFolderID, "", -1, "default", getProperties());
 	EntityPropertiesString::createProperty("Settings", "Print Settings", "print all", "CircuitSimulator", getProperties());
 
 	createDCProperties();
 	createTranProperties();
+	createACProperties();
 	
 
 	SetVisibleDCSimulationParameters(true);
 	SetVisibleTRANSimulationParameters(false);
+	SetVisibleACSimulationParameters(false);
 }
 
 
@@ -56,6 +58,25 @@ bool EntitySolverCircuitSimulator::SetVisibleTRANSimulationParameters(bool visib
 	return refresh;
 }
 
+bool EntitySolverCircuitSimulator::SetVisibleACSimulationParameters(bool visible)
+{
+
+	const bool isVisible = getProperties().getProperty("Variation")->getVisible();
+	const bool refresh = isVisible != visible;
+	if (refresh)
+	{
+		getProperties().getProperty("Variation")->setVisible(visible);
+		getProperties().getProperty("Number of Points")->setVisible(visible);
+		getProperties().getProperty("Starting Frequency")->setVisible(visible);
+		getProperties().getProperty("Final Frequency")->setVisible(visible);
+		this->setModified();
+
+	}
+	return refresh;
+}
+
+
+
 void EntitySolverCircuitSimulator::createDCProperties()
 {
 	EntityPropertiesEntityList* circuit = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Circuit"));
@@ -73,15 +94,18 @@ void EntitySolverCircuitSimulator::createDCProperties()
 
 void EntitySolverCircuitSimulator::createTranProperties()
 {
-	EntityPropertiesEntityList* circuit = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Circuit"));
-	std::string elementFolder = circuit->getValueName();
-	ot::UID elementFolderID = circuit->getValueID();
 
 	EntityPropertiesString::createProperty("TRAN-Settings", "Duration", "10ms", "default", getProperties());
 	EntityPropertiesString::createProperty("TRAN-Settings", "TimeSteps", "1ms", "default", getProperties());
 }
 
-
+void EntitySolverCircuitSimulator::createACProperties()
+{
+	EntityPropertiesSelection::createProperty("AC-Properties", "Variation", { "dec","oct","lin" }, "lin", "default", getProperties());
+	EntityPropertiesString::createProperty("AC-Properties", "Number of Points", "100", "default", getProperties());
+	EntityPropertiesString::createProperty("AC-Properties", "Starting Frequency", "1", "default", getProperties());
+	EntityPropertiesString::createProperty("AC-Properties", "Final Frequency", "100HZ", "default", getProperties());
+}
 
 bool EntitySolverCircuitSimulator::updateFromProperties()
 {
@@ -107,11 +131,20 @@ bool EntitySolverCircuitSimulator::updateFromProperties()
 	{
 		refresh |= SetVisibleDCSimulationParameters(true);
 		refresh |= SetVisibleTRANSimulationParameters(false);
+		refresh |= SetVisibleACSimulationParameters(false);
+	}
+	else if(selectionProperty->getValue() == ".TRAN")
+	{
+		refresh |= SetVisibleDCSimulationParameters(false);
+		refresh |= SetVisibleTRANSimulationParameters(true);
+		refresh |= SetVisibleACSimulationParameters(false);
 	}
 	else
 	{
 		refresh |= SetVisibleDCSimulationParameters(false);
-		refresh |= SetVisibleTRANSimulationParameters(true);
+		refresh |= SetVisibleTRANSimulationParameters(false);
+		refresh |= SetVisibleACSimulationParameters(true);
+
 	}
 
 	
