@@ -96,35 +96,33 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	std::string printSettings = printSettingsProperty->getValue();
 	
 
-	// Now I write the informations to the File
-	// Here i get the Circuit and the map of Elements
-	std::string simulationLine = "";
 
+	//Here i first create the Title of the Netlist
+	std::string TitleLine = "circbyline *Test";
+	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
+
+
+	//Now i get the SimulationLine depending on which simulation i chose
+	std::string simulationLine = "";
+	
 	if (simulationType == ".dc")
 	{
-		EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
+		simulationLine = generateNetlistDCSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
 		
-		std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
-		if (element == "Voltage Source")
-		{
-			element = "V1";
-		}
-
-		EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
-		EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
-		EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
-		simulationLine = simulationType + " " + element + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
 	}
 	else if (simulationType == ".TRAN")
 	{
-		EntityPropertiesString* duration = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Duration"));
-		EntityPropertiesString* timeSteps = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("TimeSteps"));
-		simulationLine = simulationType + " " + duration->getValue() + " " + timeSteps->getValue();
+		simulationLine = generateNetlistTRANSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
+		
+	}
+	else
+	{
+		simulationLine = generateNetlistACSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
+		
 	}
 	
 
-	std::string TitleLine = "circbyline *Test";
-	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
+	//Here i create and generate all the netlist Elements and their relation to each other line by line
 
 	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
@@ -141,12 +139,14 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
 			netlistVoltageSourceType = element.getType() + " ";
+
+			//if the voltage source is an AC i need the function for it
 			if (netlistVoltageSourceType == "AC ")
 			{
 				netlistVoltageSourceType += element.getFunction();
 			}
 			netlistLine += netlistElementName + " ";
-			/*netlistLine = "V1 13 2 0.001 AC 1 SIN (0 1 1 MEG ) ";*/
+			
 		}
 		else if (element.getItemName() == "Resistor")
 		{
@@ -187,6 +187,53 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 
 	return "success";
+}
+
+std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
+{
+	EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
+
+	std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
+	if (element == "Voltage Source")
+	{
+		element = "V1";
+	}
+
+	std::string simulationLine="";
+	std::string type = ".dc";
+	EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
+	EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
+	EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
+	simulationLine = type + " " + element + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
+	return simulationLine;
+}
+
+std::string NGSpice::generateNetlistACSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
+{
+	EntityPropertiesSelection* variation = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Variation"));
+	EntityPropertiesString* np = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Number of Points"));
+	EntityPropertiesString* fStart = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Starting Frequency"));
+	EntityPropertiesString* fEnd = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Final Frequency"));
+
+	std::string simulationLine = "";
+	std::string type = ".ac";
+
+	simulationLine = type + " " + variation->getValue() + " " + np->getValue() + " " + fStart->getValue() + " " + fEnd->getValue();
+
+	return simulationLine;
+}
+
+std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
+{
+	EntityPropertiesString* duration = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Duration"));
+	EntityPropertiesString* timeSteps = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("TimeSteps"));
+
+	std::string simulationLine = "";
+	std::string type = ".TRAN";
+
+	simulationLine = type + " " + duration->getValue() + " " + timeSteps->getValue();
+
+	return simulationLine;
 }
 
 std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
