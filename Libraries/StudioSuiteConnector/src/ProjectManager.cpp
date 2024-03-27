@@ -82,7 +82,7 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 
 		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName);
+		studioObject.searchProjectAndExtractData(fileName, baseProjectName);
 
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName);
@@ -162,7 +162,7 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 
 		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName);
+		studioObject.searchProjectAndExtractData(fileName, baseProjectName);
 
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName);
