@@ -86,23 +86,18 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
-	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
-	assert(simulationTypeProperty != nullptr);
-
-	EntityPropertiesString* printSettingsProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
-	assert(printSettingsProperty != nullptr);
-
-	std::string simulationType = simulationTypeProperty->getValue();
-	std::string printSettings = printSettingsProperty->getValue();
+	
 	
 
 
-	//Here i first create the Title of the Netlist
+	//Here i first create the Title of the Netlist and send it to NGSpice
 	std::string TitleLine = "circbyline *Test";
-
-	//ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
+	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
+	
+	
+	
 	//ngSpice_Command(const_cast<char*>("circbyline R1 0 1 200"));
-	////ngSpice_Command(const_cast<char*>("circbyline iin 0 1 AC 1"));
+	//ngSpice_Command(const_cast<char*>("circbyline iin 0 1 AC 1"));
 	//ngSpice_Command(const_cast<char*>("circbyline V1 0 1 AC 10 sin(0 1 1k)"));
 	//ngSpice_Command(const_cast<char*>("circbyline .ac dec 10 .01 10"));
 	//ngSpice_Command(const_cast<char*>("circbyline .Control"));
@@ -111,36 +106,17 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	//ngSpice_Command(const_cast<char*>("circbyline .end"));
 
-	//Now i get the SimulationLine depending on which simulation i chose
-	std::string simulationLine = "";
-	
-	if (simulationType == ".dc")
-	{
-		simulationLine = generateNetlistDCSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-		
-	}
-	else if (simulationType == ".TRAN")
-	{
-		simulationLine = generateNetlistTRANSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-		
-	}
-	else
-	{
-		simulationLine = generateNetlistACSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-		
-	}
 
-	simulationLine = "circbyline " + simulationLine;
-	printSettings = "circbyline " + printSettings;
 	
 
-	//Here i create and generate all the netlist Elements and their relation to each other line by line
+	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
 
 	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
 	for (auto mapOfElements : it->second.getMapOfElements())
 	{
 		auto element = mapOfElements.second;
+
 		std::string netlistElementName = "";
 		std::string netlistLine="circbyline ";
 		std::string netlistValue = element.getValue();
@@ -182,13 +158,46 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistLine += netlistValue;
 		}
-		
+
+
+		//Here i send the Lines to NGSpice dll
 		ngSpice_Command(const_cast<char*>(netlistLine.c_str()));
 	}
 
+	//After i got the TitleLine and the elements which represent my circuit I check which simulation was chosen and create the simlationLine
+	
+	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
+	assert(simulationTypeProperty != nullptr);
+
+	EntityPropertiesString* printSettingsProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
+	assert(printSettingsProperty != nullptr);
+
+	std::string simulationType = simulationTypeProperty->getValue();
+	std::string printSettings = printSettingsProperty->getValue();
 
 	
+	std::string simulationLine = "";
 
+	if (simulationType == ".dc")
+	{
+		simulationLine = generateNetlistDCSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
+
+	}
+	else if (simulationType == ".TRAN")
+	{
+		simulationLine = generateNetlistTRANSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
+
+	}
+	else
+	{
+		simulationLine = generateNetlistACSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
+
+	}
+
+	simulationLine = "circbyline " + simulationLine;
+	printSettings = "circbyline " + printSettings;
+	
+	//And now i send it to NGSpice in the right order
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));

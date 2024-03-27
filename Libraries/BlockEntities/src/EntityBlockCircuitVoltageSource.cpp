@@ -137,7 +137,7 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 
 void EntityBlockCircuitVoltageSource::createACProperties()
 {
-	EntityPropertiesSelection::createProperty("AC-Properties", "Function", { "10 sin(0 1 1k)" }, "10 sin(0 1 1k)", "default", getProperties());
+	EntityPropertiesSelection::createProperty("AC-Properties", "Function", { "10 sin(0 1 1k)","1"}, "10 sin(0 1 1k)", "default", getProperties());
 }
 
 bool EntityBlockCircuitVoltageSource::SetVisibleACProperties(bool visible)
