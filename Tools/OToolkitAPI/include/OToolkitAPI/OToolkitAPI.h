@@ -54,7 +54,7 @@ namespace otoolkit {
 	};
 
 	namespace api {
-		OTOOLKITAPI_EXPORTONLY void initialize(APIInterface* _interface);
+		OTOOLKITAPI_EXPORTONLY bool initialize(APIInterface* _interface);
 
 		OTOOLKITAPI_EXPORTONLY otoolkit::APIInterface* getGlobalInterface(void);
 	}

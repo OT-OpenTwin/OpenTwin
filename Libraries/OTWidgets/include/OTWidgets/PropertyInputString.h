@@ -27,6 +27,7 @@ namespace ot {
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
+		virtual Property* createPropertyConfiguration(void) const override;
 
 		const QString& getCurrentText(void) const { return m_text; };
 
@@ -37,7 +38,7 @@ namespace ot {
 		LineEdit* m_lineEdit;
 		QString m_text;
 
-		void ini(const QString& _text);
+		void ini(void);
 	};
 
 }

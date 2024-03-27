@@ -13,8 +13,8 @@ ot::PropertyInputDouble::PropertyInputDouble(const PropertyDouble* _property)
 {
 	m_spinBox = new DoubleSpinBox;
 	m_spinBox->setDecimals(_property->precision());
-	m_spinBox->setToolTip(QString::fromStdString(_property->propertyTip()));
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
+	m_spinBox->setToolTip(this->propertyTip());
+	if (this->propertyFlags() & Property::HasMultipleValues) {
 		m_spinBox->setSpecialValueText("??");
 		m_spinBox->setValue(_property->min());
 	}
@@ -43,4 +43,18 @@ QWidget* ot::PropertyInputDouble::getQWidget(void) {
 void ot::PropertyInputDouble::lclValueChanged(int) {
 	m_spinBox->setSpecialValueText("");
 	PropertyInput::slotValueChanged();
+}
+
+ot::Property* ot::PropertyInputDouble::createPropertyConfiguration(void) const {
+	ot::PropertyDouble* newProperty = new ot::PropertyDouble;
+	newProperty->setPropertyName(this->propertyName());
+	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
+	newProperty->setPropertyTip(this->propertyTip().toStdString());
+	newProperty->setPropertyFlags(this->propertyFlags());
+
+	newProperty->setMin(m_spinBox->minimum());
+	newProperty->setMax(m_spinBox->maximum());
+	newProperty->setValue(m_spinBox->value());
+
+	return newProperty;
 }

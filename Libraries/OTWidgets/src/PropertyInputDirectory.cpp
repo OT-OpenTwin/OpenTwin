@@ -68,3 +68,14 @@ void ot::PropertyInputDirectory::slotChanged(void) {
 		this->slotValueChanged();
 	}
 }
+
+ot::Property* ot::PropertyInputDirectory::createPropertyConfiguration(void) const {
+	ot::PropertyDirectory* newProperty = new ot::PropertyDirectory;
+	newProperty->setPropertyName(this->propertyName());
+	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
+	newProperty->setPropertyFlags(this->propertyFlags());
+
+	newProperty->setPath(m_edit->text().toStdString());
+
+	return newProperty;
+}

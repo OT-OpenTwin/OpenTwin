@@ -10,23 +10,13 @@
 
 ot::PropertyInputString::PropertyInputString(const QString& _text) 
 	: m_text(_text)
-{
-	this->ini(m_text);
-}
+{}
 
 ot::PropertyInputString::PropertyInputString(const PropertyString* _property)
 	: PropertyInput(_property)
 {
 	m_text = QString::fromStdString(_property->value());
-
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		this->ini("...");
-	}
-	else {
-		this->ini(m_text);
-	}
-
-	m_lineEdit->setToolTip(QString::fromStdString(_property->propertyTip()));
+	this->ini();
 	m_lineEdit->setPlaceholderText(QString::fromStdString(_property->placeholderText()));
 }
 
@@ -53,9 +43,26 @@ void ot::PropertyInputString::lclValueChanged(void) {
 	}
 }
 
-void ot::PropertyInputString::ini(const QString& _text) {
+void ot::PropertyInputString::ini() {
 	m_lineEdit = new LineEdit;
-	m_lineEdit->setText(_text);
+	if (this->propertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
+	else m_lineEdit->setText(m_text);
 
+
+	m_lineEdit->setToolTip(this->propertyTip());
 	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+}
+
+ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
+	ot::PropertyString* newProperty = new ot::PropertyString;
+	newProperty->setPropertyName(this->propertyName());
+	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
+	newProperty->setPropertyTip(this->propertyTip().toStdString());
+	newProperty->setPropertyFlags(this->propertyFlags());
+
+	newProperty->setMaxLength(m_lineEdit->maxLength());
+	newProperty->setPlaceholderText(m_lineEdit->placeholderText().toStdString());
+	newProperty->setValue(m_lineEdit->text().toStdString());
+
+	return newProperty;
 }

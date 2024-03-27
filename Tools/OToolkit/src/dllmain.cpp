@@ -24,6 +24,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTCommunication/actionTypes.h"
 
 #define DLLMAIN_LOG(___msg) OTOOLKIT_LOG("main", ___msg)
@@ -66,14 +67,17 @@ void mainApplicationThread()
 		// Set global text size
 		application.setStyleSheet("* { font-size: 9pt; }");
 
+		
+		ot::GlobalColorStyle::instance();
+
 		// Apply global stylesheet
-		QFile styleFile(":/OToolkit.qss");
-		if (styleFile.exists()) {
-			if (styleFile.open(QIODevice::ReadOnly)) {
-				application.setStyleSheet(styleFile.readAll());
-				styleFile.close();
-			}
-		}
+		//QFile styleFile(":/OToolkit.qss");
+		//if (styleFile.exists()) {
+			//if (styleFile.open(QIODevice::ReadOnly)) {
+//				application.setStyleSheet(styleFile.readAll());
+				//styleFile.close();
+			//}
+		//}
 
 		// Create application instance, the application instance will initialize the toolkit api
 		AppBase::instance();

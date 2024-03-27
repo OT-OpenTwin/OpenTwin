@@ -72,6 +72,7 @@
 #include "OTGui/MessageDialogCfg.h"
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
 
 // C++ header
@@ -215,16 +216,22 @@ int AppBase::run() {
 
 		// Setup icon manager
 		int iconPathCounter{ 0 };
+		int stylePathCounter{ 0 };
 #ifdef _DEBUG
 		if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 			iconPathCounter++;
 		}
-#else
+		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
+			stylePathCounter++;
+		}
+#endif // _DEBUG
 		if (ot::IconManager::instance().addSearchPath(QDir::currentPath() + "/icons/")) {
 			iconPathCounter++;
 		}
-#endif // _DEBUG		
-
+		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QDir::currentPath() + "/ColorStyles/")) {
+			stylePathCounter++;
+		}
+	
 		// Check if at least one icon directory was found
 		if (iconPathCounter == 0) {
 			OTAssert(0, "No icon path was found!");
@@ -232,6 +239,15 @@ int AppBase::run() {
 			showErrorPrompt("No icon path was found. Try to reinstall the application", "Error");
 			return 3;
 		}
+
+		// Check if at least one style directory was found
+		if (stylePathCounter == 0) {
+			OT_LOG_EA("No color style path found");
+			showErrorPrompt("No color style path was found. Try to reinstall the application", "Error");
+			return 4;
+		}
+
+		ot::GlobalColorStyle::instance().scanForStyleFiles();
 
 		// Initialize Widget view manager
 		ot::WidgetViewManager::instance().initialize();

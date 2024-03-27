@@ -118,7 +118,7 @@ const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemN
 		else {
 			const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
 			if (g) {
-				const PropertyGridItem* itm = g->findChildProperty(_itemName);
+				const PropertyGridItem* itm = g->findChildProperty(_itemName, true);
 				if (itm) return itm;
 			}
 		}
@@ -129,7 +129,7 @@ const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemN
 
 const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _groupName, const std::string& _itemName) const {
 	const PropertyGridGroup* g = this->findGroup(_groupName);
-	if (g) return g->findChildProperty(_itemName);
+	if (g) return g->findChildProperty(_itemName, false);
 	else return nullptr;
 }
 

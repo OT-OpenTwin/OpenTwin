@@ -50,6 +50,25 @@
 #define CSE_TAB_Base "Base"
 #define CSE_TAB_Generated "Generated"
 
+#define CSE_COLOR_Widget_Background_1 "Widget Background 1"
+#define CSE_COLOR_Widget_Background_2 "Widget Background 2"
+#define CSE_COLOR_Widget_Background_3 "Widget Background 3"
+#define CSE_COLOR_Widget_Background_4 "Widget Background 4"
+#define CSE_COLOR_Widget_Background_5 "Widget Background 5"
+#define CSE_COLOR_Widget_Background_6 "Widget Background 6"
+#define CSE_COLOR_Widget_Background_7 "Widget Background 7"
+#define CSE_COLOR_Widget_Background_8 "Widget Background 8"
+#define CSE_COLOR_Widget_Background_9 "Widget Background 9"
+#define CSE_COLOR_Accent_1 "Accent Color 1"
+#define CSE_COLOR_Accent_2 "Accent Color 2"
+#define CSE_COLOR_Accent_3 "Accent Color 3"
+#define CSE_COLOR_Accent_4 "Accent Color 4"
+#define CSE_COLOR_Accent_5 "Accent Color 5"
+#define CSE_COLOR_Accent_6 "Accent Color 6"
+#define CSE_COLOR_Accent_7 "Accent Color 7"
+#define CSE_COLOR_Accent_8 "Accent Color 8"
+#define CSE_COLOR_Accent_9 "Accent Color 9"
+
 ColorStyleEditor::ColorStyleEditor() {
 
 }
@@ -111,12 +130,16 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	// Create menu
 	QAction* actionImportConfig = _rootMenu->addAction("Save Configuration");
 	QAction* actionExportConfig = _rootMenu->addAction("Load Configuration");
-	QAction* actionReset = _rootMenu->addAction("Reset");
+	_rootMenu->addSeparator();
+	QAction* actionBright = _rootMenu->addAction("Set Bright");
+	QAction* actionDark = _rootMenu->addAction("Set Dark");
+	QAction* actionBlue = _rootMenu->addAction("Set Blue");
+	_rootMenu->addSeparator();
 	QAction* actionApplyAsCurrent = _rootMenu->addAction("Apply As current");
 	QAction* actionExport = _rootMenu->addAction("Export");
 
 	// Initialize data
-	this->initializeStyleValues();
+	this->initializeBrightStyleValues();
 	this->initializeStyleSheetBase();
 	this->parseStyleSheetBaseFile();
 	this->initializePropertyGrid();
@@ -125,7 +148,9 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	// Connect signals
 	this->connect(actionImportConfig, &QAction::triggered, this, &ColorStyleEditor::slotImportConfig);
 	this->connect(actionExportConfig, &QAction::triggered, this, &ColorStyleEditor::slotExportConfig);
-	this->connect(actionReset, &QAction::triggered, this, &ColorStyleEditor::slotReset);
+	this->connect(actionBright, &QAction::triggered, this, &ColorStyleEditor::slotBright);
+	this->connect(actionDark, &QAction::triggered, this, &ColorStyleEditor::slotDark);
+	this->connect(actionBlue, &QAction::triggered, this, &ColorStyleEditor::slotBlue);
 	this->connect(btnGenerate, &QPushButton::clicked, this, &ColorStyleEditor::slotGenerate);
 	this->connect(btnApply, &QPushButton::clicked, this, &ColorStyleEditor::slotApplyAsCurrent);
 	this->connect(actionApplyAsCurrent, &QAction::triggered, this, &ColorStyleEditor::slotApplyAsCurrent);
@@ -260,8 +285,16 @@ void ColorStyleEditor::slotExportConfig(void) {
 	otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->setValue("ColorStlyeEditor.LastConfig", fileName);
 }
 
-void ColorStyleEditor::slotReset(void) {
-	this->initializeStyleValues();
+void ColorStyleEditor::slotBright(void) {
+	this->initializeBrightStyleValues();
+}
+
+void ColorStyleEditor::slotDark(void) {
+	this->initializeDarkStyleValues();
+}
+
+void ColorStyleEditor::slotBlue(void) {
+	this->initializeBlueStyleValues();
 }
 
 void ColorStyleEditor::slotGenerate(void) {
@@ -303,8 +336,7 @@ void ColorStyleEditor::initializeStyleSheetBase(void) {
 	m_baseEditor->setPlainText(QString::fromStdString(m_sheetBase.toStdString()));
 }
 
-void ColorStyleEditor::initializeStyleValues(void) {
-	// Clean up data
+void ColorStyleEditor::cleanUpData(void) {
 	for (const auto& p : m_styleValues) {
 		delete p.second;
 	}
@@ -319,6 +351,52 @@ void ColorStyleEditor::initializeStyleValues(void) {
 		delete f.second;
 	}
 	m_files.clear();
+}
+
+void ColorStyleEditor::initializeBrightStyleValues(void) {
+	// Clean up data
+	this->cleanUpData();
+
+	// Initialize default style values
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(255, 255, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(0, 0, 0))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(72, 72, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(255, 255, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(72, 255, 72))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(0, 0, 0))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(240, 240, 240))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(0, 0, 0))));
+
+	// Initialize default colors
+	m_colors.insert_or_assign(CSE_COLOR_Accent_1, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Accent_2, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Accent_3, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Accent_4, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_1, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_2, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_3, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_4, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_5, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color())));
+}
+
+void ColorStyleEditor::initializeDarkStyleValues(void) {
+	// Clean up data
+	this->cleanUpData();
+
+	// Initialize default style values
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(255, 255, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(0, 0, 0))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(72, 72, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(255, 255, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(72, 255, 72))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(0, 0, 0))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(240, 240, 240))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(0, 0, 0))));
+}
+
+void ColorStyleEditor::initializeBlueStyleValues(void) {
+	// Clean up data
+	this->cleanUpData();
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new ot::PropertyPainter2D(new ot::FillPainter2D(ot::Color(255, 255, 255))));

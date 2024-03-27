@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyGroup.h"
+#include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
@@ -43,6 +44,28 @@ void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	}
 }
 
+ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(void) const {
+	PropertyGroup* newGroup = new PropertyGroup;
+	newGroup->setName(this->getName());
+	newGroup->setTitle(this->getTitle().toStdString());
+	
+	std::list<Property*> p;
+	for (const PropertyGridItem* i : this->childProperties()) {
+		OTAssertNullptr(i->getInput());
+		p.push_back(i->getInput()->createPropertyConfiguration());
+	}
+	newGroup->setProperties(p);
+
+	std::list<PropertyGroup*> g;
+	for (const PropertyGridGroup* i : this->childGroups()) {
+		g.push_back(i->createConfiguration());
+	}
+
+	newGroup->setChildGroups(g);
+
+	return newGroup;
+}
+
 void ot::PropertyGridGroup::finishSetup(void) {
 	this->setFirstColumnSpanned(false);
 	for (int i = 0; i < this->childCount(); i++) {
@@ -74,14 +97,17 @@ void ot::PropertyGridGroup::addItem(PropertyGridItem* _item) {
 	this->addChild(_item);
 }
 
-const ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName) const {
+const ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const {
 	for (int i = 0; this->childCount(); i++) {
 		const PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (p) {
 			if (p->getName() == _propertyName) return p;
 		}
-		else {
-			OT_LOG_W("Invalid child item");
+		if (!_searchChildGroups) continue;
+		const PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
+		if (g) {
+			p = g->findChildProperty(_propertyName, _searchChildGroups);
+			if (p) return p;
 		}
 	}
 	return nullptr;
@@ -93,6 +119,32 @@ std::list<const ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties(vo
 	for (int i = 0; i < this->childCount(); i++) {
 		const PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (p) ret.push_back(p);
+	}
+
+	return ret;
+}
+
+const ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::string& _name, bool _searchChildGroups) const {
+	for (int i = 0; this->childCount(); i++) {
+		const PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
+		if (g) {
+			if (g->getName() == _name) return g;
+			if (!_searchChildGroups) continue;
+			g = g->findChildGroup(_name, _searchChildGroups);
+			if (g) return g;
+		}
+	}
+	return nullptr;
+}
+
+std::list<const ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const {
+	std::list<const ot::PropertyGridGroup*> ret;
+
+	for (int i = 0; this->childCount(); i++) {
+		const PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
+		if (g) {
+			ret.push_back(g);
+		}
 	}
 
 	return ret;

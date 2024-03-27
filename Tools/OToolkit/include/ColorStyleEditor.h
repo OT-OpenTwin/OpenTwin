@@ -60,7 +60,9 @@ public:
 private slots:
 	void slotImportConfig(void);
 	void slotExportConfig(void);
-	void slotReset(void);
+	void slotBright(void);
+	void slotDark(void);
+	void slotBlue(void);
 	void slotGenerate(void);
 	void slotApplyAsCurrent(void);
 	void slotExport(void);
@@ -84,7 +86,10 @@ private:
 	std::map<std::string, ot::PropertyString*> m_files;
 
 	void initializeStyleSheetBase(void);
-	void initializeStyleValues(void);
+	void cleanUpData(void);
+	void initializeBrightStyleValues(void);
+	void initializeDarkStyleValues(void);
+	void initializeBlueStyleValues(void);
 	void parseStyleSheetBaseFile(void);
 	void initializePropertyGrid(void);
 	bool generateFile(std::string& _result);

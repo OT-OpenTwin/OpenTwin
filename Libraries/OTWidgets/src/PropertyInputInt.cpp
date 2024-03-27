@@ -44,3 +44,17 @@ void ot::PropertyInputInt::lclValueChanged(int) {
 	m_spinBox->setSpecialValueText("");
 	PropertyInput::slotValueChanged();
 }
+
+ot::Property* ot::PropertyInputInt::createPropertyConfiguration(void) const {
+	ot::PropertyInt* newProperty = new ot::PropertyInt;
+	newProperty->setPropertyName(this->propertyName());
+	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
+	newProperty->setPropertyTip(this->propertyTip().toStdString());
+	newProperty->setPropertyFlags(this->propertyFlags());
+
+	newProperty->setMin(m_spinBox->minimum());
+	newProperty->setMax(m_spinBox->maximum());
+	newProperty->setValue(m_spinBox->value());
+
+	return newProperty;
+}

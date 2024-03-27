@@ -12,6 +12,7 @@
 
 // Qt header
 #include <QtCore/qobject.h>
+#include <QtCore/qbytearray.h>
 #include <QtCore/qstringlist.h>
 
 // std header
@@ -32,6 +33,7 @@ namespace ot {
 		// Setter/Getter
 
 		void addStyle(const ColorStyle& _style, bool _replace = false);
+		void addStyle(QByteArray _rawStyle, bool _replace = false);
 		bool hasStyle(const std::string& _name) const;
 		const ColorStyle& getStyle(const std::string& _name, const ColorStyle& _default = ColorStyle()) const;
 
@@ -44,6 +46,8 @@ namespace ot {
 		bool addStyleRootSearchPath(const QString& _path);
 
 		QString styleRootPath(const std::string& _styleName) const;
+
+		void scanForStyleFiles(void);
 
 	Q_SIGNALS:
 		void currentStyleChanged(const ColorStyle& _style);

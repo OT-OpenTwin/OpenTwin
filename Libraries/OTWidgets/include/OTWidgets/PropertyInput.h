@@ -36,6 +36,9 @@ namespace ot {
 		//! @brief Returns the current value
 		virtual QVariant getCurrentValue(void) const = 0;
 
+		//! @brief Creates a property configuration that can be used to later create this object
+		virtual Property* createPropertyConfiguration(void) const = 0;
+
 		//! @brief Returns the root widget of the input (allows nested widgets)
 		virtual QWidget* getQWidget(void) override = 0;
 
@@ -50,6 +53,9 @@ namespace ot {
 
 		void setPropertyTitle(const QString& _title) { m_propertyTitle =_title; };
 		const QString& propertyTitle(void) const { return m_propertyTitle; };
+
+		void setPropertyTip(const QString& _tip) { m_propertyTip = _tip; };
+		const QString& propertyTip(void) const { return m_propertyTip; };
 
 	Q_SIGNALS:
 		//! @brief Is emitted whenever the user changed a value
@@ -68,6 +74,7 @@ namespace ot {
 	private:
 		std::string m_propertyName;
 		QString m_propertyTitle;
+		QString m_propertyTip;
 		Property::PropertyFlags m_flags;
 		bool m_dataChanged;
 	};

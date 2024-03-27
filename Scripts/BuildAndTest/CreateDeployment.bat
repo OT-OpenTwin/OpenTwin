@@ -169,6 +169,10 @@ REM Copy the icons
 MKDIR "%OT_DEPLOYMENT_DIR%\icons"
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Icons" "%OT_DEPLOYMENT_DIR%\icons"
 
+REM Copy the color styles
+MKDIR "%OT_DEPLOYMENT_DIR%\ColorStyles"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles" "%OT_DEPLOYMENT_DIR%\ColorStyles"
+
 REM GMSH
 COPY "%GMSH_ROOT_BIN%\gmsh.dll" "%OT_DEPLOYMENT_DIR%"
 

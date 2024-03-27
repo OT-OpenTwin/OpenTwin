@@ -37,3 +37,14 @@ QVariant ot::PropertyInputColor::getCurrentValue(void) const {
 QWidget* ot::PropertyInputColor::getQWidget(void) {
 	return m_colorBtn->getQWidget();
 }
+
+ot::Property* ot::PropertyInputColor::createPropertyConfiguration(void) const {
+	ot::PropertyColor* newProperty = new ot::PropertyColor;
+	newProperty->setPropertyName(this->propertyName());
+	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
+	newProperty->setPropertyTip(this->propertyTip().toStdString());
+	newProperty->setPropertyFlags(this->propertyFlags());
+	newProperty->setValue(m_colorBtn->otColor());
+
+	return newProperty;
+}

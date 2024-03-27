@@ -10,6 +10,7 @@
 
 // Qt header
 #include <QtCore/qdir.h>
+#include <QtCore/qdiriterator.h>
 
 ot::GlobalColorStyle& ot::GlobalColorStyle::instance(void) {
 	static GlobalColorStyle g_instance;
@@ -31,6 +32,24 @@ void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
 	if (m_currentStyle == _style.name()) {
 		Q_EMIT currentStyleChanged(m_styles[_style.name()]);
 	}
+}
+
+void ot::GlobalColorStyle::addStyle(QByteArray _rawStyle, bool _replace) {
+	if (_rawStyle.isEmpty()) return;
+	ColorStyle newStyle;
+
+	int ix = _rawStyle.indexOf('\n');
+	while (ix != (-1)) {
+		QString line = _rawStyle.left(ix);
+		_rawStyle.remove(0, ix + 1);
+		ix = _rawStyle.indexOf('\n');
+
+		if (line == "sheet:") {
+
+		}
+	}
+
+	this->addStyle(newStyle, _replace);
 }
 
 bool ot::GlobalColorStyle::hasStyle(const std::string& _name) const {
@@ -102,6 +121,22 @@ QString ot::GlobalColorStyle::styleRootPath(const std::string& _styleName) const
 	}
 	OT_LOG_W("Root path for style \"" + _styleName + "\" not found");
 	return QString();
+}
+
+void ot::GlobalColorStyle::scanForStyleFiles(void) {
+	for (const QString& pth : m_styleRootSearchPaths) {
+		QDirIterator it(pth, QStringList() << "*.otcsf", QDir::Files, QDirIterator::Subdirectories);
+
+		while (it.hasNext()) {
+			QString f = it.next();
+			QFile file(f);
+			if (!file.open(QIODevice::ReadOnly)) continue;
+			QByteArray data = file.readAll();
+			file.close();
+
+			this->addStyle(data, true);
+		}
+	}
 }
 
 ot::GlobalColorStyle::GlobalColorStyle() {

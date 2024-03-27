@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTGui/Painter2D.h"
+#include "OTGui/FillPainter2D.h"
 #include "OTGui/PropertyPainter2D.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/Painter2DEditButton.h"
@@ -40,4 +41,18 @@ QVariant ot::PropertyInputPainter2D::getCurrentValue(void) const {
 
 QWidget* ot::PropertyInputPainter2D::getQWidget(void) {
 	return m_button->getQWidget();
+}
+
+ot::Property* ot::PropertyInputPainter2D::createPropertyConfiguration(void) const {
+	ot::PropertyPainter2D* newProperty = new ot::PropertyPainter2D;
+	newProperty->setPropertyName(this->propertyName());
+	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
+	newProperty->setPropertyTip(this->propertyTip().toStdString());
+	newProperty->setPropertyFlags(this->propertyFlags());
+
+	const Painter2D* p = m_button->getPainter();
+	if (p) newProperty->setPainter(p->createCopy());
+	else newProperty->setPainter(new FillPainter2D);
+
+	return newProperty;
 }

@@ -25,6 +25,8 @@ namespace ot {
 
 		void setupFromConfig(const PropertyGroup* _group);
 
+		PropertyGroup* createConfiguration(void) const;
+
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);
 
@@ -39,8 +41,11 @@ namespace ot {
 		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
 		const QBrush& groupBrush(void) const { return m_groupBrush; };
 
-		const PropertyGridItem* findChildProperty(const std::string& _propertyName) const;
+		const PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
 		std::list<const PropertyGridItem*> childProperties(void) const;
+
+		const PropertyGridGroup* findChildGroup(const std::string& _name, bool _searchChildGroups) const;
+		std::list<const PropertyGridGroup*> childGroups(void) const;
 
 	private:
 		std::string m_name;
