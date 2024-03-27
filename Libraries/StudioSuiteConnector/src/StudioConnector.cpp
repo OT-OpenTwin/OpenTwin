@@ -1,4 +1,5 @@
 #include "StudioSuiteConnector/StudioConnector.h"
+#include "StudioSuiteConnector/ProgressInfo.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
@@ -13,6 +14,8 @@
 
 std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName)
 {
+	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
+
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
 
@@ -47,6 +50,8 @@ std::string StudioConnector::searchProjectAndExtractData(const std::string& file
 
 std::string StudioConnector::closeProject(const std::string& fileName)
 {
+	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
+
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
 
@@ -78,6 +83,8 @@ std::string StudioConnector::closeProject(const std::string& fileName)
 
 std::string StudioConnector::openProject(const std::string& fileName)
 {
+	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
+
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
 

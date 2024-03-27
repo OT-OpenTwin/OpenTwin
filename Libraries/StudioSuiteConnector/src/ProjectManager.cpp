@@ -87,7 +87,8 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName);
 
-		ProgressInfo::getInstance().setProgressValue(10);
+		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
+		ProgressInfo::getInstance().setProgressValue(15);
 
 		std::string hostName = QHostInfo::localHostName().toStdString();
 
@@ -150,7 +151,7 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		projectName = prjName;
 		changeMessage = changeComment;
 
-		ProgressInfo::getInstance().setProgressState(true, "Committing project changes", false);
+		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
 
 		// Determine the base project name (without .cst extension)
@@ -166,7 +167,8 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName);
 
-		ProgressInfo::getInstance().setProgressValue(10);
+		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
+		ProgressInfo::getInstance().setProgressValue(15);
 
 		std::string hostName = QHostInfo::localHostName().toStdString();
 
@@ -215,6 +217,9 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		StudioConnector studioObject;
 		studioObject.closeProject(fileName);
 
+		ProgressInfo::getInstance().setProgressState(true, "Getting project", false);
+		ProgressInfo::getInstance().setProgressValue(10);
+
 		// Delete project files
 		deleteLocalProjectFiles(baseProjectName);
 
@@ -222,7 +227,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		if (!restoreFromCache(baseProjectName, cacheFolderName, version))
 		{
 			// The project was not found in the cache. Therefore, the files need to be retrieved from the repo
-			ProgressInfo::getInstance().setProgressValue(10);
+			ProgressInfo::getInstance().setProgressValue(20);
 
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
@@ -231,6 +236,8 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		}
 		else
 		{
+			ProgressInfo::getInstance().setProgressValue(90);
+
 			// We have successfully restored the project data, so we can now open the project
 			studioObject.openProject(fileName);
 
@@ -253,7 +260,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 
 void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
 {
-	ProgressInfo::getInstance().setProgressValue(10);
+	ProgressInfo::getInstance().setProgressValue(15);
 
 	try
 	{
@@ -261,10 +268,10 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		std::filesystem::path projectPath(baseProjectName);
 		std::string projectRoot = projectPath.parent_path().string();
 
-		// Load the hash information for the entities
+		// Load the hash information for the entities 
 		ShapeTriangleHash shapeTriangleHash(infoEntityID, infoEntityVersion);
 
-		// Upload files
+		// Upload files (progress range 15-70)
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
 
 		// Send the units information
@@ -273,13 +280,13 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Send the material information
 		sendMaterialInformation(baseProjectName);
 
-		// Send the shapes information and triangulations
+		// Send the shapes information and triangulations (progress range 70-90)
 		sendShapeInformationAndTriangulation(baseProjectName, shapeTriangleHash);
 
 		// Create the new version
 		commitNewVersion(changeMessage);
 
-		ProgressInfo::getInstance().setProgressValue(70);
+		ProgressInfo::getInstance().setProgressValue(90);
 	}
 	catch (std::string& error)
 	{
@@ -548,6 +555,9 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 
 	DataBase::GetDataBase()->queueWriting(true);
 
+	int fileCount = 0;
+	int lastPercent = 15;
+
 	for (auto file : uploadFileList)
 	{
 		ot::UID dataEntityID = entityIDList.front(); entityIDList.pop_front();
@@ -605,9 +615,19 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 			DataBase::GetDataBase()->flushWritingQueue();
 			dataSize = 0;
 		}
+
+		int percent = (int)(50.0 * fileCount / uploadFileList.size() + 15.0);
+		if (percent > lastPercent)
+		{
+			ProgressInfo::getInstance().setProgressValue(percent);
+			lastPercent = percent;
+		}
+		fileCount++;
 	}
 
 	DataBase::GetDataBase()->queueWriting(false);
+
+	ProgressInfo::getInstance().setProgressValue(70);
 }
 
 void ProjectManager::commitNewVersion(const std::string &changeMessage)
@@ -701,6 +721,9 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 	// messages in case of many small objects.
 	size_t dataSize = 0;
 
+	int shapeCount = 0;
+	int lastPercent = 70;
+
 	for (auto shape : trianglesMap)
 	{
 		std::string fileContent;
@@ -726,12 +749,22 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 				shapeTriangles.clear();
 			}
 		}
+
+		int percent = (int)(15.0 * shapeCount / trianglesMap.size() + 70.0);
+		if (percent > lastPercent)
+		{
+			ProgressInfo::getInstance().setProgressValue(percent);
+			lastPercent = percent;
+		}
+		shapeCount++;
 	}
 
 	if (dataSize > 0)
 	{
 		sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
 	}
+
+	ProgressInfo::getInstance().setProgressValue(90);
 }
 
 std::string ProjectManager::calculateHash(const std::string& fileContent)
@@ -1014,10 +1047,22 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 
 	bool success = true;
 
+	// Here we have a progress range from 20-90
+	int entityCount = 0;
+	int lastPercent = 20;
 	for (auto entity : prefetchIDs)
 	{
 		// Download a single cache file
 		success &= downloadFile(cacheFolderVersion, entity.first, entity.second);
+
+		int percent = (int)(70.0 * entityCount / prefetchIDs.size() + 20.0);
+		if (percent > lastPercent)
+		{
+			ProgressInfo::getInstance().setProgressValue(percent);
+			lastPercent = percent;
+		}
+
+		entityCount++;
 	}
 
 	if (!success)
