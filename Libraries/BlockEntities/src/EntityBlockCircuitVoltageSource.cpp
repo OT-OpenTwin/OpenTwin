@@ -29,7 +29,7 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 void EntityBlockCircuitVoltageSource::createProperties()
 {
 	EntityPropertiesString::createProperty("Element Property", "ElementType", "100", "default", getProperties());
-	EntityPropertiesSelection::createProperty("Element Property", "Type", { "dc","ac" }, "dc", "default", getProperties());
+	EntityPropertiesSelection::createProperty("Element Property", "Type", { "DC","AC" }, "DC", "default", getProperties());
 
 	createACProperties();
 	SetVisibleACProperties(false);
@@ -117,7 +117,7 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 	bool refresh = false;
 	auto baseProperty = getProperties().getProperty("Type");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
-	if (selectionProperty->getValue() == "ac")
+	if (selectionProperty->getValue() == "AC")
 	{
 		refresh = SetVisibleACProperties(true);
 	}

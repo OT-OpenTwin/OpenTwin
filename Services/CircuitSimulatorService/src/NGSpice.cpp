@@ -99,8 +99,17 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	//Here i first create the Title of the Netlist
 	std::string TitleLine = "circbyline *Test";
-	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
 
+	//ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
+	//ngSpice_Command(const_cast<char*>("circbyline R1 0 1 200"));
+	////ngSpice_Command(const_cast<char*>("circbyline iin 0 1 AC 1"));
+	//ngSpice_Command(const_cast<char*>("circbyline V1 0 1 AC 10 sin(0 1 1k)"));
+	//ngSpice_Command(const_cast<char*>("circbyline .ac dec 10 .01 10"));
+	//ngSpice_Command(const_cast<char*>("circbyline .Control"));
+	//ngSpice_Command(const_cast<char*>("circbyline run"));
+	//ngSpice_Command(const_cast<char*>("circbyline asciiplot all"));
+	//ngSpice_Command(const_cast<char*>("circbyline .endc"));
+	//ngSpice_Command(const_cast<char*>("circbyline .end"));
 
 	//Now i get the SimulationLine depending on which simulation i chose
 	std::string simulationLine = "";
@@ -120,6 +129,9 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		simulationLine = generateNetlistACSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
 		
 	}
+
+	simulationLine = "circbyline " + simulationLine;
+	printSettings = "circbyline " + printSettings;
 	
 
 	//Here i create and generate all the netlist Elements and their relation to each other line by line
@@ -161,6 +173,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 		netlistLine += netlistNodeNumbers;
+
 		if (netlistVoltageSourceType != "")
 		{
 			netlistLine += netlistVoltageSourceType;
@@ -174,8 +187,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	}
 
 
-	simulationLine = "circbyline " + simulationLine;
-	printSettings = "circbyline " + printSettings;
+	
 
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
