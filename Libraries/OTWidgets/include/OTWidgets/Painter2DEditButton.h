@@ -30,6 +30,8 @@ namespace ot{
 		Painter2DEditButton(const Painter2D* _painter);
 		virtual ~Painter2DEditButton();
 
+		virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
+
 		virtual QWidget* getQWidget(void) override { return m_rootWidget; };
 		PushButton* getButton(void) const { return m_btn; };
 
@@ -47,8 +49,11 @@ namespace ot{
 		QWidget* m_rootWidget;
 		Painter2D* m_painter;
 		PushButton* m_btn;
+		QString m_btnTip;
+		QString m_btnText;
 		Painter2DPreview* m_preview;
 
+		void ini(void);
 		void updateText(void);
 	};
 }

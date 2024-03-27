@@ -22,33 +22,14 @@ class QSplitter;
 class QHBoxLayout;
 class QVBoxLayout;
 
-namespace ot { 
-	class PropertyGrid; 
+namespace ot {
+	class LineEdit;
 	class Painter2D;
+	class TextEditor;
+	class PropertyGrid; 
+	class PropertyString;
+	class PropertyPainter2D;
 }
-
-class ColorStyleEditorEntry {
-public:
-	enum EntryType {
-		ColorEntry,
-		FileEntry
-	};
-	enum ColorMode {
-		FillMode,
-		GradientMode,
-	};
-
-
-public:
-	ColorStyleEditorEntry();
-	virtual ~ColorStyleEditorEntry();
-
-
-
-private:
-	std::string m_name;
-
-};
 
 class ColorStyleEditor : public QObject, public otoolkit::Tool {
 	Q_OBJECT
@@ -75,19 +56,21 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private slots:
-	void slotImport(void);
+	void slotReset(void);
+	void slotGenerate(void);
 	void slotExport(void);
-	void slotShowPreview(void);
 
 private:
 	QSplitter* m_root;
 	ot::PropertyGrid* m_propertyGrid;
+	ot::TextEditor* m_editor;
 
 	QString m_currentName;
-	std::map<std::string, const ot::Painter2D*> m_styleValues;
-
+	std::map<std::string, ot::PropertyPainter2D*> m_styleValues;
+	std::map<std::string, ot::PropertyPainter2D*> m_colors;
+	std::map<std::string, ot::PropertyString*> m_files;
 
 	void initializeStyleValues(void);
-	void rebuildProperties(void);
+	void initializePropertyGrid(void);
 
 };

@@ -31,10 +31,14 @@ namespace ot {
 
 		virtual QWidget* getQWidget(void) override { return this; };
 
+		void setMaintainAspectRatio(bool _maintain) { m_maintainAspectRatio = _maintain; };
+		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };
+
 	private Q_SLOTS:
 		void slotGlobalStyleChanged(const ColorStyle& _style);
 
 	private:
+		bool m_maintainAspectRatio;
 		QBrush m_brush;
 	};
 
