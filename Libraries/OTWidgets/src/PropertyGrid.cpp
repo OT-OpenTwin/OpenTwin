@@ -47,7 +47,7 @@ protected:
 	}
 };
 
-ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject), m_defaultGroup(nullptr) {
+ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) {
 	m_tree = new PropertyGrid::PropertyGridTree;
 	m_tree->setColumnCount(2);
 	m_tree->setHeaderLabels({ "Name", "Value" });
@@ -69,13 +69,13 @@ ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 }
 
 void ot::PropertyGrid::setupFromConfig(const PropertyGridCfg& _config) {
-	for (Property* itm : _config.defaultGroup()->properties()) {
+	for (const Property* itm : _config.defaultGroup()->properties()) {
 		PropertyGridItem* newItm = new PropertyGridItem;
 		newItm->setupFromConfig(itm);
 		this->addRootItem(newItm);
 		newItm->finishSetup();
 	}
-	for (PropertyGroup* group : _config.rootGroups()) {
+	for (const PropertyGroup* group : _config.rootGroups()) {
 		PropertyGridGroup* newGroup = new PropertyGridGroup;
 		newGroup->setupFromConfig(group);
 		this->addGroup(newGroup);
@@ -84,11 +84,53 @@ void ot::PropertyGrid::setupFromConfig(const PropertyGridCfg& _config) {
 }
 
 void ot::PropertyGrid::addRootItem(PropertyGridItem* _item) {
+	if (_item->getName().empty()) {
+		OT_LOG_W("Item name is empty");
+	}
 	m_tree->addTopLevelItem(_item);
 }
 
 void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
+	if (_group->getName().empty()) {
+		OT_LOG_W("Group name is empty. Group wont be findable trough find group");
+	}
 	m_tree->addTopLevelItem(_group);
+}
+
+const ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _groupName) const {
+	if (_groupName.empty()) return nullptr;
+	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
+		const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
+		if (g) {
+			if (g->getName() == _groupName) return g;
+		}
+	}
+	return nullptr;
+}
+
+const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemName) const {
+	if (_itemName.empty()) return nullptr;
+	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
+		const PropertyGridItem* itm = dynamic_cast<const PropertyGridItem*>(m_tree->topLevelItem(i));
+		if (itm) {
+			if (itm->getName() == _itemName) return itm;
+		}
+		else {
+			const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
+			if (g) {
+				const PropertyGridItem* itm = g->findChildProperty(_itemName);
+				if (itm) return itm;
+			}
+		}
+		
+	}
+	return nullptr;
+}
+
+const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _groupName, const std::string& _itemName) const {
+	const PropertyGridGroup* g = this->findGroup(_groupName);
+	if (g) return g->findChildProperty(_itemName);
+	else return nullptr;
 }
 
 void ot::PropertyGrid::clear(void) {

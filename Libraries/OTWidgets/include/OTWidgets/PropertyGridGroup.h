@@ -23,7 +23,7 @@ namespace ot {
 		PropertyGridGroup();
 		virtual ~PropertyGridGroup();
 
-		void setupFromConfig(PropertyGroup* _group);
+		void setupFromConfig(const PropertyGroup* _group);
 
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);
@@ -38,6 +38,9 @@ namespace ot {
 
 		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
 		const QBrush& groupBrush(void) const { return m_groupBrush; };
+
+		const PropertyGridItem* findChildProperty(const std::string& _propertyName) const;
+		std::list<const PropertyGridItem*> childProperties(void) const;
 
 	private:
 		std::string m_name;

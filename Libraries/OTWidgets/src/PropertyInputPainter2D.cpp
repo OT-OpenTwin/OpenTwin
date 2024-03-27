@@ -32,7 +32,10 @@ void ot::PropertyInputPainter2D::addPropertyInputValueToJson(ot::JsonValue& _obj
 }
 
 QVariant ot::PropertyInputPainter2D::getCurrentValue(void) const {
-	return QVariant();
+	JsonDocument doc;
+	m_button->getPainter()->addToJsonObject(doc, doc.GetAllocator());
+
+	return QVariant(QByteArray::fromStdString(doc.toJson()));
 }
 
 QWidget* ot::PropertyInputPainter2D::getQWidget(void) {

@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
 #include "OTGui/GradientPainter2D.h"
 
 #define OT_JSON_MEMBER_Stops "Stops"
@@ -53,4 +53,23 @@ void ot::GradientPainter2D::addStop(const GradientPainterStop2D& _stop) {
 
 void ot::GradientPainter2D::addStops(const std::vector<GradientPainterStop2D>& _stops) {
 	for (auto s : _stops) m_stops.push_back(s);
+}
+
+void ot::GradientPainter2D::addStopsAndSpreadToQss(std::string& _targetString) const {
+	switch (m_spread)
+	{
+	case ot::PadSpread: _targetString.append(", spread: pad"); break;
+	case ot::RepeatSpread: _targetString.append(", spread: repeat"); break;
+	case ot::ReflectSpread: _targetString.append(", spread: reflect"); break;
+	default:
+		OT_LOG_E("Unknown spread");
+		break;
+	}
+	for (const GradientPainterStop2D& s : m_stops) {
+		_targetString.append(", stop: " + std::to_string(s.pos()) +
+			" rgba(" + std::to_string(s.color().rInt()) +
+			", " + std::to_string(s.color().gInt()) +
+			", " + std::to_string(s.color().bInt()) +
+			", " + std::to_string(s.color().aInt()) + ")");
+	}
 }

@@ -47,3 +47,20 @@ void ot::RadialGradientPainter2D::setFocalPoint(const ot::Point2DD& _focal) {
 	m_focal = _focal;
 	m_focalSet = true;
 }
+
+std::string ot::RadialGradientPainter2D::generateQss(void) const {
+	std::string ret = "qradialgradient(cx: " + std::to_string(m_center.x()) +
+						", cy: " + std::to_string(m_center.y()) +
+						", radius: " + std::to_string(m_centerRadius);
+	if (m_focalSet) {
+		ret.append(", fx: " + std::to_string(m_focal.x()) +
+			", fy: " + std::to_string(m_focal.y()) +
+			", fradius: " + std::to_string(m_focalRadius)
+		);
+	}
+	
+	this->addStopsAndSpreadToQss(ret);
+	ret.append(")");
+
+	return ret;
+}

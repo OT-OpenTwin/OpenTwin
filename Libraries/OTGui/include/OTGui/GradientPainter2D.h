@@ -39,6 +39,9 @@ namespace ot {
 		void setSpread(GradientSpread _spread) { m_spread = _spread; };
 		GradientSpread spread(void) const { return m_spread; };
 
+	protected:
+		void addStopsAndSpreadToQss(std::string& _targetString) const;
+
 	private:
 		std::vector<GradientPainterStop2D> m_stops;
 		GradientSpread m_spread;

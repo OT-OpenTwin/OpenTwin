@@ -38,3 +38,15 @@ void ot::LinearGradientPainter2D::setFromJsonObject(const ConstJsonObject& _obje
 	m_start.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Start));
 	m_finalStop.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_FinalStop));
 }
+
+std::string ot::LinearGradientPainter2D::generateQss(void) const {
+	std::string ret = "qlineargradient(x1: " + std::to_string(m_start.x()) +
+		", y1: " + std::to_string(m_start.y()) +
+		", x2: " + std::to_string(m_finalStop.x()) +
+		", y2: " + std::to_string(m_finalStop.y());
+
+	this->addStopsAndSpreadToQss(ret);
+	ret.append(")");
+
+	return ret;
+}

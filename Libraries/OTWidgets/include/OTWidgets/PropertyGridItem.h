@@ -25,7 +25,7 @@ namespace ot {
 
 		//! @brief Setup the item
 		//! Note that the item must be placed in a tree before calling the setup
-		bool setupFromConfig(Property* _config);
+		virtual bool setupFromConfig(const Property* _config);
 
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);

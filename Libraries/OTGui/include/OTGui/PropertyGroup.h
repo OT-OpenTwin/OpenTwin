@@ -78,6 +78,8 @@ namespace ot {
 		void setBackgroundPainter(Painter2D* _painter);
 		Painter2D* backgroundPainter(void) const { return m_backgroundPainter; };
 
+		void clear(bool _keepGroups = false);
+
 	private:
 		std::string m_name;
 		std::string m_title;

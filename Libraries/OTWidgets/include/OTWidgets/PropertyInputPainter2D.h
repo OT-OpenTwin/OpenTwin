@@ -23,6 +23,8 @@ namespace ot {
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 
+		Painter2DEditButton* getButton(void) const { return m_button; };
+
 	private:
 		Painter2DEditButton* m_button;
 	};

@@ -28,6 +28,8 @@ namespace ot {
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 
+		const QString& getCurrentText(void) const { return m_text; };
+
 	private Q_SLOTS:
 		void lclValueChanged(void);
 

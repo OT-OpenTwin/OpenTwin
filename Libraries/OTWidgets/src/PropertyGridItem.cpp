@@ -20,7 +20,7 @@ ot::PropertyGridItem::~PropertyGridItem() {
 
 }
 
-bool ot::PropertyGridItem::setupFromConfig(Property * _config) {
+bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 	m_name = _config->propertyName();
 	this->setText(0, QString::fromStdString(_config->propertyTitle()));
 	if (m_input) delete m_input;

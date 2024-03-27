@@ -28,7 +28,7 @@ ot::PropertyGridGroup::~PropertyGridGroup() {
 
 }
 
-void ot::PropertyGridGroup::setupFromConfig(PropertyGroup* _group) {
+void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_name = _group->name();
 	m_groupBrush = Painter2DFactory::brushFromPainter2D(_group->backgroundPainter());
 
@@ -72,4 +72,28 @@ QString ot::PropertyGridGroup::getTitle(void) const {
 
 void ot::PropertyGridGroup::addItem(PropertyGridItem* _item) {
 	this->addChild(_item);
+}
+
+const ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName) const {
+	for (int i = 0; this->childCount(); i++) {
+		const PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
+		if (p) {
+			if (p->getName() == _propertyName) return p;
+		}
+		else {
+			OT_LOG_W("Invalid child item");
+		}
+	}
+	return nullptr;
+}
+
+std::list<const ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties(void) const {
+	std::list<const ot::PropertyGridItem*> ret;
+
+	for (int i = 0; i < this->childCount(); i++) {
+		const PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
+		if (p) ret.push_back(p);
+	}
+
+	return ret;
 }

@@ -31,13 +31,25 @@ namespace ot {
 		PropertyGrid(QObject* _parentObject = (QObject*)nullptr);
 		virtual ~PropertyGrid();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions
+
 		virtual QWidget* getQWidget(void) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
 
 		TreeWidget* getTreeWidget(void) const;
 
 		void setupFromConfig(const PropertyGridCfg& _config);
 		void addRootItem(PropertyGridItem* _item);
 		void addGroup(PropertyGridGroup* _group);
+
+		const PropertyGridGroup* findGroup(const std::string& _groupName) const;
+		const PropertyGridItem* findItem(const std::string& _itemName) const;
+		const PropertyGridItem* findItem(const std::string& _groupName, const std::string& _itemName) const;
 
 		void clear(void);
 
@@ -48,9 +60,6 @@ namespace ot {
 	private:
 		class PropertyGridTree;
 		PropertyGridTree* m_tree;
-
-		PropertyGridGroup* m_defaultGroup;
-		std::list<PropertyGridGroup*> m_groups;
 	};
 
 }

@@ -110,3 +110,17 @@ void ot::PropertyGroup::setBackgroundPainter(Painter2D* _painter) {
 	if (m_backgroundPainter && m_backgroundPainter != _painter) delete m_backgroundPainter;
 	m_backgroundPainter = _painter;
 }
+
+void ot::PropertyGroup::clear(bool _keepGroups) {
+	if (!_keepGroups) {
+		for (PropertyGroup* g : m_childGroups) {
+			delete g;
+		}
+		m_childGroups.clear();
+	}
+	
+	for (Property* p : m_properties) {
+		delete p;
+	}
+	m_properties.clear();
+}

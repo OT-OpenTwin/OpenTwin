@@ -8,6 +8,7 @@
 // Toolkit API header
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/Color.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OToolkitAPI/Tool.h"
 
 // Qt header
@@ -25,6 +26,7 @@ class QVBoxLayout;
 namespace ot {
 	class LineEdit;
 	class Painter2D;
+	class TabWidget;
 	class TextEditor;
 	class PropertyGrid; 
 	class PropertyString;
@@ -56,21 +58,34 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private slots:
+	void slotImportConfig(void);
+	void slotExportConfig(void);
 	void slotReset(void);
 	void slotGenerate(void);
+	void slotApplyAsCurrent(void);
 	void slotExport(void);
 
 private:
-	QSplitter* m_root;
-	ot::PropertyGrid* m_propertyGrid;
-	ot::TextEditor* m_editor;
+	QByteArray m_sheetBase;
 
-	QString m_currentName;
+	QWidget* m_root;
+	ot::PropertyGrid* m_propertyGrid;
+	ot::TabWidget* m_editorTab;
+	ot::TextEditor* m_baseEditor;
+	ot::TextEditor* m_editor;
+	ot::PropertyGridCfg m_propertyGridConfig;
+
+	ot::PropertyString* m_nameProp;
+	ot::PropertyGroup* m_styleValuesGroup;
+	ot::PropertyGroup* m_colorsGroup;
+	ot::PropertyGroup* m_fileGroup;
 	std::map<std::string, ot::PropertyPainter2D*> m_styleValues;
 	std::map<std::string, ot::PropertyPainter2D*> m_colors;
 	std::map<std::string, ot::PropertyString*> m_files;
 
+	void initializeStyleSheetBase(void);
 	void initializeStyleValues(void);
+	void parseStyleSheetBaseFile(void);
 	void initializePropertyGrid(void);
-
+	bool generateFile(std::string& _result);
 };
