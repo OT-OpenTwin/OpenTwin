@@ -30,6 +30,7 @@
 #include "EntityGeometry.h"
 #include "EntityFile.h"
 #include "EntityBinaryData.h"
+#include "ShapeTriangleHash.h"
 
 #include "boost/algorithm/string.hpp"
 
@@ -108,7 +109,9 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 	{
 		std::list<std::string> names = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Name);
 		std::list<std::string> triangles = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
-		shapeTriangles(names, triangles);
+		std::list<std::string> hash = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Hash);
+
+		shapeTriangles(names, triangles, hash);
 		return "";
 	}
 	else if (_action == OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME)
@@ -401,7 +404,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	for (auto file : fileInfo)
 	{
-		if (file.getType() == "EntityFile")
+		if (file.getType() == "EntityFile" && file.getName() != "Files/Information")
 		{
 			entityID.push_back(file.getID());
 			versionID.push_back(file.getVersion());
@@ -432,8 +435,11 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	std::list<std::string> deletedNameList = ot::json::getStringList(_doc, OT_ACTION_CMD_MODEL_DeleteEntity);
 
-	// Now we need to send the model change to the model service 
+	// We need to finalize the shape triangle information
+	shapeTriangleHash.writeInformation();
+	shapeTriangleHash.addDeletedShapesToList(deletedNameList);
 
+	// Now we need to send the model change to the model service 
 	for (auto item : modifiedNameList)
 	{
 		ot::UID fileEntityID = fileEntityIDList.front(); fileEntityIDList.pop_front();
@@ -667,23 +673,39 @@ void Application::readDoubleTriple(const std::string& line, double& a, double& b
 
 void Application::shapeInformation(const std::string &content)
 {
+	shapeTriangleHash.setData(this);
+	shapeTriangleHash.readInformation();
+
+	std::map<std::string, bool> previousShape;
+	shapeTriangleHash.getShapes(previousShape);
+
 	std::stringstream data(content);
 
 	while (!data.eof())
 	{
 		std::string name, material;
 
-		data >> name;
-		data >> material;
+		std::getline(data, name);
+		std::getline(data, material);
 
-		if (!name.empty())
+		if (!name.empty() && !material.empty())
 		{
 			shapeMaterials[name] = material;
+			previousShape[name] = true;
+		}
+	}
+
+	for (auto shape : previousShape)
+	{
+		if (!shape.second)
+		{
+			// This shape existed before, but was not processed this time anyore -> the shape has been deleted
+			shapeTriangleHash.deleteShape(shape.first);
 		}
 	}
 }
 
-void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles)
+void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash)
 {
 	std::string materialsFolder = "Materials";
 
@@ -698,11 +720,15 @@ void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<s
 	ot::UID materialsFolderID = entityInfo.front().getID();
 
 	auto triangles = shapeTriangles.begin();
+	auto hash      = shapeHash.begin();
 
 	for (auto name : shapeNames)
 	{
 		storeShape(name, *triangles, materialsFolder, materialsFolderID);
+		shapeTriangleHash.setShapeHash(name, *hash);
+
 		triangles++;
+		hash++;
 	}
 }
 

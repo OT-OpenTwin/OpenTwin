@@ -804,10 +804,10 @@ std::map<std::string, int> ProjectManager::determineAllShapes(std::stringstream 
 	{
 		std::string name, material;
 
-		fileContent >> name;
-		fileContent >> material;
+		std::getline(fileContent, name);
+		std::getline(fileContent, material);
 
-		if (!name.empty())
+		if (!name.empty() && !material.empty())
 		{
 			shapeNameToIdMap[name] = id;
 			id++;
