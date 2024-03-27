@@ -16,6 +16,8 @@ void ShapeTriangleHash::readInformation()
 	shapeHashMap.clear();
 	deletedShapes.clear();
 	hasChanged = false;
+	infoEntityID = 0;
+	infoEntityVersion = 0;
 
 	ot::EntityInformation triangleInfoItem;
 	if (application->modelComponent()->getEntityInformation("Files/Information", triangleInfoItem))
@@ -25,6 +27,9 @@ void ShapeTriangleHash::readInformation()
 
 		if (fileEntity != nullptr)
 		{
+			infoEntityID = fileEntity->getData()->getEntityID();
+			infoEntityVersion = fileEntity->getData()->getEntityStorageVersion();
+
 			size_t size = fileEntity->getData()->getData().size();
 
 			std::stringstream dataContent;
@@ -42,6 +47,9 @@ void ShapeTriangleHash::readInformation()
 					shapeHashMap[name] = hash;
 				}
 			}
+
+			delete fileEntity;
+			fileEntity = nullptr;
 		}
 	}
 }
@@ -131,6 +139,9 @@ void ShapeTriangleHash::writeInformation()
 	// And add them to the model
 	application->modelComponent()->addNewTopologyEntity(fileEntity->getEntityID(), fileEntity->getEntityStorageVersion(), false);
 	application->modelComponent()->addNewDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion(), fileEntity->getEntityID());
+
+	delete fileEntity;
+	fileEntity = nullptr;
 }
 
 void ShapeTriangleHash::addDeletedShapesToList(std::list<std::string>& list)

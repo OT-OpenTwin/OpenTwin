@@ -251,7 +251,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 	}
 }
 
-void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList)
+void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
 {
 	ProgressInfo::getInstance().setProgressValue(10);
 
@@ -260,6 +260,9 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Determine the project root folder
 		std::filesystem::path projectPath(baseProjectName);
 		std::string projectRoot = projectPath.parent_path().string();
+
+		// Load the hash information for the entities
+		ShapeTriangleHash shapeTriangleHash(infoEntityID, infoEntityVersion);
 
 		// Upload files
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
@@ -271,7 +274,7 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		sendMaterialInformation(baseProjectName);
 
 		// Send the shapes information and triangulations
-		sendShapeInformationAndTriangulation(baseProjectName);
+		sendShapeInformationAndTriangulation(baseProjectName, shapeTriangleHash);
 
 		// Create the new version
 		commitNewVersion(changeMessage);
@@ -669,7 +672,7 @@ void ProjectManager::sendMaterialInformation(const std::string& projectRoot)
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }
 
-void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot)
+void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot, ShapeTriangleHash &shapeTriangleHash)
 {
 	std::string fileContent;
 	readFileContent(projectRoot + "/Temp/Upload/shape.info", fileContent);
@@ -685,10 +688,10 @@ void ProjectManager::sendShapeInformationAndTriangulation(const std::string& pro
 	std::map<std::string, int> allShapesMap = determineAllShapes(std::stringstream(fileContent));
 	 
 	// Now send the modified triangulations (one by one)
-	sendTriangulations(projectRoot, allShapesMap);
+	sendTriangulations(projectRoot, allShapesMap, shapeTriangleHash);
 }
 
-void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap)
+void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap, ShapeTriangleHash& shapeTriangleHash)
 {
 	std::list<std::string> shapeNames;
 	std::list<std::string> shapeTriangles;
@@ -705,20 +708,23 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 
 		std::string hash = calculateHash(fileContent);
 
-		// TODO: Compare hash
-
-		shapeNames.push_back(shape.first);
-		shapeTriangles.push_back(fileContent);
-		shapeHash.push_back(hash);
-
-		dataSize += (shape.first.size() + fileContent.size() + shapeHash.size());
-
-		if (dataSize > 10000000)
+		if (shapeTriangleHash.getHash(shape.first) != hash)
 		{
-			sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
-			dataSize = 0;
-			shapeNames.clear();
-			shapeTriangles.clear();
+			// The hash value is different -> sending the shape is required
+
+			shapeNames.push_back(shape.first);
+			shapeTriangles.push_back(fileContent);
+			shapeHash.push_back(hash);
+
+			dataSize += (shape.first.size() + fileContent.size() + shapeHash.size());
+
+			if (dataSize > 10000000)
+			{
+				sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
+				dataSize = 0;
+				shapeNames.clear();
+				shapeTriangles.clear();
+			}
 		}
 	}
 

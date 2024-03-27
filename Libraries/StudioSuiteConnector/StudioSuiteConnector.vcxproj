@@ -25,6 +25,7 @@
     <ClCompile Include="src\ProjectInformationDialog.cpp" />
     <ClCompile Include="src\ProjectManager.cpp" />
     <ClCompile Include="src\ServiceConnector.cpp" />
+    <ClCompile Include="src\ShapeTriangleHash.cpp" />
     <ClCompile Include="src\StudioConnector.cpp" />
     <ClCompile Include="src\StudioSuiteConnectorAPI.cpp" />
     <ClCompile Include="src\VersionFile.cpp" />
@@ -35,6 +36,7 @@
     <QtMoc Include="include\StudioSuiteConnector\ProjectInformationDialog.h" />
     <ClInclude Include="include\StudioSuiteConnector\ProjectManager.h" />
     <ClInclude Include="include\StudioSuiteConnector\ServiceConnector.h" />
+    <ClInclude Include="include\StudioSuiteConnector\ShapeTriangleHash.h" />
     <ClInclude Include="include\StudioSuiteConnector\StudioConnector.h" />
     <ClInclude Include="include\StudioSuiteConnector\StudioSuiteConnectorAPI.h" />
     <ClInclude Include="include\StudioSuiteConnector\VersionFile.h" />

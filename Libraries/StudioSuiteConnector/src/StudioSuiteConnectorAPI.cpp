@@ -93,8 +93,10 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 
 		std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 		std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+		ot::UID infoEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
+		ot::UID infoEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
 
-		std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList);
+		std::thread workerThread(StudioSuiteConnectorAPI::uploadFiles, entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
 		workerThread.detach();
 	}
 	else if (action == OT_ACTION_CMD_UI_SS_DOWNLOAD) {
@@ -349,9 +351,9 @@ void StudioSuiteConnectorAPI::getProject(std::string fileName, std::string proje
 	ProjectManager::getInstance().getProject(fileName, projectName, version);
 }
 
-void StudioSuiteConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
+void StudioSuiteConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
 {
-	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList);
+	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
 }
 
 void StudioSuiteConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)

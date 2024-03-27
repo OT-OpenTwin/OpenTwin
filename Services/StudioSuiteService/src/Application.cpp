@@ -384,11 +384,17 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 		versionID.push_back(m_modelComponent->createEntityUID());
 	}
 
+	// Read the information
+	shapeTriangleHash.setData(this);
+	shapeTriangleHash.readInformation();
+
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
-	
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, shapeTriangleHash.getInfoEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, shapeTriangleHash.getInfoEntityVersion(), doc.GetAllocator());
+
 	uiComponent()->sendMessage(true, doc);
 }
 
@@ -673,9 +679,6 @@ void Application::readDoubleTriple(const std::string& line, double& a, double& b
 
 void Application::shapeInformation(const std::string &content)
 {
-	shapeTriangleHash.setData(this);
-	shapeTriangleHash.readInformation();
-
 	std::map<std::string, bool> previousShape;
 	shapeTriangleHash.getShapes(previousShape);
 
