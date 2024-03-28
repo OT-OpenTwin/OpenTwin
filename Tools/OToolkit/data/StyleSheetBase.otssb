@@ -37,7 +37,7 @@ QWidget:disabled {
 }
 
 QWidget::item {
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
 }
 
 QWidget::item:!selected {
@@ -45,7 +45,7 @@ QWidget::item:!selected {
 }
 
 QWidget::item:hover:!selected {
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
 }
 
 /* ##################################################################################### */
@@ -61,7 +61,7 @@ QMainWindow::separator {
 
 QMainWindow::separator:hover {
     background-color: %color:Widget Background 5%;
-    border: 0px solid %color:Accent Color 3%;
+    border: 0px solid %color:Widget Hover Color 1%;
 }
 
 QMainWindow::separator:horizontal {
@@ -107,7 +107,7 @@ QStatusBar::item {
 }
 
 QToolTip {
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
     border-color: %color:Border Color 1%;
     color: %color:Widget Background 1%;
 
@@ -342,7 +342,7 @@ QMenuBar {
     padding: 2px;
     border-color: %color:Border Color 1%;
     color: %color:Text Color 1%;
-    selection-background-color: %color:Accent Color 3%;
+    selection-background-color: %color:Widget Hover Color 1%;
 }
 
 QMenuBar:focus {
@@ -358,13 +358,13 @@ QMenuBar::item:selected {
     padding: 4px;
     background: transparent;
     border: 0px solid %color:Widget Background 3%;
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
 }
 
 QMenuBar::item:pressed {
     padding: 4px;
     border: 0px solid %color:Widget Background 3%;
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
     color: %color:Text Color 1%;
     margin-bottom: 0px;
     padding-bottom: 0px;
@@ -379,7 +379,7 @@ QMenu {
     color: %color:Text Color 1%;
     margin: 0px;
     background-color: %color:Widget Background 2%;
-    selection-background-color: %color:Accent Color 3%;
+    selection-background-color: %color:Widget Hover Color 1%;
 }
 
 QMenu::separator {
@@ -397,11 +397,11 @@ QMenu::item {
 
 QMenu::item:selected {
     color: %color:Text Color 1%;
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
 }
 
 QMenu::item:pressed {
-    background-color: %color:Accent Color 3%;
+    background-color: %color:Widget Hover Color 1%;
 }
 
 QMenu::icon {
@@ -1579,14 +1579,14 @@ QTabBar, QDockWidget QTabBar::tab:top {
 
 QTabBar, QDockWidget QTabBar::tab:top:selected {
     background-color: %color:Widget Background 4%;
-    border-bottom: 3px solid %color:Accent Color 4%;
+    border-bottom: 3px solid %color:Widget Hover Color 2%;
     border-top-left-radius: %number:Border Radius 1%;
     border-top-right-radius: %number:Border Radius 1%;
 }
 
 QTabBar, QDockWidget QTabBar::tab:top:!selected:hover {
     border-coor: %color:Border Selection Color 3%;
-    border-bottom: 3px solid %color:Accent Color 3%;
+    border-bottom: 3px solid %color:Widget Hover Color 1%;
     padding-left: 3px;
     padding-right: 3px;
 }
@@ -1606,14 +1606,14 @@ QTabBar, QDockWidget QTabBar::tab:bottom {
 
 QTabBar, QDockWidget QTabBar::tab:bottom:selected {
     background-color: %color:Widget Background 4%;
-    border-top: 3px solid %color:Accent Color 4%;
+    border-top: 3px solid %color:Widget Hover Color 2%;
     border-bottom-left-radius: %number:Border Radius 1%;
     border-bottom-right-radius: %number:Border Radius 1%;
 }
 
 QTabBar, QDockWidget QTabBar::tab:bottom:!selected:hover {
     border-coor: %color:Border Selection Color 3%;
-    border-top: 3px solid %color:Accent Color 3%;
+    border-top: 3px solid %color:Widget Hover Color 1%;
     padding-left: 3px;
     padding-right: 3px;
 }
@@ -1632,12 +1632,12 @@ QTabBar, QDockWidget QTabBar::tab:left {
 
 QTabBar, QDockWidget QTabBar::tab:left:selected {
     background-color: %color:Widget Background 4%;
-    border-right: 3px solid %color:Accent Color 4%;
+    border-right: 3px solid %color:Widget Hover Color 2%;
 }
 
 QTabBar, QDockWidget QTabBar::tab:left:!selected:hover {
     border-coor: %color:Border Selection Color 3%;
-    border-right: 3px solid %color:Accent Color 3%;
+    border-right: 3px solid %color:Widget Hover Color 1%;
     margin-right: 0px;
     padding-right: -1px;
 }
@@ -1656,12 +1656,12 @@ QTabBar, QDockWidget QTabBar::tab:right {
 
 QTabBar, QDockWidget QTabBar::tab:right:selected {
     background-color: %color:Widget Background 4%;
-    border-left: 3px solid %color:Accent Color 4%;
+    border-left: 3px solid %color:Widget Hover Color 2%;
 }
 
 QTabBar, QDockWidget QTabBar::tab:right:!selected:hover {
     border-coor: %color:Border Selection Color 3%;
-    border-left: 3px solid %color:Accent Color 3%;
+    border-left: 3px solid %color:Widget Hover Color 1%;
     margin-left: 0px;
     padding-left: 0px;
 }
@@ -1704,6 +1704,7 @@ QDockWidget {
     outline: %color:Border Color 2%;
     background-color: %color:Widget Background 1%;
     border-color: %color:Border Color 2%;
+    border-width: %number:Border Width 2%;
     border-radius: %number:Border Radius 1%;
     titlebar-close-icon: url('%file:/icons/transparent.png%');
     titlebar-normal-icon: url('%file:/icons/transparent.png%');
@@ -2063,8 +2064,8 @@ QToolBox::tab:!selected:disabled {
 }
 
 QToolBox::tab:hover {
-    border-color: %color:Accent Color 3%;
-    border-bottom: 2px solid %color:Accent Color 3%;
+    border-color: %color:Widget Hover Color 1%;
+    border-bottom: 2px solid %color:Widget Hover Color 1%;
 }
 
 QToolBox QScrollArea {
@@ -2080,6 +2081,7 @@ QToolBox QScrollArea {
 .QFrame {
     border-radius: %number:Border Radius 1%;
     border-color: %color:Border Color 2%;
+    border-width: %number:Border Width 2%;
 }
 
 /* No frame */
@@ -2143,6 +2145,7 @@ QDateEdit, QDateTimeEdit {
     selection-background-color: %color:Accent Color 2%;
     border-style: solid;
     border-color: %color:Border Color 2%;
+    border-width: %number:Border Width 2%;
     border-radius: %number:Border Radius 1%;
 
     /* This fixes 103, 111 */
@@ -2188,6 +2191,7 @@ QDateTimeEdit QAbstractItemView {
     background-color: %color:Widget Background 1%;
     border-radius: %number:Border Radius 1%;
     border-color: %color:Border Color 2%;
+    border-width: %number:Border Width 2%;
     selection-background-color: %color:Accent Color 2%;
 }
 

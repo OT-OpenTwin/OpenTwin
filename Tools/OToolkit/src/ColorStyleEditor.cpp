@@ -68,7 +68,8 @@
 #define CSE_COLOR_Widget_Background_5 "Widget Background 5"
 #define CSE_COLOR_Accent_1 "Accent Color 1"
 #define CSE_COLOR_Accent_2 "Accent Color 2"
-#define CSE_COLOR_Accent_3 "Accent Color 3"
+#define CSE_COLOR_Widget_Hover_Color_1 "Widget Hover Color 1"
+#define CSE_COLOR_Widget_Hover_Color_2 "Widget Hover Color 2"
 #define CSE_COLOR_Accent_4 "Accent Color 4"
 #define CSE_COLOR_BorderColor_1 "Border Color 1"
 #define CSE_COLOR_BorderColor_2 "Border Color 2"
@@ -82,6 +83,8 @@
 
 #define CSE_COLOR_BorderRadius_1 "Border Radius 1"
 #define CSE_COLOR_BorderRadius_2 "Border Radius 2"
+#define CSE_COLOR_BorderWidth_1 "Border Width 1"
+#define CSE_COLOR_BorderWidth_2 "Border Width 2"
 #define CSE_COLOR_OpacityTooltip "Opacity ToolTip"
 
 ColorStyleEditor::ColorStyleEditor() {
@@ -426,14 +429,14 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 0, 0))));
 
 	// Initialize default colors
-	m_colors.insert_or_assign(CSE_COLOR_Accent_1, new PropertyPainter2D(new FillPainter2D(Color(Color::Red))));
-	m_colors.insert_or_assign(CSE_COLOR_Accent_2, new PropertyPainter2D(new FillPainter2D(Color(Color::Red))));
-	m_colors.insert_or_assign(CSE_COLOR_Accent_3, new PropertyPainter2D(new FillPainter2D(Color(Color::Red))));
-	m_colors.insert_or_assign(CSE_COLOR_Accent_4, new PropertyPainter2D(new FillPainter2D(Color(Color::Red))));
+	m_colors.insert_or_assign(CSE_COLOR_Accent_1, new PropertyPainter2D(new FillPainter2D(Color(Color::Black))));
+	m_colors.insert_or_assign(CSE_COLOR_Accent_2, new PropertyPainter2D(new FillPainter2D(Color(Color::White))));
 	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_1, new PropertyPainter2D(new FillPainter2D(Color(Color::White))));
 	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_2, new PropertyPainter2D(new FillPainter2D(Color(Color::White))));
 	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_3, new PropertyPainter2D(new FillPainter2D(Color(Color::LightGray))));
 	m_colors.insert_or_assign(CSE_COLOR_Widget_Background_4, new PropertyPainter2D(new FillPainter2D(Color(Color::White))));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Hover_Color_1, new PropertyPainter2D(new FillPainter2D(Color(Color::Red))));
+	m_colors.insert_or_assign(CSE_COLOR_Widget_Hover_Color_2, new PropertyPainter2D(new FillPainter2D(Color(Color::Red))));
 	m_colors.insert_or_assign(CSE_COLOR_BorderColor_1, new PropertyPainter2D(new FillPainter2D(Color(Color::Black))));
 	m_colors.insert_or_assign(CSE_COLOR_BorderColor_2, new PropertyPainter2D(new FillPainter2D(Color(Color::Black))));
 	m_colors.insert_or_assign(CSE_COLOR_TextColor_1, new PropertyPainter2D(new FillPainter2D(Color(Color::Black))));
