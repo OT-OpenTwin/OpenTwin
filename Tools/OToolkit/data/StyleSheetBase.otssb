@@ -1470,101 +1470,117 @@ QTabWidget::pane:selected {
 
 /* QTabWidget */
 
-QTabBar, QDockWidget QTabBar {
+QTabBar,
+QDockWidget QTabBar {
     qproperty-drawBase: 0;
     border-radius: %number:Border Radius 1%;
     margin: 0px;
     padding: 2px;
     border: 0;
-    /* left: 5px; move to the right by 5px - removed for fix */
 }
 
-QTabBar, QDockWidget QTabBar::close-button {
+QTabBar::close-button,
+QDockWidget QTabBar::close-button {
     border: 0;
     margin: 0;
     padding: 4px;
     image: url('%file:/icons/window_close.png%');
 }
 
-QTabBar, QDockWidget QTabBar::close-button:hover {
+QTabBar::close-button:hover,
+QDockWidget QTabBar::close-button:hover {
     image: url('%file:/icons/window_close_focus.png%');
 }
 
-QTabBar, QDockWidget QTabBar::close-button:pressed {
+QTabBar::close-button:pressed,
+QDockWidget QTabBar::close-button:pressed {
     image: url('%file:/icons/window_close_pressed.png%');
 }
 
-QTabBar, QDockWidget QTabBar::tab:top:selected:disabled {
+QTabBar::tab:top:selected:disabled, 
+QDockWidget QTabBar::tab:top:selected:disabled {
     border-bottom: 3px solid %color:Accent Color 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 3%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:bottom:selected:disabled {
+QTabBar::tab:bottom:selected:disabled, 
+QDockWidget QTabBar::tab:bottom:selected:disabled {
     border-top: 3px solid %color:Accent Color 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 3%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:left:selected:disabled {
+QTabBar::tab:left:selected:disabled, 
+QDockWidget QTabBar::tab:left:selected:disabled {
     border-right: 3px solid %color:Accent Color 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 3%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:right:selected:disabled {
+QTabBar::tab:right:selected:disabled, 
+QDockWidget QTabBar::tab:right:selected:disabled {
     border-left: 3px solid %color:Accent Color 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 3%;
 }
 
 /* !selected and disabled ----------------------------------------- */
-QTabBar, QDockWidget QTabBar::tab:top:!selected:disabled {
+QTabBar::tab:top:!selected:disabled, 
+QDockWidget QTabBar::tab:top:!selected:disabled {
     border-bottom: 3px solid %color:Widget Background 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 1%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:bottom:!selected:disabled {
+QTabBar::tab:bottom:!selected:disabled, 
+QDockWidget QTabBar::tab:bottom:!selected:disabled {
     border-top: 3px solid %color:Widget Background 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 1%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:left:!selected:disabled {
+QTabBar::tab:left:!selected:disabled, 
+QDockWidget QTabBar::tab:left:!selected:disabled {
     border-right: 3px solid %color:Widget Background 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 1%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:right:!selected:disabled {
+QTabBar::tab:right:!selected:disabled, 
+QDockWidget QTabBar::tab:right:!selected:disabled {
     border-left: 3px solid %color:Widget Background 1%;
     color: %color:Disabled Color%;
     background-color: %color:Widget Background 1%;
 }
 
 /* selected ------------------------------------------------------- */
-QTabBar, QDockWidget QTabBar::tab:top:!selected {
+QTabBar::tab:top:!selected,
+QDockWidget QTabBar::tab:top:!selected {
     border-bottom: 2px solid %color:Widget Background 1%;
     margin-top: 2px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:bottom:!selected {
+QTabBar::tab:bottom:!selected, 
+QDockWidget QTabBar::tab:bottom:!selected {
     border-top: 2px solid %color:Widget Background 1%;
     margin-bottom: 2px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:left:!selected {
+QTabBar::tab:left:!selected, 
+QDockWidget QTabBar::tab:left:!selected {
     border-left: 2px solid %color:Widget Background 1%;
     margin-right: 2px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:right:!selected {
+QTabBar::tab:right:!selected, 
+QDockWidget QTabBar::tab:right:!selected {
     border-right: 2px solid %color:Widget Background 1%;
     margin-left: 2px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:top {
+QTabBar::tab:top, 
+QDockWidget QTabBar::tab:top {
     background-color: %color:Widget Background 3%;
     margin-left: 2px;
     padding-left: 4px;
@@ -1577,21 +1593,24 @@ QTabBar, QDockWidget QTabBar::tab:top {
     border-top-right-radius: %number:Border Radius 1%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:top:selected {
+QTabBar::tab:top:selected, 
+QDockWidget QTabBar::tab:top:selected {
     background-color: %color:Widget Background 4%;
     border-bottom: 3px solid %color:Widget Hover Color 2%;
     border-top-left-radius: %number:Border Radius 1%;
     border-top-right-radius: %number:Border Radius 1%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:top:!selected:hover {
+QTabBar::tab:top:!selected:hover, 
+QDockWidget QTabBar::tab:top:!selected:hover {
     border-color: %color:Border Selection Color 3%;
     border-bottom: 3px solid %color:Widget Hover Color 1%;
     padding-left: 3px;
     padding-right: 3px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:bottom {
+QTabBar::tab:bottom, 
+QDockWidget QTabBar::tab:bottom {
     border-top: 3px solid %color:Widget Background 3%;
     background-color: %color:Widget Background 3%;
     margin-left: 2px;
@@ -1604,21 +1623,24 @@ QTabBar, QDockWidget QTabBar::tab:bottom {
     min-width: 5px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:bottom:selected {
+QTabBar::tab:bottom:selected, 
+QDockWidget QTabBar::tab:bottom:selected {
     background-color: %color:Widget Background 4%;
     border-top: 3px solid %color:Widget Hover Color 2%;
     border-bottom-left-radius: %number:Border Radius 1%;
     border-bottom-right-radius: %number:Border Radius 1%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:bottom:!selected:hover {
+QTabBar::tab:bottom:!selected:hover, 
+QDockWidget QTabBar::tab:bottom:!selected:hover {
     border-color: %color:Border Selection Color 3%;
     border-top: 3px solid %color:Widget Hover Color 1%;
     padding-left: 3px;
     padding-right: 3px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:left {
+QTabBar::tab:left, 
+QDockWidget QTabBar::tab:left {
     background-color: %color:Widget Background 3%;
     margin-top: 2px;
     padding-left: 2px;
@@ -1630,19 +1652,22 @@ QTabBar, QDockWidget QTabBar::tab:left {
     min-height: 5px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:left:selected {
+QTabBar::tab:left:selected, 
+QDockWidget QTabBar::tab:left:selected {
     background-color: %color:Widget Background 4%;
     border-right: 3px solid %color:Widget Hover Color 2%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:left:!selected:hover {
+QTabBar::tab:left:!selected:hover, 
+QDockWidget QTabBar::tab:left:!selected:hover {
     border-color: %color:Border Selection Color 3%;
     border-right: 3px solid %color:Widget Hover Color 1%;
     margin-right: 0px;
     padding-right: -1px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:right {
+QTabBar::tab:right, 
+QDockWidget QTabBar::tab:right {
     background-color: %color:Widget Background 3%;
     margin-top: 2px;
     padding-left: 2px;
@@ -1654,45 +1679,54 @@ QTabBar, QDockWidget QTabBar::tab:right {
     min-height: 5px;
 }
 
-QTabBar, QDockWidget QTabBar::tab:right:selected {
+QTabBar::tab:right:selected, 
+QDockWidget QTabBar::tab:right:selected {
     background-color: %color:Widget Background 4%;
     border-left: 3px solid %color:Widget Hover Color 2%;
 }
 
-QTabBar, QDockWidget QTabBar::tab:right:!selected:hover {
+QTabBar::tab:right:!selected:hover, 
+QDockWidget QTabBar::tab:right:!selected:hover {
     border-color: %color:Border Selection Color 3%;
     border-left: 3px solid %color:Widget Hover Color 1%;
     margin-left: 0px;
     padding-left: 0px;
 }
 
-QTabBar, QDockWidget QTabBar QToolButton {
+QTabBar QToolButton, 
+QDockWidget QTabBar QToolButton {
     background-color: %color:Widget Background 3%;
     height: 12px;
     width: 12px;
 }
 
-QTabBar, QDockWidget QTabBar QToolButton:pressed {
+QTabBar QToolButton:pressed, 
+QDockWidget QTabBar QToolButton:pressed {
     background-color: %color:Widget Background 3%;
 }
 
-QTabBar, QDockWidget QTabBar QToolButton:pressed:hover {
+QTabBar QToolButton:pressed:hover, 
+QDockWidget QTabBar QToolButton:pressed:hover {
     border-color: %color:Border Selection Color 2%;
 }
 
-QTabBar, QDockWidget QTabBar QToolButton::left-arrow:enabled {
+QTabBar QTabBar QToolButton::left-arrow:enabled, 
+QDockWidget QTabBar QToolButton::left-arrow:enabled {
     image: url('%file:/icons/arrow_left.png%');
 }
 
-QTabBar, QDockWidget QTabBar QToolButton::left-arrow:disabled {
+QTabBar QTabBar QToolButton::left-arrow:disabled, 
+QDockWidget QTabBar QToolButton::left-arrow:disabled {
     image: url('%file:/icons/arrow_left_disabled.png%');
 }
         
-QTabBar, QDockWidget QTabBar QToolButton::right-arrow:enabled {
+QTabBar QTabBar QToolButton::right-arrow:enabled, 
+QDockWidget QTabBar QToolButton::right-arrow:enabled {
     image: url('%file:/icons/arrow_right.png%');
 }
 
-QTabBar, QDockWidget QTabBar QToolButton::right-arrow:disabled {
+QTabBar QTabBar QToolButton::right-arrow:disabled, 
+QDockWidget QTabBar QToolButton::right-arrow:disabled {
     image: url('%file:/icons/arrow_right_disabled.png%');
 }
 

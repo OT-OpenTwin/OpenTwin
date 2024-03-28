@@ -359,10 +359,8 @@ void AppBase::slotRecenter(void) {
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
-	this->hide();
-	QString s = _style.styleSheet();
-	//this->setStyleSheet(s);
-	QMetaObject::invokeMethod(this, &AppBase::show, Qt::QueuedConnection);
+	//this->hide();
+	//QMetaObject::invokeMethod(this, &AppBase::show, Qt::QueuedConnection);
 }
 
 AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr) {
