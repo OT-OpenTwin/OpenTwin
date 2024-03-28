@@ -6,12 +6,12 @@ setlocal enabledelayedexpansion
 
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto EXIT
+	goto END_FAIL
 )
 
 IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
-	goto EXIT
+	goto END_FAIL
 )
 
 set NSIS_REG_KEY=HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\NSIS
@@ -46,8 +46,7 @@ REM Test for Python Installation
 
 :PYTHON_NOT_INSTALLED
 	echo ERROR: Python is not installed on your system.
-	pause
-	GOTO EXIT
+	GOTO END_FAIL
 
 	
 :PYTHON_INSTALLED
@@ -58,24 +57,20 @@ REM Test for Python Installation
 
 if "!SEVENZIP_REG_DATA!"=="" (
 	echo ERROR: 7Zip is not installed on your system!
-	pause
+	GOTO END_FAIL
 )	else (
 	echo 7Zip Installation verified in '!SEVENZIP_REG_DATA!'...
 )
 
-
-
 if "!NSIS_REG_VALUE!"=="" (
     echo NSIS Installation not found!
-	pause
-	GOTO EXIT
+	GOTO END_FAIL
 ) else (
     echo NSIS Installation verified in '!NSIS_REG_VALUE!'...
 	echo -------------------------------------------------------------
 	echo Script compilation will take a few minutes, please be patient!
 	echo Ready to compile!
 	echo -------------------------------------------------------------
-	pause
     GOTO COMPILE
 )
 
@@ -83,10 +78,8 @@ if "!NSIS_REG_VALUE!"=="" (
 echo +++ COMPILE TIME +++
 
 	echo Extracting Third Party Toolchain using 7-Zip...
-	@REM echo !SEVENZIP_REG_DATA!
-	@REM pause
 	"!SEVENZIP_REG_DATA!\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
-	@REM pause
+
 	
 	echo Compiling Python Scripts...
 	cd !PYTHON_PATH!
@@ -102,7 +95,7 @@ echo +++ COMPILE TIME +++
 
 :END_SUCCESS
 	echo ---------------------------------------------
-	echo Script compilation has finished. Exiting...
+	echo Script compilation has finished successfully. Exiting...
 	GOTO EXIT
 	
 :END_FAIL
