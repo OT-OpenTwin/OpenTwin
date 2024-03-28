@@ -231,7 +231,7 @@ QGroupBox::indicator:unchecked {
 
 QGroupBox::indicator:unchecked:hover,
 QGroupBox::indicator:unchecked:focus,
-QGroupBox::indicator:unchecked&:pressed {
+QGroupBox::indicator:unchecked:pressed {
     border: none;
     image: url('%file:/icons/checkbox_unchecked_focus.png%');
 }
@@ -346,7 +346,7 @@ QMenuBar {
 }
 
 QMenuBar:focus {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QMenuBar::item {
@@ -579,7 +579,7 @@ QScrollBar::handle:horizontal:hover {
 }
 
 QScrollBar::handle:horizontal:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QScrollBar::handle:vertical {
@@ -597,7 +597,7 @@ QScrollBar::handle:vertical:hover {
 }
 
 QScrollBar::handle:vertical:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QScrollBar::add-line:horizontal {
@@ -704,7 +704,7 @@ QTextEdit {
 }
 
 QTextEdit:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QTextEdit:selected {
@@ -724,7 +724,7 @@ QPlainTextEdit {
 }
 
 QPlainTextEdit:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QPlainTextEdit:selected {
@@ -862,12 +862,12 @@ QAbstractSpinBox::down-arrow:hover {
 }
 
 QAbstractSpinBox:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
     color: %color:Text Color 1%;
 }
 
 QAbstractSpinBox:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QAbstractSpinBox:selected {
@@ -1165,11 +1165,11 @@ QToolButton::menu-button {
 }
 
 QToolButton::menu-button:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QToolButton::menu-button:checked:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QToolButton::menu-indicator {
@@ -1256,11 +1256,11 @@ QComboBox:disabled {
 }
 
 QComboBox:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QComboBox:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QComboBox:on {
@@ -1378,11 +1378,11 @@ QSlider::handle:horizontal {
 
 QSlider::handle:horizontal:hover {
     background: %color:Accent Color 2%;
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QSlider::handle:horizontal:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QSlider::handle:vertical {
@@ -1396,11 +1396,11 @@ QSlider::handle:vertical {
 
 QSlider::handle:vertical:hover {
     background: %color:Accent Color 2%;
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QSlider::handle:vertical:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 /* ##################################################################################### */
@@ -1427,12 +1427,12 @@ QLineEdit:disabled {
 }
 
 QLineEdit:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
     color: %color:Text Color 1%;
 }
 
 QLineEdit:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QLineEdit:selected {
@@ -1585,7 +1585,7 @@ QTabBar, QDockWidget QTabBar::tab:top:selected {
 }
 
 QTabBar, QDockWidget QTabBar::tab:top:!selected:hover {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
     border-bottom: 3px solid %color:Widget Hover Color 1%;
     padding-left: 3px;
     padding-right: 3px;
@@ -1612,7 +1612,7 @@ QTabBar, QDockWidget QTabBar::tab:bottom:selected {
 }
 
 QTabBar, QDockWidget QTabBar::tab:bottom:!selected:hover {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
     border-top: 3px solid %color:Widget Hover Color 1%;
     padding-left: 3px;
     padding-right: 3px;
@@ -1636,7 +1636,7 @@ QTabBar, QDockWidget QTabBar::tab:left:selected {
 }
 
 QTabBar, QDockWidget QTabBar::tab:left:!selected:hover {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
     border-right: 3px solid %color:Widget Hover Color 1%;
     margin-right: 0px;
     padding-right: -1px;
@@ -1660,7 +1660,7 @@ QTabBar, QDockWidget QTabBar::tab:right:selected {
 }
 
 QTabBar, QDockWidget QTabBar::tab:right:!selected:hover {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
     border-left: 3px solid %color:Widget Hover Color 1%;
     margin-left: 0px;
     padding-left: 0px;
@@ -1677,7 +1677,7 @@ QTabBar, QDockWidget QTabBar QToolButton:pressed {
 }
 
 QTabBar, QDockWidget QTabBar QToolButton:pressed:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
 }
 
 QTabBar, QDockWidget QTabBar QToolButton::left-arrow:enabled {
@@ -1896,7 +1896,7 @@ QTreeView:focus,
 QListView:focus,
 QTableView:focus,
 QColumnView:focus {
-    border-coor: %color:Border Selection Color 3%;
+    border-color: %color:Border Selection Color 3%;
 }
 
 QTreeView::item:pressed,
@@ -2201,7 +2201,7 @@ QDateTimeEdit QAbstractItemView {
 /* QAbstractView */
 
 QAbstractView:hover {
-    border-coor: %color:Border Selection Color 2%;
+    border-color: %color:Border Selection Color 2%;
     color: %color:Text Color 1%;
 }
 
