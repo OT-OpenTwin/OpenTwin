@@ -300,6 +300,7 @@ void ColorStyleEditor::slotExportConfig(void) {
 
 void ColorStyleEditor::slotBright(void) {
 	this->initializeBrightStyleValues();
+	this->initializePropertyGrid();
 }
 
 void ColorStyleEditor::slotDark(void) {
