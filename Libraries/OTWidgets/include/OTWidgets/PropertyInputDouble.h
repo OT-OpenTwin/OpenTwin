@@ -25,6 +25,8 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 
+		DoubleSpinBox* getSpinBox(void) const { return m_spinBox; };
+
 	private slots:
 		void lclValueChanged(int);
 

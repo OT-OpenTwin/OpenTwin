@@ -19,6 +19,8 @@
 #include <map>
 #include <string>
 
+class QApplication;
+
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GlobalColorStyle : public QObject {
@@ -33,7 +35,7 @@ namespace ot {
 		// Setter/Getter
 
 		void addStyle(const ColorStyle& _style, bool _replace = false);
-		void addStyle(QByteArray _rawStyle, bool _replace = false);
+		void addStyle(const QByteArray& _rawStyle, bool _replace = false, bool _apply = false);
 		bool hasStyle(const std::string& _name) const;
 		const ColorStyle& getStyle(const std::string& _name, const ColorStyle& _default = ColorStyle()) const;
 
@@ -49,6 +51,10 @@ namespace ot {
 
 		void scanForStyleFiles(void);
 
+		void evaluateStyleSheetMacros(ColorStyle& _style);
+
+		void setApplication(QApplication* _application);
+
 	Q_SIGNALS:
 		void currentStyleChanged(const ColorStyle& _style);
 
@@ -56,12 +62,12 @@ namespace ot {
 		GlobalColorStyle();
 		~GlobalColorStyle() {};
 
-		void evaluateStyleSheetMacros(ColorStyle& _style);
-
 		std::string m_currentStyle;
 		ColorStyle m_emptyStyle;
 		std::map<std::string, ColorStyle> m_styles;
 		QStringList m_styleRootSearchPaths;
+
+		QApplication* m_app;
 	};
 
 }

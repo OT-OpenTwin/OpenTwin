@@ -11,6 +11,9 @@
 // Qt header
 #include <QtCore/qdir.h>
 #include <QtCore/qdiriterator.h>
+#include <QtWidgets/qstyle.h>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qstylefactory.h>
 
 ot::GlobalColorStyle& ot::GlobalColorStyle::instance(void) {
 	static GlobalColorStyle g_instance;
@@ -18,38 +21,34 @@ ot::GlobalColorStyle& ot::GlobalColorStyle::instance(void) {
 }
 
 void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
-	if (_style.name().empty()) {
+	if (_style.colorStyleName().empty()) {
 		OT_LOG_E("Color style name may not be empty");
 		return;
 	}
-	if (!_replace && this->hasStyle(_style.name())) {
-		OT_LOG_E("Color style already exists (Name: \"" + _style.name() + "\")");
+	if (!_replace && this->hasStyle(_style.colorStyleName())) {
+		OT_LOG_E("Color style already exists (Name: \"" + _style.colorStyleName() + "\")");
 	}
 
-	m_styles.insert_or_assign(_style.name(), _style);
-	this->evaluateStyleSheetMacros(m_styles[_style.name()]);
+	m_styles.insert_or_assign(_style.colorStyleName(), _style);
+	ColorStyle& cs = m_styles.at(_style.colorStyleName());
+	this->evaluateStyleSheetMacros(cs);
 
-	if (m_currentStyle == _style.name()) {
-		Q_EMIT currentStyleChanged(m_styles[_style.name()]);
+	if (m_currentStyle == _style.colorStyleName()) {
+		Q_EMIT currentStyleChanged(cs);
 	}
 }
 
-void ot::GlobalColorStyle::addStyle(QByteArray _rawStyle, bool _replace) {
+void ot::GlobalColorStyle::addStyle(const QByteArray& _rawStyle, bool _replace, bool _apply) {
 	if (_rawStyle.isEmpty()) return;
 	ColorStyle newStyle;
-
-	int ix = _rawStyle.indexOf('\n');
-	while (ix != (-1)) {
-		QString line = _rawStyle.left(ix);
-		_rawStyle.remove(0, ix + 1);
-		ix = _rawStyle.indexOf('\n');
-
-		if (line == "sheet:") {
-
-		}
-	}
+	
+	if (!newStyle.setupFromFile(_rawStyle)) return;
 
 	this->addStyle(newStyle, _replace);
+
+	if (_apply) {
+		this->setCurrentStyle(newStyle.colorStyleName());
+	}
 }
 
 bool ot::GlobalColorStyle::hasStyle(const std::string& _name) const {
@@ -70,6 +69,10 @@ bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName) {
 	}
 
 	m_currentStyle = _styleName;
+	if (m_app) {
+		m_app->setStyleSheet(it->second.styleSheet());
+	}
+	OT_LOG_D("Current color style changed \"" + m_currentStyle + "\"");
 	Q_EMIT currentStyleChanged(it->second);
 	return true;
 }
@@ -139,15 +142,21 @@ void ot::GlobalColorStyle::scanForStyleFiles(void) {
 	}
 }
 
-ot::GlobalColorStyle::GlobalColorStyle() {
-	m_emptyStyle.setName("");
-	m_styles.insert_or_assign(m_emptyStyle.name(), m_emptyStyle);
-}
-
 void ot::GlobalColorStyle::evaluateStyleSheetMacros(ColorStyle& _style) {
-	QString rootPath = this->styleRootPath(_style.name());
+	QString rootPath = this->styleRootPath(_style.colorStyleName());
 	QString evaluatedSheet = _style.styleSheet();
 	evaluatedSheet.replace(OT_COLORSTYLE_FILE_MACRO_Root, rootPath);
 
 	_style.setStyleSheet(evaluatedSheet);
+}
+
+void ot::GlobalColorStyle::setApplication(QApplication* _application) {
+	if (m_app == _application) return;
+	OTAssertNullptr(_application);
+	m_app = _application;
+}
+
+ot::GlobalColorStyle::GlobalColorStyle() : m_app(nullptr) {
+	m_emptyStyle.setColorStyleName("");
+	m_styles.insert_or_assign(m_emptyStyle.colorStyleName(), m_emptyStyle);
 }

@@ -38,6 +38,8 @@ namespace ot {
 
 		virtual std::string generateQss(void) const override;
 
+		virtual ot::Color getDefaultColor(void) const override;
+
 		//! @brief Set the center point for the gradient
 		void setCenterPoint(const ot::Point2DD& _center) { m_center = _center; };
 		const ot::Point2DD& centerPoint(void) const { return m_center; }

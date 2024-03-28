@@ -28,7 +28,9 @@ namespace ot {
 	class Painter2D;
 	class TabWidget;
 	class TextEditor;
-	class PropertyGrid; 
+	class PropertyInt;
+	class PropertyGrid;
+	class PropertyDouble;
 	class PropertyString;
 	class PropertyPainter2D;
 }
@@ -79,11 +81,15 @@ private:
 
 	ot::PropertyString* m_nameProp;
 	ot::PropertyGroup* m_styleValuesGroup;
+	ot::PropertyGroup* m_intGroup;
+	ot::PropertyGroup* m_doubleGroup;
 	ot::PropertyGroup* m_colorsGroup;
 	ot::PropertyGroup* m_fileGroup;
 	std::map<std::string, ot::PropertyPainter2D*> m_styleValues;
 	std::map<std::string, ot::PropertyPainter2D*> m_colors;
 	std::map<std::string, ot::PropertyString*> m_files;
+	std::map<std::string, ot::PropertyInt*> m_integer;
+	std::map<std::string, ot::PropertyDouble*> m_double;
 
 	void initializeStyleSheetBase(void);
 	void cleanUpData(void);

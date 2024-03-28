@@ -11,6 +11,12 @@
 
 #define OT_COLORSTYLE_FILE_MACRO_Root "%root%"
 
+#define OT_COLORSTYLE_BASEFILE_MACRO_Color "color"
+#define OT_COLORSTYLE_BASEFILE_MACRO_File "file"
+#define OT_COLORSTYLE_BASEFILE_MACRO_Int "int"
+#define OT_COLORSTYLE_BASEFILE_MACRO_Double "number"
+
+
 #define OT_COLORSTYLE_VALUE_ControlsBackground "ControlsBackground"
 #define OT_COLORSTYLE_VALUE_ControlsForeground "ControlsForeground"
 #define OT_COLORSTYLE_VALUE_ControlsHoverBackground "ControlsHoverBackground"

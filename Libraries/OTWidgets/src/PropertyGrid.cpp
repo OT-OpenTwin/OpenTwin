@@ -9,7 +9,6 @@
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/PropertyGridItemDelegate.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -29,21 +28,7 @@ protected:
 	}
 
 	virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override {
-		QStyleOptionViewItem opt = _options;
-		if (_index.isValid()) {
-
-			QTreeWidgetItem* item = this->topLevelItem(_index.row());
-
-			PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(item);
-			PropertyGridItem* i = dynamic_cast<PropertyGridItem*>(item);
-			if (g) {
-				_painter->fillRect(_options.rect, g->groupBrush());
-			}
-			else if (i) {
-				_painter->fillRect(_options.rect, i->itemBrush());
-			}
-		}
-		TreeWidget::drawRow(_painter, opt, _index);
+		TreeWidget::drawRow(_painter, _options, _index);
 	}
 };
 
@@ -51,7 +36,6 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) 
 	m_tree = new PropertyGrid::PropertyGridTree;
 	m_tree->setColumnCount(2);
 	m_tree->setHeaderLabels({ "Name", "Value" });
-	m_tree->setItemDelegate(new PropertyGridItemDelegate(m_tree));
 	m_tree->setIndentation(0);
 	this->connect(m_tree, &TreeWidget::itemChanged, this, &PropertyGrid::slotItemChanged);
 }

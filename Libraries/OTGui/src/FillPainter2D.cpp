@@ -29,3 +29,7 @@ void ot::FillPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 std::string ot::FillPainter2D::generateQss(void) const {
 	return "rgba(" + std::to_string(m_color.rInt()) + "," + std::to_string(m_color.gInt()) + "," + std::to_string(m_color.bInt()) + "," + std::to_string(m_color.aInt()) + ")";
 }
+
+ot::Color ot::FillPainter2D::getDefaultColor(void) const {
+	return m_color;
+}

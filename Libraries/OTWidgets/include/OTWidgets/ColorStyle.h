@@ -46,8 +46,8 @@ namespace ot {
 
 		// Setter/Getter
 
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
+		void setColorStyleName(const std::string& _name) { m_name = _name; };
+		const std::string& colorStyleName(void) const { return m_name; };
 
 		void setStyleSheet(const QString& _sheet) { m_styleSheet = _sheet; };
 		const QString& styleSheet(void) const { return m_styleSheet; };
@@ -55,6 +55,8 @@ namespace ot {
 		void addValue(const ColorStyleValue& _value);
 		bool hasValue(const std::string& _name) const;
 		const ColorStyleValue& getValue(const std::string& _name, const ColorStyleValue& _default = ColorStyleValue()) const;
+
+		bool setupFromFile(QByteArray _data);
 
 	private:
 		std::string m_name;

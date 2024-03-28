@@ -50,3 +50,8 @@ std::string ot::LinearGradientPainter2D::generateQss(void) const {
 
 	return ret;
 }
+
+ot::Color ot::LinearGradientPainter2D::getDefaultColor(void) const {
+	if (this->stops().empty()) return Color();
+	else return this->stops().front().color();
+}

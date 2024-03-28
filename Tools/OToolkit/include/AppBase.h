@@ -11,6 +11,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/ColorStyle.h"
 
 // Qt header
 #include <QtCore/qthread.h>
@@ -31,7 +32,7 @@ class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::Ab
 public:
 	// Static functions
 
-	static AppBase * instance(void);
+	static AppBase * instance(QApplication* _app = (QApplication*)nullptr);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -87,9 +88,10 @@ private slots:
 	void slotInitialize(void);
 	void slotInitializeTools(void);
 	void slotRecenter(void);
+	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
 private:
-	AppBase();
+	AppBase(QApplication* _app = (QApplication*)nullptr);
 	
 	Qt::HANDLE			m_mainThread;
 

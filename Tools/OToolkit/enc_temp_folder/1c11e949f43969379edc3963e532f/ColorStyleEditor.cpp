@@ -327,35 +327,7 @@ void ColorStyleEditor::slotApplyAsCurrent(void) {
 }
 
 void ColorStyleEditor::slotExport(void) {
-	std::string tmp = m_editor->toPlainText().toStdString();
-	if (tmp.empty()) {
-		OT_LOG_W("No data to apply");
-		return;
-	}
 
-	std::string lastDir = otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->value("LastColorStyleEditorExportFile", QString()).toString().toStdString();
-	size_t ix = lastDir.rfind('\\');
-	size_t ix2 = lastDir.rfind('/');
-	if (ix2 == std::string::npos) ix2 = ix;
-	if (ix != std::string::npos) {
-		ix = std::max(ix, ix2);
-		lastDir = lastDir.substr(0, ix);
-	}
-	
-	QString fileName = QFileDialog::getSaveFileName(nullptr, "Export Color Style File", QString::fromStdString(lastDir), "Color Style Files (*.otcsf)");
-	if (fileName.isEmpty()) return;
-
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		OT_LOG_E("Failed to open file for writing: \"" + fileName.toStdString() + "\"");
-		return;
-	}
-
-	file.write(QByteArray::fromStdString(tmp));
-	file.close();
-
-	otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->setValue("LastColorStyleEditorExportFile", fileName);
-	OT_LOG_I("Color style exported \"" + fileName.toStdString() + "\"");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

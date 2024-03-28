@@ -6,9 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/SimpleFactory.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
 
@@ -28,6 +29,8 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		virtual std::string generateQss(void) const = 0;
+
+		virtual ot::Color getDefaultColor(void) const = 0;
 
 		//! @brief Creates a copy of this painter
 		Painter2D* createCopy(void) const;

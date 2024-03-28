@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCommunication/actionTypes.h"
+#include "OTWidgets/GlobalColorStyle.h"
 
 // Qt header
 #include <QtCore/qdatetime.h>
@@ -48,9 +49,10 @@ enum InternLogType {
 
 // Static functions
 
-AppBase * AppBase::instance(void) {
+AppBase * AppBase::instance(QApplication* _app) {
 	static AppBase* g_instance{ nullptr };
-	if (g_instance == nullptr) g_instance = new AppBase;
+	if (g_instance == nullptr) g_instance = new AppBase();
+	if (_app) g_instance->setApplicationInstance(_app);
 	return g_instance;
 }
 
@@ -356,7 +358,14 @@ void AppBase::slotRecenter(void) {
 	this->resize(800, 600);
 }
 
-AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m_logger(nullptr) {
+void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
+	this->hide();
+	QString s = _style.styleSheet();
+	//this->setStyleSheet(s);
+	QMetaObject::invokeMethod(this, &AppBase::show, Qt::QueuedConnection);
+}
+
+AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr) {
 	this->deleteLogNotifierLater(true);
 
 	// Initialize Toolkit API
@@ -415,6 +424,7 @@ AppBase::AppBase() : m_mainThread(QThread::currentThreadId()), m_app(nullptr), m
 	//connect(menuManager, &MenuManager::settingsRequested, this, &AppBase::slotSettings);
 	this->connect(m_toolManager->menuManager(), &MenuManager::exitRequested , this, &AppBase::close);
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
+	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
 }

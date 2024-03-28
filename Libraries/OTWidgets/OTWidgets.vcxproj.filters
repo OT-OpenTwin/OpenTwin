@@ -133,9 +133,6 @@
     <ClCompile Include="src\PropertyInputDouble.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyGridItemDelegate.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
     <ClCompile Include="src\Dialog.cpp">
       <Filter>src\Dialogs</Filter>
     </ClCompile>
@@ -378,9 +375,6 @@
       <Filter>include\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\MessageDialog.h">

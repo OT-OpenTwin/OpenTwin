@@ -4,15 +4,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/ColorStyleTypes.h"
 
 ot::ColorStyle::ColorStyle() {
 
 }
 
 ot::ColorStyle::ColorStyle(const ColorStyle& _other)
-	: m_styleSheet(_other.m_styleSheet), m_values(_other.m_values)
+	: m_styleSheet(_other.m_styleSheet), m_values(_other.m_values), m_name(_other.m_name)
 {
 	
 }
@@ -24,6 +26,7 @@ ot::ColorStyle::~ColorStyle() {
 ot::ColorStyle& ot::ColorStyle::operator = (const ColorStyle& _other) {
 	m_styleSheet = _other.m_styleSheet;
 	m_values = _other.m_values;
+	m_name = _other.m_name;
 
 	return *this;
 }
@@ -76,4 +79,52 @@ const ot::ColorStyleValue& ot::ColorStyle::getValue(const std::string& _name, co
 	const auto& it = m_values.find(_name);
 	if (it == m_values.end()) return _default;
 	else return it->second;
+}
+
+bool ot::ColorStyle::setupFromFile(QByteArray _data) {
+	if (_data.isEmpty()) return false;
+	qsizetype ix = _data.indexOf('\n');
+	if (ix == -1) {
+		OT_LOG_E("ColorStyle file broken");
+		return false;
+	}
+	while (ix != -1) {
+		qsizetype ix2 = _data.indexOf(':');
+		if (ix2 > ix) {
+			OT_LOG_E("ColorStyle file key broken");
+			return false;
+		}
+		QByteArray k = _data.mid(0, ix2 + 1);
+		QByteArray n = _data.mid(0, ix);
+		n.remove(0, ix2 + 1);
+		_data.remove(0, ix + 1);
+		ix = _data.indexOf('\n');
+
+		if (k == OT_COLORSTYLE_FILE_KEY_Name) {
+			this->setColorStyleName(n.toStdString());
+		}
+		else if (k == OT_COLORSTYLE_FILE_KEY_Values) {
+			JsonDocument doc;
+			if (!doc.fromJson(n.toStdString())) {
+				OT_LOG_E("Failed to parse document");
+				return false;
+			}
+			for (JsonSizeType i = 0; i < doc.Size(); i++) {
+				ConstJsonObject vObj = json::getObject(doc, i);
+				ColorStyleValue newValue;
+				newValue.setFromJsonObject(vObj);
+				this->addValue(newValue);
+			}
+		}
+		else if (k == OT_COLORSTYLE_FILE_KEY_StyleSheet) {
+			std::string tmp = _data.toStdString();
+			this->setStyleSheet(QString::fromStdString(tmp));
+			return true;
+		}
+		else {
+			OT_LOG_E("Unknown color style file key \"" + k.toStdString() + "\"");
+			return false;
+		}
+	}
+	return false;
 }

@@ -68,7 +68,7 @@ void mainApplicationThread()
 		application.setStyleSheet("* { font-size: 9pt; }");
 
 		
-		ot::GlobalColorStyle::instance();
+		ot::GlobalColorStyle::instance().setApplication(&application);
 
 		// Apply global stylesheet
 		//QFile styleFile(":/OToolkit.qss");

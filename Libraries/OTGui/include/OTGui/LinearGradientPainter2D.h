@@ -39,6 +39,8 @@ namespace ot {
 		
 		virtual std::string generateQss(void) const override;
 
+		virtual ot::Color getDefaultColor(void) const override;
+
 		//! @brief Set the starting point for the gradient.
 		//! The painted area is between 0.0 and 1.0.
 		void setStart(const ot::Point2DD& _start) { m_start = _start; };

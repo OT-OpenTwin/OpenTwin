@@ -34,6 +34,8 @@ namespace ot {
 
 		virtual std::string generateQss(void) const override;
 
+		virtual ot::Color getDefaultColor(void) const override;
+
 		void setColor(ot::Color& _color) { m_color = _color; };
 		const ot::Color& color(void) const { return m_color; };
 

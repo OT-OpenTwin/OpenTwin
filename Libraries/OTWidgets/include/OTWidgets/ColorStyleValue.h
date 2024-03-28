@@ -50,24 +50,18 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& name(void) const { return m_name; };
 
-		void setQss(const QString& _qss) { m_qss = _qss; };
-		const QString& qss(void) const { return m_qss; };
-
-		void setColor(const QColor& _color) { m_color = _color; };
-		const QColor& color(void) const { return m_color; };
-
-		const QBrush& brush(void) const { return m_brush; };
+		QString qss(void) const;
+		QColor color(void) const;
+		QBrush brush(void) const;
 
 		//! @brief Set the painter which will also set the brush
 		//! The object takes ownership
 		void setPainter(Painter2D* _painter);
+		void setPainter(const Painter2D* _painter);
 		Painter2D* painter(void) const { return m_painter; };
 
 	private:
 		std::string m_name;
-		QString m_qss;
-		QColor m_color;
-		QBrush m_brush;
 		Painter2D* m_painter;
 	};
 
