@@ -25,7 +25,7 @@ QWidget {
     border: 0px solid %color:Widget Background 3%;
     padding: 0px;
     color: %color:Text Color 1%;
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
     selection-color: %color:Text Color 1%;
 }
 
@@ -37,14 +37,14 @@ QWidget:disabled {
 }
 
 QWidget::item {
-    background-color: %color:Widget Hover Color 1%;
+    background-color: %color:Widget Hover Background 1%;
 }
 
-QWidget::item:!selected {
-    background-color: %color:Accent Color 2%;
+QWidget::item:selected {
+    background-color: %color:Widget Selected Color 1%;
 }
 
-QWidget::item:hover:!selected {
+QWidget::item:hover {
     background-color: %color:Widget Hover Color 1%;
 }
 
@@ -83,7 +83,7 @@ QMainWindow::separator:vertical {
 /* QToolTip */
 
 QToolTip {
-    background-color: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
     color: %color:Text Color 1%;
     /* If you remove the border property, background stops working on Windows */
     border: none;
@@ -572,8 +572,8 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar::handle:horizontal:hover {
-    background-color: %color:Accent Color 2%;
-    border: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
+    border: %color:Widget Selected Color 1%;
     border-radius: %number:Border Radius 1%;
     min-width: 8px;
 }
@@ -590,8 +590,8 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar::handle:vertical:hover {
-    background-color: %color:Accent Color 2%;
-    border: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
+    border: %color:Widget Selected Color 1%;
     border-radius: %number:Border Radius 1%;
     min-height: 8px;
 }
@@ -708,7 +708,7 @@ QTextEdit:focus {
 }
 
 QTextEdit:selected {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
 
@@ -728,7 +728,7 @@ QPlainTextEdit:focus {
 }
 
 QPlainTextEdit:selected {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
 
@@ -871,7 +871,7 @@ QAbstractSpinBox:focus {
 }
 
 QAbstractSpinBox:selected {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
 
@@ -992,7 +992,7 @@ QProgressBar:disabled {
 }
 
 QProgressBar::chunk {
-    background-color: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
     color: %color:Widget Background 1%;
     border-radius: %number:Border Radius 1%;
 }
@@ -1008,7 +1008,7 @@ QProgressBar::chunk:disabled {
 /* QPushButton */
 
 QPushButton {
-    background-color: %color:Widget Background 3%;
+    background-color: %color:Input Background 1%;
     color: %color:Text Color 1%;
     border-radius: %number:Border Radius 1%;
     padding: 2px;
@@ -1017,7 +1017,7 @@ QPushButton {
 }
 
 QPushButton:disabled {
-    background-color: %color:Widget Background 3%;
+    background-color: %color:Input Background 1%;
     color: %color:Disabled Color%;
     border-radius: %number:Border Radius 1%;
     padding: 2px;
@@ -1215,7 +1215,7 @@ QCommandLinkButton:disabled {
 QComboBox {
     border-color: %color:Border Color 2%;
     border-radius: %number:Border Radius 1%;
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
     padding-left: 4px;
     padding-right: 4px;
     /* padding-right = 36; 4 + 16*2 See scrollbar size */
@@ -1233,7 +1233,7 @@ QComboBox QAbstractItemView {
     border-color: %color:Border Color 2%;
     border-radius: 0;
     background-color: %color:Widget Background 1%;
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
 }
 
 QComboBox QAbstractItemView:hover {
@@ -1242,7 +1242,7 @@ QComboBox QAbstractItemView:hover {
 }
 
 QComboBox QAbstractItemView:selected {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
 
@@ -1264,7 +1264,7 @@ QComboBox:focus {
 }
 
 QComboBox:on {
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
 }
 
 /* Needed to remove indicator - fix #132 */
@@ -1344,7 +1344,7 @@ QSlider::groove:vertical {
 }
 
 QSlider::add-page:vertical {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     border-color: %color:Border Color 2%;
     width: 4px;
     margin: 0px;
@@ -1356,7 +1356,7 @@ QSlider::add-page:vertical:disabled {
 }
 
 QSlider::sub-page:horizontal {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     border-color: %color:Border Color 2%;
     height: 4px;
     margin: 0px;
@@ -1377,7 +1377,7 @@ QSlider::handle:horizontal {
 }
 
 QSlider::handle:horizontal:hover {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     border-color: %color:Border Selection Color 2%;
 }
 
@@ -1395,7 +1395,7 @@ QSlider::handle:vertical {
 }
 
 QSlider::handle:vertical:hover {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     border-color: %color:Border Selection Color 2%;
 }
 
@@ -1436,7 +1436,7 @@ QLineEdit:focus {
 }
 
 QLineEdit:selected {
-    background-color: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
 
@@ -1463,7 +1463,7 @@ QTabWidget::pane {
 
 QTabWidget::pane:selected {
     background-color: %color:Widget Background 3%;
-    border: 1px solid %color:Accent Color 2%;
+    border: 1px solid %color:Widget Selected Color 1%;
 }
 
 /* ##################################################################################### */
@@ -1922,7 +1922,7 @@ QTreeView:selected,
 QListView:selected,
 QTableView:selected,
 QColumnView:selected {
-    background-color: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
 
@@ -1937,14 +1937,14 @@ QTreeView::item:pressed,
 QListView::item:pressed,
 QTableView::item:pressed,
 QColumnView::item:pressed {
-    background-color: %color:Accent Color 2%;
+    background-color: %color:Widget Selected Color 1%;
 }
 
 QTreeView::item:selected:active,
 QListView::item:selected:active,
 QTableView::item:selected:active,
 QColumnView::item:selected:active {
-    background-color: %color:Accent Color 2%;   
+    background-color: %color:Widget Selected Color 1%;   
 }
 
 QTreeView::item:selected:!active,
@@ -2063,7 +2063,7 @@ QToolBox {
 
 QToolBox:selected {
     padding: 0px;
-    border: 2px solid %color:Accent Color 2%;
+    border: 2px solid %color:Widget Selected Color 1%;
 }
 
 QToolBox::tab {
@@ -2080,7 +2080,7 @@ QToolBox::tab:disabled {
 
 QToolBox::tab:selected {
     background-color: %color:Widget Background 5%;
-    border-bottom: 2px solid %color:Accent Color 2%;
+    border-bottom: 2px solid %color:Widget Selected Color 1%;
 }
 
 QToolBox::tab:selected:disabled {
@@ -2176,7 +2176,7 @@ QSplitter::handle:vertical {
 /* QDateEdit, QDateTimeEdit */
 
 QDateEdit, QDateTimeEdit {
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
     border-style: solid;
     border-color: %color:Border Color 2%;
     border-width: %number:Border Width 2%;
@@ -2194,7 +2194,7 @@ QDateEdit, QDateTimeEdit {
 
 QDateEdit:on,
 QDateTimeEdit:on {
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
 }
 
 QDateEdit::drop-down {
@@ -2226,7 +2226,7 @@ QDateTimeEdit QAbstractItemView {
     border-radius: %number:Border Radius 1%;
     border-color: %color:Border Color 2%;
     border-width: %number:Border Width 2%;
-    selection-background-color: %color:Accent Color 2%;
+    selection-background-color: %color:Widget Selected Color 1%;
 }
 
 
@@ -2240,6 +2240,6 @@ QAbstractView:hover {
 }
 
 QAbstractView:selected {
-    background: %color:Accent Color 2%;
+    background: %color:Widget Selected Color 1%;
     color: %color:Widget Background 3%;
 }
