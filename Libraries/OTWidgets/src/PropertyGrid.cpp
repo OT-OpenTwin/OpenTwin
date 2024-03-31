@@ -53,6 +53,8 @@ ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 }
 
 void ot::PropertyGrid::setupFromConfig(const PropertyGridCfg& _config) {
+	this->clear();
+
 	for (const Property* itm : _config.defaultGroup()->properties()) {
 		PropertyGridItem* newItm = new PropertyGridItem;
 		newItm->setupFromConfig(itm);

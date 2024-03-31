@@ -67,21 +67,23 @@ QMainWindow::separator {
 QMainWindow::separator:hover {
     background-color: %color:Widget Hover Background 1%;
     color: %color:Widget Hover Foreground 1%;
-    border: 0px solid transparent;
+}
+
+QMainWindow::separator:pressed {
+    background-color: %color:Widget Selection Background 1%;
+    color: %color:Widget Selection Foreground 1%;
 }
 
 QMainWindow::separator:horizontal {
     width: 5px;
     margin-top: 2px;
     margin-bottom: 2px;
-    image: url('%file:/icons/toolbar_separator_vertical.png%');
 }
 
 QMainWindow::separator:vertical {
     height: 5px;
     margin-left: 2px;
     margin-right: 2px;
-    image: url('%file:/icons/toolbar_separator_horizontal.png%');
 }
 
 /* ##################################################################################### */
@@ -391,8 +393,7 @@ QMenu {
 
 QMenu::separator {
     height: 1px;
-    background-color: %color:Widget Background 1%;
-    color: %color:Widget Foreground 1%;
+    background-color: %color:Light Border Color 1%;
 }
 
 QMenu::item {
@@ -702,11 +703,11 @@ QScrollBar::sub-page:vertical {
 QTextEdit {
     background-color: %color:Widget Background 1%;
     color: %color:Widget Foreground 1%;
+    border: 1px solid %color:Light Border Color 1%;
     border-radius: %number:Border Radius 1%;
-    border-color: %color:Border Color 1%;
 }
 
-QTextEdit:focus {
+QTextEdit:hover {
     border-color: %color:Border Hover Color 1%;
 }
 
@@ -721,8 +722,8 @@ QTextEdit:selected {
 QPlainTextEdit {
     background-color: %color:Widget Background 1%;
     color: %color:Widget Foreground 1%;
+    border: 1px solid %color:Light Border Color 1%;
     border-radius: %number:Border Radius 1%;
-    border-color: %color:Border Color 1%;
 }
 
 QPlainTextEdit:focus {
@@ -898,8 +899,8 @@ QLabel:disabled {
 
 QTextBrowser {
     background-color: %color:Widget Background 1%;
-    border-color: %color:Border Color 2%;
     color: %color:Widget Foreground 1%;
+    border: 1px solid %color:Light Border Color 2%;
     border-radius: %number:Border Radius 1%;
 }
 
@@ -910,11 +911,12 @@ QTextBrowser:disabled {
     border-radius: %number:Border Radius 1%;
 }
 
-QTextBrowser:hover,
-QTextBrowser:!hover,
-QTextBrowser:selected,
-QTextBrowser:pressed {
-    border-color: %color:Border Color 2%;
+QTextBrowser:hover {
+    border-color: %color:Border Hover Color 1%;
+}
+
+QTextBrowser:selected {
+    border-color: %color:Border Selection Color 1%;
 }
 
 /* ##################################################################################### */
@@ -1009,7 +1011,10 @@ QProgressBar::chunk:disabled {
 QPushButton {
     background-color: %color:Input Background 1%;
     color: %color:Widget Foreground 1%;
-    padding: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 6px;
+    padding-right: 6px;
     outline: none;
     border: 1px solid %color:Border Color 1%;
     border-style: outset;
@@ -1020,12 +1025,10 @@ QPushButton:disabled {
     background-color: %color:Input Background 1%;
     color: %color:Widget Disabled Foreground 1%;
     border-radius: %number:Border Radius 1%;
-    padding: 2px;
 }
 
 QPushButton:checked {
     background-color: %color:Widget Background 2%;
-    padding: 2px;
     outline: none;
 }
 
@@ -1033,7 +1036,6 @@ QPushButton:checked:disabled {
     background-color: %color:Widget Background 2%;
     color: %color:Widget Disabled Foreground 1%;
     border-radius: %number:Border Radius 1%;
-    padding: 2px;
     outline: none;
 }
 
@@ -1398,7 +1400,7 @@ QLineEdit {
     padding-left: 4px;
     padding-right: 4px;
     border-style: solid;
-    border-color: %color:Border Color 1%;
+    border: 1px solid %color:Light Border Color 1%;
     border-radius: %number:Border Radius 1%;
     color: %color:Widget Foreground 1%;
 }
@@ -1410,7 +1412,6 @@ QLineEdit:disabled {
 
 QLineEdit:hover {
     border-color: %color:Border Hover Color 1%;
-    color: %color:Widget Foreground 1%;
 }
 
 QLineEdit:focus {
