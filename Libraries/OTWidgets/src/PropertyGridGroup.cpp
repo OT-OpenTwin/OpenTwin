@@ -7,8 +7,10 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PropertyGridGroup.h"
 
 namespace ot {
@@ -22,11 +24,13 @@ namespace ot {
 }
 
 ot::PropertyGridGroup::PropertyGridGroup() {
-
+	this->setFlags(this->flags() & (~Qt::ItemIsSelectable));
+	this->slotColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
+	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 ot::PropertyGridGroup::~PropertyGridGroup() {
-
+	this->disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
@@ -148,4 +152,11 @@ std::list<const ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void)
 	}
 
 	return ret;
+}
+
+void ot::PropertyGridGroup::slotColorStyleChanged(const ColorStyle& _style) {
+	this->setBackground(0, _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
+	this->setBackground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
+	this->setForeground(0, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
+	this->setForeground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
 }

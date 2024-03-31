@@ -7,9 +7,11 @@
 
 // OpenTwin header
 #include "OTGui/PropertyGroup.h"
+#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qobject.h>
 #include <QtGui/qbrush.h>
 #include <QtWidgets/qtreewidget.h>
 
@@ -17,7 +19,8 @@ namespace ot {
 
 	class PropertyGridItem;
 
-	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QTreeWidgetItem {
+	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public QTreeWidgetItem {
+		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridGroup)
 	public:
 		PropertyGridGroup();
@@ -46,6 +49,9 @@ namespace ot {
 
 		const PropertyGridGroup* findChildGroup(const std::string& _name, bool _searchChildGroups) const;
 		std::list<const PropertyGridGroup*> childGroups(void) const;
+
+	private Q_SLOTS:
+		void slotColorStyleChanged(const ColorStyle& _style);
 
 	private:
 		std::string m_name;

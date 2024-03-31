@@ -359,9 +359,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridGroup.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\OnePropertyDialog.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
@@ -534,6 +531,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyGridGroup.h">
+      <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

@@ -68,7 +68,9 @@ void ot::ColorStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 void ot::ColorStyle::addValue(const ColorStyleValue& _value) {
 	if (this->hasValue(_value.name())) {
 		OT_LOG_W("A value with the name \"" + _value.name() + "\" already exists");
+		return;
 	}
+	m_values.insert_or_assign(_value.name(), _value);
 }
 
 bool ot::ColorStyle::hasValue(const std::string& _name) const {
