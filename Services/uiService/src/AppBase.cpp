@@ -73,6 +73,7 @@
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/WidgetViewManager.h"
 
 // C++ header
@@ -247,7 +248,12 @@ int AppBase::run() {
 			return 4;
 		}
 
+		ot::GlobalColorStyle::instance().setApplication(uiAPI::getApplication());
 		ot::GlobalColorStyle::instance().scanForStyleFiles();
+
+		if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
+			//ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
+		}
 
 		// Initialize Widget view manager
 		ot::WidgetViewManager::instance().initialize();

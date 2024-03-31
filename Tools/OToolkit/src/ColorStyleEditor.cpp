@@ -410,7 +410,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	// Clean up data
 	this->cleanUpData();
 
-	m_nameProp->setValue("Bright");
+	m_nameProp->setValue(OT_COLORSTYLE_NAME_Bright);
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
@@ -463,7 +463,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	// Clean up data
 	this->cleanUpData();
 
-	m_nameProp->setValue("Dark");
+	m_nameProp->setValue(OT_COLORSTYLE_NAME_Dark);
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
@@ -516,7 +516,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	// Clean up data
 	this->cleanUpData();
 
-	m_nameProp->setValue("Blue");
+	m_nameProp->setValue(OT_COLORSTYLE_NAME_Blue);
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));

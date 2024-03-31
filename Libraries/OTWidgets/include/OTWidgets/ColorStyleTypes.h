@@ -5,6 +5,10 @@
 
 #pragma once
 
+#define OT_COLORSTYLE_NAME_Bright "Bright"
+#define OT_COLORSTYLE_NAME_Dark "Dark"
+#define OT_COLORSTYLE_NAME_Blue "Blue"
+
 #define OT_COLORSTYLE_FILE_KEY_Name "name:"
 #define OT_COLORSTYLE_FILE_KEY_Values "values:"
 #define OT_COLORSTYLE_FILE_KEY_StyleSheet "sheet:"
@@ -15,7 +19,6 @@
 #define OT_COLORSTYLE_BASEFILE_MACRO_File "file"
 #define OT_COLORSTYLE_BASEFILE_MACRO_Int "int"
 #define OT_COLORSTYLE_BASEFILE_MACRO_Double "number"
-
 
 #define OT_COLORSTYLE_VALUE_ControlsBackground "Controls Background"
 #define OT_COLORSTYLE_VALUE_ControlsForeground "Controls Foreground"
