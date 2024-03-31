@@ -223,6 +223,7 @@ void AppBase::slotProcessMessage(const QString& _json) {
 // Private: Slots
 
 void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
+	m_logMutex.lock();
 	QTextCursor cursor = m_output->textCursor();
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
@@ -247,9 +248,11 @@ void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
 	m_output->append("");
+	m_logMutex.unlock();
 }
 
 void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
+	m_logMutex.lock();
 	QTextCursor cursor = m_output->textCursor();
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
@@ -282,6 +285,7 @@ void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
 	m_output->append("");
+	m_logMutex.unlock();
 }
 
 void AppBase::slotLogError(const QString& _sender, const QString& _message) {
@@ -317,6 +321,7 @@ void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
 	m_output->append("");
+	m_logMutex.unlock();
 }
 
 void AppBase::slotSetStatus(const QString& _text) {

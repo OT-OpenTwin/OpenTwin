@@ -469,7 +469,7 @@ QString FAR::toolName(void) const {
 }
 
 QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
-	QSplitter* centralSplitter = new QSplitter;
+	m_centralSplitter = new QSplitter;
 	// Filter
 
 	m_leftGridW = new QWidget;
@@ -513,7 +513,7 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 
 	m_leftGrid->setColumnStretch(1, 1);
 
-	centralSplitter->addWidget(leftGridScrollArea);
+	m_centralSplitter->addWidget(leftGridScrollArea);
 
 	// Find mode
 	m_rightLayoutW = new QWidget;
@@ -534,7 +534,7 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	m_rightLayout->addLayout(m_rightTopLayout);
 	m_rightLayout->addWidget(m_findModeTab, 1);
 
-	centralSplitter->addWidget(m_rightLayoutW);
+	m_centralSplitter->addWidget(m_rightLayoutW);
 
 	this->connect(m_browseRootDir, &QPushButton::clicked, this, &FAR::slotBrowseRoot);
 
@@ -600,7 +600,7 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	this->connect(m_replaceTextBtn, &QPushButton::clicked, this, &FAR::slotReplaceText);
 	m_findModeTab->addTab(m_replaceTextLayoutW, FAR_SEARCHMODE_ReplaceText);
 
-	return centralSplitter;
+	return m_centralSplitter;
 }
 
 void FAR::restoreToolSettings(QSettings& _settings) {

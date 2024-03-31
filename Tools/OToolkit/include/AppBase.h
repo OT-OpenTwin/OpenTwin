@@ -17,6 +17,9 @@
 #include <QtCore/qthread.h>
 #include <QtWidgets/qmainwindow.h>
 
+// std header
+#include <mutex>
+
 class ToolManager;
 class LogVisualization;
 class Terminal;
@@ -105,4 +108,6 @@ private:
 	QApplication*		m_app;
 
 	QShortcut* m_recenterShortcut;
+
+	std::mutex m_logMutex;
 };
