@@ -10,6 +10,8 @@ static ot::SimpleFactoryRegistrar<ot::FillPainter2D> fillCfg(OT_SimpleFactoryJso
 
 ot::FillPainter2D::FillPainter2D() {}
 
+ot::FillPainter2D::FillPainter2D(ot::Color::DefaultColor _color) : m_color(_color) {}
+
 ot::FillPainter2D::FillPainter2D(const ot::Color& _color) : m_color(_color) {}
 
 ot::FillPainter2D::~FillPainter2D() {}

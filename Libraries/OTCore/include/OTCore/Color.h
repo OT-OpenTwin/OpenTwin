@@ -69,8 +69,8 @@ namespace ot {
 
 		explicit Color();
 		explicit Color(DefaultColor _color);
-		explicit Color(float _r, float _g, float _b, float _a = 1.f);
 		explicit Color(int r, int g, int b, int a = 255);
+		explicit Color(float _r, float _g, float _b, float _a = 1.f);
 		Color(const Color& _other);
 		virtual ~Color();
 

@@ -431,6 +431,9 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 0, 0))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(240, 240, 240))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 0, 0))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color(0, 0, 0))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(Color::LightGray))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color(Color::Black))));
 
 	// Initialize default colors
 	m_colors.insert_or_assign(CSE_COLOR_BorderColor_1, new PropertyPainter2D(new FillPainter2D(Color(Color::Black))));
