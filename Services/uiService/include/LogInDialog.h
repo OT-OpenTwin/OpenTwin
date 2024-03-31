@@ -1,0 +1,25 @@
+//! @file LogInDialog.h
+//! @author Alexander Kuester (alexk95)
+//! @date April 2024
+// ###########################################################################################################################################################################################################################################################################################################################
+
+#pragma once
+
+// OpenTwin header
+#include "OTWidgets/Dialog.h"
+
+class LogInDialog : public ot::Dialog {
+	Q_OBJECT
+public:
+	LogInDialog();
+	virtual ~LogInDialog();
+
+private Q_SLOTS:
+	void slotLogIn(void);
+	void slotCancel(void);
+	void slotNewUser(void);
+	void slotGSSChanged(void);
+
+private:
+
+};

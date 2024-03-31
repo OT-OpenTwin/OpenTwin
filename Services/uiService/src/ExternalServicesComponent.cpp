@@ -865,12 +865,10 @@ void ExternalServicesComponent::contextMenuItemClicked(ot::ServiceBase * _sender
 
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		assert(0); // ERROR
-		printSWarning(_sender, ("Response for context menu item clicked: " + response).c_str());
+		OT_LOG_E(response);
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		assert(0); // ERROR
-		printSError(_sender, ("Response for context menu item clicked: " + response).c_str());
+		OT_LOG_W(response);
 	}
 }
 
@@ -886,12 +884,10 @@ void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase * 
 
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		assert(0); // ERROR
-		printSWarning(_sender, ("Response for context menu item checked changed: " + response).c_str());
+		OT_LOG_E(response);
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-	assert(0); // ERROR
-	printSError(_sender, ("Response for context menu item checked changed: " + response).c_str());
+		OT_LOG_W(response);
 	}
 }
 

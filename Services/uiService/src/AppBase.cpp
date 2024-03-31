@@ -5,20 +5,20 @@
 
 // uiService header
 #include "AppBase.h"		// Corresponding header
-#include <ViewerComponent.h>	// Viewer component
-#include <ExternalServicesComponent.h>		// ExternalServices component
-#include <debugNotifier.h>		// DebugNotifier
-#include <UserManagement.h>
-#include <ProjectManagement.h>
-#include <ControlsManager.h>
-#include <ToolBar.h>
+#include "ViewerComponent.h"	// Viewer component
+#include "ExternalServicesComponent.h"		// ExternalServices component
+#include "debugNotifier.h"		// DebugNotifier
+#include "UserManagement.h"
+#include "ProjectManagement.h"
+#include "ControlsManager.h"
+#include "ToolBar.h"
 #include "ShortcutManager.h"
 #include "ContextMenuManager.h"
-#include <LogInManager.h>
-#include <ManageGroups.h>
-#include <ManageAccess.h>
-#include <UiPluginComponent.h>
-#include <UiPluginManager.h>
+#include "LogInManager.h"
+#include "ManageGroups.h"
+#include "ManageAccess.h"
+#include "UiPluginComponent.h"
+#include "UiPluginManager.h"
 #include "DevLogger.h"
 #include "PropertyGridView.h"
 #include "NavigationTreeView.h"
@@ -184,7 +184,7 @@ int AppBase::run() {
 
 		// Initialize uiCore
 		OT_LOG_I("Initializing UI Core Module");
-		uiAPI::ini("OpenTwin", "uiService");
+		uiAPI::ini("OpenTwin", "UserFrontend");
 
 		OT_UISERVICE_DEV_LOGGER_INIT;
 
@@ -365,6 +365,10 @@ int AppBase::run() {
 }
 
 bool AppBase::isInitialized(void) const { return m_isInitialized; }
+
+std::shared_ptr<QSettings> AppBase::createSettingsInstance(void) const {
+	return std::shared_ptr<QSettings>(new QSettings("OpenTwin", "UserFrontend"));
+}
 
 // ##############################################################################################
 

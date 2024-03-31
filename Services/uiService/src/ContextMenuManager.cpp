@@ -236,8 +236,7 @@ void ContextMenuManager::notify(UID _sender, eventType _event, int _info1, int _
 				}
 			}
 			else {
-				OTAssert(0, "Failed to find context menu entry by id");
-				printIError("Failed to find context menu entry by id");
+				OT_LOG_EA("Failed to find context menu entry by id");
 			}
 		}
 		else if (_event == etContextMenuItemCheckedChanged) {
@@ -277,8 +276,7 @@ void ContextMenuManager::notify(UID _sender, eventType _event, int _info1, int _
 				}
 			}
 			else {
-				OTAssert(0, "Failed to find context menu entry by id");
-				printIError("Failed to find context menu entry by id");
+				OT_LOG_EA("Failed to find context menu entry by id");
 			}
 		}
 	}
@@ -304,21 +302,18 @@ ContextMenuItem * ContextMenuManager::createItem(ot::ServiceBase * _creator, ak:
 				newItem->addEntry(actualItem);
 			}
 			else {
-				OTAssert(0, "Context menu item cast failed");
-				printSError(_creator, "Context menu item cast failed");
+				OT_LOG_EA("Context menu item cast failed");
 			}
 		}
 		else if (itm->type() == ot::AbstractContextMenuItem::Seperator) {
 			ot::ContextMenuSeperator * actualItem = dynamic_cast<ot::ContextMenuSeperator *>(itm);
 			if (actualItem) { newItem->addSeperator(); }
 			else {
-				OTAssert(0, "Context menu seperator cast failed");
-				printSError(_creator, "Context menu seperator cast failed");
+				OT_LOG_EA("Context menu seperator cast failed");
 			}
 		}
 		else {
-			OTAssert(0, "Unknown context menu item type");
-			printSError(_creator, "Unknown context menu item type");
+			OT_LOG_EA("Unknown context menu item type");
 		}
 	}
 	uiAPI::registerUidNotifier(newUid, this);

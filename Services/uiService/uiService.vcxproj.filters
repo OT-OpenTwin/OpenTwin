@@ -21,9 +21,6 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{7fabad94-f6ff-43d9-a1d5-5bcc04e1742b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\customWidgets">
-      <UniqueIdentifier>{9e6a87d1-0d17-4a75-8d8f-d825e9c8fe35}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Third Party files">
       <UniqueIdentifier>{461d365b-33aa-4b14-8471-f732cca75cb4}</UniqueIdentifier>
     </Filter>
@@ -34,14 +31,17 @@
     <Filter Include="Header Files\Components">
       <UniqueIdentifier>{0ac18b09-ef1d-4460-b910-0824408fcd5d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\customWidgets">
-      <UniqueIdentifier>{43562513-ec1f-4c42-b7da-a0b294b91791}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\WidgetView">
       <UniqueIdentifier>{afa15437-274f-4c00-8540-08f4aa3adc51}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\WidgetView">
       <UniqueIdentifier>{2794138f-29af-48a1-b8f7-9f6c997b2921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CustomWidgets">
+      <UniqueIdentifier>{43562513-ec1f-4c42-b7da-a0b294b91791}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CustomWidgets">
+      <UniqueIdentifier>{9e6a87d1-0d17-4a75-8d8f-d825e9c8fe35}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -58,7 +58,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\welcomeScreen.cpp">
-      <Filter>Source Files\customWidgets</Filter>
+      <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
     <ClCompile Include="src\ExternalServicesComponent.cpp">
       <Filter>Source Files\Components</Filter>
@@ -82,9 +82,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ContextMenuManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LogInManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ManageGroups.cpp">
@@ -115,13 +112,19 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SelectEntitiesDialog.cpp">
-      <Filter>Source Files\customWidgets</Filter>
+      <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
     <ClCompile Include="src\NavigationTreeView.cpp">
       <Filter>Source Files\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyGridView.cpp">
       <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogInManager.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogInDialog.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,7 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\welcomeScreen.h">
-      <Filter>Header Files\customWidgets</Filter>
+      <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
     <QtMoc Include="include\ExternalServicesComponent.h">
       <Filter>Header Files\Components</Filter>
@@ -185,9 +188,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="include\UserSettings.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="include\LogInManager.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="include\AppBase.h">
@@ -206,7 +206,13 @@
       <Filter>Header Files\Components</Filter>
     </QtMoc>
     <QtMoc Include="include\SelectEntitiesDialog.h">
-      <Filter>Header Files\customWidgets</Filter>
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogInManager.h">
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogInDialog.h">
+      <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

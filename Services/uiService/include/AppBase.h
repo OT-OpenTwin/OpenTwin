@@ -30,6 +30,7 @@
 #include <qobject.h>
 #include <qstring.h>
 #include <qicon.h>
+#include <QtCore/qsettings.h>
 
 // C++ header
 #include <vector>
@@ -69,21 +70,6 @@ struct structModelViewInfo
 	ModelUIDtype	model;
 };
 
-#define printIInfo(__message) { QString msg{"[INTERN] : "}; msg.append(__message); AppBase::instance()->appendDebugMessage(msg); }
-#define printIWarning(__message) { QString msg{"[WARNING] : "}; msg.append(__message); AppBase::instance()->appendDebugMessage(msg); }
-#define printIError(__message) { QString msg{"[ERROR] : "}; msg.append(__message); AppBase::instance()->appendDebugMessage(msg); }
-
-#define printServiceInfo(__service) if (__service) { msg.append("#").append(QString::number(__service->serviceID())).append("  ").append(__service->serviceName().c_str()).append("  @ ").append(__service->serviceURL().c_str()); } else { msg.append("#- null  @ unknown"); } msg.append("] : ")
-
-#define printSInfo(__service, __message) { QString msg{ "[EXTERN] [SERVICE:  " }; printServiceInfo(__service).append(__message); AppBase::instance()->appendDebugMessage(msg); }
-#define printSInfoD(__service, __message) { QString msg{ "[EXTERN] [SERVICE:  " }; printServiceInfo(__service).append(__message); AppBase::instance()->appendDebugMessage(msg); }
-
-#define printSWarning(__service, __message) { QString msg{ "[WARNING] [EXTERN] [SERVICE:  " }; printServiceInfo(__service).append(__message); AppBase::instance()->appendDebugMessage(msg); }
-#define printSWarningD(__service, __message) { QString msg{ "[WARNING] [EXTERN] [SERVICE:  " }; printServiceInfo(__service).append(__message); AppBase::instance()->appendDebugMessage(msg); }
-
-#define printSError(__service, __message) { QString msg{ "[ERROR] [EXTERN] [SERVICE:  " }; printServiceInfo(__service).append(__message); AppBase::instance()->appendDebugMessage(msg); }
-#define printSErrorD(__service, __message) { QString msg{ "[ERROR] [EXTERN] [SERVICE:  " }; printServiceInfo(__service).append(__message); AppBase::instance()->appendDebugMessage(msg); }
-
 //! The API manager is used to manage the global objects required for this API to work
 class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier {
 	Q_OBJECT
@@ -107,6 +93,8 @@ public:
 
 	//! @brief Returns true if the API was initialized
 	bool isInitialized(void) const;
+
+	std::shared_ptr<QSettings> createSettingsInstance(void) const;
 
 	// ##############################################################################################
 
