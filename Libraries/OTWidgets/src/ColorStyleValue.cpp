@@ -56,6 +56,7 @@ void ot::ColorStyleValue::setFromJsonObject(const ot::ConstJsonObject& _object) 
 		OT_LOG_E("Failed to create painter");
 		return;
 	}
+	newPainter->setFromJsonObject(painterObj);
 	this->setPainter(newPainter);
 }
 
