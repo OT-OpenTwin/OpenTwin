@@ -24,8 +24,6 @@ for /f "tokens=2,*" %%a in ('reg query "%NSIS_REG_KEY%" /ve 2^>nul') do (
 )
 
 for /f "tokens=2*" %%a in ('reg query "%SEVENZIP_REG_KEY%" /v "%SEVENZIP_VALUE%" 2^>nul') do set SEVENZIP_REG_DATA=%%b
-REM install pyinstaller
-REM 7zip check
 
 Set MAKENSIS_PATH="!NSIS_REG_VALUE!\makensis.exe"
 Set ENDUSER_NSI="!OPENTWIN_DEV_ROOT!\Scripts\Installer\nsis\install_opentwin_endUser.nsi"
