@@ -575,41 +575,32 @@ QScrollBar:vertical {
 
 QScrollBar::handle:horizontal {
     background-color: %color:Input Background 2%;
-    border-color: %color:Border Color 2%;
-    border-radius: %number:Border Radius 1%;
+    border: 1px solid transparent;
+    border-radius: %number:Border Radius 2%;
     min-width: 8px;
 }
 
 QScrollBar::handle:horizontal:hover {
     background-color: %color:Widget Hover Background 1%;
-    color: %color:Widget Hover Foreground 1%;
-    border: %color:Border Color 1%;
-    border-radius: %number:Border Radius 1%;
-    min-width: 8px;
 }
 
-QScrollBar::handle:horizontal:focus {
-    border-color: %color:Border Selection Color 1%;
-    background-color: %color:Widget Selection Color 1%;
+QScrollBar::handle:horizontal:pressed {
+    background-color: %color:Widget Selection Background 1%;
 }
 
 QScrollBar::handle:vertical {
     background-color: %color:Input Background 1%;
-    border-color: %color:Border Color 1%;
     min-height: 8px;
-    border-radius: %number:Border Radius 1%;
+    border: 1px solid transparent;
+    border-radius: %number:Border Radius 2%;
 }
 
 QScrollBar::handle:vertical:hover {
     background-color: %color:Widget Hover Background 1%;
-    border: 1px solid %color:Border Color 1%;
-    border-radius: %number:Border Radius 1%;
-    min-height: 8px;
 }
 
-QScrollBar::handle:vertical:focus {
-    border-color: %color:Border Selection Color 1%;
-    background-color: %color:Widget Selection Color 1%;
+QScrollBar::handle:vertical:pressed {
+    background-color: %color:Widget Selection Background 1%;
 }
 
 QScrollBar::add-line:horizontal {
@@ -1018,11 +1009,11 @@ QProgressBar::chunk:disabled {
 QPushButton {
     background-color: %color:Input Background 1%;
     color: %color:Widget Foreground 1%;
-    border-radius: %number:Border Radius 1%;
     padding: 2px;
     outline: none;
-    border: 1px solid %color:Light Border Color 1%;
+    border: 1px solid %color:Border Color 1%;
     border-style: outset;
+    border-radius: %number:Border Radius 1%;
 }
 
 QPushButton:disabled {
@@ -1034,7 +1025,6 @@ QPushButton:disabled {
 
 QPushButton:checked {
     background-color: %color:Widget Background 2%;
-    border-radius: %number:Border Radius 1%;
     padding: 2px;
     outline: none;
 }
@@ -1439,10 +1429,7 @@ QLineEdit:selected {
 QTabWidget {
     padding: 2px;
     selection-background-color: %color:Widget Background 1%;
-}
-
-QTabWidget QWidget {
-    border-radius: %number:Border Radius 1%;
+    border-radius: 0;
 }
 
 QTabWidget::pane {
@@ -1552,8 +1539,8 @@ QTabBar::tab:top,
 QDockWidget QTabBar::tab:top {
     background-color: %color:Widget Background 1%;
     margin-left: 0px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
     padding-top: 2px;
     padding-bottom: 2px;
     min-width: 5px;
@@ -1563,13 +1550,6 @@ QDockWidget QTabBar::tab:top {
     border-bottom: 3px solid %color:Light Border Color 1%;
     border-top-left-radius: %number:Border Radius 1%;
     border-top-right-radius: %number:Border Radius 1%;
-}
-
-QTabBar::tab:top:first, 
-QDockWidget QTabBar::tab:top:first,
-QTabBar::tab:top:only-one,
-QDockWidget QTabBar::tab:top:only-one {
-    margin-left: 8px;
 }
 
 QTabBar::tab:top:selected,
@@ -1586,8 +1566,8 @@ QTabBar::tab:bottom,
 QDockWidget QTabBar::tab:bottom {
     background-color: %color:Widget Background 1%;
     margin-left: 2px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
     padding-top: 2px;
     padding-bottom: 2px;
     border-bottom: 1px solid %color:Light Border Color 1%;
@@ -1631,8 +1611,8 @@ QDockWidget QTabBar::tab:left {
     margin-top: 2px;
     padding-left: 2px;
     padding-right: 2px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     border-top-left-radius: %number:Border Radius 1%;
     border-bottom-left-radius: %number:Border Radius 1%;
     min-height: 5px;
@@ -1658,8 +1638,8 @@ QDockWidget QTabBar::tab:right {
     margin-top: 2px;
     padding-left: 2px;
     padding-right: 2px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     border-top-right-radius: %number:Border Radius 1%;
     border-bottom-right-radius: %number:Border Radius 1%;
     min-height: 5px;
@@ -2145,7 +2125,8 @@ QSplitter {
 
 QSplitter::handle {
     background-color: %color:Input Background 1%;
-    border: 0px solid %color:Border Color 1%;
+    border: 1px solid transparent;
+    border-radius: %number:Border Radius 2%;
     spacing: 0px;
     padding: 1px;
     margin: 0px;
@@ -2157,12 +2138,12 @@ QSplitter::handle:hover {
 
 QSplitter::handle:horizontal {
     width: 5px;
-    image: url('%file:/icons/line_vertical.png%');
+    /*image: url('%file:/icons/line_vertical.png%');*/
 }
 
 QSplitter::handle:vertical {
     height: 5px;
-    image: url('%file:/icons/line_horizontal.png%');
+    /*image: url('%file:/icons/line_horizontal.png%');*/
 }
 
 /* ##################################################################################### */

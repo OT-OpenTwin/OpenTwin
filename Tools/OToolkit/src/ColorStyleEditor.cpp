@@ -463,7 +463,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
 
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(10.));
+	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
 	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
 }
 
