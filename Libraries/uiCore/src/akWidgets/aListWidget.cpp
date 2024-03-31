@@ -29,13 +29,13 @@ ak::aListWidget::~aListWidget() {
 QWidget * ak::aListWidget::widget(void) { return this; }
 
 void ak::aListWidget::keyPressEvent(QKeyEvent *_event)
-{ QListWidget::keyPressEvent(_event); emit keyPressed(_event); }
+{ QListWidget::keyPressEvent(_event); Q_EMIT keyPressed(_event); }
 
 void ak::aListWidget::keyReleaseEvent(QKeyEvent * _event)
-{ QListWidget::keyReleaseEvent(_event); emit keyReleased(_event); }
+{ QListWidget::keyReleaseEvent(_event); Q_EMIT keyReleased(_event); }
 
 void ak::aListWidget::mouseMoveEvent(QMouseEvent * _event)
-{ QListWidget::mouseMoveEvent(_event); emit mouseMove(_event); }
+{ QListWidget::mouseMoveEvent(_event); Q_EMIT mouseMove(_event); }
 
 // ###########################################################################################################################################
 

@@ -228,7 +228,7 @@ void ot::TextEditor::slotUpdateLineNumberArea(const QRect & _rect, int _dy) {
 
 void ot::TextEditor::slotSaveRequested(void) {
 	if (!m_contentChanged) return;
-	emit saveRequested();
+	Q_EMIT saveRequested();
 }
 
 void ot::TextEditor::slotTextChanged(void) {

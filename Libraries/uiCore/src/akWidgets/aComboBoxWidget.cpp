@@ -26,12 +26,12 @@ ak::aComboBoxWidget::~aComboBoxWidget() { A_OBJECT_DESTROYING }
 void ak::aComboBoxWidget::keyPressEvent(QKeyEvent *_event)
 {
 	QComboBox::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aComboBoxWidget::keyReleaseEvent(QKeyEvent * _event) {
 	QComboBox::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 void ak::aComboBoxWidget::wheelEvent(QWheelEvent * _event) {

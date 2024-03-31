@@ -15,10 +15,10 @@ ot::TabWidget::~TabWidget() {
 
 void ot::TabWidget::focusInEvent(QFocusEvent* _event) {
 	QTabWidget::focusInEvent(_event);
-	emit widgetGotFocus();
+	Q_EMIT widgetGotFocus();
 }
 
 void ot::TabWidget::focusOutEvent(QFocusEvent* _event) {
 	QTabWidget::focusOutEvent(_event);
-	emit widgetLostFocus();
+	Q_EMIT widgetLostFocus();
 }

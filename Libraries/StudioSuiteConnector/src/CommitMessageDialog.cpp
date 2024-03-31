@@ -90,7 +90,7 @@ void CommitMessageDialog::Close(void) {
 	if (my_input->text().length() == 0) { return; }
 
 	my_cancelClose = false;
-	emit isClosing();
+	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }
 	else { my_confirmed = false; }
 }

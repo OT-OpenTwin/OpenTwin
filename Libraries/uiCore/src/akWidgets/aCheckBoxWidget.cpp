@@ -39,14 +39,14 @@ void ak::aCheckBoxWidget::keyPressEvent(
 	QKeyEvent *								_event
 ) {
 	QCheckBox::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aCheckBoxWidget::keyReleaseEvent(
 	QKeyEvent *								_event
 ) {
 	QCheckBox::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 // #######################################################################################################

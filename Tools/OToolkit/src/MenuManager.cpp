@@ -66,9 +66,9 @@ ToolMenuManager* MenuManager::toolMenu(const QString& _toolName) {
 }
 
 void MenuManager::slotExit(void) {
-	emit exitRequested();
+	Q_EMIT exitRequested();
 }
 
 void MenuManager::slotSettings(void) {
-	emit settingsRequested();
+	Q_EMIT settingsRequested();
 }

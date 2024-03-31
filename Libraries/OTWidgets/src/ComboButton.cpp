@@ -56,7 +56,7 @@ void ot::ComboButton::mousePressEvent(QMouseEvent* _event) {
 
 void ot::ComboButton::slotActionTriggered(QAction* _action) {
 	this->setText(_action->text());
-	emit textChanged();
+	Q_EMIT textChanged();
 }
 
 void ot::ComboButton::ini(void) {

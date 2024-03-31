@@ -51,7 +51,7 @@ void ak::aDockWidget::removeChildObject(
 void ak::aDockWidget::closeEvent(
 	QCloseEvent *								_event
 ) {
-	emit closing();
+	Q_EMIT closing();
 	QDockWidget::closeEvent(_event);
 }
 

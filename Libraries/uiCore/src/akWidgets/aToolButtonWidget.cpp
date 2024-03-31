@@ -55,12 +55,12 @@ ak::aToolButtonWidget::~aToolButtonWidget() { A_OBJECT_DESTROYING }
 void ak::aToolButtonWidget::keyPressEvent(QKeyEvent *_event)
 {
 	QToolButton::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aToolButtonWidget::keyReleaseEvent(QKeyEvent * _event) {
 	QToolButton::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 // #######################################################################################################
@@ -146,21 +146,21 @@ void ak::aToolButtonWidget::slotClicked() {
 	if (m_menuItems.size() != 0) {
 		showMenu();
 	}
-	else { emit btnClicked(); }
+	else { Q_EMIT btnClicked(); }
 }
 
 void ak::aToolButtonWidget::slotMenuItemClicked() {
 	aContextMenuItem * itm = nullptr;
 	itm = dynamic_cast<aContextMenuItem *>(sender());
 	assert(itm != nullptr); // Cast failed
-	emit menuItemClicked(itm->id());
+	Q_EMIT menuItemClicked(itm->id());
 }
 
 void ak::aToolButtonWidget::slotMenuItemCheckedChanged() {
 	aContextMenuItem * itm = nullptr;
 	itm = dynamic_cast<aContextMenuItem *>(sender());
 	assert(itm != nullptr); // Cast failed
-	emit menuItemCheckedChanged(itm->id(), itm->isChecked());
+	Q_EMIT menuItemCheckedChanged(itm->id(), itm->isChecked());
 }
 
 // #######################################################################################################

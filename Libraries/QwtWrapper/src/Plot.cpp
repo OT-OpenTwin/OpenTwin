@@ -169,7 +169,7 @@ qwtw::PlotDataset * qwtw::Plot::addDataset(
 }
 
 void qwtw::Plot::datasetSelectionChanged(PlotDataset * _selectedDataset) {
-	emit selectionChanged(_selectedDataset, (QApplication::keyboardModifiers() & Qt::ControlModifier));
+	Q_EMIT selectionChanged(_selectedDataset, (QApplication::keyboardModifiers() & Qt::ControlModifier));
 }
 
 void qwtw::Plot::setErrorState(bool _isError, const QString & _message) {

@@ -110,6 +110,6 @@ void ProjectInformationDialog::slotButtonClosePressed() { Close(); }
 
 void ProjectInformationDialog::Close(void) {
 
-	emit isClosing();
+	Q_EMIT isClosing();
 	close();
 }

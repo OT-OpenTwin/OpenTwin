@@ -33,7 +33,7 @@ bool ak::aLabelWidget::event(QEvent *myEvent)
 	switch(myEvent->type())
 	{        
 	case(QEvent :: MouseButtonRelease):   // Identify Mouse press Event
-		emit clicked();
+		Q_EMIT clicked();
 		break;
 	}
 	return QWidget::event(myEvent);

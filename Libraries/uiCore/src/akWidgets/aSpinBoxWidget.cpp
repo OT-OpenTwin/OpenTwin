@@ -52,7 +52,7 @@ void ak::aSpinBoxWidget::slotValueChanged(int _v) {
 	}
 	if (value() != m_value) {
 		m_value = value();
-		emit aValueChanged(m_value);
+		Q_EMIT aValueChanged(m_value);
 	}
 }
 
@@ -60,7 +60,7 @@ void ak::aSpinBoxWidget::mouseReleaseEvent(QMouseEvent *event)
 {
 	QSpinBox::mouseReleaseEvent(event);
 
-	emit editingFinished();
+	Q_EMIT editingFinished();
 }
 
 void ak::aSpinBoxWidget::keyReleaseEvent(QKeyEvent *event)
@@ -69,6 +69,6 @@ void ak::aSpinBoxWidget::keyReleaseEvent(QKeyEvent *event)
 
 	if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down)
 	{
-		emit editingFinished();
+		Q_EMIT editingFinished();
 	}
 }

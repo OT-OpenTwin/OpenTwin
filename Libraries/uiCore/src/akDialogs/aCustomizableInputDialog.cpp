@@ -323,7 +323,7 @@ void ak::aCustomizableInputDialog::setChecked(UID _inputUID, bool _isChecked) {
 void ak::aCustomizableInputDialog::slotButtonClicked(void) {
 	aObject * actualSender = dynamic_cast<aObject *>(sender());
 	if (actualSender) {
-		emit buttonClicked(actualSender->uid());
+		Q_EMIT buttonClicked(actualSender->uid());
 	}
 	else {
 		assert(0);
@@ -333,7 +333,7 @@ void ak::aCustomizableInputDialog::slotButtonClicked(void) {
 void ak::aCustomizableInputDialog::slotInputChanged(void) {
 	aObject * actualSender = dynamic_cast<aObject *>(sender());
 	if (actualSender) {
-		emit editFinished(actualSender->uid());
+		Q_EMIT editFinished(actualSender->uid());
 	}
 	else {
 		assert(0);

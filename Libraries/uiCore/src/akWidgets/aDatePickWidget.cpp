@@ -73,7 +73,7 @@ void ak::aDatePickWidget::slotClicked(void) {
 	if (d.showDialog() == ak::dialogResult::resultOk) {
 		m_date = d.selectedDate();
 		setText(m_date.toQString(m_delimiter, m_dateFormat));
-		emit changed();
+		Q_EMIT changed();
 	}
 }
 

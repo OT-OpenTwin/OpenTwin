@@ -148,7 +148,7 @@ void ManageOwnerTable::slotSelectionChanged() {
 		}
 	}
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
-	emit selectionChanged();
+	Q_EMIT selectionChanged();
 }
 
 void ManageOwnerTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second)

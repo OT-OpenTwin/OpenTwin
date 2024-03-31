@@ -48,12 +48,12 @@ ak::aComboButtonWidget::~aComboButtonWidget() { A_OBJECT_DESTROYING clearItems()
 void ak::aComboButtonWidget::keyPressEvent(QKeyEvent *_event)
 {
 	QPushButton::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aComboButtonWidget::keyReleaseEvent(QKeyEvent * _event) {
 	QPushButton::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 // #######################################################################################################
@@ -160,7 +160,7 @@ void ak::aComboButtonWidget::slotItemTriggered() {
 	auto obj = m_itemUids.find(itm->uid());
 	assert(obj != m_itemUids.end()); // Invalid data stored
 	setText(m_items.at(obj->second)->text());
-	emit changed();
+	Q_EMIT changed();
 }
 
 QWidget * ak::aComboButtonWidget::widget(void) { return this; }

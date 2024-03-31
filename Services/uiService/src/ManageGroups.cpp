@@ -150,7 +150,7 @@ void ManageGroupsTable::slotSelectionChanged() {
 		}
 	}
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
-	emit selectionChanged();
+	Q_EMIT selectionChanged();
 }
 
 void ManageGroupsTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second)
@@ -290,12 +290,12 @@ void addGroupDialog::slotButtonCancelPressed()
 
 void addGroupDialog::slotReturnPressed() 
 {
-	emit my_buttonConfirm->clicked();
+	Q_EMIT my_buttonConfirm->clicked();
 }
 
 void addGroupDialog::Close(void) 
 {
-	emit isClosing();
+	Q_EMIT isClosing();
 	close();
 }
 
@@ -421,13 +421,13 @@ void renameGroupDialog::slotButtonCancelPressed()
 
 void renameGroupDialog::slotReturnPressed() 
 {
-	emit my_buttonConfirm->clicked();
+	Q_EMIT my_buttonConfirm->clicked();
  }
 
 void renameGroupDialog::Close(void) 
 {
 	my_cancelClose = false;
-	emit isClosing();
+	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }
 	else { my_confirmed = false; }
 }

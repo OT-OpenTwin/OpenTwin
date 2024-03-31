@@ -58,7 +58,7 @@ void ak::aDialog::Close(
 bool ak::aDialog::event(QEvent * _event) {
 	if (_event->type() == QEvent::EnterWhatsThisMode) { 
 		_event->setAccepted(false);
-		emit helpButtonClicked(); 
+		Q_EMIT helpButtonClicked(); 
 		return false; 
 	}
 	return QDialog::event(_event);

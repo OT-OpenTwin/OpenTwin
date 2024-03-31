@@ -178,7 +178,7 @@ void ak::aTreeWidget::clear(bool _emitEvent) {
 	m_tree->Clear();
 	m_items.clear();
 	m_currentId = 0;
-	if (_emitEvent) { emit cleared(); }
+	if (_emitEvent) { Q_EMIT cleared(); }
 }
 
 void ak::aTreeWidget::setItemEnabled(
@@ -268,7 +268,7 @@ void ak::aTreeWidget::deselectAllItems(
 	for (auto itm = m_items.begin(); itm != m_items.end(); itm++) { itm->second->setSelected(false); }
 	m_ignoreEvents = false;
 
-	if (_emitEvent) { emit selectionChanged(); }
+	if (_emitEvent) { Q_EMIT selectionChanged(); }
 }
 
 void ak::aTreeWidget::setEnabled(
@@ -598,7 +598,7 @@ void ak::aTreeWidget::selectionChangedEvent(
 	}
 	m_ignoreEvents = ignoreBackup;
 
-	if (_emitEvent) { emit selectionChanged(); }
+	if (_emitEvent) { Q_EMIT selectionChanged(); }
 }
 
 ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {
@@ -615,17 +615,17 @@ ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {
 
 void ak::aTreeWidget::slotTreeKeyPressed(QKeyEvent * _event) {
 	if (m_ignoreEvents) { return; }
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aTreeWidget::slotTreeKeyReleased(QKeyEvent * _event) {
 	if (m_ignoreEvents) { return; }
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 void ak::aTreeWidget::slotTreeItemActivated(QTreeWidgetItem * _item, int _column) {
 	if (m_ignoreEvents) { return; }
-	emit itemActivated(_item, _column);
+	Q_EMIT itemActivated(_item, _column);
 }
 
 void ak::aTreeWidget::slotTreeItemChanged(QTreeWidgetItem * _item, int _column) {
@@ -640,17 +640,17 @@ void ak::aTreeWidget::slotTreeItemChanged(QTreeWidgetItem * _item, int _column) 
 		// Item text changed
 		itm->setStoredText(itm->text(0));
 		if (m_ignoreEvents) { return; }
-		emit itemTextChanged(_item, _column);
+		Q_EMIT itemTextChanged(_item, _column);
 	}
 	else if (!m_ignoreEvents) {
 		// Regular change
-		emit itemChanged(_item, _column);
+		Q_EMIT itemChanged(_item, _column);
 	}
 }
 
 void ak::aTreeWidget::slotTreeItemClicked(QTreeWidgetItem * _item, int _column) {
 	if (m_ignoreEvents) { return; }
-	emit itemClicked(_item, _column);
+	Q_EMIT itemClicked(_item, _column);
 }
 
 void ak::aTreeWidget::slotTreeItemCollapsed(QTreeWidgetItem * _item) {
@@ -659,18 +659,18 @@ void ak::aTreeWidget::slotTreeItemCollapsed(QTreeWidgetItem * _item) {
 	assert(itm != nullptr); // Cast failed
 	itm->collapse();
 	if (m_ignoreEvents) { return; }
-	emit itemCollapsed(_item);
+	Q_EMIT itemCollapsed(_item);
 
 }
 
 void ak::aTreeWidget::slotTreeItemDoubleClicked(QTreeWidgetItem * _item, int _column) {
 	if (m_ignoreEvents) { return; }
-	emit itemDoubleClicked(_item, _column);
+	Q_EMIT itemDoubleClicked(_item, _column);
 }
 
 void ak::aTreeWidget::slotTreeItemExpanded(QTreeWidgetItem * _item) {
 	if (m_ignoreEvents) { return; }
-	emit itemExpanded(_item);
+	Q_EMIT itemExpanded(_item);
 }
 
 void ak::aTreeWidget::slotTreeSelectionChanged() {
@@ -684,7 +684,7 @@ void ak::aTreeWidget::slotTreeMouseMove(QMouseEvent * _event) {
 		if (m_focusedItem != invalidID) {
 			m_focusedItem = invalidID;
 			if (m_ignoreEvents) { return; }
-			emit focusLost();
+			Q_EMIT focusLost();
 		}
 	}
 	else {
@@ -694,7 +694,7 @@ void ak::aTreeWidget::slotTreeMouseMove(QMouseEvent * _event) {
 		if (actualItem->id() != m_focusedItem) {
 			m_focusedItem = actualItem->id();
 			if (m_ignoreEvents) { return; }
-			emit itemFocused(item);
+			Q_EMIT itemFocused(item);
 		}
 	}
 }
@@ -703,7 +703,7 @@ void ak::aTreeWidget::slotTreeLeave(QEvent * _event) {
 	if (m_focusedItem != invalidID) {
 		m_focusedItem = invalidID;
 		if (m_ignoreEvents) { return; }
-		emit focusLost();
+		Q_EMIT focusLost();
 	}
 }
 
@@ -718,7 +718,7 @@ void ak::aTreeWidget::slotFilterKeyPressed(QKeyEvent * _event) {
 }
 
 void ak::aTreeWidget::slotCustomContextMenuRequested(const QPoint& _pos) {
-	emit customContextMenuRequested(_pos);
+	Q_EMIT customContextMenuRequested(_pos);
 }
 
 // ###########################################################################################################################
@@ -748,7 +748,7 @@ void ak::aTreeWidget::refreshAfterItemsMoved(const QList<aTreeWidgetItem *>& _it
 {
 
 
-	emit itemsMoved(_itemIds, _oldParentIds, _newParentIds);
+	Q_EMIT itemsMoved(_itemIds, _oldParentIds, _newParentIds);
 }
 
 void ak::aTreeWidget::memFree(void) {
@@ -799,22 +799,22 @@ ak::aTreeWidgetBase::~aTreeWidgetBase() { A_OBJECT_DESTROYING }
 
 void ak::aTreeWidgetBase::keyPressEvent(QKeyEvent *_event)
 {
-	QTreeWidget::keyPressEvent(_event); emit keyPressed(_event);
+	QTreeWidget::keyPressEvent(_event); Q_EMIT keyPressed(_event);
 }
 
 void ak::aTreeWidgetBase::keyReleaseEvent(QKeyEvent * _event)
 {
-	QTreeWidget::keyReleaseEvent(_event); emit keyReleased(_event);
+	QTreeWidget::keyReleaseEvent(_event); Q_EMIT keyReleased(_event);
 }
 
 void ak::aTreeWidgetBase::mouseMoveEvent(QMouseEvent * _event)
 {
-	QTreeWidget::mouseMoveEvent(_event); emit mouseMove(_event);
+	QTreeWidget::mouseMoveEvent(_event); Q_EMIT mouseMove(_event);
 }
 
 void ak::aTreeWidgetBase::leaveEvent(QEvent *_event)
 {
-	QTreeWidget::leaveEvent(_event); emit leave(_event);
+	QTreeWidget::leaveEvent(_event); Q_EMIT leave(_event);
 }
 
 void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {

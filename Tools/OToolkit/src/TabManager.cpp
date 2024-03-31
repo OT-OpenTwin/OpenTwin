@@ -50,6 +50,6 @@ void TabManager::removeTool(const QString& _toolName) {
 
 void TabManager::slotTabChanged(int _ix) {
 	if (_ix >= 0 && _ix < this->count()) {
-		emit currentToolChanged(this->tabText(_ix));
+		Q_EMIT currentToolChanged(this->tabText(_ix));
 	}
 }

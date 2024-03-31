@@ -87,7 +87,7 @@ void ak::aTimePickWidget::slotClicked(void) {
 	if (t.showDialog() == ak::dialogResult::resultOk) {
 		m_time = t.selectedTime();
 		setText(m_time.toQString(m_delimiter, m_timeFormat));
-		emit changed();
+		Q_EMIT changed();
 	}
 }
 

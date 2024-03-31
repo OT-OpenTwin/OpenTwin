@@ -234,7 +234,7 @@ void ak::aPropertyGridWidget::clear(bool _keepGroups) {
 
 	updateTableVisibility();
 
-	emit cleared();
+	Q_EMIT cleared();
 }
 
 // ##############################################################################################
@@ -278,7 +278,7 @@ ak::aPropertyGridItem * ak::aPropertyGridWidget::findItem(const QString& _itemNa
 void ak::aPropertyGridWidget::slotItemChanged(void) {
 	aPropertyGridItem * itm = dynamic_cast<aPropertyGridItem *>(sender());
 	if (itm) {
-		emit itemChanged(itm->id());
+		Q_EMIT itemChanged(itm->id());
 	}
 	else {
 		assert(0);
@@ -294,7 +294,7 @@ void ak::aPropertyGridWidget::slotFocusOut(void) {
 void ak::aPropertyGridWidget::slotItemDeleted(void) {
 	aPropertyGridItem* itm = dynamic_cast<aPropertyGridItem*>(sender());
 	if (itm) {
-		emit itemDeleted(itm->id());
+		Q_EMIT itemDeleted(itm->id());
 	}
 	else {
 		assert(0);
@@ -863,7 +863,7 @@ void ak::aPropertyGridItem::slotValueChanged(void) {
 		return;
 	}
 	m_isMultipleValues = false;
-	emit changed();
+	Q_EMIT changed();
 }
 
 void ak::aPropertyGridItem::slotValueBoolChanged(int _v) {
@@ -889,7 +889,7 @@ void ak::aPropertyGridItem::slotValueBoolChanged(int _v) {
 		return;
 	}
 	m_isMultipleValues = false;
-	emit changed();
+	Q_EMIT changed();
 }
 
 void ak::aPropertyGridItem::slotItemChanged(QTableWidgetItem * _item) {
@@ -928,11 +928,11 @@ void ak::aPropertyGridItem::slotItemChanged(QTableWidgetItem * _item) {
 		return;
 	}
 	setErrorState(false);
-	emit changed();
+	Q_EMIT changed();
 }
 
 void ak::aPropertyGridItem::slotItemDeleted(void) {
-	emit deleted();
+	Q_EMIT deleted();
 }
 
 

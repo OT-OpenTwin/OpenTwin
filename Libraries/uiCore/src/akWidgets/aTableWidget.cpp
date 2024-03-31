@@ -28,22 +28,22 @@ ak::aTableWidget::~aTableWidget() { A_OBJECT_DESTROYING }
 void ak::aTableWidget::keyPressEvent(QKeyEvent *_event)
 {
 	QTableWidget::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aTableWidget::keyReleaseEvent(QKeyEvent * _event) {
 	QTableWidget::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 void ak::aTableWidget::focusInEvent(QFocusEvent * _event) {
 	QTableWidget::focusInEvent(_event);
-	emit focused();
+	Q_EMIT focused();
 }
 
 void ak::aTableWidget::focusOutEvent(QFocusEvent * _event) {
 	QTableWidget::focusOutEvent(_event);
-	emit focusLost();
+	Q_EMIT focusLost();
 }
 
 // #######################################################################################################

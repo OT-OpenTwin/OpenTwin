@@ -70,16 +70,16 @@ QString ak::aNiceLineEditWidget::infoLabelText(void) const { return m_label->tex
 
 // Slots
 
-void ak::aNiceLineEditWidget::slotCursorPositionChanged(int _oldPos, int _newPos) { emit cursorPositionChanged(_oldPos, _newPos); }
+void ak::aNiceLineEditWidget::slotCursorPositionChanged(int _oldPos, int _newPos) { Q_EMIT cursorPositionChanged(_oldPos, _newPos); }
 
-void ak::aNiceLineEditWidget::slotSelectionChanged() { emit selectionChanged(); }
+void ak::aNiceLineEditWidget::slotSelectionChanged() { Q_EMIT selectionChanged(); }
 
-void ak::aNiceLineEditWidget::slotKeyPressed(QKeyEvent * _event) { emit keyPressed(_event); }
+void ak::aNiceLineEditWidget::slotKeyPressed(QKeyEvent * _event) { Q_EMIT keyPressed(_event); }
 
-void ak::aNiceLineEditWidget::slotKeyReleased(QKeyEvent * _event) { emit keyReleased(_event); }
+void ak::aNiceLineEditWidget::slotKeyReleased(QKeyEvent * _event) { Q_EMIT keyReleased(_event); }
 
-void ak::aNiceLineEditWidget::slotEditingFinished(void) { emit editingFinished(); }
+void ak::aNiceLineEditWidget::slotEditingFinished(void) { Q_EMIT editingFinished(); }
 
-void ak::aNiceLineEditWidget::slotTextChanged(const QString & _text) { emit textChanged(_text); }
+void ak::aNiceLineEditWidget::slotTextChanged(const QString & _text) { Q_EMIT textChanged(_text); }
 
-void ak::aNiceLineEditWidget::slotReturnPressed() { emit returnPressed(); }
+void ak::aNiceLineEditWidget::slotReturnPressed() { Q_EMIT returnPressed(); }

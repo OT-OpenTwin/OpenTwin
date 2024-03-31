@@ -101,12 +101,12 @@ void ak::aToolButtonCustomContextMenu::slotMenuItemClicked() {
 	aContextMenuItem * itm = nullptr;
 	itm = dynamic_cast<aContextMenuItem *>(sender());
 	assert(itm != nullptr); // Cast failed
-	emit menuItemClicked(itm->id());
+	Q_EMIT menuItemClicked(itm->id());
 }
 
 void ak::aToolButtonCustomContextMenu::slotMenuItemCheckedChanged(bool _state) {
 	aContextMenuItem * itm = nullptr;
 	itm = dynamic_cast<aContextMenuItem *>(sender());
 	assert(itm != nullptr); // Cast failed
-	emit menuItemCheckedChanged(itm->id(), itm->isChecked());
+	Q_EMIT menuItemCheckedChanged(itm->id(), itm->isChecked());
 }

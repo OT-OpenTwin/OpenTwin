@@ -43,7 +43,7 @@ bool ak::aLineEditWidget::eventFilter(QObject * _obj, QEvent * _event) {
 			if (actualEvent->key() == Qt::Key_Tab) {
 				if (m_ignoreTabulator) {
 					_event->accept();
-					emit tabPressed();
+					Q_EMIT tabPressed();
 					return true;
 				}
 			}
@@ -57,18 +57,18 @@ void ak::aLineEditWidget::keyPressEvent(QKeyEvent *_event)
 {
 	if (_event->key() == Qt::Key_Tab) {
 		QLineEdit::keyPressEvent(_event);
-		emit keyPressed(_event);
-		emit tabPressed();
+		Q_EMIT keyPressed(_event);
+		Q_EMIT tabPressed();
 		return;
 	}
 
 	if (_event->key() == Qt::Key_Return) {
-		emit returnPressed();
+		Q_EMIT returnPressed();
 	}
 	else
 	{
 		QLineEdit::keyPressEvent(_event);
-		emit keyPressed(_event);
+		Q_EMIT keyPressed(_event);
 	}
 }
 
@@ -77,18 +77,18 @@ void ak::aLineEditWidget::keyReleaseEvent(QKeyEvent *_event) {
 		_event->accept();
 	}
 	else {
-		QLineEdit::keyReleaseEvent(_event); emit keyReleased(_event);
+		QLineEdit::keyReleaseEvent(_event); Q_EMIT keyReleased(_event);
 	}
 }
 
 void ak::aLineEditWidget::focusInEvent(QFocusEvent * _event) {
 	QLineEdit::focusInEvent(_event);
-	emit focused();
+	Q_EMIT focused();
 }
 
 void ak::aLineEditWidget::focusOutEvent(QFocusEvent * _event) {
 	QLineEdit::focusOutEvent(_event);
-	emit focusLost();
+	Q_EMIT focusLost();
 }
 
 // #######################################################################################################
@@ -129,5 +129,5 @@ void ak::aLineEditWidget::setErrorStateIsForeground(bool _isForeground) {
 // Slots
 
 void ak::aLineEditWidget::slotEditingFinished() {
-	if (text() != m_text) { m_text = text(); emit finishedChanges(); }
+	if (text() != m_text) { m_text = text(); Q_EMIT finishedChanges(); }
 }

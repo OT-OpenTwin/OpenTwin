@@ -95,7 +95,7 @@ void ot::GraphicsScene::handleSelectionChanged(void) {
 	QList<QGraphicsItem*> tmp = m_lastSelection;
 	m_lastSelection = this->selectedItems();
 	if (tmp.size() != m_lastSelection.size()) {
-		emit selectionChangeFinished();
+		Q_EMIT selectionChangeFinished();
 	}
 	else {
 		for (QGraphicsItem* itm : m_lastSelection) {
@@ -107,7 +107,7 @@ void ot::GraphicsScene::handleSelectionChanged(void) {
 				}
 			}
 			if (!found) {
-				emit selectionChangeFinished();
+				Q_EMIT selectionChangeFinished();
 				return;
 			}
 		}

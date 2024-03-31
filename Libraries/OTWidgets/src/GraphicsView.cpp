@@ -269,11 +269,11 @@ void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::str
 		OT_LOG_W("Connection already exists { \"Origin.UID\": \"" + std::to_string(_fromUid) + "\", \"Origin.Conn\"" + _fromConnector + "\", \"Dest.UID\": \"" + std::to_string(_toUid) + "\", \"Dest.Conn\": \"" + _toConnector + "\" }");
 		return;
 	}
-	emit connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
+	Q_EMIT connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
 void ot::GraphicsView::notifyItemMoved(ot::GraphicsItem* _item) {
-	emit itemMoved(_item->graphicsItemUid(), _item->getQGraphicsItem()->pos());
+	Q_EMIT itemMoved(_item->graphicsItemUid(), _item->getQGraphicsItem()->pos());
 }
 
 // ########################################################################################################
@@ -344,7 +344,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 	else if (_event->key() == Qt::Key_Delete) {
 		ot::UIDList itm = this->selectedItems();
 		ot::UIDList con = this->selectedConnections();
-		emit removeItemsRequested(itm, con);
+		Q_EMIT removeItemsRequested(itm, con);
 	}
 }
 
@@ -377,7 +377,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		return;
 	}
 
-	emit itemRequested(itemName, this->mapToScene(_event->pos()));
+	Q_EMIT itemRequested(itemName, this->mapToScene(_event->pos()));
 	_event->acceptProposedAction();
 }
 

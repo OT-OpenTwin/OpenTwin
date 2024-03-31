@@ -31,17 +31,17 @@ ak::aPushButtonWidget::~aPushButtonWidget() { A_OBJECT_DESTROYING }
 void ak::aPushButtonWidget::keyPressEvent(QKeyEvent *_event)
 {
 	QPushButton::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aPushButtonWidget::keyReleaseEvent(QKeyEvent * _event) {
 	QPushButton::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 void ak::aPushButtonWidget::resizeEvent(QResizeEvent * _event) {
 	QPushButton::resizeEvent(_event);
-	emit resized(_event);
+	Q_EMIT resized(_event);
 }
 
 // #######################################################################################################

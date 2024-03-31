@@ -38,28 +38,28 @@ ak::aTextEditWidget::~aTextEditWidget()
 void ak::aTextEditWidget::keyPressEvent(QKeyEvent *_event)
 {
 	if (_event->key() == Qt::Key_Control) { m_controlIsPressed = true; }
-	if (m_maxLength <= 0) { QTextEdit::keyPressEvent(_event); emit keyPressed(_event); }
+	if (m_maxLength <= 0) { QTextEdit::keyPressEvent(_event); Q_EMIT keyPressed(_event); }
 	else if (toPlainText().length() < m_maxLength || _event->key() == Qt::Key_Backspace || m_controlIsPressed ||
 		_event->key() == Qt::Key_Up || _event->key() == Qt::Key_Down || _event->key() == Qt::Key_Left ||
-		_event->key() == Qt::Key_Right) { QTextEdit::keyPressEvent(_event); emit keyPressed(_event); }
+		_event->key() == Qt::Key_Right) { QTextEdit::keyPressEvent(_event); Q_EMIT keyPressed(_event); }
 }
 
 void ak::aTextEditWidget::keyReleaseEvent(QKeyEvent *_event) {
 	if (_event->key() == Qt::Key_Control) { m_controlIsPressed = false; }
-	if (m_maxLength <= 0) { QTextEdit::keyReleaseEvent(_event); emit keyReleased(_event); }
+	if (m_maxLength <= 0) { QTextEdit::keyReleaseEvent(_event); Q_EMIT keyReleased(_event); }
 	else if (toPlainText().length() < m_maxLength || _event->key() == Qt::Key_Backspace || m_controlIsPressed ||
 		_event->key() == Qt::Key_Up || _event->key() == Qt::Key_Down || _event->key() == Qt::Key_Left ||
-		_event->key() == Qt::Key_Right) { QTextEdit::keyReleaseEvent(_event); emit keyReleased(_event); }
+		_event->key() == Qt::Key_Right) { QTextEdit::keyReleaseEvent(_event); Q_EMIT keyReleased(_event); }
 }
 
 void ak::aTextEditWidget::focusInEvent(QFocusEvent * _event) {
 	QTextEdit::focusInEvent(_event);
-	emit focused();
+	Q_EMIT focused();
 }
 
 void ak::aTextEditWidget::focusOutEvent(QFocusEvent * _event) {
 	QTextEdit::focusOutEvent(_event);
-	emit focusLost();
+	Q_EMIT focusLost();
 }
 
 void ak::aTextEditWidget::slotChanged() {

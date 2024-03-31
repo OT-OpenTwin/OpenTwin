@@ -19,17 +19,17 @@ ot::PropertyInput::PropertyInput(const Property* _property)
 void ot::PropertyInput::slotValueChanged(void) {
 	this->m_flags &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
-	emit inputValueChanged();
+	Q_EMIT inputValueChanged();
 }
 
 void ot::PropertyInput::slotValueChanged(bool) {
 	this->m_flags &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
-	emit inputValueChanged();
+	Q_EMIT inputValueChanged();
 }
 
 void ot::PropertyInput::slotValueChanged(int) {
 	this->m_flags &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
-	emit inputValueChanged();
+	Q_EMIT inputValueChanged();
 }

@@ -36,10 +36,10 @@ ToolMenuManager::~ToolMenuManager() {
 
 void ToolMenuManager::slotRun(void) {
 	m_run->setEnabled(false);
-	emit runRequested();
+	Q_EMIT runRequested();
 }
 
 void ToolMenuManager::slotAutorun(bool _checked) {
 	AppBase::instance()->createSettingsInstance()->setValue("AutostartOption_" + m_toolName + "_", _checked);
-	emit autorunChanged(_checked);
+	Q_EMIT autorunChanged(_checked);
 }

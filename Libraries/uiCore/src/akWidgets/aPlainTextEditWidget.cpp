@@ -32,21 +32,21 @@ QWidget * ak::aPlainTextEditWidget::widget(void) {
 void ak::aPlainTextEditWidget::keyPressEvent(QKeyEvent * _event) {
 	if (_event->key() == Qt::Key_Control) { m_controlIsPressed = true; }
 	QPlainTextEdit::keyPressEvent(_event);
-	emit keyPressed(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aPlainTextEditWidget::keyReleaseEvent(QKeyEvent * _event) {
 	if (_event->key() == Qt::Key_Control) { m_controlIsPressed = false; }
 	QPlainTextEdit::keyReleaseEvent(_event);
-	emit keyReleased(_event);
+	Q_EMIT keyReleased(_event);
 }
 
 void ak::aPlainTextEditWidget::focusInEvent(QFocusEvent * _event) {
 	QPlainTextEdit::focusInEvent(_event);
-	emit focused();
+	Q_EMIT focused();
 }
 
 void ak::aPlainTextEditWidget::focusOutEvent(QFocusEvent * _event) {
 	QPlainTextEdit::focusOutEvent(_event);
-	emit focusLost();
+	Q_EMIT focusLost();
 }

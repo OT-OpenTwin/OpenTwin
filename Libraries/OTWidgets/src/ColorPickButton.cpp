@@ -56,7 +56,7 @@ void ot::ColorPickButton::slotBrowse(void) {
 	if (dia.currentColor() != m_view->color()) {
 		m_view->setColor(dia.currentColor());
 		this->updateButtonText();
-		emit colorChanged();
+		Q_EMIT colorChanged();
 	}
 }
 

@@ -345,12 +345,12 @@ void ak::aOptionsDialog::slotCancel(void) {
 
 void ak::aOptionsDialog::slotApply(void) {
 	m_buttonApply->setEnabled(false);
-	emit saveSettingsRequested();
+	Q_EMIT saveSettingsRequested();
 }
 
 void ak::aOptionsDialog::slotEmitChanged(aAbstractOptionsItem * _item) {
 	m_itemChangedIsQueued = false;
-	emit itemChanged(_item);
+	Q_EMIT itemChanged(_item);
 }
 
 // #############################################################################################################

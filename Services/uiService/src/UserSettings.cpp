@@ -179,7 +179,7 @@ void UserSettings::slotItemChanged(ak::aAbstractOptionsItem * _item) {
 	{
 	case ot::AbstractSettingsItem::InfoText:
 	{
-		OTAssert(0, "The info text item should not emit any signals");
+		OTAssert(0, "The info text item should not Q_EMIT any signals");
 		return;
 	}
 	break;

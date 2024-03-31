@@ -19,13 +19,13 @@ bool ot::EventNotifierMousePressed::eventFilter(QObject* _obj, QEvent* _event) {
 		QMouseEvent* e = dynamic_cast<QMouseEvent*>(_event);
 		OTAssertNullptr(e);
 		if (e->button() == Qt::LeftButton) {
-			emit leftMouseButtonPressed();
+			Q_EMIT leftMouseButtonPressed();
 		}
 		else if (e->button() == Qt::MiddleButton) {
-			emit middleMouseButtonPressed();
+			Q_EMIT middleMouseButtonPressed();
 		}
 		else if (e->button() == Qt::RightButton) {
-			emit rightMouseButtonPressed();
+			Q_EMIT rightMouseButtonPressed();
 		}
 	}
 	return false;

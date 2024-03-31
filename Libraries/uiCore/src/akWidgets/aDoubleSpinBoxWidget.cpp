@@ -36,7 +36,7 @@ void ak::aDoubleSpinBoxWidget::mouseReleaseEvent(QMouseEvent *event)
 {
 	QDoubleSpinBox::mouseReleaseEvent(event);
 
-	emit editingFinished();
+	Q_EMIT editingFinished();
 }
 
 void ak::aDoubleSpinBoxWidget::keyReleaseEvent(QKeyEvent *event)
@@ -45,6 +45,6 @@ void ak::aDoubleSpinBoxWidget::keyReleaseEvent(QKeyEvent *event)
 
 	if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down)
 	{
-		emit editingFinished();
+		Q_EMIT editingFinished();
 	}
 }

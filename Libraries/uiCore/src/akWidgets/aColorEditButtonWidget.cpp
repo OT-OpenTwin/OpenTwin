@@ -146,7 +146,7 @@ void ak::aColorEditButtonWidget::slotButtonClicked() {
 		if (newColor != m_color) {
 			setColor(newColor);
 			// Send changed message
-			emit changed();
+			Q_EMIT changed();
 		}
 	}
 }

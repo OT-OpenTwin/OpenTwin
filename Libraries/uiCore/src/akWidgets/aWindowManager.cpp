@@ -637,7 +637,7 @@ void ak::aWindowManager::slotTabToolbarTabClicked(int _index) {
 }
 void ak::aWindowManager::slotTabToolbarTabCurrentTabChanged(int _index) {
 	m_messenger->sendMessage(m_uid, etTabToolbarChanged, _index);
-	emit tabToolBarTabChanged(_index);
+	Q_EMIT tabToolBarTabChanged(_index);
 }
 
 // #############################################################################################################

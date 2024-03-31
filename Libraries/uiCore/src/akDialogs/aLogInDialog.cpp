@@ -280,12 +280,12 @@ void ak::aLogInDialog::slotClicked(void) {
 		return;
 	}
 
-	emit logInRequested();
+	Q_EMIT logInRequested();
 }
 
 void ak::aLogInDialog::registerClicked(void) {
 
-	emit registerRequested();
+	Q_EMIT registerRequested();
 }
 
 void ak::aLogInDialog::slotUsernameChanged(const QString & _text) {

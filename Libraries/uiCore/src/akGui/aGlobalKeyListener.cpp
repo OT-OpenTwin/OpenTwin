@@ -43,7 +43,7 @@ bool ak::aGlobalKeyListener::eventFilter(QObject * _watchedObject, QEvent * _eve
 					}
 				}
 
-				emit keyCombinationPressed();
+				Q_EMIT keyCombinationPressed();
 				if (m_blockOthers) { return false; }
 			}
 		}

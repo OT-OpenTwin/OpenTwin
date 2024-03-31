@@ -617,10 +617,10 @@ lineEdit::~lineEdit()
 
 void lineEdit::keyReleaseEvent(QKeyEvent *_event) {
 	if (_event->key() == Qt::Key::Key_Return) {
-		emit returnPressed();
+		Q_EMIT returnPressed();
 	}
 	else if (_event->key() == Qt::Key::Key_Backspace) {
-		emit backspacePressed();
+		Q_EMIT backspacePressed();
 	}
 }
 
@@ -840,7 +840,7 @@ void copyProjectDialog::Close(void) {
 		return;
 	}
 	my_cancelClose = false;
-	emit isClosing();
+	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }
 	else { my_confirmed = false; }
 }
@@ -922,7 +922,7 @@ void renameProjectDialog::Close(void) {
 		return;
 	}
 	my_cancelClose = false;
-	emit isClosing();
+	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }
 	else { my_confirmed = false; }
 }
@@ -1011,7 +1011,7 @@ void createNewAccountDialog::Close(void) {
 		return;
 	}
 	my_cancelClose = false;
-	emit isClosing();
+	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }
 	else { my_confirmed = false; }
 }
@@ -1148,7 +1148,7 @@ void createNewProjectDialog::Close(void) {
 	}
 
 	my_cancelClose = false;
-	emit isClosing();
+	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }
 	else { my_confirmed = false; }
 }

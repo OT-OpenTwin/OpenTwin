@@ -75,7 +75,7 @@ void ot::TreeWidgetFilter::dispatchFilter(const QString& _text) {
 		
 		clearFilter();
 		
-		emit filterCleared();
+		Q_EMIT filterCleared();
 	}
 	else {
 		if (m_lastFilter == _text) return;
@@ -84,7 +84,7 @@ void ot::TreeWidgetFilter::dispatchFilter(const QString& _text) {
 		m_tree->collapseAll();
 		applyFilter(_text);
 
-		emit filterChanged(m_lastFilter);
+		Q_EMIT filterChanged(m_lastFilter);
 	}
 }
 

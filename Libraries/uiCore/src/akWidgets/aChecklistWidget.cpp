@@ -86,13 +86,13 @@ void ak::aChecklistItem::slotCheckedChanged(int _state) {
 void ak::aChecklistItem::slotTextChanged(void) {
 	if (m_text == m_TextEdit->text()) return;
 	m_text = m_TextEdit->text();
-	emit textChanged(m_Index);
+	Q_EMIT textChanged(m_Index);
 }
 
 void ak::aChecklistItem::slotEditingFinished(void) {
 	if (m_text == m_TextEdit->text()) return;
 	m_text = m_TextEdit->text();
-	emit editingFinished(m_Index);
+	Q_EMIT editingFinished(m_Index);
 }
 
 void ak::aChecklistItem::slotToggleChecked(void) {
@@ -100,26 +100,26 @@ void ak::aChecklistItem::slotToggleChecked(void) {
 }
 
 void ak::aChecklistItem::slotRequestDelete(void) {
-	emit requestDelete(m_Index);
+	Q_EMIT requestDelete(m_Index);
 }
 
 void ak::aChecklistItem::slotReturnPressed(void) {
 	slotTextChanged();
 	if (m_TextEdit->text().isEmpty()) return;
-	emit returnPressed(m_Index);
+	Q_EMIT returnPressed(m_Index);
 }
 
 void ak::aChecklistItem::slotKeyEvent(QKeyEvent * _event) {
-	if (_event->key() == Qt::Key::Key_Up) { slotTextChanged(); emit keyUpPressed(m_Index); }
-	else if (_event->key() == Qt::Key::Key_Down) { slotTextChanged(); emit keyDownPressed(m_Index); }
+	if (_event->key() == Qt::Key::Key_Up) { slotTextChanged(); Q_EMIT keyUpPressed(m_Index); }
+	else if (_event->key() == Qt::Key::Key_Down) { slotTextChanged(); Q_EMIT keyDownPressed(m_Index); }
 }
 
 void ak::aChecklistItem::slotMoveUpRequested(void) {
-	emit moveUpRequested(m_Index);
+	Q_EMIT moveUpRequested(m_Index);
 }
 
 void ak::aChecklistItem::slotMoveDownRequested(void) {
-	emit moveDownRequested(m_Index);
+	Q_EMIT moveDownRequested(m_Index);
 }
 
 void ak::aChecklistItem::ini(void) {
@@ -225,7 +225,7 @@ void ak::aChecklistWidget::clear(bool _addEmptyItem) {
 // Private slots
 
 void ak::aChecklistWidget::slotItemChanged(int _index) {
-	emit itemChanged(_index);
+	Q_EMIT itemChanged(_index);
 }
 
 void ak::aChecklistWidget::slotReturnPressed(int _index) {
@@ -286,21 +286,21 @@ void ak::aChecklistWidget::slotDeleteItem(int _index) {
 	if (_index >= m_items.size()) m_items[0]->TextEdit()->setFocus();
 	else m_items[_index]->TextEdit()->setFocus();
 
-	emit itemRemoved(_index);
+	Q_EMIT itemRemoved(_index);
 }
 
 void ak::aChecklistWidget::slotMoveItemUp(int _index) {
 	int index2 = _index - 1;
 	if (index2 < 0) moveItemToTheBottom(_index);
 	else switchItemLocations(_index, index2);
-	if (m_items.size() > 1) emit itemOrderChanged();
+	if (m_items.size() > 1) Q_EMIT itemOrderChanged();
 }
 
 void ak::aChecklistWidget::slotMoveItemDown(int _index) {
 	int index2 = _index + 1;
 	if (index2 >= m_items.size()) moveItemToTheTop(_index);
 	else switchItemLocations(_index, index2);
-	if (m_items.size() > 1) emit itemOrderChanged();
+	if (m_items.size() > 1) Q_EMIT itemOrderChanged();
 }
 
 // ################################################################################
@@ -330,7 +330,7 @@ void ak::aChecklistWidget::clearEmptyItems(void) {
 				}
 				m_items.erase(m_items.begin() + i);
 				erased = true;
-				emit itemRemoved(i);
+				Q_EMIT itemRemoved(i);
 				break;
 			}
 		}
@@ -365,7 +365,7 @@ void ak::aChecklistWidget::initializeNewItem(aChecklistItem * _item, int _index)
 	connect(_item, &aChecklistItem::moveDownRequested, this, &aChecklistWidget::slotMoveItemDown, Qt::QueuedConnection);
 	connect(_item, &aChecklistItem::moveUpRequested, this, &aChecklistWidget::slotMoveItemUp, Qt::QueuedConnection);
 
-	emit itemCreated(_index);
+	Q_EMIT itemCreated(_index);
 }
 
 void ak::aChecklistWidget::switchItemLocations(int _index1, int _index2) {

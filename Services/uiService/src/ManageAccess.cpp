@@ -149,7 +149,7 @@ void ManageAccessTable::slotSelectionChanged() {
 		}
 	}
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
-	emit selectionChanged();
+	Q_EMIT selectionChanged();
 }
 
 void ManageAccessTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second)
