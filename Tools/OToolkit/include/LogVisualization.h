@@ -69,7 +69,7 @@ public:
 	void appendLogMessage(const ot::LogMessage& _msg);
 	void appendLogMessages(const QList<ot::LogMessage>& _messages);
 
-public slots:
+public Q_SLOTS:
 	void slotConnect(void);
 	void slotAutoConnect(void);
 	void slotImport(void);
@@ -150,7 +150,7 @@ public:
 
 	virtual bool event(QEvent* _event) override;
 
-private slots:
+private Q_SLOTS:
 	void slotRecenter(void);
 	void slotDisplayMessageText(int _state);
 

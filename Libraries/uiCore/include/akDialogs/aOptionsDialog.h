@@ -110,11 +110,11 @@ namespace ak {
 
 		aOptionsGroup * findGroupByLogicalName(const QString& _logicalName, const QString& _delimiter = QString(":"));
 
-	signals:
+	Q_SIGNALS:
 		void saveSettingsRequested(void);
 		void itemChanged(aAbstractOptionsItem * item);
 
-	private slots:
+	private Q_SLOTS:
 		void slotShowGroup();
 		void slotRemoveGroup(aOptionsGroup * _group);
 		void slotNavigationChanged(void);
@@ -396,7 +396,7 @@ namespace ak {
 
 		bool							m_supressEvents;
 
-	protected slots:
+	protected Q_SLOTS:
 		void slotChanged(void);
 		void slotChanged(int _v);
 		void slotChanged(double _v);
@@ -491,7 +491,7 @@ namespace ak {
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 		
-	private slots:
+	private Q_SLOTS:
 		void slotCheckStateChanged(int _state);
 
 	private:
@@ -868,7 +868,7 @@ namespace ak {
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
-	private slots:
+	private Q_SLOTS:
 		void slotButtonClicked(void);
 
 	private:
@@ -919,7 +919,7 @@ namespace ak {
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
-	private slots:
+	private Q_SLOTS:
 		void slotButtonClicked(void);
 
 	private:
@@ -971,7 +971,7 @@ namespace ak {
 
 		virtual void addItemWidgetsToLayout(QHBoxLayout * _layout) override;
 
-	private slots:
+	private Q_SLOTS:
 		void slotButtonClicked(void);
 
 	private:

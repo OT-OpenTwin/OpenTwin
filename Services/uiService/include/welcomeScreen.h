@@ -94,7 +94,7 @@ public:
 	void lock(bool flag);
 	void refreshList(void);
 
-private slots:
+private Q_SLOTS:
 	void slotProjectNameChanged(void);
 	void slotCreateClicked(void);
 	void slotRefreshClicked(void);
@@ -201,7 +201,7 @@ public:
 
 	virtual void keyReleaseEvent(QKeyEvent *_event) override;
 
-signals:
+Q_SIGNALS:
 	//void returnPressed(void);
 	void backspacePressed(void);
 
@@ -238,7 +238,7 @@ public:
 
 	virtual void leaveEvent(QEvent * _event) override;
 
-private slots:
+private Q_SLOTS:
 	void slotSelectionChanged();
 
 private:
@@ -279,10 +279,10 @@ public:
 
 	void reset(const QString & _projectToCopy);
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
@@ -330,10 +330,10 @@ public:
 
 	void reset(const QString & _projectToCopy);
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
@@ -379,10 +379,10 @@ public:
 
 	void cancelClose(void) { my_cancelClose = true; }
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
@@ -435,10 +435,10 @@ public:
 	std::string getTemplateName(void);
 	std::string getProjectType(void);
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();

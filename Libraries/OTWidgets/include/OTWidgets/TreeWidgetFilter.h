@@ -36,11 +36,11 @@ namespace ot {
 		ot::LineEdit* filterLineEdit(void) { return m_lineEdit; };
 		ot::TreeWidget* treeWidget(void) { return m_tree; };
 
-	signals:
+	Q_SIGNALS:
 		void filterChanged(const QString& _filterText);
 		void filterCleared(void);
 
-	public slots:
+	public Q_SLOTS:
 		void slotReturnPressed(void);
 		void slotTextChanged(void);
 

@@ -26,11 +26,11 @@ public:
 	QAction* runAction(void) { return m_run; };
 	QAction* autorunAction(void) { return m_autorun; };
 
-signals:
+Q_SIGNALS:
 	void runRequested(void);
 	void autorunChanged(bool _isEnabled);
 
-private slots:
+private Q_SLOTS:
 	void slotRun(void);
 	void slotAutorun(bool _checked);
 

@@ -48,7 +48,7 @@ namespace ot {
 		void setDialogName(const std::string& _name) { m_dialogName = _name; };
 		const std::string& dialogName(void) const { return m_dialogName; };
 
-	public slots:
+	public Q_SLOTS:
 		void closeOk(void);
 		void closeYes(void);
 		void closeNo(void);

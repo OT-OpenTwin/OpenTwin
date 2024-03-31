@@ -84,12 +84,12 @@ namespace ak {
 		//! @brief Will set the provided step length as a minute step
 		void setMinuteStep(int _step);
 
-	signals:
+	Q_SIGNALS:
 
 		//! @brief Sends a signal, when changes occured
 		void changed(void);
 
-	private slots:
+	private Q_SLOTS:
 
 		//! @brief When the slot is clicked, the dialog to select a date appears
 		void slotClicked(void);
@@ -123,7 +123,7 @@ namespace ak {
 		//! @brief Will return the currently sected date
 		aTime selectedTime(void) const;
 
-	private slots:
+	private Q_SLOTS:
 
 		//! @brief When the slot is clicked, the dialog closes with current results
 		void slotOkClicked(void);

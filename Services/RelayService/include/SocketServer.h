@@ -24,7 +24,7 @@ public:
 
 	static bool sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response);
 
-public slots:
+public Q_SLOTS:
 	QString performAction(const char *json, const char *senderIP);
 	void queueAction(const char *json, const char *senderIP);
 	void deallocateData(const char *data);

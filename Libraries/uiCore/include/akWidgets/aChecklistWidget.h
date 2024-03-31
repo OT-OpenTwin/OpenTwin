@@ -39,7 +39,7 @@ namespace ak {
 
 		bool checkTextModified(void);
 
-	signals:
+	Q_SIGNALS:
 		void textChanged(int _index);
 		void editingFinished(int _index);
 		void returnPressed(int _index);
@@ -49,7 +49,7 @@ namespace ak {
 		void moveUpRequested(int _index);
 		void moveDownRequested(int _index);
 
-	private slots:
+	private Q_SLOTS:
 		void slotCheckedChanged(int _state);
 		void slotTextChanged(void);
 		void slotEditingFinished(void);
@@ -104,13 +104,13 @@ namespace ak {
 
 		void clear(bool _addEmptyItem = true);
 
-	signals:
+	Q_SIGNALS:
 		void itemOrderChanged(void);
 		void itemChanged(int _index);
 		void itemRemoved(int _index);
 		void itemCreated(int _index);
 
-	private slots:
+	private Q_SLOTS:
 		void slotItemChanged(int _index);
 		void slotReturnPressed(int _index);
 		void slotFocusNext(int _index);

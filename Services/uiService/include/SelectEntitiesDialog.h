@@ -43,7 +43,7 @@ public:
 	//! @param _bottomLevelOnly If true the parent items wont be added to the list
 	std::list<std::string> selectedItemPaths(char _pathDelimiter = '/', bool _bottomLevelOnly = true) const;
 
-private slots:
+private Q_SLOTS:
 	void slotApply(void);
 	void slotCancel(void);
 	void slotAdd(QTreeWidgetItem* _item, int _col);

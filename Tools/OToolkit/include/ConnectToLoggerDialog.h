@@ -32,7 +32,7 @@ public:
 	void queueConnectRequest(void);
 	void queueRecenterRequest(void);
 
-private slots:
+private Q_SLOTS:
 	void slotCancel(void);
 	void slotConnect(void);
 	void slotPingFail(void);

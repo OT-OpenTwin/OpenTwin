@@ -159,7 +159,7 @@ public:
 
 	// Private: Slots
 
-private slots:
+private Q_SLOTS:
 	void slotSendMessage(void);
 	void slotMessageSendSuccessful(const QByteArray& _response);
 	void slotMessageSendFailed(const QString& _errorString);

@@ -27,7 +27,7 @@ namespace ot {
 
 		void queue(QWidget* _widget);
 
-	private slots:
+	private Q_SLOTS:
 		void slotQueue(void);
 
 	private:

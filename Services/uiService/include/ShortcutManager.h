@@ -89,7 +89,7 @@ public:
 
 	void attachToEvent(ak::UID _sender, ak::eventType _event, int _info1 = 0, int _info2 = 0);
 
-private slots:
+private Q_SLOTS:
 	void slotActivated(void);
 
 private:

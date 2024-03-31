@@ -129,7 +129,7 @@ namespace ak {
 		void hideWaitingAnimation(void);
 
 		// #############################################################################################################
-	private slots:
+	private Q_SLOTS:
 
 		//! @brief Callback for the log in button
 		void slotClicked(void);
@@ -139,7 +139,7 @@ namespace ak {
 		void slotPasswordChanged(const QString & _text);
 
 		// #############################################################################################################
-	signals:
+	Q_SIGNALS:
 		void logInRequested(void);
 		void registerRequested(void);
 

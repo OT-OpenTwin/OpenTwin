@@ -27,7 +27,7 @@ namespace ot {
 
 		SpinBox* getSpinBox(void) const { return m_spinBox; };
 
-	private slots:
+	private Q_SLOTS:
 		void lclValueChanged(int);
 
 	private:

@@ -162,7 +162,7 @@ public:
 	//! @brief Stop all the logic of this tool
 	virtual bool prepareToolShutdown(QSettings& _settings) override;
 
-private slots:
+private Q_SLOTS:
 	void slotBrowseRoot(void);
 	void slotFindText(void);
 	void slotReplaceText(void);

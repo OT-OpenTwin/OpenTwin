@@ -56,7 +56,7 @@ namespace ak {
 		//! @param _timerType The timer type of the timer to connect the singals of
 		void addLink(QTimer * _timer, timerType _timerType);
 
-	private slots:
+	private Q_SLOTS:
 		void timerTimeoutProgressShow(void);
 		void timerTimeoutProgressHide(void);
 		void timerTimeoutLabelShow(void);

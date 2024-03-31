@@ -38,10 +38,10 @@ public:
 
 	void getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second);
 
-signals:
+Q_SIGNALS:
 	void selectionChanged();
 
-private slots:
+private Q_SLOTS:
 	void slotSelectionChanged();
 
 private:
@@ -67,7 +67,7 @@ public:
 	ManageAccess(const std::string &authServerURL, const std::string &projectName);
 	virtual ~ManageAccess();
 
-public slots:
+public Q_SLOTS:
 	void slotClose(void);
 	void slotShowGroupsWithAccessOnly(void);
 	void slotGroupsFilter(void);

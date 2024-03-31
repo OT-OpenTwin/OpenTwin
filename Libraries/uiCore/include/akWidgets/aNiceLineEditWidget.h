@@ -52,7 +52,7 @@ namespace ak {
 		QString text(void) const;
 		QString infoLabelText(void) const;
 
-	private slots:
+	private Q_SLOTS:
 		void slotCursorPositionChanged(int, int);
 		void slotSelectionChanged();
 		void slotKeyPressed(QKeyEvent * _event);
@@ -61,7 +61,7 @@ namespace ak {
 		void slotTextChanged(const QString & _text);
 		void slotReturnPressed();
 
-	signals:
+	Q_SIGNALS:
 		void cursorPositionChanged(int, int);
 		void selectionChanged();
 		void keyPressed(QKeyEvent *);

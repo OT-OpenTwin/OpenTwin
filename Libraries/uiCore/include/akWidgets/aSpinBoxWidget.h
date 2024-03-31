@@ -42,10 +42,10 @@ namespace ak {
 
 		int StepLength(void) const { return m_stepLength; }
 
-	private slots:
+	private Q_SLOTS:
 		void slotValueChanged(int _v);
 
-	signals:
+	Q_SIGNALS:
 		void aValueChanged(int _value);
 
 	protected:

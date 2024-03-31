@@ -64,7 +64,7 @@ public:
 	MenuManager* menuManager(void) { return m_menuManager; };
 	StatusManager* statusManager(void) { return m_statusManager; };
 
-private slots:
+private Q_SLOTS:
 	void runToolTriggered(void);
 	void currentToolChanged(const QString& _toolName);
 

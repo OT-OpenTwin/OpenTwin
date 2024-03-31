@@ -81,7 +81,7 @@ public:
 
 	void hideWaitingAnimation(void);
 
-public slots:
+public Q_SLOTS:
 	void slotLogIn(void);
 	void slotRegister(void);
 	void slotSessionServiceChanged(void);
@@ -137,7 +137,7 @@ public:
 
 	// ####################################################################################################
 
-private slots:
+private Q_SLOTS:
 	void slotItemClicked(QTableWidgetItem * _item);
 	void slotNameChanged(const QString& _text);
 	void slotIpChanged(const QString& _text);
@@ -185,7 +185,7 @@ public:
 
 	void clearInvalidEntries(void);
 
-public slots:
+public Q_SLOTS:
 	void slotAdd(void);
 	void slotClose(void);
 	void deleteItem(int _logicalIndex);

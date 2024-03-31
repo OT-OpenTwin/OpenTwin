@@ -26,7 +26,7 @@ namespace ot {
 		void watch(QDockWidget* _dock);
 		void removeWatch(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotTriggered(bool _checked);
 		void slotVisibilityChanged(bool _vis);
 

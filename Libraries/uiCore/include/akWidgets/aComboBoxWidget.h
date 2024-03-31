@@ -58,7 +58,7 @@ namespace ak {
 
 		bool isMousewheelEnabled(void) const { return m_mouseWheelEnabled; }
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 

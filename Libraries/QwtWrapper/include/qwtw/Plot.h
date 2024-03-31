@@ -278,7 +278,7 @@ namespace qwtw {
 
 		void SetStyleSheets(const std::string & _plotBackgroundSheet, const std::string & _xyPlot, const std::string & _xyCanvas, const QColor & _polarPlotColor, const QPen & _zoomerPen);
 
-	signals:
+	Q_SIGNALS:
 		void selectionChanged(PlotDataset * _selectedDataset, bool _isControlPressed);
 
 	private:

@@ -62,7 +62,7 @@ namespace ak {
 		//! @brief Will return the enabled state that is currently set
 		bool isWatcherEnabled(void) const { return m_isEnabled; }
 
-	private slots:
+	private Q_SLOTS:
 		void slotVisibilityChanged(bool _visible);
 		void slotClicked();
 		void slotMenuItemChanged();

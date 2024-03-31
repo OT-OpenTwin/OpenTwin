@@ -319,7 +319,7 @@ public:
 	OT_HANDLER(handleRequestPlugin, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPlugin, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePluginMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_PluginMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	
-public slots:
+public Q_SLOTS:
 	char *performAction(const char *json, const char *senderIP);
 	void queueAction(const char *json, const char *senderIP);
 	void deallocateData(const char *data);

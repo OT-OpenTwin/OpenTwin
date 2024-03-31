@@ -19,7 +19,7 @@ namespace ot {
 		EventNotifierMousePressed(QObject* _parent = (QObject*)nullptr);
 		virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
 
-	signals:
+	Q_SIGNALS:
 		void leftMouseButtonPressed(void);
 		void middleMouseButtonPressed(void);
 		void rightMouseButtonPressed(void);

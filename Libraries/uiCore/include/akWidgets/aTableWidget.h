@@ -233,7 +233,7 @@ namespace ak {
 			int																_column
 		);
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void focused(void);

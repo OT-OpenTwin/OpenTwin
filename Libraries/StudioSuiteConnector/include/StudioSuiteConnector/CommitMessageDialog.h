@@ -40,10 +40,10 @@ public:
 
 	void reset(const QString& _projectToCopy);
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();

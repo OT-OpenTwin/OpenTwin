@@ -112,7 +112,7 @@ namespace ak {
 		const std::map<ID, aListWidgetItem *>& items(void) const { return m_items; }
 
 		//QString itemText
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void mouseMove(QMouseEvent *);

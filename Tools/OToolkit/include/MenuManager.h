@@ -33,11 +33,11 @@ public:
 	ToolMenuManager* addToolMenu(const QString& _toolName);
 	ToolMenuManager* toolMenu(const QString& _toolName);
 
-signals:
+Q_SIGNALS:
 	void exitRequested(void);
 	void settingsRequested(void);
 
-private slots:
+private Q_SLOTS:
 	void slotExit(void);
 	void slotSettings(void);
 

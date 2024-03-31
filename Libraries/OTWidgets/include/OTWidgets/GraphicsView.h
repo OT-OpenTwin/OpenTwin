@@ -68,7 +68,7 @@ namespace ot {
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		void notifyItemMoved(ot::GraphicsItem* _item);
 
-	signals:
+	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
 		//! @param _name Item name
 		//! @param _pos Item scene position

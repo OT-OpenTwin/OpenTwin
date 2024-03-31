@@ -33,7 +33,7 @@ public:
 	void addTool(const QString& _toolName, const std::list<QWidget*>& _widgets);
 	void removeTool(const QString& _toolName);
 
-private slots:
+private Q_SLOTS:
 	void slotResetErrorStatus(void);
 
 private:

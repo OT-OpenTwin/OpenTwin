@@ -110,10 +110,10 @@ namespace ak {
 
 		aGraphicsWidget * graphicsWidget(void) { return m_view; }
 
-	signals:
+	Q_SIGNALS:
 		void changed(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotButtonClicked();
 		void slotButtonResized(QResizeEvent * _event);
 

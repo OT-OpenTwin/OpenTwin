@@ -22,10 +22,10 @@ public:
 	void addTool(const QString& _toolName, QWidget* _toolWidget);
 	void removeTool(const QString& _toolName);
 
-signals:
+Q_SIGNALS:
 	void currentToolChanged(const QString& _toolName);
 
-private slots:
+private Q_SLOTS:
 	void slotTabChanged(int _ix);
 
 private:

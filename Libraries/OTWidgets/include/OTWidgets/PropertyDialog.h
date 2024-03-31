@@ -21,7 +21,7 @@ namespace ot {
 		PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~PropertyDialog();
 
-	private slots:
+	private Q_SLOTS:
 		void slotConfirm(void);
 		void slotCancel(void);
 

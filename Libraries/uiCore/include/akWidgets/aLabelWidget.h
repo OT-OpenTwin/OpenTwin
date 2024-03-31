@@ -38,7 +38,7 @@ namespace ak {
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
 
-	signals:
+	Q_SIGNALS:
 		void clicked();
 
 	protected:

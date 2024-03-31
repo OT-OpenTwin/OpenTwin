@@ -35,7 +35,7 @@ namespace ak {
 
 		virtual bool eventFilter(QObject * _watchedObject, QEvent * _event) override;
 
-	signals:
+	Q_SIGNALS:
 		void keyCombinationPressed(void);
 
 	private:

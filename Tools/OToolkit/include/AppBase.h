@@ -75,14 +75,14 @@ public:
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
 	QApplication* applicationInstance(void) { return m_app; };
 
-public slots:
+public Q_SLOTS:
 	void slotProcessMessage(const QString& _json);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Slots
 
-private slots:
+private Q_SLOTS:
 	void slotLogMessage(const QString& _sender, const QString& _message);
 	void slotLogWarning(const QString& _sender, const QString& _message);
 	void slotLogError(const QString& _sender, const QString& _message);

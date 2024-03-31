@@ -64,13 +64,13 @@ namespace ot {
 		QSyntaxHighlighter * syntaxHighlighter(void) { return m_syntaxHighlighter; }
 
 		bool requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion);
-	signals:							
+	Q_SIGNALS:							
 		void saveRequested(void);
 
 	protected:
 		virtual void resizeEvent(QResizeEvent * _event) override;
 
-	private slots:
+	private Q_SLOTS:
 		void slotUpdateLineNumberAreaWidth(int _newBlockCount);
 		void slotHighlightCurrentLine();
 		void slotUpdateLineNumberArea(const QRect & _rect, int _dy);

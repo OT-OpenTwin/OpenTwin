@@ -95,12 +95,12 @@ namespace ak {
 
 		QMenu* getMenu(void) { return m_menu; };
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void changed(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotItemTriggered();
 
 	private:

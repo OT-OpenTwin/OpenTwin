@@ -109,14 +109,14 @@ namespace ak {
 			ID								_itemID
 		);
 
-	signals:
+	Q_SIGNALS:
 		void btnClicked();
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void menuItemClicked(ID);
 		void menuItemCheckedChanged(ID, bool);
 
-	private slots:
+	private Q_SLOTS:
 		void slotClicked();
 		void slotMenuItemClicked();
 		void slotMenuItemCheckedChanged();

@@ -74,11 +74,11 @@ namespace ak {
 
 		aContextMenuItem * item(ID _itemId);
 
-	signals:
+	Q_SIGNALS:
 		void menuItemClicked(ID);
 		void menuItemCheckedChanged(ID, bool);
 
-	private slots:
+	private Q_SLOTS:
 		void slotMenuRequested(const QPoint& _pos);
 		void slotMenuItemClicked(void);
 		void slotMenuItemCheckedChanged(bool _state);

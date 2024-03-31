@@ -101,14 +101,14 @@ namespace ak {
 
 		int maxTextLength(void) const { return m_maxLength; }
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void contextMenuItemClicked(ak::ID);
 		void focused(void);
 		void focusLost(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotChanged();
 		void slotCustomMenuRequested(const QPoint & _pos);
 		void slotContextMenuItemClicked();

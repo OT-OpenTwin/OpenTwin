@@ -25,7 +25,7 @@ namespace ot {
 
 		static void hideToolTip(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotShowDelayedToolTip(void);
 
 	private:

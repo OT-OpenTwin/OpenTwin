@@ -3,7 +3,7 @@
 
 class Table : public QTableWidget {
 	Q_OBJECT
-private slots:
+private Q_SLOTS:
 
 private:
 	QColor			my_colorBack;

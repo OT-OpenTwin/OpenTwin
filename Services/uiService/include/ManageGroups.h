@@ -40,10 +40,10 @@ public:
 
 	void getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second);
 
-signals:
+Q_SIGNALS:
 	void selectionChanged();
 
-private slots:
+private Q_SLOTS:
 	void slotSelectionChanged();
 
 
@@ -76,10 +76,10 @@ public:
 
 	bool wasConfirmed(void) const { return my_confirmed; }
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
@@ -120,10 +120,10 @@ public:
 
 	bool wasConfirmed(void) const { return my_confirmed; }
 
-signals:
+Q_SIGNALS:
 	void isClosing(void);
 
-private slots:
+private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
@@ -175,7 +175,7 @@ public:
 
 	//void clearInvalidEntries(void);
 
-public slots:
+public Q_SLOTS:
 	void slotClose(void);
 	void slotAddGroup(void);
 	void slotRenameGroup(void);

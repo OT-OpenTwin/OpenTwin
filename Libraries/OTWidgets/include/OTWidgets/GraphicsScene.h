@@ -52,10 +52,10 @@ namespace ot {
 		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
 		bool ignoreEvents(void) const { return m_ignoreEvents; };
 
-	signals:
+	Q_SIGNALS:
 		void selectionChangeFinished(void);
 
-	public slots:
+	public Q_SLOTS:
 		void slotSelectionChanged(void);
 		void handleSelectionChanged(void);
 

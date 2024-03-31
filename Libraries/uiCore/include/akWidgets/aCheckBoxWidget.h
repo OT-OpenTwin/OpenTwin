@@ -72,7 +72,7 @@ namespace ak {
 
 		void setPaintBackground(bool _paint);
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 

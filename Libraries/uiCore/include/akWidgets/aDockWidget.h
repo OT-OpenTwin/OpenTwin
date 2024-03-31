@@ -56,10 +56,10 @@ namespace ak {
 			QCloseEvent *								_event
 		) override;
 
-	signals:
+	Q_SIGNALS:
 		void closing();
 
-	private slots:
+	private Q_SLOTS:
 		void slotDockLocationChanged(
 			Qt::DockWidgetArea						_area
 		);

@@ -207,7 +207,7 @@ namespace ot {
 	Q_SIGNALS:
 		void painterChanged(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotTypeChanged(void);
 		void slotUpdate(void);
 		void slotConfirm(void);

@@ -42,7 +42,7 @@ namespace ak {
 
 		virtual void focusOutEvent(QFocusEvent * _event) override;
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent * _event);
 		void keyReleased(QKeyEvent * _event);
 		void focused(void);

@@ -82,7 +82,7 @@ namespace ak {
 	protected:
 		virtual void resizeEvent(QResizeEvent * _event) override;
 
-	private slots:
+	private Q_SLOTS:
 		void slotOk(void);
 		void slotCancel(void);
 		void slotYes(void);

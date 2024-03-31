@@ -32,7 +32,7 @@ namespace ot {
 
 		void appendLog(const ot::LogMessage& _message);
 
-	private slots:
+	private Q_SLOTS:
 		void slotAppendLog(const ot::LogMessage& _message);
 
 	private:

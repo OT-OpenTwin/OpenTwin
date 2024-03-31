@@ -312,7 +312,7 @@ public:
 	//! @brief Will clear the session information such as the project name, collection name and user name
 	void clearSessionInformation(void);
 
-public slots:
+public Q_SLOTS:
 
 	void lockUI(bool flag);
 	void refreshWelcomeScreen(void);
@@ -468,7 +468,7 @@ public:
 	// ######################################################################################################################
 
 	// Prompt
-public slots:
+public Q_SLOTS:
 
 	ak::dialogResult showPrompt(const QString _message, const QString & _title, ak::promptType _type = ak::promptOk);
 
@@ -499,7 +499,7 @@ public:
 	std::string getCredentialUserPassword(void) { return m_userEncryptedPassword; }
 	std::string getCredentialUserPasswordClear(void) { return m_userPassword; }
 
-public slots:
+public Q_SLOTS:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
 	void slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos);
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
@@ -511,7 +511,7 @@ public slots:
 
 	// Private: Slots
 
-private slots:
+private Q_SLOTS:
 	void slotOutputContextMenuItemClicked();
 
 	// ###########################################################################################################################################################################################################################################################################################################################

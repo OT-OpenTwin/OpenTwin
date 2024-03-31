@@ -47,7 +47,7 @@ namespace ak {
 
 		void setAnimationDelay(int _ms) { m_animationDelay =_ms; }
 
-	private slots:
+	private Q_SLOTS:
 		void slotTimeout(void);
 
 	private:

@@ -51,7 +51,7 @@ namespace ot {
 		void setPreviewBoxSize(const QSize& _size) { m_previewSize = _size; };
 		const QSize& previewBoxSize(void) const { return m_previewSize; };
 
-	private slots:
+	private Q_SLOTS:
 		void slotSelectionChanged(void);
 
 	private:

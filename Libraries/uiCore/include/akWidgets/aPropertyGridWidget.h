@@ -102,12 +102,12 @@ namespace ak {
 
 		bool isEnabled(void) const { return m_isEnabled; }
 
-	signals:
+	Q_SIGNALS:
 		void itemChanged(ID _itemId);
 		void cleared(void);
 		void itemDeleted(ID _itemId);
 
-	private slots:
+	private Q_SLOTS:
 		void slotItemChanged(void);
 		void slotFocusOut(void);
 		void slotItemDeleted(void);
@@ -194,7 +194,7 @@ namespace ak {
 		//! @brief Will clear the groups focus (reset the items to not focused)
 		void clearFocus(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotItemDoubleClicked(QTableWidgetItem * _item);
 
 	private:
@@ -406,11 +406,11 @@ namespace ak {
 		//! @param _value The value to set
 		void setError(const aDate& _value);
 
-	signals:
+	Q_SIGNALS:
 		void changed(void);
 		void deleted(void);
 
-	private slots:
+	private Q_SLOTS:
 
 		void slotValueChanged(void);
 

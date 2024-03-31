@@ -69,7 +69,7 @@ namespace ak {
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent * _event);
 		void keyReleased(QKeyEvent * _event);
 		void resized(QResizeEvent * _event);

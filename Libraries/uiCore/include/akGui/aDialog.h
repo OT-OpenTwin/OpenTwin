@@ -60,7 +60,7 @@ namespace ak {
 
 		virtual bool event(QEvent * _event) override;
 
-	signals:
+	Q_SIGNALS:
 		void helpButtonClicked(void);
 
 	protected:

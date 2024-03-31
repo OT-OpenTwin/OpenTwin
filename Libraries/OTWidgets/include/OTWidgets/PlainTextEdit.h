@@ -29,7 +29,7 @@ namespace ot {
 
 		void scrollToBottom(void);
 
-	public slots:
+	public Q_SLOTS:
 		void slotTextChanged(void);
 
 	private:

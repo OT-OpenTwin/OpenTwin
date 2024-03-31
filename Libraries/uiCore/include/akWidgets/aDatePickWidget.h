@@ -79,12 +79,12 @@ namespace ak {
 		void setDateFormat(dateFormat _dateFormat, bool _refresh = true);
 
 
-	signals:
+	Q_SIGNALS:
 
 		//! @brief Sends a signal, when changes occured
 		void changed(void);
 
-	private slots:
+	private Q_SLOTS:
 
 		//! @brief When the slot is clicked, the dialog to select a date appears
 		void slotClicked(void);
@@ -115,7 +115,7 @@ namespace ak {
 		//! @brief Will return the currently sected date
 		aDate selectedDate(void) const;
 
-	private slots:
+	private Q_SLOTS:
 
 		//! @brief When the slot is clicked, the dialog closes with current results
 		void slotOkClicked(void);

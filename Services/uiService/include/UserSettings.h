@@ -70,7 +70,7 @@ public:
 
 	// #######################################################################################
 
-private slots:
+private Q_SLOTS:
 	void slotItemChanged(ak::aAbstractOptionsItem * _item);
 
 private:

@@ -57,7 +57,7 @@ public:
 
 	const std::map<QString, QPlainTextEdit*>& listEntries(void) const { return m_lists; };
 
-private slots:
+private Q_SLOTS:
 	void slotRunBool(void);
 	void slotRunText(void);
 	void slotRunList(void);
@@ -111,7 +111,7 @@ public:
 
 	QString currentName(void) const;
 
-private slots:
+private Q_SLOTS:
 	void slotConfirm(void);
 	void slotCancel(void);
 

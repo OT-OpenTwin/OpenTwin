@@ -81,7 +81,7 @@ namespace ak {
 
 		bool ignoreTabulator(void) const { return m_ignoreTabulator; }
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void finishedChanges();
@@ -90,7 +90,7 @@ namespace ak {
 		void focused(void);
 		void focusLost(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotEditingFinished();
 
 	private:

@@ -53,7 +53,7 @@ namespace ot {
 
 		void clear(void);
 
-	private slots:
+	private Q_SLOTS:
 		void slotPropertyChanged();
 		void slotItemChanged(QTreeWidgetItem* _item, int _column);
 

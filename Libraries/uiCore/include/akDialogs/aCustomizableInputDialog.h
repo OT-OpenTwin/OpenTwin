@@ -145,11 +145,11 @@ namespace ak {
 		//! @param _inputUID The input UID
 		void setChecked(UID _inputUID, bool _isChecked);
 
-	signals:
+	Q_SIGNALS:
 		void buttonClicked(UID _buttonUID);
 		void editFinished(UID _editUID);
 
-	protected slots:
+	protected Q_SLOTS:
 		void slotButtonClicked(void);
 		void slotInputChanged(void);
 

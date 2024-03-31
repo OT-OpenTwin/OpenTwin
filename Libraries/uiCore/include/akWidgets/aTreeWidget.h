@@ -401,7 +401,7 @@ namespace ak {
 
 		aTreeWidgetItem * itemAt(const QPoint& _pos);
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void cleared(void);
@@ -419,7 +419,7 @@ namespace ak {
 		void itemsMoved(const QList<ID>& _itemIds, const QList<ID>& _oldParentIds, const QList<ID>& _newParentIds);
 		void customContextMenuRequested(const QPoint& _pos);
 
-	public slots:
+	public Q_SLOTS:
 
 		void slotTreeKeyPressed(QKeyEvent * _event);
 		void slotTreeKeyReleased(QKeyEvent * _event);
@@ -577,7 +577,7 @@ namespace ak {
 
 		void setItemMoveNotifier(aTreeWidgetItemMoveNotifier * _notifier) { m_moveNotifier = _notifier; }
 
-	signals:
+	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void mouseMove(QMouseEvent *);

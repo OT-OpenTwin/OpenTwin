@@ -24,7 +24,7 @@ namespace ot {
 
 		bool valueHasChanged(void) const { return m_changed; };
 
-	private slots:
+	private Q_SLOTS:
 		void slotValueChanged(void);
 		void slotConfirm(void);
 		void slotCancel(void);

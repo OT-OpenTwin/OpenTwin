@@ -330,10 +330,10 @@ namespace ak {
 		
 		void setTabToolBarTabOrder(const QStringList& _list);
 
-	signals:
+	Q_SIGNALS:
 		void tabToolBarTabChanged(int _index);
 
-	private slots:
+	private Q_SLOTS:
 		void slotRestoreSetting(const QByteArray & _actualState);
 		void slotTabToolbarTabClicked(int _index);
 		void slotTabToolbarTabCurrentTabChanged(int _index);
