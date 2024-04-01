@@ -21,6 +21,7 @@
 #include "UiPluginManager.h"
 #include "DevLogger.h"
 #include "PropertyGridView.h"
+#include "LogInDialog.h"
 #include "NavigationTreeView.h"
 
 // uiCore header
@@ -258,6 +259,9 @@ int AppBase::run() {
 		// Initialize Widget view manager
 		ot::WidgetViewManager::instance().initialize();
 		
+		//LogInDialog logInDia;
+		//if (logInDia.showDialog() != ot::Dialog::Ok) return 0;
+
 		m_logInManager = new LogInManager();
 		if (!m_logInManager->showDialog()) { return 0; }
 		m_currentUser = m_logInManager->username().toStdString();

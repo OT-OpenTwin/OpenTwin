@@ -8,6 +8,13 @@
 // OpenTwin header
 #include "OTWidgets/Dialog.h"
 
+// Qt header
+#include <QtCore/qstring.h>
+
+namespace ot {
+	class ComboButton;
+}
+
 class LogInDialog : public ot::Dialog {
 	Q_OBJECT
 public:
@@ -21,5 +28,7 @@ private Q_SLOTS:
 	void slotGSSChanged(void);
 
 private:
+	ot::ComboButton* m_gss;
+	QString m_lastPassword;
 
 };
