@@ -199,19 +199,45 @@ bool ot::msg::send(
 		// SHARED CACHES CONFIG
 		curl_easy_setopt(curl, CURLOPT_SHARE, share);
 	}
+	
+	/* provide a buffer to store errors in */
+	char errbuf[CURL_ERROR_SIZE];
+	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+	errbuf[0] = 0;
 
 	// Send the request
-	CURLcode res = curl_easy_perform(curl);
+	CURLcode errorCode = curl_easy_perform(curl);
 	//std::cout << "URL Code received: " << res << std::endl;
 
 	curl_easy_cleanup(curl);
 	//curl_share_cleanup(share);
 	curl = NULL;
 
-	//lock = false;	
-	if (_createLogMessage) { OT_LOG(".. Message sent successful (Receiver = \"" + _receiverIP + "\"; Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG); }
-	return (res == CURLE_OK);
-
+	//lock = false;
+	if (errorCode == CURLE_OK)
+	{
+		if (_createLogMessage) 
+		{ 
+			OT_LOG(".. Message sent successful (Receiver = \"" + _receiverIP + "\"; Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG); 
+		}
+		return true;
+	}
+	else
+	{
+		std::string errorString = curl_easy_strerror(errorCode);
+		if (_createLogMessage)
+		{
+			OT_LOG_D(
+				".. Message sent failed "
+				"Error message: " + errorString + "; "
+				"Error buffer: " + errbuf + "; "
+				"(Receiver = \"" + _receiverIP + "\"; "
+				"Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). );"
+				
+			);
+		}
+		return false;
+	}
 }
 
 void ot::msg::sendAsync(
