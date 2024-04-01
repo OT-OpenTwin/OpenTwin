@@ -117,11 +117,12 @@ std::string ot::Dispatcher::dispatch(const std::string& _action, JsonDocument& _
 		return OT_ACTION_CMD_Ping;
 	}; // todo: switch to return OK (like for every empty/default result)
 
+	OT_LOG("Dispatching start: \"" + _action + "\"", ot::messageTypeToLogFlag(_messageType));
+	
 	m_mutex.lock();
 
 	std::string result;
 
-	OT_LOG("Dispatching: \"" + _action + "\"", ot::messageTypeToLogFlag(_messageType));
 
 	try {
 		auto it = m_data.find(_action);
@@ -155,5 +156,7 @@ std::string ot::Dispatcher::dispatch(const std::string& _action, JsonDocument& _
 	}
 	
 	m_mutex.unlock();
+	OT_LOG("Dispatching end: \"" + _action + "\"", ot::messageTypeToLogFlag(_messageType));
+
 	return result;
 }
