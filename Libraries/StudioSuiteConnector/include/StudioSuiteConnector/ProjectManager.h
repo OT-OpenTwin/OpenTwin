@@ -64,6 +64,9 @@ private:
     void                       getCacheFileWriteTimes(const std::string& cacheFolderName, std::map<std::string, std::filesystem::file_time_type>& cacheFileWriteTimes, std::map<std::string, bool>& cacheFiles);
     bool                       fileContentDiffers(const std::string& file1, const std::string& file2);
     std::string                calculateHash(const std::string& fileContent);
+    void                       send1dResultData(const std::string& projectRoot);
+    std::list<int>             getAllRunIds(const std::string& uploadDirectory);
+    std::list<int>             checkForChangedData(std::list<int>& allRunIds, const std::string& uploadDirectory);
 
     std::list<std::string> uploadFileList;
     std::string projectName;

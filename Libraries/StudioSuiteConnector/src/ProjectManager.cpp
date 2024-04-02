@@ -26,6 +26,7 @@
 #include <QCryptographicHash>
 
 #include "boost/algorithm/string.hpp"
+#include "zlib.h"
 
 void ProjectManager::openProject()
 {
@@ -284,8 +285,11 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Send the material information
 		sendMaterialInformation(baseProjectName);
 
-		// Send the shapes information and triangulations (progress range 70-90)
+		// Send the shapes information and triangulations (progress range 70-80)
 		sendShapeInformationAndTriangulation(baseProjectName, shapeTriangleHash);
+
+		// Send the (parametric) 1D result data (progress range 80-90)
+		send1dResultData(baseProjectName);
 
 		// Create the new version
 		commitNewVersion(changeMessage);
@@ -300,6 +304,75 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 	ProgressInfo::getInstance().setProgressState(false, "", false);
 	ProgressInfo::getInstance().unlockGui();
 }
+
+void ProjectManager::send1dResultData(const std::string& projectRoot)
+{
+	// First, we get a list of all available run-ids
+	std::string uploadDirectory = projectRoot + "/Temp/Upload/";
+
+	std::list<int> runIds = getAllRunIds(uploadDirectory);
+
+	// Now check whether the run-ids (1,2,3,...) have changed. In this case, a full upload is needed.
+	// Otherwise, only the new run-ids need to be uploaded (added).
+	std::list<int> changedRunIds = checkForChangedData(runIds, uploadDirectory);
+
+	bool appendData = (changedRunIds.size() < runIds.size());
+
+	// Create a zip archive of the to-be uploaded run-ids (including the cache information)
+
+	// Durchlaufen aller files und berechnen der benoetigten Groesse. Anlegen eines Byte Buffers
+	// Danach Durchlaufen aller files und hinzufuegen zum Byte Buffer. 
+	// Am Ende den Byte Buffer mit compress komprimieren
+
+	// Finally send the zip archive to the server (together with the information whether the data shall be replaced or added)
+
+
+
+
+
+
+}
+
+std::list<int> ProjectManager::getAllRunIds(const std::string & uploadDirectory)
+{
+	std::list<int> runIds;
+
+	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(uploadDirectory))
+	{
+		if (dirEntry.is_directory())
+		{
+			// This could be a runid
+			std::string dirname = dirEntry.path().filename().string();
+			if (std::find_if(dirname.begin(), dirname.end(), [](unsigned char c) { return !std::isdigit(c); }) == dirname.end())
+			{
+				// The directory name consists of digits only -> is an integer number#
+				int runId = atoi(dirname.c_str());
+				if (runId != 0)
+				{
+					// We have a parametric result
+					runIds.push_back(runId);
+				}
+			}
+		}
+	}
+
+	// Finally we sort the list
+	runIds.sort();
+
+	return runIds;
+}
+
+
+std::list<int> ProjectManager::checkForChangedData(std::list<int> &allRunIds, const std::string &uploadDirectory)
+{
+	std::list<int> changedRunIds;
+
+	// TODO: Check which runids have really changed
+	changedRunIds = allRunIds;
+
+	return changedRunIds;
+}
+
 
 void ProjectManager::copyFiles(const std::string &newVersion)
 {
@@ -780,7 +853,7 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 			}
 		}
 
-		int percent = (int)(15.0 * shapeCount / trianglesMap.size() + 70.0);
+		int percent = (int)(8.0 * shapeCount / trianglesMap.size() + 70.0);
 		if (percent > lastPercent)
 		{
 			ProgressInfo::getInstance().setProgressValue(percent);
@@ -794,7 +867,7 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 		sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
 	}
 
-	ProgressInfo::getInstance().setProgressValue(90);
+	ProgressInfo::getInstance().setProgressValue(80);
 }
 
 std::string ProjectManager::calculateHash(const std::string& fileContent)
