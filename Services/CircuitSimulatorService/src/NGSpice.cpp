@@ -262,9 +262,11 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
 	ControlledExit* ngexit = MyControlledExit;
+	SendData* datfcn = MySendDataFunction;
+	SendInitData* initData = MySendInitDataFunction;
 	std::string myString;
 
-	int status = ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, nullptr, nullptr, nullptr, nullptr);
+	int status = ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
 
 	if (status == 0)
 	{
@@ -327,3 +329,30 @@ int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int
 
 }
 
+
+
+int NGSpice::MySendDataFunction(pvecvaluesall vectorsAll, int numStructs, int idNumNGSpiceSharedLib, void* userData)
+{
+	//Application::instance()->uiComponent()->displayMessage("Got Vector Data\n");
+
+	Application::instance()->uiComponent()->displayMessage("Received data for% d vectors from ngspice shared library with ID% d:\n");
+	Application::instance()->uiComponent()->displayMessage(std::to_string(vectorsAll->veccount));
+	Application::instance()->uiComponent()->displayMessage(std::to_string(idNumNGSpiceSharedLib));
+	for (int i = 0; i < vectorsAll->veccount; ++i) {
+		Application::instance()->uiComponent()->displayMessage(vectorsAll->vecsa[i]->name);
+		Application::instance()->uiComponent()->displayMessage(std::to_string(vectorsAll->vecsa[i]->creal));
+		Application::instance()->uiComponent()->displayMessage(std::to_string(vectorsAll->vecsa[i]->cimag));
+	}
+	
+	return 0;
+}
+
+int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceSharedLib, void* userData)
+{
+	for (int i = 0; i < vectorInfoAll->veccount; i++)
+	{
+		Application::instance()->uiComponent()->displayMessage(vectorInfoAll->vecs[i]->vecname);
+	}
+
+	return 0;
+}

@@ -33,9 +33,13 @@ public:
 	std::string ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
 	void clearBufferStructure(std::string name);
 
+	//Callback functions from NGSpice
 	static int MySendCharFunction(char*, int, void*);
 	static int MySendStat(char*, int, void*);
 	static int MyControlledExit(int, bool imidiate, bool quitexit, int, void*);
+	static int MySendDataFunction(pvecvaluesall, int, int, void*);
+	static int MySendInitDataFunction(pvecinfoall, int, void*);
+	
 
 	//Getter
 	/*std::multimap<std::string, Connection>& getMapOfConnections() { return mapOfConnections; }*/
