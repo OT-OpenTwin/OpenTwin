@@ -18,12 +18,12 @@ Such labels can be used for machine learning methods that require labelled data,
 
 
 Data import from a csv file
---------------------
+---------------------------
 The import via csv files shall act as interface to any kind of data format. It is up to the user to transform data from any other format into a csv format that can be interpreted by OpenTwin. Following the workflow is described how data, originating from a csv file can be imported, analysed and stored in the described data model. 
 All described features can be executed via buttons in the *Import Parameterized Data* menu tab.
 
 Table import
-^^^^^^^^^^^
+^^^^^^^^^^^^
 First the csv file needs to be imported as plain file. OpenTwin tries to detect the text encoding and shows it in one of the file entity properties. This is important since MongoDB supports only UTF-8 encoding and OpenTwin has to perform a encoding conversion if necessary. The file entity also allows the selection of row and column delimitter. After checking the settings selected files can be turned into tables.
 For performance reasons only a section of the table will be shown. The displayed range can be adjusted via the table entity properties. Additional it is possible to switch the header position between first row and first column. This is important for the following selection interpretation. The table content is displayed as text. It is up to the user to select the correct decimal point character in the table property.
 
@@ -37,7 +37,7 @@ In this example the three columns on the right are selected as parameter and the
 The selection is then shown as an entity in the navigation tree. With its properties it is possible to select a data type. Since the displayed table is only a selection of the entire table, the user can select if the entire column or row shall be selected with the corresponding properties. If no series metadata is selected in the navigation tree while chategorising a table selection, a new series meta data entry is added. 
 
 Batching of Selections
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 It is possible to use defined selection as the base for the automised creation of new selections, which will be part of a new series metadata. This feature can be started with the button *Auto Create Series Metadata*. If this feature is started, all selections that have the box *Consider for batching* ticked are being copied into a new series meta data. Afterwards they are altered by the selected python script which can selected with the *Update script* property. Some example scripts:
 
 .. code-block:: Python
