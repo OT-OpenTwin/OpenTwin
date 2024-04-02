@@ -22,8 +22,7 @@ public:
 	std::map<std::string, Circuit> mapOfCircuits;
 
 	
-	/*void setConnectionNodeNumbers(std::map<std::string, std::shared_ptr<EntityBlock>>&);
-	std::string getBlockEntityTitleByUID(std::string UID, std::map<std::string, std::shared_ptr<EntityBlock>>&);*/
+
 
 	void updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
 	std::string generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string editorname);
@@ -42,13 +41,10 @@ public:
 	
 
 	//Getter
-	/*std::multimap<std::string, Connection>& getMapOfConnections() { return mapOfConnections; }*/
 	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
-	//Setter
-	/*void addConnection(std::string key, const Connection& obj);*/
-
+	
 
 private:
 	
-	/*std::multimap<std::string,Connection> mapOfConnections;*/
+	
 };

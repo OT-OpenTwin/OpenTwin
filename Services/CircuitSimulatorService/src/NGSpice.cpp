@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "Connection.h"
 #include "CircuitElement.h"
+#include "SimulationResults.h"
+
 //Open Twin Header
 #include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
@@ -298,6 +300,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	sprintf_s(command, sizeof(command), "source %s", netlist);
 	ngSpice_Command(command);*/
 
+	 std::map<std::string, std::vector<double>> map = SimulationResults::getInstance()->getResultMap();
 	myString = std::to_string(status);
 
 	return myString;
@@ -333,15 +336,11 @@ int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int
 
 int NGSpice::MySendDataFunction(pvecvaluesall vectorsAll, int numStructs, int idNumNGSpiceSharedLib, void* userData)
 {
-	//Application::instance()->uiComponent()->displayMessage("Got Vector Data\n");
-
-	Application::instance()->uiComponent()->displayMessage("Received data for% d vectors from ngspice shared library with ID% d:\n");
-	Application::instance()->uiComponent()->displayMessage(std::to_string(vectorsAll->veccount));
-	Application::instance()->uiComponent()->displayMessage(std::to_string(idNumNGSpiceSharedLib));
+	
 	for (int i = 0; i < vectorsAll->veccount; ++i) {
-		Application::instance()->uiComponent()->displayMessage(vectorsAll->vecsa[i]->name);
-		Application::instance()->uiComponent()->displayMessage(std::to_string(vectorsAll->vecsa[i]->creal));
-		Application::instance()->uiComponent()->displayMessage(std::to_string(vectorsAll->vecsa[i]->cimag));
+		std::string name = vectorsAll->vecsa[i]->name;
+		double value = vectorsAll->vecsa[i]->creal;
+		SimulationResults::getInstance()->getResultMap().at(name).push_back(value);
 	}
 	
 	return 0;
@@ -351,8 +350,13 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 {
 	for (int i = 0; i < vectorInfoAll->veccount; i++)
 	{
-		Application::instance()->uiComponent()->displayMessage(vectorInfoAll->vecs[i]->vecname);
+		std::string name = vectorInfoAll->vecs[i]->vecname;
+		std::vector<double> values;
+		SimulationResults::getInstance()->getResultMap().insert_or_assign(name, values);
+
 	}
 
 	return 0;
 }
+
+
