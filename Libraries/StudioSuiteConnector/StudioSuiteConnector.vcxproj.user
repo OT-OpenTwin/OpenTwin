@@ -16,16 +16,19 @@
     <LocalDebuggerEnvironment>PATH=$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup>
+    <ShowAllFiles>false</ShowAllFiles>
+  </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-03-17T14:43:05.3116709Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-02T08:04:54.1550098Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-03-17T14:43:05.1714131Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-02T08:04:54.0991105Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2024-03-17T14:43:05.0913747Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-02T08:04:54.0275844Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-03-17T14:43:05.3657484Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-02T08:04:54.2000376Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

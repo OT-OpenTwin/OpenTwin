@@ -10,6 +10,7 @@
 #include <qlineedit.h>
 #include <qtablewidget.h>
 #include <qdialog.h>
+#include <qcheckbox.h>
 
 // AK header
 #include <akWidgets/aWidget.h>
@@ -27,10 +28,12 @@ class QHBoxLayout;
 class CommitMessageDialog : public QDialog {
 	Q_OBJECT
 public:
-	CommitMessageDialog(const QIcon& windowIcon);
+	CommitMessageDialog(const QIcon& windowIcon, QString type, QString message);
 	virtual ~CommitMessageDialog();
 
 	QString changeMessage(void);
+	bool includeResults(void);
+	bool includeParametricResults(void);
 
 	bool wasConfirmed(void) const { return my_confirmed; }
 
@@ -47,6 +50,7 @@ private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
+	void slotIncludeResultsChecked(int state);
 
 private:
 
@@ -68,6 +72,9 @@ private:
 
 	QHBoxLayout* my_layoutInput;
 	QWidget* my_widgetInput;
+
+	QCheckBox* my_includeResults;
+	QCheckBox* my_includeParametricResults;
 
 	CommitMessageDialog(const CommitMessageDialog&) = delete;
 	CommitMessageDialog& operator = (CommitMessageDialog&) = delete;

@@ -25,9 +25,9 @@ public:
     void openProject();
     void setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject);
 
-    void importProject(const std::string& fileName, const std::string& prjName);
+    void importProject(const std::string& fileName, const std::string& prjName, const std::string& changeMessage, bool incResults, bool incParametricResults);
     std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);
-    void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment);
+    void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults, bool incParametricResults);
     void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion);
     void downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version);
@@ -39,15 +39,15 @@ public:
 private:
     enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};
 
-    ProjectManager() : currentOperation(OPERATION_NONE) {};
+    ProjectManager() : currentOperation(OPERATION_NONE), includeResults(false), includeParametricResults(false) {};
     ~ProjectManager() {};
 
     std::string                getBaseProjectName(const std::string& cstFileName);
     std::string                createCacheFolder(const std::string& baseProjectName);
-    std::list<std::string>     determineUploadFiles(const std::string& baseProjectName);
+    std::list<std::string>     determineUploadFiles(const std::string& baseProjectName, bool incResults);
     void                       uploadFiles(const std::string& projectRoot, std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
     void                       commitNewVersion(const std::string& changeMessage);
-    void                       copyCacheFiles(const std::string& baseProjectName, const std::string& newVersion, const std::string& cacheFolderName);
+    void                       copyCacheFiles(const std::string& baseProjectName, const std::string& newVersion, const std::string& cacheFolderName, bool copyResults);
     void                       writeVersionFile(const std::string& baseProjectName, const std::string &projectName, const std::string& newVersion, const std::string& cacheFolderName);
     void                       sendUnitsInformation(const std::string& projectRoot);
     void                       sendMaterialInformation(const std::string& projectRoot);
@@ -73,6 +73,8 @@ private:
     std::map<std::string, std::pair<ot::UID, ot::UID>> dependentDataFiles;
     std::list<std::string> deletedFiles;
     std::string changeMessage;
+    bool includeResults;
+    bool includeParametricResults;
     operationType currentOperation;
     std::string localProjectFileName;
 };

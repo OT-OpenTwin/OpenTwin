@@ -17,14 +17,14 @@
 // AK header
 #include <akAPI/uiAPI.h>
 
-CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon)
+CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, QString message)
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
 	// Create controls
 	my_buttonCancel = new QPushButton{ "Cancel" };
-	my_buttonConfirm = new QPushButton{ "Commit" };
-	my_input = new QLineEdit;
+	my_buttonConfirm = new QPushButton{ type };
+	my_input = new QLineEdit(message);
 	my_label = new QLabel("Change message");
 	my_label->setBuddy(my_input);
 
@@ -38,6 +38,16 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon)
 	my_layoutInput->addWidget(my_input);
 	my_layout->addWidget(my_widgetInput);
 
+	// Create checkboxes
+	my_includeResults = new QCheckBox("Include results");
+	my_includeParametricResults = new QCheckBox("Include parametric results");
+
+	my_includeResults->setChecked(true);
+	my_includeParametricResults->setChecked(false);
+
+	my_layout->addWidget(my_includeResults);
+	my_layout->addWidget(my_includeParametricResults);
+
 	// Create button layout
 	my_widgetButtons = new QWidget;
 	my_layoutButtons = new QHBoxLayout{ my_widgetButtons };
@@ -45,7 +55,7 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon)
 	my_layoutButtons->addWidget(my_buttonCancel);
 	my_layout->addWidget(my_widgetButtons);
 
-	setWindowTitle("Commit Project");
+	setWindowTitle(type + "Project");
 	setWindowIcon(windowIcon);
 
 	my_input->setMinimumWidth(300);
@@ -56,6 +66,7 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon)
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
+	connect(my_includeResults, SIGNAL(stateChanged(int)), this, SLOT(slotIncludeResultsChecked(int)));
 }
 
 CommitMessageDialog::~CommitMessageDialog() {
@@ -68,11 +79,16 @@ CommitMessageDialog::~CommitMessageDialog() {
 
 	delete my_layoutInput;
 	delete my_widgetInput;
+	
+	delete my_includeResults;
+	delete my_includeParametricResults;
 
 	delete my_layout;
 }
 
 QString CommitMessageDialog::changeMessage(void) { return my_input->text(); }
+bool CommitMessageDialog::includeResults(void) { return my_includeResults->isChecked(); }
+bool CommitMessageDialog::includeParametricResults(void) { return (my_includeResults->isChecked() && my_includeParametricResults->isChecked()); }
 
 void CommitMessageDialog::reset(const QString& _projectToCopy) {
 	my_input->setText(_projectToCopy);
@@ -85,6 +101,13 @@ void CommitMessageDialog::slotButtonConfirmPressed() { my_confirmed = true; Clos
 void CommitMessageDialog::slotButtonCancelPressed() { my_confirmed = false;  close(); }
 
 void CommitMessageDialog::slotReturnPressed() { my_confirmed = true; Close(); }
+
+void CommitMessageDialog::slotIncludeResultsChecked(int state)
+{
+	bool includeResults = my_includeResults->isChecked();
+
+	my_includeParametricResults->setEnabled(includeResults);
+}
 
 void CommitMessageDialog::Close(void) {
 	if (my_input->text().length() == 0) { return; }

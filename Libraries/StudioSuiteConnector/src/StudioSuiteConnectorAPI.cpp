@@ -25,6 +25,14 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 
 		if (fileName == "") return "";
 
+		CommitMessageDialog commitMessageDialog(windowIcon, "Import", "Import CST Studio Suite project");
+		commitMessageDialog.exec();
+		if (!commitMessageDialog.wasConfirmed()) return "";
+
+		std::string message = commitMessageDialog.changeMessage().toStdString();
+		bool includeResults = commitMessageDialog.includeResults();
+		bool includeParametricResults = commitMessageDialog.includeParametricResults();
+
 		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
 
 		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
@@ -32,7 +40,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
 		StudioSuiteConnectorAPI::setLocalFileName(fileName.toStdString());
 
-		std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), projectName);
+		std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), projectName, message, includeResults, includeParametricResults);
 		workerThread.detach();
 	}
 	else if (action == OT_ACTION_CMD_UI_SS_COMMIT) {
@@ -46,10 +54,12 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 			return "";
 		}
 
-		CommitMessageDialog commitMessageDialog(windowIcon);
+		CommitMessageDialog commitMessageDialog(windowIcon, "Commit", "");
 		commitMessageDialog.exec();
 		if (!commitMessageDialog.wasConfirmed()) return "";
 		std::string changeComment = commitMessageDialog.changeMessage().toStdString();
+		bool includeResults = commitMessageDialog.includeResults();
+		bool includeParametricResults = commitMessageDialog.includeParametricResults();
 
 		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
 
@@ -63,7 +73,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 
 		QMetaObject::invokeMethod(mainObject, "activateModelVersion", Qt::DirectConnection, Q_ARG(const char*, vsn));
 
-		std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName, projectName, changeComment);
+		std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName, projectName, changeComment, includeResults, includeParametricResults);
 		workerThread.detach();
 	}
 	else if (action == OT_ACTION_CMD_UI_SS_GET) {
@@ -331,9 +341,9 @@ void StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServic
 	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL, mainObject);
 }
 
-void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string projectName)
+void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults, bool includeParametricResults)
 {
-	ProjectManager::getInstance().importProject(fileName, projectName);
+	ProjectManager::getInstance().importProject(fileName, projectName, message, includeResults, includeParametricResults);
 }
 
 std::string StudioSuiteConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
@@ -341,9 +351,9 @@ std::string StudioSuiteConnectorAPI::getCurrentVersion(std::string fileName, std
 	return ProjectManager::getInstance().getCurrentVersion(fileName, projectName);
 }
 
-void StudioSuiteConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment)
+void StudioSuiteConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults, bool includeParametricResults)
 {
-	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment);
+	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment, includeResults, includeParametricResults);
 }
 
 void StudioSuiteConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)

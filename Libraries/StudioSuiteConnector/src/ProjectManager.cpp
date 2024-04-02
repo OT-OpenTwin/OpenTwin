@@ -54,7 +54,7 @@ void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceU
 	ProgressInfo::getInstance().setMainObject(mainObject);
 }
 
-void ProjectManager::importProject(const std::string& fileName, const std::string& prjName)
+void ProjectManager::importProject(const std::string& fileName, const std::string& prjName, const std::string &message, bool incResults, bool incParametricResults)
 {
 	try
 	{
@@ -69,7 +69,9 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		deletedFiles.clear();
 
 		projectName = prjName;
-		changeMessage = "Import CST Studio Suite project";
+		changeMessage = message;
+		includeResults = incResults;
+		includeParametricResults = incParametricResults;
 
 		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
@@ -82,10 +84,10 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 
 		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName, baseProjectName);
+		studioObject.searchProjectAndExtractData(fileName, baseProjectName, includeResults, includeParametricResults);
 
 		// Get the files to be uploaded
-		uploadFileList = determineUploadFiles(baseProjectName);
+		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
 
 		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
 		ProgressInfo::getInstance().setProgressValue(15);
@@ -134,7 +136,7 @@ std::string ProjectManager::getCurrentVersion(const std::string& fileName, const
 	return version.getVersion();
 }
 
-void ProjectManager::commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment)
+void ProjectManager::commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults, bool incParametricResults)
 {
 	try
 	{
@@ -150,6 +152,8 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 
 		projectName = prjName;
 		changeMessage = changeComment;
+		includeResults = incResults;
+		includeParametricResults = incParametricResults;
 
 		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
@@ -162,10 +166,10 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 
 		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName, baseProjectName);
+		studioObject.searchProjectAndExtractData(fileName, baseProjectName, includeResults, includeParametricResults);
 
 		// Get the files to be uploaded
-		uploadFileList = determineUploadFiles(baseProjectName);
+		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
 
 		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
 		ProgressInfo::getInstance().setProgressValue(15);
@@ -302,7 +306,7 @@ void ProjectManager::copyFiles(const std::string &newVersion)
 	try
 	{
 		// Copy the files to the cache directory
-		copyCacheFiles(baseProjectName, newVersion, cacheFolderName);
+		copyCacheFiles(baseProjectName, newVersion, cacheFolderName, includeResults);
 
 		// Store version information
 		writeVersionFile(baseProjectName, projectName, newVersion, cacheFolderName);
@@ -356,7 +360,7 @@ std::string ProjectManager::createCacheFolder(const std::string& baseProjectName
 	return cacheFolderName;
 }
 
-std::list<std::string> ProjectManager::determineUploadFiles(const std::string& baseProjectName)
+std::list<std::string> ProjectManager::determineUploadFiles(const std::string& baseProjectName, bool includeResults)
 {
 	std::list<std::string> uploadFiles;
 	std::string path;
@@ -390,41 +394,54 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 	}
 
 	// Now add the content of the results folder
-	std::string resultDirName = baseProjectName + "/Result";
-	std::string cacheResultDirName = versionFolderName + "/Result";
 
-	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
+	if (includeResults)
 	{
-		if (!dirEntry.is_directory())
+		std::string resultDirName = baseProjectName + "/Result";
+		std::string cacheResultDirName = versionFolderName + "/Result";
+
+		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
 		{
-			path = dirEntry.path().string();
-			std::replace(path.begin(), path.end(), '\\', '/');
-
-			std::string correspondingCacheFile = path.substr(resultDirName.length());
-
-			if (cacheFiles.count(correspondingCacheFile) == 0)
+			if (!dirEntry.is_directory())
 			{
-				// This file does not exist in the cache
-				uploadFiles.push_back(path);
+				path = dirEntry.path().string();
+				std::replace(path.begin(), path.end(), '\\', '/');
+
+				std::string correspondingCacheFile = path.substr(resultDirName.length());
+
+				if (cacheFiles.count(correspondingCacheFile) == 0)
+				{
+					// This file does not exist in the cache
+					uploadFiles.push_back(path);
+				}
+				else
+				{
+					// This file exists in the cache
+					cacheFiles[correspondingCacheFile] = true; // This file is still present
+
+					auto cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
+					auto newFileTimeStamp = std::filesystem::last_write_time(path);
+
+					if (newFileTimeStamp > cacheFileTimeStamp)
+					{
+						// The time stamp of this file has changed. Now we need to compare the file content to determine whether 
+						// the file has indeed changed
+						if (fileContentDiffers(path, cacheResultDirName + correspondingCacheFile))
+						{
+							// This file has changed compared to the data in the cache
+							uploadFiles.push_back(path);
+						}
+					}
+				}
 			}
 			else
 			{
-				// This file exists in the cache
+				path = dirEntry.path().string();
+				std::replace(path.begin(), path.end(), '\\', '/');
+
+				std::string correspondingCacheFile = path.substr(resultDirName.length());
+
 				cacheFiles[correspondingCacheFile] = true; // This file is still present
-
-				auto cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
-				auto newFileTimeStamp = std::filesystem::last_write_time(path);
-
-				if (newFileTimeStamp > cacheFileTimeStamp)
-				{
-					// The time stamp of this file has changed. Now we need to compare the file content to determine whether 
-					// the file has indeed changed
-					if (fileContentDiffers(path, cacheResultDirName + correspondingCacheFile))
-					{
-						// This file has changed compared to the data in the cache
-						uploadFiles.push_back(path);
-					}
-				}
 			}
 		}
 	}
@@ -438,6 +455,12 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 			// This file is not present anymore
 			deletedFiles.push_back(fileNamePrefix + file.first);
 		}
+	}
+
+	if (!includeResults)
+	{
+		deletedFiles.push_back(fileNamePrefix);
+		deletedFiles.push_back("Files/" + std::filesystem::path(baseProjectName).filename().string());
 	}
 
 	return uploadFiles;
@@ -492,20 +515,20 @@ void ProjectManager::getCacheFileWriteTimes(const std::string& versionFolderName
 
 	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
 	{
+		std::string path = dirEntry.path().string();
+		std::replace(path.begin(), path.end(), '\\', '/');
+
+		std::string cacheFile = path.substr(resultDirName.length());
+		cacheFiles[cacheFile] = false;
+
 		if (!dirEntry.is_directory())
 		{
-			std::string path = dirEntry.path().string();
-			std::replace(path.begin(), path.end(), '\\', '/');
-		
-			std::string cacheFile = path.substr(resultDirName.length());
-
 			cacheFileWriteTimes[cacheFile] = std::filesystem::last_write_time(path);
-			cacheFiles[cacheFile] = false;
 		}
 	}
 }
 
-void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const std::string &newVersion, const std::string &cacheFolderName)
+void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const std::string &newVersion, const std::string &cacheFolderName, bool copyResults)
 {
 	// Create new version subfolder
 	std::string versionFolderName = cacheFolderName + "/" + newVersion;
@@ -520,9 +543,12 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 		throw("Unable to create cache version folder: " + versionFolderName);
 	}
 
-	if (!std::filesystem::create_directory(versionFolderName + "/Result"))
+	if (copyResults)
 	{
-		throw("Unable to create cache result folder: " + versionFolderName + "/Result");
+		if (!std::filesystem::create_directory(versionFolderName + "/Result"))
+		{
+			throw("Unable to create cache result folder: " + versionFolderName + "/Result");
+		}
 	}
 
 	// Now copy all upload files to the cache version folder
@@ -535,7 +561,11 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 	try
 	{
 		copyFile(cstFileName, versionFolderName);
-		copyDirectory(resultFolderName, versionFolderName + "/Result");
+
+		if (copyResults)
+		{
+			copyDirectory(resultFolderName, versionFolderName + "/Result");
+		}
 	}
 	catch (std::exception &error)
 	{
@@ -897,7 +927,11 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 			std::filesystem::create_directory(baseProjectName);
 
 			copyFile(cstCacheFileName, baseProjectName + ".cst");
-			copyDirectory(cacheDirectory + "/Result", baseProjectName + "/Result");
+
+			if (std::filesystem::is_directory(cacheDirectory + "/Result"))
+			{
+				copyDirectory(cacheDirectory + "/Result", baseProjectName + "/Result");
+			}
 
 			return true;
 		}

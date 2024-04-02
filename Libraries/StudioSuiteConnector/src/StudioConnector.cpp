@@ -13,7 +13,7 @@
 
 //#define DEBUG_PYTHON_SERVER
 
-std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName, const std::string& projectRoot)
+std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName, const std::string& projectRoot, bool includeResults, bool includeParametricResults)
 {
 	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
 
@@ -38,7 +38,7 @@ std::string StudioConnector::searchProjectAndExtractData(const std::string& file
 	std::string exportFolder = projectRoot + "/Temp/Upload";
 	std::filesystem::remove_all(exportFolder);
 
-	std::string script = generateExtractScript(studioPath, fileName, exportFolder, studioPidList);
+	std::string script = generateExtractScript(studioPath, fileName, exportFolder, studioPidList, includeResults, includeParametricResults);
 
 	ot::ReturnMessage returnMessage = executeCommand(script);
 
@@ -150,9 +150,8 @@ std::list<long long> StudioConnector::getRunningDesignEnvironmentProcesses()
 	return processIDs;
 }
 
-std::string StudioConnector::generateExtractScript(const std::string &studioPath, std::string fileName, std::string exportFolder, std::list<long long> studioPidList)
+std::string StudioConnector::generateExtractScript(const std::string &studioPath, std::string fileName, std::string exportFolder, std::list<long long> studioPidList, bool includeResults, bool includeParametricResults)
 {
-	bool includeParametricResults = false;
 
 	std::replace(fileName.begin(), fileName.end(), '/', '\\');
 
@@ -160,6 +159,7 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 
 	script << "fileName = r'" << fileName << "'\n";
 	script << "exportFolder = r'" << exportFolder << "'\n";
+	script << "includeResults = " << (includeResults ? "True" : "False") << "\n";
 	script << "includeParametricResults = " << (includeParametricResults ? "True" : "False") << "\n";
 	script << "idlist = [";
 	while (!studioPidList.empty())
@@ -344,40 +344,41 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 	script << "print('execute VBA code')\n";
 	script << "prj.schematic.execute_vba_code(vbaCode)\n";
 
-	script << "project = cst.results.ProjectFile(fileName, True)\n";
-	script << "results = project.get_3d().get_tree_items()\n";
+	script << "if includeResults:\n";
+	script << "    project = cst.results.ProjectFile(fileName, True)\n";
+	script << "    results = project.get_3d().get_tree_items()\n";
 
-	script << "if includeParametricResults:\n";
-	script << "    runIds = project.get_3d().get_all_run_ids()\n";
-	script << "else:\n";
-	script << "    runIds = [0]\n";
-
-	script << "for id in runIds :\n";
-	script << "    dict = project.get_3d().get_parameter_combination(id)\n";
-	script << "    exportFileName = exportFolder + '\\\\' + str(id) + '\\\\parameters.info'\n";
-	script << "    os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
-	script << "    f = open(exportFileName, 'w')\n";
-	script << "    for key, value in dict.items() :\n";
-	script << "        f.write(str(key) + '\\n' + str(value) + '\\n')\n";
-	script << "    f.close()\n";
-
-	script << "for item in results :\n";
 	script << "    if includeParametricResults:\n";
-	script << "        runIds = project.get_3d().get_run_ids(item)\n";
+	script << "        runIds = project.get_3d().get_all_run_ids()\n";
 	script << "    else:\n";
 	script << "        runIds = [0]\n";
-	script << "    for id in runIds : \n";
-	script << "        data = project.get_3d().get_result_item(item, 0, False)\n";
-	script << "        exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
+
+	script << "    for id in runIds :\n";
+	script << "        dict = project.get_3d().get_parameter_combination(id)\n";
+	script << "        exportFileName = exportFolder + '\\\\' + str(id) + '\\\\parameters.info'\n";
 	script << "        os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
 	script << "        f = open(exportFileName, 'w')\n";
-	script << "        f.write(data.title + '\\n')\n";
-	script << "        f.write(data.xlabel + '\\n')\n";
-	script << "        f.write(data.ylabel + '\\n')\n";
-	script << "        f.write(str(len(data.get_data())) + '\\n')\n";
-	script << "        for value in data.get_data() :\n";
-	script << "            f.write(str(value) + '\\n')\n";
+	script << "        for key, value in dict.items() :\n";
+	script << "            f.write(str(key) + '\\n' + str(value) + '\\n')\n";
 	script << "        f.close()\n";
+
+	script << "    for item in results :\n";
+	script << "        if includeParametricResults:\n";
+	script << "            runIds = project.get_3d().get_run_ids(item)\n";
+	script << "        else:\n";
+	script << "            runIds = [0]\n";
+	script << "        for id in runIds : \n";
+	script << "            data = project.get_3d().get_result_item(item, 0, False)\n";
+	script << "            exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
+	script << "            os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
+	script << "            f = open(exportFileName, 'w')\n";
+	script << "            f.write(data.title + '\\n')\n";
+	script << "            f.write(data.xlabel + '\\n')\n";
+	script << "            f.write(data.ylabel + '\\n')\n";
+	script << "            f.write(str(len(data.get_data())) + '\\n')\n";
+	script << "            for value in data.get_data() :\n";
+	script << "                f.write(str(value) + '\\n')\n";
+	script << "            f.close()\n";
 
 	script << "de.set_quiet_mode(False)\n";
 
