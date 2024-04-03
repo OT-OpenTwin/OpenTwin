@@ -238,6 +238,9 @@
     <ClCompile Include="src\Painter2DPreview.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\PropertyGridItemDelegate.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -451,6 +454,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\ComboBox.h">
       <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
+      <Filter>include\Properties</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

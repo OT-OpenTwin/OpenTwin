@@ -9,6 +9,7 @@
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/PropertyGridItemDelegate.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -38,6 +39,7 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) 
 	m_tree->setHeaderLabels({ "Name", "Value" });
 	m_tree->setIndentation(0);
 	m_tree->setObjectName("ot_property_grid");
+	m_tree->setItemDelegate(new PropertyGridItemDelegate(m_tree));
 	this->connect(m_tree, &TreeWidget::itemChanged, this, &PropertyGrid::slotItemChanged);
 }
 

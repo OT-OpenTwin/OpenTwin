@@ -81,6 +81,7 @@
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\PlainTextEdit.cpp" />
     <ClCompile Include="src\PropertyDialog.cpp" />
+    <ClCompile Include="src\PropertyGridItemDelegate.cpp" />
     <ClCompile Include="src\PropertyInputBool.cpp" />
     <ClCompile Include="src\PropertyInputColor.cpp" />
     <ClCompile Include="src\PropertyInputDirectory.cpp" />
@@ -121,6 +122,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DEditDialog.h" />
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
+    <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />

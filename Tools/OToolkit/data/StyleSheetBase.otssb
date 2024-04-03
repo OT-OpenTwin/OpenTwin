@@ -2218,3 +2218,22 @@ QAbstractView:selected {
     background: %color:Widget Selection Background 1%;
     color: %color:Widget Selection Foreground 1%;
 }
+
+/* ##################################################################################### */
+
+/* Property Grid */
+
+#ot_property_grid::item {
+    background-color: transparent;
+    color: black;
+}
+
+#ot_property_grid::item:hover:!selected {
+    background-color: transparent;
+    color: black;
+}
+
+#ot_property_grid::item:selected {
+    background-color: transparent;
+    color: black;
+}
