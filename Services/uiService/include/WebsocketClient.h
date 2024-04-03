@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 
 #include <QtCore/QObject>
 #include <QtWebSockets/QWebSocket>
@@ -31,17 +32,19 @@ private Q_SLOTS:
 	void onSslErrors(const QList<QSslError> &errors);
 
 private:
-	void processMessages(void);	
+	void processMessages(int maxTime = 0);	
 	void sendExecuteOrQueueMessage(QString message);
 	bool ensureConnection(void);
 
+	std::string stateAsString(QAbstractSocket::SocketState state);
+
 	QWebSocket m_webSocket;
 	QUrl m_url;
-	bool isConnected;
-	std::map<std::string, bool> waitingForResponse;
-	bool currentlyProcessingQueuedMessage;
+	std::atomic_bool isConnected;
+	std::map<std::string, std::atomic_bool> waitingForResponse;
+	std::atomic_bool currentlyProcessingQueuedMessage;
 	std::string responseText;
 	std::list<QString> commandQueue;
-	bool sessionIsClosing;
+	std::atomic_bool sessionIsClosing;
 };
 

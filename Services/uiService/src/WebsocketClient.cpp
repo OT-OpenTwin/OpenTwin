@@ -42,19 +42,28 @@ WebsocketClient::WebsocketClient(const std::string &socketUrl) :
 	replace(wsUrl, "127.0.0.1", "localhost");
 	m_url = QUrl(wsUrl.c_str());
 
-	QString caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";
-
-	// Check whether local cert file ca.pem exists
-	if (!QFile::exists("caStr"))
+	QString caStr;
+	std::string message;
+	const QString developerBasePath = QProcessEnvironment::systemEnvironment().value("OPENTWIN_DEV_ROOT", "");
+	
+	if (developerBasePath == "")
 	{
-		// Get the development root environment variable
-		std::cout << "Using development root certificate file" << std::endl;
-
-		caStr = QProcessEnvironment::systemEnvironment().value("OPENTWIN_DEV_ROOT", "") + "\\Deployment\\Certificates\\ca.pem";
+		caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";
+		message = "Using deployment root certificate file: " + caStr.toStdString();
 	}
 	else
 	{
-		std::cout << "Using local certificate file" << std::endl;
+		caStr = developerBasePath + "\\Deployment\\Certificates\\ca.pem";
+		message = "Using development root certificate file: " + caStr.toStdString();
+	}
+
+	OT_LOG_D(message);
+	std::cout << message << std::endl;
+
+	// Check whether local cert file ca.pem exists
+	if (!QFile::exists(caStr))
+	{
+		throw std::exception("Root certificate not found.");
 	}
 
 	// SSL/ TLS Configuration
@@ -79,7 +88,7 @@ WebsocketClient::WebsocketClient(const std::string &socketUrl) :
 		this, &WebsocketClient::onSslErrors);
 
 	m_webSocket.open(QUrl(m_url));
-
+	OT_LOG_D("Websocket opened with state: " + stateAsString(m_webSocket.state()));
 }
 
 WebsocketClient::~WebsocketClient()
@@ -202,45 +211,101 @@ void WebsocketClient::sendMessage(const std::string &message, std::string &respo
 	std::string senderIP = message.substr(index1 + 1, index2 - index1 - 1);
 
 	// Make sure we are connected
-	if (!ensureConnection()) return;
+	if (!ensureConnection())
+	{
+		OT_LOG_D("Sending message via websocket client failed, because not connected.");
+		return;
+	}
 
 	// Now send our message	
 	waitingForResponse[senderIP] = true;
+	OT_LOG_D("Sending websocket message");
 	m_webSocket.sendTextMessage(message.c_str());
 
 	// Wait for the reponse
+	OT_LOG_D("Starting to wait for response");
 	while (waitingForResponse[senderIP])
 	{
 		processMessages();
 	}
-
+	OT_LOG_D("Finished waitinf for a response");
 	// We have received a response and return the text
 	response = responseText;
 }
 
-void WebsocketClient::processMessages(void) 
+void WebsocketClient::processMessages(int maxTime) 
 {
 	QEventLoop eventLoop;		
-	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+	if (maxTime == 0)
+	{
+		eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+	}
+	else
+	{
+		eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents,maxTime);
+	}
 }
 
 bool WebsocketClient::ensureConnection(void)
 {
-	if (!isConnected && sessionIsClosing) return false;
-
+	if (!isConnected && sessionIsClosing) 
+	{
+		OT_LOG_D("WebsocketClient is not connected and the session is closing");
+		return false;
+	}
+	int maxWaitingTime = 1000; //in ms
+	
+	auto socketState = m_webSocket.state();
+	if (!isConnected)
+	{
+		OT_LOG_D("Websocket not connected. Socket state: " + socketState);
+	}
 	while (!isConnected)
 	{
-		if (m_webSocket.state() == QAbstractSocket::UnconnectedState)
+		if (socketState == QAbstractSocket::UnconnectedState)
 		{
 			// The relay service was probably not running when the connection was tried to establish
 			// Try to connect again
 			m_webSocket.open(QUrl(m_url));
 		}
-		processMessages();
+		processMessages(maxWaitingTime);
 	}
 	assert(isConnected);
 
 	return isConnected;
+}
+
+std::string WebsocketClient::stateAsString(QAbstractSocket::SocketState state)
+{
+	if (state == QAbstractSocket::UnconnectedState)
+	{
+		return "The socket is not connected.";
+	}
+	else if(state == QAbstractSocket::HostLookupState)
+	{
+		return "The socket is performing a host name lookup.";
+	}
+	else if (state == QAbstractSocket::ConnectingState)
+	{
+		return "The socket has started establishing a connection.";
+	}
+	else if (state == QAbstractSocket::ConnectedState)
+	{
+		return "A connection is established.";
+	}
+	else if (state == QAbstractSocket::BoundState)
+	{
+		return "The socket is bound to an address and port.";
+	}
+	else if (state == QAbstractSocket::ClosingState)
+	{
+		return "The socket is about to close(data may still be waiting to be written).";
+	}
+	else
+	{
+		assert(QAbstractSocket::ListeningState); 
+		return "For internal use only.";
+	}
 }
 
 void WebsocketClient::sendExecuteOrQueueMessage(QString message)
@@ -256,7 +321,7 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 	QString jsonData = message.mid(index2 + 1);
 
 	const char *response = nullptr;
-
+	
 	if (action == "execute")
 	{
 		response = performAction(jsonData.toStdString().c_str(), senderIP.toStdString().c_str());
