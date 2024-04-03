@@ -3398,6 +3398,7 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 
 bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response)
 {
+	OT_LOG_D("Sending Relay Request");
 	assert(m_websocket != nullptr);
 
 	// This function is sending the request through the UI relay service to the destination
@@ -3749,7 +3750,10 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 		do
 		{
-			if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
+			OT_LOG_D("Sending message with startup complete");
+			const bool messageSendSuccess = sendHttpRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response);
+			OT_LOG_D("Sending message with startup complete finished");
+			if (!messageSendSuccess) {
 				m_lockManager->unlock(AppBase::instance(), ot::ui::tlAll);
 				throw std::exception("Failed to send http request to Session Service");
 			}

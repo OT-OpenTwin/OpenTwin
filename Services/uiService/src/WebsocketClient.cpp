@@ -150,6 +150,7 @@ void WebsocketClient::onMessageReceived(QString message)
 	QString action = message.left(index1);
 	QString senderIP = message.mid(index1 + 1, index2 - index1 - 1);
 
+	OT_LOG_D("Received message on WebsocketClient. Action: " + action.toStdString() + " Sender: " + senderIP.toStdString());
 	// Process the action
 	if (action == "response")
 	{
@@ -178,6 +179,7 @@ void WebsocketClient::onMessageReceived(QString message)
 			sendExecuteOrQueueMessage(message);
 		}
 	}
+	OT_LOG_D("Finished Received message handling on WebsocketClient.");
 }
 
 void WebsocketClient::finishedProcessingQueuedMessage(void)
@@ -250,7 +252,7 @@ bool WebsocketClient::ensureConnection(void)
 	auto socketState = m_webSocket.state();
 	if (!isConnected)
 	{
-		OT_LOG_D("Websocket not connected. Socket state: " + socketState);
+		OT_LOG_D("Websocket not connected. Socket state: " + stateAsString(socketState));
 	}
 	while (!isConnected)
 	{
@@ -258,6 +260,7 @@ bool WebsocketClient::ensureConnection(void)
 		{
 			// The relay service was probably not running when the connection was tried to establish
 			// Try to connect again
+			OT_LOG_D("Websocket retry to connect at: " + m_url.toString().toStdString());
 			m_webSocket.open(QUrl(m_url));
 		}
 		processMessages();
