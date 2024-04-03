@@ -233,17 +233,10 @@ void WebsocketClient::sendMessage(const std::string &message, std::string &respo
 	response = responseText;
 }
 
-void WebsocketClient::processMessages(int maxTime) 
+void WebsocketClient::processMessages() 
 {
 	QEventLoop eventLoop;		
-	if (maxTime == 0)
-	{
-		eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
-	}
-	else
-	{
-		eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents,maxTime);
-	}
+	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 }
 
 bool WebsocketClient::ensureConnection(void)
@@ -253,8 +246,7 @@ bool WebsocketClient::ensureConnection(void)
 		OT_LOG_D("WebsocketClient is not connected and the session is closing");
 		return false;
 	}
-	int maxWaitingTime = 1000; //in ms
-	
+		
 	auto socketState = m_webSocket.state();
 	if (!isConnected)
 	{
@@ -268,7 +260,7 @@ bool WebsocketClient::ensureConnection(void)
 			// Try to connect again
 			m_webSocket.open(QUrl(m_url));
 		}
-		processMessages(maxWaitingTime);
+		processMessages();
 	}
 	assert(isConnected);
 

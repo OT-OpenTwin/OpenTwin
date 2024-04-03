@@ -32,7 +32,7 @@ private Q_SLOTS:
 	void onSslErrors(const QList<QSslError> &errors);
 
 private:
-	void processMessages(int maxTime = 0);	
+	void processMessages();	
 	void sendExecuteOrQueueMessage(QString message);
 	bool ensureConnection(void);
 
