@@ -72,11 +72,19 @@ namespace ot {
 		//! This group takes ownership of the child.
 		void addChildGroup(PropertyGroup* _group);
 
+		void setBackgroundColor(Color::DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setBackgroundColor(const Color& _color);
 		void setBackgroundPainter(Painter2D* _painter);
 		Painter2D* backgroundPainter(void) const { return m_backgroundPainter; };
+
+		void setAlternateBackgroundColor(Color::DefaultColor _color) { this->setAlternateBackgroundColor(Color(_color)); };
+		void setAlternateBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
+		void setAlternateBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
+		void setAlternateBackgroundColor(const Color& _color);
+		void setAlternateBackgroundPainter(Painter2D* _painter);
+		Painter2D* alternateBackgroundPainter(void) const { return m_alternateBackgroundPainter; };
 
 		void clear(bool _keepGroups = false);
 
@@ -84,6 +92,7 @@ namespace ot {
 		std::string m_name;
 		std::string m_title;
 		Painter2D* m_backgroundPainter;
+		Painter2D* m_alternateBackgroundPainter;
 		std::list<Property*> m_properties;
 		std::list<PropertyGroup*> m_childGroups;
 	};

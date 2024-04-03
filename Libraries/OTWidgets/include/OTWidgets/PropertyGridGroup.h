@@ -39,7 +39,7 @@ namespace ot {
 		void setTitle(const QString& _title);
 		QString getTitle(void) const;
 
-		void addItem(PropertyGridItem* _item);
+		void addProperty(PropertyGridItem* _item);
 
 		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
 		const QBrush& groupBrush(void) const { return m_groupBrush; };
@@ -54,8 +54,10 @@ namespace ot {
 		void slotColorStyleChanged(const ColorStyle& _style);
 
 	private:
+		bool m_isAlternate;
 		std::string m_name;
 		QBrush m_groupBrush;
+		QBrush m_groupAlternateBrush;
 	};
 
 }

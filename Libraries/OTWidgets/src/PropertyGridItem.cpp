@@ -12,7 +12,7 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputFactory.h"
 
-ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_itemBrush(QColor(0, 0, 0, 0)) {
+ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_propertyBrush(QColor(Qt::white)) {
 
 }
 

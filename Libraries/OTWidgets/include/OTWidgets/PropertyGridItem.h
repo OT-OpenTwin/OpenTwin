@@ -39,13 +39,13 @@ namespace ot {
 		void setInput(PropertyInput* _input);
 		PropertyInput* getInput(void) const { return m_input; };
 		
-		void setItemBrush(const QBrush& _brush) { m_itemBrush = _brush; };
-		const QBrush& itemBrush(void) const { return m_itemBrush; };
+		void setPropertyBrush(const QBrush& _brush) { m_propertyBrush = _brush; };
+		const QBrush& propertyBrush(void) const { return m_propertyBrush; };
 
 	private:
 		std::string m_name;
 		PropertyInput* m_input;
-		QBrush m_itemBrush;
+		QBrush m_propertyBrush;
 	};
 
 }

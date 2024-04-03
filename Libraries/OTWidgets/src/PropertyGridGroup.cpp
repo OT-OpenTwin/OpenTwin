@@ -23,7 +23,9 @@ namespace ot {
 	}
 }
 
-ot::PropertyGridGroup::PropertyGridGroup() {
+ot::PropertyGridGroup::PropertyGridGroup() 
+	: m_isAlternate(false), m_groupBrush(QColor(Qt::white)), m_groupAlternateBrush(QColor(Qt::white))
+{
 	this->setFlags(this->flags() & (~Qt::ItemIsSelectable));
 	this->slotColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
@@ -36,12 +38,13 @@ ot::PropertyGridGroup::~PropertyGridGroup() {
 void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_name = _group->name();
 	m_groupBrush = Painter2DFactory::brushFromPainter2D(_group->backgroundPainter());
+	m_groupAlternateBrush = Painter2DFactory::brushFromPainter2D(_group->alternateBackgroundPainter());
 
 	this->setText(intern::pgcTitle, QString::fromStdString(_group->title()));
 
 	for (Property* p : _group->properties()) {
 		PropertyGridItem* newItem = new PropertyGridItem;
-		this->addChild(newItem);
+		this->addProperty(newItem);
 
 		// Setup must be called after adding
 		newItem->setupFromConfig(p);
@@ -97,7 +100,9 @@ QString ot::PropertyGridGroup::getTitle(void) const {
 	return this->text(0);
 }
 
-void ot::PropertyGridGroup::addItem(PropertyGridItem* _item) {
+void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
+	_item->setPropertyBrush((m_isAlternate ? m_groupAlternateBrush : m_groupBrush));
+	m_isAlternate = !m_isAlternate;
 	this->addChild(_item);
 }
 
