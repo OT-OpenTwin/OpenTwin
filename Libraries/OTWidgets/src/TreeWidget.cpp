@@ -54,7 +54,11 @@ void ot::TreeWidgetItemInfo::clearChildItems(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::TreeWidget::TreeWidget(QWidget * _parentWidget) : QTreeWidget(_parentWidget) {}
+ot::TreeWidget::TreeWidget(QWidget * _parentWidget) 
+	: QTreeWidget(_parentWidget) 
+{
+	this->setObjectName("ot_tree");
+}
 
 ot::TreeWidget::~TreeWidget() {
 

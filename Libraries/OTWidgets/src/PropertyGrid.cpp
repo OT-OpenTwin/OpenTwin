@@ -37,6 +37,7 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) 
 	m_tree->setColumnCount(2);
 	m_tree->setHeaderLabels({ "Name", "Value" });
 	m_tree->setIndentation(0);
+	m_tree->setObjectName("ot_property_grid");
 	this->connect(m_tree, &TreeWidget::itemChanged, this, &PropertyGrid::slotItemChanged);
 }
 
