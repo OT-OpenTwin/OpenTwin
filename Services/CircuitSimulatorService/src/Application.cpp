@@ -457,6 +457,10 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
+	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
+	assert(simulationTypeProperty != nullptr);
+
+	
 
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 
@@ -467,7 +471,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 
 	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
-	m_blockEntityHandler.createResultCurves();
+	m_blockEntityHandler.createResultCurves(simulationTypeProperty->getValue());
 	m_ngSpice.clearBufferStructure(name);
 }
 

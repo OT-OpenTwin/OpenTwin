@@ -311,7 +311,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-void BlockEntityHandler::createResultCurves()
+void BlockEntityHandler::createResultCurves(std::string simulationType)
 {
 	
 		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
@@ -321,72 +321,52 @@ void BlockEntityHandler::createResultCurves()
 		const int colorID(0);
 
 		std::vector<double> xValues;
-		std::vector<double> yValues_1;
-		std::vector<double> yValues_2;
+	
 
-		//Filling the needed vectors with data from resultVectorsMap
+		
+
+		//First i try to find the xValues of the Curve and that are the sweep 
+		//Then i fill my vector with it and erase it out of the map
 
 		for (auto it : resultVectors)
 		{
 			if (it.first == "v-sweep")
 			{
-				for (int i = 0; i < it.second.size(); i++)
-				{
-					xValues.push_back(it.second.at(i));
-				}
-			}
-			else if (it.first == "v1#branch")
-			{
-				continue;
-			}
-			else if (it.first == "V(1)")
-			{
-				for (int i = 0; i < it.second.size(); i++)
-				{
-					yValues_1.push_back(it.second.at(i));
-				}
-			}
-			else
-			{
-				for (int i = 0; i < it.second.size(); i++)
-				{
-					yValues_2.push_back(it.second.at(i));
-				}
+				xValues = it.second;
+				resultVectors.erase("v-sweep");
+				break;
 			}
 		}
 
-		//Creating all needed Names for resultEntity creation
-		const std::string curveName1 = "V(1)";
-		const std::string curveName2 = "V(2)";
-		const std::string _plotName = "DC-Simulation";
+		//Now i try to find the branch and erase it too
+		auto it = resultVectors.find("v1#branch");
+		if (it != resultVectors.end())
+		{
+			resultVectors.erase(it);
+		}
 
-		const std::string fullCurveName1 = _curveFolderPath + "/" + curveName1;
-		const std::string fullCurveName2 = _curveFolderPath + "/" + curveName2;
 
+		// No i want to get the node vectors of voltage and for each of them i create a curve
+		for (auto it : resultVectors)
+		{
+			const std::string curveName = it.first;
+			const std::string fullCurveName = _curveFolderPath + "/" + curveName;
+
+			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, "sweep", "V", it.first, "V", colorID, true);
+			curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
+
+			topoEntID.push_back(curve->getEntityID());
+			topoEntVers.push_back(curve->getEntityStorageVersion());
+			dataEntID.push_back((ot::UID)curve->getCurveDataStorageId());
+			dataEntVers.push_back((ot::UID)curve->getCurveDataStorageId());
+			dataEntParent.push_back(curve->getEntityID());
+			forceVis.push_back(false);
+		}
+	
+		//Here i create the plot for all the curves
+		const std::string _plotName = simulationType + "-Simulation";
 		const std::string plotFolder = _resultFolder + "1D/Plots/";
 		const std::string fullPlotName = plotFolder + _plotName;
-
-		//creating the resultCurves
-		EntityResult1DCurve* curve1 = _modelComponent->addResult1DCurveEntity(fullCurveName1, xValues, yValues_1, {}, "sweep", "V", "V(1)", "V", colorID, true);
-		EntityResult1DCurve* curve2 = _modelComponent->addResult1DCurveEntity(fullCurveName2, xValues, yValues_2, {}, "sweep", "V", "V(2)", "V", colorID, true);
-
-		//adding the curves to list of curves
-		curves.push_back(std::pair<ot::UID, std::string>(curve1->getEntityID(), curveName1));
-		curves.push_back(std::pair<ot::UID, std::string>(curve2->getEntityID(), curveName2));
-
-		topoEntID.push_back(curve1->getEntityID());
-		topoEntVers.push_back(curve1->getEntityStorageVersion());
-		dataEntID.push_back((ot::UID)curve1->getCurveDataStorageId());
-		dataEntVers.push_back((ot::UID)curve1->getCurveDataStorageId());
-		dataEntParent.push_back(curve1->getEntityID());
-		forceVis.push_back(false);
-
-		topoEntID.push_back(curve2->getEntityID());
-		topoEntVers.push_back(curve2->getEntityStorageVersion());
-		dataEntID.push_back((ot::UID)curve2->getCurveDataStorageId());
-		dataEntVers.push_back((ot::UID)curve2->getCurveDataStorageId());
-		dataEntParent.push_back(curve2->getEntityID());
-		forceVis.push_back(false);
 
 		//Creating the Plot Entity
 		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);

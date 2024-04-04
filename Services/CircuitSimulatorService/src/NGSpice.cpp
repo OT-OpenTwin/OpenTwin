@@ -22,6 +22,7 @@ namespace Numbers
 void NGSpice::clearBufferStructure(std::string name)
 {
 	this->getMapOfCircuits().find(name)->second.getMapOfElements().clear();
+	SimulationResults::getInstance()->getResultMap().clear();
 
 }
 
@@ -355,7 +356,9 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 	{
 		std::string name = vectorInfoAll->vecs[i]->vecname;
 		std::vector<double> values;
+		SimulationResults::getInstance()->setVecAmount(vectorInfoAll->veccount);
 		SimulationResults::getInstance()->getResultMap().insert_or_assign(name, values);
+
 
 	}
 
