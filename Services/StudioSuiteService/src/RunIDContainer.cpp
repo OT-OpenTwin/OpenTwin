@@ -63,7 +63,7 @@ std::string RunIDContainer::readStringFromBuffer(size_t& bufferIndex, char* data
 	std::string value;
 	value.reserve(stringLength);
 
-	for (size_t index = 0; index < stringLength; index++)
+	for (size_t index = 0; index < stringLength-1; index++)
 	{
 		if (bufferIndex == dataBufferLength) throw std::overflow_error("buffer overflow when reading data");
 		

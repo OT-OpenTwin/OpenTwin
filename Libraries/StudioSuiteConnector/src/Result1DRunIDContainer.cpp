@@ -33,8 +33,10 @@ bool Result1DRunIDContainer::readData(const std::string& dataDir)
 			
 			if (data->readData(dirEntry.path().string()))
 			{
-				assert(fileNameToDataMap.count(dirEntry.path().string()) == 0);
-				fileNameToDataMap[dirEntry.path().string()] = data;
+				std::string fileName = dirEntry.path().string().substr(dataDir.length() + 1);
+
+				assert(fileNameToDataMap.count(fileName) == 0);
+				fileNameToDataMap[fileName] = data;
 			}
 			else
 			{
@@ -84,7 +86,7 @@ void Result1DRunIDContainer::calculateSize()
 		containerSize += sizeof(size_t);					     // Add the storage for the data hash length
 		containerSize += item.second->getDataHash().size() + 1;  // Add the storage for the data hash
 		containerSize += sizeof(size_t);					     // Add the storage for the data length
-		containerSize += item.second->getBufferSize();	         // Add the storage for the data itself (the buffer already includes the ending 0)
+		containerSize += item.second->getBufferSize() + 1;       // Add the storage for the data itself (plus the ending 0)
 	}
 
 	totalSize = containerSize;
@@ -108,6 +110,7 @@ void Result1DRunIDContainer::writeToBuffer(size_t runId, std::vector<char>& buff
 		{
 			buffer.push_back(item.second->getBuffer()[index]);
 		}
+		buffer.push_back(0);
 	}
 }
 

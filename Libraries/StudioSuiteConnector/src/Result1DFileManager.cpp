@@ -7,7 +7,7 @@ Result1DFileManager::Result1DFileManager(const std::string& baseDir, std::list<i
 	// In a first step, we need to recursively read the data for each runid
 	for (auto id : runIds)
 	{
-		std::string runIdDir = baseDir + "/" + std::to_string(id);
+		std::string runIdDir = baseDir + std::to_string(id);
 
 		Result1DRunIDContainer* container = new Result1DRunIDContainer;
 		bool success = container->readData(runIdDir);
