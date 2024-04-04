@@ -54,14 +54,14 @@ namespace ot {
 		void clear(void);
 
 	Q_SIGNALS:
-		void propertyChanged(const std::string& _propertyName);
-		void propertyDeleteRequested(const std::string& _propertyName);
+		void propertyChanged(const std::string& _groupName, const std::string& _propertyName);
+		void propertyDeleteRequested(const std::string& _groupName, const std::string& _propertyName);
 
 	private Q_SLOTS:
 		void slotPropertyChanged(void);
-		void slotPropertyChanged(const std::string& _itemName);
+		void slotPropertyChanged(const std::string& _groupName, const std::string& _itemName);
 		void slotPropertyDeleteRequested(void);
-		void slotPropertyDeleteRequested(const std::string& _itemName);
+		void slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName);
 
 	private:
 		class PropertyGridTree;

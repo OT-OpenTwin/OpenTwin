@@ -103,6 +103,9 @@ QString ot::PropertyGridGroup::getTitle(void) const {
 void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
 	_item->setPropertyBrush((m_isAlternate ? m_groupAlternateBrush : m_groupBrush));
 	m_isAlternate = !m_isAlternate;
+
+	_item->setGroupName(this->getName());
+
 	this->addChild(_item);
 
 	this->connect(_item, &PropertyGridItem::inputValueChanged, this, qOverload<>(&PropertyGridGroup::slotItemInputValueChanged));
@@ -175,11 +178,11 @@ void ot::PropertyGridGroup::slotItemInputValueChanged(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT itemInputValueChanged(itm->getName());
+	Q_EMIT itemInputValueChanged(itm->getGroupName(), itm->getName());
 }
 
-void ot::PropertyGridGroup::slotItemInputValueChanged(const std::string& _itemName) {
-	Q_EMIT itemInputValueChanged(_itemName);
+void ot::PropertyGridGroup::slotItemInputValueChanged(const std::string& _groupName, const std::string& _itemName) {
+	Q_EMIT itemInputValueChanged(_groupName, _itemName);
 }
 
 void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
@@ -188,9 +191,9 @@ void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT itemDeleteRequested(itm->getName());
+	Q_EMIT itemDeleteRequested(itm->getGroupName(), itm->getName());
 }
 
-void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _itemName) {
-	Q_EMIT itemDeleteRequested(_itemName);
+void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
+	Q_EMIT itemDeleteRequested(_groupName, _itemName);
 }

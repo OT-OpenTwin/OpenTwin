@@ -87,8 +87,8 @@ void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
 	}
 	m_tree->addTopLevelItem(_group);
 
-	this->connect(_group, &PropertyGridGroup::itemInputValueChanged, this, qOverload<const std::string&>(&PropertyGrid::slotPropertyChanged));
-	this->connect(_group, &PropertyGridGroup::itemDeleteRequested, this, qOverload<const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
+	this->connect(_group, &PropertyGridGroup::itemInputValueChanged, this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyChanged));
+	this->connect(_group, &PropertyGridGroup::itemDeleteRequested, this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
 }
 
 ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _groupName) const {
@@ -132,17 +132,27 @@ void ot::PropertyGrid::clear(void) {
 }
 
 void ot::PropertyGrid::slotPropertyChanged() {
-
+	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
+	if (!itm) {
+		OT_LOG_E("Item cast failed");
+		return;
+	}
+	Q_EMIT propertyChanged(itm->getGroupName(), itm->getName());
 }
 
-void ot::PropertyGrid::slotPropertyChanged(const std::string& _itemName) {
-
+void ot::PropertyGrid::slotPropertyChanged(const std::string& _groupName, const std::string& _itemName) {
+	Q_EMIT propertyChanged(_groupName, _itemName);
 }
 
 void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
-
+	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
+	if (!itm) {
+		OT_LOG_E("Item cast failed");
+		return;
+	}
+	Q_EMIT propertyDeleteRequested(itm->getGroupName(), itm->getName());
 }
 
-void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _itemName) {
-
+void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
+	Q_EMIT propertyDeleteRequested(_groupName, _itemName);
 }

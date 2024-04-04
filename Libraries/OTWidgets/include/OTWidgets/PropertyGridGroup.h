@@ -51,15 +51,15 @@ namespace ot {
 		std::list<PropertyGridGroup*> childGroups(void) const;
 
 	Q_SIGNALS:
-		void itemInputValueChanged(const std::string& _itemName);
-		void itemDeleteRequested(const std::string& _itemName);
+		void itemInputValueChanged(const std::string& _groupName, const std::string& _itemName);
+		void itemDeleteRequested(const std::string& _groupName, const std::string& _itemName);
 
 	private Q_SLOTS:
 		void slotColorStyleChanged(const ColorStyle& _style);
 		void slotItemInputValueChanged(void);
-		void slotItemInputValueChanged(const std::string& _itemName);
+		void slotItemInputValueChanged(const std::string& _groupName, const std::string& _itemName);
 		void slotItemDeleteRequested(void);
-		void slotItemDeleteRequested(const std::string& _itemName);
+		void slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName);
 
 	private:
 		bool m_isAlternate;
