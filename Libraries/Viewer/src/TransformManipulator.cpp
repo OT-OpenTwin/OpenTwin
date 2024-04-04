@@ -9,22 +9,30 @@
 #include "HandleWheel.h"
 #include "Model.h"
 
+#include "OTCore/Logger.h"
+#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyDouble.h"
+
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
+
+#define PROP_Group_Rotation "Rotation"
+#define PROP_Group_Translation "Translation"
+
+#define PROP_Item_TranslateX "Translate X"
+#define PROP_Item_TranslateY "Translate Y"
+#define PROP_Item_TranslateZ "Translate Z"
+
+#define PROP_Item_AxisX "Axis X"
+#define PROP_Item_AxisY "Axis Y"
+#define PROP_Item_AxisZ "Axis Z"
+#define PROP_Item_Angle "Angle (deg.)"
 
 TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBase *> objects)
 {
 	assert(!objects.empty());
 	assert(viewer != nullptr);
-
-	propertyOffsetX = 0;
-	propertyOffsetY = 0;
-	propertyOffsetZ = 0;
-
-	propertyAxisX = 0;
-	propertyAxisY = 0;
-	propertyAxisZ = 0;
-	propertyAngle = 0;
 
 	viewer3D = viewer;
 	transformedObjects = objects;
@@ -351,44 +359,39 @@ void TransformManipulator::setPropertyGrid(void)
 	totQuat.getRotate(lastPropertyAngle, lastPropertyAxis);
 	lastPropertyAngle *= 180.0 / M_PI;
 
-	// Create the document
-	rapidjson::Document jsonDoc;
-	jsonDoc.SetObject();	
+	// Create the configuration
+	ot::PropertyGridCfg cfg;
 
-	// fill the document data
-	addSetting(jsonDoc, "Translation", "Translate X", lastPropertyOffset.x());
-	addSetting(jsonDoc, "Translation", "Translate Y", lastPropertyOffset.y());
-	addSetting(jsonDoc, "Translation", "Translate Z", lastPropertyOffset.z());
+	{
+		ot::PropertyGroup* gTranslation = new ot::PropertyGroup(PROP_Group_Translation);
 
-	addSetting(jsonDoc, "Rotation", "Axis X", lastPropertyAxis.x());
-	addSetting(jsonDoc, "Rotation", "Axis Y", lastPropertyAxis.y());
-	addSetting(jsonDoc, "Rotation", "Axis Z", lastPropertyAxis.z());
-	addSetting(jsonDoc, "Rotation", "Angle (deg.)", lastPropertyAngle);
+		ot::PropertyDouble* iTranslateX = new ot::PropertyDouble(PROP_Item_TranslateX, lastPropertyOffset.x());
+		ot::PropertyDouble* iTranslateY = new ot::PropertyDouble(PROP_Item_TranslateY, lastPropertyOffset.y());
+		ot::PropertyDouble* iTranslateZ = new ot::PropertyDouble(PROP_Item_TranslateZ, lastPropertyOffset.z());
 
-	// Write the settings to the property grid
+		gTranslation->addProperty(iTranslateX);
+		gTranslation->addProperty(iTranslateY);
+		gTranslation->addProperty(iTranslateZ);
+		cfg.addRootGroup(gTranslation);
+	}
+	
+	{
+		ot::PropertyGroup* gRotation = new ot::PropertyGroup(PROP_Group_Rotation);
 
-	rapidjson::StringBuffer buffer;
-	buffer.Clear();
+		ot::PropertyDouble* iRotationX = new ot::PropertyDouble(PROP_Item_AxisX, lastPropertyAxis.x());
+		ot::PropertyDouble* iRotationY = new ot::PropertyDouble(PROP_Item_AxisY, lastPropertyAxis.y());
+		ot::PropertyDouble* iRotationZ = new ot::PropertyDouble(PROP_Item_AxisZ, lastPropertyAxis.z());
+		ot::PropertyDouble* iAngle = new ot::PropertyDouble(PROP_Item_Angle, lastPropertyAngle);
 
-	// Setup the Writer
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	jsonDoc.Accept(writer);
-
-	// Create the output string
-	std::string settings = buffer.GetString();
+		gRotation->addProperty(iRotationX);
+		gRotation->addProperty(iRotationY);
+		gRotation->addProperty(iRotationZ);
+		gRotation->addProperty(iAngle);
+		cfg.addRootGroup(gRotation);
+	}
 
 	assert(viewer3D->getModel() != nullptr);
-	viewer3D->getModel()->fillPropertyGrid(settings);
-
-	// Now get the item IDs for accessing the properties
-	propertyOffsetX = viewer3D->getModel()->findPropertyItem("Translate X");
-	propertyOffsetY = viewer3D->getModel()->findPropertyItem("Translate Y");
-	propertyOffsetZ = viewer3D->getModel()->findPropertyItem("Translate Z");
-
-	propertyAxisX = viewer3D->getModel()->findPropertyItem("Axis X");
-	propertyAxisY = viewer3D->getModel()->findPropertyItem("Axis Y");
-	propertyAxisZ = viewer3D->getModel()->findPropertyItem("Axis Z");
-	propertyAngle = viewer3D->getModel()->findPropertyItem("Angle (deg.)");
+	viewer3D->getModel()->fillPropertyGrid(cfg);
 }
 
 void TransformManipulator::updatePropertyGrid(void)
@@ -422,14 +425,14 @@ void TransformManipulator::updatePropertyGrid(void)
 		angle = 0.0;
 	}
 
-	if (offset.x() != lastPropertyOffset.x()) updateSetting(propertyOffsetX, offset.x());
-	if (offset.y() != lastPropertyOffset.y()) updateSetting(propertyOffsetY, offset.y());
-	if (offset.z() != lastPropertyOffset.z()) updateSetting(propertyOffsetZ, offset.z());
+	if (offset.x() != lastPropertyOffset.x()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateX, offset.x());
+	if (offset.y() != lastPropertyOffset.y()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateY, offset.y());
+	if (offset.z() != lastPropertyOffset.z()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateZ, offset.z());
 
-	if (axis.x() != lastPropertyAxis.x()) updateSetting(propertyAxisX, axis.x());
-	if (axis.y() != lastPropertyAxis.y()) updateSetting(propertyAxisY, axis.y());
-	if (axis.z() != lastPropertyAxis.z()) updateSetting(propertyAxisZ, axis.z());
-	if (angle    != lastPropertyAngle)    updateSetting(propertyAngle, angle);
+	if (axis.x() != lastPropertyAxis.x()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisX, axis.x());
+	if (axis.y() != lastPropertyAxis.y()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisY, axis.y());
+	if (axis.z() != lastPropertyAxis.z()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisZ, axis.z());
+	if (angle    != lastPropertyAngle)    updateSetting(PROP_Group_Rotation, PROP_Item_Angle, angle);
 
 	lastPropertyOffset = offset;
 	lastPropertyAxis = axis;
@@ -468,45 +471,52 @@ void TransformManipulator::addSetting(rapidjson::Document &jsonDoc, const std::s
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void TransformManipulator::updateSetting(int itemID, double value)
+void TransformManipulator::updateSetting(const std::string& _groupName, const std::string& _itemName, double value)
 {
 	assert(viewer3D->getModel() != nullptr);
 
 	if (fabs(value) < 1e-6) value = 0.0;  // Trim small values to 0
-	viewer3D->getModel()->setDoublePropertyGridValue(itemID, value);
+	viewer3D->getModel()->setDoublePropertyGridValue(_groupName, _itemName, value);
 }
 
-bool TransformManipulator::propertyGridValueChanged(int itemID)
+bool TransformManipulator::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
 {
 	osg::Vec3d offset = lastPropertyOffset;
 
-	if (itemID == propertyOffsetX)
-	{
-		offset.set(viewer3D->getModel()->getDoublePropertyGridValue(itemID), offset.y(), offset.z());
+	if (_groupName == PROP_Group_Rotation) {
+		if (_itemName == PROP_Item_AxisX) {
+			lastPropertyAxis = osg::Vec3d(viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), lastPropertyAxis.y(), lastPropertyAxis.z());
+		}
+		else if (_itemName == PROP_Item_AxisY) {
+			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), lastPropertyAxis.z());
+		}
+		else if (_itemName == PROP_Item_AxisZ) {
+			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), lastPropertyAxis.y(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName));
+		}
+		else if (_itemName == PROP_Item_Angle) {
+			lastPropertyAngle = viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName);
+		}
+		else {
+			OT_LOG_E("Unknown property \"" + _itemName + "\"");
+		}
 	}
-	else if (itemID == propertyOffsetY)
-	{
-		offset.set(offset.x(), viewer3D->getModel()->getDoublePropertyGridValue(itemID), offset.z());
+	else if (_groupName == PROP_Group_Translation) {
+		if (_itemName == PROP_Item_TranslateX) {
+			offset.set(viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), offset.y(), offset.z());
+		}
+		else if (_itemName == PROP_Item_TranslateY) {
+			offset.set(offset.x(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), offset.z());
+		}
+		else if (_itemName == PROP_Item_TranslateZ) {
+			offset.set(offset.x(), offset.y(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName));
+		}
+		else {
+			OT_LOG_E("Unknown property \"" + _itemName + "\"");
+		}
 	}
-	else if (itemID == propertyOffsetZ)
-	{
-		offset.set(offset.x(), offset.y(), viewer3D->getModel()->getDoublePropertyGridValue(itemID));
-	}
-	else if (itemID == propertyAxisX)
-	{
-		lastPropertyAxis = osg::Vec3d(viewer3D->getModel()->getDoublePropertyGridValue(itemID), lastPropertyAxis.y(), lastPropertyAxis.z());
-	}
-	else if (itemID == propertyAxisY)
-	{
-		lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), viewer3D->getModel()->getDoublePropertyGridValue(itemID), lastPropertyAxis.z());
-	}
-	else if (itemID == propertyAxisZ)
-	{
-		lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), lastPropertyAxis.y(), viewer3D->getModel()->getDoublePropertyGridValue(itemID));
-	}
-	else if (itemID == propertyAngle)
-	{
-		lastPropertyAngle = viewer3D->getModel()->getDoublePropertyGridValue(itemID);
+	else {
+		OT_LOG_E("Unknown property group \"" + _groupName + "\"");
+		return false;
 	}
 
 	lastPropertyOffset = offset;

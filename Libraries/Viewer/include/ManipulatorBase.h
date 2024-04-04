@@ -14,7 +14,7 @@ public:
 	virtual void cancelOperation(void) = 0;
 	virtual void performOperation(void) = 0;
 
-	virtual bool propertyGridValueChanged(int itemID) { return false; }
+	virtual bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) { return false; }
 
 	void setReplyTo(ot::serviceID_t replyTo) { messageReplyTo = replyTo; }
 	void setAction(const std::string &selectionAction) { messageSelectionAction = selectionAction; }

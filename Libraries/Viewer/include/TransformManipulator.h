@@ -25,7 +25,7 @@ public:
 	virtual void cancelOperation(void) override;
 	virtual void performOperation(void) override;
 
-	virtual bool propertyGridValueChanged(int itemID) override;
+	virtual bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) override;
 
 private:
 	void getBoundingSphere(osg::Vec3d &center, double &radius, std::list<SceneNodeBase *> objects);
@@ -35,7 +35,7 @@ private:
 	void setPropertyGrid(void);
 	void updatePropertyGrid(void);
 	void addSetting(rapidjson::Document &jsonDoc, const std::string &group, const std::string &name, double value);
-	void updateSetting(int itemID, double value);
+	void updateSetting(const std::string& _groupName, const std::string& _itemName, double value);
 
 	osg::Vec3d sphereCenter;
 	osg::Vec3d initialSphereCenter;
@@ -52,13 +52,6 @@ private:
 	double rotationDegX;
 	double rotationDegY;
 	double rotationDegZ;
-	int	propertyOffsetX;
-	int	propertyOffsetY;
-	int	propertyOffsetZ;
-	int	propertyAxisX;
-	int	propertyAxisY;
-	int	propertyAxisZ;
-	int	propertyAngle;
 	osg::Matrix totalRotation;
 	osg::Matrix workingPlaneRotation;
 };

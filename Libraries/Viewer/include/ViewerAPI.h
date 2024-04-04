@@ -5,9 +5,10 @@
 
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
+#include "OTCore/GenericDataStructMatrix.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTServiceFoundation/ContextMenu.h"
 #include "OTServiceFoundation/TableRange.h"
-#include "OTCore/GenericDataStructMatrix.h"
 
 #include <list>
 #include <vector>
@@ -43,9 +44,9 @@ namespace ViewerAPI
 		virtual void setTreeItemText(ot::UID treeItemID, const std::string &text) {};
 		virtual void refreshSelection(void) {};
 		virtual void addKeyShortcut(const std::string &keySequence) {};
-		virtual void fillPropertyGrid(const std::string &settings) {};
-		virtual void setDoublePropertyValue(int itemID, double value) {};
-		virtual double getDoublePropertyValue(int itemID) { return 0.0; };
+		virtual void fillPropertyGrid(const ot::PropertyGridCfg& _configuration) {};
+		virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {};
+		virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) { return 0.0; };
 		virtual int findItemID(const std::string &name) { return 0; };
 		virtual void lockSelectionAndModification(bool flag) {};
 		virtual void removeViewer(ot::UID viewerID) {};
@@ -229,7 +230,7 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void contextMenuItemCheckedChanged(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
-	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, int itemID);
+	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const std::string& _groupName, const std::string& _itemName);
 
 	__declspec(dllexport) void freeze3DView(unsigned long long osgModelID, bool flag);
 

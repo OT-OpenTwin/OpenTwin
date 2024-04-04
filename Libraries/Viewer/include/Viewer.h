@@ -109,7 +109,7 @@ public:
 
 	Model *getModel(void) { return model; }
 
-	bool propertyGridValueChanged(int itemID);
+	bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
 
 	void enableClipPlane(osg::Vec3d normal, osg::Vec3d point);
 	void updateClipPlane(osg::Vec3d normal, osg::Vec3d point);

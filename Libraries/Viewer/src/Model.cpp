@@ -124,26 +124,26 @@ void Model::activateModel(void)
 	}
 }
 
-void Model::fillPropertyGrid(const std::string &settings)
+void Model::fillPropertyGrid(const ot::PropertyGridCfg& _configuration)
 {
-	getNotifier()->fillPropertyGrid(settings);
+	getNotifier()->fillPropertyGrid(_configuration);
 }
 
-void Model::setDoublePropertyGridValue(int itemID, double value)
+void Model::setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value)
 {
-	getNotifier()->setDoublePropertyValue(itemID, value);
+	getNotifier()->setDoublePropertyValue(_groupName, _itemName, value);
 }
 
-double Model::getDoublePropertyGridValue(int itemID)
+double Model::getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName)
 {
-	return getNotifier()->getDoublePropertyValue(itemID);
+	return getNotifier()->getDoublePropertyValue(_groupName, _itemName);
 }
 
-bool Model::propertyGridValueChanged(int itemID)
+bool Model::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
 {
 	if (currentManipulator != nullptr)
 	{
-		return currentManipulator->propertyGridValueChanged(itemID);
+		return currentManipulator->propertyGridValueChanged(_groupName, _itemName);
 	}
 
 	return false;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
+#include "OTGui/PropertyGridCfg.h"
 
 #include <list>
 #include <tuple>
@@ -218,11 +219,11 @@ public:
 	osg::Matrix getCurrentWorkingPlaneTransform(void) { return currentWorkingplaneTransform; }
 	osg::Matrix getCurrentWorkingPlaneTransformTransposedInverse(void) { return currentWorkingplaneTransformTransposedInverse; }
 
-	void   fillPropertyGrid(const std::string &settings);
+	void   fillPropertyGrid(const ot::PropertyGridCfg& _configuration);
 	int    findPropertyItem(const std::string &name);
-	void   setDoublePropertyGridValue(int itemID, double value);
-	double getDoublePropertyGridValue(int itemID);
-	bool   propertyGridValueChanged(int itemID);
+	void   setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value);
+	double getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName);
+	bool   propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
 
 	void lockSelectionAndModification(bool flag);
 
