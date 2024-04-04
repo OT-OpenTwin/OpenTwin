@@ -40,6 +40,14 @@ QWidget* ot::PropertyInputInt::getQWidget(void) {
 	return m_spinBox;
 }
 
+void ot::PropertyInputInt::setValue(int _value) {
+	m_spinBox->setValue(_value);
+}
+
+int ot::PropertyInputInt::getValue(void) const {
+	return m_spinBox->value();
+}
+
 void ot::PropertyInputInt::lclValueChanged(int) {
 	m_spinBox->setSpecialValueText("");
 	PropertyInput::slotValueChanged();

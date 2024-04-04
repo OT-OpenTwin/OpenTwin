@@ -48,3 +48,19 @@ ot::Property* ot::PropertyInputColor::createPropertyConfiguration(void) const {
 
 	return newProperty;
 }
+
+void ot::PropertyInputColor::setColor(const Color& _color) {
+	m_colorBtn->setColor(_color);
+}
+
+void ot::PropertyInputColor::setColor(const QColor& _color) {
+	m_colorBtn->setColor(_color);
+}
+
+ot::Color ot::PropertyInputColor::getOTColor(void) const {
+	return m_colorBtn->otColor();
+}
+
+QColor ot::PropertyInputColor::getColor(void) const {
+	return m_colorBtn->color();
+}

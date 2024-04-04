@@ -24,6 +24,11 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 
+		void setColor(const Color& _color);
+		void setColor(const QColor& _color);
+		Color getOTColor(void) const;
+		QColor getColor(void) const;
+
 	private:
 		ColorPickButton* m_colorBtn;
 	};

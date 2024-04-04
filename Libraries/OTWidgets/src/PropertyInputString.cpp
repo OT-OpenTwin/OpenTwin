@@ -66,3 +66,8 @@ ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
 
 	return newProperty;
 }
+
+void ot::PropertyInputString::setText(const QString& _text) {
+	m_text = _text;
+	m_lineEdit->setText(m_text);
+}

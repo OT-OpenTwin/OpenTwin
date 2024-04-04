@@ -24,6 +24,9 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 
+		void setChecked(bool _isChecked);
+		bool isChecked(void) const;
+
 	private:
 		CheckBox* m_checkBox;
 	};

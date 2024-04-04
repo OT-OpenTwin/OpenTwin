@@ -24,6 +24,10 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 
+		void setCurrentText(const QString& _text);
+		QString getCurrentText(void) const;
+		QStringList getPossibleSelection(void) const;
+
 	private:
 		ComboButton* m_comboButton;
 	};

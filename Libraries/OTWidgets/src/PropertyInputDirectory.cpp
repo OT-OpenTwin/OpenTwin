@@ -79,3 +79,11 @@ ot::Property* ot::PropertyInputDirectory::createPropertyConfiguration(void) cons
 
 	return newProperty;
 }
+
+void ot::PropertyInputDirectory::setCurrentDirectory(const QString& _dir) {
+	m_edit->setText(_dir);
+}
+
+QString ot::PropertyInputDirectory::currentDirectory(void) const {
+	return m_edit->text();
+}

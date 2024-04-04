@@ -56,3 +56,19 @@ ot::Property* ot::PropertyInputStringList::createPropertyConfiguration(void) con
 
 	return newProperty;
 }
+
+void ot::PropertyInputStringList::setCurrentText(const QString& _text) {
+	m_comboButton->setText(_text);
+}
+
+QString ot::PropertyInputStringList::getCurrentText(void) const {
+	return m_comboButton->text();
+}
+
+QStringList ot::PropertyInputStringList::getPossibleSelection(void) const {
+	QStringList lst;
+	for (const QAction* a : m_comboButton->menu()->actions()) {
+		lst.append(a->text());
+	}
+	return lst;
+}

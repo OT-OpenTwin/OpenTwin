@@ -29,6 +29,7 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 
+		void setText(const QString& _text);
 		const QString& getCurrentText(void) const { return m_text; };
 
 	private Q_SLOTS:

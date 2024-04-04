@@ -46,3 +46,11 @@ ot::Property* ot::PropertyInputBool::createPropertyConfiguration(void) const {
 
 	return newProperty;
 }
+
+void ot::PropertyInputBool::setChecked(bool _isChecked) {
+	m_checkBox->setChecked(_isChecked);
+}
+
+bool ot::PropertyInputBool::isChecked(void) const {
+	return m_checkBox->isChecked();
+}

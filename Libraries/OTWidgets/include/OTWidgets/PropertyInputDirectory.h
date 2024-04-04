@@ -25,6 +25,9 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 
+		void setCurrentDirectory(const QString& _dir);
+		QString currentDirectory(void) const;
+
 	private Q_SLOTS:
 		void slotFind(void);
 		void slotChanged(void);

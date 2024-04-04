@@ -90,3 +90,11 @@ ot::Property* ot::PropertyInputFilePath::createPropertyConfiguration(void) const
 
 	return newProperty;
 }
+
+void ot::PropertyInputFilePath::setCurrentFile(const QString& _file) {
+	m_edit->setText(_file);
+}
+
+QString ot::PropertyInputFilePath::currentFile(void) const {
+	return m_edit->text();
+}
