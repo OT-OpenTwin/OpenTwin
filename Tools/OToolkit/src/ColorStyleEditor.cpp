@@ -697,7 +697,7 @@ void ColorStyleEditor::initializePropertyGrid(void) {
 		m_doubleGroup->addProperty(it.second);
 	}
 
-	m_propertyGrid->setupFromConfig(m_propertyGridConfig);
+	m_propertyGrid->setupGridFromConfig(m_propertyGridConfig);
 	m_propertyGrid->blockSignals(false);
 }
 
