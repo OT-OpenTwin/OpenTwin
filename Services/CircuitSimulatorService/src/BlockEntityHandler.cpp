@@ -12,6 +12,7 @@
 #include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
+#include "SimulationResults.h"
 // Third Party Header
 
 namespace NodeNumbers
@@ -308,6 +309,92 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(pckg->name(), circuit);
 
 	return pckg;
+}
+
+void BlockEntityHandler::createResultCurves()
+{
+	
+		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
+		std::list<std::pair<ot::UID, std::string>> curves;
+		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+		std::list<bool> forceVis;
+		const int colorID(0);
+
+		std::vector<double> xValues;
+		std::vector<double> yValues_1;
+		std::vector<double> yValues_2;
+
+		//Filling the needed vectors with data from resultVectorsMap
+
+		for (auto it : resultVectors)
+		{
+			if (it.first == "v-sweep")
+			{
+				for (int i = 0; i < it.second.size(); i++)
+				{
+					xValues.push_back(it.second.at(i));
+				}
+			}
+			else if (it.first == "v1#branch")
+			{
+				continue;
+			}
+			else if (it.first == "V(1)")
+			{
+				for (int i = 0; i < it.second.size(); i++)
+				{
+					yValues_1.push_back(it.second.at(i));
+				}
+			}
+			else
+			{
+				for (int i = 0; i < it.second.size(); i++)
+				{
+					yValues_2.push_back(it.second.at(i));
+				}
+			}
+		}
+
+		//Creating all needed Names for resultEntity creation
+		const std::string curveName1 = "V(1)";
+		const std::string curveName2 = "V(2)";
+		const std::string _plotName = "DC-Simulation";
+
+		const std::string fullCurveName1 = _curveFolderPath + "/" + curveName1;
+		const std::string fullCurveName2 = _curveFolderPath + "/" + curveName2;
+
+		const std::string plotFolder = _resultFolder + "1D/Plots/";
+		const std::string fullPlotName = plotFolder + _plotName;
+
+		//creating the resultCurves
+		EntityResult1DCurve* curve1 = _modelComponent->addResult1DCurveEntity(fullCurveName1, xValues, yValues_1, {}, "sweep", "V", "V(1)", "V", colorID, true);
+		EntityResult1DCurve* curve2 = _modelComponent->addResult1DCurveEntity(fullCurveName2, xValues, yValues_2, {}, "sweep", "V", "V(2)", "V", colorID, true);
+
+		//adding the curves to list of curves
+		curves.push_back(std::pair<ot::UID, std::string>(curve1->getEntityID(), curveName1));
+		curves.push_back(std::pair<ot::UID, std::string>(curve2->getEntityID(), curveName2));
+
+		topoEntID.push_back(curve1->getEntityID());
+		topoEntVers.push_back(curve1->getEntityStorageVersion());
+		dataEntID.push_back((ot::UID)curve1->getCurveDataStorageId());
+		dataEntVers.push_back((ot::UID)curve1->getCurveDataStorageId());
+		dataEntParent.push_back(curve1->getEntityID());
+		forceVis.push_back(false);
+
+		topoEntID.push_back(curve2->getEntityID());
+		topoEntVers.push_back(curve2->getEntityStorageVersion());
+		dataEntID.push_back((ot::UID)curve2->getCurveDataStorageId());
+		dataEntVers.push_back((ot::UID)curve2->getCurveDataStorageId());
+		dataEntParent.push_back(curve2->getEntityID());
+		forceVis.push_back(false);
+
+		//Creating the Plot Entity
+		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
+		topoEntID.push_back(plotID->getEntityID());
+		topoEntVers.push_back(plotID->getEntityStorageVersion());
+		forceVis.push_back(false);
+		
+		_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
 }
 
 //Setter

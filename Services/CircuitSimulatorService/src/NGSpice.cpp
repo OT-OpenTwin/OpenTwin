@@ -25,6 +25,8 @@ void NGSpice::clearBufferStructure(std::string name)
 
 }
 
+
+
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
@@ -300,6 +302,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	sprintf_s(command, sizeof(command), "source %s", netlist);
 	ngSpice_Command(command);*/
 
+	 
 	 std::map<std::string, std::vector<double>> map = SimulationResults::getInstance()->getResultMap();
 	myString = std::to_string(status);
 

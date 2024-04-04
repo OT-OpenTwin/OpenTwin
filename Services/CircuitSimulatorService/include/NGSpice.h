@@ -7,6 +7,7 @@
 #include "EntityBlockConnection.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
+
 //ThirdPartyHeader
 #include <ngspice/sharedspice.h>
 #include <iostream>
@@ -31,6 +32,9 @@ public:
 	std::string generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname);
 	std::string ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
 	void clearBufferStructure(std::string name);
+
+	//Result Curve Functions
+	
 
 	//Callback functions from NGSpice
 	static int MySendCharFunction(char*, int, void*);

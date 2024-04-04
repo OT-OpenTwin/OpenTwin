@@ -467,6 +467,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 
 	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
+	m_blockEntityHandler.createResultCurves();
 	m_ngSpice.clearBufferStructure(name);
 }
 
@@ -751,6 +752,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	m_blockEntityHandler.setModelComponent(_model);
+	
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)
