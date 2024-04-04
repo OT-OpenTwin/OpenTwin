@@ -27,6 +27,8 @@ void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 		gArr.PushBack(gObj, _allocator);
 	}
 	_object.AddMember("Groups", gArr, _allocator);
+
+	WidgetViewCfg::addToJsonObject(_object, _allocator);
 }
 
 void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -42,6 +44,8 @@ void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 		newGroup->setFromJsonObject(gObj);
 		m_rootGroups.push_back(newGroup);
 	}
+
+	WidgetViewCfg::setFromJsonObject(_object);
 }
 
 void ot::PropertyGridCfg::setRootGroups(const std::list<PropertyGroup*>& _groups) {

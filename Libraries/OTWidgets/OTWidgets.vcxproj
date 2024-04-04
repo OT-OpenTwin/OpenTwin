@@ -82,6 +82,7 @@
     <ClCompile Include="src\PlainTextEdit.cpp" />
     <ClCompile Include="src\PropertyDialog.cpp" />
     <ClCompile Include="src\PropertyGridItemDelegate.cpp" />
+    <ClCompile Include="src\PropertyGridView.cpp" />
     <ClCompile Include="src\PropertyInputBool.cpp" />
     <ClCompile Include="src\PropertyInputColor.cpp" />
     <ClCompile Include="src\PropertyInputDirectory.cpp" />
@@ -123,6 +124,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
+    <ClInclude Include="include\OTWidgets\PropertyGridView.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
@@ -179,7 +181,7 @@
     <QtMoc Include="include\OTWidgets\PlainTextEdit.h" />
     <QtMoc Include="include\OTWidgets\PropertyGrid.h" />
     <QtMoc Include="include\OTWidgets\PropertyDialog.h" />
-    <ClInclude Include="include\OTWidgets\PropertyGridItem.h" />
+    <QtMoc Include="include\OTWidgets\PropertyGridItem.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridGroup.h" />
     <QtMoc Include="include\OTWidgets\PropertyInput.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputInt.h" />

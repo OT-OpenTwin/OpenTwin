@@ -24,7 +24,7 @@ class LockManagerElement;
 class AppBase;
 namespace ot { class ServiceBase; }
 namespace ak { class aTreeWidget; }
-namespace ak { class aPropertyGridWidget; }
+namespace ot { class PropertyGrid; }
 
 class ControlsManager {
 public:
@@ -61,7 +61,7 @@ public:
 	//! This function will be called from the controls manager automatically if the lock manager was set
 	void uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, const ot::Flags<ot::ui::lockType> & _typeFlags);
 	void uiElementCreated(ot::ServiceBase * _service, ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType> & _typeFlags);
-	void uiElementCreated(ot::ServiceBase * _service, ak::aPropertyGridWidget* _propertyGrid, const ot::Flags<ot::ui::lockType> & _typeFlags);
+	void uiElementCreated(ot::ServiceBase * _service, ot::PropertyGrid* _propertyGrid, const ot::Flags<ot::ui::lockType> & _typeFlags);
 
 	//! @brief Will remove all the stored information about the UI element
 	//! This function will be called from the controls manager automatically if the lock manager was set
@@ -106,7 +106,7 @@ class LockManagerElement {
 public:
 	LockManagerElement(ak::UID _uid, const ot::Flags<ot::ui::lockType> & _flags);
 	LockManagerElement(ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType> & _flags);
-	LockManagerElement(ak::aPropertyGridWidget* _prop, const ot::Flags<ot::ui::lockType> & _flags);
+	LockManagerElement(ot::PropertyGrid* _prop, const ot::Flags<ot::ui::lockType> & _flags);
 
 	void enable(int _value);
 	void disable(int _value);
@@ -118,7 +118,7 @@ public:
 private:
 
 	ak::aTreeWidget* m_tree;
-	ak::aPropertyGridWidget* m_prop;
+	ot::PropertyGrid* m_prop;
 	ak::UID							m_uid;
 	ot::Flags<ot::ui::lockType>		m_lockTypes;
 	int								m_disabledCount;

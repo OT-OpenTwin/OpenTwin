@@ -1,31 +1,25 @@
 //! @file PropertyGridView.h
 //! @author Alexander Kuester (alexk95)
-//! @date March 2024
+//! @date April 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
-
-#include "akWidgets/aPropertyGridWidget.h"
-
-#define OT_WIDGETTYPE_PropertyGrid "PropertyGrid"
+#include "OTWidgets/PropertyGrid.h"
 
 namespace ot {
 
-	class PropertyGridView : public ak::aPropertyGridWidget, public WidgetView {
+	class OT_WIDGETS_API_EXPORT PropertyGridView : public PropertyGrid, public WidgetView {
+		OT_DECL_NOCOPY(PropertyGridView)
 	public:
 		PropertyGridView();
 		virtual ~PropertyGridView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		// Base class functions
-
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

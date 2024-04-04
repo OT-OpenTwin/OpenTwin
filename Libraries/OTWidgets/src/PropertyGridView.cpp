@@ -1,18 +1,17 @@
 //! @file PropertyGridView.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date March 2024
+//! @date April 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#include "stdafx.h"
-
 // OpenTwin header
-#include "PropertyGridView.h"
+#include "OTCore/Logger.h"
+#include "OTWidgets/PropertyGridView.h"
 #include "OTWidgets/WidgetViewRegistrar.h"
 
-//static ot::WidgetViewRegistrar<ot::PropertyGridView> PropertyGridViewRegistrar(OT_WIDGETTYPE_PropertyGrid);
+//static ot::WidgetViewRegistrar<ot::PropertyGridView> PropertyGridViewRegistrar(OT_WIDGETTYPE_PropertyGridView);
 
 ot::PropertyGridView::PropertyGridView() {
-	this->addWidgetToDock(this->widget());
+	this->addWidgetToDock(this->getQWidget());
 }
 
 ot::PropertyGridView::~PropertyGridView() {
@@ -21,15 +20,8 @@ ot::PropertyGridView::~PropertyGridView() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Base class functions
-
 QWidget* ot::PropertyGridView::getViewWidget(void) {
-	return this->widget();
+	return this->getQWidget();
 }
 
-bool ot::PropertyGridView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
-
-
-	return true;
-}
+// ###########################################################################################################################################################################################################################################################################################################################

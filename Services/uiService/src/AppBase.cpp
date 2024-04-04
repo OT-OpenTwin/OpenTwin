@@ -20,7 +20,6 @@
 #include "UiPluginComponent.h"
 #include "UiPluginManager.h"
 #include "DevLogger.h"
-#include "PropertyGridView.h"
 #include "LogInDialog.h"
 #include "NavigationTreeView.h"
 
@@ -31,7 +30,6 @@
 #include <akWidgets/aWindowManager.h>
 #include <akWidgets/aDockWidget.h>
 #include <akWidgets/aTextEditWidget.h>
-#include <akWidgets/aPropertyGridWidget.h>
 #include <akWidgets/aTreeWidget.h>
 #include <akCore/rJSON.h>
 #include <akDialogs/aLogInDialog.h>
@@ -64,9 +62,16 @@
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/PropertyInputDouble.h"
+#include "OTWidgets/PropertyInputStringList.h"
+#include "OTWidgets/PropertyGridView.h"
+#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PlainTextEditView.h"
 #include "OTWidgets/IconManager.h"
 #include "DataBase.h"
@@ -1332,8 +1337,8 @@ void AppBase::createUi(void) {
 			m_debug->setReadOnly(true);
 			m_debug->setAutoScrollToBottomEnabled(true);
 
-			m_propertyGrid->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"), ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"));
-			m_propertyGrid->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
+			//m_propertyGrid->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"), ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"));
+			//m_propertyGrid->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
 
 			//m_contextMenus.output.clear = uiAPI::contextMenu::addItem(m_widgets.output, "Clear", "Clear", "Default", cmrClear);
 			//uiAPI::contextMenu::addItem(m_widgets.debug, "Clear", "Clear", "Default", cmrClear);
@@ -1378,8 +1383,8 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Register notifier
-			this->connect(m_propertyGrid, &ak::aPropertyGridWidget::itemChanged, this, &AppBase::slotPropertyGridValueChanged);
-			this->connect(m_propertyGrid, &ak::aPropertyGridWidget::itemDeleted, this, &AppBase::slotPropertyGridValueDeleted);
+			this->connect(m_propertyGrid, &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_propertyGrid, &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
 
 			this->connect(m_projectNavigation, &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
@@ -1790,6 +1795,11 @@ std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
 	return m_projectNavigation->selectedItems();
 }
 
+void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
+	m_propertyGrid->setupGridFromConfig(_configuration);
+}
+
+/*
 void AppBase::fillPropertyGrid(const std::string &settings) {
 	this->clearPropertyGrid();
 
@@ -1922,6 +1932,7 @@ void AppBase::fillPropertyGrid(const std::string &settings) {
 		}
 	}
 }
+*/
 
 // ##############################################################################################
 
@@ -1947,233 +1958,149 @@ void AppBase::appendDebugMessage(const QString & _message) {
 
 void AppBase::lockPropertyGrid(bool flag)
 {
-	m_propertyGrid->setEnabled(flag);
+	m_propertyGrid->getTreeWidget()->setEnabled(flag);
 }
 
-QString AppBase::getPropertyName(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
+ot::Property::PropertyType AppBase::getPropertyType(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
 	if (itm) {
-		return itm->name();
+		return itm->getPropertyType();
 	}
 	else {
-		OT_LOG_EA("Invalid item id");
-		return "";
-	}
-}
-
-valueType AppBase::getPropertyType(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getValueType();
-	}
-	else {
-		OT_LOG_EA("Invalid item id");
-		return ak::vtNull;
+		OT_LOG_E("Item not found: \"" + _itemName + "\"");
+		return ot::Property::NullType;
 	}
 }
 
-bool AppBase::getPropertyValueBool(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getBool();
-	}
-	else {
-		OT_LOG_EA("Invalid item id");
+bool AppBase::getPropertyValueBool(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
 		return false;
 	}
+	if (itm->getPropertyType() != ot::Property::BoolType) {
+		OT_LOG_E("Invalid property type");
+		return false;
+	}
+	return itm->getInput()->getCurrentValue().toBool();
 }
 
-int AppBase::getPropertyValueInt(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getInt();
-	}
-	else {
-		OT_LOG_EA("Invalid item id");
+int AppBase::getPropertyValueInt(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
 		return 0;
 	}
+	if (itm->getPropertyType() != ot::Property::IntType) {
+		OT_LOG_E("Invalid property type");
+		return 0;
+	}
+	return itm->getInput()->getCurrentValue().toInt();
 }
 
-double AppBase::getPropertyValueDouble(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getDouble();
-	}
-	else {
-		OT_LOG_EA("Invalid item id");
+double AppBase::getPropertyValueDouble(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
 		return 0.;
 	}
+	if (itm->getPropertyType() != ot::Property::DoubleType) {
+		OT_LOG_E("Invalid property type");
+		return 0.;
+	}
+	return itm->getInput()->getCurrentValue().toDouble();
 }
 
-QString AppBase::getPropertyValueString(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getString();
+QString AppBase::getPropertyValueString(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
+		return QString();
 	}
-	else {
-		OT_LOG_EA("Invalid item id");
-		return "";
+	if (itm->getPropertyType() != ot::Property::StringType) {
+		OT_LOG_E("Invalid property type");
+		return QString();
 	}
+	return itm->getInput()->getCurrentValue().toString();
 }
 
-QString AppBase::getPropertyValueSelection(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getSelection();
+QString AppBase::getPropertyValueSelection(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
+		return QString();
 	}
-	else {
-		OT_LOG_EA("Invalid item id");
-		return "";
+	if (itm->getPropertyType() != ot::Property::StringListType) {
+		OT_LOG_E("Invalid property type");
+		return QString();
 	}
+	return itm->getInput()->getCurrentValue().toString();
 }
 
-std::vector<QString> AppBase::getPropertyPossibleSelection(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	std::vector<QString> lst;
-	if (itm) {
-		for (const QString& s : itm->getPossibleSelection()) {
-			lst.push_back(s);
-		}
+QStringList AppBase::getPropertyPossibleSelection(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
+		return QStringList();
 	}
-	else {
-		OT_LOG_EA("Invalid item id");
+	if (itm->getPropertyType() != ot::Property::StringListType) {
+		OT_LOG_E("Invalid property type");
+		return QStringList();
 	}
-	return lst;
+
+	ot::PropertyInputStringList* inp = dynamic_cast<ot::PropertyInputStringList*>(itm->getInput());
+	if (!inp) {
+		OT_LOG_E("Input cast failed");
+		return QStringList();
+	}
+	return inp->getPossibleSelection();
 }
 
-aColor AppBase::getPropertyValueColor(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->getColor();
+QColor AppBase::getPropertyValueColor(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
+		return QColor();
 	}
-	else {
-		OT_LOG_EA("Invalid item id");
-		return aColor();
+	if (itm->getPropertyType() != ot::Property::ColorType) {
+		OT_LOG_E("Invalid property type");
+		return QColor();
 	}
+	QVariant var = itm->getInput()->getCurrentValue();
+	if (!var.canConvert<QColor>()) {
+		OT_LOG_E("Invalid variant type");
+		return QColor();
+	}
+	return var.value<QColor>();
 }
 
-bool AppBase::getPropertyIsDeletable(ID _itemID) {
-	auto itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		return itm->isDeletable();
-	}
-	else {
-		OT_LOG_EA("Invalid item id");
+bool AppBase::getPropertyIsDeletable(const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Property cast failed");
 		return false;
 	}
+	return itm->isPropertyDeletable();
 }
 
 // Setter
 
 void AppBase::clearPropertyGrid(void) {
-	m_propertyGrid->clear(false);
+	m_propertyGrid->clear();
 }
 
-void AppBase::addPropertyGroup(const QString & _groupName, const aColor & _color, const aColor& _foregroundColor, const aColor& _errorColor) {
-	m_propertyGrid->addGroup(_groupName, _color, _foregroundColor, _errorColor);
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, bool _value) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
+void AppBase::setPropertyValueDouble(const std::string& _itemName, double _value) {
+	ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+	if (!itm) {
+		OT_LOG_E("Invalid item name \"" + _itemName + "\"");
+		return;
 	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
+	ot::PropertyInputDouble* inp = dynamic_cast<ot::PropertyInputDouble*>(itm->getInput());
+	if (!inp) {
+		OT_LOG_E("Property input cast failed");
+		return;
 	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value, int _min, int _max) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _min, _max, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
-	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, double _value) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
-	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const char * _value) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, QString(_value), _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
-	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const QString & _value) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
-	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const aColor & _value) {
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, _value, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
-	}
-	return id;
-}
-
-ID AppBase::addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const std::vector<QString> & _possibleSelection, const QString & _initialSelection) {
-	QStringList pos;
-	for (const QString& p : _possibleSelection) pos.append(p);
-	ak::ID id = m_propertyGrid->addItem(_groupName, _propertyName, pos, _initialSelection, _isMultipleValues);
-	m_propertyGrid->item(id)->setReadOnly(_isReadOnly);
-	m_propertyGrid->item(id)->setDeletable(_isDeletable);
-	if (_hasError) {
-		m_propertyGrid->item(id)->setErrorState(true);
-	}
-	return id;
-}
-
-void AppBase::setPropertyValueDouble(ak::ID _itemID, double _value) {
-	ak::aPropertyGridItem* itm = m_propertyGrid->item(_itemID);
-	if (itm) {
-		itm->setDouble(_value);
-	}
-	else {
-		OT_LOG_EA("Invalid item id");
-	}
-}
-
-int AppBase::findPropertyID(const QString & _propertyName) {
-	ak::aPropertyGridItem* item = m_propertyGrid->findItem(_propertyName);
-	if (item) {
-		return item->id();
-	}
-	else {
-		OT_LOG_EA("Invalid item name");
-		return ak::invalidID;
-	}
+	inp->setValue(_value);
 }
 
 ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
@@ -2636,17 +2563,18 @@ void AppBase::slotOutputContextMenuItemClicked() {
 
 // Private: Property grid slots
 
-void AppBase::slotPropertyGridValueChanged(int _id) {
+void AppBase::slotPropertyGridValueChanged(const std::string& _itemName) {
 	// We first ask the viewer whether it needs to handle the property grid change.
-	if (!m_viewerComponent->propertyGridValueChanged(_id))
+	/*if (!m_viewerComponent->propertyGridValueChanged(_id))
 	{
 		// If not, we pass thic change on to the external services component
 		m_ExternalServicesComponent->propertyGridValueChanged(_id);
 	}
+	*/
 }
 
-void AppBase::slotPropertyGridValueDeleted(int _id) {
-	m_ExternalServicesComponent->propertyGridValueDeleted(_id);
+void AppBase::slotPropertyGridValueDeleteRequested(const std::string& _itemName) {
+	//m_ExternalServicesComponent->propertyGridValueDeleted(_id);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

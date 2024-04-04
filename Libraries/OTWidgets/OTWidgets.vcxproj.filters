@@ -241,6 +241,9 @@
     <ClCompile Include="src\PropertyGridItemDelegate.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="src\PropertyGridView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -425,9 +428,6 @@
     <ClInclude Include="include\OTWidgets\ColorStyleTypes.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyGridItem.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CheckBox.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
@@ -457,6 +457,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
       <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyGridView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -539,6 +542,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PropertyGridGroup.h">
+      <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyGridItem.h">
       <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>

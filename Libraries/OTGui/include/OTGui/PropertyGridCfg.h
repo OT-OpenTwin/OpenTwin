@@ -9,13 +9,15 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/WidgetViewCfg.h"
+
+#define OT_WIDGETTYPE_PropertyGridView "PropertyGridView"
 
 namespace ot {
 
 	class PropertyGroup;
 
-	class OT_GUI_API_EXPORT PropertyGridCfg : public ot::Serializable {
+	class OT_GUI_API_EXPORT PropertyGridCfg : public ot::WidgetViewCfg {
 		OT_DECL_NOCOPY(PropertyGridCfg)
 	public:
 		PropertyGridCfg();
@@ -30,6 +32,8 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+		virtual std::string getViewType(void) const override { return OT_WIDGETTYPE_PropertyGridView; };
 
 		PropertyGroup* defaultGroup(void) const { return m_defaultGroup; };
 

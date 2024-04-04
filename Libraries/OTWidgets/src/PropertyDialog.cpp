@@ -37,7 +37,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	btnLay->addWidget(btnCancel);
 
 	// Setup data
-	m_grid->setupFromConfig(_config.gridConfig());
+	m_grid->setupGridFromConfig(_config.gridConfig());
 
 	// Connect signals
 	this->connect(btnConfirm, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);

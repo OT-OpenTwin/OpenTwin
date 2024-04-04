@@ -44,14 +44,22 @@ namespace ot {
 		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
 		const QBrush& groupBrush(void) const { return m_groupBrush; };
 
-		const PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
-		std::list<const PropertyGridItem*> childProperties(void) const;
+		PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
+		std::list<PropertyGridItem*> childProperties(void) const;
 
-		const PropertyGridGroup* findChildGroup(const std::string& _name, bool _searchChildGroups) const;
-		std::list<const PropertyGridGroup*> childGroups(void) const;
+		PropertyGridGroup* findChildGroup(const std::string& _name, bool _searchChildGroups) const;
+		std::list<PropertyGridGroup*> childGroups(void) const;
+
+	Q_SIGNALS:
+		void itemInputValueChanged(const std::string& _itemName);
+		void itemDeleteRequested(const std::string& _itemName);
 
 	private Q_SLOTS:
 		void slotColorStyleChanged(const ColorStyle& _style);
+		void slotItemInputValueChanged(void);
+		void slotItemInputValueChanged(const std::string& _itemName);
+		void slotItemDeleteRequested(void);
+		void slotItemDeleteRequested(const std::string& _itemName);
 
 	private:
 		bool m_isAlternate;

@@ -21,8 +21,10 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerManagerTemplate.h"
-
+#include "OTGui/Property.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTServiceFoundation/UserCredentials.h"
+
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
 
@@ -353,7 +355,9 @@ public:
 
 	void clearNavigationTreeSelection(void);
 	
-	void fillPropertyGrid(const std::string &settings);
+	void setupPropertyGrid(const ot::PropertyGridCfg& _configuration);
+
+	//void fillPropertyGrid(const std::string &settings);
 
 	QString getNavigationTreeItemText(ak::ID _itemID);
 
@@ -383,25 +387,23 @@ public:
 
 	// Getter
 
-	QString getPropertyName(ak::ID _itemID);
+	ot::Property::PropertyType getPropertyType(const std::string& _itemName);
 
-	ak::valueType getPropertyType(ak::ID _itemID);
+	bool getPropertyValueBool(const std::string& _itemName);
 
-	bool getPropertyValueBool(ak::ID _itemID);
+	int getPropertyValueInt(const std::string& _itemName);
 
-	int getPropertyValueInt(ak::ID _itemID);
+	double getPropertyValueDouble(const std::string& _itemName);
 
-	double getPropertyValueDouble(ak::ID _itemID);
+	QString getPropertyValueString(const std::string& _itemName);
 
-	QString getPropertyValueString(ak::ID _itemID);
+	QString getPropertyValueSelection(const std::string& _itemName);
 
-	QString getPropertyValueSelection(ak::ID _itemID);
+	QStringList getPropertyPossibleSelection(const std::string& _itemName);
 
-	std::vector<QString> getPropertyPossibleSelection(ak::ID _itemID);
+	QColor getPropertyValueColor(const std::string& _itemName);
 
-	ak::aColor getPropertyValueColor(ak::ID _itemID);
-
-	bool getPropertyIsDeletable(ak::ID _itemID);
+	bool getPropertyIsDeletable(const std::string& _itemName);
 
 	ShortcutManager * shortcutManager(void) { return m_shortcutManager; }
 
@@ -411,27 +413,7 @@ public:
 
 	void lockPropertyGrid(bool flag);
 
-	void addPropertyGroup(const QString & _groupName, const ak::aColor & _color, const ak::aColor& _foregroundColor, const ak::aColor& _errorColor);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, bool _value);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, int _value, int _min, int _max);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, double _value);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const char * _value);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const QString & _value);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const ak::aColor & _value);
-
-	ak::ID addProperty(const QString & _groupName, const QString & _propertyName, bool _isMultipleValues, bool _isReadOnly, bool _isDeletable, bool _hasError, const std::vector<QString> & _possibleSelection, const QString & _initialSelection);
-
-	void setPropertyValueDouble(ak::ID _itemID, double _value);
-
-	int findPropertyID(const QString & _propertyName);
+	void setPropertyValueDouble(const std::string& _itemName, double _value);
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
@@ -506,8 +488,8 @@ private Q_SLOTS:
 
 	// Private: Property grid slots
 
-	void slotPropertyGridValueChanged(int _id);
-	void slotPropertyGridValueDeleted(int _id);
+	void slotPropertyGridValueChanged(const std::string& _itemName);
+	void slotPropertyGridValueDeleteRequested(const std::string& _itemName);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

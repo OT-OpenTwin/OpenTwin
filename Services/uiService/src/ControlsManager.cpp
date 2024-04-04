@@ -11,11 +11,12 @@
 
 // OT header
 #include "OTCore/ServiceBase.h"
+#include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/PropertyGrid.h"
 
 // AK header
 #include <akAPI/uiAPI.h>
 #include <akWidgets/aTreeWidget.h>
-#include <akWidgets/aPropertyGridWidget.h>
 
 ControlsManager::~ControlsManager() {
 	for (auto itm : m_creatorMap) { delete itm.second; }
@@ -157,7 +158,7 @@ void LockManager::uiElementCreated(ot::ServiceBase* _service, ak::aTreeWidget* _
 	}
 }
 
-void LockManager::uiElementCreated(ot::ServiceBase* _service, ak::aPropertyGridWidget* _propertyGrid, const ot::Flags<ot::ui::lockType>& _typeFlags) {
+void LockManager::uiElementCreated(ot::ServiceBase* _service, ot::PropertyGrid* _propertyGrid, const ot::Flags<ot::ui::lockType>& _typeFlags) {
 	// Create new entrys
 	OTAssert(m_prop == nullptr, "");
 	m_prop = new LockManagerElement{ _propertyGrid, _typeFlags };
@@ -450,7 +451,7 @@ LockManagerElement::LockManagerElement(ak::aTreeWidget* _tree, const ot::Flags<o
 	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ ak::invalidUID }, m_tree(_tree), m_prop(nullptr)
 {}
 
-LockManagerElement::LockManagerElement(ak::aPropertyGridWidget* _prop, const ot::Flags<ot::ui::lockType>& _flags) 
+LockManagerElement::LockManagerElement(ot::PropertyGrid* _prop, const ot::Flags<ot::ui::lockType>& _flags)
 	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ ak::invalidUID }, m_tree(nullptr), m_prop(_prop)
 {}
 
@@ -467,7 +468,7 @@ void LockManagerElement::enable(int _value) {
 			m_tree->setEnabled(true);
 		}
 		else if (m_prop) {
-			m_prop->setEnabled(true);
+			m_prop->getTreeWidget()->setEnabled(true);
 		}
 		else {
 			ak::uiAPI::object::setEnabled(m_uid, true);
@@ -483,7 +484,7 @@ void LockManagerElement::disable(int _value) {
 			m_tree->setEnabled(false);
 		}
 		else if (m_prop) {
-			m_prop->setEnabled(false);
+			m_prop->getTreeWidget()->setEnabled(false);
 		}
 		else {
 			ak::uiAPI::object::setEnabled(m_uid, false);
@@ -502,7 +503,7 @@ void LockManagerElement::lock(int _value, ot::ui::lockType _lockType) {
 				}
 			}
 			else if (m_prop) {
-				m_prop->setEnabled(false);
+				m_prop->getTreeWidget()->setEnabled(false);
 			}
 			else {
 				ak::uiAPI::object::setEnabled(m_uid, false);
@@ -528,7 +529,7 @@ void LockManagerElement::unlock(int _value, ot::ui::lockType _lockType) {
 				}
 			}
 			else if (m_prop) {
-				m_prop->setEnabled(true);
+				m_prop->getTreeWidget()->setEnabled(true);
 			}
 			else {
 				ak::uiAPI::object::setEnabled(m_uid, true);

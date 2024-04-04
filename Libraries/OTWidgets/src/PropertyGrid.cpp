@@ -40,7 +40,6 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) 
 	m_tree->setIndentation(0);
 	m_tree->setObjectName("ot_property_grid");
 	m_tree->setItemDelegate(new PropertyGridItemDelegate(m_tree));
-	this->connect(m_tree, &TreeWidget::itemChanged, this, &PropertyGrid::slotItemChanged);
 }
 
 ot::PropertyGrid::~PropertyGrid() {
@@ -55,7 +54,7 @@ ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 	return m_tree;
 }
 
-void ot::PropertyGrid::setupFromConfig(const PropertyGridCfg& _config) {
+void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	this->clear();
 
 	for (const Property* itm : _config.defaultGroup()->properties()) {
@@ -77,6 +76,9 @@ void ot::PropertyGrid::addRootItem(PropertyGridItem* _item) {
 		OT_LOG_W("Item name is empty");
 	}
 	m_tree->addTopLevelItem(_item);
+
+	this->connect(_item, &PropertyGridItem::inputValueChanged, this, qOverload<>(&PropertyGrid::slotPropertyChanged));
+	this->connect(_item, &PropertyGridItem::deleteRequested, this, qOverload<>(&PropertyGrid::slotPropertyDeleteRequested));
 }
 
 void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
@@ -84,12 +86,15 @@ void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
 		OT_LOG_W("Group name is empty. Group wont be findable trough find group");
 	}
 	m_tree->addTopLevelItem(_group);
+
+	this->connect(_group, &PropertyGridGroup::itemInputValueChanged, this, qOverload<const std::string&>(&PropertyGrid::slotPropertyChanged));
+	this->connect(_group, &PropertyGridGroup::itemDeleteRequested, this, qOverload<const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
 }
 
-const ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _groupName) const {
+ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _groupName) const {
 	if (_groupName.empty()) return nullptr;
 	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
-		const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
+		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(m_tree->topLevelItem(i));
 		if (g) {
 			if (g->getName() == _groupName) return g;
 		}
@@ -97,17 +102,17 @@ const ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _gro
 	return nullptr;
 }
 
-const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemName) const {
+ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemName) const {
 	if (_itemName.empty()) return nullptr;
 	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
-		const PropertyGridItem* itm = dynamic_cast<const PropertyGridItem*>(m_tree->topLevelItem(i));
+		PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(m_tree->topLevelItem(i));
 		if (itm) {
 			if (itm->getName() == _itemName) return itm;
 		}
 		else {
 			const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
 			if (g) {
-				const PropertyGridItem* itm = g->findChildProperty(_itemName, true);
+				PropertyGridItem* itm = g->findChildProperty(_itemName, true);
 				if (itm) return itm;
 			}
 		}
@@ -116,7 +121,7 @@ const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemN
 	return nullptr;
 }
 
-const ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _groupName, const std::string& _itemName) const {
+ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _groupName, const std::string& _itemName) const {
 	const PropertyGridGroup* g = this->findGroup(_groupName);
 	if (g) return g->findChildProperty(_itemName, false);
 	else return nullptr;
@@ -130,6 +135,14 @@ void ot::PropertyGrid::slotPropertyChanged() {
 
 }
 
-void ot::PropertyGrid::slotItemChanged(QTreeWidgetItem* _item, int _column) {
+void ot::PropertyGrid::slotPropertyChanged(const std::string& _itemName) {
+
+}
+
+void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
+
+}
+
+void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _itemName) {
 
 }

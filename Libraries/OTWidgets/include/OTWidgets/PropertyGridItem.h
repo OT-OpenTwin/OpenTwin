@@ -7,9 +7,11 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Property.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qobject.h>
 #include <QtWidgets/qtreewidget.h>
 
 namespace ot {
@@ -17,7 +19,8 @@ namespace ot {
 	class Property;
 	class PropertyInput;
 
-	class OT_WIDGETS_API_EXPORT PropertyGridItem : public QTreeWidgetItem {
+	class OT_WIDGETS_API_EXPORT PropertyGridItem : public QObject, public QTreeWidgetItem {
+		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridItem)
 	public:
 		PropertyGridItem();
@@ -33,6 +36,8 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
 
+		Property::PropertyType getPropertyType(void) const { return m_type; };
+
 		void setTitle(const QString& _title);
 		QString getTitle(void) const;
 
@@ -42,10 +47,23 @@ namespace ot {
 		void setPropertyBrush(const QBrush& _brush) { m_propertyBrush = _brush; };
 		const QBrush& propertyBrush(void) const { return m_propertyBrush; };
 
+		bool isPropertyDeletable(void) const { return m_isDeleteable; };
+
+	Q_SIGNALS:
+		void inputValueChanged(void);
+		void deleteRequested(void);
+
+	private Q_SLOTS:
+		void slotValueChanged(void);
+
 	private:
+		bool m_isDeleteable;
 		std::string m_name;
+		Property::PropertyType m_type;
 		PropertyInput* m_input;
 		QBrush m_propertyBrush;
 	};
 
 }
+
+Q_DECLARE_METATYPE(ot::PropertyGridItem*)

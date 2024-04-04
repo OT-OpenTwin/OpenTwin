@@ -266,7 +266,6 @@
     <ClCompile Include="src\akWidgets\aListWidget.cpp" />
     <ClCompile Include="src\akWidgets\aNiceLineEditWidget.cpp" />
     <ClCompile Include="src\akWidgets\aPlainTextEditWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aPropertyGridWidget.cpp" />
     <ClCompile Include="src\akWidgets\aPushButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aRadioButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aSpinBoxWidget.cpp" />
@@ -329,7 +328,6 @@
     <QtMoc Include="include\akWidgets\aSpinBoxWidget.h" />
     <QtMoc Include="include\akWidgets\aDoubleSpinBoxWidget.h" />
     <QtMoc Include="include\akWidgets\aDockWatcherWidget.h" />
-    <QtMoc Include="include\akWidgets\aPropertyGridWidget.h" />
     <QtMoc Include="include\akWidgets\aChecklistWidget.h" />
     <QtMoc Include="include\akWidgets\aPlainTextEditWidget.h" />
     <ClInclude Include="include\akWidgets\aTtbGroup.h" />

@@ -117,9 +117,6 @@
     <ClCompile Include="src\NavigationTreeView.cpp">
       <Filter>Source Files\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyGridView.cpp">
-      <Filter>Source Files\WidgetView</Filter>
-    </ClCompile>
     <ClCompile Include="src\LogInManager.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
@@ -166,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="include\FileHandler.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PropertyGridView.h">
-      <Filter>Header Files\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\NavigationTreeView.h">
       <Filter>Header Files\WidgetView</Filter>

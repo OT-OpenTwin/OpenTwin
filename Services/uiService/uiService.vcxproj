@@ -42,7 +42,6 @@
     <ClCompile Include="src\ManageGroups.cpp" />
     <ClCompile Include="src\ManageOwner.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
-    <ClCompile Include="src\PropertyGridView.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
     <ClCompile Include="src\ShortcutManager.cpp" />
     <ClCompile Include="src\ProjectManagement.cpp" />
@@ -71,7 +70,6 @@
     <ClInclude Include="include\FileHandler.h" />
     <QtMoc Include="include\LogInDialog.h" />
     <ClInclude Include="include\NavigationTreeView.h" />
-    <ClInclude Include="include\PropertyGridView.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <ClInclude Include="include\ToolBar.h" />

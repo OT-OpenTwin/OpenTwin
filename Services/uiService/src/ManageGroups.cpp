@@ -9,7 +9,6 @@
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aTableWidget.h>
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aPropertyGridWidget.h>
 
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"

@@ -258,9 +258,6 @@
     <ClCompile Include="src\akDialogs\aCustomizableInputDialog.cpp">
       <Filter>Source Files\ak\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aPropertyGridWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akCore\aBasicDictionary.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
@@ -492,9 +489,6 @@
     </QtMoc>
     <QtMoc Include="include\akDialogs\aCustomizableInputDialog.h">
       <Filter>Header Files\ak\Dialogs</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aPropertyGridWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akGui\aGlobalKeyListener.h">
       <Filter>Header Files\ak\Gui</Filter>

@@ -104,16 +104,19 @@ void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
 	_item->setPropertyBrush((m_isAlternate ? m_groupAlternateBrush : m_groupBrush));
 	m_isAlternate = !m_isAlternate;
 	this->addChild(_item);
+
+	this->connect(_item, &PropertyGridItem::inputValueChanged, this, qOverload<>(&PropertyGridGroup::slotItemInputValueChanged));
+	this->connect(_item, &PropertyGridItem::deleteRequested, this, qOverload<>(&PropertyGridGroup::slotItemDeleteRequested));
 }
 
-const ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const {
+ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const {
 	for (int i = 0; this->childCount(); i++) {
-		const PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
+		PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (p) {
 			if (p->getName() == _propertyName) return p;
 		}
 		if (!_searchChildGroups) continue;
-		const PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
+		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
 		if (g) {
 			p = g->findChildProperty(_propertyName, _searchChildGroups);
 			if (p) return p;
@@ -122,20 +125,20 @@ const ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::
 	return nullptr;
 }
 
-std::list<const ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties(void) const {
-	std::list<const ot::PropertyGridItem*> ret;
+std::list<ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties(void) const {
+	std::list<ot::PropertyGridItem*> ret;
 
 	for (int i = 0; i < this->childCount(); i++) {
-		const PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
+		PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (p) ret.push_back(p);
 	}
 
 	return ret;
 }
 
-const ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::string& _name, bool _searchChildGroups) const {
+ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::string& _name, bool _searchChildGroups) const {
 	for (int i = 0; this->childCount(); i++) {
-		const PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
+		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
 		if (g) {
 			if (g->getName() == _name) return g;
 			if (!_searchChildGroups) continue;
@@ -146,11 +149,11 @@ const ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::st
 	return nullptr;
 }
 
-std::list<const ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const {
-	std::list<const ot::PropertyGridGroup*> ret;
+std::list<ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const {
+	std::list<ot::PropertyGridGroup*> ret;
 
 	for (int i = 0; this->childCount(); i++) {
-		const PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
+		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
 		if (g) {
 			ret.push_back(g);
 		}
@@ -164,4 +167,30 @@ void ot::PropertyGridGroup::slotColorStyleChanged(const ColorStyle& _style) {
 	this->setBackground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
 	this->setForeground(0, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
 	this->setForeground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
+}
+
+void ot::PropertyGridGroup::slotItemInputValueChanged(void) {
+	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
+	if (!itm) {
+		OT_LOG_E("Item cast failed");
+		return;
+	}
+	Q_EMIT itemInputValueChanged(itm->getName());
+}
+
+void ot::PropertyGridGroup::slotItemInputValueChanged(const std::string& _itemName) {
+	Q_EMIT itemInputValueChanged(_itemName);
+}
+
+void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
+	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
+	if (!itm) {
+		OT_LOG_E("Item cast failed");
+		return;
+	}
+	Q_EMIT itemDeleteRequested(itm->getName());
+}
+
+void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _itemName) {
+	Q_EMIT itemDeleteRequested(_itemName);
 }

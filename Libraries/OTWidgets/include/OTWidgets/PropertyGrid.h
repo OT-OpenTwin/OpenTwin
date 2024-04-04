@@ -43,19 +43,25 @@ namespace ot {
 
 		TreeWidget* getTreeWidget(void) const;
 
-		void setupFromConfig(const PropertyGridCfg& _config);
+		void setupGridFromConfig(const PropertyGridCfg& _config);
 		void addRootItem(PropertyGridItem* _item);
 		void addGroup(PropertyGridGroup* _group);
 
-		const PropertyGridGroup* findGroup(const std::string& _groupName) const;
-		const PropertyGridItem* findItem(const std::string& _itemName) const;
-		const PropertyGridItem* findItem(const std::string& _groupName, const std::string& _itemName) const;
+		PropertyGridGroup* findGroup(const std::string& _groupName) const;
+		PropertyGridItem* findItem(const std::string& _itemName) const;
+		PropertyGridItem* findItem(const std::string& _groupName, const std::string& _itemName) const;
 
 		void clear(void);
 
+	Q_SIGNALS:
+		void propertyChanged(const std::string& _propertyName);
+		void propertyDeleteRequested(const std::string& _propertyName);
+
 	private Q_SLOTS:
-		void slotPropertyChanged();
-		void slotItemChanged(QTreeWidgetItem* _item, int _column);
+		void slotPropertyChanged(void);
+		void slotPropertyChanged(const std::string& _itemName);
+		void slotPropertyDeleteRequested(void);
+		void slotPropertyDeleteRequested(const std::string& _itemName);
 
 	private:
 		class PropertyGridTree;
