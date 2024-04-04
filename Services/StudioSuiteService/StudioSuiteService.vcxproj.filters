@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Third Party Files">
+      <UniqueIdentifier>{3923beac-319d-4562-8a8c-f3e321a3d358}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -27,7 +30,19 @@
     <ClCompile Include="src\UiNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShapeTriangleHash.cpp">
+    <ClCompile Include="src\InfoFileManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+      <Filter>Third Party Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Result1DData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RunIDContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Result1DManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +56,16 @@
     <ClInclude Include="include\UiNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShapeTriangleHash.h">
+    <ClInclude Include="include\InfoFileManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Result1DManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RunIDContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Result1DData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

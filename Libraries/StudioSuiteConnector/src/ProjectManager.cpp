@@ -3,6 +3,7 @@
 #include "StudioSuiteConnector/StudioConnector.h"
 #include "StudioSuiteConnector/VersionFile.h"
 #include "StudioSuiteConnector/ProgressInfo.h"
+#include "StudioSuiteConnector/Result1DFileManager.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -27,6 +28,7 @@
 
 #include "boost/algorithm/string.hpp"
 #include "zlib.h"
+#include "base64.h"
 
 void ProjectManager::openProject()
 {
@@ -274,7 +276,7 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		std::string projectRoot = projectPath.parent_path().string();
 
 		// Load the hash information for the entities 
-		ShapeTriangleHash shapeTriangleHash(infoEntityID, infoEntityVersion);
+		InfoFileManager infoFileManager(infoEntityID, infoEntityVersion);
 
 		// Upload files (progress range 15-70)
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
@@ -286,10 +288,10 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		sendMaterialInformation(baseProjectName);
 
 		// Send the shapes information and triangulations (progress range 70-80)
-		sendShapeInformationAndTriangulation(baseProjectName, shapeTriangleHash);
+		sendShapeInformationAndTriangulation(baseProjectName, infoFileManager);
 
 		// Send the (parametric) 1D result data (progress range 80-90)
-		send1dResultData(baseProjectName);
+		send1dResultData(baseProjectName, infoFileManager);
 
 		// Create the new version
 		commitNewVersion(changeMessage);
@@ -305,39 +307,101 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 	ProgressInfo::getInstance().unlockGui();
 }
 
-void ProjectManager::send1dResultData(const std::string& projectRoot)
+void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileManager &infoFileManager)
 {
 	// First, we get a list of all available run-ids
 	std::string uploadDirectory = projectRoot + "/Temp/Upload/";
 
 	std::list<int> runIds = getAllRunIds(uploadDirectory);
 
+	// Load all result data and determine the hashes
+	Result1DFileManager result1DData(uploadDirectory, runIds);
+
 	// Now check whether the run-ids (1,2,3,...) have changed. In this case, a full upload is needed.
 	// Otherwise, only the new run-ids need to be uploaded (added).
-	std::list<int> changedRunIds = checkForChangedData(runIds, uploadDirectory);
+	std::list<int> changedRunIds = checkForChangedData(runIds, uploadDirectory, result1DData, infoFileManager);
 
 	bool appendData = (changedRunIds.size() < runIds.size());
 
 	// Create a zip archive of the to-be uploaded run-ids (including the cache information)
+	// In a first step, we calculate the buffer size to store all the data
+	size_t bufferSize = sizeof(size_t);   // Store the number of run IDs
+	size_t validRunIds = 0;
 
-	// Durchlaufen aller files und berechnen der benoetigten Groesse. Anlegen eines Byte Buffers
-	// Danach Durchlaufen aller files und hinzufuegen zum Byte Buffer. 
-	// Am Ende den Byte Buffer mit compress komprimieren
+	for (int runId : changedRunIds)
+	{
+		Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
+		if (container != nullptr)
+		{
+			bufferSize += container->getSize();
+			validRunIds++;
+		}
+	}
+
+	assert(bufferSize > 0);
+	if (bufferSize == 0) return;
+
+	std::vector<char> buffer;
+	buffer.reserve(bufferSize);
+
+	// Write the number of valid runids
+	char* valueBuffer = (char*)(&validRunIds);
+
+	for (size_t index = 0; index < sizeof(size_t); index++)
+	{
+		buffer.push_back(valueBuffer[index]);
+	}
+
+	// Now we write all data to the buffer
+	for (int runId : changedRunIds)
+	{
+		Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
+		if (container != nullptr)
+		{
+			container->writeToBuffer(runId, buffer);
+		}
+	}
+
+	// In a next step, we do not need the original data anymore
+	result1DData.clear();
+
+	// Create a buffer for the compressed storage
+	uLong compressedSize = compressBound((uLong)bufferSize);
+
+	char* compressedData = new char[compressedSize];
+	compress((Bytef*)compressedData, &compressedSize, (Bytef*)buffer.data(), bufferSize);
+
+	buffer.clear();
+
+	// Convert the binary to an encoded string
+	int encoded_data_length = Base64encode_len(compressedSize);
+	char* base64_string = new char[encoded_data_length];
+
+	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+	delete[] compressedData;
+	compressedData = nullptr;
+
+	std::string dataContent = std::string(base64_string);
+
+	delete[] base64_string;
+	base64_string = nullptr;
 
 	// Finally send the zip archive to the server (together with the information whether the data shall be replaced or added)
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_RESULT1D, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_APPEND, appendData, doc.GetAllocator());  // We need ids for the data entities and the file entities
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(dataContent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(bufferSize), doc.GetAllocator());
 
-
-
-
-
-
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }
 
 std::list<int> ProjectManager::getAllRunIds(const std::string & uploadDirectory)
 {
 	std::list<int> runIds;
 
-	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(uploadDirectory))
+	for (const auto& dirEntry : std::filesystem::directory_iterator(uploadDirectory))
 	{
 		if (dirEntry.is_directory())
 		{
@@ -362,17 +426,16 @@ std::list<int> ProjectManager::getAllRunIds(const std::string & uploadDirectory)
 	return runIds;
 }
 
-
-std::list<int> ProjectManager::checkForChangedData(std::list<int> &allRunIds, const std::string &uploadDirectory)
+std::list<int> ProjectManager::checkForChangedData(std::list<int> &allRunIds, const std::string &uploadDirectory, Result1DFileManager & result1DData, InfoFileManager& infoFileManager)
 {
 	std::list<int> changedRunIds;
 
-	// TODO: Check which runids have really changed
+	// TODO: Check which runids have really changed (in case that there is a change, all runids are returned again, since a full upload will be performed
+	// For this, we can use the current information about the results in the result1DData object as well as the previous information stored in infoFileManager
 	changedRunIds = allRunIds;
 
 	return changedRunIds;
 }
-
 
 void ProjectManager::copyFiles(const std::string &newVersion)
 {
@@ -795,7 +858,7 @@ void ProjectManager::sendMaterialInformation(const std::string& projectRoot)
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }
 
-void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot, ShapeTriangleHash &shapeTriangleHash)
+void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot, InfoFileManager &infoFileManager)
 {
 	std::string fileContent;
 	readFileContent(projectRoot + "/Temp/Upload/shape.info", fileContent);
@@ -811,10 +874,10 @@ void ProjectManager::sendShapeInformationAndTriangulation(const std::string& pro
 	std::map<std::string, int> allShapesMap = determineAllShapes(std::stringstream(fileContent));
 	 
 	// Now send the modified triangulations (one by one)
-	sendTriangulations(projectRoot, allShapesMap, shapeTriangleHash);
+	sendTriangulations(projectRoot, allShapesMap, infoFileManager);
 }
 
-void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap, ShapeTriangleHash& shapeTriangleHash)
+void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap, InfoFileManager& infoFileManager)
 {
 	std::list<std::string> shapeNames;
 	std::list<std::string> shapeTriangles;
@@ -834,7 +897,7 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 
 		std::string hash = calculateHash(fileContent);
 
-		if (shapeTriangleHash.getHash(shape.first) != hash)
+		if (infoFileManager.getTriangleHash(shape.first) != hash)
 		{
 			// The hash value is different -> sending the shape is required
 

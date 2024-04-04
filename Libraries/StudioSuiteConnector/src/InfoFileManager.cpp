@@ -1,4 +1,4 @@
-#include "StudioSuiteConnector/ShapeTriangleHash.h"
+#include "StudioSuiteConnector/InfoFileManager.h"
 
 #include "EntityBinaryData.h"
 #include "DataBase.h"
@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-ShapeTriangleHash::ShapeTriangleHash(ot::UID infoEntityID, ot::UID infoEntityVersion)
+InfoFileManager::InfoFileManager(ot::UID infoEntityID, ot::UID infoEntityVersion)
 {
 	if (infoEntityID != 0 && infoEntityVersion != 0)
 	{
@@ -21,7 +21,11 @@ ShapeTriangleHash::ShapeTriangleHash(ot::UID infoEntityID, ot::UID infoEntityVer
 			std::stringstream dataContent;
 			dataContent.write(dataEntity->getData().data(), size);
 
-			while (!dataContent.eof())
+			std::string line;
+			std::getline(dataContent, line);
+			size_t numberItems = atoll(line.c_str());
+
+			for (size_t index = 0; index < numberItems; index++)
 			{
 				std::string name, hash;
 
@@ -30,7 +34,13 @@ ShapeTriangleHash::ShapeTriangleHash(ot::UID infoEntityID, ot::UID infoEntityVer
 
 				if (!name.empty() && !hash.empty())
 				{
-					shapeHashMap[name] = hash;
+					triangleHashMap[name] = hash;
+				}
+
+				if (dataContent.eof())
+				{
+					assert(0);
+					break;
 				}
 			}
 
@@ -40,11 +50,11 @@ ShapeTriangleHash::ShapeTriangleHash(ot::UID infoEntityID, ot::UID infoEntityVer
 	}
 }
 
-std::string ShapeTriangleHash::getHash(const std::string& shapeName)
+std::string InfoFileManager::getTriangleHash(const std::string& shapeName)
 {
-	auto item = shapeHashMap.find(shapeName);
+	auto item = triangleHashMap.find(shapeName);
 
-	if (item != shapeHashMap.end())
+	if (item != triangleHashMap.end())
 	{
 		// We found the item -> return the hash
 		return item->second;

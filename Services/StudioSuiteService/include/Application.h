@@ -13,7 +13,7 @@
 #include "OTServiceFoundation/EntityInformation.h"
 #include "EntityGeometry.h"
 
-#include "ShapeTriangleHash.h"
+#include "InfoFileManager.h"
 
 // C++ header
 #include <string>
@@ -129,6 +129,7 @@ public:
 	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed);
 	void readDoubleTriple(const std::string& line, double& a, double& b, double& c);
 	void shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash);
+	void result1D(bool appendData, std::string &data, size_t uncompressedDataLength);
 	void storeShape(const std::string& name, const std::string& triangles, const std::string& materialsFolder, ot::UID materialsFolderID);
 	void createFacets(const std::string& data, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges);
 	void writeProjectInformation(const std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
@@ -149,5 +150,5 @@ private:
 
 	std::map<std::string, std::tuple<double, double, double>> materialColors;
 	std::map<std::string, std::string> shapeMaterials;
-	ShapeTriangleHash shapeTriangleHash;
+	InfoFileManager infoFileManager;
 };

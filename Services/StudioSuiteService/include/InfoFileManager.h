@@ -8,11 +8,11 @@
 
 class Application;
 
-class ShapeTriangleHash
+class InfoFileManager
 {
 public:
-	ShapeTriangleHash() : application(nullptr), hasChanged(false), infoEntityID(0), infoEntityVersion(0) {};
-	~ShapeTriangleHash() {};
+	InfoFileManager() : application(nullptr), hasChanged(false), infoEntityID(0), infoEntityVersion(0) {};
+	~InfoFileManager() {};
 
 	void setData(Application* app);
 	void readInformation();
@@ -23,6 +23,8 @@ public:
 	void addDeletedShapesToList(std::list<std::string>& list);
 	ot::UID getInfoEntityID() { return infoEntityID; }
 	ot::UID getInfoEntityVersion() { return infoEntityVersion; }
+	void clearResult1D(void);
+
 
 private:
 	Application* application;

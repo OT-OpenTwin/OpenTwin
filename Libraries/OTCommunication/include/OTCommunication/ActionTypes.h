@@ -180,6 +180,7 @@
 #define OT_ACTION_CMD_UI_SS_MATERIALS "StudioSuite.MaterialsInformation"
 #define OT_ACTION_CMD_UI_SS_SHAPEINFO "StudioSuite.ShapesInformation"
 #define OT_ACTION_CMD_UI_SS_TRIANGLES "StudioSuite.ShapesTriangles"
+#define OT_ACTION_CMD_UI_SS_RESULT1D "StudioSuite.Result1D"
 #define OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME "StudioSuite.GetLocalFileName"
 #define OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME "StudioSuite.SetLocalFileName"
 #define OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME "StudioSuite.GetSimpleFileName"
@@ -595,6 +596,7 @@
 #define OT_ACTION_PARAM_NAME "Name"
 #define OT_ACTION_PARAM_QUEUE_FLAG "Queue.Messages.Flag"
 #define OT_ACTION_PARAM_Filter "Filter"
+#define OT_ACTION_PARAM_APPEND "Append"
 
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 

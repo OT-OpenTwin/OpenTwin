@@ -1,17 +1,17 @@
-#include "ShapeTriangleHash.h"
+#include "InfoFileManager.h"
 #include "Application.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 
 #include "EntityFile.h"
 
-void ShapeTriangleHash::setData(Application* app)
+void InfoFileManager::setData(Application* app)
 {
 	application = app;
 	hasChanged = false;
 }
 
-void ShapeTriangleHash::readInformation()
+void InfoFileManager::readInformation()
 {
 	shapeHashMap.clear();
 	deletedShapes.clear();
@@ -35,7 +35,11 @@ void ShapeTriangleHash::readInformation()
 			std::stringstream dataContent;
 			dataContent.write(fileEntity->getData()->getData().data(), size);
 
-			while (!dataContent.eof())
+			std::string line;
+			std::getline(dataContent, line);
+			size_t numberItems = atoll(line.c_str());
+
+			for (size_t index = 0; index < numberItems; index++)
 			{
 				std::string name, hash;
 
@@ -46,6 +50,12 @@ void ShapeTriangleHash::readInformation()
 				{
 					shapeHashMap[name] = hash;
 				}
+
+				if (dataContent.eof())
+				{
+					assert(0);
+					break;
+				}
 			}
 
 			delete fileEntity;
@@ -54,7 +64,7 @@ void ShapeTriangleHash::readInformation()
 	}
 }
 
-void ShapeTriangleHash::getShapes(std::map<std::string, bool>& shapes)
+void InfoFileManager::getShapes(std::map<std::string, bool>& shapes)
 {
 	shapes.clear();
 
@@ -64,7 +74,7 @@ void ShapeTriangleHash::getShapes(std::map<std::string, bool>& shapes)
 	}
 }
 
-void ShapeTriangleHash::setShapeHash(const std::string& name, const std::string& hash)
+void InfoFileManager::setShapeHash(const std::string& name, const std::string& hash)
 {
 	if (shapeHashMap.count(name) != 0)
 	{
@@ -84,7 +94,7 @@ void ShapeTriangleHash::setShapeHash(const std::string& name, const std::string&
 	}
 }
 
-void ShapeTriangleHash::deleteShape(const std::string& name)
+void InfoFileManager::deleteShape(const std::string& name)
 {
 	if (shapeHashMap.count(name) != 0)
 	{
@@ -96,7 +106,7 @@ void ShapeTriangleHash::deleteShape(const std::string& name)
 	}
 }
 
-void ShapeTriangleHash::writeInformation()
+void InfoFileManager::writeInformation()
 {
 	if (!hasChanged) return; // We don't have any changes -> no need to write the entity
 
@@ -122,6 +132,11 @@ void ShapeTriangleHash::writeInformation()
 
 	// Store the data in the item
 	std::stringstream dataContent;
+
+	// Write the number of data items first
+	dataContent << shapeHashMap.size() << std::endl;
+
+	// And the write the data itseld
 	for (auto item : shapeHashMap)
 	{
 		dataContent << item.first << std::endl; // Write the name
@@ -144,7 +159,7 @@ void ShapeTriangleHash::writeInformation()
 	fileEntity = nullptr;
 }
 
-void ShapeTriangleHash::addDeletedShapesToList(std::list<std::string>& list)
+void InfoFileManager::addDeletedShapesToList(std::list<std::string>& list)
 {
 	for (auto shape : deletedShapes)
 	{
@@ -154,3 +169,9 @@ void ShapeTriangleHash::addDeletedShapesToList(std::list<std::string>& list)
 		list.push_back(shapeName);
 	}
 }
+
+void InfoFileManager::clearResult1D(void)
+{
+
+}
+

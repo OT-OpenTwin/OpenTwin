@@ -28,13 +28,28 @@
     <ClCompile Include="src\ProjectInformationDialog.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShapeTriangleHash.cpp">
+    <ClCompile Include="src\InfoFileManager.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Result1DFileManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Result1DFileData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Result1DRunIDContainer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+      <Filter>Third Party Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
       <UniqueIdentifier>{dc781e08-fab5-4632-abda-b91ae6477943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Third Party Files">
+      <UniqueIdentifier>{1e0b5a35-265a-43a3-8dbe-534da8d0db96}</UniqueIdentifier>
     </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{3a2333c6-55c2-41ae-ae35-786e6bac71b8}</UniqueIdentifier>
@@ -59,7 +74,16 @@
     <ClInclude Include="include\StudioSuiteConnector\ProgressInfo.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\ShapeTriangleHash.h">
+    <ClInclude Include="include\StudioSuiteConnector\InfoFileManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StudioSuiteConnector\Result1DFileManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StudioSuiteConnector\Result1DRunIDContainer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StudioSuiteConnector\Result1DFileData.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

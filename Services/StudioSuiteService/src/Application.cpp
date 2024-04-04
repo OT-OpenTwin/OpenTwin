@@ -30,7 +30,9 @@
 #include "EntityGeometry.h"
 #include "EntityFile.h"
 #include "EntityBinaryData.h"
-#include "ShapeTriangleHash.h"
+
+#include "InfoFileManager.h"
+#include "Result1DManager.h"
 
 #include "boost/algorithm/string.hpp"
 
@@ -38,6 +40,9 @@
 #include <map>
 #include <sstream>
 #include <filesystem>
+
+#include "zlib.h"
+#include "base64.h"
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_STUDIOSUITE
@@ -103,6 +108,15 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 	{
 		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 		shapeInformation(content);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_RESULT1D)
+	{
+		bool appendData = ot::json::getBool(_doc, OT_ACTION_PARAM_APPEND);
+		std::string data = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+		size_t uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+
+		result1D(appendData, data, uncompressedDataLength);
 		return "";
 	}
 	else if (_action == OT_ACTION_CMD_UI_SS_TRIANGLES)
@@ -385,15 +399,15 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	}
 
 	// Read the information
-	shapeTriangleHash.setData(this);
-	shapeTriangleHash.readInformation();
+	infoFileManager.setData(this);
+	infoFileManager.readInformation();
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, shapeTriangleHash.getInfoEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, shapeTriangleHash.getInfoEntityVersion(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, infoFileManager.getInfoEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, infoFileManager.getInfoEntityVersion(), doc.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc);
 }
@@ -442,8 +456,8 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	std::list<std::string> deletedNameList = ot::json::getStringList(_doc, OT_ACTION_CMD_MODEL_DeleteEntity);
 
 	// We need to finalize the shape triangle information
-	shapeTriangleHash.writeInformation();
-	shapeTriangleHash.addDeletedShapesToList(deletedNameList);
+	infoFileManager.writeInformation();
+	infoFileManager.addDeletedShapesToList(deletedNameList);
 
 	// Now we need to send the model change to the model service 
 	for (auto item : modifiedNameList)
@@ -680,7 +694,7 @@ void Application::readDoubleTriple(const std::string& line, double& a, double& b
 void Application::shapeInformation(const std::string &content)
 {
 	std::map<std::string, bool> previousShape;
-	shapeTriangleHash.getShapes(previousShape);
+	infoFileManager.getShapes(previousShape);
 
 	std::stringstream data(content);
 
@@ -703,10 +717,64 @@ void Application::shapeInformation(const std::string &content)
 		if (!shape.second)
 		{
 			// This shape existed before, but was not processed this time anyore -> the shape has been deleted
-			shapeTriangleHash.deleteShape(shape.first);
+			infoFileManager.deleteShape(shape.first);
 		}
 	}
 }
+
+void Application::result1D(bool appendData, std::string& data, size_t uncompressedDataLength)
+{
+	// First, we need to decode the data back into a byte buffer
+	int decoded_compressed_data_length = Base64decode_len(data.c_str());
+	char* decodedCompressedString = new char[decoded_compressed_data_length];
+
+	Base64decode(decodedCompressedString, data.c_str());
+
+	data.clear();
+
+	// Decompress the data
+	char* dataBuffer = new char[uncompressedDataLength];
+	uLongf destLen = (uLongf)uncompressedDataLength;
+	uLong  sourceLen = decoded_compressed_data_length;
+	uncompress((Bytef*)dataBuffer, &destLen, (Bytef*)decodedCompressedString, sourceLen);
+
+	delete[] decodedCompressedString;
+	decodedCompressedString = nullptr;
+
+	try
+	{
+		// Now the data is in the dataBuffer with length uncompressedDataLength
+		// We need to process the buffer and read the data from it
+		Result1DManager resultManager(dataBuffer, uncompressedDataLength);
+
+		// We need to clear the result1D information in the info file manager in case that we do not want to append
+		infoFileManager.clearResult1D();
+
+		// Now we need to store the new hash information in the infoFileManager
+		// TODO
+
+		// We can now delete the buffer
+		delete[] dataBuffer;
+		dataBuffer = nullptr;
+
+		// And finally store the parametric data (either append or clear and re-add)
+		// TODO
+
+
+	}
+	catch (std::exception)
+	{
+		assert(0);
+
+		// We have an problem processing the data.
+		if (dataBuffer != nullptr)
+		{
+			delete[] dataBuffer;
+			dataBuffer = nullptr;
+		}
+	}
+}
+
 
 void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash)
 {
@@ -728,7 +796,7 @@ void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<s
 	for (auto name : shapeNames)
 	{
 		storeShape(name, *triangles, materialsFolder, materialsFolderID);
-		shapeTriangleHash.setShapeHash(name, *hash);
+		infoFileManager.setShapeHash(name, *hash);
 
 		triangles++;
 		hash++;
