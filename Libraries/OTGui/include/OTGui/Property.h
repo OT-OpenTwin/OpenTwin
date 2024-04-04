@@ -25,6 +25,7 @@ namespace ot {
 		OT_DECL_NOCOPY(Property)
 	public:
 		enum PropertyType {
+			NullType, //! Used for uninitialized properties
 			BoolType,
 			IntType,
 			DoubleType,
@@ -43,6 +44,7 @@ namespace ot {
 			IsHidden            = 0x0004, //! @brief Property is hidden to the user
 			HasMultipleValues   = 0x0008, //! @brief Property has multiple values
 			HasInputError       = 0x0010, //! @brief The value is invalid
+			IsDeletable         = 0x0020, //! @brief Property is deletable
 			AllowCustomValues   = 0x1000, //! @brief User may set user values (e.g. in the StringListProperty)
 			AllowMultiselection = 0x2000  //! @brief User may select multiple values (e.g. in the StringListProperty)
 		};

@@ -58,6 +58,7 @@ std::string ot::Property::toString(PropertyFlags _flag) {
 	case ot::Property::IsHidden: return "IsHidden";
 	case ot::Property::HasInputError: return "HasInputError";
 	case ot::Property::HasMultipleValues: return "HasMultipleValues";
+	case ot::Property::IsDeletable: return "IsDeletable";
 	case ot::Property::AllowCustomValues: return "AllowCustomValues";
 	case ot::Property::AllowMultiselection: return "AllowMultiselection";
 	default:
@@ -73,6 +74,7 @@ ot::Property::PropertyFlags ot::Property::stringToFlag(const std::string& _flag)
 	else if (_flag == Property::toString(Property::IsHidden)) { return Property::IsHidden; }
 	else if (_flag == Property::toString(Property::HasInputError)) { return Property::HasInputError; }
 	else if (_flag == Property::toString(Property::HasMultipleValues)) { return Property::HasMultipleValues; }
+	else if (_flag == Property::toString(Property::IsDeletable)) { return Property::IsDeletable; }
 	else if (_flag == Property::toString(Property::AllowCustomValues)) { return Property::AllowCustomValues; }
 	else if (_flag == Property::toString(Property::AllowMultiselection)) { return Property::AllowMultiselection; }
 	else {
@@ -88,6 +90,7 @@ std::list<std::string> ot::Property::toStringList(PropertyFlags _flags) {
 	if (_flags & Property::IsProtected) ret.push_back(Property::toString(Property::IsProtected));
 	if (_flags & Property::HasInputError) ret.push_back(Property::toString(Property::HasInputError));
 	if (_flags & Property::HasMultipleValues) ret.push_back(Property::toString(Property::HasMultipleValues));
+	if (_flags & Property::IsDeletable) ret.push_back(Property::toString(Property::IsDeletable));
 	if (_flags & Property::AllowCustomValues) ret.push_back(Property::toString(Property::AllowCustomValues));
 	if (_flags & Property::AllowMultiselection) ret.push_back(Property::toString(Property::AllowMultiselection));
 	return ret;
