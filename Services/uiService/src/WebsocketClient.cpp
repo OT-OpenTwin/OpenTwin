@@ -83,10 +83,11 @@ WebsocketClient::WebsocketClient(const std::string &socketUrl) :
 
 	connect(&m_webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
 	connect(&m_webSocket, &QWebSocket::disconnected, this, &WebsocketClient::socketDisconnected);
-
+	connect(&m_webSocket, &QWebSocket::errorOccurred, this, &WebsocketClient::onErrorOccured);
+		
 	connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
 		this, &WebsocketClient::onSslErrors);
-
+	std::this_thread::sleep_for(std::chrono::seconds(4));
 	m_webSocket.open(QUrl(m_url));
 	OT_LOG_D("Websocket opened with state: " + stateAsString(m_webSocket.state()));
 }
@@ -113,6 +114,11 @@ void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 
 	// TODO: REMOVE THIS AFTER Qt UPDATE
 	m_webSocket.ignoreSslErrors();
+}
+
+void WebsocketClient::onErrorOccured(QAbstractSocket::SocketError error)
+{
+	OT_LOG_E("Websocket client detected error: " + m_webSocket.errorString().toStdString());
 }
 
 void WebsocketClient::onConnected()
@@ -260,7 +266,7 @@ bool WebsocketClient::ensureConnection(void)
 		{
 			// The relay service was probably not running when the connection was tried to establish
 			// Try to connect again
-			OT_LOG_D("Websocket retry to connect at: " + m_url.toString().toStdString());
+			OT_LOG_D("Websocket has state: " + stateAsString(socketState) + ". Retry to connect at: " + m_url.toString().toStdString());
 			m_webSocket.open(QUrl(m_url));
 		}
 		processMessages();

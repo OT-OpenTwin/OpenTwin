@@ -42,6 +42,8 @@ SocketServer::SocketServer(std::string socketIP, unsigned int socketPort) :
 
 	QString server_cert_file_path = QProcessEnvironment::systemEnvironment().value("OPEN_TWIN_SERVER_CERT", "");
 	QString server_key_file_path = QProcessEnvironment::systemEnvironment().value("OPEN_TWIN_SERVER_CERT_KEY", "");
+	OT_LOG_D("Using the server cert: " + server_cert_file_path.toStdString());
+	OT_LOG_D("Using the server key: " + server_key_file_path.toStdString());
 
 	QFile certFile(server_cert_file_path);
 	QFile keyFile(server_key_file_path);
@@ -57,16 +59,20 @@ SocketServer::SocketServer(std::string socketIP, unsigned int socketPort) :
 	sslConfiguration.setPrivateKey(sslKey);
 	m_pWebSocketServer->setSslConfiguration(sslConfiguration);
 	
-
-
 	if (m_pWebSocketServer->listen(serverAddress, socketPort))
 	{
 		OT_LOG_I("Websocket server listening on: " + socketIP + ":" + std::to_string(socketPort));
+		
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &SocketServer::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &SocketServer::closed);
 		connect(m_pWebSocketServer, &QWebSocketServer::sslErrors,
 			this, &SocketServer::onSslErrors);
     }
+	if (m_pWebSocketServer->hasPendingConnections())
+	{
+		OT_LOG_D("Websocket server had connection pending and slot did not took care of it");
+		onNewConnection();
+	}
 }
 
 void SocketServer::onSslErrors(const QList<QSslError> & _errors)

@@ -30,6 +30,7 @@ private Q_SLOTS:
 	void onMessageReceived(QString message);
 	void socketDisconnected();
 	void onSslErrors(const QList<QSslError> &errors);
+	void onErrorOccured(QAbstractSocket::SocketError error);
 
 private:
 	void processMessages();	
