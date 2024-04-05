@@ -194,6 +194,7 @@ private:
 
 	//NOTE, debug only this variable contains the IP address that is used for the services 
 	
+	bool										m_relayIsDebug;
 	std::map<std::string, bool>					m_serviceDebugList;
 	std::map<std::string,
 		std::vector<ot::ServiceBase> *>			m_mandatoryServicesMap;				//! Map containing all names of mandatory services for each session type

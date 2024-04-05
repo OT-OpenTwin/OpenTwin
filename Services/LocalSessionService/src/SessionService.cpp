@@ -37,7 +37,8 @@ void logMessage(const std::string &msg);
 size_t writeFunction(void *, size_t, size_t, std::string*);
 
 SessionService::SessionService() 
-	: m_globalSessionService(nullptr), m_globalDirectoryService(nullptr), m_id(ot::invalidServiceID)
+	: m_globalSessionService(nullptr), m_globalDirectoryService(nullptr), m_id(ot::invalidServiceID),
+	m_relayIsDebug(false)
 {
 	m_globalDirectoryService = new GlobalDirectoryService(this);
 
@@ -328,7 +329,7 @@ bool SessionService::runServiceInDebug(const std::string& _serviceName, const st
 }
 
 bool SessionService::runRelayService(Session * _session, std::string & _websocketURL, std::string& _serviceURL) {
-	if (isServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService)) {
+	if (m_relayIsDebug) {
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" in debug mode");
 		char * buffer = nullptr;
 		size_t bufferSize = 0;
@@ -800,20 +801,27 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 
 std::string SessionService::handleEnableServiceDebug(ot::JsonDocument& _commandDoc) {
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
-	// Check if the provided services is contained in the mandatory services list
-	bool found = false;
-	for (auto sessionType : m_mandatoryServicesMap) {
-		for (auto serviceType : *sessionType.second) {
-			if (serviceType.serviceName() == serviceName) {
-				found = true;
-				break;
-			}
-		}
-		if (found) break;
-	}
-	if (!found) return OT_ACTION_RETURN_INDICATOR_Error "The specified service is not contained in the mandatory services list";
 
-	m_serviceDebugList.insert_or_assign(serviceName, true);
+	// Check if the service is the relay service
+	if (serviceName == OT_INFO_SERVICE_TYPE_RelayService) {
+		m_relayIsDebug = true;
+	}
+	else {
+		// Check if the provided services is contained in the mandatory services list
+		bool found = false;
+		for (auto sessionType : m_mandatoryServicesMap) {
+			for (auto serviceType : *sessionType.second) {
+				if (serviceType.serviceName() == serviceName) {
+					found = true;
+					break;
+				}
+			}
+			if (found) break;
+		}
+		if (!found) return OT_ACTION_RETURN_INDICATOR_Error "The specified service is not contained in the mandatory services list";
+		
+		m_serviceDebugList.insert_or_assign(serviceName, true);
+	}
 	OT_LOG_D("Enabled the debug mode for the service \"" + serviceName  + "\"");
 
 	return OT_ACTION_RETURN_VALUE_OK;
@@ -821,7 +829,12 @@ std::string SessionService::handleEnableServiceDebug(ot::JsonDocument& _commandD
 
 std::string SessionService::handleDisableServiceDebug(ot::JsonDocument& _commandDoc) {
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
-	m_serviceDebugList.erase(serviceName);
+	if (serviceName == OT_INFO_SERVICE_TYPE_RelayService) {
+		m_relayIsDebug = false;
+	}
+	else {
+		m_serviceDebugList.erase(serviceName);
+	}
 	OT_LOG_D("Disabled the debug mode for the service \"" + serviceName + "\"");
 
 	return OT_ACTION_RETURN_VALUE_OK;
