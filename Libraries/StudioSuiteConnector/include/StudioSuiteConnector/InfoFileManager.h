@@ -13,9 +13,12 @@ public:
 	~InfoFileManager() {};
 
 	std::string getTriangleHash(const std::string& shapeName);
-
+	std::string getRunIDMetaHash(int runID);
+	std::string getRunIDFileHash(int runID, const std::string& fileName);
+	size_t getNumberOfFilesForRunID(int runID);
 
 private:
 	std::map<std::string, std::string> triangleHashMap;
-
+	std::map<int, std::string> runIdMetaHash;
+	std::map<int, std::map<std::string, std::string>> runIdToFileNameToHash;
 };

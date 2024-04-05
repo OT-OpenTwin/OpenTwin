@@ -1,4 +1,5 @@
 #include "StudioSuiteConnector/Result1DRunIDContainer.h"
+#include "StudioSuiteConnector/InfoFileManager.h"
 
 #include <filesystem>
 #include <sstream>
@@ -154,4 +155,33 @@ void Result1DRunIDContainer::calculateMetaDataHash()
 	hashCalculator.addData(data.str().c_str(), data.str().size());
 
 	metaHashValue = hashCalculator.result().toHex().toStdString();
+}
+
+bool Result1DRunIDContainer::hasChanged(int runID, InfoFileManager& infoFileManager)
+{
+	// First, we compare the meta data and the number of files
+	if (getMetaDataHash() != infoFileManager.getRunIDMetaHash(runID))
+	{
+		return true;
+	}
+
+	if (getNumberFiles() != infoFileManager.getNumberOfFilesForRunID(runID))
+	{
+		return true;
+	}
+
+	// There was no obvious change, so we need to compare all file hashes
+	for (auto item : fileNameToDataMap)
+	{
+		std::string fileName = item.first;
+		std::string hash     = item.second->getDataHash();
+
+		if (infoFileManager.getRunIDFileHash(runID, fileName) != hash)
+		{
+			return true;
+		}
+	}
+
+	// There was no change in data detected
+	return false;
 }

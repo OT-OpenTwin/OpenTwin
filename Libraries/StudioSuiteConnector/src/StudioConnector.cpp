@@ -368,7 +368,7 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 	script << "        else:\n";
 	script << "            runIds = [0]\n";
 	script << "        for id in runIds : \n";
-	script << "            data = project.get_3d().get_result_item(item, 0, False)\n";
+	script << "            data = project.get_3d().get_result_item(item, id, False)\n";
 	script << "            exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
 	script << "            os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
 	script << "            f = open(exportFileName, 'w')\n";

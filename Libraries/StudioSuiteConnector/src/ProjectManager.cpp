@@ -321,6 +321,11 @@ void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileMa
 	// Otherwise, only the new run-ids need to be uploaded (added).
 	std::list<int> changedRunIds = checkForChangedData(runIds, uploadDirectory, result1DData, infoFileManager);
 
+	if (changedRunIds.empty())
+	{
+		return; // There is no change, we don't need to do anything here
+	}
+
 	bool appendData = (changedRunIds.size() < runIds.size());
 
 	// Create a zip archive of the to-be uploaded run-ids (including the cache information)
@@ -430,10 +435,21 @@ std::list<int> ProjectManager::checkForChangedData(std::list<int> &allRunIds, co
 {
 	std::list<int> changedRunIds;
 
-	// TODO: Check which runids have really changed (in case that there is a change, all runids are returned again, since a full upload will be performed
-	// For this, we can use the current information about the results in the result1DData object as well as the previous information stored in infoFileManager
-	changedRunIds = allRunIds;
+	for (int runID : allRunIds)
+	{
+		// Here we check whether this runID has changed
+		bool hasChanged = false;
 
+		Result1DRunIDContainer* container = result1DData.getRunContainer(runID);
+		assert(container != nullptr);
+		if (container == nullptr) break;
+
+		if (container->hasChanged(runID, infoFileManager))
+		{
+			changedRunIds.push_back(runID);
+		}
+	}
+		
 	return changedRunIds;
 }
 

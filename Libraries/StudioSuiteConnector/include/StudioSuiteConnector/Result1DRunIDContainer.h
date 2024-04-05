@@ -6,6 +6,8 @@
 
 #include "StudioSuiteConnector/Result1DFileData.h"
 
+class InfoFileManager;
+
 class Result1DRunIDContainer
 {
 public:
@@ -18,6 +20,8 @@ public:
 	size_t getSize();
 	size_t getNumberFiles();
 	std::string getMetaDataHash();
+
+	bool hasChanged(int runID, InfoFileManager& infoFileManager);
 
 private:
 	void calculateMetaDataHash();

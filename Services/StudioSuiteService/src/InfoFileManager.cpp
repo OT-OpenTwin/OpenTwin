@@ -15,6 +15,8 @@ void InfoFileManager::readInformation()
 {
 	shapeHashMap.clear();
 	deletedShapes.clear();
+	runIdMetaHash.clear();
+	runIdToFileNameToHash.clear();
 	hasChanged = false;
 	infoEntityID = 0;
 	infoEntityVersion = 0;
@@ -35,27 +37,64 @@ void InfoFileManager::readInformation()
 			std::stringstream dataContent;
 			dataContent.write(fileEntity->getData()->getData().data(), size);
 
-			std::string line;
-			std::getline(dataContent, line);
-			size_t numberItems = atoll(line.c_str());
-
-			for (size_t index = 0; index < numberItems; index++)
+			try
 			{
-				std::string name, hash;
+				std::string line;
 
-				std::getline(dataContent, name);
-				std::getline(dataContent, hash);
+				// Now read the information about the shape triangle hashes
+				std::getline(dataContent, line);
+				if (line.empty()) throw std::out_of_range("error reading number of shapes");
+				size_t numberShapes = atoll(line.c_str());
 
-				if (!name.empty() && !hash.empty())
+				for (size_t index = 0; index < numberShapes; index++)
 				{
+					std::string name, hash;
+
+					std::getline(dataContent, name);
+					std::getline(dataContent, hash);
+
+					if (name.empty() || hash.empty()) throw std::out_of_range("error reading shape information");
+
 					shapeHashMap[name] = hash;
 				}
 
-				if (dataContent.eof())
+				// Next, read the information about the 1d results
+				std::getline(dataContent, line);
+				if (line.empty()) throw std::out_of_range("error reading number of 1d results");
+				size_t numberRunIDs = atoll(line.c_str());
+
+				for (size_t index = 0; index < numberRunIDs; index++)
 				{
-					assert(0);
-					break;
+					std::getline(dataContent, line);
+					if (line.empty()) throw std::out_of_range("error reading run id");
+					int runID = atoi(line.c_str());
+
+					std::string metaHashValue;
+					std::getline(dataContent, metaHashValue);
+					if (metaHashValue.empty()) throw std::out_of_range("error reading meta hash value");
+
+					runIdMetaHash[runID] = metaHashValue;
+
+					std::getline(dataContent, line);
+					if (line.empty()) throw std::out_of_range("error reading number of files");
+					size_t numberOfFiles = atoll(line.c_str());
+
+					for (size_t fileIndex = 0; fileIndex < numberOfFiles; fileIndex++)
+					{
+						std::string name, hash;
+
+						std::getline(dataContent, name);
+						std::getline(dataContent, hash);
+
+						if (name.empty() || hash.empty()) throw std::out_of_range("error result 1d file information");
+
+						runIdToFileNameToHash[runID][name] = hash;
+					}
 				}
+			}
+			catch (std::exception)
+			{
+				assert(0);
 			}
 
 			delete fileEntity;
