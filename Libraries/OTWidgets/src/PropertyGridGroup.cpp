@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyGroup.h"
+#include "OTGui/FillPainter2D.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/Painter2DFactory.h"
@@ -24,21 +25,27 @@ namespace ot {
 }
 
 ot::PropertyGridGroup::PropertyGridGroup() 
-	: m_isAlternate(false), m_groupBrush(QColor(Qt::white)), m_groupAlternateBrush(QColor(Qt::white))
+	: m_isAlternate(false), m_groupBrush(QColor(Qt::white)), m_groupAlternateBrush(QColor(235, 235, 235))
 {
+	m_painter = new FillPainter2D(Color::White);
+	m_alternatePainter = new FillPainter2D(Color(235, 235, 235));
+
 	this->setFlags(this->flags() & (~Qt::ItemIsSelectable));
 	this->slotColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 ot::PropertyGridGroup::~PropertyGridGroup() {
+	delete m_painter;
+	delete m_alternatePainter;
+
 	this->disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_name = _group->name();
-	m_groupBrush = Painter2DFactory::brushFromPainter2D(_group->backgroundPainter());
-	m_groupAlternateBrush = Painter2DFactory::brushFromPainter2D(_group->alternateBackgroundPainter());
+	this->setPainter(_group->backgroundPainter()->createCopy());
+	this->setAlternatePainter(_group->alternateBackgroundPainter()->createCopy());
 
 	this->setText(intern::pgcTitle, QString::fromStdString(_group->title()));
 
@@ -55,7 +62,9 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(void) const {
 	PropertyGroup* newGroup = new PropertyGroup;
 	newGroup->setName(this->getName());
 	newGroup->setTitle(this->getTitle().toStdString());
-	
+	newGroup->setBackgroundPainter(m_painter->createCopy());
+	newGroup->setAlternateBackgroundPainter(m_alternatePainter->createCopy());
+
 	std::list<Property*> p;
 	for (const PropertyGridItem* i : this->childProperties()) {
 		OTAssertNullptr(i->getInput());
@@ -98,6 +107,21 @@ void ot::PropertyGridGroup::setTitle(const QString& _title) {
 
 QString ot::PropertyGridGroup::getTitle(void) const {
 	return this->text(0);
+}
+
+void ot::PropertyGridGroup::setPainter(Painter2D* _painter) {
+	if (m_painter == _painter || !_painter) return;
+	if (m_painter) delete m_painter;
+	m_painter = _painter;
+	m_groupBrush = Painter2DFactory::brushFromPainter2D(m_painter);
+}
+
+void ot::PropertyGridGroup::setAlternatePainter(Painter2D* _painter) {
+	if (m_alternatePainter == _painter || !_painter) return;
+	if (m_alternatePainter) delete m_alternatePainter;
+	m_alternatePainter = _painter;
+	m_groupBrush = Painter2DFactory::brushFromPainter2D(m_painter);
+	m_groupAlternateBrush = Painter2DFactory::brushFromPainter2D(m_alternatePainter);
 }
 
 void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {

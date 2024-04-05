@@ -17,6 +17,7 @@
 
 namespace ot {
 
+	class Painter2D;
 	class PropertyGridItem;
 
 	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public QTreeWidgetItem {
@@ -41,8 +42,11 @@ namespace ot {
 
 		void addProperty(PropertyGridItem* _item);
 
-		void setGroupBrush(const QBrush& _brush) { m_groupBrush = _brush; };
+		void setPainter(Painter2D* _painter);
+		void setAlternatePainter(Painter2D* _painter);
+
 		const QBrush& groupBrush(void) const { return m_groupBrush; };
+		const QBrush& alternateGroupBrush(void) const { return m_groupAlternateBrush; };
 
 		PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
 		std::list<PropertyGridItem*> childProperties(void) const;
@@ -65,7 +69,9 @@ namespace ot {
 		bool m_isAlternate;
 		std::string m_name;
 		QBrush m_groupBrush;
+		Painter2D* m_painter;
 		QBrush m_groupAlternateBrush;
+		Painter2D* m_alternatePainter;
 	};
 
 }

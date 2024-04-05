@@ -93,3 +93,11 @@ void ot::ColorStyleValue::setPainter(Painter2D* _painter) {
 void ot::ColorStyleValue::setPainter(const Painter2D* _painter) {
 	this->setPainter(_painter->createCopy());
 }
+
+void ot::ColorStyleValue::setColor(Color _color) {
+	this->setPainter(new FillPainter2D(_color));
+}
+
+void ot::ColorStyleValue::setColor(Color::DefaultColor _color) {
+	this->setPainter(new FillPainter2D(_color));
+}

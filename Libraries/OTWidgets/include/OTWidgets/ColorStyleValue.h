@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -59,6 +60,9 @@ namespace ot {
 		void setPainter(Painter2D* _painter);
 		void setPainter(const Painter2D* _painter);
 		Painter2D* painter(void) const { return m_painter; };
+
+		void setColor(Color _color);
+		void setColor(Color::DefaultColor _color);
 
 	private:
 		std::string m_name;

@@ -21,12 +21,12 @@ ot::GlobalColorStyle& ot::GlobalColorStyle::instance(void) {
 }
 
 void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
-	if (_style.colorStyleName().empty()) {
-		OT_LOG_E("Color style name may not be empty");
-		return;
-	}
 	if (!_replace && this->hasStyle(_style.colorStyleName())) {
 		OT_LOG_E("Color style already exists (Name: \"" + _style.colorStyleName() + "\")");
+	}
+
+	if (_style.colorStyleName().empty()) {
+		m_emptyStyle = _style;
 	}
 
 	m_styles.insert_or_assign(_style.colorStyleName(), _style);

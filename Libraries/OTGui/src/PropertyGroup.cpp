@@ -116,11 +116,17 @@ void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	ConstJsonObject bObj = json::getObject(_object, "BPainter");
 	Painter2D* newPainter = SimpleFactory::instance().createType<Painter2D>(bObj);
-	if (newPainter) { this->setBackgroundPainter(newPainter); }
+	if (newPainter) { 
+		newPainter->setFromJsonObject(bObj);
+		this->setBackgroundPainter(newPainter); 
+	}
 
 	ConstJsonObject abObj = json::getObject(_object, "ABPainter");
 	Painter2D* newAlternatePainter = SimpleFactory::instance().createType<Painter2D>(abObj);
-	if (newAlternatePainter) { this->setAlternateBackgroundPainter(newAlternatePainter); }
+	if (newAlternatePainter) { 
+		newAlternatePainter->setFromJsonObject(abObj);
+		this->setAlternateBackgroundPainter(newAlternatePainter); 
+	}
 }
 
 void ot::PropertyGroup::setProperties(const std::list<Property*>& _properties)
@@ -165,6 +171,7 @@ void ot::PropertyGroup::setBackgroundColor(const Color& _color) {
 }
 
 void ot::PropertyGroup::setBackgroundPainter(Painter2D* _painter) {
+	if (!_painter) return;
 	if (m_backgroundPainter && m_backgroundPainter != _painter) delete m_backgroundPainter;
 	m_backgroundPainter = _painter;
 }
@@ -174,6 +181,7 @@ void ot::PropertyGroup::setAlternateBackgroundColor(const Color& _color) {
 }
 
 void ot::PropertyGroup::setAlternateBackgroundPainter(Painter2D* _painter) {
+	if (!_painter) return;
 	if (m_alternateBackgroundPainter && m_alternateBackgroundPainter != _painter) delete m_alternateBackgroundPainter;
 	m_alternateBackgroundPainter = _painter;
 }

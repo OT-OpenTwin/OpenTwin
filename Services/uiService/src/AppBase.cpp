@@ -258,6 +258,75 @@ int AppBase::run() {
 		ot::GlobalColorStyle::instance().setApplication(uiAPI::getApplication());
 		ot::GlobalColorStyle::instance().scanForStyleFiles();
 
+		ot::ColorStyle cs = ot::GlobalColorStyle::instance().getCurrentStyle();
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsBackground);
+			val.setColor(ot::Color::White);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsBorderColor);
+			val.setColor(ot::Color::Black);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsForeground);
+			val.setColor(ot::Color::Black);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsHoverBackground);
+			val.setColor(ot::Color::Blue);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsHoverForeground);
+			val.setColor(ot::Color::White);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsSelectedBackground);
+			val.setColor(ot::Color::Lime);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_ControlsSelectedForeground);
+			val.setColor(ot::Color::Black);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_TitleBackground);
+			val.setColor(ot::Color::Gray);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_TitleForeground);
+			val.setColor(ot::Color::Black);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_WindowBackground);
+			val.setColor(ot::Color::LightGray);
+			cs.addValue(val);
+		}
+		{
+			ot::ColorStyleValue val;
+			val.setName(OT_COLORSTYLE_VALUE_WindowForeground);
+			val.setColor(ot::Color::Black);
+			cs.addValue(val);
+		}
+		ot::GlobalColorStyle::instance().addStyle(cs, true);
+
 		if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
 			//ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
 		}
