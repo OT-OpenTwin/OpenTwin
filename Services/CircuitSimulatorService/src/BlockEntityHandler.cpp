@@ -322,21 +322,49 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 
 		std::vector<double> xValues;
 	
-
+		if (simulationType == ".dc")
+		{
+			for (auto it : resultVectors)
+			{
+				if (it.first == "v-sweep")
+				{
+					xValues = it.second;
+					resultVectors.erase("v-sweep");
+					break;
+				}
+			}
+		}
+		else if (simulationType == ".TRAN")
+		{
+			for (auto it : resultVectors)
+			{
+				if (it.first == "time")
+				{
+					xValues = it.second;
+					resultVectors.erase("time");
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (auto it : resultVectors)
+			{
+				if (it.first == "frequency")
+				{
+					xValues = it.second;
+					resultVectors.erase("frequency");
+					break;
+				}
+			}
+		}
+			
 		
 
 		//First i try to find the xValues of the Curve and that are the sweep 
 		//Then i fill my vector with it and erase it out of the map
 
-		for (auto it : resultVectors)
-		{
-			if (it.first == "v-sweep")
-			{
-				xValues = it.second;
-				resultVectors.erase("v-sweep");
-				break;
-			}
-		}
+		
 
 		//Now i try to find the branch and erase it too
 		auto it = resultVectors.find("v1#branch");
@@ -349,10 +377,38 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 		// No i want to get the node vectors of voltage and for each of them i create a curve
 		for (auto it : resultVectors)
 		{
-			const std::string curveName = it.first;
-			const std::string fullCurveName = _curveFolderPath + "/" + curveName;
+			std::string curveName;
+			std::string fullCurveName;
+			EntityResult1DCurve* curve;
+			if (simulationType == ".dc")
+			{
+				curveName = it.first + "-DC";
+				fullCurveName = _curveFolderPath + "/" + curveName;
+				std::string xLabel = "sweep";
+				std::string xUnit = "V";
+				std::string yUnit = "V";
+				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, it.first, yUnit, colorID, true);
+			}
+			else if (simulationType == ".TRAN")
+			{
+				curveName = it.first + "-TRAN";
+				fullCurveName = _curveFolderPath + "/" + curveName;
+				std::string xLabel = "time";
+				std::string xUnit = "ms";
+				std::string yUnit = "V";
+				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, it.first, yUnit, colorID, true);
+			}
+			else
+			{
+				curveName = it.first + "-AC";
+				fullCurveName = _curveFolderPath + "/" + curveName;
+				std::string xLabel = "frequency";
+				std::string xUnit = "hz";
+				std::string yUnit = "V";
+				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, it.first, yUnit, colorID, true);
+			}
 
-			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, "sweep", "V", it.first, "V", colorID, true);
+			
 			curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
 
 			topoEntID.push_back(curve->getEntityID());
