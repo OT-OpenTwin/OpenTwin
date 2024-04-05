@@ -4,6 +4,8 @@
 
 #include "RunIDContainer.h"
 
+class InfoFileManager;
+
 class Result1DManager
 {
 public:
@@ -11,8 +13,10 @@ public:
 	Result1DManager() = delete;
 	~Result1DManager();
 
+	void addResult1DInformation(InfoFileManager& infoFileManager);
+
 private:
 	size_t readIntegerFromBuffer(size_t &bufferIndex, char* dataBuffer, size_t dataBufferLength);
 
-	std::map<size_t, RunIDContainer*> runIDtoContainerMap;
+	std::map<int, RunIDContainer*> runIDtoContainerMap;
 };

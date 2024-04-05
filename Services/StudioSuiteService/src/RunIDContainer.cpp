@@ -1,5 +1,6 @@
 #include "RunIDContainer.h"
 #include "Result1DData.h"
+#include "InfoFileManager.h"
 
 #include <stdexcept>
 
@@ -18,11 +19,12 @@ RunIDContainer::~RunIDContainer()
 	fileNameToData.clear();
 }
 
-size_t RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t dataBufferLength)
+int RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t dataBufferLength)
 {
 	size_t runId              = readIntegerFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
 	size_t numberOfFiles      = readIntegerFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
-	std::string metaHashValue = readStringFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
+
+	metaHashValue             = readStringFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
 
 	for (size_t fileIndex = 0; fileIndex < numberOfFiles; fileIndex++)
 	{
@@ -37,7 +39,7 @@ size_t RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t da
 		fileNameToData[fileName] = resultData;
 	}
 
-	return runId;
+	return (int) runId;
 }
 
 size_t RunIDContainer::readIntegerFromBuffer(size_t& bufferIndex, char* dataBuffer, size_t dataBufferLength)
@@ -81,3 +83,16 @@ std::string RunIDContainer::readStringFromBuffer(size_t& bufferIndex, char* data
 
 	return value;
 }
+
+void RunIDContainer::addResult1DInformation(int runID, InfoFileManager& infoFileManager)
+{
+	// First, add the meta hash information for this runId
+	infoFileManager.setRunIDMetaHash(runID, metaHashValue);
+
+	// Now add the information for each file
+	for (auto file : fileNameToData)
+	{
+		infoFileManager.setRunIDFileHash(runID, file.first, file.second->getDataHashValue());
+	}
+}
+

@@ -143,6 +143,9 @@ void InfoFileManager::writeInformation()
 		dataContent << item.second << std::endl; // Write the hash
 	}
 
+	// Write the infromation about 1D results
+	writeResult1DInformation(dataContent);
+
 	dataEntity->setData(dataContent.str().c_str(), dataContent.str().length()+1);
 
 	// Store the entities
@@ -172,6 +175,53 @@ void InfoFileManager::addDeletedShapesToList(std::list<std::string>& list)
 
 void InfoFileManager::clearResult1D(void)
 {
+	hasChanged = true;
 
+	runIdMetaHash.clear();
+	runIdToFileNameToHash.clear();
+}
+
+void InfoFileManager::setRunIDMetaHash(int runID, const std::string& hash)
+{
+	hasChanged = true;
+
+	assert(runIdMetaHash.count(runID) == 0);
+	runIdMetaHash[runID] = hash;
+}
+
+void InfoFileManager::setRunIDFileHash(int runID, const std::string& fileName, const std::string& hash)
+{
+	hasChanged = true;
+
+	runIdToFileNameToHash[runID][fileName] = hash;
+}
+
+void InfoFileManager::writeResult1DInformation(std::stringstream& dataContent)
+{
+	// Write the number of RunIds
+	dataContent << runIdMetaHash.size() << std::endl;
+
+	// Now write the information for each runID
+	for (auto runID : runIdMetaHash)
+	{
+		// Write the runID
+		dataContent << runID.first << std::endl;
+
+		// Write the runID meta hash
+		dataContent << runID.second << std::endl;
+
+		// Write the number of files
+		dataContent << runIdToFileNameToHash[runID.first].size() << std::endl;
+
+		// Write the information for each file
+		for (auto file : runIdToFileNameToHash[runID.first])
+		{
+			// Write the file name
+			dataContent << file.first << std::endl;
+
+			// Write the file hash
+			dataContent << file.second << std::endl;
+		}
+	}
 }
 

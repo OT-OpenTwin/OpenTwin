@@ -197,6 +197,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
+    <ClCompile Include="src\ParametricResult1DManager.cpp" />
     <ClCompile Include="src\Result1DData.cpp" />
     <ClCompile Include="src\Result1DManager.cpp" />
     <ClCompile Include="src\RunIDContainer.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\InfoFileManager.h" />
+    <ClInclude Include="include\ParametricResult1DManager.h" />
     <ClInclude Include="include\Result1DData.h" />
     <ClInclude Include="include\Result1DManager.h" />
     <ClInclude Include="include\RunIDContainer.h" />

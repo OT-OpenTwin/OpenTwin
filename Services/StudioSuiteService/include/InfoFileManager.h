@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <sstream>
 
 #include "OTCore/CoreTypes.h"
 
@@ -24,13 +25,18 @@ public:
 	ot::UID getInfoEntityID() { return infoEntityID; }
 	ot::UID getInfoEntityVersion() { return infoEntityVersion; }
 	void clearResult1D(void);
-
+	void setRunIDMetaHash(int runID, const std::string& hash);
+	void setRunIDFileHash(int runID, const std::string& fileName, const std::string& hash);
 
 private:
+	void writeResult1DInformation(std::stringstream& dataContent);
+
 	Application* application;
 	bool hasChanged;
 	std::map<std::string, std::string> shapeHashMap;
 	std::list<std::string> deletedShapes;
 	ot::UID infoEntityID;
 	ot::UID infoEntityVersion;
+	std::map<int, std::string> runIdMetaHash;
+	std::map<int, std::map<std::string, std::string>> runIdToFileNameToHash;
 };

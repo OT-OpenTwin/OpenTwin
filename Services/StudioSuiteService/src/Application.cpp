@@ -33,6 +33,7 @@
 
 #include "InfoFileManager.h"
 #include "Result1DManager.h"
+#include "ParametricResult1DManager.h"
 
 #include "boost/algorithm/string.hpp"
 
@@ -724,6 +725,15 @@ void Application::shapeInformation(const std::string &content)
 
 void Application::result1D(bool appendData, std::string& data, size_t uncompressedDataLength)
 {
+	ParametricResult1DManager parametricResultManager;
+
+	if (!appendData)
+	{
+		// We need to clear the result1D information in the info file manager in case that we do not want to append
+		infoFileManager.clearResult1D();
+		parametricResultManager.clear();
+	}
+
 	// First, we need to decode the data back into a byte buffer
 	int decoded_compressed_data_length = Base64decode_len(data.c_str());
 	char* decodedCompressedString = new char[decoded_compressed_data_length];
@@ -747,20 +757,15 @@ void Application::result1D(bool appendData, std::string& data, size_t uncompress
 		// We need to process the buffer and read the data from it
 		Result1DManager resultManager(dataBuffer, uncompressedDataLength);
 
-		// We need to clear the result1D information in the info file manager in case that we do not want to append
-		infoFileManager.clearResult1D();
-
-		// Now we need to store the new hash information in the infoFileManager
-		// TODO
-
 		// We can now delete the buffer
 		delete[] dataBuffer;
 		dataBuffer = nullptr;
 
-		// And finally store the parametric data (either append or clear and re-add)
-		// TODO
+		// Now we need to store the new hash information in the infoFileManager
+		resultManager.addResult1DInformation(infoFileManager);
 
-
+		// And finally store (add) the parametric data. In case that the data is not appended, the storage was already cleared above
+		parametricResultManager.add(resultManager);
 	}
 	catch (std::exception)
 	{

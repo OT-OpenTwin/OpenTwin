@@ -12,7 +12,7 @@ Result1DManager::Result1DManager(char* dataBuffer, size_t dataBufferLength)
 	for (size_t runIndex = 0; runIndex < numberRunIds; runIndex++)
 	{
 		RunIDContainer* container = new RunIDContainer();
-		size_t runID = container->readData(bufferIndex, dataBuffer, dataBufferLength);
+		int runID = container->readData(bufferIndex, dataBuffer, dataBufferLength);
 
 		runIDtoContainerMap[runID] = container;
 	}
@@ -42,4 +42,12 @@ size_t Result1DManager::readIntegerFromBuffer(size_t &bufferIndex, char *dataBuf
 	}
 
 	return value;
+}
+
+void Result1DManager::addResult1DInformation(InfoFileManager& infoFileManager)
+{
+	for (auto item : runIDtoContainerMap)
+	{
+		item.second->addResult1DInformation(item.first, infoFileManager);
+	}
 }
