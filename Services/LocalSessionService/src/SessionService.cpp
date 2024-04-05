@@ -343,13 +343,9 @@ bool SessionService::runRelayService(Session * _session, std::string & _websocke
 
 		path.append("\\Deployment\\").append(OT_INFO_SERVICE_TYPE_RelayService).append(".cfg");
 
-		_serviceURL = m_ip;
-		assert(0); // determine new port (service started was removed!)
-		//_serviceURL.append(":" + std::to_string(m_serviceStarter.getPortManager()->determineAndBlockAvailablePort()));
+		_serviceURL = m_ip + ":" + std::to_string(ot::PortManager::instance().determineAndBlockAvailablePort());
 
-		_websocketURL = m_ip;
-		assert(0); // determine new port (service started was removed!)
-		//_websocketURL.append(":" + std::to_string(m_serviceStarter.getPortManager()->determineAndBlockAvailablePort()));
+		_websocketURL = m_ip + ":" + std::to_string(ot::PortManager::instance().determineAndBlockAvailablePort());
 
 		ot::JsonDocument startupParams;
 		startupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", startupParams.GetAllocator()), startupParams.GetAllocator());
