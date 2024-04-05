@@ -38,6 +38,8 @@ namespace ot {
 
 		virtual PropertyType getPropertyType(void) const override { return Property::Painter2DType; };
 
+		virtual Property* createCopy(void) const override;
+
 		//! @brief Set the painter for this property.
 		//! Object takes ownership of the painter.
 		void setPainter(Painter2D* _painter);

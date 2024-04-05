@@ -22,10 +22,11 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT PropertyGroup : public Serializable {
-		OT_DECL_NOCOPY(PropertyGroup)
 	public:
 		//! @brief Create empty group
 		PropertyGroup();
+
+		PropertyGroup(const PropertyGroup& _other);
 
 		//! @brief Create empty group with name and title
 		//! @param _name Will be set as name and title
@@ -36,6 +37,8 @@ namespace ot {
 		//! @param _title Group title
 		PropertyGroup(const std::string& _name, const std::string& _title);
 		virtual ~PropertyGroup();
+
+		PropertyGroup& operator = (const PropertyGroup& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -72,7 +75,9 @@ namespace ot {
 		//! This group takes ownership of the child.
 		void addChildGroup(PropertyGroup* _group);
 
-		PropertyGroup* findGroup(const std::string& _name);
+		PropertyGroup* findGroup(const std::string& _name) const;
+
+		void findPropertiesByContent(const std::string& _content, std::list<Property*>& _list) const;
 
 		void setBackgroundColor(Color::DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };

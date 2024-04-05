@@ -9,19 +9,20 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/WidgetViewCfg.h"
-
-#define OT_WIDGETTYPE_PropertyGridView "PropertyGridView"
+#include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
 
+	class Property;
 	class PropertyGroup;
 
-	class OT_GUI_API_EXPORT PropertyGridCfg : public ot::WidgetViewCfg {
-		OT_DECL_NOCOPY(PropertyGridCfg)
+	class OT_GUI_API_EXPORT PropertyGridCfg : public ot::Serializable {
 	public:
 		PropertyGridCfg();
+		PropertyGridCfg(const PropertyGridCfg& _other);
 		virtual ~PropertyGridCfg();
+
+		PropertyGridCfg& operator = (const PropertyGridCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -33,15 +34,15 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		virtual std::string getViewType(void) const override { return OT_WIDGETTYPE_PropertyGridView; };
-
 		PropertyGroup* defaultGroup(void) const { return m_defaultGroup; };
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);
 		void addRootGroup(PropertyGroup* _group);
 		const std::list<PropertyGroup*>& rootGroups(void) const { return m_rootGroups; };
-		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false);
+		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
+
+		std::list<Property*> findPropertiesByContent(const std::string& _content) const;
 
 	private:
 		void clear(void);

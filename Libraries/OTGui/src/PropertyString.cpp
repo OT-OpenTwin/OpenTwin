@@ -20,6 +20,17 @@ ot::PropertyString::PropertyString(const std::string& _name, const std::string& 
 	: Property(_name, _flags), m_value(_value), m_maxLength(0)
 {}
 
+ot::Property* ot::PropertyString::createCopy(void) const {
+	ot::PropertyString* newProp = new ot::PropertyString;
+	newProp->setFromOther(this);
+
+	newProp->setValue(this->value());
+	newProp->setPlaceholderText(this->placeholderText());
+	newProp->setMaxLength(this->maxLength());
+
+	return newProp;
+}
+
 void ot::PropertyString::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Value", JsonString(m_value, _allocator), _allocator);
 	_object.AddMember("Placeholder", JsonString(m_placeholderText, _allocator), _allocator);

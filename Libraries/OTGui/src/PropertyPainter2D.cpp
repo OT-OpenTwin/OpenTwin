@@ -48,6 +48,15 @@ ot::PropertyPainter2D::~PropertyPainter2D() {
 	m_painter = nullptr;
 }
 
+ot::Property* ot::PropertyPainter2D::createCopy(void) const {
+	ot::PropertyPainter2D* newProp = new ot::PropertyPainter2D;
+	newProp->setFromOther(this);
+
+	newProp->setPainter(this->getPainter()->createCopy());
+
+	return newProp;
+}
+
 void ot::PropertyPainter2D::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	OTAssertNullptr(m_painter);
 

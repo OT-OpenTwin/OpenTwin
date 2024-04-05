@@ -24,6 +24,17 @@ void ot::PropertyFilePath::addFilter(const FilterInfo& _info) {
 	m_filters.push_back(_info);
 }
 
+ot::Property* ot::PropertyFilePath::createCopy(void) const {
+	ot::PropertyFilePath* newProp = new ot::PropertyFilePath;
+	newProp->setFromOther(this);
+
+	newProp->setPath(this->path());
+	newProp->setBrowseMode(this->browseMode());
+	newProp->setFilters(this->filters());
+
+	return newProp;
+}
+
 void ot::PropertyFilePath::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Path", JsonString(m_path, _allocator), _allocator);
 	_object.AddMember("Mode", (bool)m_browseMode, _allocator);

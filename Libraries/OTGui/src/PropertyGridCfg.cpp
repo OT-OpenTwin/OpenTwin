@@ -11,8 +11,27 @@ ot::PropertyGridCfg::PropertyGridCfg() {
 	m_defaultGroup = new PropertyGroup;
 }
 
+ot::PropertyGridCfg::PropertyGridCfg(const PropertyGridCfg& _other) {
+	m_defaultGroup = new PropertyGroup;
+	*this = _other;
+}
+
 ot::PropertyGridCfg::~PropertyGridCfg() {
 	this->clear();
+}
+
+ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _other) {
+	m_defaultGroup->clear();
+	this->clear();
+
+	*m_defaultGroup = *_other.m_defaultGroup;
+
+	for (PropertyGroup* g : _other.m_rootGroups) {
+		PropertyGroup* ng = new PropertyGroup(*g);
+		this->addRootGroup(ng);
+	}
+
+	return *this;
 }
 
 void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
@@ -27,8 +46,6 @@ void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 		gArr.PushBack(gObj, _allocator);
 	}
 	_object.AddMember("Groups", gArr, _allocator);
-
-	WidgetViewCfg::addToJsonObject(_object, _allocator);
 }
 
 void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -44,8 +61,6 @@ void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 		newGroup->setFromJsonObject(gObj);
 		m_rootGroups.push_back(newGroup);
 	}
-
-	WidgetViewCfg::setFromJsonObject(_object);
 }
 
 void ot::PropertyGridCfg::setRootGroups(const std::list<PropertyGroup*>& _groups) {
@@ -59,7 +74,7 @@ void ot::PropertyGridCfg::addRootGroup(PropertyGroup* _group) {
 	m_rootGroups.push_back(_group);
 }
 
-ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) {
+ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) const {
 	for (PropertyGroup* g : m_rootGroups) {
 		if (g->name() == _name) return g;
 		if (_searchChildGroups) {
@@ -79,7 +94,15 @@ ot::PropertyGroup* ot::PropertyGridCfg::findOrCreateGroup(const std::string& _na
 	}
 
 	return g;
+}
 
+std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesByContent(const std::string& _content) const {
+	std::list<ot::Property*> ret;
+	m_defaultGroup->findPropertiesByContent(_content, ret);
+	for (PropertyGroup* g : m_rootGroups) {
+		g->findPropertiesByContent(_content, ret);
+	}
+	return ret;
 }
 
 void ot::PropertyGridCfg::clear(void) {

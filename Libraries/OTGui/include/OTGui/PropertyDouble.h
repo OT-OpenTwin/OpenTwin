@@ -20,6 +20,8 @@ namespace ot {
 
 		virtual PropertyType getPropertyType(void) const override { return Property::DoubleType; };
 
+		virtual Property* createCopy(void) const override;
+
 		void setValue(double _value) { m_value = _value; };
 		double value(void) const { return m_value; };
 

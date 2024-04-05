@@ -8,6 +8,15 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyColor.h"
 
+ot::Property* ot::PropertyColor::createCopy(void) const {
+	ot::PropertyColor* newProp = new ot::PropertyColor;
+	newProp->setFromOther(this);
+
+	newProp->setValue(this->value());
+
+	return newProp;
+}
+
 void ot::PropertyColor::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	JsonObject colorObj;
 	m_value.addToJsonObject(colorObj, _allocator);

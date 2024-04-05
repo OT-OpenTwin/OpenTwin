@@ -33,6 +33,8 @@ namespace ot {
 
 		virtual PropertyType getPropertyType(void) const override { return FilePathType; };
 
+		virtual Property* createCopy(void) const override;
+
 		void setPath(const std::string& _path) { m_path = _path; };
 		const std::string& path(void) const { return m_path; };
 

@@ -17,6 +17,13 @@ ot::PropertyGroup::PropertyGroup()
 	m_alternateBackgroundPainter = new FillPainter2D(Color(235, 235, 235));
 }
 
+ot::PropertyGroup::PropertyGroup(const PropertyGroup& _other) {
+	m_backgroundPainter = new FillPainter2D(Color(255, 255, 255));
+	m_alternateBackgroundPainter = new FillPainter2D(Color(235, 235, 235));
+
+	*this = _other;
+}
+
 ot::PropertyGroup::PropertyGroup(const std::string& _name)
 	: m_name(_name), m_title(_name)
 {
@@ -37,6 +44,25 @@ ot::PropertyGroup::~PropertyGroup() {
 	for (auto itm : p) delete itm;
 	if (m_backgroundPainter) delete m_backgroundPainter;
 	if (m_alternateBackgroundPainter) delete m_alternateBackgroundPainter;
+}
+
+ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
+	this->clear();
+
+	m_name = _other.m_name;
+	m_title = _other.m_title;
+	this->setBackgroundPainter(_other.m_backgroundPainter->createCopy());
+	this->setAlternateBackgroundPainter(_other.m_alternateBackgroundPainter->createCopy());
+
+	for (Property* p : _other.m_properties) {
+		this->addProperty(p->createCopy());
+	}
+	for (PropertyGroup* g : _other.m_childGroups) {
+		PropertyGroup* ng = new PropertyGroup(*g);
+		this->addChildGroup(ng);
+	}
+
+	return *this;
 }
 
 void ot::PropertyGroup::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
@@ -114,13 +140,24 @@ void ot::PropertyGroup::addChildGroup(PropertyGroup* _group) {
 	m_childGroups.push_back(_group);
 }
 
-ot::PropertyGroup* ot::PropertyGroup::findGroup(const std::string& _name) {
+ot::PropertyGroup* ot::PropertyGroup::findGroup(const std::string& _name) const {
 	for (PropertyGroup* g : m_childGroups) {
 		if (g->name() == _name) return g;
 		PropertyGroup* c = g->findGroup(_name);
 		if (c) return c;
 	}
 	return nullptr;
+}
+
+void ot::PropertyGroup::findPropertiesByContent(const std::string& _content, std::list<Property*>& _list) const {
+	for (Property* p : m_properties) {
+		if (p->content() == _content) {
+			_list.push_back(p);
+		}
+	}
+	for (PropertyGroup* g : m_childGroups) {
+		g->findPropertiesByContent(_content, _list);
+	}
 }
 
 void ot::PropertyGroup::setBackgroundColor(const Color& _color) {

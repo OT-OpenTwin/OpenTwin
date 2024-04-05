@@ -8,6 +8,15 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyDirectory.h"
 
+ot::Property* ot::PropertyDirectory::createCopy(void) const {
+	ot::PropertyDirectory* newProp = new ot::PropertyDirectory;
+	newProp->setFromOther(this);
+
+	newProp->setPath(this->path());
+
+	return newProp;
+}
+
 void ot::PropertyDirectory::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Path", JsonString(m_path, _allocator), _allocator);
 }

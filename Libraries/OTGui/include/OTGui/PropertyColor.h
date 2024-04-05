@@ -21,6 +21,8 @@ namespace ot {
 
 		virtual PropertyType getPropertyType(void) const override { return Property::ColorType; };
 
+		virtual Property* createCopy(void) const override;
+
 		void setValue(ot::Color _value) { m_value = _value; };
 		ot::Color value(void) const { return m_value; };
 

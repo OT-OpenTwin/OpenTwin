@@ -20,9 +20,35 @@ ot::PropertyStringList::PropertyStringList(const std::string& _current, const st
 	: Property(_flags), m_current(_current), m_list(_list) 
 {}
 
+ot::PropertyStringList::PropertyStringList(const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags)
+	: Property(_flags), m_current(_current)
+{
+	for (const std::string& s : _list) {
+		m_list.push_back(s);
+	}
+}
+
 ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags)
 	: Property(_name, _flags), m_current(_current), m_list(_list)
 {}
+
+ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags)
+	: Property(_name, _flags), m_current(_current)
+{
+	for (const std::string& s : _list) {
+		m_list.push_back(s);
+	}
+}
+
+ot::Property* ot::PropertyStringList::createCopy(void) const {
+	ot::PropertyStringList* newProp = new ot::PropertyStringList;
+	newProp->setFromOther(this);
+
+	newProp->setCurrent(this->current());
+	newProp->setList(this->list());
+
+	return newProp;
+}
 
 void ot::PropertyStringList::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("List", JsonArray(m_list, _allocator), _allocator);

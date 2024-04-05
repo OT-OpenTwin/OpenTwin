@@ -11,6 +11,7 @@
 // std header
 #include <list>
 #include <string>
+#include <vector>
 
 namespace ot {
 
@@ -20,10 +21,14 @@ namespace ot {
 		PropertyStringList(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyStringList(const std::string& _current, PropertyFlags _flags = PropertyFlags::NoFlags) ;
 		PropertyStringList(const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyStringList(const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~PropertyStringList() {};
 
 		virtual PropertyType getPropertyType(void) const override { return Property::StringListType; };
+
+		virtual Property* createCopy(void) const override;
 
 		void setList(const std::list<std::string>& _values) { m_list = _values; };
 		std::list<std::string>& list(void) { return m_list; };

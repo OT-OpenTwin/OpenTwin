@@ -63,6 +63,8 @@ namespace ot {
 
 		virtual PropertyType getPropertyType(void) const = 0;
 
+		virtual Property* createCopy(void) const = 0;
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
 		//! @param _allocator Allocator
@@ -92,7 +94,12 @@ namespace ot {
 		PropertyFlags propertyFlags(void) const { return m_flags; };
 		PropertyFlags& propertyFlags(void) { return m_flags; };
 
+		void setContent(const std::string& _content) { m_content = _content; };
+		const std::string& content(void) const { return m_content; };
+
 	protected:
+		void setFromOther(const Property* _other);
+
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
 		//! @param _object Json object reference
@@ -108,6 +115,7 @@ namespace ot {
 		std::string m_tip;
 		std::string m_name;
 		std::string m_title;
+		std::string m_content;
 		PropertyFlags m_flags;
 	};
 
