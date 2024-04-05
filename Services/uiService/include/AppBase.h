@@ -491,8 +491,8 @@ private Q_SLOTS:
 
 	// Private: Property grid slots
 
-	void slotPropertyGridValueChanged(const std::string& _itemName);
-	void slotPropertyGridValueDeleteRequested(const std::string& _itemName);
+	void slotPropertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	void slotPropertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

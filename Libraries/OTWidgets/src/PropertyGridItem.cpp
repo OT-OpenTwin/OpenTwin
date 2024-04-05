@@ -31,6 +31,8 @@ bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 	m_input = PropertyInputFactory::createInput(_config);
 	m_isDeleteable = _config->propertyFlags() & Property::IsDeletable;
 	
+	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
+
 	return true;
 }
 

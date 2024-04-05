@@ -2651,18 +2651,17 @@ void AppBase::slotOutputContextMenuItemClicked() {
 
 // Private: Property grid slots
 
-void AppBase::slotPropertyGridValueChanged(const std::string& _itemName) {
+void AppBase::slotPropertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) {
 	// We first ask the viewer whether it needs to handle the property grid change.
-	/*if (!m_viewerComponent->propertyGridValueChanged(_id))
+	if (!m_viewerComponent->propertyGridValueChanged(_groupName, _itemName))
 	{
 		// If not, we pass thic change on to the external services component
-		m_ExternalServicesComponent->propertyGridValueChanged(_id);
+		m_ExternalServicesComponent->propertyGridValueChanged(_groupName, _itemName);
 	}
-	*/
 }
 
-void AppBase::slotPropertyGridValueDeleteRequested(const std::string& _itemName) {
-	//m_ExternalServicesComponent->propertyGridValueDeleted(_id);
+void AppBase::slotPropertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
+	m_ExternalServicesComponent->propertyGridValueDeleted(_groupName, _itemName);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
