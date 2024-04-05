@@ -114,6 +114,15 @@ void ot::PropertyGroup::addChildGroup(PropertyGroup* _group) {
 	m_childGroups.push_back(_group);
 }
 
+ot::PropertyGroup* ot::PropertyGroup::findGroup(const std::string& _name) {
+	for (PropertyGroup* g : m_childGroups) {
+		if (g->name() == _name) return g;
+		PropertyGroup* c = g->findGroup(_name);
+		if (c) return c;
+	}
+	return nullptr;
+}
+
 void ot::PropertyGroup::setBackgroundColor(const Color& _color) {
 	this->setBackgroundPainter(new FillPainter2D(_color));
 }

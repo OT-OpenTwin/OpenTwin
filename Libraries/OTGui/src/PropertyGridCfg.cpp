@@ -59,6 +59,29 @@ void ot::PropertyGridCfg::addRootGroup(PropertyGroup* _group) {
 	m_rootGroups.push_back(_group);
 }
 
+ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) {
+	for (PropertyGroup* g : m_rootGroups) {
+		if (g->name() == _name) return g;
+		if (_searchChildGroups) {
+			PropertyGroup* c = g->findGroup(_name);
+			if (c) return c;
+		}
+	}
+	return nullptr;
+}
+
+ot::PropertyGroup* ot::PropertyGridCfg::findOrCreateGroup(const std::string& _name, bool _searchChildGroups) {
+	PropertyGroup* g = this->findGroup(_name, _searchChildGroups);
+	
+	if (!g) {
+		g = new PropertyGroup(_name);
+		this->addRootGroup(g);
+	}
+
+	return g;
+
+}
+
 void ot::PropertyGridCfg::clear(void) {
 	for (PropertyGroup* g : m_rootGroups) {
 		delete g;

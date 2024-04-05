@@ -40,6 +40,8 @@ namespace ot {
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);
 		void addRootGroup(PropertyGroup* _group);
 		const std::list<PropertyGroup*>& rootGroups(void) const { return m_rootGroups; };
+		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false);
+		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
 	private:
 		void clear(void);
