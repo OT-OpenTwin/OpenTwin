@@ -55,10 +55,9 @@ public:
 	virtual void setTreeItemText(ot::UID treeItemID, const std::string &text) override;
 	virtual void refreshSelection(void) override;
 	virtual void addKeyShortcut(const std::string &keySequence) override;
-	virtual void fillPropertyGrid(const std::string &settings) override;
-	virtual void setDoublePropertyValue(int itemID, double value) override;
-	virtual double getDoublePropertyValue(int itemID) override;
-	virtual int findItemID(const std::string &name) override;
+	virtual void fillPropertyGrid(const ot::PropertyGridCfg& configuration) override;
+	virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) override;
+	virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) override;
 	virtual void lockSelectionAndModification(bool flag) override;
 	virtual void removeViewer(ot::UID viewerID) override;
 
@@ -184,7 +183,7 @@ public:
 
 	void contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
-	bool propertyGridValueChanged(int itemID);
+	bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
 
 private:
 	std::vector<ViewerUIDtype>		m_viewers;

@@ -65,6 +65,7 @@
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/OnePropertyDialog.h"
 #include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/IconManager.h"
@@ -477,34 +478,6 @@ std::string ExternalServicesComponent::getCommonPropertiesAsJson(ModelUIDtype mo
 	}
 }
 
-void ExternalServicesComponent::setPropertiesFromJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList, std::string props, bool update, bool itemsVisible)
-{
-	try {
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, ot::JsonString(props, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, update, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
-		std::string response;
-
-		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-}
-
 // ###################################################################################################
 
 // Event handling
@@ -610,119 +583,19 @@ void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::str
 	}
 }
 
-void ExternalServicesComponent::propertyGridValueChanged(int itemID)
+void ExternalServicesComponent::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
 {
 	AppBase::instance()->lockPropertyGrid(true);
 
 	try {
-		std::string name = AppBase::instance()->getPropertyName(itemID).toStdString();
-
-		ot::JsonDocument doc;
-		doc.SetObject();
-
-		ot::JsonDocument::AllocatorType& allocator = doc.GetAllocator();
-
-		rapidjson::Value container(rapidjson::kObjectType);
-		rapidjson::Value jsonType(rapidjson::kStringType);
-
-		switch (AppBase::instance()->getPropertyType(itemID))
-		{
-		case ak::vtDouble:
-		{
-			jsonType.SetString("double");
-
-			rapidjson::Value jsonValue(rapidjson::kNumberType);
-			jsonValue.SetDouble(AppBase::instance()->getPropertyValueDouble(itemID));
-
-			container.AddMember("Value", jsonValue, allocator);
-		}
-		break;
-		case ak::vtInt:
-		{
-			jsonType.SetString("integer");
-
-			rapidjson::Value jsonValue(rapidjson::kNumberType);
-			jsonValue.SetInt64(AppBase::instance()->getPropertyValueInt(itemID));
-
-			container.AddMember("Value", jsonValue, allocator);
-		}
-		break;
-		case ak::vtBool:
-		{
-			jsonType.SetString("boolean");
-
-			rapidjson::Value jsonValue(rapidjson::kNumberType);
-			jsonValue.SetBool(AppBase::instance()->getPropertyValueBool(itemID));
-
-			container.AddMember("Value", jsonValue, allocator);
-		}
-		break;
-		case ak::vtString:
-		{
-			jsonType.SetString("string");
-
-			rapidjson::Value jsonValue(AppBase::instance()->getPropertyValueString(itemID).toStdString().c_str(), allocator);
-
-			container.AddMember("Value", jsonValue, allocator);
-		}
-		break;
-		case ak::vtSelection:
-		{
-			jsonType.SetString("selection");
-
-			rapidjson::Value jsonValue(AppBase::instance()->getPropertyValueSelection(itemID).toStdString().c_str(), allocator);
-
-			rapidjson::Value jsonOptions(rapidjson::kArrayType);
-
-			std::vector<QString> selection = AppBase::instance()->getPropertyPossibleSelection(itemID);
-			for (auto option : selection)
-			{
-				rapidjson::Value val(option.toStdString().c_str(), allocator);
-				jsonOptions.PushBack(val, allocator);;
-			}
-
-			container.AddMember("Options", jsonOptions, allocator);
-			container.AddMember("Value", jsonValue, allocator);
-		}
-		break;
-		case ak::vtColor:
-		{
-			jsonType.SetString("color");
-
-			rapidjson::Value jsonValueR(rapidjson::kNumberType);
-			rapidjson::Value jsonValueG(rapidjson::kNumberType);
-			rapidjson::Value jsonValueB(rapidjson::kNumberType);
-
-			ak::aColor color = AppBase::instance()->getPropertyValueColor(itemID);
-
-			jsonValueR.SetDouble(color.r() / 255.0);
-			jsonValueG.SetDouble(color.g() / 255.0);
-			jsonValueB.SetDouble(color.b() / 255.0);
-
-			container.AddMember("ValueR", jsonValueR, allocator);
-			container.AddMember("ValueG", jsonValueG, allocator);
-			container.AddMember("ValueB", jsonValueB, allocator);
-		}
-		break;
-		default:
-			assert(0); // Unknown type
+		ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupName, _itemName);
+		if (!itm) {
+			OT_LOG_E("Property not found");
 			return;
 		}
-
-		// Now create the Json string from the document and send it to the model
-
-		rapidjson::Value jsonMixed(rapidjson::kNumberType);
-		jsonMixed.SetBool(false);
-
-		rapidjson::Value jsonProtected(rapidjson::kNumberType);
-		jsonProtected.SetBool(!AppBase::instance()->getPropertyIsDeletable(itemID));
-
-		container.AddMember("Type", jsonType, allocator);
-		container.AddMember("MultipleValues", jsonMixed, allocator);
-		container.AddMember("Protected", jsonProtected, allocator);
-
-		doc.AddMember(rapidjson::Value::StringRefType(name.c_str()), container, allocator);
-
+		ot::PropertyInput* inp = itm->getInput();
+		OTAssertNullptr(inp);
+		
 		// Get the currently selected model entities. We first get all visible entities only.
 		std::list<ak::UID> selectedModelEntityIDs;
 		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
@@ -737,7 +610,28 @@ void ExternalServicesComponent::propertyGridValueChanged(int itemID)
 
 		// Finally send the string
 		ak::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
-		setPropertiesFromJson(modelID, selectedModelEntityIDs, doc.toJson(), true, itemsVisible);
+		
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, false, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
+
+		inp->addPropertyInputValueToJson(doc, OT_ACTION_PARAM_Value, doc.GetAllocator());
+
+		std::string response;
+
+		for (auto reciever : m_modelViewNotifier) {
+			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				assert(0); // ERROR
+			}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			assert(0); // WARNING
+		}
+		}
 
 	}
 	catch (...) {
@@ -747,11 +641,9 @@ void ExternalServicesComponent::propertyGridValueChanged(int itemID)
 	AppBase::instance()->lockPropertyGrid(false);
 }
 
-void ExternalServicesComponent::propertyGridValueDeleted(int itemID)
+void ExternalServicesComponent::propertyGridValueDeleted(const std::string& _groupName, const std::string& _itemName)
 {
 	AppBase::instance()->lockPropertyGrid(true);
-
-	std::string propertyName = AppBase::instance()->getPropertyName(itemID).toStdString();
 
 	// Get the currently selected model entities. We first get all visible entities only.
 	std::list<ak::UID> selectedModelEntityIDs;
@@ -769,7 +661,7 @@ void ExternalServicesComponent::propertyGridValueDeleted(int itemID)
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteProperty, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(propertyName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
@@ -2607,8 +2499,10 @@ std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _docu
 }
 
 std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
-	std::string settings = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON);
-	AppBase::instance()->fillPropertyGrid(settings);
+	ot::PropertyGridCfg cfg;
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	cfg.setFromJsonObject(cfgObj);
+	AppBase::instance()->setupPropertyGrid(cfg);
 	return "";
 }
 

@@ -47,7 +47,6 @@ namespace ViewerAPI
 		virtual void fillPropertyGrid(const ot::PropertyGridCfg& _configuration) {};
 		virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {};
 		virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) { return 0.0; };
-		virtual int findItemID(const std::string &name) { return 0; };
 		virtual void lockSelectionAndModification(bool flag) {};
 		virtual void removeViewer(ot::UID viewerID) {};
 

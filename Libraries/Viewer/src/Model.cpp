@@ -149,11 +149,6 @@ bool Model::propertyGridValueChanged(const std::string& _groupName, const std::s
 	return false;
 }
 
-int Model::findPropertyItem(const std::string &name)
-{
-	return getNotifier()->findItemID(name);
-}
-
 void Model::lockSelectionAndModification(bool flag)
 {
 	getNotifier()->lockSelectionAndModification(flag);

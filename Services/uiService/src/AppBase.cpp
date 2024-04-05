@@ -1961,8 +1961,12 @@ void AppBase::lockPropertyGrid(bool flag)
 	m_propertyGrid->getTreeWidget()->setEnabled(flag);
 }
 
-ot::Property::PropertyType AppBase::getPropertyType(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const std::string& _itemName) {
+	return m_propertyGrid->findItem(_groupName, _itemName);
+}
+
+ot::Property::PropertyType AppBase::getPropertyType(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (itm) {
 		return itm->getPropertyType();
 	}
@@ -1972,8 +1976,8 @@ ot::Property::PropertyType AppBase::getPropertyType(const std::string& _itemName
 	}
 }
 
-bool AppBase::getPropertyValueBool(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+bool AppBase::getPropertyValueBool(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return false;
@@ -1985,8 +1989,8 @@ bool AppBase::getPropertyValueBool(const std::string& _itemName) {
 	return itm->getInput()->getCurrentValue().toBool();
 }
 
-int AppBase::getPropertyValueInt(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+int AppBase::getPropertyValueInt(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return 0;
@@ -1998,8 +2002,8 @@ int AppBase::getPropertyValueInt(const std::string& _itemName) {
 	return itm->getInput()->getCurrentValue().toInt();
 }
 
-double AppBase::getPropertyValueDouble(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+double AppBase::getPropertyValueDouble(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return 0.;
@@ -2011,8 +2015,8 @@ double AppBase::getPropertyValueDouble(const std::string& _itemName) {
 	return itm->getInput()->getCurrentValue().toDouble();
 }
 
-QString AppBase::getPropertyValueString(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+QString AppBase::getPropertyValueString(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return QString();
@@ -2024,8 +2028,8 @@ QString AppBase::getPropertyValueString(const std::string& _itemName) {
 	return itm->getInput()->getCurrentValue().toString();
 }
 
-QString AppBase::getPropertyValueSelection(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+QString AppBase::getPropertyValueSelection(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return QString();
@@ -2037,8 +2041,8 @@ QString AppBase::getPropertyValueSelection(const std::string& _itemName) {
 	return itm->getInput()->getCurrentValue().toString();
 }
 
-QStringList AppBase::getPropertyPossibleSelection(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+QStringList AppBase::getPropertyPossibleSelection(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return QStringList();
@@ -2056,8 +2060,8 @@ QStringList AppBase::getPropertyPossibleSelection(const std::string& _itemName) 
 	return inp->getPossibleSelection();
 }
 
-QColor AppBase::getPropertyValueColor(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+QColor AppBase::getPropertyValueColor(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return QColor();
@@ -2074,8 +2078,8 @@ QColor AppBase::getPropertyValueColor(const std::string& _itemName) {
 	return var.value<QColor>();
 }
 
-bool AppBase::getPropertyIsDeletable(const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
+bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::string& _itemName) {
+	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return false;
@@ -2089,7 +2093,7 @@ void AppBase::clearPropertyGrid(void) {
 	m_propertyGrid->clear();
 }
 
-void AppBase::setPropertyValueDouble(const std::string& _itemName, double _value) {
+void AppBase::setPropertyValueDouble(const std::string& _groupName, const std::string& _itemName, double _value) {
 	ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
 	if (!itm) {
 		OT_LOG_E("Invalid item name \"" + _itemName + "\"");

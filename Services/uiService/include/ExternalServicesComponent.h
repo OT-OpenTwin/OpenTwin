@@ -113,8 +113,7 @@ public:
 	bool isCurrentModelModified(void);
 
 	std::string getCommonPropertiesAsJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList);
-	void setPropertiesFromJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList, std::string props, bool update, bool itemsVisible);
-
+	
 	// ###################################################################################################
 
 	// Event handling
@@ -127,8 +126,8 @@ public:
 
 	void itemRenamed(ModelUIDtype modelID, const std::string &newName);
 
-	void propertyGridValueChanged(int itemID);
-	void propertyGridValueDeleted(int itemID);
+	void propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	void propertyGridValueDeleted(const std::string& _groupName, const std::string& _itemName);
 
 	void executeAction(ModelUIDtype modelID, ModelUIDtype buttonID);
 

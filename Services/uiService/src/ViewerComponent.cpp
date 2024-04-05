@@ -196,20 +196,16 @@ void ViewerComponent::addKeyShortcut(const std::string &keySequence) {
 	AppBase::instance()->shortcutManager()->addHandler(newHandler);
 }
 
-void ViewerComponent::fillPropertyGrid(const std::string &settings) {
-	AppBase::instance()->fillPropertyGrid(settings);
+void ViewerComponent::fillPropertyGrid(const ot::PropertyGridCfg& _configuration) {
+	AppBase::instance()->setupPropertyGrid(_configuration);
 }
 
-void ViewerComponent::setDoublePropertyValue(int itemID, double value) {
-	AppBase::instance()->setPropertyValueDouble(itemID, value);
+void ViewerComponent::setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {
+	AppBase::instance()->setPropertyValueDouble(_groupName, _itemName, value);
 }
 
-double ViewerComponent::getDoublePropertyValue(int itemID) {
-	return AppBase::instance()->getPropertyValueDouble(itemID);
-}
-
-int ViewerComponent::findItemID(const std::string &name) {
-	return AppBase::instance()->findPropertyID(name.c_str());
+double ViewerComponent::getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) {
+	return AppBase::instance()->getPropertyValueDouble(_groupName, _itemName);
 }
 
 void ViewerComponent::lockSelectionAndModification(bool flag) {
@@ -1009,9 +1005,9 @@ void ViewerComponent::contextMenuItemCheckedChanged(const std::string& _menuName
 	}
 }
 
-bool ViewerComponent::propertyGridValueChanged(int itemID) {
+bool ViewerComponent::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) {
 	for (auto vId : m_viewers) {
-		if (ViewerAPI::propertyGridValueChanged(vId, itemID))
+		if (ViewerAPI::propertyGridValueChanged(vId, _groupName, _itemName))
 		{
 			return true;  // The viewer has handled the property grid change
 		}

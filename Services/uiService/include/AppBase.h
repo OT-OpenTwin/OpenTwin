@@ -56,13 +56,14 @@ class UiPluginManager;
 // Forward declaration
 class ToolBar;
 namespace ak { class aNotifier; class aWindow; }
-namespace ak { class aTreeWidget; class aPropertyGridWidget; }
+namespace ak { class aTreeWidget; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsViewView; }
 namespace ot { class GraphicsItem; }
 namespace ot { class TextEditorView; }
 namespace ot { class PropertyGridView; }
+namespace ot { class PropertyGridItem; }
 namespace ot { class NavigationTreeView; }
 namespace ot { class PlainTextEditView; }
 namespace ot { class GraphicsPickerView; }
@@ -387,23 +388,25 @@ public:
 
 	// Getter
 
-	ot::Property::PropertyType getPropertyType(const std::string& _itemName);
+	ot::PropertyGridItem* findProperty(const std::string& _groupName, const std::string& _itemName);
 
-	bool getPropertyValueBool(const std::string& _itemName);
+	ot::Property::PropertyType getPropertyType(const std::string& _groupName, const std::string& _itemName);
 
-	int getPropertyValueInt(const std::string& _itemName);
+	bool getPropertyValueBool(const std::string& _groupName, const std::string& _itemName);
 
-	double getPropertyValueDouble(const std::string& _itemName);
+	int getPropertyValueInt(const std::string& _groupName, const std::string& _itemName);
 
-	QString getPropertyValueString(const std::string& _itemName);
+	double getPropertyValueDouble(const std::string& _groupName, const std::string& _itemName);
 
-	QString getPropertyValueSelection(const std::string& _itemName);
+	QString getPropertyValueString(const std::string& _groupName, const std::string& _itemName);
 
-	QStringList getPropertyPossibleSelection(const std::string& _itemName);
+	QString getPropertyValueSelection(const std::string& _groupName, const std::string& _itemName);
 
-	QColor getPropertyValueColor(const std::string& _itemName);
+	QStringList getPropertyPossibleSelection(const std::string& _groupName, const std::string& _itemName);
 
-	bool getPropertyIsDeletable(const std::string& _itemName);
+	QColor getPropertyValueColor(const std::string& _groupName, const std::string& _itemName);
+
+	bool getPropertyIsDeletable(const std::string& _groupName, const std::string& _itemName);
 
 	ShortcutManager * shortcutManager(void) { return m_shortcutManager; }
 
@@ -413,7 +416,7 @@ public:
 
 	void lockPropertyGrid(bool flag);
 
-	void setPropertyValueDouble(const std::string& _itemName, double _value);
+	void setPropertyValueDouble(const std::string& _groupName, const std::string& _itemName, double _value);
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 
