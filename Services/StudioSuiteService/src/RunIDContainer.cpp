@@ -3,6 +3,7 @@
 #include "InfoFileManager.h"
 
 #include <stdexcept>
+#include <cassert>
 
 RunIDContainer::RunIDContainer()
 {
@@ -11,16 +12,26 @@ RunIDContainer::RunIDContainer()
 
 RunIDContainer::~RunIDContainer()
 {
+	clear();
+}
+
+void RunIDContainer::clear()
+{
+	metaHashValue.clear();
+
 	for (auto item : fileNameToData)
 	{
 		delete item.second;
 	}
 
 	fileNameToData.clear();
+	parameterValues.clear();
 }
 
 int RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t dataBufferLength)
 {
+	clear();
+
 	size_t runId              = readIntegerFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
 	size_t numberOfFiles      = readIntegerFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
 
@@ -34,7 +45,15 @@ int RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t dataB
 
 		Result1DData* resultData = new Result1DData;
 		resultData->setDataHashValue(dataHashValue);
-		resultData->setData(data);
+
+		if (fileName == "parameters.info")
+		{
+			processParameterInformation(data);
+		}
+		else
+		{
+			resultData->setData(data);
+		}
 
 		fileNameToData[fileName] = resultData;
 	}
@@ -96,3 +115,36 @@ void RunIDContainer::addResult1DInformation(int runID, InfoFileManager& infoFile
 	}
 }
 
+void RunIDContainer::processParameterInformation(const std::string& data)
+{
+	std::stringstream dataContent(data);
+
+	while (!dataContent.eof())
+	{
+		std::string name, value;
+
+		readLine(dataContent, name);
+		readLine(dataContent, value);
+
+		if (!name.empty() && !value.empty())
+		{
+			double numericValue = atof(value.c_str());
+
+			assert(parameterValues.count(name) == 0);
+			parameterValues[name] = numericValue;
+		}
+	}
+}
+
+void RunIDContainer::readLine(std::stringstream& dataContent, std::string& line)
+{
+	std::getline(dataContent, line);
+
+	if (!line.empty())
+	{
+		if (line[line.size() - 1] == '\r')
+		{
+			line.pop_back();
+		}
+	}
+}

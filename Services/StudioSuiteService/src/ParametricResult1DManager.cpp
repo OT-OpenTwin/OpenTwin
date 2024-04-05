@@ -24,3 +24,4 @@ void ParametricResult1DManager::add(Result1DManager& result1DManager)
 
 	// TODO: Implementation is missing
 }
+
