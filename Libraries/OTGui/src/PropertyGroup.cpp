@@ -149,14 +149,14 @@ ot::PropertyGroup* ot::PropertyGroup::findGroup(const std::string& _name) const 
 	return nullptr;
 }
 
-void ot::PropertyGroup::findPropertiesByContent(const std::string& _content, std::list<Property*>& _list) const {
+void ot::PropertyGroup::findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const {
 	for (Property* p : m_properties) {
-		if (p->content() == _content) {
+		if (p->specialType() == _specialType) {
 			_list.push_back(p);
 		}
 	}
 	for (PropertyGroup* g : m_childGroups) {
-		g->findPropertiesByContent(_content, _list);
+		g->findPropertiesBySpecialType(_specialType, _list);
 	}
 }
 

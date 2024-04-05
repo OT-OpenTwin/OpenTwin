@@ -107,10 +107,7 @@ std::string ot::ModelServiceAPI::getCurrentModelVersion(void)
 
 	// Process the result from the model service
 
-	JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	std::string modelVersion = ot::json::getString(responseDoc, OT_ACTION_PARAM_BASETYPE_Props);
+	std::string modelVersion = response;
 
 	return modelVersion;
 }
@@ -594,12 +591,15 @@ void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<Entit
 	}
 }
 
-void ot::ModelServiceAPI::addPropertiesToEntities(std::list<UID>& _entityList, const std::string& _propertiesJson)
+void ot::ModelServiceAPI::addPropertiesToEntities(std::list<UID>& _entityList, const ot::PropertyGridCfg& _configuration)
 {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddPropertiesToEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(_entityList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_JSON, JsonString(_propertiesJson, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	JsonObject cfgObj;
+	_configuration.addToJsonObject(cfgObj, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Config, cfgObj, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
@@ -644,16 +644,23 @@ void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, cons
 	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
-	std::list<std::string> entityProperties;
+	std::list<ot::ConstJsonObject> entityProperties;
 
 	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityProperties = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
+	entityProperties = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
 
 	auto prop = entityProperties.begin();
 	for (auto id : entityIDs)
 	{
+		if (prop == entityProperties.end()) {
+			OT_LOG_E("List size mismatch");
+			return;
+		}
+		ot::PropertyGridCfg cfg;
+		cfg.setFromJsonObject(*prop);
+
 		EntityProperties props;
-		props.buildFromJSON(*prop);
+		props.buildFromConfiguration(cfg);
 
 		_entityProperties[id] = props;
 
@@ -691,16 +698,19 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 	responseDoc.fromJson(response);
 
 	std::list<UID> entityIDs;
-	std::list<std::string> entityProperties;
+	std::list<ot::ConstJsonObject> entityProperties;
 
 	entityIDs = ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	entityProperties = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
+	entityProperties = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
 
 	auto prop = entityProperties.begin();
 	for (auto id : entityIDs)
 	{
+		ot::PropertyGridCfg cfg;
+		cfg.setFromJsonObject(*prop);
+
 		EntityProperties props;
-		props.buildFromJSON(*prop);
+		props.buildFromConfiguration(cfg);
 
 		_entityProperties[id] = props;
 

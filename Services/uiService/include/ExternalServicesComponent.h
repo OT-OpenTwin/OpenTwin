@@ -42,6 +42,7 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/OTObjectBase.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/UiTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
@@ -112,8 +113,6 @@ public:
 	bool isModelModified(ModelUIDtype modelID);
 	bool isCurrentModelModified(void);
 
-	std::string getCommonPropertiesAsJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList);
-	
 	// ###################################################################################################
 
 	// Event handling

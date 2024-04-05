@@ -26,7 +26,6 @@ namespace MicroserviceAPI
 	std::string getReturnJSONFromUID(ot::UID uid);
 	std::string getReturnJSONFromUIDList(std::list<ot::UID> list);
 	std::string getReturnJSONFromStringList(std::list<std::string> list);
-	std::string getReturnJSONFromString(std::string props);
 	std::string getReturnJSONFromBool(bool flag);
 	std::string getEntityInformation(std::list<ot::UID> &entityIDList);
 

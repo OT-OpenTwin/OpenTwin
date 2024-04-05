@@ -39,7 +39,15 @@ namespace ot {
 		void setGroupName(const std::string& _name) { m_groupName = _name; };
 		const std::string& getGroupName(void) const { return m_groupName; };
 
+		void setPropertySpecialType(const std::string& _type) { m_specialType = _type; };
+		const std::string& propertySpecialType(void) const { return m_specialType; };
+
+		void setAdditionalPropertyData(const std::string& _data) { m_data = _data; };
+		const std::string& additionalPropertyData(void) const { return m_data; };
+
 		Property::PropertyType getPropertyType(void) const { return m_type; };
+
+		Property* createProperty(void) const;
 
 		void setTitle(const QString& _title);
 		QString getTitle(void) const;
@@ -63,6 +71,8 @@ namespace ot {
 		bool m_isDeleteable;
 		std::string m_name;
 		std::string m_groupName;
+		std::string m_specialType;
+		std::string m_data;
 		Property::PropertyType m_type;
 		PropertyInput* m_input;
 		QBrush m_propertyBrush;

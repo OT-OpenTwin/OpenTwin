@@ -218,10 +218,11 @@ void Application::definePotential(void)
 	EntityPropertiesDouble::createProperty("Solver", "Electrostatic Potential", 0.0, "ElmerFEM", properties);
 	properties.setAllPropertiesNonProtected();
 
-	std::string propertiesJson = properties.getJSON(nullptr, false);
+	ot::PropertyGridCfg cfg;
+	properties.addToConfiguration(nullptr, false, cfg);
 
 	// Set the message to the model service
-	m_modelComponent->addPropertiesToEntities(updateEntities, propertiesJson);
+	m_modelComponent->addPropertiesToEntities(updateEntities, cfg);
 
 	m_modelComponent->modelChangeOperationCompleted("Added electrostatic potential definitions");
 }

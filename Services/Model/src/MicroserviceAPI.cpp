@@ -19,6 +19,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/CoreTypes.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
@@ -586,21 +587,18 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			bool modified = globalModel->getModified();
 			result = getReturnJSONFromBool(modified);
 		}
-		else if (action == OT_ACTION_CMD_MODEL_CommonPropertiesJSON)
-		{
-			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-			if (globalModel == nullptr) throw std::exception("No model created yet");
-			std::string props = globalModel->getCommonPropertiesAsJson(entityIDList, false);
-			result = getReturnJSONFromString(props);
-		}
 		else if (action == OT_ACTION_CMD_MODEL_SetPropertiesFromJSON)
 		{
 			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-			std::string props = doc[OT_ACTION_PARAM_MODEL_PropertyList].GetString();
+			
+			ot::ConstJsonObject cfgObj = ot::json::getObject(doc, OT_ACTION_PARAM_Config);
+			ot::PropertyGridCfg cfg;
+			cfg.setFromJsonObject(cfgObj);
+
 			bool update = doc[OT_ACTION_PARAM_MODEL_Update].GetBool();
 			bool itemsVisible = doc[OT_ACTION_PARAM_MODEL_ItemsVisible].GetBool();
 			if (globalModel == nullptr) throw std::exception("No model created yet");
-			globalModel->setPropertiesFromJson(entityIDList, props, update, itemsVisible);
+			globalModel->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_GenerateEntityIDs)
 		{
@@ -674,17 +672,18 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			ot::UID facetsEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion_Facets);
 			bool overrideGeometry = doc[OT_ACTION_PARAM_MODEL_OverrideGeometry].GetBool();
 
-			std::string properties;
+			ot::PropertyGridCfg cfg;
 			bool updateProperties = false;
 
 			if (doc.HasMember(OT_ACTION_PARAM_MODEL_NewProperties)) {
-				properties = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_NewProperties);
+				ot::ConstJsonObject cfgObj = ot::json::getObject(doc, OT_ACTION_PARAM_MODEL_NewProperties);
+				cfg.setFromJsonObject(cfgObj);
 				updateProperties = true;
 			}
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			globalModel->updateGeometryEntity(geomEntityID, brepEntityID, brepEntityVersion, facetsEntityID, facetsEntityVersion, overrideGeometry, properties, updateProperties);
+			globalModel->updateGeometryEntity(geomEntityID, brepEntityID, brepEntityVersion, facetsEntityID, facetsEntityVersion, overrideGeometry, cfg, updateProperties);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted)
 		{
@@ -901,23 +900,24 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			bool recursive = ot::json::getBool(doc, OT_ACTION_PARAM_Recursive);
 			std::string propertyGroupFilter = ot::json::getString(doc, OT_ACTION_PARAM_Filter);
 
-			std::map<ot::UID, std::string> entityProperties;
+			std::map<ot::UID, ot::PropertyGridCfg> entityProperties;
 
 			globalModel->getEntityProperties(entityID, recursive, propertyGroupFilter, entityProperties);
 
 			// Now we convert the results into JSON data
+			ot::JsonDocument newDoc;
 			std::list<ot::UID> entityIDList;
-			std::list<std::string> propertyList;
-
+			ot::JsonArray propertyList;
 			for (auto item : entityProperties)
 			{
 				entityIDList.push_back(item.first);
-				propertyList.push_back(item.second);
+				ot::JsonObject cfgObj;
+				item.second.addToJsonObject(cfgObj, newDoc.GetAllocator());
+				propertyList.PushBack(cfgObj, newDoc.GetAllocator());
 			}
 
-			ot::JsonDocument newDoc;
 			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
-			newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, ot::JsonArray(propertyList, newDoc.GetAllocator()), newDoc.GetAllocator());
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, propertyList, newDoc.GetAllocator());
 
 			return newDoc.toJson();
 		}
@@ -931,7 +931,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 
 			EntityBase *entity = globalModel->findEntityFromName(entityName);
 
-			std::map<ot::UID, std::string> entityProperties;
+			std::map<ot::UID, ot::PropertyGridCfg> entityProperties;
 
 			if (entity != nullptr)
 			{
@@ -939,18 +939,20 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			}
 
 			// Now we convert the results into JSON data
+			ot::JsonDocument newDoc;
 			std::list<ot::UID> entityIDList;
-			std::list<std::string> propertyList;
+			ot::JsonArray propertyList;
 
 			for (auto item : entityProperties)
 			{
 				entityIDList.push_back(item.first);
-				propertyList.push_back(item.second);
+				ot::JsonObject cfgObj;
+				item.second.addToJsonObject(cfgObj, newDoc.GetAllocator());
+				propertyList.PushBack(cfgObj, newDoc.GetAllocator());
 			}
 
-			ot::JsonDocument newDoc;
 			newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
-			newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, ot::JsonArray(propertyList, newDoc.GetAllocator()), newDoc.GetAllocator());
+			newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, propertyList, newDoc.GetAllocator());
 
 			return newDoc.toJson();
 		}
@@ -962,7 +964,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			return getReturnJSONFromString(globalModel->getCurrentModelVersion());
+			return globalModel->getCurrentModelVersion();
 		}
 		else if (action == OT_ACTION_CMD_MODEL_ActivateVersion)
 		{
@@ -983,18 +985,24 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
 			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-			std::string propertiesJson = doc[OT_ACTION_PARAM_MODEL_JSON].GetString();
 
-			globalModel->addPropertiesToEntities(entityIDList, propertiesJson);
+			ot::ConstJsonObject cfgObj = ot::json::getObject(doc, OT_ACTION_PARAM_Config);
+			ot::PropertyGridCfg cfg;
+			cfg.setFromJsonObject(cfgObj);
+
+			globalModel->addPropertiesToEntities(entityIDList, cfg);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities)
 		{
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
 			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-			std::string propertiesJson = doc[OT_ACTION_PARAM_MODEL_JSON].GetString();
+			
+			ot::ConstJsonObject cfgObj = ot::json::getObject(doc, OT_ACTION_PARAM_Config);
+			ot::PropertyGridCfg cfg;
+			cfg.setFromJsonObject(cfgObj);
 
-			globalModel->updatePropertiesOfEntities(entityIDList, propertiesJson);
+			globalModel->updatePropertiesOfEntities(entityIDList, cfg);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_DeleteProperty)
 		{
@@ -1295,16 +1303,6 @@ std::string MicroserviceAPI::getReturnJSONFromUID(ot::UID uid)
 	ot::JsonDocument::AllocatorType& allocator = newDoc.GetAllocator();
 
 	newDoc.AddMember(OT_ACTION_PARAM_BASETYPE_UID, uid, allocator);
-
-	return newDoc.toJson();
-}
-
-std::string MicroserviceAPI::getReturnJSONFromString(std::string props)
-{
-	ot::JsonDocument newDoc;
-	newDoc.SetObject();
-
-	newDoc.AddMember(OT_ACTION_PARAM_BASETYPE_Props, rapidjson::Value(props.c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
 
 	return newDoc.toJson();
 }

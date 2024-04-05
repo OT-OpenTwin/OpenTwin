@@ -27,7 +27,9 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 			EntityProperties selectionDependendProperties = UpdateSelectionProperties(dbAccessEntity);
 			campaignDependendProperties.merge(selectionDependendProperties);
 			ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
-			RequestPropertyUpdate(modelServiceURL, entityIDs, campaignDependendProperties.getJSON(nullptr, false));
+			ot::PropertyGridCfg cfg;
+			campaignDependendProperties.addToConfiguration(nullptr, false, cfg);
+			RequestPropertyUpdate(modelServiceURL, entityIDs, cfg);
 		}
 		else
 		{
@@ -39,7 +41,9 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 				if (selectionDependendProperties.getNumberOfProperties() > 0)
 				{
 					ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
-					RequestPropertyUpdate(modelServiceURL, entityIDs, selectionDependendProperties.getJSON(nullptr, false));
+					ot::PropertyGridCfg cfg;
+					selectionDependendProperties.addToConfiguration(nullptr, false, cfg);
+					RequestPropertyUpdate(modelServiceURL, entityIDs, cfg);
 				}
 			}
 		}
@@ -59,7 +63,9 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 		EntityProperties selectionDependendProperties = UpdateSelectionProperties(dbAccessEntity);
 		campaignDependendProperties.merge(selectionDependendProperties);
 		ot::UIDList entityIDs{ dbAccessEntity->getEntityID() };
-		RequestPropertyUpdate(modelServiceURL, entityIDs, campaignDependendProperties.getJSON(nullptr, false));
+		ot::PropertyGridCfg cfg;
+		campaignDependendProperties.addToConfiguration(nullptr, false, cfg);
+		RequestPropertyUpdate(modelServiceURL, entityIDs, cfg);
 	}
 }
 
@@ -114,13 +120,16 @@ EntityProperties PropertyHandlerDatabaseAccessBlock::UpdateAllCampaignDependenci
 	return properties;
 }
 
-void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON)
+void PropertyHandlerDatabaseAccessBlock::RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const ot::PropertyGridCfg& _propertyConfiguration)
 {
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities,requestDoc.GetAllocator());
 	ot::JsonObject jEntityIDs;
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs,requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_JSON, ot::JsonString(propertiesAsJSON,requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	ot::JsonObject cfgObj;
+	_propertyConfiguration.addToJsonObject(cfgObj, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Config, cfgObj, requestDoc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", modelServiceURL, ot::EXECUTE, requestDoc.toJson(), response))

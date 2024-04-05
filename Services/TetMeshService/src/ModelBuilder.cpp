@@ -289,7 +289,9 @@ void ModelBuilder::createAllShapes(BRepAlgoAPI_BuilderAlgo &booleanOperation, co
 	TopTools_ListOfShape generatedShapes = booleanOperation.Generated(entity->getBrep());
 	TopTools_ListOfShape modifiedShapes  = booleanOperation.Modified(entity->getBrep());
 
-	std::string shapeProperties = entity->getProperties().getJSON(nullptr, false);
+	ot::PropertyGridCfg cfg;
+
+	entity->getProperties().addToConfiguration(nullptr, false, cfg);
 
 	allShapes.Append(generatedShapes);
 
@@ -311,7 +313,7 @@ void ModelBuilder::createAllShapes(BRepAlgoAPI_BuilderAlgo &booleanOperation, co
 			std::string shapeName = meshName + "/" + entity->getName() + "/" + std::to_string(count);
 			count++;
 
-			modelEntities.push_back(createGeometryEntity(shapeName, body, shapeProperties));
+			modelEntities.push_back(createGeometryEntity(shapeName, body, cfg));
 
 			meshPriorities[shapeName] = meshPriority;
 			parentShapeName[shapeName] = meshName + "/" + entity->getName();
@@ -321,14 +323,14 @@ void ModelBuilder::createAllShapes(BRepAlgoAPI_BuilderAlgo &booleanOperation, co
 	{
 		std::string shapeName = meshName + "/" + entity->getName();
 
-		modelEntities.push_back(createGeometryEntity(shapeName, allShapes.First(), shapeProperties));
+		modelEntities.push_back(createGeometryEntity(shapeName, allShapes.First(), cfg));
 
 		meshPriorities[shapeName] = meshPriority;
 		parentShapeName[shapeName] = shapeName;
 	}
 }
 
-EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const std::string &shapeProperties)
+EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const ot::PropertyGridCfg& shapeProperties)
 {
 	EntityGeometry *entityGeom = new EntityGeometry(0, nullptr, nullptr, nullptr, nullptr, application->serviceName());
 
@@ -337,7 +339,7 @@ EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, Topo
 	entityGeom->setBrep(shape);
 	entityGeom->setInitiallyHidden(true);
 
-	entityGeom->getProperties().buildFromJSON(shapeProperties);
+	entityGeom->getProperties().buildFromConfiguration(shapeProperties);
 	entityGeom->getProperties().forceResetUpdateForAllProperties();
 
 	entityGeom->getProperties().setAllPropertiesReadOnly();

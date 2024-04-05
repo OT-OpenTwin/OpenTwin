@@ -1453,10 +1453,10 @@ std::list<EntityBase*> Model::getListOfSelectedEntities(const std::string& typeF
 	return selectedEntities;
 }
 
-void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const std::string& propertiesJson)
+void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration)
 {
 	EntityProperties properties;
-	properties.buildFromJSON(propertiesJson);
+	properties.buildFromConfiguration(_configuration);
 
 	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
 
@@ -1488,10 +1488,10 @@ void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const std:
 	}
 }
 
-void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const std::string& propertiesJson)
+void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration)
 {
 	EntityProperties properties;
-	properties.buildFromJSON(propertiesJson);
+	properties.buildFromConfiguration(_configuration);
 
 	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
 
@@ -1806,18 +1806,18 @@ void Model::otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ow
 void Model::updatePropertyGrid(void)
 {
 	EntityProperties properties;
-	std::string settings;
+	ot::PropertyGridCfg cfg;
 	
 	if (selectedVisibleModelEntityIDs.size() > 0)
 	{
-		settings = getCommonPropertiesAsJson(selectedVisibleModelEntityIDs, true);
+		this->addCommonPropertiesToConfig(selectedVisibleModelEntityIDs, true, cfg);
 	}
 	else
 	{
-		settings = getCommonPropertiesAsJson(selectedModelEntityIDs, true);
+		this->addCommonPropertiesToConfig(selectedModelEntityIDs, true, cfg);
 	}
 
-	getNotifier()->fillPropertyGrid(settings);
+	getNotifier()->fillPropertyGrid(cfg);
 }
 
 void Model::setEntityOutdated(EntityBase *entity)
@@ -1838,7 +1838,7 @@ void Model::clearEntityUpdates(EntityBase *entity)
 	pendingEntityUpdates.clear();
 }
 
-std::string Model::getCommonPropertiesAsJson(const std::list<ot::UID> &entityIDList, bool visibleOnly)
+void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config)
 {
 	std::list<EntityBase *> entities;
 	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
@@ -1846,7 +1846,7 @@ std::string Model::getCommonPropertiesAsJson(const std::list<ot::UID> &entityIDL
 	EntityProperties props;
 	getCommonProperties(entities, props);
 
-	return props.getJSON(getRootNode(), visibleOnly);
+	props.addToConfiguration(getRootNode(), visibleOnly, _config);
 }
 
 void Model::refreshAllViews(void)
@@ -1864,13 +1864,13 @@ void Model::resetAllViews(void)
 	getNotifier()->resetAllViews(visualizationModelID);
 }
 
-void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, std::string props, bool update, bool itemsVisible)
+void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration, bool update, bool itemsVisible)
 {
 	std::list<EntityBase *> entities;
 	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
 
 	EntityProperties properties;
-	properties.buildFromJSON(props);
+	properties.buildFromConfiguration(_configuration);
 
 	setProperties(entities, properties);
 
@@ -2011,16 +2011,16 @@ void Model::getCommonProperties(const std::list<EntityBase *> &entities, EntityP
 	}
 }
 
-void Model::getEntityProperties(ot::UID entityID, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, std::string>& entityProperties)
+void Model::getEntityProperties(ot::UID entityID, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties)
 {
 	// Get the specified entity
 	EntityBase* entity = getEntity(entityID);
 
 	// Add the properties of the given entity (and potentially its children) to the map
-	getEntityProperties(entity, recursive, propertyGroupFilter, entityProperties);
+	getEntityProperties(entity, recursive, propertyGroupFilter, _entityProperties);
 }
 
-void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, std::string>& entityProperties)
+void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties)
 {
 	if (entity != nullptr)
 	{
@@ -2037,8 +2037,9 @@ void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::s
 
 		if (entityProps.getNumberOfProperties() > 0)
 		{
-			std::string propertyString = entityProps.getJSON(entity, false);
-			entityProperties[entity->getEntityID()] = propertyString;
+			ot::PropertyGridCfg cfg;
+			entityProps.addToConfiguration(entity, false, cfg);
+			_entityProperties[entity->getEntityID()] = cfg;
 		}
 
 		if (recursive)
@@ -2048,7 +2049,7 @@ void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::s
 			{
 				for (auto child : container->getChildrenList())
 				{
-					getEntityProperties(child, recursive, propertyGroupFilter, entityProperties);
+					getEntityProperties(child, recursive, propertyGroupFilter, _entityProperties);
 				}
 			}
 		}
@@ -4655,7 +4656,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	sendMessageToViewer(notify, prefetchIds);
 }
 
-void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const std::string &properties, bool updateProperties)
+void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties)
 {
 	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(getEntity(geomEntityID));
 	if (geomEntity == nullptr)
@@ -4667,7 +4668,7 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	// Update the properties, if requested
 	if (updateProperties)
 	{
-		geomEntity->getProperties().buildFromJSON(properties);
+		geomEntity->getProperties().buildFromConfiguration(_configuration);
 	}
 
 	// Release the brep and facets (if loaded)

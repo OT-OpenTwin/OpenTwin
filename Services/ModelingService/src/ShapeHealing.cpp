@@ -160,8 +160,14 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, (unsigned long long) geometryEntity->getFacetsStorageObjectID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, doc.GetAllocator());	// The modified entity was not yet written 
-		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, ot::JsonString(geometryEntity->getProperties().getJSON(nullptr, false), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, doc.GetAllocator());	// The modified entity was not yet written
+		ot::PropertyGridCfg cfg;
+		geometryEntity->getProperties().addToConfiguration(nullptr, false, cfg);
+
+		ot::JsonObject cfgObj;
+		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+
+		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, cfgObj, doc.GetAllocator());
 
 		application->modelComponent()->sendMessage(false, doc);
 

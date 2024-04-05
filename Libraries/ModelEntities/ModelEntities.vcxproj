@@ -318,7 +318,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <MinimalRebuild />
@@ -330,8 +330,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTCommunication.lib;DataStorage.lib;$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(MONGO_C_LIBPATHD);$(MONGO_CXX_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTCommunication.lib;DataStorage.lib;$(MONGO_C_LIBD);$(MONGO_CXX_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(MONGO_C_LIBPATHD);$(MONGO_CXX_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -346,7 +346,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -371,7 +371,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996;4828</DisableSpecificWarnings>
@@ -380,8 +380,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTCommunication.lib;DataStorage.lib;$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(MONGO_C_LIBPATHR);$(MONGO_CXX_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTCommunication.lib;DataStorage.lib;$(MONGO_C_LIBR);$(MONGO_CXX_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(MONGO_C_LIBPATHR);$(MONGO_CXX_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -396,7 +396,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>

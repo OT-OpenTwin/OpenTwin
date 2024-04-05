@@ -94,8 +94,11 @@ namespace ot {
 		PropertyFlags propertyFlags(void) const { return m_flags; };
 		PropertyFlags& propertyFlags(void) { return m_flags; };
 
-		void setContent(const std::string& _content) { m_content = _content; };
-		const std::string& content(void) const { return m_content; };
+		void setSpecialType(const std::string& _type) { m_specialType = _type; };
+		const std::string& specialType(void) const { return m_specialType; };
+
+		void setAdditionalPropertyData(const std::string& _data) { m_data = _data; };
+		const std::string& additionalPropertyData(void) const { return m_data; };
 
 	protected:
 		void setFromOther(const Property* _other);
@@ -115,7 +118,8 @@ namespace ot {
 		std::string m_tip;
 		std::string m_name;
 		std::string m_title;
-		std::string m_content;
+		std::string m_specialType;
+		std::string m_data;
 		PropertyFlags m_flags;
 	};
 

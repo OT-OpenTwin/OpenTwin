@@ -1,6 +1,10 @@
 
 #include "EntityProperties.h"
 
+#include "OTCore/Logger.h"
+#include "OTGui/Property.h"
+#include "OTGui/PropertyGroup.h"
+
 #include <cassert>
 #include <list>
 
@@ -150,119 +154,82 @@ EntityProperties& EntityProperties::operator=(const EntityProperties &other)
 	return *this;
 }
 
-std::string EntityProperties::getJSON(EntityBase *root, bool visibleOnly)
+void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _configuration)
 {
 	// Here we convert the entire container with all its entities into a JSON document
-
-	ot::JsonDocument jsonDoc;
-	jsonDoc.SetObject();	
-	
+		
 	for (auto prop : propertiesList)
 	{
 		if (!visibleOnly || prop->getVisible())
 		{
-			prop->addToJsonDocument(jsonDoc, root);
+			prop->addToConfiguration(_configuration, root);
 		}
 	}
-
-	rapidjson::StringBuffer buffer;
-	buffer.Clear();
-
-	// Setup the Writer
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	jsonDoc.Accept(writer);
-
-	// Create the output string
-	return buffer.GetString();
 }
 
-void EntityProperties::buildFromJSON(const std::string &prop)
+void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config)
 {
 	// Here we re-build the current container with the settings in the JSON document. All previous settings will be overridden.
 
 	deleteAllProperties();
 
-	// Read settings into JSOC Doc
-	ot::JsonDocument doc;
+	this->buildFromConfiguration(_config.defaultGroup());
 
-	// Parse the document with the json string we have "received"
-	doc.fromJson(prop);
+	for (const ot::PropertyGroup* g : _config.rootGroups()) {
+		this->buildFromConfiguration(g);
+	}
+}
 
-	// Now loop through all members of the document
-	for (ot::JsonMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
-	{
-		std::string propertyName = i->name.GetString();
+void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupConfig)
+{
+	for (const ot::Property* p : _groupConfig->properties()) {
+		EntityPropertiesBase* newSetting(nullptr);
 
-		if (i->value.IsObject())
+		switch (p->getPropertyType())
 		{
-			//const rapidjson::Value &object = i->value;
-			std::string type = ot::json::getString(i->value, "Type");
-			bool multipleValues = ot::json::getBool(i->value, "MultipleValues");
-
-			bool readOnly = false;
-			if (i->value.HasMember("ReadOnly"))
-			{
-				readOnly = ot::json::getBool(i->value, "ReadOnly");
-			}
-
-			bool protectedProperty = true;
-			if (i->value.HasMember("Protected"))
-			{
-				protectedProperty = ot::json::getBool(i->value, "Protected");
-			}
-
-			bool visible = true;
-			if (i->value.HasMember("Visible"))
-			{
-				visible = ot::json::getBool(i->value, "Visible");
-			}
-
-			bool errorState = false;
-			if (i->value.HasMember("ErrorState"))
-			{
-				errorState = ot::json::getBool(i->value, "ErrorState");
-			}
-
-			std::string group;
-			if (i->value.HasMember("Group"))
-			{
-				group = ot::json::getString(i->value, "Group");
-			}
-
-			EntityPropertiesBase *newSetting(nullptr);
-
-			if (type == "double") newSetting = new EntityPropertiesDouble;
-			else if (type == "integer") newSetting = new EntityPropertiesInteger;
-			else if (type == "boolean") newSetting = new EntityPropertiesBoolean;
-			else if (type == "string") newSetting = new EntityPropertiesString;
-			else if (type == "selection") newSetting = new EntityPropertiesSelection;
-			else if (type == "color") newSetting = new EntityPropertiesColor;
-			else if (type == "entitylist") newSetting = new EntityPropertiesEntityList;
-			else if (type == "projectlist") newSetting = new EntityPropertiesProjectList;
-			else
-			{
-				assert(0); // Unknown type
-			}
-
-			assert(newSetting != nullptr);
-
-			if (newSetting != nullptr)
-			{
-				newSetting->readFromJsonObject(i->value.GetObject());
-				newSetting->setName(propertyName);
-				newSetting->setHasMultipleValues(multipleValues);
-				newSetting->setReadOnly(readOnly);
-				newSetting->setProtected(protectedProperty);
-				newSetting->setVisible(visible);
-				newSetting->setErrorState(errorState);
-
-				createProperty(newSetting, group);
+		case ot::Property::NullType:
+			OT_LOG_E("Unsupported type (null)");
+			return;
+		case ot::Property::BoolType:
+			newSetting = new EntityPropertiesBoolean;
+			break;
+		case ot::Property::IntType:
+			newSetting = new EntityPropertiesInteger;
+			break;
+		case ot::Property::DoubleType:
+			newSetting = new EntityPropertiesDouble;
+			break;
+		case ot::Property::StringType:
+			newSetting = new EntityPropertiesString;
+			break;
+		case ot::Property::StringListType:
+		{
+			if (p->specialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
+			else if (p->specialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
+			else if (p->specialType().empty()) newSetting = new EntityPropertiesSelection;
+			else {
+				OT_LOG_E("Unknown string list property special type \"" + p->specialType() + "\"");
+				return;
 			}
 		}
-		else
-		{
-			assert(0); // Unsupported type
+		break;
+		case ot::Property::ColorType:
+			newSetting = new EntityPropertiesColor;
+			break;
+		default:
+			OT_LOG_E("Unknown type (" + std::to_string(p->getPropertyType()) + ")");
+			return;
 		}
+
+		newSetting->setFromConfiguration(p);
+		newSetting->setName(p->propertyName());
+		newSetting->setHasMultipleValues(p->propertyFlags() & ot::Property::HasMultipleValues);
+		newSetting->setReadOnly(p->propertyFlags() & ot::Property::IsReadOnly);
+		newSetting->setProtected(!(p->propertyFlags() & ot::Property::IsDeletable));
+		newSetting->setVisible(!(p->propertyFlags() & ot::Property::IsHidden));
+		newSetting->setErrorState(p->propertyFlags() & ot::Property::HasInputError);
+
+		createProperty(newSetting, _groupConfig->name());
 	}
 }
 

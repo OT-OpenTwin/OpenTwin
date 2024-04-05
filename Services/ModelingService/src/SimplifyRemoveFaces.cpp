@@ -253,7 +253,14 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, doc.GetAllocator());	// The modified entity was not yet written 
-		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, ot::JsonString(geometryEntity->getProperties().getJSON(nullptr, false), doc.GetAllocator()), doc.GetAllocator());
+
+		ot::PropertyGridCfg cfg;
+		geometryEntity->getProperties().addToConfiguration(nullptr, false, cfg);
+
+		ot::JsonObject cfgObj;
+		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+
+		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, cfgObj, doc.GetAllocator());
 
 		modelComponent->sendMessage(false, doc);
 	}

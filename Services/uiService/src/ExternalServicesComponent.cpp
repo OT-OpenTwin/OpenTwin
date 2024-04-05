@@ -447,37 +447,6 @@ bool ExternalServicesComponent::isCurrentModelModified(void)
 	return false;
 }
 
-std::string ExternalServicesComponent::getCommonPropertiesAsJson(ModelUIDtype modelID, const std::list<ModelUIDtype> &entityIDList)
-{
-	try {
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_CommonPropertiesJSON, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::JsonValue(modelID), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, inDoc.GetAllocator()), inDoc.GetAllocator());
-		std::string response;
-
-		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->serviceURL(), inDoc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
-		}
-
-		ot::JsonDocument outDoc;
-		outDoc.fromJson(response);
-		std::string props = outDoc[OT_ACTION_PARAM_MODEL_PropertyList].GetString();
-		return props;
-	}
-	catch (...) {
-		assert(0); // Error handling
-		return "";
-	}
-}
-
 // ###################################################################################################
 
 // Event handling
@@ -593,9 +562,12 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 			OT_LOG_E("Property not found");
 			return;
 		}
-		ot::PropertyInput* inp = itm->getInput();
-		OTAssertNullptr(inp);
 		
+		ot::PropertyGridCfg cfg;
+		ot::PropertyGroup* cfgGroup = new ot::PropertyGroup(_groupName);
+		cfgGroup->addProperty(itm->createProperty());
+		cfg.addRootGroup(cfgGroup);
+
 		// Get the currently selected model entities. We first get all visible entities only.
 		std::list<ak::UID> selectedModelEntityIDs;
 		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
@@ -612,14 +584,16 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 		ak::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 		
 		ot::JsonDocument doc;
+		ot::JsonObject cfgObj;
+		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, false, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
-
-		inp->addPropertyInputValueToJson(doc, OT_ACTION_PARAM_Value, doc.GetAllocator());
-
+		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+		
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {

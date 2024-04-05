@@ -33,10 +33,12 @@ void MicroserviceNotifier::requestFileForReading(const std::string &dialogTitle,
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::fillPropertyGrid(const std::string &settings)
+void MicroserviceNotifier::fillPropertyGrid(const ot::PropertyGridCfg& _configuration)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_FillPropertyGrid);
-	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON, rapidjson::Value(settings.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	ot::JsonObject cfgObj;
+	_configuration.addToJsonObject(cfgObj, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_Config, cfgObj, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);

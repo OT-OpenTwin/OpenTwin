@@ -49,16 +49,19 @@
 #include <qfiledialog.h>		// Open/Save file dialog
 
 // Open twin header
+#include "DataBase.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Flags.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/OTObject.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/UiTypes.h"
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTGui/GraphicsPackage.h"
+#include "OTGui/MessageDialogCfg.h"
+#include "OTGui/PropertyStringList.h"
+#include "OTCommunication/UiTypes.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/SettingsData.h"
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -74,8 +77,6 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PlainTextEditView.h"
 #include "OTWidgets/IconManager.h"
-#include "DataBase.h"
-#include "OTGui/MessageDialogCfg.h"
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"
@@ -1796,6 +1797,20 @@ std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
 }
 
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
+	// Properties with the "ProjectList" special type need to get the project list set by the frontend
+	std::list<ot::Property*> projListProps = _configuration.findPropertiesBySpecialType("ProjectList");
+	for (ot::Property* p : projListProps) {
+		ot::PropertyStringList* actualProp = dynamic_cast<ot::PropertyStringList*>(p);
+		if (!p) {
+			OT_LOG_E("Property cast failed");
+			continue;
+		}
+
+		std::list<std::string> userProjects = m_ExternalServicesComponent->GetAllUserProjects();
+		actualProp->setList(userProjects);
+	}
+
+
 	m_propertyGrid->setupGridFromConfig(_configuration);
 }
 

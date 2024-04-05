@@ -70,7 +70,7 @@ std::string Application::test(void) {
 	s1->setMaxLength(10);
 	g2->addProperty(s1);
 
-	ot::PropertyStringList* sl1 = new ot::PropertyStringList("StringList", "Test", { "Test", "Other", "Some" });
+	ot::PropertyStringList* sl1 = new ot::PropertyStringList("StringList", "Test", std::list<std::string>{ "Test", "Other", "Some" });
 	g2->addProperty(sl1);
 
 	ot::PropertyGroup* g3 = new ot::PropertyGroup("G3", "File system");

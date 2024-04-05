@@ -97,7 +97,13 @@ void EntityBase::StoreToDataBase(ot::UID givenEntityVersion)
 
 	assert(!owningService.empty());
 
-	bsoncxx::document::value bsonObj = bsoncxx::from_json(properties.getJSON(nullptr, false));
+	ot::PropertyGridCfg cfg;
+	properties.addToConfiguration(nullptr, false, cfg);
+
+	ot::JsonDocument cfgDoc;
+	cfg.addToJsonObject(cfgDoc, cfgDoc.GetAllocator());
+	
+	bsoncxx::document::value bsonObj = bsoncxx::from_json(cfgDoc.toJson());
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
 		bsoncxx::builder::basic::kvp("EntityID", (long long)entityID),
@@ -192,7 +198,14 @@ void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 		}
 
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
-		properties.buildFromJSON(propertiesJSON);
+
+		ot::JsonDocument cfgDoc;
+		cfgDoc.fromJson(propertiesJSON);
+
+		ot::PropertyGridCfg cfg;
+		cfg.setFromJsonObject(cfgDoc.GetConstObject());
+
+		properties.buildFromConfiguration(cfg);
 		properties.forceResetUpdateForAllProperties();
 		
 		resetModified();

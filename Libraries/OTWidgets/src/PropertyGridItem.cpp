@@ -24,6 +24,8 @@ ot::PropertyGridItem::~PropertyGridItem() {
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 	m_name = _config->propertyName();
 	m_type = _config->getPropertyType();
+	m_specialType = _config->specialType();
+	m_data = _config->additionalPropertyData();
 	this->setText(0, QString::fromStdString(_config->propertyTitle()));
 	if (m_input) delete m_input;
 	m_input = PropertyInputFactory::createInput(_config);
@@ -42,6 +44,17 @@ void ot::PropertyGridItem::finishSetup(void) {
 	this->setFirstColumnSpanned(false);
 
 
+}
+
+ot::Property* ot::PropertyGridItem::createProperty(void) const {
+	OTAssertNullptr(m_input);
+	ot::Property* prop = m_input->createPropertyConfiguration();
+
+	prop->setPropertyName(m_name);
+	prop->setSpecialType(m_specialType);
+	prop->setAdditionalPropertyData(m_data);
+	
+	return prop;
 }
 
 void ot::PropertyGridItem::setTitle(const QString& _title) {

@@ -163,15 +163,23 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	QAction* actionExport = _rootMenu->addAction("Export");
 
 	// Initialize data
-	this->initializeBrightStyleValues();
-	this->initializeStyleSheetBase();
-	this->parseStyleSheetBaseFile();
-	this->initializePropertyGrid();
-	this->slotGenerate();
-	if (!m_editor->toPlainText().isEmpty()) {
-		this->slotApplyAsCurrent();
+	try {
+		this->initializeBrightStyleValues();
+		this->initializeStyleSheetBase();
+		this->parseStyleSheetBaseFile();
+		this->initializePropertyGrid();
+		this->slotGenerate();
+		if (!m_editor->toPlainText().isEmpty()) {
+			this->slotApplyAsCurrent();
+		}
 	}
-
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("Unknown error");
+	}
+	
 	// Connect signals
 	this->connect(actionImportConfig, &QAction::triggered, this, &ColorStyleEditor::slotImportConfig);
 	this->connect(actionExportConfig, &QAction::triggered, this, &ColorStyleEditor::slotExportConfig);

@@ -77,7 +77,7 @@ namespace ot {
 
 		PropertyGroup* findGroup(const std::string& _name) const;
 
-		void findPropertiesByContent(const std::string& _content, std::list<Property*>& _list) const;
+		void findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const;
 
 		void setBackgroundColor(Color::DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };

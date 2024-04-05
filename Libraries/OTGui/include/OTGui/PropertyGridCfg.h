@@ -11,6 +11,8 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	class Property;
@@ -42,7 +44,7 @@ namespace ot {
 		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
-		std::list<Property*> findPropertiesByContent(const std::string& _content) const;
+		std::list<Property*> findPropertiesBySpecialType(const std::string& _specialType) const;
 
 	private:
 		void clear(void);

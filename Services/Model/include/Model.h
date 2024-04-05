@@ -13,6 +13,7 @@
 #include "ClassFactoryModel.h"
 #include "EntityFaceAnnotation.h"
 
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/UiTypes.h"
 
 class EntityMesh;
@@ -61,8 +62,8 @@ public:
 	std::map<std::string, bool> getListOfEntityNames();
 	std::map<std::string, ot::UID> getEntityNameToIDMap();
 
-	std::string getCommonPropertiesAsJson(const std::list<ot::UID> &entityIDList, bool visibleOnly);
-	void        setPropertiesFromJson(const std::list<ot::UID>& entityIDList, std::string props, bool updateEntities, bool itemsVisible);
+	void addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config);
+	void        setPropertiesFromJson(const std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration, bool updateEntities, bool itemsVisible);
 	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName);
 
 	bool entitiesNeedUpdate(void);
@@ -162,22 +163,22 @@ public:
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
 	void deleteCurves(std::list<std::string> &entityNameList);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
-	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const std::string &properties, bool updateProperties);
+	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion, const std::string& comment);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
 	std::list<std::string> getListOfFolderItems(const std::string &folder, bool recursive);
 	std::list<ot::UID> getIDsOfFolderItemsOfType(const std::string &folder, const std::string &className, bool recursive);
 	std::list<EntityBase*> getListOfSelectedEntities(const std::string &typeFilter);
-	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);
-	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const std::string &propertiesJson);
+	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration);
+	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration);
 	void getListOfAllChildEntities(EntityBase* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
 
 	void getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions);
 	void getEntityNames(std::list<ot::UID> &entityIDList, std::list<std::string> &entityNames);
 	void getEntityTypes(std::list<ot::UID> &entityIDList, std::list<std::string> &entityTypes);
 	std::list<ot::UID> getAllGeometryEntitiesForMeshing(void);
-	void getEntityProperties(ot::UID entityID, bool recursive, const std::string &propertyGroupFilter, std::map<ot::UID, std::string> &entityProperties);
+	void getEntityProperties(ot::UID entityID, bool recursive, const std::string &propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties);
 
 	EntityBase *findEntityFromName(const std::string &name);
 
@@ -284,7 +285,7 @@ private:
 	void otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ownerEntityListMap);
 	size_t getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geometryEntities);
 	std::list<EntityBase*> getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities);
-	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, std::string>& entityProperties);
+	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties);
 	void addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible);
 	std::list<ot::UID> RemoveBlockConnections(std::list<EntityBase*>& entityID);
 	void VisualizeRelatedBlockConnections(std::list<EntityBase*>& entityID);

@@ -16,6 +16,8 @@ class TopoDS_Shape;
 #include <vector>
 #include <map>
 
+#include "OTGui/PropertyGridCfg.h"
+
 class ModelBuilder
 {
 public:
@@ -39,7 +41,7 @@ private:
 	void removeUnnecessaryHierarchies(void);
 	void mergeShapesOfSameParent(void);
 	bool mergeChildren(std::vector<std::string> &childList, std::map<std::string, EntityGeometry *> &shapesInEntityList);
-	EntityGeometry *createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const std::string &shapeProperties);
+	EntityGeometry *createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const ot::PropertyGridCfg& shapeProperties);
 	void storeEntities(void);
 
 	Application *application;

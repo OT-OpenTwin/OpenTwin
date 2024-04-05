@@ -109,7 +109,8 @@ void ot::Property::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 	_object.AddMember("Tip", JsonString(m_tip, _allocator), _allocator);
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
-	_object.AddMember("Content", JsonString(m_content, _allocator), _allocator);
+	_object.AddMember("SpecialType", JsonString(m_specialType, _allocator), _allocator);
+	_object.AddMember("Data", JsonString(m_data, _allocator), _allocator);
 	_object.AddMember("Flags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
 	this->getPropertyData(_object, _allocator);
 }
@@ -118,7 +119,8 @@ void ot::Property::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_tip = json::getString(_object, "Tip");
 	m_name = json::getString(_object, "Name");
 	m_title = json::getString(_object, "Title");
-	m_content = json::getString(_object, "Content");
+	m_specialType = json::getString(_object, "SpecialType");
+	m_data = json::getString(_object, "Data");
 	m_flags = this->stringListToFlags(json::getStringList(_object, "Flags"));
 
 	this->setPropertyData(_object); 
@@ -128,6 +130,7 @@ void ot::Property::setFromOther(const Property* _other) {
 	m_tip = _other->m_tip;
 	m_name = _other->m_name;
 	m_title = _other->m_title;
-	m_content = _other->m_content;
+	m_specialType = _other->m_specialType;
+	m_data = _other->m_data;
 	m_flags = _other->m_flags;
 }

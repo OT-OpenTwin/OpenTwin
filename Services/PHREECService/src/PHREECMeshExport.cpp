@@ -373,7 +373,11 @@ std::string PHREECMeshExport::prefetchTetList(const std::string &dataBaseURL, co
 	auto bsonObj = meshItemDocView["Properties"].get_document();
 	std::string propertiesJSON = bsoncxx::to_json(bsonObj);
 	EntityProperties properties;
-	properties.buildFromJSON(propertiesJSON);
+	ot::PropertyGridCfg cfg;
+	ot::JsonDocument cfgDoc;
+	cfgDoc.fromJson(propertiesJSON);
+	cfg.setFromJsonObject(cfgDoc.GetConstObject());
+	properties.buildFromConfiguration(cfg);
 
 	EntityPropertiesEntityList *materialProperty = dynamic_cast<EntityPropertiesEntityList*>(properties.getProperty("Material"));
 

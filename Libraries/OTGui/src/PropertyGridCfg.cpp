@@ -96,11 +96,11 @@ ot::PropertyGroup* ot::PropertyGridCfg::findOrCreateGroup(const std::string& _na
 	return g;
 }
 
-std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesByContent(const std::string& _content) const {
+std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesBySpecialType(const std::string& _specialType) const {
 	std::list<ot::Property*> ret;
-	m_defaultGroup->findPropertiesByContent(_content, ret);
+	m_defaultGroup->findPropertiesBySpecialType(_specialType, ret);
 	for (PropertyGroup* g : m_rootGroups) {
-		g->findPropertiesByContent(_content, ret);
+		g->findPropertiesBySpecialType(_specialType, ret);
 	}
 	return ret;
 }

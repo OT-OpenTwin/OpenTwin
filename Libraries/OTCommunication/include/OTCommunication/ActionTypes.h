@@ -75,7 +75,6 @@
 #define OT_ACTION_CMD_MODEL_ParentNeedsUpdate "Model.Event.ParentNeedsUpdate"
 #define OT_ACTION_CMD_MODEL_ItemRenamed "Model.Event.ItemRenamed"
 #define OT_ACTION_CMD_MODEL_GetIsModified "Model.State.Modified.Get"
-#define OT_ACTION_CMD_MODEL_CommonPropertiesJSON "Model.Properties.Common.JSON"
 #define OT_ACTION_CMD_MODEL_SetPropertiesFromJSON "Model.Properties.SetFromJSON"
 #define OT_ACTION_CMD_MODEL_DeleteProperty "Model.Properties.Delete"
 #define OT_ACTION_CMD_MODEL_GenerateEntityIDs "Model.EntityIDs.Generate"

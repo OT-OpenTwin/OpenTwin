@@ -6,7 +6,11 @@
 
 #include "EntityPropertiesItems.h"
 
+#include "OTGui/PropertyGridCfg.h"
+
 class EntityBase;
+
+namespace ot { class PropertyGroup; };
 
 class __declspec(dllexport) EntityProperties
 {
@@ -29,8 +33,9 @@ public:
 	void checkWhetherUpdateNecessary(void);
 	void forceResetUpdateForAllProperties();
 
-	std::string getJSON(EntityBase *root, bool visibleOnly);
-	void buildFromJSON(const std::string &prop);
+	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config);
+	void buildFromConfiguration(const ot::PropertyGridCfg& _config);
+	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig);
 	void checkMatchingProperties(EntityProperties &other);
 	void readFromProperties(const EntityProperties &other, EntityBase *root);
 

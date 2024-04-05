@@ -9,6 +9,7 @@
 #include "Geometry.h"
 
 #include "OTCore/CoreTypes.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/UiTypes.h"
 
 class MicroserviceNotifier
@@ -21,7 +22,7 @@ public:
 	void requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentAction, int siteID);
 
 	// All other actions can be executed asynchronously
-	void fillPropertyGrid(const std::string &settings);
+	void fillPropertyGrid(const ot::PropertyGridCfg& _configuration);
 	void addMenuPage(const std::string &pageName);
 	void addMenuGroup(const std::string &pageName, const std::string &groupName);
 	void addMenuSubGroup(const std::string &pageName, const std::string &groupName, const std::string &subGroupName);
