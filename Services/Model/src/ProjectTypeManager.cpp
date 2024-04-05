@@ -88,7 +88,7 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 	_has3DView = true;
 	_has1DView = true;
 	_hasTableView = false;
-	_hasBlockPicker = false;
+	_hasBlockPicker = true;
 }
 
 std::string ProjectTypeManager::getViews(void)
