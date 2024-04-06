@@ -50,8 +50,7 @@ void ot::ComboButton::setItems(const QStringList& _items) {
 }
 
 void ot::ComboButton::mousePressEvent(QMouseEvent* _event) {
-	m_menu->move(this->mapToGlobal(this->pos()));
-	m_menu->exec();
+	QPushButton::mousePressEvent(_event);
 }
 
 void ot::ComboButton::slotActionTriggered(QAction* _action) {
@@ -60,5 +59,6 @@ void ot::ComboButton::slotActionTriggered(QAction* _action) {
 }
 
 void ot::ComboButton::ini(void) {
+	this->setMenu(m_menu);
 	this->connect(m_menu, &QMenu::triggered, this, &ComboButton::slotActionTriggered);
 }
