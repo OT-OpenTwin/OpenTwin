@@ -600,16 +600,18 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_E(response);
 			}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
+			else OT_ACTION_IF_RESPONSE_WARNING(response) {
+				OT_LOG_W(response);
+			}
 		}
-		}
-
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_E("Unknown error occured");
 	}
 
 	AppBase::instance()->lockPropertyGrid(false);

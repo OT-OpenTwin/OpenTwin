@@ -55,6 +55,7 @@ ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 }
 
 void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
+	this->blockSignals(true);
 	this->clear();
 
 	for (const Property* itm : _config.defaultGroup()->properties()) {
@@ -76,6 +77,7 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 			m_tree->topLevelItem(i)->setExpanded(true);
 		}
 	}
+	this->blockSignals(false);
 }
 
 void ot::PropertyGrid::addRootItem(PropertyGridItem* _item) {

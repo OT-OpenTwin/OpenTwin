@@ -2042,7 +2042,7 @@ void AppBase::appendDebugMessage(const QString & _message) {
 
 void AppBase::lockPropertyGrid(bool flag)
 {
-	m_propertyGrid->getTreeWidget()->setEnabled(flag);
+	m_propertyGrid->getTreeWidget()->setEnabled(!flag);
 }
 
 ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const std::string& _itemName) {
