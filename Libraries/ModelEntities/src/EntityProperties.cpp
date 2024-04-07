@@ -221,6 +221,11 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 			return;
 		}
 
+		if (!newSetting) {
+			OT_LOG_E("Failed to create property entity");
+			return;
+		}
+
 		newSetting->setFromConfiguration(p);
 		newSetting->setName(p->propertyName());
 		newSetting->setHasMultipleValues(p->propertyFlags() & ot::Property::HasMultipleValues);
@@ -229,7 +234,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		newSetting->setVisible(!(p->propertyFlags() & ot::Property::IsHidden));
 		newSetting->setErrorState(p->propertyFlags() & ot::Property::HasInputError);
 
-		createProperty(newSetting, _groupConfig->name());
+		this->createProperty(newSetting, _groupConfig->name());
 	}
 }
 

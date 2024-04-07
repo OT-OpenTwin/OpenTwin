@@ -595,8 +595,8 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 			ot::PropertyGridCfg cfg;
 			cfg.setFromJsonObject(cfgObj);
 
-			bool update = doc[OT_ACTION_PARAM_MODEL_Update].GetBool();
-			bool itemsVisible = doc[OT_ACTION_PARAM_MODEL_ItemsVisible].GetBool();
+			bool update = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_Update);
+			bool itemsVisible = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 			globalModel->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
 		}

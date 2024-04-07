@@ -590,7 +590,7 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, false, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 		
