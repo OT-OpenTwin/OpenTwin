@@ -31,6 +31,8 @@ protected:
 	virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override {
 		TreeWidget::drawRow(_painter, _options, _index);
 	}
+
+	
 };
 
 ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) {
@@ -40,6 +42,9 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) 
 	m_tree->setIndentation(0);
 	m_tree->setObjectName("ot_property_grid");
 	m_tree->setItemDelegate(new PropertyGridItemDelegate(m_tree));
+
+	this->connect(m_tree, &QTreeWidget::itemCollapsed, this, &PropertyGrid::slotItemCollapsed);
+	this->connect(m_tree, &QTreeWidget::itemExpanded, this, &PropertyGrid::slotItemExpanded);
 }
 
 ot::PropertyGrid::~PropertyGrid() {
@@ -164,4 +169,18 @@ void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
 
 void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
 	Q_EMIT propertyDeleteRequested(_groupName, _itemName);
+}
+
+void ot::PropertyGrid::slotItemCollapsed(QTreeWidgetItem* _item) {
+	PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(_item);
+	if (g) {
+		g->updateStateIcon();
+	}
+}
+
+void ot::PropertyGrid::slotItemExpanded(QTreeWidgetItem* _item) {
+	PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(_item);
+	if (g) {
+		g->updateStateIcon();
+	}
 }

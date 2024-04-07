@@ -14,7 +14,7 @@ ot::ColorStyle::ColorStyle() {
 }
 
 ot::ColorStyle::ColorStyle(const ColorStyle& _other)
-	: m_styleSheet(_other.m_styleSheet), m_values(_other.m_values), m_name(_other.m_name)
+	: m_styleSheet(_other.m_styleSheet), m_files(_other.m_files), m_values(_other.m_values), m_name(_other.m_name)
 {
 	
 }
@@ -25,6 +25,7 @@ ot::ColorStyle::~ColorStyle() {
 
 ot::ColorStyle& ot::ColorStyle::operator = (const ColorStyle& _other) {
 	m_styleSheet = _other.m_styleSheet;
+	m_files = _other.m_files;
 	m_values = _other.m_values;
 	m_name = _other.m_name;
 
@@ -65,8 +66,8 @@ void ot::ColorStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 // Setter/Getter
 
-void ot::ColorStyle::addValue(const ColorStyleValue& _value) {
-	if (this->hasValue(_value.name())) {
+void ot::ColorStyle::addValue(const ColorStyleValue& _value, bool _replace) {
+	if (this->hasValue(_value.name()) && !_replace) {
 		OT_LOG_W("A value with the name \"" + _value.name() + "\" already exists");
 		return;
 	}
@@ -80,6 +81,24 @@ bool ot::ColorStyle::hasValue(const std::string& _name) const {
 const ot::ColorStyleValue& ot::ColorStyle::getValue(const std::string& _name, const ColorStyleValue& _default) const {
 	const auto& it = m_values.find(_name);
 	if (it == m_values.end()) return _default;
+	else return it->second;
+}
+
+void ot::ColorStyle::addFile(const std::string& _name, const QString& _path, bool _replace) {
+	if (this->hasFile(_name) && !_replace) {
+		OT_LOG_W("A file with the name \"" + _name + "\" already exists");
+		return;
+	}
+	m_files.insert_or_assign(_name, _path);
+}
+
+bool ot::ColorStyle::hasFile(const std::string& _name) const {
+	return m_files.find(_name) != m_files.end();
+}
+
+QString ot::ColorStyle::getFile(const std::string& _name) const {
+	const auto& it = m_files.find(_name);
+	if (it == m_files.end()) return QString();
 	else return it->second;
 }
 
@@ -105,10 +124,23 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 		if (k == OT_COLORSTYLE_FILE_KEY_Name) {
 			this->setColorStyleName(n.toStdString());
 		}
+		else if (k == OT_COLORSTYLE_FILE_KEY_Files) {
+			JsonDocument doc;
+			if (!doc.fromJson(n.toStdString())) {
+				OT_LOG_E("Failed to parse files document");
+				return false;
+			}
+			for (JsonSizeType i = 0; i < doc.Size(); i++) {
+				ConstJsonObject vObj = json::getObject(doc, i);
+				std::string n = json::getString(vObj, OT_COLORSTYLE_FILE_VALUE_Name);
+				QString p = QString::fromStdString(json::getString(vObj, OT_COLORSTYLE_FILE_VALUE_Path));
+				this->addFile(n, p, false);
+			}
+		}
 		else if (k == OT_COLORSTYLE_FILE_KEY_Values) {
 			JsonDocument doc;
 			if (!doc.fromJson(n.toStdString())) {
-				OT_LOG_E("Failed to parse document");
+				OT_LOG_E("Failed to parse values document");
 				return false;
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {

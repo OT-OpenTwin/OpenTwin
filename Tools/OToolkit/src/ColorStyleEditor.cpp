@@ -50,6 +50,7 @@
 #include <QtWidgets/qfiledialog.h>
 
 #define CSE_GROUP_General "General"
+#define CSE_GROUP_StyleFiles "Style Files"
 #define CSE_GROUP_StyleValues "Style Values"
 #define CSE_GROUP_Int "Integer Numbers"
 #define CSE_GROUP_Double "Decimal Numbers"
@@ -96,6 +97,9 @@ ColorStyleEditor::ColorStyleEditor() {
 }
 
 ColorStyleEditor::~ColorStyleEditor() {
+	for (const auto& f : m_styleFiles) {
+		delete f.second;
+	}
 	for (const auto& p : m_styleValues) {
 		delete p.second;
 	}
@@ -122,13 +126,14 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	m_nameProp = new PropertyString(CSE_Name, std::string());
 	generalGroup->addProperty(m_nameProp);
 
+	m_styleFilesGroup = new PropertyGroup(CSE_GROUP_StyleFiles);
 	m_styleValuesGroup = new PropertyGroup(CSE_GROUP_StyleValues);
 	m_intGroup = new PropertyGroup(CSE_GROUP_Int);
 	m_doubleGroup = new PropertyGroup(CSE_GROUP_Double);
 	m_colorsGroup = new PropertyGroup(CSE_GROUP_StyleSheetColors);
 	m_fileGroup = new PropertyGroup(CSE_GROUP_StyleSheetFiles);
 
-	m_propertyGridConfig.setRootGroups({ generalGroup, m_styleValuesGroup, m_intGroup, m_doubleGroup, m_colorsGroup, m_fileGroup });
+	m_propertyGridConfig.setRootGroups({ generalGroup, m_styleFilesGroup, m_styleValuesGroup, m_intGroup, m_doubleGroup, m_colorsGroup, m_fileGroup });
 
 	m_editor = new ot::TextEditor;
 	m_editor->setReadOnly(true);
@@ -283,6 +288,15 @@ void ColorStyleEditor::slotExportConfig(void) {
 
 	doc.AddMember("Name", JsonString(m_nameProp->value(), doc.GetAllocator()), doc.GetAllocator());
 
+	JsonArray styleFileArr;
+	for (const auto& it : m_styleFiles) {
+		JsonObject styleFileObj;
+		styleFileObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(it.first, doc.GetAllocator()), doc.GetAllocator());
+		styleFileObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Path, JsonString(it.second->value(), doc.GetAllocator()), doc.GetAllocator());
+		styleFileArr.PushBack(styleFileObj, doc.GetAllocator());
+	}
+	doc.AddMember("StyleFiles", styleFileArr, doc.GetAllocator());
+
 	JsonArray styleArr;
 	for (const auto& it : m_styleValues) {
 		JsonObject styleObj;
@@ -406,6 +420,7 @@ void ColorStyleEditor::initializeStyleSheetBase(void) {
 }
 
 void ColorStyleEditor::cleanUpData(void) {
+	m_styleFiles.clear();
 	m_styleValues.clear();
 	m_colors.clear();
 	m_files.clear();
@@ -419,6 +434,10 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	this->cleanUpData();
 
 	m_nameProp->setValue(OT_COLORSTYLE_NAME_Bright);
+
+	// Initialize default style files
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
@@ -473,6 +492,10 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	m_nameProp->setValue(OT_COLORSTYLE_NAME_Dark);
 
+	// Initialize default style files
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
+
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
@@ -525,6 +548,10 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	this->cleanUpData();
 
 	m_nameProp->setValue(OT_COLORSTYLE_NAME_Blue);
+
+	// Initialize default style files
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
@@ -665,6 +692,14 @@ void ColorStyleEditor::initializePropertyGrid(void) {
 
 	using namespace ot;
 	
+	// Style files
+	m_styleFilesGroup->clear();
+	for (const auto& it : m_styleFiles) {
+		it.second->setPropertyName(it.first);
+		it.second->setPropertyTitle(it.first);
+		m_styleFilesGroup->addProperty(it.second);
+	}
+
 	// Style values
 	m_styleValuesGroup->clear();
 	for (const auto& it : m_styleValues) {
@@ -726,6 +761,33 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	OTAssertNullptr(iName);
 	std::string cName = iName->getCurrentValue().toString().toStdString();
 
+	// Get style files
+	JsonDocument styleFilesDoc(rapidjson::kArrayType);
+	const PropertyGridGroup* gStyleFiles = m_propertyGrid->findGroup(CSE_GROUP_StyleFiles);
+	OTAssertNullptr(gStyleFiles);
+	for (const PropertyGridItem* itm : gStyleFiles->childProperties()) {
+		const PropertyInputString* inp = dynamic_cast<const PropertyInputString*>(itm->getInput());
+		if (!inp) {
+			OT_LOG_E("Input cast failed");
+			return false;
+		}
+
+		JsonObject fObj;
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Path, JsonString(inp->getCurrentText().toStdString(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
+		styleFilesDoc.PushBack(fObj, styleFilesDoc.GetAllocator());
+	}
+	std::string cStyleFiles = styleFilesDoc.toJson();
+
+	// Clean up new line if exists
+	{
+		size_t ix = cStyleFiles.find('\n');
+		while (ix != std::string::npos) {
+			cStyleFiles.erase(ix);
+			ix = cStyleFiles.find('\n');
+		}
+	}
+
 	// Get style values
 	JsonDocument styleValuesDoc(rapidjson::kArrayType);
 	const PropertyGridGroup* gStyleValues = m_propertyGrid->findGroup(CSE_GROUP_StyleValues);
@@ -752,10 +814,12 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	std::string cStyleValue = styleValuesDoc.toJson();
 
 	// Clean up new line if exists
-	size_t ix = cStyleValue.find('\n');
-	while (ix != std::string::npos) {
-		cStyleValue.erase(ix);
-		ix = cStyleValue.find('\n');
+	{
+		size_t ix = cStyleValue.find('\n');
+		while (ix != std::string::npos) {
+			cStyleValue.erase(ix);
+			ix = cStyleValue.find('\n');
+		}
 	}
 
 	// Build up color replace map
@@ -834,9 +898,10 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		base.replace(it.first, it.second);
 	}
 
-	_result = "name:" + cName + "\n" +
-		"values:" + cStyleValue + "\n" +
-		"sheet:\n";
+	_result = OT_COLORSTYLE_FILE_KEY_Name + cName + "\n" +
+		OT_COLORSTYLE_FILE_KEY_Files + cStyleFiles + "\n" +
+		OT_COLORSTYLE_FILE_KEY_Values + cStyleValue + "\n" +
+		OT_COLORSTYLE_FILE_KEY_StyleSheet "\n";
 	_result.append(base.toStdString());
 
 	return true;

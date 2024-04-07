@@ -15,6 +15,9 @@
 #include <QtGui/qbrush.h>
 #include <QtWidgets/qtreewidget.h>
 
+class QLabel;
+class QWidget;
+
 namespace ot {
 
 	class Painter2D;
@@ -54,6 +57,8 @@ namespace ot {
 		PropertyGridGroup* findChildGroup(const std::string& _name, bool _searchChildGroups) const;
 		std::list<PropertyGridGroup*> childGroups(void) const;
 
+		void updateStateIcon(void);
+
 	Q_SIGNALS:
 		void itemInputValueChanged(const std::string& _groupName, const std::string& _itemName);
 		void itemDeleteRequested(const std::string& _groupName, const std::string& _itemName);
@@ -66,8 +71,13 @@ namespace ot {
 		void slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName);
 
 	private:
+		void updateStateIcon(const ColorStyle& _style);
+
 		bool m_isAlternate;
 		std::string m_name;
+		QWidget* m_titleLayoutW;
+		QLabel* m_titleIconLabel;
+		QLabel* m_titleLabel;
 		QBrush m_groupBrush;
 		Painter2D* m_painter;
 		QBrush m_groupAlternateBrush;

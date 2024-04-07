@@ -31,6 +31,7 @@ void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
 
 	m_styles.insert_or_assign(_style.colorStyleName(), _style);
 	ColorStyle& cs = m_styles.at(_style.colorStyleName());
+	this->evaluateColorStyleFiles(cs);
 	this->evaluateStyleSheetMacros(cs);
 
 	if (m_currentStyle == _style.colorStyleName()) {
@@ -142,7 +143,16 @@ void ot::GlobalColorStyle::scanForStyleFiles(void) {
 	}
 }
 
-void ot::GlobalColorStyle::evaluateStyleSheetMacros(ColorStyle& _style) {
+void ot::GlobalColorStyle::evaluateColorStyleFiles(ColorStyle& _style) const {
+	QString rootPath = this->styleRootPath(_style.colorStyleName());
+	std::map<std::string, QString> data = _style.getFiles();
+	for (auto& it : data) {
+		it.second = rootPath + it.second;
+	}
+	_style.setFiles(data);
+}
+
+void ot::GlobalColorStyle::evaluateStyleSheetMacros(ColorStyle& _style) const {
 	QString rootPath = this->styleRootPath(_style.colorStyleName());
 	QString evaluatedSheet = _style.styleSheet();
 	evaluatedSheet.replace(OT_COLORSTYLE_FILE_MACRO_Root, rootPath);

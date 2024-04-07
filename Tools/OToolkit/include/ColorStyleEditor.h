@@ -80,11 +80,13 @@ private:
 	ot::PropertyGridCfg m_propertyGridConfig;
 
 	ot::PropertyString* m_nameProp;
+	ot::PropertyGroup* m_styleFilesGroup;
 	ot::PropertyGroup* m_styleValuesGroup;
 	ot::PropertyGroup* m_intGroup;
 	ot::PropertyGroup* m_doubleGroup;
 	ot::PropertyGroup* m_colorsGroup;
 	ot::PropertyGroup* m_fileGroup;
+	std::map<std::string, ot::PropertyString*> m_styleFiles;
 	std::map<std::string, ot::PropertyPainter2D*> m_styleValues;
 	std::map<std::string, ot::PropertyPainter2D*> m_colors;
 	std::map<std::string, ot::PropertyString*> m_files;

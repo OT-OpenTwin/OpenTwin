@@ -51,7 +51,9 @@ namespace ot {
 
 		void scanForStyleFiles(void);
 
-		void evaluateStyleSheetMacros(ColorStyle& _style);
+		void evaluateColorStyleFiles(ColorStyle& _style) const;
+
+		void evaluateStyleSheetMacros(ColorStyle& _style) const;
 
 		void setApplication(QApplication* _application);
 

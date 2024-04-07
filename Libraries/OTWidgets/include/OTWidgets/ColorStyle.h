@@ -52,9 +52,17 @@ namespace ot {
 		void setStyleSheet(const QString& _sheet) { m_styleSheet = _sheet; };
 		const QString& styleSheet(void) const { return m_styleSheet; };
 
-		void addValue(const ColorStyleValue& _value);
+		void addValue(const ColorStyleValue& _value, bool _replace = false);
 		bool hasValue(const std::string& _name) const;
 		const ColorStyleValue& getValue(const std::string& _name, const ColorStyleValue& _default = ColorStyleValue()) const;
+		void setValues(const std::map<std::string, ColorStyleValue>& _values) { m_values = _values; };
+		const std::map<std::string, ColorStyleValue>& getValues(void) const { return m_values; };
+
+		void addFile(const std::string& _name, const QString& _path, bool _replace = false);
+		bool hasFile(const std::string& _name) const;
+		QString getFile(const std::string& _name) const;
+		void setFiles(const std::map<std::string, QString>& _files) { m_files = _files; };
+		const std::map<std::string, QString>& getFiles(void) const { return m_files; };
 
 		bool setupFromFile(QByteArray _data);
 
@@ -62,6 +70,7 @@ namespace ot {
 		std::string m_name;
 		QString m_styleSheet;
 		std::map<std::string, ColorStyleValue> m_values;
+		std::map<std::string, QString> m_files;
 	};
 
 }

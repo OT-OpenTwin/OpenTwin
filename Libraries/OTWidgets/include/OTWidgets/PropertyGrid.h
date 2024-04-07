@@ -62,6 +62,8 @@ namespace ot {
 		void slotPropertyChanged(const std::string& _groupName, const std::string& _itemName);
 		void slotPropertyDeleteRequested(void);
 		void slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName);
+		void slotItemCollapsed(QTreeWidgetItem* _item);
+		void slotItemExpanded(QTreeWidgetItem* _item);
 
 	private:
 		class PropertyGridTree;

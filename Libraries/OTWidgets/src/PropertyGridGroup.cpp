@@ -7,12 +7,17 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PropertyGridGroup.h"
+
+// Qt header
+#include <QtWidgets/qlabel.h>
+#include <QtWidgets/qlayout.h>
 
 namespace ot {
 	namespace intern {
@@ -27,6 +32,17 @@ namespace ot {
 ot::PropertyGridGroup::PropertyGridGroup() 
 	: m_isAlternate(false), m_groupBrush(QColor(Qt::white)), m_groupAlternateBrush(QColor(235, 235, 235))
 {
+	m_titleLabel = new QLabel;
+	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
+	m_titleIconLabel = new QLabel;
+	m_titleIconLabel->setObjectName("PropertyGridGroupTitleIconLabel");
+	m_titleLayoutW = new QWidget;
+	m_titleLayoutW->setObjectName("PropertyGridGroupTitleLayoutW");
+	QHBoxLayout* titleLayout = new QHBoxLayout(m_titleLayoutW);
+	titleLayout->addWidget(m_titleIconLabel);
+	titleLayout->addWidget(m_titleLabel, 1);
+	titleLayout->setContentsMargins(0, 0, 0, 0);
+
 	m_painter = new FillPainter2D(Color::White);
 	m_alternatePainter = new FillPainter2D(Color(235, 235, 235));
 
@@ -47,7 +63,7 @@ void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	this->setPainter(_group->backgroundPainter()->createCopy());
 	this->setAlternatePainter(_group->alternateBackgroundPainter()->createCopy());
 
-	this->setText(intern::pgcTitle, QString::fromStdString(_group->title()));
+	m_titleLabel->setText(QString::fromStdString(_group->title()));
 
 	for (Property* p : _group->properties()) {
 		PropertyGridItem* newItem = new PropertyGridItem;
@@ -84,6 +100,14 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(void) const {
 
 void ot::PropertyGridGroup::finishSetup(void) {
 	this->setFirstColumnSpanned(false);
+
+	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
+	if (!tree) {
+		OT_LOG_EA("Tree cast failed");
+		return;
+	}
+	tree->setItemWidget(this, 0, m_titleLayoutW);
+
 	for (int i = 0; i < this->childCount(); i++) {
 		PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (itm) {
@@ -102,11 +126,11 @@ void ot::PropertyGridGroup::finishSetup(void) {
 }
 
 void ot::PropertyGridGroup::setTitle(const QString& _title) {
-	this->setText(0, _title);
+	m_titleLabel->setText(_title);
 }
 
 QString ot::PropertyGridGroup::getTitle(void) const {
-	return this->text(0);
+	return m_titleLabel->text();
 }
 
 void ot::PropertyGridGroup::setPainter(Painter2D* _painter) {
@@ -189,11 +213,21 @@ std::list<ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const
 	return ret;
 }
 
+void ot::PropertyGridGroup::updateStateIcon(void) {
+	this->updateStateIcon(GlobalColorStyle::instance().getCurrentStyle());
+}
+
 void ot::PropertyGridGroup::slotColorStyleChanged(const ColorStyle& _style) {
-	this->setBackground(0, _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
 	this->setBackground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
-	this->setForeground(0, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
 	this->setForeground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
+
+	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).qss() +
+		"; color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).qss() + "; }" +
+		"#PropertyGridGroupTitleLabel { background-color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).qss() +
+		"; color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).qss() + "; }";
+
+	m_titleLayoutW->setStyleSheet(sheet);
+	this->updateStateIcon(_style);
 }
 
 void ot::PropertyGridGroup::slotItemInputValueChanged(void) {
@@ -220,4 +254,10 @@ void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
 
 void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
 	Q_EMIT itemDeleteRequested(_groupName, _itemName);
+}
+
+void ot::PropertyGridGroup::updateStateIcon(const ColorStyle& _style) {
+	QString icoPath = _style.getFile((this->isExpanded() ? OT_COLORSTYLE_FILE_PropertyGroupExpanded : OT_COLORSTYLE_FILE_PropertyGroupCollapsed));
+	QIcon ico(icoPath);
+	m_titleIconLabel->setPixmap(ico.pixmap(16, 16));
 }
