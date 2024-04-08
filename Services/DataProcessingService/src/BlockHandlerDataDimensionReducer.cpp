@@ -5,8 +5,8 @@
 BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDataDimensionReducer* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
 {
-	_column = blockEntity->getInputColumn();
-	_row = blockEntity->getInputRow();
+	_column = blockEntity->getInputColumn() -1; //Switching from 1 based displayed index to zero based
+	_row = blockEntity->getInputRow() - 1;//Switching from 1 based displayed index to zero based
 	_inputConnectorName = blockEntity->getInputConnector()->getConnectorName();
 	_outputConnectorName = blockEntity->getOutputConnector()->getConnectorName();
 }
