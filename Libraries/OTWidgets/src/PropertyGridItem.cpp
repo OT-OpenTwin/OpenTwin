@@ -5,16 +5,38 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PropertyInputFactory.h"
 
-ot::PropertyGridItem::PropertyGridItem()
-	: m_input(nullptr), m_propertyBrush(QColor(Qt::white)), m_type(Property::NullType), m_isDeleteable(false)
-{
+// Qt header
+#include <QtWidgets/qlayout.h>
 
+ot::PropertyGridItem::PropertyGridItem()
+	: m_input(nullptr), m_propertyBrush(QColor(Qt::white)), m_type(Property::NullType), m_flags(Property::NoFlags)
+{
+	m_titleLayoutW = new QWidget;
+	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
+	QHBoxLayout* titleLayout = new QHBoxLayout(m_titleLayoutW);
+	titleLayout->setContentsMargins(0, 0, 0, 0);
+	m_titleLabel = new Label;
+	m_titleLabel->setObjectName("PropertyGridItemTitleLabel");
+	m_deleteLabel = new Label;
+	m_deleteLabel->setObjectName("PropertyGridItemDeleteLabel");
+	m_deleteLabel->setHidden(true);
+
+	titleLayout->addWidget(m_titleLabel, 1);
+	titleLayout->addWidget(m_deleteLabel);
+
+	this->slotGlobalStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
+
+	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridItem::slotGlobalStyleChanged);
+	this->connect(m_deleteLabel, &Label::mousePressed, this, &PropertyGridItem::slotDeleteRequested);
 }
 
 ot::PropertyGridItem::~PropertyGridItem() {
@@ -26,11 +48,13 @@ bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 	m_type = _config->getPropertyType();
 	m_specialType = _config->specialType();
 	m_data = _config->additionalPropertyData();
-	this->setText(0, QString::fromStdString(_config->propertyTitle()));
+	m_titleLabel->setText(QString::fromStdString(_config->propertyTitle()));
 	if (m_input) delete m_input;
 	m_input = PropertyInputFactory::createInput(_config);
-	m_isDeleteable = _config->propertyFlags() & Property::IsDeletable;
-	
+	m_flags = _config->propertyFlags();
+
+	m_deleteLabel->setHidden(!(m_flags & Property::IsDeletable));
+
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
 
 	return true;
@@ -42,10 +66,9 @@ void ot::PropertyGridItem::finishSetup(void) {
 		OT_LOG_EA("Tree cast failed");
 		return;
 	}
+	tree->setItemWidget(this, 0, m_titleLayoutW);
 	tree->setItemWidget(this, 1, m_input->getQWidget());
 	this->setFirstColumnSpanned(false);
-
-
 }
 
 ot::Property* ot::PropertyGridItem::createProperty(void) const {
@@ -85,6 +108,20 @@ void ot::PropertyGridItem::setInput(PropertyInput* _input) {
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
 }
 
+bool ot::PropertyGridItem::isPropertyDeletable(void) const {
+	return m_flags & Property::IsDeletable;
+}
+
 void ot::PropertyGridItem::slotValueChanged(void) {
 	Q_EMIT inputValueChanged();
+}
+
+void ot::PropertyGridItem::slotDeleteRequested(void) {
+	Q_EMIT deleteRequested();
+}
+
+void ot::PropertyGridItem::slotGlobalStyleChanged(const ColorStyle& _style) {
+	QString pth = GlobalColorStyle::instance().getCurrentStyle().getFile(OT_COLORSTYLE_FILE_PropertyItemDelete);
+	QIcon ico(pth);
+	m_deleteLabel->setPixmap(ico.pixmap(16, 16));
 }

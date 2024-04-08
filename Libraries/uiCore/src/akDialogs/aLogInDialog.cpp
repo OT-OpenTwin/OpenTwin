@@ -109,19 +109,21 @@ ak::aLogInDialog::aLogInDialog(
 
 	// Create main layout and display data
 	m_mainLayoutW->setObjectName("LogInDialogMainLayoutW");
+	m_bgImage = new QPixmap(_backgroundImage);
+
+	this->setObjectName("LogInDialog");
+	setWindowTitle("Welcome");
+
+	hideInfoButton();
+
+	resize(m_bgImage->size());
+
 	m_mainLayoutW->setStyleSheet("#LogInDialogMainLayoutW{"
 		"background-color:#90000000;"
 		"border-radius:10px;"
 		"}\n"
 		"QLabel{color:#FFFFFF}\n"
 		"QCheckBox{color:#FFFFFF}\n");
-	m_bgImage = new QPixmap(_backgroundImage);
-
-	setWindowTitle("Welcome");
-
-	hideInfoButton();
-
-	resize(m_bgImage->size());
 }
 
 ak::aLogInDialog::~aLogInDialog() {
@@ -158,12 +160,13 @@ ak::aLogInDialog::~aLogInDialog() {
 
 void ak::aLogInDialog::paintEvent(QPaintEvent *pe)
 {
-	QPainter paint(this);
+	/*QPainter paint(this);
 	m_currentImage = m_bgImage->scaled(width(), height(), Qt::KeepAspectRatioByExpanding);
 	QPoint centerOfWidget = rect().center();
 	QRect rectOfPixmap = m_currentImage.rect();
 	rectOfPixmap.moveCenter(centerOfWidget);
-	paint.drawPixmap(rectOfPixmap.topLeft(), m_currentImage);
+	paint.drawPixmap(rectOfPixmap.topLeft(), m_currentImage);*/
+	QDialog::paintEvent(pe);
 }
 
 ak::ID ak::aLogInDialog::addCustomInput(

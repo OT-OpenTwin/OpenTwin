@@ -244,6 +244,9 @@
     <ClCompile Include="src\PropertyGridView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\Label.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -546,6 +549,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PropertyGridItem.h">
       <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Label.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

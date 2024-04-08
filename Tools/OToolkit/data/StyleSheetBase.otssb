@@ -2221,6 +2221,25 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
+#LogInDialog {
+    background: url('%file:Log In Background Image%');
+}
+
+#LogInDialogMainLayoutW {
+    background-color:#90000000;
+	border-radius:10px;
+}
+
+#LogInDialogMainLayoutW QLabel {
+    color:#FFFFFF;
+}
+
+#LogInDialogMainLayoutW QCheckBox{
+    color:#FFFFFF;
+}
+
+/* ##################################################################################### */
+
 /* Property Grid */
 
 #ot_property_grid::item {

@@ -180,6 +180,7 @@ LogInManager::LogInManager()
 
 	AppBase * app = AppBase::instance();
 	m_dialog = new aLogInDialog(true, uiAPI::getPixmap("OpenTwin"), lastUser, lastPassword);
+	m_dialog->setObjectName("ot_LogInDialog");
 	m_dialog->setReturnHashedPassword(false);
 	m_dialog->setWindowIcon(uiAPI::getApplicationIcon("OpenTwin"));
 	m_dialog->setWaitingAnimationDelay(500);

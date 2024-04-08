@@ -88,6 +88,8 @@
 #define CSE_COLOR_TitleBackground_1 "Title Background 1"
 #define CSE_COLOR_TitleForeground_1 "Title Foreground 1"
 
+#define CSE_FILE_LogInBackgroundImage "Log In Background Image"
+
 #define CSE_NUMBER_BorderRadius_1 "Border Radius 1"
 #define CSE_NUMBER_BorderRadius_2 "Border Radius 2"
 #define CSE_NUMBER_OpacityTooltip "Opacity ToolTip"
@@ -436,6 +438,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_nameProp->setValue(OT_COLORSTYLE_NAME_Bright);
 
 	// Initialize default style files
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
 
@@ -483,6 +486,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
 	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+
+	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
 }
 
 void ColorStyleEditor::initializeDarkStyleValues(void) {
@@ -493,6 +498,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_nameProp->setValue(OT_COLORSTYLE_NAME_Dark);
 
 	// Initialize default style files
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
 
@@ -540,6 +546,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
 	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+
+	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
 }
 
 void ColorStyleEditor::initializeBlueStyleValues(void) {
@@ -550,6 +558,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_nameProp->setValue(OT_COLORSTYLE_NAME_Blue);
 
 	// Initialize default style files
+	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
 
@@ -597,6 +606,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
 	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+
+	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
 }
 
 void ColorStyleEditor::parseStyleSheetBaseFile(void) {

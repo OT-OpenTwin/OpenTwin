@@ -586,9 +586,12 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 }
 
 void LogVisualization::appendLogMessages(const QList<ot::LogMessage>& _messages) {
+	bool actb = m_autoScrollToBottom->isChecked();
+	m_autoScrollToBottom->setChecked(false);
 	for (auto m : _messages) {
 		appendLogMessage(m); 
 	}
+	m_autoScrollToBottom->setChecked(actb);
 }
 
 QString LogVisualization::logMessageTypeString(const ot::LogMessage& _msg) {

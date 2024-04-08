@@ -8,14 +8,18 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Property.h"
+#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtWidgets/qtreewidget.h>
 
+class QWidget;
+
 namespace ot {
 
+	class Label;
 	class Property;
 	class PropertyInput;
 
@@ -58,7 +62,7 @@ namespace ot {
 		void setPropertyBrush(const QBrush& _brush) { m_propertyBrush = _brush; };
 		const QBrush& propertyBrush(void) const { return m_propertyBrush; };
 
-		bool isPropertyDeletable(void) const { return m_isDeleteable; };
+		bool isPropertyDeletable(void) const;
 
 	Q_SIGNALS:
 		void inputValueChanged(void);
@@ -66,13 +70,19 @@ namespace ot {
 
 	private Q_SLOTS:
 		void slotValueChanged(void);
+		void slotDeleteRequested(void);
+		void slotGlobalStyleChanged(const ColorStyle& _style);
 
 	private:
-		bool m_isDeleteable;
+		QWidget* m_titleLayoutW;
+		Label* m_deleteLabel;
+		Label* m_titleLabel;
+
 		std::string m_name;
 		std::string m_groupName;
 		std::string m_specialType;
 		std::string m_data;
+		Property::PropertyFlags m_flags;
 		Property::PropertyType m_type;
 		PropertyInput* m_input;
 		QBrush m_propertyBrush;

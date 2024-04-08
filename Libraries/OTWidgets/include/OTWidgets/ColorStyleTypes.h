@@ -24,6 +24,7 @@
 #define OT_COLORSTYLE_BASEFILE_MACRO_Int "int"
 #define OT_COLORSTYLE_BASEFILE_MACRO_Double "number"
 
+#define OT_COLORSTYLE_FILE_PropertyItemDelete "Property Item Delete"
 #define OT_COLORSTYLE_FILE_PropertyGroupExpanded "Property Group Expanded"
 #define OT_COLORSTYLE_FILE_PropertyGroupCollapsed "Property Group Collapsed"
 
