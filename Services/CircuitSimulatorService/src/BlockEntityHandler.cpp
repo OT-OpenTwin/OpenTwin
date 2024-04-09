@@ -324,37 +324,31 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 	
 		if (simulationType == ".dc")
 		{
-			for (auto it : resultVectors)
+			auto it = resultVectors.find("v-sweep");
+			xValues = resultVectors.at("v-sweep");
+			if (it != resultVectors.end())
 			{
-				if (it.first == "v-sweep")
-				{
-					xValues = it.second;
-					resultVectors.erase("v-sweep");
-					break;
-				}
+				resultVectors.erase(it);
 			}
 		}
 		else if (simulationType == ".TRAN")
 		{
-			for (auto it : resultVectors)
+			auto it = resultVectors.find("time");
+			xValues = resultVectors.at("time");
+			if (it != resultVectors.end())
 			{
-				if (it.first == "time")
-				{
-					xValues = it.second;
-					resultVectors.erase("time");
-					break;
-				}
+				resultVectors.erase(it);
 			}
 		}
 		else
 		{
 			for (auto it : resultVectors)
 			{
-				if (it.first == "frequency")
+				auto it = resultVectors.find("frequency");
+				xValues = resultVectors.at("frequency");
+				if (it != resultVectors.end())
 				{
-					xValues = it.second;
-					resultVectors.erase("frequency");
-					break;
+					resultVectors.erase(it);
 				}
 			}
 		}
@@ -379,36 +373,38 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 		{
 			std::string curveName;
 			std::string fullCurveName;
-			EntityResult1DCurve* curve;
+			std::string xLabel;
+			std::string xUnit;
+			std::string yUnit;
+	
 			if (simulationType == ".dc")
 			{
 				curveName = it.first + "-DC";
 				fullCurveName = _curveFolderPath + "/" + curveName;
-				std::string xLabel = "sweep";
-				std::string xUnit = "V";
-				std::string yUnit = "V";
-				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, it.first, yUnit, colorID, true);
+				xLabel = "sweep";
+				xUnit = "V";
+				yUnit = "V";
+				
 			}
 			else if (simulationType == ".TRAN")
 			{
 				curveName = it.first + "-TRAN";
 				fullCurveName = _curveFolderPath + "/" + curveName;
-				std::string xLabel = "time";
-				std::string xUnit = "ms";
-				std::string yUnit = "V";
-				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, it.first, yUnit, colorID, true);
+				xLabel = "time";
+				xUnit = "ms";
+				yUnit = "V";
 			}
 			else
 			{
 				curveName = it.first + "-AC";
 				fullCurveName = _curveFolderPath + "/" + curveName;
-				std::string xLabel = "frequency";
-				std::string xUnit = "hz";
-				std::string yUnit = "V";
-				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, it.first, yUnit, colorID, true);
+				xLabel = "frequency";
+				xUnit = "hz";
+				yUnit = "V";
 			}
 
-			
+			std::string yLabel = it.first;
+			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
 			curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
 
 			topoEntID.push_back(curve->getEntityID());
