@@ -323,9 +323,6 @@
     <ClInclude Include="include\akCore\rJSON.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\akGui\aApplication.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="include\akGui\aColor.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
@@ -510,6 +507,9 @@
     </QtMoc>
     <QtMoc Include="include\akWidgets\aPlainTextEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\akGui\aApplication.h">
+      <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

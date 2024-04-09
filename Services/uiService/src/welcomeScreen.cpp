@@ -964,7 +964,7 @@ createNewAccountDialog::createNewAccountDialog()
 	my_layout->addWidget(my_widgetButtons);
 
 	setWindowTitle("Create New Account");
-	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+	//setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
 
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);

@@ -25,6 +25,8 @@ ak::aComboButtonWidget::aComboButtonWidget(
 	m_menu(nullptr)
 {
 	try {
+		this->setObjectName("OT_ComboButton");
+
 		// Create new QMenu to be a dropdown menu of the pushbutton
 		m_menu = new QMenu;
 		if (m_menu == nullptr) { throw aException("Failed to create", "Create menu"); }
@@ -32,7 +34,6 @@ ak::aComboButtonWidget::aComboButtonWidget(
 		// Apply color style and menu
 		setMenu(m_menu);
 		m_itemsUIDmanager.setLatestUid(1);
-		setObjectName("AK_ComboButtonWidget");
 	}
 	catch (const aException & e) { throw aException(e, "ak::aComboButtonWidget::aComboButtonWidget()"); }
 	catch (const std::exception & e) { throw aException(e.what(), "ak::aComboButtonWidget::aComboButtonWidget()"); }

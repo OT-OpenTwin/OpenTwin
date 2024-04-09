@@ -328,7 +328,7 @@ int AppBase::run() {
 		ot::GlobalColorStyle::instance().addStyle(cs, true);
 
 		if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
-			//ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
+			ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
 		}
 
 		// Initialize Widget view manager

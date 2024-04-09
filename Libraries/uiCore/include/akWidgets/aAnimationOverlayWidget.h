@@ -47,6 +47,8 @@ namespace ak {
 
 		void setAnimationDelay(int _ms) { m_animationDelay =_ms; }
 
+		QLabel* waitingLabel(void) const { return m_waitingLabel; };
+
 	private Q_SLOTS:
 		void slotTimeout(void);
 

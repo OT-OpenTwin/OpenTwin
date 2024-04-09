@@ -307,7 +307,7 @@
     <ClInclude Include="include\akDB\aMSSQLWrapper.h" />
     <QtMoc Include="include\akDialogs\aCustomizableInputDialog.h" />
     <QtMoc Include="include\akDialogs\aOptionsDialog.h" />
-    <ClInclude Include="include\akGui\aApplication.h" />
+    <QtMoc Include="include\akGui\aApplication.h" />
     <ClInclude Include="include\akGui\aColor.h" />
     <QtMoc Include="include\akGui\aContextMenuItem.h" />
     <QtMoc Include="include\akGui\aDialog.h" />

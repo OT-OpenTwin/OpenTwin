@@ -135,7 +135,7 @@ QStatusBar QLabel {
 /* QCheckBox */
 
 QCheckBox {
-    background-color: %color:Widget Background 1%;
+    background-color: transparent;
     color: %color:Widget Foreground 1%;
     spacing: 4px;
     outline: none;
@@ -148,7 +148,7 @@ QCheckBox:focus {
 }
 
 QWidget:disabled {
-    background-color: %color:Widget Background 1%;
+    background-color: transparent;
     color: %color:Widget Disabled Foreground 1%;
 }
 
@@ -2221,8 +2221,14 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
-#LogInDialog {
+#LogInDialogCentralLayoutW {
     background: url('%file:Log In Background Image%');
+    background-repeat: no-repeat;
+    background-size: stretch;
+}
+
+#LogInDialogGridLayoutW {
+    background: transparent;
 }
 
 #LogInDialogMainLayoutW {
@@ -2255,4 +2261,37 @@ QAbstractView:selected {
 #ot_property_grid::item:selected {
     background-color: transparent;
     color: black;
+}
+
+/* ##################################################################################### */
+
+/* Combo Button */
+
+#OT_ComboButton {
+    border-radius: 0;
+}
+
+#OT_ComboButton:disabled {
+    border-radius: 0;
+}
+
+#OT_ComboButton:checked:disabled {
+    border-radius: 0;
+}
+
+/* ##################################################################################### */
+
+/* Log In URL */
+
+#LogInDialogSessionServiceUrl {
+    border-radius: 0;
+    text-align: left;
+}
+
+/* ##################################################################################### */
+
+/* Line Edit */
+
+#OT_LineEdit {
+    border-radius: 0;
 }

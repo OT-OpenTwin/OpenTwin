@@ -20,12 +20,17 @@
 ak::aLineEditWidget::aLineEditWidget(QWidget * _parent)
 	: QLineEdit(_parent), aWidget(otLineEdit), m_isError(false), m_errorIsForeground(true), m_ignoreTabulator(false) {
 	
+	this->setObjectName("OT_LineEdit");
+
 	connect(this, &QLineEdit::editingFinished, this, &aLineEditWidget::slotEditingFinished);
 	installEventFilter(this);
 }
 
 ak::aLineEditWidget::aLineEditWidget(const QString & _text, QWidget * _parent)
 	: QLineEdit(_text, _parent), aWidget(otLineEdit), m_isError(false), m_errorIsForeground(true), m_text(_text), m_ignoreTabulator(false) {
+
+	this->setObjectName("OT_LineEdit");
+
 	connect(this, &QLineEdit::editingFinished, this, &aLineEditWidget::slotEditingFinished);
 	installEventFilter(this);
 }

@@ -171,7 +171,6 @@ namespace ak {
 		QWidget *								m_vLayoutW;
 		QVBoxLayout *							m_vLayout;
 
-		QWidget *								m_hLayoutW;
 		QHBoxLayout *							m_hLayout;
 
 		QWidget *								m_mainLayoutW;

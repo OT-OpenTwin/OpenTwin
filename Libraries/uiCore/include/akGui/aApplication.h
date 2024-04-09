@@ -14,19 +14,17 @@
 
 // AK header
 #include <akCore/globalDataTypes.h>
-
+#include "OTCore/OTClassHelper.h"
 // Qt header
 #include <qapplication.h>				// base class
 
 namespace ak {
 
 	class UICORE_API_EXPORT aApplication : public QApplication {
+		Q_OBJECT
+		OT_DECL_NOCOPY(aApplication)
 	public:
 		aApplication();
 		virtual ~aApplication();
-
-	private:
-		aApplication(const aApplication &) = delete;
-		aApplication & operator = (aApplication &) = delete;
 	};
 }

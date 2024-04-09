@@ -180,7 +180,6 @@ LogInManager::LogInManager()
 
 	AppBase * app = AppBase::instance();
 	m_dialog = new aLogInDialog(true, uiAPI::getPixmap("OpenTwin"), lastUser, lastPassword);
-	m_dialog->setObjectName("ot_LogInDialog");
 	m_dialog->setReturnHashedPassword(false);
 	m_dialog->setWindowIcon(uiAPI::getApplicationIcon("OpenTwin"));
 	m_dialog->setWaitingAnimationDelay(500);
@@ -193,9 +192,9 @@ LogInManager::LogInManager()
 	m_sessionServiceL = new aLabelWidget("Session service:");
 #endif
 	m_sessionService = new aComboButtonWidget;
+	m_sessionService->setObjectName("LogInDialogSessionServiceUrl");
 	m_sessionService->setMinimumWidth(200);
-	m_sessionService->setStyleSheet("QPushButton { text-align: left; }");
-
+	
 	if (!sessionServiceJSON.isEmpty()) {
 		QJsonDocument doc = QJsonDocument::fromJson(sessionServiceJSON);
 		if (doc.isArray()) {

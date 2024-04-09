@@ -44,20 +44,23 @@ ak::aLogInDialog::aLogInDialog(
 	m_buttonLogIn(nullptr), m_buttonRegister(nullptr), m_savePassword(nullptr), m_mainLayout(nullptr), m_inputPassword(nullptr), m_inputUsername(nullptr),
 	m_currentID(ak::invalidID), m_rowCounter(0), m_showSavePassword(_showSavePassword), m_passwordHashAlgorithm(hashSha_256), m_returnHashedPassword(true)
 {
+	this->setObjectName("LogInDialog");
+
 	// Create layouts
 	m_centralLayout = new QVBoxLayout(this);
 	m_centralLayout->setContentsMargins(0, 0, 0, 0);
 	m_animationWidget = new aAnimationOverlayWidget;
+	m_animationWidget->waitingLabel()->setObjectName("LogInDialogWaitingAnimationLabel");
 	m_centralLayout->addWidget(m_animationWidget);
 
 	m_vLayoutW = new QWidget;
+	m_vLayoutW->setObjectName("LogInDialogCentralLayoutW");
 	m_vLayout = new QVBoxLayout(m_vLayoutW);
 	m_animationWidget->setChild(m_vLayoutW);
 
-	m_hLayoutW = new QWidget;
-	m_hLayout = new QHBoxLayout(m_hLayoutW);
+	m_hLayout = new QHBoxLayout;
 	m_vLayout->addStretch(1);
-	m_vLayout->addWidget(m_hLayoutW);
+	m_vLayout->addLayout(m_hLayout);
 
 	m_mainLayoutW = new QWidget;
 	m_mainLayout = new QVBoxLayout(m_mainLayoutW);
@@ -67,6 +70,7 @@ ak::aLogInDialog::aLogInDialog(
 
 	m_gridLayoutW = new QWidget;
 	m_gridLayout = new QGridLayout(m_gridLayoutW);
+	m_gridLayoutW->setObjectName("LogInDialogGridLayoutW");
 	m_gridLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->addWidget(m_gridLayoutW);
 
@@ -111,19 +115,20 @@ ak::aLogInDialog::aLogInDialog(
 	m_mainLayoutW->setObjectName("LogInDialogMainLayoutW");
 	m_bgImage = new QPixmap(_backgroundImage);
 
-	this->setObjectName("LogInDialog");
 	setWindowTitle("Welcome");
 
 	hideInfoButton();
 
 	resize(m_bgImage->size());
-
+	this->setMinimumSize(m_bgImage->size());
+	this->setMaximumSize(m_bgImage->size());
+	/*
 	m_mainLayoutW->setStyleSheet("#LogInDialogMainLayoutW{"
 		"background-color:#90000000;"
 		"border-radius:10px;"
 		"}\n"
 		"QLabel{color:#FFFFFF}\n"
-		"QCheckBox{color:#FFFFFF}\n");
+		"QCheckBox{color:#FFFFFF}\n");*/
 }
 
 ak::aLogInDialog::~aLogInDialog() {
@@ -151,7 +156,6 @@ ak::aLogInDialog::~aLogInDialog() {
 	delete m_mainLayout;
 	delete m_mainLayoutW;
 	delete m_hLayout;
-	delete m_hLayoutW;
 	delete m_vLayout;
 	delete m_vLayoutW;
 	delete m_animationWidget;

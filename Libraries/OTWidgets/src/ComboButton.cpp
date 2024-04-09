@@ -13,6 +13,8 @@
 ot::ComboButton::ComboButton(QWidget* _parent)
 	: QPushButton(_parent)
 {
+	this->setObjectName("OT_ComboButton");
+
 	m_menu = new QMenu(this);
 
 	this->ini();
@@ -21,6 +23,8 @@ ot::ComboButton::ComboButton(QWidget* _parent)
 ot::ComboButton::ComboButton(const QString& _text, QWidget* _parent) 
 	: QPushButton(_text, _parent)
 {
+	this->setObjectName("OT_ComboButton");
+
 	m_menu = new QMenu(this);
 	m_menu->addAction(_text);
 
@@ -30,6 +34,8 @@ ot::ComboButton::ComboButton(const QString& _text, QWidget* _parent)
 ot::ComboButton::ComboButton(const QString& _text, const QStringList& _items, QWidget* _parent)
 	: QPushButton(_text, _parent)
 {
+	this->setObjectName("OT_ComboButton");
+
 	m_menu = new QMenu(this);
 	for (const QString& itm : _items) {
 		m_menu->addAction(itm);

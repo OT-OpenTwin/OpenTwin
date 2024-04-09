@@ -177,7 +177,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 		this->initializePropertyGrid();
 		this->slotGenerate();
 		if (!m_editor->toPlainText().isEmpty()) {
-			this->slotApplyAsCurrent();
+			//this->slotApplyAsCurrent();
 		}
 	}
 	catch (const std::exception& _e) {
