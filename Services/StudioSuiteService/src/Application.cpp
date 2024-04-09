@@ -767,8 +767,9 @@ void Application::result1D(bool appendData, std::string& data, size_t uncompress
 		// And finally store (add) the parametric data. In case that the data is not appended, the storage was already cleared above
 		parametricResultManager.add(resultManager);
 	}
-	catch (std::exception)
+	catch (std::exception &e)
 	{
+		std::string error = e.what();
 		assert(0);
 
 		// We have an problem processing the data.

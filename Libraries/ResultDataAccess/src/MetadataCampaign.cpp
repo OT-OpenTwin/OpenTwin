@@ -63,6 +63,7 @@ void MetadataCampaign::UpdateMetadataOverview(MetadataSeries& seriesMetadata)
 		{
 			std::list<ot::Variable>& values = _parameterOverviewByName[parameter.parameterName].values;
 			values.splice(values.begin(), parameter.values);
+			values.sort();
 		}
 	}
 
