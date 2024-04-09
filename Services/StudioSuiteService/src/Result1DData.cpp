@@ -160,4 +160,14 @@ void Result1DData::readLine(std::stringstream& dataContent, std::string& line)
 	}
 }
 
+int Result1DData::getNumberOfQuantities()
+{
+	int count = 0;
+
+	if (!yreValues.empty()) count++;
+	if (!yimValues.empty()) count++;
+
+	return count;
+}
+
 

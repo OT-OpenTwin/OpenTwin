@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <list>
 
 #include "RunIDContainer.h"
 
@@ -14,6 +15,9 @@ public:
 	~Result1DManager();
 
 	void addResult1DInformation(InfoFileManager& infoFileManager);
+	std::list<int> getRunIDList();
+	
+	RunIDContainer* getContainer(int runID);
 
 private:
 	size_t readIntegerFromBuffer(size_t &bufferIndex, char* dataBuffer, size_t dataBufferLength);

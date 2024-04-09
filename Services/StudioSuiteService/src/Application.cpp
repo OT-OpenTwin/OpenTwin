@@ -725,7 +725,7 @@ void Application::shapeInformation(const std::string &content)
 
 void Application::result1D(bool appendData, std::string& data, size_t uncompressedDataLength)
 {
-	ParametricResult1DManager parametricResultManager;
+	ParametricResult1DManager parametricResultManager(this);
 
 	if (!appendData)
 	{

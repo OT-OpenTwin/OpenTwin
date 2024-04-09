@@ -138,13 +138,13 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 	_newEntityVersions.push_back(entityCampaign.getEntityStorageVersion());
 }
 
-void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign, std::list<const MetadataSeries*>& seriesMetadata)
+void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign, std::list<const MetadataSeries*>& seriesMetadata, bool saveModel)
 {
 	StoreCampaign(modelComponent, metaDataCampaign);
-	StoreCampaign(modelComponent, seriesMetadata);
+	StoreCampaign(modelComponent, seriesMetadata, saveModel);
 }
 
-void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, std::list<const MetadataSeries*>& seriesMetadata)
+void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& modelComponent, std::list<const MetadataSeries*>& seriesMetadata, bool saveModel)
 {
 	std::list< EntityMetadataSeries> entitiesMetadataSeries;
 	for (auto& newSeriesMetadata : seriesMetadata)
@@ -184,7 +184,7 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 	}
 
 	std::list<bool> visibillity(false);
-	modelComponent.addEntitiesToModel(std::move(_newEntityIDs), std::move(_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection");
+	modelComponent.addEntitiesToModel(std::move(_newEntityIDs), std::move(_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, saveModel);
 }
 
 void MetadataEntityInterface::ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityMetadataCampaign> rmd)

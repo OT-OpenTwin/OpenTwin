@@ -14,6 +14,14 @@ public:
 	void setData(const std::string &data);
 
 	std::string getDataHashValue() { return dataHashValue; }
+	int getNumberOfQuantities();
+
+	std::string getTitle() { return title; }
+	std::string getXLabel() { return xlabel; }
+	std::string getYLabel() { return ylabel; }
+	std::vector<double>& getXValues() { return xValues; }
+	std::vector<double>& getYreValues() { return yreValues; }
+	std::vector<double>& getYimValues() { return yimValues; }
 
 private:
 	void readLine(std::stringstream& dataContent, std::string& line);

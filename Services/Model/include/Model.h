@@ -87,10 +87,6 @@ public:
 	std::string getSolverRootName(void) { return "Solvers"; };
 	std::string getScriptsRootName(void) { return "Scripts"; };
 	std::string getUnitRootName(void) { return "Units"; };
-	std::string getDataCategorizationRootName(void) { return "Data Categorization"; };
-	std::string getDatasetRootName() { return "Dataset"; };
-	std::string getRMDCategorizationName() { return getDataCategorizationRootName()+"/Campaign Metadata"; };
-	std::string getDatasetRMD() { return getDatasetRootName() + "/Campaign Metadata"; }
 
 	void addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
 										   double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);

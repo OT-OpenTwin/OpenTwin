@@ -225,7 +225,7 @@ void Model::resetToNew(void)
 	if (typeManager.hasDataCategorizationRoot())
 	{
 		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-		entityRMDCategorizationRoot->setName(getDataCategorizationRootName());
+		entityRMDCategorizationRoot->setName(typeManager.getDataCategorizationRootName());
 		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
 	}
 
@@ -233,7 +233,7 @@ void Model::resetToNew(void)
 	{
 		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 		newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
-		newDataCatEntity->setName(getRMDCategorizationName());
+		newDataCatEntity->setName(typeManager.getRMDCategorizationName());
 		newDataCatEntity->setEditable(false);
 		addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);
 	}
@@ -241,21 +241,21 @@ void Model::resetToNew(void)
 	if (typeManager.hasRMDCategorizationPreview())
 	{
 		auto rmdCategorizationPreview = new EntityParameterizedDataPreviewTable(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-		rmdCategorizationPreview->setName(getRMDCategorizationName() + "/Preview");
+		rmdCategorizationPreview->setName(typeManager.getRMDCategorizationName() + "/Preview");
 		addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDatasetRoot())
 	{
 		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
-		entityDatasetRoot->setName(getDatasetRootName());
+		entityDatasetRoot->setName(typeManager.getDatasetRootName());
 		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDatasetRMD())
 	{
 		EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager(), &classFactory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		rmd->setName(getDatasetRMD());
+		rmd->setName(typeManager.getDatasetRMD());
 		addEntityToModel(rmd->getName(), rmd, entityRoot, true, allNewEntities);
 	}
 	

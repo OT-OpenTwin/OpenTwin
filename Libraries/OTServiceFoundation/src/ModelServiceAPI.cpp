@@ -191,7 +191,7 @@ void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& 
 
 void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>& _topologyEntityIDList, std::list<UID>& _topologyEntityVersionList, std::list<bool>& _topologyEntityForceVisible,
 	std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList,
-	const std::string& _changeComment, bool askForBranchCreation)
+	const std::string& _changeComment, bool askForBranchCreation, bool saveModel)
 {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -203,6 +203,7 @@ void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>& _topologyEntityIDLi
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityParentList, JsonArray(_dataEntityParentList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(_changeComment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation, askForBranchCreation, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_SaveModel, saveModel, requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
@@ -220,7 +221,7 @@ void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>& _topologyEntityIDLi
 	}
 }
 
-void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation)
+void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation, bool saveModel)
 {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -232,7 +233,8 @@ void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDL
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataEntityParentList, JsonArray(_dataEntityParentList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(_changeComment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation, askForBranchCreation, requestDoc.GetAllocator());
-
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_SaveModel, saveModel, requestDoc.GetAllocator());
+	
 	// Send the command
 	std::string response;
 	if (!ot::msg::send(getThisServiceURL(), getModelServiceURL(), ot::EXECUTE, requestDoc.toJson(), response)) {

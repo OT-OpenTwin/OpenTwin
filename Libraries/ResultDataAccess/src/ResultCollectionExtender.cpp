@@ -121,7 +121,7 @@ void ResultCollectionExtender::StoreCampaignChanges()
 	MetadataEntityInterface entityCreator(_ownerServiceName);
 	if (_requiresUpdateMetadataCampaign && _seriesMetadataForStorage.size() != 0)
 	{
-		entityCreator.StoreCampaign(*_modelComponent, _metadataCampaign, _seriesMetadataForStorage);
+		entityCreator.StoreCampaign(*_modelComponent, _metadataCampaign, _seriesMetadataForStorage, _saveModel);
 	}
 	else if (_requiresUpdateMetadataCampaign)
 	{
@@ -129,7 +129,7 @@ void ResultCollectionExtender::StoreCampaignChanges()
 	}
 	else if (_seriesMetadataForStorage.size() != 0)
 	{
-		entityCreator.StoreCampaign(*_modelComponent, _seriesMetadataForStorage);
+		entityCreator.StoreCampaign(*_modelComponent, _seriesMetadataForStorage, _saveModel);
 	}
 }
 

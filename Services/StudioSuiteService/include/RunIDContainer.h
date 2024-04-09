@@ -15,6 +15,8 @@ public:
 
 	int readData(size_t& bufferIndex, char* dataBuffer, size_t dataBufferLength);
 	void addResult1DInformation(int runID, InfoFileManager& infoFileManager);
+	std::map<std::string, double>& getParameters() { return parameterValues; }
+	std::map<std::string, Result1DData*> getResultsForCategory(const std::string &category);
 
 private:
 	size_t readIntegerFromBuffer(size_t& bufferIndex, char* dataBuffer, size_t dataBufferLength);

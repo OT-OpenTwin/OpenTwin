@@ -19,6 +19,7 @@ public:
 	~ResultCollectionExtender();
 	
 	void setBucketSize(const uint64_t bucketSize) { _bucketSize = bucketSize; }
+	void setSaveModel(bool saveModel) { _saveModel = saveModel; }
 
 	void AddSeries(MetadataSeries&& series);
 	bool CampaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> metadata);
@@ -53,6 +54,8 @@ private:
 	const uint64_t FindNextFreeSeriesIndex();
 	const uint64_t FindNextFreeQuantityIndex();
 	const uint64_t FindNextFreeParameterIndex();
+
+	bool _saveModel = true;
 };			  
 
 

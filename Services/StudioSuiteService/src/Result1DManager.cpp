@@ -51,3 +51,30 @@ void Result1DManager::addResult1DInformation(InfoFileManager& infoFileManager)
 		item.second->addResult1DInformation(item.first, infoFileManager);
 	}
 }
+
+std::list<int> Result1DManager::getRunIDList()
+{
+	std::list<int> runIDs;
+
+	for (auto item : runIDtoContainerMap)
+	{
+		runIDs.push_back(item.first);
+	}
+
+	runIDs.sort();
+
+	return runIDs;
+}
+
+RunIDContainer* Result1DManager::getContainer(int runID)
+{
+	auto container = runIDtoContainerMap.find(runID);
+
+	if (container == runIDtoContainerMap.end())
+	{
+		return nullptr;
+	}
+
+	return container->second;
+}
+

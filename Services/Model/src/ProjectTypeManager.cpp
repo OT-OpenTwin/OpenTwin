@@ -5,6 +5,7 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/JSON.h"
+#include "OTCore/FolderNames.h"
 
 ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {
@@ -69,6 +70,12 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	_has1DView						= true;
 	_hasTableView					= true;
 	_hasBlockPicker					= true;
+
+	_dataCategorizationRootName = "Data Categorization";
+	_datasetRootName            = ot::FolderNames::DatasetFolder;
+	_RMDCategorizationName      = getDataCategorizationRootName() + "/Campaign Metadata";
+	_datasetRMD                 = getDatasetRootName() + "/Campaign Metadata";
+
 }
 
 void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
@@ -82,13 +89,16 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 	_hasDataCategorizationRoot = false;
 	_hasRMDCategorization = false;
 	_hasRMDCategorizationPreview = false;
-	_hasDatasetRoot = false;
-	_hasDatasetRMD = false;
+	_hasDatasetRoot = true;
+	_hasDatasetRMD = true;
 
 	_has3DView = true;
 	_has1DView = true;
-	_hasTableView = false;
+	_hasTableView = true;
 	_hasBlockPicker = true;
+
+	_datasetRootName = ot::FolderNames::DatasetFolder;
+	_datasetRMD      = getDatasetRootName() + "/Information";
 }
 
 std::string ProjectTypeManager::getViews(void)

@@ -13,8 +13,8 @@ public:
 	MetadataCampaign CreateCampaign(std::shared_ptr<EntityMetadataCampaign> rmd, std::list<std::shared_ptr<EntityMetadataSeries>> msmds);
 	MetadataSeries CreateSeries(std::shared_ptr<EntityMetadataSeries> seriesMetadataEntity);
 	void StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign);
-	void StoreCampaign(ot::components::ModelComponent& modelComponent, std::list<const MetadataSeries*>& seriesMetadata);
-	void StoreCampaign(ot::components::ModelComponent& modelComponent,  MetadataCampaign& metaDataCampaign, std::list<const MetadataSeries*>& seriesMetadata);
+	void StoreCampaign(ot::components::ModelComponent& modelComponent, std::list<const MetadataSeries*>& seriesMetadata, bool saveModel);
+	void StoreCampaign(ot::components::ModelComponent& modelComponent,  MetadataCampaign& metaDataCampaign, std::list<const MetadataSeries*>& seriesMetadata, bool saveModel);
 
 private:
 	const std::string& _ownerServiceName;

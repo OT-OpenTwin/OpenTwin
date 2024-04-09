@@ -725,9 +725,15 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 				askForBranchCreation = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation);
 			}
 
+			bool saveModel = true;
+			if (ot::json::exists(doc, OT_ACTION_PARAM_MODEL_SaveModel))
+			{
+				saveModel = ot::json::getBool(doc, OT_ACTION_PARAM_MODEL_SaveModel);
+			}
+			
 			if (globalModel == nullptr) throw std::exception("No model created yet");
 
-			globalModel->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, true, askForBranchCreation);
+			globalModel->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, saveModel, askForBranchCreation);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_UpdateTopologyEntity)
 		{

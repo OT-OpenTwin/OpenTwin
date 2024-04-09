@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <cassert>
+#include <algorithm>
 
 RunIDContainer::RunIDContainer()
 {
@@ -42,6 +43,8 @@ int RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t dataB
 		std::string fileName      = readStringFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
 		std::string dataHashValue = readStringFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
 		std::string data          = readStringFromBuffer(bufferIndex, dataBuffer, dataBufferLength);
+
+		std::replace(fileName.begin(), fileName.end(), '\\', '/');
 
 		Result1DData* resultData = new Result1DData;
 		resultData->setDataHashValue(dataHashValue);
@@ -147,4 +150,21 @@ void RunIDContainer::readLine(std::stringstream& dataContent, std::string& line)
 			line.pop_back();
 		}
 	}
+}
+
+std::map<std::string, Result1DData*> RunIDContainer::getResultsForCategory(const std::string& category)
+{
+	std::map<std::string, Result1DData*> results;
+
+	std::string filter = category + "/";
+
+	for (auto file : fileNameToData)
+	{
+		if (file.first.substr(0, filter.size()) == filter)
+		{
+			results[file.first] = file.second;
+		}
+	}
+
+	return results;
 }

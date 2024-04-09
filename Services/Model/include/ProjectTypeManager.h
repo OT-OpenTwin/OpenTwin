@@ -20,6 +20,11 @@ public:
 	bool hasDatasetRoot(void)				{ return _hasDatasetRoot; }
 	bool hasDatasetRMD(void)				{ return _hasDatasetRMD; }
 
+	std::string getDataCategorizationRootName(void) { return _dataCategorizationRootName; };
+	std::string getDatasetRootName()                { return _datasetRootName; };
+	std::string getRMDCategorizationName()          { return _RMDCategorizationName; };
+	std::string getDatasetRMD()                     { return _datasetRMD; }
+
 	std::string getViews(void);
 
 private:
@@ -43,6 +48,11 @@ private:
 	bool _has1DView						= true;
 	bool _hasTableView					= true;
 	bool _hasBlockPicker				= true;
+
+	std::string _dataCategorizationRootName;
+	std::string _datasetRootName;
+	std::string _RMDCategorizationName;
+	std::string _datasetRMD;
 };
 
 

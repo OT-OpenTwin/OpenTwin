@@ -146,7 +146,7 @@ void ResultMetadataAccess::LoadExistingCampaignData(ClassFactory* classFactory)
 
 std::vector<EntityBase*> ResultMetadataAccess::FindAllExistingMetadata(ClassFactory *classFactory)
 {
-	std::list<std::string> allExistingMetadataNames = _modelComponent->getListOfFolderItems(ot::FolderNames::DatasetFolder);
+	std::list<ot::UID> allExistingMetadataNames = _modelComponent->getIDsOfFolderItemsOfType(ot::FolderNames::DatasetFolder, "EntityMetadataCampaign", false);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(allExistingMetadataNames, entityInfos);
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
