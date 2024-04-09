@@ -11,6 +11,7 @@
 #include "EntityBlockConnection.h"
 //Third Party Header
 #include <string>
+#include <algorithm>
 namespace Numbers
 {
 	static unsigned long long nodeNumber = 0;
@@ -147,11 +148,23 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			netlistLine += netlistElementName + " ";
 		}
 
+		//From begin
 		auto connections = element.getList();
-		for (auto conn : connections)
+
+		/*for (auto conn : connections)
+		{
+			netlistNodeNumbers += conn.getNodeNumber() + " ";
+		}*/
+
+		//From behind
+		std::vector<Connection> tempVector(connections.begin(), connections.end());
+		std::reverse(tempVector.begin(), tempVector.end());
+
+		for (auto conn : tempVector)
 		{
 			netlistNodeNumbers += conn.getNodeNumber() + " ";
 		}
+
 
 		netlistLine += netlistNodeNumbers;
 
@@ -304,7 +317,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	ngSpice_Command(command);*/
 
 	 
-	 std::map<std::string, std::vector<double>> map = SimulationResults::getInstance()->getResultMap();
+	
 	myString = std::to_string(status);
 
 	return myString;
