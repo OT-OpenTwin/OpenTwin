@@ -134,6 +134,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string netlistValue = element.getValue();
 		std::string netlistNodeNumbers;
 		std::string netlistVoltageSourceType="";
+		std::string modelNetlistLine = "circbyline ";
 
 		if (element.getItemName() == "Voltage Source")
 		{
@@ -157,6 +158,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistElementName = "D" + std::to_string(++Numbers::diodeNetlistNumber);
 			netlistLine += netlistElementName + " ";
+			modelNetlistLine += ".MODEL D1N4148 D(IS=1e-15)";
 		}
 
 		//From begin
@@ -191,6 +193,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 		//Here i send the Lines to NGSpice dll
 		ngSpice_Command(const_cast<char*>(netlistLine.c_str()));
+		if (modelNetlistLine != "circbyline ")
+		{
+			ngSpice_Command(const_cast<char*>(modelNetlistLine.c_str()));
+		}
 	}
 
 	//After i got the TitleLine and the elements which represent my circuit I check which simulation was chosen and create the simlationLine
@@ -227,6 +233,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	printSettings = "circbyline " + printSettings;
 	
 	//And now i send it to NGSpice in the right order
+	
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
