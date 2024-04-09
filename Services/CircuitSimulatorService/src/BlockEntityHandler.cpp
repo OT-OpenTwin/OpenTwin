@@ -13,6 +13,7 @@
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
 #include "SimulationResults.h"
+#include "EntityBlockCircuitDiode.h"
 // Third Party Header
 
 namespace NodeNumbers
@@ -285,6 +286,12 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 	{
 		resistor->createProperties();
 	}
+
+	EntityBlockCircuitDiode* diode = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
+	if (diode != nullptr)
+	{
+		diode->createProperties();
+	}
 	
 }
 
@@ -296,10 +303,14 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
 	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
 	a->addChildCollection(a1);
+
 	EntityBlockCircuitVoltageSource element(0, nullptr, nullptr, nullptr,nullptr, "");
 	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockCircuitDiode diode(0, nullptr, nullptr, nullptr, nullptr, "");
+
 	a1->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
+	a1->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
 
 	pckg->addCollection(a);
 

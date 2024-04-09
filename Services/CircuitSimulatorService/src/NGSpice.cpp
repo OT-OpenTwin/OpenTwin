@@ -9,6 +9,7 @@
 #include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
+#include "EntityBlockCircuitDiode.h"
 //Third Party Header
 #include <string>
 #include <algorithm>
@@ -17,7 +18,7 @@ namespace Numbers
 	static unsigned long long nodeNumber = 0;
 	static unsigned long long voltageSourceNetlistNumber = 0;
 	static unsigned long long resistorNetlistNumber = 0;
-	
+	static unsigned long long diodeNetlistNumber = 0;
 }
 
 void NGSpice::clearBufferStructure(std::string name)
@@ -57,6 +58,11 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		else if (blockEntity->getBlockTitle() == "Resistor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
+			element.setValue(myElement->getElementType());
+		}
+		else if (blockEntity->getBlockTitle() == "Diode")
+		{
+			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
 		}
 
@@ -145,6 +151,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		else if (element.getItemName() == "Resistor")
 		{
 			netlistElementName = "R" + std::to_string(++Numbers::resistorNetlistNumber);
+			netlistLine += netlistElementName + " ";
+		}
+		else if (element.getItemName() == "Diode")
+		{
+			netlistElementName = "D" + std::to_string(++Numbers::diodeNetlistNumber);
 			netlistLine += netlistElementName + " ";
 		}
 

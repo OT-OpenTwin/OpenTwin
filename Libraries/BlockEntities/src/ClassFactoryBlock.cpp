@@ -11,6 +11,7 @@
 #include "EntityBlockStorage.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"
+#include "EntityBlockCircuitDiode.h"
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 {
@@ -50,5 +51,10 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	{
 		return new EntityBlockDisplay(0, nullptr, nullptr, nullptr, this, "");
 	}
+	else if (entityType == "EntityBlockCircuitDiode")
+	{
+		return new EntityBlockCircuitDiode(0, nullptr, nullptr, nullptr, this, "");
+	}
+
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);
 }
