@@ -48,7 +48,7 @@ void ParametricResult1DManager::add(Result1DManager& result1DManager)
 
 	// Now we process the different types of data entries
 	processCurves("1D Results/Balance", runIDLabel, runIDList, result1DManager, resultCollectionExtender);
-	//processCurves("1D Results/Energy", runIDLabel, runIDList, result1DManager, resultCollectionExtender);
+	processCurves("1D Results/Energy", runIDLabel, runIDList, result1DManager, resultCollectionExtender);
 	processCurves("1D Results/Port signals", runIDLabel, runIDList, result1DManager, resultCollectionExtender);
 	processCurves("1D Results/Power", runIDLabel, runIDList, result1DManager, resultCollectionExtender);
 	processCurves("1D Results/Reference Impedance", runIDLabel, runIDList, result1DManager, resultCollectionExtender);
@@ -81,6 +81,10 @@ void ParametricResult1DManager::processCurves(const std::string& category, const
 		std::map<std::string, Result1DData*> categoryResults = container->getResultsForCategory(category);
 		if (categoryResults.empty()) continue;
 
+		// Determine x-axis type and unit
+		std::string xLabel, xUnit;
+		parseAxisLabel(categoryResults.begin()->second->getXLabel(), xLabel, xUnit);
+
 		size_t numberOfXValues = categoryResults.begin()->second->getXValues().size();
 
 		bool hasRealPart    = !(categoryResults.begin()->second->getYreValues().empty());
@@ -95,14 +99,15 @@ void ParametricResult1DManager::processCurves(const std::string& category, const
 		std::list<ot::Variable> xValues;
 
 		// Add the meta data
-		addCurveSeriesMetadata(resultCollectionExtender, category, seriesName, seriesID, container, categoryResults, xValues, hasRealPart, hasImagPart, numberOfQuantities);
+		addCurveSeriesMetadata(resultCollectionExtender, category, seriesName, seriesID, xLabel, xUnit, container, categoryResults, xValues, hasRealPart, hasImagPart, numberOfQuantities);
 
 		// Now we add the quantity data
-		addCurveSeriesQuantityData(resultCollectionExtender, seriesName, seriesID, numberOfXValues, categoryResults, hasRealPart, hasImagPart);
+		addCurveSeriesQuantityData(resultCollectionExtender, seriesName, seriesID, xLabel, numberOfXValues, categoryResults, hasRealPart, hasImagPart);
 	}
 }
 
-void ParametricResult1DManager::addCurveSeriesMetadata(ResultCollectionExtender &resultCollectionExtender, const std::string& category, const std::string &seriesName, ot::UID seriesID, RunIDContainer* container, 
+void ParametricResult1DManager::addCurveSeriesMetadata(ResultCollectionExtender &resultCollectionExtender, const std::string& category, const std::string &seriesName, ot::UID seriesID, 
+													   const std::string &xLabel, const std::string &xUnit, RunIDContainer* container, 
 													   std::map<std::string, Result1DData*> &categoryResults, std::list<ot::Variable> &xValues,
 													   bool hasRealPart, bool hasImagPart, size_t numberOfQuantities)
 {
@@ -114,10 +119,6 @@ void ParametricResult1DManager::addCurveSeriesMetadata(ResultCollectionExtender 
 		std::shared_ptr<MetadataEntry>mdParameter(new MetadataEntrySingle(param.first, ot::Variable(param.second)));
 		seriesMetadata.AddMetadata(mdParameter);
 	}
-
-	// Determine x-axis type and unit
-	std::string xLabel, xUnit;
-	parseAxisLabel(categoryResults.begin()->second->getXLabel(), xLabel, xUnit);
 
 	// Determine the xvalues
 	for (auto x : categoryResults.begin()->second->getXValues())
@@ -180,14 +181,15 @@ void ParametricResult1DManager::addCurveSeriesMetadata(ResultCollectionExtender 
 	resultCollectionExtender.setBucketSize(1);
 }
 
-void ParametricResult1DManager::addCurveSeriesQuantityData(ResultCollectionExtender& resultCollectionExtender, const std::string& seriesName, ot::UID seriesID, size_t numberOfXValues, 
+void ParametricResult1DManager::addCurveSeriesQuantityData(ResultCollectionExtender& resultCollectionExtender, const std::string& seriesName, ot::UID seriesID, const std::string& xLabel, size_t numberOfXValues,
 														   std::map<std::string, Result1DData*>& categoryResults, bool hasRealPart, bool hasImagPart)
 {
 	const auto seriesMetadata = resultCollectionExtender.FindMetadataSeries(seriesName);
-	const auto& allParameter = seriesMetadata->getParameter();
-	assert(allParameter.size() == 1);
+	const MetadataParameter* parameter = resultCollectionExtender.FindMetadataParameter(xLabel);
+	assert(parameter != nullptr);
+	if (parameter == nullptr) return;
 
-	std::list<std::string> parameterAbbrev{ allParameter.front().parameterAbbreviation };
+	std::list<std::string> parameterAbbrev{ parameter->parameterAbbreviation };
 
 	const auto allQuantities = seriesMetadata->getQuantities();
 

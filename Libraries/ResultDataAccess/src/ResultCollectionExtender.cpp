@@ -64,7 +64,7 @@ void ResultCollectionExtender::AddSeries(MetadataSeries&& series)
 		{
 			const std::list<ot::Variable>& values = addedParameterInExistingParameter->values;
 			std::list<ot::Variable> valueDifference;
-			std::set_difference(values.begin(), values.end(), parameter.values.begin(), parameter.values.end(), std::inserter(valueDifference, valueDifference.end()));
+			std::set_difference(parameter.values.begin(), parameter.values.end(), values.begin(), values.end(), std::inserter(valueDifference, valueDifference.end()));
 			if (valueDifference.size() != 0)
 			{
 				parameterForEditing.values = valueDifference;
