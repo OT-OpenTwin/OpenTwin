@@ -134,7 +134,10 @@ void ot::GlobalColorStyle::scanForStyleFiles(void) {
 		while (it.hasNext()) {
 			QString f = it.next();
 			QFile file(f);
-			if (!file.open(QIODevice::ReadOnly)) continue;
+			if (!file.open(QIODevice::ReadOnly)) {
+				OT_LOG_W("Failed to open file for reading \"" + f.toStdString() + "\". Skipping file");
+				continue;
+			}
 			QByteArray data = file.readAll();
 			file.close();
 

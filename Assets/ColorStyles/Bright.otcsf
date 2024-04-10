@@ -2228,7 +2228,6 @@ QAbstractView:selected {
 #LogInDialogCentralLayoutW {
     background: url('%root%/images/OpenTwin.png');
     background-repeat: no-repeat;
-    background-size: stretch;
 }
 
 #LogInDialogGridLayoutW {
