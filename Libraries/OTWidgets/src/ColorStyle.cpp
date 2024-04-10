@@ -122,7 +122,11 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 		ix = _data.indexOf('\n');
 
 		if (k == OT_COLORSTYLE_FILE_KEY_Name) {
-			this->setColorStyleName(n.toStdString());
+			std::string nam = n.toStdString();
+			while (nam.find('\r') != std::string::npos) {
+				nam.erase(nam.find('\r'));
+			}
+			this->setColorStyleName(nam);
 		}
 		else if (k == OT_COLORSTYLE_FILE_KEY_Files) {
 			JsonDocument doc;
