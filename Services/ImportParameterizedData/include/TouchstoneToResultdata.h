@@ -23,7 +23,7 @@ private:
 	bool SeriesAlreadyExists(const std::string& seriesName);
 
 	TouchstoneHandler ImportTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts);
-	void BuildSeriesMetadataFromTouchstone(TouchstoneHandler& touchstoneHandler, MetadataSeries& series);
+	void BuildSeriesMetadataFromTouchstone(TouchstoneHandler& touchstoneHandler, MetadataSeries& series, int numberOfPorts);
 	//std::string DetermineDominantType(const std::list<std::string>& typeNames);
 };
 

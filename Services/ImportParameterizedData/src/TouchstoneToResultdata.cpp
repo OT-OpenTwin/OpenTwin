@@ -49,7 +49,7 @@ void TouchstoneToResultdata::CreateResultdata(int numberOfPorts)
 		TouchstoneHandler handler = std::move(ImportTouchstoneFile(_fileName, _fileContent, _uncompressedLength, numberOfPorts));
 		ot::UID seriesID = _modelComponent->createEntityUID();
 		MetadataSeries newSeriesMetadata(seriesName, seriesID);
-		BuildSeriesMetadataFromTouchstone(handler, newSeriesMetadata);
+		BuildSeriesMetadataFromTouchstone(handler, newSeriesMetadata, numberOfPorts);
 		ResultCollectionExtender resultCollectionExtender(_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		resultCollectionExtender.AddSeries(std::move(newSeriesMetadata));
 
@@ -144,7 +144,7 @@ TouchstoneHandler TouchstoneToResultdata::ImportTouchstoneFile(const std::string
 	return handler;
 }
 
-void TouchstoneToResultdata::BuildSeriesMetadataFromTouchstone(TouchstoneHandler& touchstoneHandler, MetadataSeries& series)
+void TouchstoneToResultdata::BuildSeriesMetadataFromTouchstone(TouchstoneHandler& touchstoneHandler, MetadataSeries& series, int numberOfPorts)
 {
 	ts::OptionSettings optionSettings =	touchstoneHandler.getOptionSettings();
 	
@@ -219,8 +219,8 @@ void TouchstoneToResultdata::BuildSeriesMetadataFromTouchstone(TouchstoneHandler
 	
 	parameter.typeName = "Numerical";
 	quantity1.typeName = "Numerical";
-	quantity1.dataRows = 4;
-	quantity1.dataColumns = 4;
+	quantity1.dataRows = numberOfPorts;
+	quantity1.dataColumns = numberOfPorts;
 
 	quantity2.typeName = "Numerical";
 	quantity2.dataRows = 4;
