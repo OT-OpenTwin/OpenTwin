@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/PropertyGridCfg.h"
 
 #include <list>
 #include <tuple>
