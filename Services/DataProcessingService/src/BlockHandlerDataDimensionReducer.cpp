@@ -3,7 +3,7 @@
 #include "OTCore/GenericDataStructMatrix.h"
 
 BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDataDimensionReducer* blockEntity, const HandlerMap& handlerMap)
-	:BlockHandler(handlerMap)
+	:BlockHandler(blockEntity, handlerMap)
 {
 	_column = blockEntity->getInputColumn();
 	_row = blockEntity->getInputRow();

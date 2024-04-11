@@ -8,7 +8,7 @@
 #include "OTCore/GenericDataStructSingle.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const HandlerMap& handlerMap)
-    : BlockHandler(handlerMap)
+    : BlockHandler(blockEntity, handlerMap)
 {
       ot::ServiceBase* pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
       const std::string pythonServiceURL = pythonService->serviceURL();

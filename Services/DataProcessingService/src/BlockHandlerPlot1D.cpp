@@ -5,7 +5,7 @@
 #include "OTCore/GenericDataStructSingle.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const HandlerMap& handlerMap)
-	:BlockHandler(handlerMap)
+	:BlockHandler(blockEntity ,handlerMap)
 {
 	_xlabel = blockEntity->getXLabel();
 	_ylabel = blockEntity->getYLabel();

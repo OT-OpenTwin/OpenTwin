@@ -20,7 +20,7 @@
 #include <algorithm>
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
-	:BlockHandler(handlerMap)
+	:BlockHandler(blockEntity,handlerMap)
 {
 	//First get a handle of the selected project.
 	std::shared_ptr<ResultMetadataAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
@@ -123,26 +123,26 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 
 	if (dbResponse.getSuccess())
 	{
-		const std::string queryResponse =	dbResponse.getResult();
+		const std::string queryResponse = dbResponse.getResult();
 		ot::JsonDocument doc;
 		doc.fromJson(queryResponse);
 		auto allEntries = ot::json::getArray(doc, "Documents");
 
-		
+
 		const uint32_t numberOfDocuments = allEntries.Size();
-		for (uint32_t i = 0; i< numberOfDocuments;i++)
+		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			auto projectedValues = ot::json::getObject(allEntries, i);
 			uint32_t count(0);
 
 			for (std::string projectionName : _projectionNames)
-			{	
+			{
 				assert(projectedValues.HasMember(projectionName.c_str()));
 
 				if (projectionName == QuantityContainer::getFieldName() && (_dataRows != 1 || _dataColumns != 1))
 				{
 					const std::string connectorName = _connectorNames[count];
-					
+
 					count++;
 					uint32_t rowCounter(0), columnCounter(0);
 					//Could be that the value array is smaller then the data array because of the query.
@@ -181,6 +181,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	}
 
 	return true;
+
 }
 
 

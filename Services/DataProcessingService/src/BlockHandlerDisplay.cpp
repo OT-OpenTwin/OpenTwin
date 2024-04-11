@@ -5,7 +5,7 @@
 #include "OTCore/VariableToStringConverter.h"
 
 BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* blockEntity, const HandlerMap& handlerMap)
-	:BlockHandler(handlerMap)
+	:BlockHandler(blockEntity ,handlerMap)
 {
 	_input = blockEntity->getConnectorInput();
 	_description = blockEntity->getDescription();

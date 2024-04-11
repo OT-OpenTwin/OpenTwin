@@ -1,8 +1,9 @@
 #include "BlockHandler.h"
 
-BlockHandler::BlockHandler(const HandlerMap& allHandler)
+BlockHandler::BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler)
 	:_allHandler(allHandler)
 {
+	_blockName = blockEntity->getName();
 }
 
 BlockHandler::~BlockHandler()
@@ -23,7 +24,17 @@ BlockHandler::~BlockHandler()
 
 void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 {
-	bool proceed = executeSpecialized();
+	bool proceed;
+	try
+	{
+		proceed = executeSpecialized();
+	}
+	catch (const std::exception& e)
+	{
+		const std::string message = "Execution of block " + _blockName + " failed due to the following exception: " + e.what();
+		throw std::exception(message.c_str());
+	}
+
 	if (proceed)
 	{
 		const auto& edges = ownNode->getSucceedingNodesWithEdgeInfo();
