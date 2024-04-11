@@ -121,7 +121,7 @@ void Result1DData::readDataLine(std::stringstream& dataContent, double& x, doubl
 			{
 				// We have both, real and complex values
 				std::string yreValue = yValue.substr(0, index);
-				std::string yimValue = yValue.substr(index + 1);
+				std::string yimValue = yValue.substr(index);
 
 				yre = atof(yreValue.c_str());
 				yim = atof(yimValue.c_str());
