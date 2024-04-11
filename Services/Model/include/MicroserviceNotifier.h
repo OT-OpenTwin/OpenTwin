@@ -9,7 +9,7 @@
 #include "Geometry.h"
 
 #include "OTCore/CoreTypes.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/PropertyGridCfg.h"
 #include "OTCommunication/UiTypes.h"
 
 class MicroserviceNotifier
