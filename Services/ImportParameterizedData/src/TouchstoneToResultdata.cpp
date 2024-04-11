@@ -223,8 +223,8 @@ void TouchstoneToResultdata::BuildSeriesMetadataFromTouchstone(TouchstoneHandler
 	quantity1.dataColumns = numberOfPorts;
 
 	quantity2.typeName = "Numerical";
-	quantity2.dataRows = 4;
-	quantity2.dataColumns = 4;
+	quantity2.dataRows = numberOfPorts;
+	quantity2.dataColumns = numberOfPorts;
 
 	series.AddParameter(std::move(parameter));
 	series.AddQuantity(std::move(quantity1));
