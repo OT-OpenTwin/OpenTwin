@@ -28,7 +28,7 @@ public:
 	NGSpice m_ngSpice;
 
 	//Function for resultCurves of Simulation
-	void createResultCurves(std::string simulationType);
+	void createResultCurves(std::string simulationType,std::string circuitName);
 
 	//Setter
 	void setPackageName(std::string name);

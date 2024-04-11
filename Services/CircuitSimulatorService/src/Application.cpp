@@ -471,7 +471,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 
 	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
-	m_blockEntityHandler.createResultCurves(simulationTypeProperty->getValue());
+	m_blockEntityHandler.createResultCurves(simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
 }
 

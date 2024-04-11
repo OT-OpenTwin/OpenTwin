@@ -322,7 +322,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-void BlockEntityHandler::createResultCurves(std::string simulationType)
+void BlockEntityHandler::createResultCurves(std::string simulationType,std::string circuitName)
 {
 	
 		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
@@ -391,7 +391,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 			if (simulationType == ".dc")
 			{
 				curveName = it.first + "-DC";
-				fullCurveName = _curveFolderPath + "/" + curveName;
+				fullCurveName = _curveFolderPath + "/" + circuitName + "/" + curveName;
 				xLabel = "sweep";
 				xUnit = "V";
 				yUnit = "V";
@@ -400,7 +400,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 			else if (simulationType == ".TRAN")
 			{
 				curveName = it.first + "-TRAN";
-				fullCurveName = _curveFolderPath + "/" + curveName;
+				fullCurveName = _curveFolderPath + "/" + circuitName + "/" + curveName;
 				xLabel = "time";
 				xUnit = "ms";
 				yUnit = "V";
@@ -408,7 +408,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 			else
 			{
 				curveName = it.first + "-AC";
-				fullCurveName = _curveFolderPath + "/" + curveName;
+				fullCurveName = _curveFolderPath + "/" + circuitName + "/" + curveName;
 				xLabel = "frequency";
 				xUnit = "hz";
 				yUnit = "V";
@@ -428,7 +428,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType)
 	
 		//Here i create the plot for all the curves
 		const std::string _plotName = simulationType + "-Simulation";
-		const std::string plotFolder = _resultFolder + "1D/Plots/";
+		const std::string plotFolder = _resultFolder + "1D/Plots/" + circuitName + "/";
 		const std::string fullPlotName = plotFolder + _plotName;
 
 		//Creating the Plot Entity
