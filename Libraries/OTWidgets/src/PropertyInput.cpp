@@ -4,17 +4,20 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
 #include "OTWidgets/PropertyInput.h"
 
 ot::PropertyInput::PropertyInput() 
 	: m_flags(ot::Property::NoFlags), m_dataChanged(false)
 {}
 
-ot::PropertyInput::PropertyInput(const Property* _property)
-	: m_flags(_property->propertyFlags()), m_propertyName(_property->propertyName()), 
-	m_propertyTitle(QString::fromStdString(_property->propertyTitle())), m_dataChanged(false)
-{}
+bool ot::PropertyInput::setupFromConfiguration(const Property* _configuration) {
+	m_propertyName = _configuration->propertyName();
+	m_propertyTitle = QString::fromStdString(_configuration->propertyTitle());
+	m_propertyTip = QString::fromStdString(_configuration->propertyTip());
+	m_flags = _configuration->propertyFlags();
+	return true;
+}
 
 void ot::PropertyInput::slotValueChanged(void) {
 	this->m_flags &= (~Property::HasMultipleValues);

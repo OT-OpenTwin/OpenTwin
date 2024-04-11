@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PropertyFilePath.h"
+#include "OTCore/PropertyFilePath.h"
 #include "OTWidgets/PropertyInput.h"
 
 namespace ot {
@@ -17,13 +17,14 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputFilePath)
 	public:
-		PropertyInputFilePath(const PropertyFilePath* _property);
+		PropertyInputFilePath();
 		virtual ~PropertyInputFilePath();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
+		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
 		void setCurrentFile(const QString& _file);
 		QString currentFile(void) const;

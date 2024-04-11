@@ -4,39 +4,31 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyFilePath.h"
+#include "OTCore/Logger.h"
+#include "OTCore/PropertyFilePath.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyInputFilePath.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
-ot::PropertyInputFilePath::PropertyInputFilePath(const PropertyFilePath* _property)
-	: PropertyInput(_property), m_mode(_property->browseMode()), m_text(QString::fromStdString(_property->path()))
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputFilePath> propertyInputFilePathRegistrar(OT_PROPERTY_TYPE_FilePath);
+
+ot::PropertyInputFilePath::PropertyInputFilePath()
+	: m_mode(PropertyFilePath::ReadFile)
 {
 	m_root = new QWidget;
 	QHBoxLayout* rLay = new QHBoxLayout(m_root);
 
 	m_edit = new LineEdit;
-	m_edit->setToolTip(QString::fromStdString(_property->propertyTip()));
+	
 	rLay->addWidget(m_edit, 1);
 
 	QPushButton* btnFind = new QPushButton("Search");
 	rLay->addWidget(btnFind);
-
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		m_edit->setText("...");
-	}
-	else {
-		m_edit->setText(m_text);
-	}
-
-	for (PropertyFilePath::FilterInfo info : _property->filters()) {
-		if (!m_filter.isEmpty()) m_filter.append(";;");
-		m_filter.append(QString::fromStdString(info.text) + " (" + QString::fromStdString(info.extension) + ")");
-	}
 
 	this->connect(m_edit, &QLineEdit::editingFinished, this, &PropertyInputFilePath::slotChanged);
 	this->connect(btnFind, &QPushButton::clicked, this, &PropertyInputFilePath::slotFind);
@@ -89,6 +81,34 @@ ot::Property* ot::PropertyInputFilePath::createPropertyConfiguration(void) const
 	newProperty->setPath(m_edit->text().toStdString());
 
 	return newProperty;
+}
+
+bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyFilePath* actualProperty = dynamic_cast<const PropertyFilePath*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	m_edit->blockSignals(true);
+
+	m_edit->setToolTip(this->propertyTip());
+	if (this->propertyFlags() & Property::HasMultipleValues) {
+		m_edit->setText("...");
+	}
+	else {
+		m_edit->setText(m_text);
+	}
+
+	for (PropertyFilePath::FilterInfo info : actualProperty->filters()) {
+		if (!m_filter.isEmpty()) m_filter.append(";;");
+		m_filter.append(QString::fromStdString(info.text) + " (" + QString::fromStdString(info.extension) + ")");
+	}
+
+	m_edit->blockSignals(false);
+
+	return true;
 }
 
 void ot::PropertyInputFilePath::setCurrentFile(const QString& _file) {

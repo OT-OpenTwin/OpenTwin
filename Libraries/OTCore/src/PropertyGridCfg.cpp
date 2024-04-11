@@ -4,8 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/PropertyGroup.h"
+#include "OTCore/PropertyGridCfg.h"
 
 ot::PropertyGridCfg::PropertyGridCfg() {
 	m_defaultGroup = new PropertyGroup;

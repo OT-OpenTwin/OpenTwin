@@ -464,6 +464,12 @@
     <ClInclude Include="include\OTWidgets\PropertyGridView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.hpp">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">

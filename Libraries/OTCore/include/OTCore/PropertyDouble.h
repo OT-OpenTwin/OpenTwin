@@ -1,4 +1,4 @@
-//! @file PropertyBool.h
+//! @file PropertyDouble.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,24 +6,37 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
+
+#define OT_PROPERTY_TYPE_Double "Double"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyBool : public Property {
-		OT_DECL_NOCOPY(PropertyBool)
+	class OT_CORE_API_EXPORT PropertyDouble : public Property {
+		OT_DECL_NOCOPY(PropertyDouble)
 	public:
-		PropertyBool(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(false) {};
-		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
-		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
-		virtual ~PropertyBool() {};
+		PropertyDouble(PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyDouble(double _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		virtual ~PropertyDouble() {};
 
-		virtual PropertyType getPropertyType(void) const override { return Property::BoolType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Double; };
 
 		virtual Property* createCopy(void) const override;
 
-		void setValue(bool _value) { m_value = _value; };
-		bool value(void) const { return m_value; };
+		void setValue(double _value) { m_value = _value; };
+		double value(void) const { return m_value; };
+
+		void setRange(double _min, double _max) { m_min = _min; m_max = _max; };
+
+		void setMin(double _value) { m_min = _value; };
+		double min(void) const { return m_min; };
+
+		void setMax(double _value) { m_max = _value; };
+		double max(void) const { return m_max; };
+
+		void setPrecision(int _p) { m_precision = _p; };
+		int precision(void) const { return m_precision; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -38,7 +51,10 @@ namespace ot {
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
 
 	private:
-		bool m_value;
+		double m_value;
+		double m_min;
+		double m_max;
+		int m_precision;
 	};
 
 }

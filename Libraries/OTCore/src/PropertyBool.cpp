@@ -6,7 +6,10 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTGui/PropertyBool.h"
+#include "OTCore/PropertyBool.h"
+#include "OTCore/PropertyFactoryRegistrar.h"
+
+static ot::PropertyFactoryRegistrar<ot::PropertyBool> propertyBoolRegistrar(OT_PROPERTY_TYPE_Bool);
 
 ot::Property* ot::PropertyBool::createCopy(void) const {
 	ot::PropertyBool* newProp = new ot::PropertyBool;

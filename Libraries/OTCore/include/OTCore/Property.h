@@ -9,7 +9,7 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <list>
@@ -21,22 +21,9 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Property : public Serializable {
+	class OT_CORE_API_EXPORT Property : public Serializable {
 		OT_DECL_NOCOPY(Property)
 	public:
-		enum PropertyType {
-			NullType, //! Used for uninitialized properties
-			BoolType,
-			IntType,
-			DoubleType,
-			StringType,
-			StringListType,
-			ColorType,
-			DirectoryType,
-			FilePathType,
-			Painter2DType
-		};
-
 		enum PropertyFlags {
 			NoFlags             = 0x0000, //! @brief No property flags set
 			IsReadOnly          = 0x0001, //! @brief Property is read only
@@ -49,9 +36,6 @@ namespace ot {
 			AllowMultiselection = 0x2000  //! @brief User may select multiple values (e.g. in the StringListProperty)
 		};
 
-		static std::string toString(PropertyType _type);
-		static PropertyType stringToPropertyType(const std::string& _type);
-
 		static std::string toString(PropertyFlags _flag);
 		static PropertyFlags stringToFlag(const std::string& _flag);
 		static std::list<std::string> toStringList(PropertyFlags _flags);
@@ -61,7 +45,7 @@ namespace ot {
 		Property(const std::string& _name, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~Property() {};
 
-		virtual PropertyType getPropertyType(void) const = 0;
+		virtual std::string getPropertyType(void) const = 0;
 
 		virtual Property* createCopy(void) const = 0;
 

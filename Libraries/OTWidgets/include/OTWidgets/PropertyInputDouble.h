@@ -11,19 +11,19 @@
 namespace ot {
 
 	class DoubleSpinBox;
-	class PropertyDouble;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputDouble : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputDouble)
 	public:
-		PropertyInputDouble(const PropertyDouble* _property);
+		PropertyInputDouble();
 		virtual ~PropertyInputDouble();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
+		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
 		DoubleSpinBox* getSpinBox(void) const { return m_spinBox; };
 

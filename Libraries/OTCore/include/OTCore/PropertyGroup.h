@@ -9,7 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <list>
@@ -19,9 +19,8 @@
 namespace ot {
 
 	class Property;
-	class Painter2D;
 
-	class OT_GUI_API_EXPORT PropertyGroup : public Serializable {
+	class OT_CORE_API_EXPORT PropertyGroup : public Serializable {
 	public:
 		//! @brief Create empty group
 		PropertyGroup();
@@ -82,24 +81,22 @@ namespace ot {
 		void setBackgroundColor(Color::DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
-		void setBackgroundColor(const Color& _color);
-		void setBackgroundPainter(Painter2D* _painter);
-		Painter2D* backgroundPainter(void) const { return m_backgroundPainter; };
+		void setBackgroundColor(const Color& _color) { m_backgroundColor = _color; };
+		const Color& backgroundColor(void) const { return m_backgroundColor; };
 
 		void setAlternateBackgroundColor(Color::DefaultColor _color) { this->setAlternateBackgroundColor(Color(_color)); };
 		void setAlternateBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setAlternateBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
-		void setAlternateBackgroundColor(const Color& _color);
-		void setAlternateBackgroundPainter(Painter2D* _painter);
-		Painter2D* alternateBackgroundPainter(void) const { return m_alternateBackgroundPainter; };
+		void setAlternateBackgroundColor(const Color& _color) { m_alternateBackgroundColor = _color; };
+		const Color& alternateBackgroundColor(void) const { return m_alternateBackgroundColor; };
 
 		void clear(bool _keepGroups = false);
 
 	private:
 		std::string m_name;
 		std::string m_title;
-		Painter2D* m_backgroundPainter;
-		Painter2D* m_alternateBackgroundPainter;
+		Color m_backgroundColor;
+		Color m_alternateBackgroundColor;
 		std::list<Property*> m_properties;
 		std::list<PropertyGroup*> m_childGroups;
 	};

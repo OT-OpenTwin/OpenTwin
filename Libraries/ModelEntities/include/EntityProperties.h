@@ -6,7 +6,7 @@
 
 #include "EntityPropertiesItems.h"
 
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/PropertyGridCfg.h"
 
 class EntityBase;
 

@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -24,7 +24,6 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyInput)
 	public:
 		PropertyInput();
-		PropertyInput(const Property* _property);
 		virtual ~PropertyInput() {};
 
 		//! @brief Add the current value to the provided JSON object
@@ -41,6 +40,9 @@ namespace ot {
 
 		//! @brief Returns the root widget of the input (allows nested widgets)
 		virtual QWidget* getQWidget(void) override = 0;
+
+		//! @brief Setup the input from the provided configration
+		virtual bool setupFromConfiguration(const Property* _configuration);
 
 		void setPropertyFlags(Property::PropertyFlags _flags) { m_flags = m_flags; };
 		Property::PropertyFlags propertyFlags(void) const { return m_flags; };

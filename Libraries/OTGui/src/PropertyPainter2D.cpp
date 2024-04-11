@@ -7,9 +7,12 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/SimpleFactory.h"
+#include "OTCore/PropertyFactoryRegistrar.h"
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+
+static ot::PropertyFactoryRegistrar<ot::PropertyPainter2D> propertyPainter2DRegistrar(OT_PROPERTY_TYPE_Painter2D);
 
 ot::PropertyPainter2D::PropertyPainter2D(PropertyFlags _flags)
 	: Property(_flags), m_painter(nullptr)

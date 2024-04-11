@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/PropertyGridCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/QWidgetInterface.h"
 

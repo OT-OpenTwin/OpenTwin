@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PropertyGroup.h"
+#include "OTCore/PropertyGroup.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -20,7 +20,6 @@ class QWidget;
 
 namespace ot {
 
-	class Painter2D;
 	class PropertyGridItem;
 
 	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public QTreeWidgetItem {
@@ -45,11 +44,8 @@ namespace ot {
 
 		void addProperty(PropertyGridItem* _item);
 
-		void setPainter(Painter2D* _painter);
-		void setAlternatePainter(Painter2D* _painter);
-
-		const QBrush& groupBrush(void) const { return m_groupBrush; };
-		const QBrush& alternateGroupBrush(void) const { return m_groupAlternateBrush; };
+		const QColor& groupColor(void) const { return m_groupColor; };
+		const QColor& alternateGroupColor(void) const { return m_groupAlternateColor; };
 
 		PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
 		std::list<PropertyGridItem*> childProperties(void) const;
@@ -78,10 +74,8 @@ namespace ot {
 		QWidget* m_titleLayoutW;
 		QLabel* m_titleIconLabel;
 		QLabel* m_titleLabel;
-		QBrush m_groupBrush;
-		Painter2D* m_painter;
-		QBrush m_groupAlternateBrush;
-		Painter2D* m_alternatePainter;
+		QColor m_groupColor;
+		QColor m_groupAlternateColor;
 	};
 
 }

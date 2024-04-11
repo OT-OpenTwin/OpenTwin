@@ -14,20 +14,19 @@
 namespace ot {
 
 	class LineEdit;
-	class PropertyString;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputString : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputString)
 	public:
-		PropertyInputString(const QString& _text);
-		PropertyInputString(const PropertyString* _property);
+		PropertyInputString(const QString& _text = QString());
 		virtual ~PropertyInputString();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
+		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
 		void setText(const QString& _text);
 		const QString& getCurrentText(void) const { return m_text; };
@@ -38,8 +37,6 @@ namespace ot {
 	private:
 		LineEdit* m_lineEdit;
 		QString m_text;
-
-		void ini(void);
 	};
 
 }

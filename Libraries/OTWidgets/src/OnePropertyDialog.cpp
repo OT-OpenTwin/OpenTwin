@@ -7,6 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/Property.h"
+#include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/OnePropertyDialog.h"
 #include "OTWidgets/PropertyInputFactory.h"
 

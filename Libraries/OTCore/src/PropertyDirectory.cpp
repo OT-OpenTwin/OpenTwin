@@ -6,7 +6,11 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTGui/PropertyDirectory.h"
+#include "OTCore/PropertyDirectory.h"
+#include "OTCore/PropertyFactoryRegistrar.h"
+
+static ot::PropertyFactoryRegistrar<ot::PropertyDirectory> propertyDirectoryRegistrar(OT_PROPERTY_TYPE_Directory);
+
 
 ot::Property* ot::PropertyDirectory::createCopy(void) const {
 	ot::PropertyDirectory* newProp = new ot::PropertyDirectory;

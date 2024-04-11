@@ -4,23 +4,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyInt.h"
+#include "OTCore/Logger.h"
+#include "OTCore/PropertyInt.h"
 #include "OTWidgets/SpinBox.h"
 #include "OTWidgets/PropertyInputInt.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-ot::PropertyInputInt::PropertyInputInt(const PropertyInt* _property)
-	: PropertyInput(_property) 
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputInt> propertyInputIntRegistrar(OT_PROPERTY_TYPE_Int);
+
+ot::PropertyInputInt::PropertyInputInt()
 {
 	m_spinBox = new SpinBox;
-	m_spinBox->setRange(_property->min(), _property->max());
-	m_spinBox->setToolTip(QString::fromStdString(_property->propertyTip()));
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		m_spinBox->setSpecialValueText("??");
-		m_spinBox->setValue(_property->min());
-	}
-	else {
-		m_spinBox->setValue(_property->value());
-	}
 	this->connect(m_spinBox, &QSpinBox::valueChanged, this, &PropertyInputInt::lclValueChanged);
 }
 
@@ -65,4 +59,26 @@ ot::Property* ot::PropertyInputInt::createPropertyConfiguration(void) const {
 	newProperty->setValue(m_spinBox->value());
 
 	return newProperty;
+}
+
+bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyInt* actualProperty = dynamic_cast<const PropertyInt*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	m_spinBox->blockSignals(true);
+
+	m_spinBox->setRange(actualProperty->min(), actualProperty->max());
+	m_spinBox->setToolTip(this->propertyTip());
+	m_spinBox->setValue(actualProperty->value());
+	if (this->propertyFlags() & Property::HasMultipleValues) {
+		m_spinBox->setSpecialValueText("??");
+	}
+
+	m_spinBox->blockSignals(false);
+
+	return true;
 }

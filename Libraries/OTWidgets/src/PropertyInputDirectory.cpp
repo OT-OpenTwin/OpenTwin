@@ -4,35 +4,30 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyDirectory.h"
+#include "OTCore/Logger.h"
+#include "OTCore/PropertyDirectory.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyInputDirectory.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
-ot::PropertyInputDirectory::PropertyInputDirectory(const PropertyDirectory* _property)
-	: PropertyInput(_property), m_text(QString::fromStdString(_property->path()))
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDirectory> propertyInputDirectoryRegistrar(OT_PROPERTY_TYPE_Directory);
+
+ot::PropertyInputDirectory::PropertyInputDirectory()
 {
 	m_root = new QWidget;
 	QHBoxLayout* rLay = new QHBoxLayout(m_root);
 
 	m_edit = new LineEdit;
-	m_edit->setToolTip(QString::fromStdString(_property->propertyTip()));
 	rLay->addWidget(m_edit, 1);
 
 	QPushButton* btnFind = new QPushButton("Search");
 	rLay->addWidget(btnFind);
-
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		m_edit->setText("...");
-	}
-	else {
-		m_edit->setText(m_text);
-	}
-
+	
 	this->connect(m_edit, &QLineEdit::editingFinished, this, &PropertyInputDirectory::slotChanged);
 	this->connect(btnFind, &QPushButton::clicked, this, &PropertyInputDirectory::slotFind);
 }
@@ -78,6 +73,29 @@ ot::Property* ot::PropertyInputDirectory::createPropertyConfiguration(void) cons
 	newProperty->setPath(m_edit->text().toStdString());
 
 	return newProperty;
+}
+
+bool ot::PropertyInputDirectory::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyDirectory* actualProperty = dynamic_cast<const PropertyDirectory*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	m_edit->blockSignals(true);
+
+	m_edit->setToolTip(this->propertyTip());
+	if (this->propertyFlags() & Property::HasMultipleValues) {
+		m_edit->setText("...");
+	}
+	else {
+		m_edit->setText(m_text);
+	}
+
+	m_edit->blockSignals(false);
+
+	return true;
 }
 
 void ot::PropertyInputDirectory::setCurrentDirectory(const QString& _dir) {

@@ -7,11 +7,13 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
+
+#define OT_PROPERTY_TYPE_Color "Color"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyColor : public Property {
+	class OT_CORE_API_EXPORT PropertyColor : public Property {
 		OT_DECL_NOCOPY(PropertyColor)
 	public:
 		PropertyColor(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
@@ -19,7 +21,7 @@ namespace ot {
 		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
 		virtual ~PropertyColor() {};
 
-		virtual PropertyType getPropertyType(void) const override { return Property::ColorType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Color; };
 
 		virtual Property* createCopy(void) const override;
 

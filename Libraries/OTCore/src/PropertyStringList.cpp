@@ -6,7 +6,10 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTGui/PropertyStringList.h"
+#include "OTCore/PropertyStringList.h"
+#include "OTCore/PropertyFactoryRegistrar.h"
+
+static ot::PropertyFactoryRegistrar<ot::PropertyStringList> propertyStringListRegistrar(OT_PROPERTY_TYPE_StringList);
 
 ot::PropertyStringList::PropertyStringList(PropertyFlags _flags)
 	: Property(_flags) 

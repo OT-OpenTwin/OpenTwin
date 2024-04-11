@@ -5,115 +5,40 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-
-#include "OTGui/PropertyInt.h"
-#include "OTGui/PropertyBool.h"
-#include "OTGui/PropertyColor.h"
-#include "OTGui/PropertyDouble.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/PropertyFilePath.h"
-#include "OTGui/PropertyDirectory.h"
-#include "OTGui/PropertyPainter2D.h"
-#include "OTGui/PropertyStringList.h"
-
-#include "OTWidgets/PropertyInputInt.h"
-#include "OTWidgets/PropertyInputBool.h"
-#include "OTWidgets/PropertyInputColor.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/PropertyInputString.h"
+#include "OTCore/Property.h"
+#include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyInputFactory.h"
-#include "OTWidgets/PropertyInputFilePath.h"
-#include "OTWidgets/PropertyInputDirectory.h"
-#include "OTWidgets/PropertyInputPainter2D.h"
-#include "OTWidgets/PropertyInputStringList.h"
+
+ot::PropertyInputFactory& ot::PropertyInputFactory::instance(void) {
+	static PropertyInputFactory g_instance;
+	return g_instance;
+}
+
+ot::PropertyInput* ot::PropertyInputFactory::createInput(const std::string& _key) {
+	PropertyInputFactory& factory = PropertyInputFactory::instance();
+	auto it = factory.m_constructors.find(_key);
+	if (it == factory.m_constructors.end()) {
+		OT_LOG_E("PropertyInput \"" + _key + "\" not registered");
+		return nullptr;
+	}
+	return it->second();
+}
 
 ot::PropertyInput* ot::PropertyInputFactory::createInput(const Property* _config) {
-	switch (_config->getPropertyType())
-	{
-	case ot::Property::BoolType:
-	{
-		const ot::PropertyBool* prop = dynamic_cast<const ot::PropertyBool*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputBool(prop);
+	OTAssertNullptr(_config);
+	PropertyInput* inp = PropertyInputFactory::createInput(_config->getPropertyType());
+	if (inp) {
+		inp->setupFromConfiguration(_config);
 	}
-	case ot::Property::IntType:
-	{
-		const ot::PropertyInt* prop = dynamic_cast<const ot::PropertyInt*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputInt(prop);
+	return inp;
+}
+
+bool ot::PropertyInputFactory::registerPropertyInput(const std::string& _key, const PropertyInputConstructor& _constructor) {
+	PropertyInputFactory& factory = PropertyInputFactory::instance();
+	if (factory.m_constructors.find(_key) != factory.m_constructors.end()) {
+		OT_LOG_E("PropertyInput \"" + _key + "\" already registered");
+		return false;
 	}
-	case ot::Property::DoubleType:
-	{
-		const ot::PropertyDouble* prop = dynamic_cast<const ot::PropertyDouble*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputDouble(prop);
-	}
-	case ot::Property::StringType:
-	{
-		const ot::PropertyString* prop = dynamic_cast<const ot::PropertyString*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputString(prop);
-	}
-	case ot::Property::StringListType:
-	{
-		const ot::PropertyStringList* prop = dynamic_cast<const ot::PropertyStringList*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputStringList(prop);
-	}
-	case ot::Property::ColorType:
-	{
-		const ot::PropertyColor* prop = dynamic_cast<const ot::PropertyColor*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputColor(prop);
-	}
-	case ot::Property::FilePathType:
-	{
-		const ot::PropertyFilePath* prop = dynamic_cast<const ot::PropertyFilePath*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputFilePath(prop);
-	}
-	case ot::Property::DirectoryType:
-	{
-		const ot::PropertyDirectory* prop = dynamic_cast<const ot::PropertyDirectory*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputDirectory(prop);
-	}
-	case ot::Property::Painter2DType:
-	{
-		const ot::PropertyPainter2D* prop = dynamic_cast<const ot::PropertyPainter2D*>(_config);
-		if (!prop) {
-			OT_LOG_EA("Property cast failed");
-			return nullptr;
-		}
-		return new PropertyInputPainter2D(prop);
-	}
-	default:
-		OT_LOG_EA("Unknown property type");
-		break;
-	}
-	return nullptr;
+	factory.m_constructors.insert_or_assign(_key, _constructor);
+	return true;
 }

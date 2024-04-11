@@ -5,45 +5,31 @@
 
 // OpenTwin header
 #include "OTCore/SimpleFactory.h"
-#include "OTGui/Painter2D.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyFactory.h"
+#include "OTCore/Property.h"
+#include "OTCore/PropertyGroup.h"
+#include "OTCore/PropertyFactory.h"
 
 ot::PropertyGroup::PropertyGroup()
+	: m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235)
+{}
+
+ot::PropertyGroup::PropertyGroup(const PropertyGroup& _other) 
 {
-	m_backgroundPainter = new FillPainter2D(Color(255, 255, 255));
-	m_alternateBackgroundPainter = new FillPainter2D(Color(235, 235, 235));
-}
-
-ot::PropertyGroup::PropertyGroup(const PropertyGroup& _other) {
-	m_backgroundPainter = new FillPainter2D(Color(255, 255, 255));
-	m_alternateBackgroundPainter = new FillPainter2D(Color(235, 235, 235));
-
 	*this = _other;
 }
 
 ot::PropertyGroup::PropertyGroup(const std::string& _name)
-	: m_name(_name), m_title(_name)
-{
-	m_backgroundPainter = new FillPainter2D(Color(255, 255, 255));
-	m_alternateBackgroundPainter = new FillPainter2D(Color(235, 235, 235));
-}
+	: m_name(_name), m_title(_name), m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235)
+{}
 
 ot::PropertyGroup::PropertyGroup(const std::string& _name, const std::string& _title)
-	: m_name(_name), m_title(_title)
-{
-	m_backgroundPainter = new FillPainter2D(Color(255, 255, 255));
-	m_alternateBackgroundPainter = new FillPainter2D(Color(235, 235, 235));
-}
+	: m_name(_name), m_title(_title), m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235)
+{}
 
 ot::PropertyGroup::~PropertyGroup() {
 	auto p = m_properties;
 	m_properties.clear();
 	for (auto itm : p) delete itm;
-	if (m_backgroundPainter) delete m_backgroundPainter;
-	if (m_alternateBackgroundPainter) delete m_alternateBackgroundPainter;
 }
 
 ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
@@ -51,9 +37,9 @@ ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
 
 	m_name = _other.m_name;
 	m_title = _other.m_title;
-	this->setBackgroundPainter(_other.m_backgroundPainter->createCopy());
-	this->setAlternateBackgroundPainter(_other.m_alternateBackgroundPainter->createCopy());
-
+	m_backgroundColor = _other.m_backgroundColor;
+	m_alternateBackgroundColor = _other.m_alternateBackgroundColor;
+	
 	for (Property* p : _other.m_properties) {
 		this->addProperty(p->createCopy());
 	}
@@ -87,12 +73,12 @@ void ot::PropertyGroup::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("Properties", pArr, _allocator);
 
 	JsonObject bObj;
-	m_backgroundPainter->addToJsonObject(bObj, _allocator);
-	_object.AddMember("BPainter", bObj, _allocator);
+	m_backgroundColor.addToJsonObject(bObj, _allocator);
+	_object.AddMember("Color", bObj, _allocator);
 
 	JsonObject abObj;
-	m_alternateBackgroundPainter->addToJsonObject(abObj, _allocator);
-	_object.AddMember("ABPainter", abObj, _allocator);
+	m_alternateBackgroundColor.addToJsonObject(abObj, _allocator);
+	_object.AddMember("AlternateColor", abObj, _allocator);
 }
 
 void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -114,19 +100,11 @@ void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
 		m_childGroups.push_back(g);
 	}
 
-	ConstJsonObject bObj = json::getObject(_object, "BPainter");
-	Painter2D* newPainter = SimpleFactory::instance().createType<Painter2D>(bObj);
-	if (newPainter) { 
-		newPainter->setFromJsonObject(bObj);
-		this->setBackgroundPainter(newPainter); 
-	}
+	ConstJsonObject bObj = json::getObject(_object, "Color");
+	m_backgroundColor.setFromJsonObject(bObj);
 
-	ConstJsonObject abObj = json::getObject(_object, "ABPainter");
-	Painter2D* newAlternatePainter = SimpleFactory::instance().createType<Painter2D>(abObj);
-	if (newAlternatePainter) { 
-		newAlternatePainter->setFromJsonObject(abObj);
-		this->setAlternateBackgroundPainter(newAlternatePainter); 
-	}
+	ConstJsonObject abObj = json::getObject(_object, "AlternateColor");
+	m_alternateBackgroundColor.setFromJsonObject(abObj);
 }
 
 void ot::PropertyGroup::setProperties(const std::list<Property*>& _properties)
@@ -164,26 +142,6 @@ void ot::PropertyGroup::findPropertiesBySpecialType(const std::string& _specialT
 	for (PropertyGroup* g : m_childGroups) {
 		g->findPropertiesBySpecialType(_specialType, _list);
 	}
-}
-
-void ot::PropertyGroup::setBackgroundColor(const Color& _color) {
-	this->setBackgroundPainter(new FillPainter2D(_color));
-}
-
-void ot::PropertyGroup::setBackgroundPainter(Painter2D* _painter) {
-	if (!_painter) return;
-	if (m_backgroundPainter && m_backgroundPainter != _painter) delete m_backgroundPainter;
-	m_backgroundPainter = _painter;
-}
-
-void ot::PropertyGroup::setAlternateBackgroundColor(const Color& _color) {
-	this->setAlternateBackgroundPainter(new FillPainter2D(_color));
-}
-
-void ot::PropertyGroup::setAlternateBackgroundPainter(Painter2D* _painter) {
-	if (!_painter) return;
-	if (m_alternateBackgroundPainter && m_alternateBackgroundPainter != _painter) delete m_alternateBackgroundPainter;
-	m_alternateBackgroundPainter = _painter;
 }
 
 void ot::PropertyGroup::clear(bool _keepGroups) {

@@ -6,7 +6,10 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTGui/PropertyInt.h"
+#include "OTCore/PropertyInt.h"
+#include "OTCore/PropertyFactoryRegistrar.h"
+
+static ot::PropertyFactoryRegistrar<ot::PropertyInt> propertyIntRegistrar(OT_PROPERTY_TYPE_Int);
 
 ot::PropertyInt::PropertyInt(PropertyFlags _flags) 
 	: Property(_flags), m_value(0), m_min(INT_MIN), m_max(INT_MAX)

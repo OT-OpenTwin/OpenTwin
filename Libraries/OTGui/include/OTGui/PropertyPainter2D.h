@@ -6,7 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
+#include "OTGui/OTGuiAPIExport.h"
+
+#define OT_PROPERTY_TYPE_Painter2D "Painter2D"
 
 namespace ot {
 
@@ -36,7 +39,7 @@ namespace ot {
 		PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~PropertyPainter2D();
 
-		virtual PropertyType getPropertyType(void) const override { return Property::Painter2DType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Painter2D; };
 
 		virtual Property* createCopy(void) const override;
 

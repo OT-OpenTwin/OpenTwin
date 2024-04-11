@@ -1,22 +1,27 @@
-//! @file PropertyFactory.h
+//! @file PropertyFactoryRegistrar.h
 //! @author Alexander Kuester (alexk95)
-//! @date February 2024
+//! @date April 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Property.h"
-#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <string>
 
 namespace ot {
-	namespace PropertyFactory {
-		OT_GUI_API_EXPORT Property* createProperty(const ConstJsonObject& _jsonObject);
-		OT_GUI_API_EXPORT Property* createProperty(Property::PropertyType _propertyType);
-	}
+
+	template <class T>
+	class PropertyFactoryRegistrar {
+		OT_DECL_NODEFAULT(PropertyFactoryRegistrar)
+		OT_DECL_NOCOPY(PropertyFactoryRegistrar)
+	public:
+		PropertyFactoryRegistrar(const std::string& _key);
+		~PropertyFactoryRegistrar() {};
+	};
+
 }
+
+#include "OTCore/PropertyFactoryRegistrar.hpp"

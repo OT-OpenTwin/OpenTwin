@@ -1,4 +1,4 @@
-//! @file PropertyDirectory.h
+//! @file PropertyString.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,28 +6,35 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
 
 // std header
 #include <string>
 
+#define OT_PROPERTY_TYPE_String "String"
+
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyDirectory : public Property {
-		OT_DECL_NOCOPY(PropertyDirectory)
+	class OT_CORE_API_EXPORT PropertyString : public Property {
+		OT_DECL_NOCOPY(PropertyString)
 	public:
-		PropertyDirectory(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
-		PropertyDirectory(const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_path(_path) {};
-		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_path(_path) {};
-		virtual ~PropertyDirectory() {};
+		PropertyString(PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		virtual ~PropertyString() {};
 
-		virtual PropertyType getPropertyType(void) const override { return DirectoryType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_String; };
 
 		virtual Property* createCopy(void) const override;
 
-		void setPath(const std::string& _path) { m_path = _path; };
-		std::string& path(void) { return m_path; };
-		const std::string& path(void) const { return m_path; };
+		void setValue(const std::string& _value) { m_value = _value; };
+		const std::string& value(void) const { return m_value; };
+
+		void setPlaceholderText(const std::string& _text) { m_placeholderText = _text; };
+		const std::string& placeholderText(void) const { return m_placeholderText; };
+
+		void setMaxLength(int _length) { m_maxLength = _length; };
+		int maxLength(void) const { return m_maxLength; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -42,7 +49,9 @@ namespace ot {
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
 
 	private:
-		std::string m_path;
+		std::string m_value;
+		std::string m_placeholderText;
+		unsigned int m_maxLength;
 	};
 
 }

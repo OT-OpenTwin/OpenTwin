@@ -4,23 +4,21 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyStringList.h"
+#include "OTCore/Logger.h"
+#include "OTCore/PropertyStringList.h"
 #include "OTWidgets/ComboButton.h"
 #include "OTWidgets/PropertyInputStringList.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
 // Qt header
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qaction.h>
 
-ot::PropertyInputStringList::PropertyInputStringList(const PropertyStringList* _property)
-	: PropertyInput(_property)
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyInputStringListRegistrar(OT_PROPERTY_TYPE_StringList);
+
+ot::PropertyInputStringList::PropertyInputStringList()
 {
-	QStringList lst;
-	for (const std::string& itm : _property->list()) {
-		lst.push_back(QString::fromStdString(itm));
-	}
-	m_comboButton = new ComboButton(QString::fromStdString(_property->current()), lst);
-	if (this->propertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
+	m_comboButton = new ComboButton;
 	this->connect(m_comboButton, &ComboButton::textChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 
@@ -55,6 +53,30 @@ ot::Property* ot::PropertyInputStringList::createPropertyConfiguration(void) con
 	newProperty->setCurrent(m_comboButton->text().toStdString());
 
 	return newProperty;
+}
+
+bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	QStringList lst;
+	for (const std::string& itm : actualProperty->list()) {
+		lst.push_back(QString::fromStdString(itm));
+	}
+	
+	m_comboButton->blockSignals(true);
+
+	m_comboButton->setItems(lst);
+	if (this->propertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
+	else m_comboButton->setText(QString::fromStdString(actualProperty->current()));
+
+	m_comboButton->blockSignals(false);
+
+	return true;
 }
 
 void ot::PropertyInputStringList::setCurrentText(const QString& _text) {

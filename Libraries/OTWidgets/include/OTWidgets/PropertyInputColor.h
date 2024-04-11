@@ -11,18 +11,18 @@
 namespace ot {
 
 	class ColorPickButton;
-	class PropertyColor;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputColor : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputColor)
 	public:
-		PropertyInputColor(const PropertyColor* _property);
+		PropertyInputColor();
 		virtual ~PropertyInputColor();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
+		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
 		void setColor(const Color& _color);
 		void setColor(const QColor& _color);

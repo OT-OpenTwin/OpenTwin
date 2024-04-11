@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyGroup.h"
+#include "OTCore/PropertyGroup.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/PropertyGridItem.h"

@@ -6,14 +6,16 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
 
 // std header
 #include <string>
 
+#define OT_PROPERTY_TYPE_FilePath "FilePath"
+
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyFilePath : public Property {
+	class OT_CORE_API_EXPORT PropertyFilePath : public Property {
 		OT_DECL_NOCOPY(PropertyFilePath)
 	public:
 		enum BrowseMode {
@@ -31,7 +33,7 @@ namespace ot {
 		PropertyFilePath(const std::string& _name, const std::string& _path, BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~PropertyFilePath() {};
 
-		virtual PropertyType getPropertyType(void) const override { return FilePathType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_FilePath; };
 
 		virtual Property* createCopy(void) const override;
 

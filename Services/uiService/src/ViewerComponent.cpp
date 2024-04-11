@@ -16,9 +16,11 @@
 #include "UserSettings.h"
 #include "ContextMenuManager.h"
 
-
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTCore/OTAssert.h"
+#include "OTWidgets/DoubleSpinBox.h"
+#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/PropertyInputDouble.h"
 
 // C++ header
 #include <exception>
@@ -201,11 +203,32 @@ void ViewerComponent::fillPropertyGrid(const ot::PropertyGridCfg& _configuration
 }
 
 void ViewerComponent::setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {
-	AppBase::instance()->setPropertyValueDouble(_groupName, _itemName, value);
+	ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupName, _itemName);
+	if (!itm) {
+		OT_LOG_E("Property not found { \"group\": \"" + _groupName + "\", \"name\": \"" + _itemName + "\" }");
+		return;
+	}
+	ot::PropertyInputDouble* inp = dynamic_cast<ot::PropertyInputDouble*>(itm->getInput());
+	if (!inp) {
+		OT_LOG_E("PropertyInput cast failed");
+		return;
+	}
+	
+	inp->getSpinBox()->setValue(value);
 }
 
 double ViewerComponent::getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) {
-	return AppBase::instance()->getPropertyValueDouble(_groupName, _itemName);
+	ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupName, _itemName);
+	if (!itm) {
+		OT_LOG_E("Property not found { \"group\": \""+ _groupName + "\", \"name\": \"" + _itemName + "\" }");
+		return 0.;
+	}
+	ot::PropertyInputDouble* inp = dynamic_cast<ot::PropertyInputDouble*>(itm->getInput());
+	if (!inp) {
+		OT_LOG_E("PropertyInput cast failed");
+		return 0.;
+	}
+	return inp->getSpinBox()->value();
 }
 
 void ViewerComponent::lockSelectionAndModification(bool flag) {

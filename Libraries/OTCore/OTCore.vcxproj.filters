@@ -100,6 +100,42 @@
     <ClCompile Include="src\OTObjectBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Property.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBool.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyColor.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyDirectory.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyDouble.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyFactory.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyFilePath.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGridCfg.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyGroup.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyInt.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyString.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyStringList.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -246,6 +282,48 @@
     <ClInclude Include="include\OTCore\OTObjectBase.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\Property.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyBool.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyColor.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyDirectory.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyDouble.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyFactory.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyFilePath.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyGridCfg.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyGroup.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyInt.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyString.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyStringList.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyFactoryRegistrar.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PropertyFactoryRegistrar.hpp">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -283,6 +361,12 @@
     </Filter>
     <Filter Include="include\GenericDataStruct">
       <UniqueIdentifier>{b61015f7-1e41-4c69-9421-f427c5cc73bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Properties">
+      <UniqueIdentifier>{8b28d7d7-6314-4316-92c5-49eb45d8a288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Properties">
+      <UniqueIdentifier>{37db62cd-f790-44e3-b958-2e4f1a263b8d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-//! @file PropertyString.h
+//! @file PropertyBool.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,33 +6,26 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
 
-// std header
-#include <string>
+#define OT_PROPERTY_TYPE_Bool "Bool"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyString : public Property {
-		OT_DECL_NOCOPY(PropertyString)
+	class OT_CORE_API_EXPORT PropertyBool : public Property {
+		OT_DECL_NOCOPY(PropertyBool)
 	public:
-		PropertyString(PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
-		virtual ~PropertyString() {};
+		PropertyBool(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(false) {};
+		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
+		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
+		virtual ~PropertyBool() {};
 
-		virtual PropertyType getPropertyType(void) const override { return Property::StringType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Bool; };
 
 		virtual Property* createCopy(void) const override;
 
-		void setValue(const std::string& _value) { m_value = _value; };
-		const std::string& value(void) const { return m_value; };
-
-		void setPlaceholderText(const std::string& _text) { m_placeholderText = _text; };
-		const std::string& placeholderText(void) const { return m_placeholderText; };
-
-		void setMaxLength(int _length) { m_maxLength = _length; };
-		int maxLength(void) const { return m_maxLength; };
+		void setValue(bool _value) { m_value = _value; };
+		bool value(void) const { return m_value; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -47,9 +40,7 @@ namespace ot {
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
 
 	private:
-		std::string m_value;
-		std::string m_placeholderText;
-		unsigned int m_maxLength;
+		bool m_value;
 	};
 
 }

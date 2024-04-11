@@ -127,6 +127,8 @@
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridView.h" />
+    <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.h" />
+    <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.hpp" />
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />

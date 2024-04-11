@@ -4,21 +4,21 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/PropertyPainter2D.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/Painter2DEditButton.h"
 #include "OTWidgets/PropertyInputPainter2D.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-ot::PropertyInputPainter2D::PropertyInputPainter2D(const PropertyPainter2D* _property)
-	: PropertyInput(_property)
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputPainter2D> propertyInputPainter2DRegistrar(OT_PROPERTY_TYPE_Painter2D);
+
+ot::PropertyInputPainter2D::PropertyInputPainter2D()
 {
-	m_button = new Painter2DEditButton(_property->getPainter());
-	m_button->getButton()->setToolTip(QString::fromStdString(_property->propertyTip()));
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		m_button->getButton()->setText("...");
-	}
+	m_button = new Painter2DEditButton;
+	
 	this->connect(m_button, &Painter2DEditButton::painter2DChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 
@@ -55,4 +55,25 @@ ot::Property* ot::PropertyInputPainter2D::createPropertyConfiguration(void) cons
 	else newProperty->setPainter(new FillPainter2D);
 
 	return newProperty;
+}
+
+bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	m_button->blockSignals(true);
+
+	m_button->setPainter(actualProperty->getPainter());
+	m_button->getButton()->setToolTip(this->propertyTip());
+	if (this->propertyFlags() & Property::HasMultipleValues) {
+		m_button->getButton()->setText("...");
+	}
+
+	m_button->blockSignals(false);
+
+	return true;
 }

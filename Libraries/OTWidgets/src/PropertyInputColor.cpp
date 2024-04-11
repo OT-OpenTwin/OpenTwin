@@ -4,18 +4,18 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyColor.h"
+#include "OTCore/Logger.h"
+#include "OTCore/PropertyColor.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/PropertyInputColor.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-ot::PropertyInputColor::PropertyInputColor(const PropertyColor* _property)
-	: PropertyInput(_property)
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputColor> propertyInputColorRegistrar(OT_PROPERTY_TYPE_Color);
+
+ot::PropertyInputColor::PropertyInputColor()
 {
-	m_colorBtn = new ColorPickButton(_property->value());
+	m_colorBtn = new ColorPickButton;
 	m_colorBtn->getQWidget()->setContentsMargins(0, 0, 0, 0);
-	if (_property->propertyFlags() & Property::HasMultipleValues) {
-		m_colorBtn->replaceButtonText("...");
-	}
 	this->connect(m_colorBtn, &ColorPickButton::colorChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 
@@ -47,6 +47,26 @@ ot::Property* ot::PropertyInputColor::createPropertyConfiguration(void) const {
 	newProperty->setValue(m_colorBtn->otColor());
 
 	return newProperty;
+}
+
+bool ot::PropertyInputColor::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyColor* actualProperty = dynamic_cast<const PropertyColor*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	m_colorBtn->blockSignals(true);
+
+	m_colorBtn->setColor(actualProperty->value());
+	if (this->propertyFlags() & Property::HasMultipleValues) {
+		m_colorBtn->replaceButtonText("...");
+	}
+
+	m_colorBtn->blockSignals(false);
+
+	return true;
 }
 
 void ot::PropertyInputColor::setColor(const Color& _color) {

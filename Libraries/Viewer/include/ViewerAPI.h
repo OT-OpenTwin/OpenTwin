@@ -6,7 +6,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
 #include "OTCore/GenericDataStructMatrix.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/PropertyGridCfg.h"
 #include "OTServiceFoundation/ContextMenu.h"
 #include "OTServiceFoundation/TableRange.h"
 

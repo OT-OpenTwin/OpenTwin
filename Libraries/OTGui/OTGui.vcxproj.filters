@@ -144,46 +144,10 @@
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\Property.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyGroup.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyBool.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyString.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyInt.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyDouble.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyStringList.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyFilePath.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyDirectory.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\PropertyDialogCfg.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\OnePropertyDialogCfg.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyFactory.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyColor.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyGridCfg.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\MessageDialogCfg.h">
@@ -305,46 +269,10 @@
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="src\Property.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGroup.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyBool.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyString.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyInt.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyDouble.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyStringList.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyDirectory.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyFilePath.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
     <ClCompile Include="src\PropertyDialogCfg.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\OnePropertyDialogCfg.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyFactory.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyColor.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyGridCfg.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\MessageDialogCfg.cpp">

@@ -2,8 +2,14 @@
 #include "EntityProperties.h"
 
 #include "OTCore/Logger.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGroup.h"
+#include "OTCore/Property.h"
+#include "OTCore/PropertyGroup.h"
+#include "OTCore/PropertyInt.h"
+#include "OTCore/PropertyBool.h"
+#include "OTCore/PropertyColor.h"
+#include "OTCore/PropertyDouble.h"
+#include "OTCore/PropertyString.h"
+#include "OTCore/PropertyStringList.h"
 
 #include <cassert>
 #include <list>
@@ -185,25 +191,12 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 	for (const ot::Property* p : _groupConfig->properties()) {
 		EntityPropertiesBase* newSetting(nullptr);
 
-		switch (p->getPropertyType())
-		{
-		case ot::Property::NullType:
-			OT_LOG_E("Unsupported type (null)");
-			return;
-		case ot::Property::BoolType:
-			newSetting = new EntityPropertiesBoolean;
-			break;
-		case ot::Property::IntType:
-			newSetting = new EntityPropertiesInteger;
-			break;
-		case ot::Property::DoubleType:
-			newSetting = new EntityPropertiesDouble;
-			break;
-		case ot::Property::StringType:
-			newSetting = new EntityPropertiesString;
-			break;
-		case ot::Property::StringListType:
-		{
+		if (p->getPropertyType() == OT_PROPERTY_TYPE_Bool) newSetting = new EntityPropertiesBoolean;
+		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Color) newSetting = new EntityPropertiesColor;
+		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Int) newSetting = new EntityPropertiesInteger;
+		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Double) newSetting = new EntityPropertiesDouble;
+		else if (p->getPropertyType() == OT_PROPERTY_TYPE_String) newSetting = new EntityPropertiesString;
+		else if (p->getPropertyType() == OT_PROPERTY_TYPE_StringList) {
 			if (p->specialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
 			else if (p->specialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
 			else if (p->specialType().empty()) newSetting = new EntityPropertiesSelection;
@@ -212,12 +205,8 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 				return;
 			}
 		}
-		break;
-		case ot::Property::ColorType:
-			newSetting = new EntityPropertiesColor;
-			break;
-		default:
-			OT_LOG_E("Unknown type (" + std::to_string(p->getPropertyType()) + ")");
+		else {
+			OT_LOG_E("Unknown type \"" + p->getPropertyType() + "\"");
 			return;
 		}
 

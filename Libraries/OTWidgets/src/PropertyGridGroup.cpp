@@ -5,15 +5,14 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/FillPainter2D.h"
+#include "OTCore/PropertyGroup.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/ColorStyleTypes.h"
-#include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/OTQtConverter.h"
 
 // Qt header
 #include <QtWidgets/qlabel.h>
@@ -30,7 +29,7 @@ namespace ot {
 }
 
 ot::PropertyGridGroup::PropertyGridGroup() 
-	: m_isAlternate(false), m_groupBrush(QColor(Qt::white)), m_groupAlternateBrush(QColor(235, 235, 235))
+	: m_isAlternate(false), m_groupColor(Qt::white), m_groupAlternateColor(235, 235, 235)
 {
 	m_titleLabel = new QLabel;
 	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
@@ -43,25 +42,19 @@ ot::PropertyGridGroup::PropertyGridGroup()
 	titleLayout->addWidget(m_titleLabel, 1);
 	titleLayout->setContentsMargins(0, 0, 0, 0);
 
-	m_painter = new FillPainter2D(Color::White);
-	m_alternatePainter = new FillPainter2D(Color(235, 235, 235));
-
 	this->setFlags(this->flags() & (~Qt::ItemIsSelectable));
 	this->slotColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 ot::PropertyGridGroup::~PropertyGridGroup() {
-	delete m_painter;
-	delete m_alternatePainter;
-
 	this->disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_name = _group->name();
-	this->setPainter(_group->backgroundPainter()->createCopy());
-	this->setAlternatePainter(_group->alternateBackgroundPainter()->createCopy());
+	m_groupColor = OTQtConverter::toQt(_group->backgroundColor());
+	m_groupAlternateColor = OTQtConverter::toQt(_group->alternateBackgroundColor());
 
 	m_titleLabel->setText(QString::fromStdString(_group->title()));
 
@@ -78,8 +71,8 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(void) const {
 	PropertyGroup* newGroup = new PropertyGroup;
 	newGroup->setName(this->getName());
 	newGroup->setTitle(this->getTitle().toStdString());
-	newGroup->setBackgroundPainter(m_painter->createCopy());
-	newGroup->setAlternateBackgroundPainter(m_alternatePainter->createCopy());
+	newGroup->setBackgroundColor(Color(m_groupColor.red(), m_groupColor.green(), m_groupColor.blue(), m_groupColor.alpha()));
+	newGroup->setAlternateBackgroundColor(Color(m_groupAlternateColor.red(), m_groupAlternateColor.green(), m_groupAlternateColor.blue(), m_groupAlternateColor.alpha()));
 
 	std::list<Property*> p;
 	for (const PropertyGridItem* i : this->childProperties()) {
@@ -133,23 +126,8 @@ QString ot::PropertyGridGroup::getTitle(void) const {
 	return m_titleLabel->text();
 }
 
-void ot::PropertyGridGroup::setPainter(Painter2D* _painter) {
-	if (m_painter == _painter || !_painter) return;
-	if (m_painter) delete m_painter;
-	m_painter = _painter;
-	m_groupBrush = Painter2DFactory::brushFromPainter2D(m_painter);
-}
-
-void ot::PropertyGridGroup::setAlternatePainter(Painter2D* _painter) {
-	if (m_alternatePainter == _painter || !_painter) return;
-	if (m_alternatePainter) delete m_alternatePainter;
-	m_alternatePainter = _painter;
-	m_groupBrush = Painter2DFactory::brushFromPainter2D(m_painter);
-	m_groupAlternateBrush = Painter2DFactory::brushFromPainter2D(m_alternatePainter);
-}
-
 void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
-	_item->setPropertyBrush((m_isAlternate ? m_groupAlternateBrush : m_groupBrush));
+	_item->setPropertyColor((m_isAlternate ? m_groupAlternateColor : m_groupColor));
 	m_isAlternate = !m_isAlternate;
 
 	_item->setGroupName(this->getName());

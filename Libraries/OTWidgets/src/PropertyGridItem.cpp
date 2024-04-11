@@ -18,7 +18,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::PropertyGridItem::PropertyGridItem()
-	: m_input(nullptr), m_propertyBrush(QColor(Qt::white)), m_type(Property::NullType), m_flags(Property::NoFlags)
+	: m_input(nullptr), m_propertyColor(Qt::white), m_flags(Property::NoFlags)
 {
 	m_titleLayoutW = new QWidget;
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");

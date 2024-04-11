@@ -58,7 +58,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/MessageDialogCfg.h"
-#include "OTGui/PropertyStringList.h"
+#include "OTCore/PropertyStringList.h"
 #include "OTCommunication/UiTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/SettingsData.h"
@@ -2049,117 +2049,15 @@ ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const
 	return m_propertyGrid->findItem(_groupName, _itemName);
 }
 
-ot::Property::PropertyType AppBase::getPropertyType(const std::string& _groupName, const std::string& _itemName) {
+std::string AppBase::getPropertyType(const std::string& _groupName, const std::string& _itemName) {
 	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
 	if (itm) {
 		return itm->getPropertyType();
 	}
 	else {
 		OT_LOG_E("Item not found: \"" + _itemName + "\"");
-		return ot::Property::NullType;
+		return "";
 	}
-}
-
-bool AppBase::getPropertyValueBool(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return false;
-	}
-	if (itm->getPropertyType() != ot::Property::BoolType) {
-		OT_LOG_E("Invalid property type");
-		return false;
-	}
-	return itm->getInput()->getCurrentValue().toBool();
-}
-
-int AppBase::getPropertyValueInt(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return 0;
-	}
-	if (itm->getPropertyType() != ot::Property::IntType) {
-		OT_LOG_E("Invalid property type");
-		return 0;
-	}
-	return itm->getInput()->getCurrentValue().toInt();
-}
-
-double AppBase::getPropertyValueDouble(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return 0.;
-	}
-	if (itm->getPropertyType() != ot::Property::DoubleType) {
-		OT_LOG_E("Invalid property type");
-		return 0.;
-	}
-	return itm->getInput()->getCurrentValue().toDouble();
-}
-
-QString AppBase::getPropertyValueString(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return QString();
-	}
-	if (itm->getPropertyType() != ot::Property::StringType) {
-		OT_LOG_E("Invalid property type");
-		return QString();
-	}
-	return itm->getInput()->getCurrentValue().toString();
-}
-
-QString AppBase::getPropertyValueSelection(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return QString();
-	}
-	if (itm->getPropertyType() != ot::Property::StringListType) {
-		OT_LOG_E("Invalid property type");
-		return QString();
-	}
-	return itm->getInput()->getCurrentValue().toString();
-}
-
-QStringList AppBase::getPropertyPossibleSelection(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return QStringList();
-	}
-	if (itm->getPropertyType() != ot::Property::StringListType) {
-		OT_LOG_E("Invalid property type");
-		return QStringList();
-	}
-
-	ot::PropertyInputStringList* inp = dynamic_cast<ot::PropertyInputStringList*>(itm->getInput());
-	if (!inp) {
-		OT_LOG_E("Input cast failed");
-		return QStringList();
-	}
-	return inp->getPossibleSelection();
-}
-
-QColor AppBase::getPropertyValueColor(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property cast failed");
-		return QColor();
-	}
-	if (itm->getPropertyType() != ot::Property::ColorType) {
-		OT_LOG_E("Invalid property type");
-		return QColor();
-	}
-	QVariant var = itm->getInput()->getCurrentValue();
-	if (!var.canConvert<QColor>()) {
-		OT_LOG_E("Invalid variant type");
-		return QColor();
-	}
-	return var.value<QColor>();
 }
 
 bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::string& _itemName) {
@@ -2175,20 +2073,6 @@ bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::s
 
 void AppBase::clearPropertyGrid(void) {
 	m_propertyGrid->clear();
-}
-
-void AppBase::setPropertyValueDouble(const std::string& _groupName, const std::string& _itemName, double _value) {
-	ot::PropertyGridItem* itm = m_propertyGrid->findItem(_itemName);
-	if (!itm) {
-		OT_LOG_E("Invalid item name \"" + _itemName + "\"");
-		return;
-	}
-	ot::PropertyInputDouble* inp = dynamic_cast<ot::PropertyInputDouble*>(itm->getInput());
-	if (!inp) {
-		OT_LOG_E("Property input cast failed");
-		return;
-	}
-	inp->setValue(_value);
 }
 
 ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {

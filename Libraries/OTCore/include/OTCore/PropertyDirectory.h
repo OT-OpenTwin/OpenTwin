@@ -1,4 +1,4 @@
-//! @file PropertyInt.h
+//! @file PropertyDirectory.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,32 +6,30 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
+
+// std header
+#include <string>
+
+#define OT_PROPERTY_TYPE_Directory "Directory"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyInt : public Property {
-		OT_DECL_NOCOPY(PropertyInt)
+	class OT_CORE_API_EXPORT PropertyDirectory : public Property {
+		OT_DECL_NOCOPY(PropertyDirectory)
 	public:
-		PropertyInt(PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags::NoFlags);
-		virtual ~PropertyInt() {};
+		PropertyDirectory(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
+		PropertyDirectory(const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_path(_path) {};
+		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_path(_path) {};
+		virtual ~PropertyDirectory() {};
 
-		virtual PropertyType getPropertyType(void) const override { return Property::IntType; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Directory; };
 
 		virtual Property* createCopy(void) const override;
 
-		void setValue(int _value) { m_value = _value; };
-		int value(void) const { return m_value; };
-
-		void setRange(int _min, int _max) { m_min = _min; m_max = _max; };
-
-		void setMin(int _value) { m_min = _value; };
-		int min(void) const { return m_min; };
-
-		void setMax(int _value) { m_max = _value; };
-		int max(void) const { return m_max; };
+		void setPath(const std::string& _path) { m_path = _path; };
+		std::string& path(void) { return m_path; };
+		const std::string& path(void) const { return m_path; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -46,9 +44,7 @@ namespace ot {
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
 
 	private:
-		int m_value;
-		int m_min;
-		int m_max;
+		std::string m_path;
 	};
 
 }

@@ -4,20 +4,19 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/PropertyString.h"
+#include "OTCore/Logger.h"
+#include "OTCore/PropertyString.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PropertyInputString.h"
+#include "OTWidgets/PropertyInputFactoryRegistrar.h"
+
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputString> propertyInputStringRegistrar(OT_PROPERTY_TYPE_String);
 
 ot::PropertyInputString::PropertyInputString(const QString& _text) 
 	: m_text(_text)
-{}
-
-ot::PropertyInputString::PropertyInputString(const PropertyString* _property)
-	: PropertyInput(_property)
 {
-	m_text = QString::fromStdString(_property->value());
-	this->ini();
-	m_lineEdit->setPlaceholderText(QString::fromStdString(_property->placeholderText()));
+	m_lineEdit = new LineEdit;
+	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 }
 
 ot::PropertyInputString::~PropertyInputString() {
@@ -43,16 +42,6 @@ void ot::PropertyInputString::lclValueChanged(void) {
 	}
 }
 
-void ot::PropertyInputString::ini() {
-	m_lineEdit = new LineEdit;
-	if (this->propertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
-	else m_lineEdit->setText(m_text);
-
-
-	m_lineEdit->setToolTip(this->propertyTip());
-	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
-}
-
 ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
 	ot::PropertyString* newProperty = new ot::PropertyString;
 	newProperty->setPropertyName(this->propertyName());
@@ -65,6 +54,29 @@ ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
 	newProperty->setValue(m_lineEdit->text().toStdString());
 
 	return newProperty;
+}
+
+bool ot::PropertyInputString::setupFromConfiguration(const Property* _configuration) {
+	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_configuration);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return false;
+	}
+
+	m_lineEdit->blockSignals(true);
+	m_text = QString::fromStdString(actualProperty->value());
+
+	m_lineEdit->setPlaceholderText(QString::fromStdString(actualProperty->placeholderText()));
+
+	if (this->propertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
+	else m_lineEdit->setText(m_text);
+
+	m_lineEdit->setToolTip(this->propertyTip());
+
+	m_lineEdit->blockSignals(false);
+
+	return true;
 }
 
 void ot::PropertyInputString::setText(const QString& _text) {

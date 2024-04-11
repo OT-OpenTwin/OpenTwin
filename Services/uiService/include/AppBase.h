@@ -21,8 +21,8 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerManagerTemplate.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/Property.h"
+#include "OTCore/PropertyGridCfg.h"
 #include "OTServiceFoundation/UserCredentials.h"
 
 #include <akGui/aWindowEventHandler.h>
@@ -390,21 +390,7 @@ public:
 
 	ot::PropertyGridItem* findProperty(const std::string& _groupName, const std::string& _itemName);
 
-	ot::Property::PropertyType getPropertyType(const std::string& _groupName, const std::string& _itemName);
-
-	bool getPropertyValueBool(const std::string& _groupName, const std::string& _itemName);
-
-	int getPropertyValueInt(const std::string& _groupName, const std::string& _itemName);
-
-	double getPropertyValueDouble(const std::string& _groupName, const std::string& _itemName);
-
-	QString getPropertyValueString(const std::string& _groupName, const std::string& _itemName);
-
-	QString getPropertyValueSelection(const std::string& _groupName, const std::string& _itemName);
-
-	QStringList getPropertyPossibleSelection(const std::string& _groupName, const std::string& _itemName);
-
-	QColor getPropertyValueColor(const std::string& _groupName, const std::string& _itemName);
+	std::string getPropertyType(const std::string& _groupName, const std::string& _itemName);
 
 	bool getPropertyIsDeletable(const std::string& _groupName, const std::string& _itemName);
 
@@ -415,8 +401,6 @@ public:
 	void clearPropertyGrid(void);
 
 	void lockPropertyGrid(bool flag);
-
-	void setPropertyValueDouble(const std::string& _groupName, const std::string& _itemName, double _value);
 
 	ot::GraphicsPicker* globalGraphicsPicker(void);
 

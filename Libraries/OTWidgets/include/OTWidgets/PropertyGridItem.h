@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Property.h"
+#include "OTCore/Property.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -49,7 +49,7 @@ namespace ot {
 		void setAdditionalPropertyData(const std::string& _data) { m_data = _data; };
 		const std::string& additionalPropertyData(void) const { return m_data; };
 
-		Property::PropertyType getPropertyType(void) const { return m_type; };
+		std::string getPropertyType(void) const { return m_type; };
 
 		Property* createProperty(void) const;
 
@@ -59,8 +59,8 @@ namespace ot {
 		void setInput(PropertyInput* _input);
 		PropertyInput* getInput(void) const { return m_input; };
 		
-		void setPropertyBrush(const QBrush& _brush) { m_propertyBrush = _brush; };
-		const QBrush& propertyBrush(void) const { return m_propertyBrush; };
+		void setPropertyColor(const QColor& _color) { m_propertyColor = _color; };
+		const QColor& propertyColor(void) const { return m_propertyColor; };
 
 		bool isPropertyDeletable(void) const;
 
@@ -83,9 +83,9 @@ namespace ot {
 		std::string m_specialType;
 		std::string m_data;
 		Property::PropertyFlags m_flags;
-		Property::PropertyType m_type;
+		std::string m_type;
 		PropertyInput* m_input;
-		QBrush m_propertyBrush;
+		QColor m_propertyColor;
 	};
 
 }
