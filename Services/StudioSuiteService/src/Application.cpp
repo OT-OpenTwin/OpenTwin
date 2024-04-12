@@ -514,6 +514,7 @@ void Application::changeUnits(const std::string &content)
 	// If a change is necessary, store the new entity
 	if (changed)
 	{
+		units->getProperties().setAllPropertiesReadOnly();
 		units->StoreToDataBase();
 		modelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
 	}
@@ -665,6 +666,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	if (changed)
 	{
 		material->updateFromProperties();
+		material->getProperties().setAllPropertiesReadOnly();
 		material->StoreToDataBase();
 		modelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
 	}
@@ -842,6 +844,7 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 
 	createFacets(triangles, entityGeom->getFacets()->getNodeVector(), entityGeom->getFacets()->getTriangleList(), entityGeom->getFacets()->getEdgeList());
 
+	entityGeom->getProperties().setAllPropertiesReadOnly();
 	entityGeom->getFacets()->StoreToDataBase();
 	entityGeom->StoreToDataBase();
 
