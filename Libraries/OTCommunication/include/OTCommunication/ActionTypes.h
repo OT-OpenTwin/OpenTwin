@@ -283,6 +283,7 @@
 #define OT_ACTION_PARAM_DATABASE_URL "Database.URL"
 #define OT_ACTION_PARAM_PROCESS_ID "PROCESS.ID"
 
+#define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_Value "Value"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Package "Package"
