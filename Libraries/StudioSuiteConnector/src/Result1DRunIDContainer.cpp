@@ -176,6 +176,8 @@ bool Result1DRunIDContainer::hasChanged(int runID, InfoFileManager& infoFileMana
 		std::string fileName = item.first;
 		std::string hash     = item.second->getDataHash();
 
+		std::replace(fileName.begin(), fileName.end(), '\\', '/');
+
 		if (infoFileManager.getRunIDFileHash(runID, fileName) != hash)
 		{
 			return true;

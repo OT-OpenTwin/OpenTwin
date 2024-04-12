@@ -14,7 +14,7 @@
 #include <boost/algorithm/string.hpp>
 
 ParametricResult1DManager::ParametricResult1DManager(Application *app) :
-	resultFolderName("Results"),
+	resultFolderName(ot::FolderNames::DatasetFolder),
 	application(app)
 {
 
@@ -28,9 +28,9 @@ ParametricResult1DManager::~ParametricResult1DManager()
 void ParametricResult1DManager::clear()
 {
 	// We delete all previous result data (series), since there was a non-parametric change
-	std::list<std::string> resultFolderContent = application->modelComponent()->getListOfFolderItems(resultFolderName, false);
+	std::list<std::string> resultEntity{ resultFolderName + "/1D Results" };
 
-	application->modelComponent()->deleteEntitiesFromModel(resultFolderContent, false);
+	application->modelComponent()->deleteEntitiesFromModel(resultEntity, false);
 }
 
 void ParametricResult1DManager::add(Result1DManager& result1DManager)

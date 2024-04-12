@@ -300,11 +300,10 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 	}
 	catch (std::string& error)
 	{
+		ProgressInfo::getInstance().setProgressState(false, "", false);
+		ProgressInfo::getInstance().unlockGui();
 		ProgressInfo::getInstance().showError(error);
 	}
-
-	ProgressInfo::getInstance().setProgressState(false, "", false);
-	ProgressInfo::getInstance().unlockGui();
 }
 
 void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileManager &infoFileManager)
@@ -321,83 +320,92 @@ void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileMa
 	// Otherwise, only the new run-ids need to be uploaded (added).
 	std::list<int> changedRunIds = checkForChangedData(runIds, uploadDirectory, result1DData, infoFileManager);
 
-	if (changedRunIds.empty())
+	// Here we have two cases: Either we do not want to include the results. In this case, the append flag needs to be false such that the 
+	// previously stored data will be deleted. If the want to include the results, the flag should be true, since if there is no change
+	// the previously stored data should be kept. 
+
+	bool appendData = includeParametricResults;  
+	std::string dataContent;
+	size_t uncompressedDataLength = 0;
+
+	if (!changedRunIds.empty())
 	{
-		return; // There is no change, we don't need to do anything here
-	}
+		appendData = (changedRunIds.size() < runIds.size());
 
-	bool appendData = (changedRunIds.size() < runIds.size());
+		// Create a zip archive of the to-be uploaded run-ids (including the cache information)
+		// In a first step, we calculate the buffer size to store all the data
+		uncompressedDataLength = sizeof(size_t);   // Store the number of run IDs
+		size_t validRunIds = 0;
 
-	// Create a zip archive of the to-be uploaded run-ids (including the cache information)
-	// In a first step, we calculate the buffer size to store all the data
-	size_t bufferSize = sizeof(size_t);   // Store the number of run IDs
-	size_t validRunIds = 0;
-
-	for (int runId : changedRunIds)
-	{
-		Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
-		if (container != nullptr)
+		for (int runId : changedRunIds)
 		{
-			bufferSize += container->getSize();
-			validRunIds++;
+			Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
+			if (container != nullptr)
+			{
+				uncompressedDataLength += container->getSize();
+				validRunIds++;
+			}
+		}
+
+		assert(uncompressedDataLength > 0);
+		if (uncompressedDataLength > 0)
+		{
+			std::vector<char> buffer;
+			buffer.reserve(uncompressedDataLength);
+
+			// Write the number of valid runids
+			char* valueBuffer = (char*)(&validRunIds);
+
+			for (size_t index = 0; index < sizeof(size_t); index++)
+			{
+				buffer.push_back(valueBuffer[index]);
+			}
+
+			// Now we write all data to the buffer
+			for (int runId : changedRunIds)
+			{
+				Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
+				if (container != nullptr)
+				{
+					container->writeToBuffer(runId, buffer);
+				}
+			}
+
+			// In a next step, we do not need the original data anymore
+			result1DData.clear();
+
+			// Create a buffer for the compressed storage
+			uLong compressedSize = compressBound((uLong)uncompressedDataLength);
+
+			char* compressedData = new char[compressedSize];
+			compress((Bytef*)compressedData, &compressedSize, (Bytef*)buffer.data(), uncompressedDataLength);
+
+			buffer.clear();
+
+			// Convert the binary to an encoded string
+			int encoded_data_length = Base64encode_len(compressedSize);
+			char* base64_string = new char[encoded_data_length];
+
+			Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+			delete[] compressedData;
+			compressedData = nullptr;
+
+			dataContent = std::string(base64_string);
+
+			delete[] base64_string;
+			base64_string = nullptr;
 		}
 	}
-
-	assert(bufferSize > 0);
-	if (bufferSize == 0) return;
-
-	std::vector<char> buffer;
-	buffer.reserve(bufferSize);
-
-	// Write the number of valid runids
-	char* valueBuffer = (char*)(&validRunIds);
-
-	for (size_t index = 0; index < sizeof(size_t); index++)
-	{
-		buffer.push_back(valueBuffer[index]);
-	}
-
-	// Now we write all data to the buffer
-	for (int runId : changedRunIds)
-	{
-		Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
-		if (container != nullptr)
-		{
-			container->writeToBuffer(runId, buffer);
-		}
-	}
-
-	// In a next step, we do not need the original data anymore
-	result1DData.clear();
-
-	// Create a buffer for the compressed storage
-	uLong compressedSize = compressBound((uLong)bufferSize);
-
-	char* compressedData = new char[compressedSize];
-	compress((Bytef*)compressedData, &compressedSize, (Bytef*)buffer.data(), bufferSize);
-
-	buffer.clear();
-
-	// Convert the binary to an encoded string
-	int encoded_data_length = Base64encode_len(compressedSize);
-	char* base64_string = new char[encoded_data_length];
-
-	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
-
-	delete[] compressedData;
-	compressedData = nullptr;
-
-	std::string dataContent = std::string(base64_string);
-
-	delete[] base64_string;
-	base64_string = nullptr;
 
 	// Finally send the zip archive to the server (together with the information whether the data shall be replaced or added)
+	// In case that we do not have any results or we do not want to add the results, the message is still sent, but with an empty content
+
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_RESULT1D, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_APPEND, appendData, doc.GetAllocator());  // We need ids for the data entities and the file entities
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(dataContent, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(bufferSize), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), doc.GetAllocator());
 
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }

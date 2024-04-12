@@ -736,6 +736,11 @@ void Application::result1D(bool appendData, std::string& data, size_t uncompress
 		parametricResultManager.clear();
 	}
 
+	if (data.empty())
+	{
+		return;
+	}
+
 	// First, we need to decode the data back into a byte buffer
 	int decoded_compressed_data_length = Base64decode_len(data.c_str());
 	char* decodedCompressedString = new char[decoded_compressed_data_length];
