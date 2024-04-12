@@ -1488,10 +1488,10 @@ void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const ot::
 	}
 }
 
-void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration)
+void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const std::string& _entitiesJson)
 {
 	EntityProperties properties;
-	properties.buildFromConfiguration(_configuration);
+	properties.buildFromJSON(_entitiesJson);
 
 	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
 

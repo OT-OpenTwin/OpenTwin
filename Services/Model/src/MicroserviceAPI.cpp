@@ -998,11 +998,9 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 
 			std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 			
-			ot::ConstJsonObject cfgObj = ot::json::getObject(doc, OT_ACTION_PARAM_Config);
-			ot::PropertyGridCfg cfg;
-			cfg.setFromJsonObject(cfgObj);
-
-			globalModel->updatePropertiesOfEntities(entityIDList, cfg);
+			std::string json = ot::json::getString(doc, OT_ACTION_PARAM_JSON);
+	
+			globalModel->updatePropertiesOfEntities(entityIDList, json);
 		}
 		else if (action == OT_ACTION_CMD_MODEL_DeleteProperty)
 		{

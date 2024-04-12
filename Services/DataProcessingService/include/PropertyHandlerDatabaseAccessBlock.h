@@ -4,7 +4,6 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "MetadataCampaign.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTGui/GraphicsItemCfg.h"
 
 #include <map>
 #include <memory>
@@ -29,7 +28,7 @@ private:
 	EntityProperties UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
 	EntityProperties UpdateSelectionProperties(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity);
 
-	void RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const ot::PropertyGridCfg& _propertyConfiguration);
+	void RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON);
 	
 	void UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const MetadataCampaign& campaignMetadata);
 	void getSelectedValues(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityValue, std::string& outParameter1Value, std::string& outParameter2Value, std::string& outParameter3Value);

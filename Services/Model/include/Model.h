@@ -171,7 +171,7 @@ public:
 	std::list<ot::UID> getIDsOfFolderItemsOfType(const std::string &folder, const std::string &className, bool recursive);
 	std::list<EntityBase*> getListOfSelectedEntities(const std::string &typeFilter);
 	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration);
-	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration);
+	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const std::string& _entitiesJson);
 	void getListOfAllChildEntities(EntityBase* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
 
 	void getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions);
