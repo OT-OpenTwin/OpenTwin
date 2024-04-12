@@ -36,6 +36,10 @@ public:
 	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config);
 	void buildFromConfiguration(const ot::PropertyGridCfg& _config);
 	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig);
+
+	std::string createJSON(EntityBase* root, bool visibleOnly);
+	void buildFromJSON(const std::string& prop);
+
 	void checkMatchingProperties(EntityProperties &other);
 	void readFromProperties(const EntityProperties &other, EntityBase *root);
 

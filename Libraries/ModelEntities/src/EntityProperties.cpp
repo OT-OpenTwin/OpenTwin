@@ -227,6 +227,114 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 	}
 }
 
+std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly)
+{
+	// Here we convert the entire container with all its entities into a JSON document
+
+	ot::JsonDocument jsonDoc;
+
+	for (auto prop : propertiesList)
+	{
+		if (!visibleOnly || prop->getVisible())
+		{
+			prop->addToJsonDocument(jsonDoc, root);
+		}
+	}
+
+	// Create the output string
+	return jsonDoc.toJson();
+}
+
+void EntityProperties::buildFromJSON(const std::string& prop)
+{
+	// Here we re-build the current container with the settings in the JSON document. All previous settings will be overridden.
+
+	deleteAllProperties();
+
+	// Read settings into JSOC Doc
+	ot::JsonDocument doc;
+
+	// Parse the document with the json string we have "received"
+	doc.fromJson(prop);
+
+	// Now loop through all members of the document
+	for (ot::JsonMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
+	{
+		std::string propertyName = i->name.GetString();
+
+		if (i->value.IsObject())
+		{
+			//const rapidjson::Value &object = i->value;
+			std::string type = ot::json::getString(i->value, "Type");
+			bool multipleValues = ot::json::getBool(i->value, "MultipleValues");
+
+			bool readOnly = false;
+			if (i->value.HasMember("ReadOnly"))
+			{
+				readOnly = ot::json::getBool(i->value, "ReadOnly");
+			}
+
+			bool protectedProperty = true;
+			if (i->value.HasMember("Protected"))
+			{
+				protectedProperty = ot::json::getBool(i->value, "Protected");
+			}
+
+			bool visible = true;
+			if (i->value.HasMember("Visible"))
+			{
+				visible = ot::json::getBool(i->value, "Visible");
+			}
+
+			bool errorState = false;
+			if (i->value.HasMember("ErrorState"))
+			{
+				errorState = ot::json::getBool(i->value, "ErrorState");
+			}
+
+			std::string group;
+			if (i->value.HasMember("Group"))
+			{
+				group = ot::json::getString(i->value, "Group");
+			}
+
+			EntityPropertiesBase* newSetting(nullptr);
+
+			if (type == "double") newSetting = new EntityPropertiesDouble;
+			else if (type == "integer") newSetting = new EntityPropertiesInteger;
+			else if (type == "boolean") newSetting = new EntityPropertiesBoolean;
+			else if (type == "string") newSetting = new EntityPropertiesString;
+			else if (type == "selection") newSetting = new EntityPropertiesSelection;
+			else if (type == "color") newSetting = new EntityPropertiesColor;
+			else if (type == "entitylist") newSetting = new EntityPropertiesEntityList;
+			else if (type == "projectlist") newSetting = new EntityPropertiesProjectList;
+			else
+			{
+				assert(0); // Unknown type
+			}
+
+			assert(newSetting != nullptr);
+
+			if (newSetting != nullptr)
+			{
+				newSetting->readFromJsonObject(i->value.GetObject());
+				newSetting->setName(propertyName);
+				newSetting->setHasMultipleValues(multipleValues);
+				newSetting->setReadOnly(readOnly);
+				newSetting->setProtected(protectedProperty);
+				newSetting->setVisible(visible);
+				newSetting->setErrorState(errorState);
+
+				this->createProperty(newSetting, group);
+			}
+		}
+		else
+		{
+			OT_LOG_E("Unsupported type");
+		}
+	}
+}
+
 void EntityProperties::checkMatchingProperties(EntityProperties &other)
 {
 	// Here we check whether we have compatible properties to the collection handed over in the argument list.

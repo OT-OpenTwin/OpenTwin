@@ -47,6 +47,9 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) = 0;
 	virtual void setFromConfiguration(const ot::Property* _property) = 0;
 
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) = 0;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) = 0;
+
 	void setReadOnly(bool flag) { readOnly = flag; };
 	bool getReadOnly(void) { return readOnly; };
 
@@ -65,6 +68,7 @@ public:
 
 protected:
 	void setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property);
+	void addBaseDataToJsonDocument(ot::JsonValue& container, ot::JsonAllocator& allocator, const std::string& type);
 
 private:
 	void setMultipleValues(void) { multipleValues = true; }
@@ -104,6 +108,9 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
 
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
+
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
 	static void createProperty(const std::string &group, const std::string &name, double defaultValue, const std::string &defaultCategory, EntityProperties &properties);
@@ -135,6 +142,9 @@ public:
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
+
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -168,6 +178,9 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
 
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
+
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
 	static void createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties);
@@ -199,6 +212,9 @@ public:
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
+
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -236,6 +252,9 @@ public:
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
+
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -280,6 +299,9 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
 
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
+
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
 	static void createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties);
@@ -308,6 +330,9 @@ public:
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
+
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -349,8 +374,12 @@ public:
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
 
 	virtual bool hasSameValue(EntityPropertiesBase* other) override { return true; };
+	
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) override;
 	virtual void setFromConfiguration(const ot::Property* _property) override;
+
+	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void readFromJsonObject(const ot::ConstJsonObject& object) override;
 
 	void setValue(std::string& value) { _value = value; }
 	std::string getValue() const {return _value;}

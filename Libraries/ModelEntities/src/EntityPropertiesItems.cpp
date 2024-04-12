@@ -81,6 +81,17 @@ void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration
 	g->addProperty(_property);
 }
 
+void EntityPropertiesBase::addBaseDataToJsonDocument(ot::JsonValue& container, ot::JsonAllocator& allocator, const std::string& type)
+{
+	container.AddMember("Type", ot::JsonString(type, allocator), allocator);
+	container.AddMember("MultipleValues", this->hasMultipleValues(), allocator);
+	container.AddMember("ReadOnly", this->getReadOnly(), allocator);
+	container.AddMember("Protected", this->getProtected(), allocator);
+	container.AddMember("Visible", this->getVisible(), allocator);
+	container.AddMember("ErrorState", this->getErrorState(), allocator);
+	container.AddMember("Group", ot::JsonString(this->getGroup(), allocator), allocator);
+}
+
 void EntityPropertiesDouble::createProperty(const std::string &group, const std::string &name, double defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
@@ -108,6 +119,25 @@ void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property)
 	}
 
 	setValue(actualProperty->value());
+}
+
+void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	ot::JsonObject container;
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, jsonDoc.GetAllocator(), "double");
+
+	container.AddMember("Value", value, jsonDoc.GetAllocator());
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, jsonDoc.GetAllocator());
+}
+
+void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& val = object["Value"];
+
+	setValue(val.GetDouble());
 }
 
 void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -152,6 +182,30 @@ void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property
 	setValue(actualProperty->value());
 }
 
+void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
+	rapidjson::Value container(rapidjson::kObjectType);
+
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "integer");
+
+	rapidjson::Value jsonValue(rapidjson::kNumberType);
+	jsonValue.SetInt64(value);
+	container.AddMember("Value", jsonValue, allocator);
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(jsonName, container, allocator);
+}
+
+void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& val = object["Value"];
+
+	setValue((long)val.GetInt64());
+}
+
 void EntityPropertiesInteger::copySettings(EntityPropertiesBase *other, EntityBase *root)
 {
 	EntityPropertiesBase::copySettings(other, root);
@@ -194,6 +248,30 @@ void EntityPropertiesBoolean::setFromConfiguration(const ot::Property* _property
 	setValue(actualProperty->value());
 }
 
+void EntityPropertiesBoolean::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
+	rapidjson::Value container(rapidjson::kObjectType);
+
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "boolean");
+
+	rapidjson::Value jsonValue(rapidjson::kNumberType);
+	jsonValue.SetBool(value);
+	container.AddMember("Value", jsonValue, allocator);
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(jsonName, container, allocator);
+}
+
+void EntityPropertiesBoolean::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& val = object["Value"];
+
+	setValue(val.GetBool());
+}
+
 void EntityPropertiesBoolean::copySettings(EntityPropertiesBase *other, EntityBase *root)
 {
 	EntityPropertiesBase::copySettings(other, root);
@@ -234,6 +312,29 @@ void EntityPropertiesString::setFromConfiguration(const ot::Property* _property)
 	}
 
 	setValue(actualProperty->value());
+}
+
+void EntityPropertiesString::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
+	rapidjson::Value container(rapidjson::kObjectType);
+
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "string");
+
+	rapidjson::Value jsonValue(value.c_str(), allocator);
+	container.AddMember("Value", jsonValue, allocator);
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(jsonName, container, allocator);
+}
+
+void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& val = object["Value"];
+
+	setValue(val.GetString());
 }
 
 void EntityPropertiesString::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -311,6 +412,48 @@ void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _proper
 	}
 }
 
+void EntityPropertiesSelection::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
+	rapidjson::Value container(rapidjson::kObjectType);
+
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "selection");
+
+	rapidjson::Value jsonValue(value.c_str(), allocator);
+	rapidjson::Value jsonOptions(rapidjson::kArrayType);
+
+	for (auto option : options)
+	{
+		rapidjson::Value val(option.c_str(), allocator);
+		jsonOptions.PushBack(val, allocator);;
+	}
+
+	container.AddMember("Value", jsonValue, allocator);
+	container.AddMember("Options", jsonOptions, allocator);
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(jsonName, container, allocator);
+}
+
+void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& val = object["Value"];
+	const rapidjson::Value& opt = object["Options"];
+
+	if (value != val.GetString()) setNeedsUpdate();
+	value = val.GetString();
+
+	// Now read the options
+	assert(opt.IsArray());
+
+	for (rapidjson::SizeType i = 0; i < opt.Size(); i++)
+	{
+		options.push_back(opt[i].GetString());
+	}
+}
+
 void EntityPropertiesSelection::copySettings(EntityPropertiesBase *other, EntityBase *root)
 {
 	EntityPropertiesBase::copySettings(other, root);
@@ -359,6 +502,42 @@ void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property)
 	setColorR(actualProperty->value().r());
 	setColorG(actualProperty->value().g());
 	setColorB(actualProperty->value().b());
+}
+
+void EntityPropertiesColor::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
+	rapidjson::Value container(rapidjson::kObjectType);
+
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "color");
+
+	rapidjson::Value jsonValueR(rapidjson::kNumberType);
+	rapidjson::Value jsonValueG(rapidjson::kNumberType);
+	rapidjson::Value jsonValueB(rapidjson::kNumberType);
+
+	jsonValueR.SetDouble(getColorR());
+	jsonValueG.SetDouble(getColorG());
+	jsonValueB.SetDouble(getColorB());
+
+	container.AddMember("ValueR", jsonValueR, allocator);
+	container.AddMember("ValueG", jsonValueG, allocator);
+	container.AddMember("ValueB", jsonValueB, allocator);
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(jsonName, container, allocator);
+}
+
+void EntityPropertiesColor::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& valR = object["ValueR"];
+	const rapidjson::Value& valG = object["ValueG"];
+	const rapidjson::Value& valB = object["ValueB"];
+
+	setColorR(valR.GetDouble());
+	setColorG(valG.GetDouble());
+	setColorB(valB.GetDouble());
 }
 
 EntityPropertiesColor& EntityPropertiesColor::operator=(const EntityPropertiesColor &other)
@@ -504,59 +683,6 @@ bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase *other)
 	return checkCompatibilityOfSettings(*otherItem);
 }
 
-void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
-{
-	std::list<std::string> opt;
-
-	if (root != nullptr)
-	{
-		EntityContainer *container = findContainerFromID(root, getEntityContainerID());
-		if (container != nullptr)
-		{
-			container = findContainerFromName(root, getEntityContainerName());
-		}
-
-		if (container != nullptr)
-		{
-			for (auto child : container->getChildrenList())
-			{
-				opt.push_back(child->getName());
-			}
-		}
-
-		EntityBase *entity = findEntityFromID(root, getValueID());
-
-		if (entity != nullptr)
-		{
-			setValueName(entity->getName());
-		}
-		else
-		{
-			entity = findEntityFromName(root, getValueName());
-			if (entity != nullptr)
-			{
-				setValueID(entity->getEntityID());
-			}
-		}
-	}
-
-	if (!root)
-	{
-		opt.clear();
-	}
-
-	ot::JsonDocument dataDoc;
-	dataDoc.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
-	dataDoc.AddMember("ContainerID", this->getEntityContainerID(), dataDoc.GetAllocator());
-	dataDoc.AddMember("ValueName", ot::JsonString(this->getValueName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
-	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
-
-	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), getValueName(), opt);
-	newProp->setSpecialType("EntityList");
-	newProp->setAdditionalPropertyData(dataDoc.toJson());
-	this->setupPropertyData(_configuration, newProp);
-}
-
 EntityContainer *EntityPropertiesEntityList::findContainerFromID(EntityBase *root, ot::UID entityID)
 {
 	EntityContainer *container = dynamic_cast<EntityContainer *>(root);
@@ -593,6 +719,59 @@ EntityContainer *EntityPropertiesEntityList::findContainerFromName(EntityBase *r
 	return nullptr;
 }
 
+void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	std::list<std::string> opt;
+
+	if (root != nullptr)
+	{
+		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
+		if (container != nullptr)
+		{
+			container = findContainerFromName(root, getEntityContainerName());
+		}
+
+		if (container != nullptr)
+		{
+			for (auto child : container->getChildrenList())
+			{
+				opt.push_back(child->getName());
+			}
+		}
+
+		EntityBase* entity = findEntityFromID(root, getValueID());
+
+		if (entity != nullptr)
+		{
+			setValueName(entity->getName());
+		}
+		else
+		{
+			entity = findEntityFromName(root, getValueName());
+			if (entity != nullptr)
+			{
+				setValueID(entity->getEntityID());
+			}
+		}
+	}
+
+	if (!root)
+	{
+		opt.clear();
+	}
+
+	ot::JsonDocument dataDoc;
+	dataDoc.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	dataDoc.AddMember("ContainerID", this->getEntityContainerID(), dataDoc.GetAllocator());
+	dataDoc.AddMember("ValueName", ot::JsonString(this->getValueName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
+
+	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), getValueName(), opt);
+	newProp->setSpecialType("EntityList");
+	newProp->setAdditionalPropertyData(dataDoc.toJson());
+	this->setupPropertyData(_configuration, newProp);
+}
+
 void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _property)
 {
 	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
@@ -614,6 +793,86 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 	this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
 	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
 	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+}
+
+void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
+	rapidjson::Value container(rapidjson::kObjectType);
+
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "entitylist");
+
+	rapidjson::Value jsonContainerName(rapidjson::kStringType);
+	rapidjson::Value jsonContainerID(rapidjson::kNumberType);
+	rapidjson::Value jsonValueName(rapidjson::kStringType);
+	rapidjson::Value jsonValueID(rapidjson::kNumberType);
+	rapidjson::Value jsonOptions(rapidjson::kArrayType);
+
+	if (root != nullptr)
+	{
+		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
+		if (container != nullptr)
+		{
+			container = findContainerFromName(root, getEntityContainerName());
+		}
+
+		if (container != nullptr)
+		{
+			for (auto child : container->getChildrenList())
+			{
+				rapidjson::Value val(child->getName().c_str(), allocator);
+				jsonOptions.PushBack(val, allocator);
+			}
+		}
+
+		EntityBase* entity = findEntityFromID(root, getValueID());
+
+		if (entity != nullptr)
+		{
+			setValueName(entity->getName());
+		}
+		else
+		{
+			entity = findEntityFromName(root, getValueName());
+			if (entity != nullptr)
+			{
+				setValueID(entity->getEntityID());
+			}
+		}
+	}
+
+	jsonContainerName.SetString(getEntityContainerName().c_str(), allocator);
+	jsonContainerID.SetInt64(getEntityContainerID());
+	jsonValueName.SetString(getValueName().c_str(), allocator);
+	jsonValueID.SetInt64(getValueID());
+
+	container.AddMember("ContainerName", jsonContainerName, allocator);
+	container.AddMember("ContainerID", jsonContainerID, allocator);
+	container.AddMember("ValueName", jsonValueName, allocator);
+	container.AddMember("ValueID", jsonValueID, allocator);
+
+	if (root != nullptr)
+	{
+		container.AddMember("Options", jsonOptions, allocator);
+	}
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(jsonName, container, allocator);
+}
+
+void EntityPropertiesEntityList::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	const rapidjson::Value& containerName = object["ContainerName"];
+	const rapidjson::Value& containerID = object["ContainerID"];
+	const rapidjson::Value& valName = object["ValueName"];
+	const rapidjson::Value& valID = object["ValueID"];
+
+	setEntityContainerName(containerName.GetString());
+	setEntityContainerID(containerID.GetInt64());
+	setValueName(valName.GetString());
+	setValueID(valID.GetInt64());
 }
 
 EntityPropertiesEntityList& EntityPropertiesEntityList::operator=(const EntityPropertiesEntityList &other)
@@ -736,7 +995,6 @@ void EntityPropertiesEntityList::createProperty(const std::string &group, const 
 	properties.createProperty(new EntityPropertiesEntityList(name, contName, contID, value, valID), group);
 }
 
-
 void EntityPropertiesProjectList::copySettings(EntityPropertiesBase* other, EntityBase* root)
 {
 	EntityPropertiesBase::copySettings(other, root);
@@ -761,4 +1019,22 @@ void EntityPropertiesProjectList::setFromConfiguration(const ot::Property* _prop
 	}
 
 	_value = actualProperty->current();
+}
+
+void EntityPropertiesProjectList::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	rapidjson::Value container(rapidjson::kObjectType);
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, jsonDoc.GetAllocator(), "projectlist");
+
+	rapidjson::Value jsonValue(rapidjson::kStringType);
+	jsonValue.SetString(_value.c_str(), jsonDoc.GetAllocator());
+	container.AddMember("Value", jsonValue, jsonDoc.GetAllocator());
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+	jsonDoc.AddMember(jsonName, container, jsonDoc.GetAllocator());
+
+}
+
+void EntityPropertiesProjectList::readFromJsonObject(const ot::ConstJsonObject& object)
+{
+	_value = ot::json::getString(object, "Value");
 }
