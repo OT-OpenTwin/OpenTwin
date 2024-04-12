@@ -45,15 +45,18 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TextEditor : public PlainTextEdit {
 		Q_OBJECT
 		OT_DECL_NOCOPY(TextEditor)
-
-		OT_PROPERTY(bool, contentChanged, setContentChanged, contentChanged)
-		OT_PROPERTY_REF(std::string, textEditorName, setTextEditorName, textEditorName)
 	public:
 		TextEditor(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~TextEditor();
 
 		int lineNumberAreaWidth(void) const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);
+
+		void setContentChanged(bool _changed = true) { m_contentChanged = _changed; };
+		bool contentChanged(void) const { return m_contentChanged; };
+
+		void setTextEditorName(const std::string& _name) { m_textEditorName = _name; };
+		const std::string& textEditorName(void) const { return m_textEditorName; };
 
 		void setCode(const QString& _text);
 		void setCode(const QStringList& _lines);
@@ -78,6 +81,8 @@ namespace ot {
 		void slotTextChanged(void);
 
 	private:
+		bool m_contentChanged;
+		std::string m_textEditorName;
 		ot::UID								m_displayedTextEntityID = 0;
 		ot::UID								m_displayedTextEntityVersion = 0;
 

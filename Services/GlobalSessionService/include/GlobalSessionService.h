@@ -30,18 +30,21 @@ public:
 
 	// ###################################################################################################
 
-	// Properties
-	OT_PROPERTY_REF(std::string, url, setUrl, url)
-	OT_PROPERTY_REF(std::string, databaseUrl, setDatabaseUrl, databaseUrl)
-	OT_PROPERTY_REF(std::string, authorizationUrl, setAuthorizationUrl, authorizationUrl)
-	OT_PROPERTY_REF(std::string, globalDirectoryUrl, setGlobalDirectoryUrl, globalDirectoryUrl)
-	OT_PROPERTY_V(bool, healthCheckRunning, setHealthCheckIsRunning, isHealthCheckRunning, private)
-
-	// ###################################################################################################
-
 	// Service handling
 
 	bool addSessionService(LocalSessionService& _service);
+
+	void setUrl(const std::string& _url) { m_url = _url; };
+	const std::string& url(void) const { return m_url; };
+
+	void setDatabaseUrl(const std::string& _url) { m_databaseUrl = _url; };
+	const std::string databaseUrl(void) const { return m_databaseUrl; };
+
+	void setAuthorizationUrl(const std::string& _url) { m_authorizationUrl = _url; };
+	const std::string& authorizationUrl(void) const { return m_authorizationUrl; };
+
+	void setGlobalDirectoryUrl(const std::string& _url) { m_globalDirectoryUrl = _url; };
+	const std::string& globalDirectoryUrl(void) const { return m_globalDirectoryUrl; };
 
 private:
 
@@ -74,6 +77,14 @@ private:
 	virtual ~GlobalSessionService();
 
 	// ###################################################################################################
+
+	void setHealthCheckRunning(bool _isRunning) { m_healthCheckRunning = _isRunning; };
+
+	std::string m_url;
+	std::string m_databaseUrl;
+	std::string m_authorizationUrl;
+	std::string m_globalDirectoryUrl;
+	bool m_healthCheckRunning;
 
 	std::mutex									m_mapMutex;
 	std::map<std::string, LocalSessionService*>		m_sessionToServiceMap;

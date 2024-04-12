@@ -30,15 +30,24 @@ class QPlainTextEdit;
 class QPushButton;
 
 class FARMatch {
-
-	OT_PROPERTY_REF(QString, text, setText, text)
-	OT_PROPERTY(int, line, setLine, line)
-	OT_PROPERTY_REF(QString, fullPath, setFullPath, fullPath)
-
 public:
 	FARMatch() : m_line(0) {};
 	FARMatch(const QString& _fullPath, int _line, const QString& _text) : m_fullPath(_fullPath), m_line(_line), m_text(_text) {};
 	FARMatch(const FARMatch& _other) : m_text(_other.m_text), m_fullPath(_other.m_fullPath), m_line(_other.m_line) {};
+
+	void setText(const QString& _text) { m_text = _text; };
+	const QString& text(void) const { return m_text; };
+
+	void setLine(int _line) { m_line = _line; };
+	int line(void) const { return m_line; };
+
+	void setFullPath(const QString& _path) { m_fullPath = _path; };
+	const QString& fullPath(void) const { return m_fullPath; };
+
+private:
+	QString m_text;
+	int m_line;
+	QString m_fullPath;
 };
 
 class FARFile;
@@ -55,31 +64,48 @@ public:
 		CheckCase  = 0x10
 	};
 
-	OT_PROPERTY_REF(QStringList, whitelistFiles, setWhitelistFiles, whitelistFiles)
-	OT_PROPERTY(FilterFlag, whitelistFilesFlags, setWhitelistFilesFlags, whitelistFilesFlags)
-	OT_PROPERTY_REF(QStringList, blacklistFiles, setBlacklistFiles, blacklistFiles)
-	OT_PROPERTY(FilterFlag, blacklistFilesFlags, setBlacklistFilesFlags, blacklistFilesFlags)
-	OT_PROPERTY_REF(QStringList, whitelistDirectories, setWhitelistDirectories, whitelistDirectories)
-	OT_PROPERTY(FilterFlag, whitelistDirectoriesFlags, setWhitelistDirectoriesFlags, whitelistDirectoriesFlags)
-	OT_PROPERTY_REF(QStringList, blacklistDirectories, setBlacklistDirectories, blacklistDirectories)
-	OT_PROPERTY(FilterFlag, blacklistDirectoriesFlags, setBlacklistDirectoriesFlags, blacklistDirectoriesFlags)
-
-public:
 	FARFilter();
 	FARFilter(const FARFilter& _other);
 
 	bool validate(const FARFile& _file) const;
 	bool validate(const FARDirectory& _dir) const;
 
+	void setWhitelistFiles(const QStringList& _whitelist) { m_whitelistFiles = _whitelist; };
+	const QStringList& whitelistFiles(void) const { return m_whitelistFiles; };
+
+	void setWhitelistFilesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlag whitelistFilesFlags(void) const { return m_whitelistFilesFlags; };
+
+	void setBlacklistFiles(const QStringList& _blacklist) { m_blacklistFiles = _blacklist; };
+	const QStringList& blacklistFiles(void) const { return m_blacklistFiles; };
+
+	void setBlacklistFilesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlag blacklistFilesFlags(void) const { return m_whitelistFilesFlags; };
+
+	void setWhitelistDirectories(const QStringList& _whitelist) { m_whitelistDirectories = _whitelist; };
+	const QStringList& whitelistDirectories(void) const { return m_whitelistDirectories; };
+
+	void setWhitelistDirectoriesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlag whitelistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
+
+	void setBlacklistDirectories(const QStringList& _blacklist) { m_blacklistDirectories = _blacklist; };
+	const QStringList& blacklistDirectories(void) const { return m_blacklistDirectories; };
+
+	void setBlacklistDirectoriesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlag blacklistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
+
+private:
+	QStringList m_whitelistFiles;
+	FilterFlag m_whitelistFilesFlags;
+	QStringList m_blacklistFiles;
+	FilterFlag m_blacklistFilesFlags;
+	QStringList m_whitelistDirectories;
+	FilterFlag m_whitelistDirectoriesFlags;
+	QStringList m_blacklistDirectories;
+	FilterFlag m_blacklistDirectoriesFlags;
 };
 
 class FARFile {
-
-	OT_PROPERTY_REF(QString, fullPath, setFullPath, fullPath)
-	OT_PROPERTY_REF(QString, nameOnly, setNameOnly, nameOnly)
-	OT_PROPERTY_REF(QString, fileExtension, setFileExtension, fileExtension)
-	OT_PROPERTY_REF(QStringList, textLines, setTextLines, textLines)
-
 public:
 
 	FARFile(const QString& _fullPath);
@@ -95,15 +121,26 @@ public:
 
 	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath);
 
+	void setFullPath(const QString& _fullPath) { m_fullPath = _fullPath; };
+	const QString& fullPath(void) const { return m_fullPath; };
+
+	void setNameOnly(const QString& _name) { m_nameOnly = _name; };
+	const QString& nameOnly(void) const { return m_nameOnly; };
+
+	void setFileExtension(const QString& _extension) { m_fileExtension = _extension; };
+	const QString& fileExtension(void) const { return m_fileExtension; };
+
+	void setTextLines(const QStringList& _lines) { m_textLines = _lines; };
+	const QStringList& textLines(void) const { return m_textLines; };
+
+private:
+	QString m_fullPath;
+	QString m_nameOnly;
+	QString m_fileExtension;
+	QStringList m_textLines;
 };
 
 class FARDirectory {
-
-	OT_PROPERTY_REF(QString, fullPath, setFullPath, fullPath)
-	OT_PROPERTY_REF(QString, nameOnly, setNameOnly, nameOnly)
-	OT_PROPERTY_REF(std::list<FARFile>, files, setFiles, files)
-	OT_PROPERTY_REF(std::list<FARDirectory>, directories, setDirectories, directories)
-
 public:
 
 	FARDirectory(const QString& _fullPath);
@@ -137,7 +174,23 @@ public:
 
 	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true);
 
+	void setFullPath(const QString& _path) { m_fullPath = _path; };
+	const QString& fullPath(void) const { return m_fullPath; };
+
+	void setNameOnly(const QString& _name) { m_nameOnly = _name; };
+	const QString& nameOnly(void) const { return m_nameOnly; };
+
+	void setFiles(const std::list<FARFile>& _files) { m_files = _files; };
+	const std::list<FARFile>& files(void) const { return m_files; };
+
+	void setDirectories(const std::list<FARDirectory>& _directories) { m_directories = _directories; };
+	const std::list<FARDirectory>& directories(void) const { return m_directories; };
+
 private:
+	QString m_fullPath;
+	QString m_nameOnly;
+	std::list<FARFile> m_files;
+	std::list<FARDirectory> m_directories;
 };
 
 class FAR : public QObject, public otoolkit::Tool {

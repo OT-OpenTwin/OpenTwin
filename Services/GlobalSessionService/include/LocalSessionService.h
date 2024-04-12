@@ -23,13 +23,18 @@ public:
 
 	LocalSessionService& operator = (const LocalSessionService& _other);
 
-	OT_PROPERTY_REF(std::string, url, setUrl, url)
-	OT_PROPERTY_REF(std::list<Session *>, sessions, setSessions, sessions)
-	OT_PROPERTY(ot::serviceID_t, id, setId, id)
-
 	// ###################################################################
 
 	// Getter/Setter
+
+	void setUrl(const std::string& _url) { m_url = _url; };
+	const std::string& url(void) const { return m_url; };
+
+	void setSessions(const std::list<Session*>& _sessions) { m_sessions = _sessions; };
+	const std::list<Session*>& sessions(void) const { return m_sessions; };
+
+	void setId(ot::serviceID_t _id) { m_id = _id; };
+	ot::serviceID_t id(void) const { return m_id; };
 
 	bool addSession(const Session& _session);
 	void removeSession(Session * _session);
@@ -51,4 +56,9 @@ public:
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	void clear();
+
+private:
+	std::string m_url;
+	std::list<Session*> m_sessions;
+	ot::serviceID_t m_id;
 };

@@ -17,6 +17,13 @@ public:
 
 	Session& operator = (const Session& _other);
 
-	OT_PROPERTY_REF(std::string, id, setId, id);
-	OT_PROPERTY_REF(std::string, userName, setUserName, userName);
+	void setId(const std::string& _id) { m_id = _id; };
+	const std::string& id(void) const { return m_id; };
+
+	void setUserName(const std::string& _name) { m_userName = _name; };
+	const std::string& userName(void) const { return m_userName; };
+
+private:
+	std::string m_id;
+	std::string m_userName;
 };

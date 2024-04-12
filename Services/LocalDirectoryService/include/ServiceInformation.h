@@ -9,11 +9,6 @@
 
 class ServiceInformation : public ot::Serializable {
 public:
-	OT_PROPERTY_REF(std::string, name, setName, name);
-	OT_PROPERTY_REF(std::string, type, setType, type);
-	OT_PROPERTY(unsigned int, maxCrashRestarts, setMaxCrashRestarts, maxCrashRestarts);
-	OT_PROPERTY(unsigned int, maxStartupRestarts, setMaxStartupRestarts, maxStartupRestarts);
-
 	ServiceInformation();
 	ServiceInformation(const std::string& _name, const std::string& _type);
 	ServiceInformation(const ServiceInformation& _other);
@@ -33,4 +28,21 @@ public:
 	//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+	void setName(const std::string& _name) { m_name = _name; };
+	const std::string& name(void) const { return m_name; };
+
+	void setType(const std::string& _type) { m_type = _type; };
+	const std::string type(void) const { return m_type; };
+
+	void setMaxCrashRestarts(unsigned int _restarts) { m_maxCrashRestarts = _restarts; };
+	unsigned int maxCrashRestarts(void) const { return m_maxCrashRestarts; };
+
+	void setMaxStartupRestarts(unsigned int _restarts) { m_maxStartupRestarts = _restarts; };
+	unsigned int maxStartupRestarts(void) const { return m_maxStartupRestarts; };
+
+private:
+	std::string m_name;
+	std::string m_type;
+	unsigned int m_maxCrashRestarts;
+	unsigned int m_maxStartupRestarts;
 };

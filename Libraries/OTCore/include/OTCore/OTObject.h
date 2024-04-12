@@ -25,11 +25,6 @@ namespace ot {
 
 		OT_DECL_NOCOPY(OTObject)
 
-		OT_PROPERTY_REF(std::string, otuid, setOtUid, otUid)
-		OT_PROPERTY_REF(std::list<OTObject*>, childOtObjects, setChildOtObjects, childOtObjects)
-		OT_PROPERTY(OTObject*, parentOtObject, setParentOtObject, parentOtObject)
-		OT_PROPERTY(bool, deleteOtObjectLater, setDeleteOtObjectLater, isDeleteOtObjectLater)
-
 	public:
 		OTObject() : m_parentOtObject(nullptr), m_deleteOtObjectLater(false) {};
 		OTObject(OTObject* _parentObject) : m_parentOtObject(_parentObject), m_deleteOtObjectLater(false) {};
@@ -54,5 +49,22 @@ namespace ot {
 		//! @brief Removes the child in the child objects list
 		void removeChildOtObject(OTObject* _childObj) { m_childOtObjects.remove(_childObj); }
 
+		void setDeleteOtObjectLater(bool _deleteLater = true) { m_deleteOtObjectLater = _deleteLater; };
+		bool isDeleteOtObjectLater(void) const { return m_deleteOtObjectLater; };
+
+		void setOtUid(const std::string& _uid) { m_otuid = _uid; };
+		const std::string& otUid(void) const { return m_otuid; };
+
+		void setChildOtObjects(const std::list<OTObject*>& _objects) { m_childOtObjects = _objects; };
+		const std::list<OTObject*>& childOtObjects(void) const { return m_childOtObjects; };
+
+		void setParentOtObject(OTObject* _object) { m_parentOtObject = _object; };
+		OTObject* parentOtObject(void) const { return m_parentOtObject; };
+
+	private:
+		bool m_deleteOtObjectLater;
+		std::string m_otuid;
+		std::list<OTObject*> m_childOtObjects;
+		OTObject* m_parentOtObject;
 	};
 }
