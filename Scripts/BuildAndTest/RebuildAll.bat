@@ -73,6 +73,7 @@ if "%1"=="DEBUG" (
 DEL buildLog_Summary.txt
 DEL RUSTbuildLog.txt
 DEL AdminPanel_buildLog.txt
+DEL Documentation_buildLog.txt
 
 REM ====================================================================
 REM Build the key generator and the encryption key, if needed
@@ -340,6 +341,13 @@ ECHO Build Admin Panel
 ECHO ====================================================================
 PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
 CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
+POPD
+
+ECHO ====================================================================
+ECHO Build Documentation
+ECHO ====================================================================
+PUSHD "%OT_DOCUMENTATION_ROOT%"
+CALL "%OT_DOCUMENTATION_ROOT%\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Documentation_buildLog.txt"
 POPD
 
 REM ====================================================================
