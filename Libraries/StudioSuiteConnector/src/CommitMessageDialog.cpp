@@ -43,7 +43,7 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, 
 	my_includeParametricResults = new QCheckBox("Include parametric results");
 
 	my_includeResults->setChecked(true);
-	my_includeParametricResults->setChecked(false);
+	my_includeParametricResults->setChecked(true);
 
 	my_layout->addWidget(my_includeResults);
 	my_layout->addWidget(my_includeParametricResults);

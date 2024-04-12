@@ -12,6 +12,11 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	if (projectType == OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT)
 	{
 		// Here we don't need to do anything, since all switches are activated by default
+
+		_dataCategorizationRootName = "Data Categorization";
+		_datasetRootName = ot::FolderNames::DatasetFolder;
+		_RMDCategorizationName = getDataCategorizationRootName() + "/Campaign Metadata";
+		_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
 	}
 	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_3DSIM)
 	{
@@ -94,8 +99,8 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 
 	_has3DView = true;
 	_has1DView = true;
-	_hasTableView = true;
-	_hasBlockPicker = true;
+	_hasTableView = false;
+	_hasBlockPicker = false;
 
 	_datasetRootName = ot::FolderNames::DatasetFolder;
 	_datasetRMD      = getDatasetRootName() + "/Information";

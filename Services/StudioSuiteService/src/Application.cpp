@@ -171,7 +171,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Project", "Local Project", "Set File", "Set File", modelWrite, "ProjectSaveAs", "Default");
 	_ui->addMenuButton("Project", "Versions", "Information", "Information", modelWrite, "Information", "Default");
 	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("Project", "Versions", "Get", "Get", modelWrite, "ArrowGreenDown", "Default");
+	_ui->addMenuButton("Project", "Versions", "Checkout", "Checkout", modelWrite, "ArrowGreenDown", "Default");
 
 	modelSelectionChangedNotification();
 
@@ -225,7 +225,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	else if (action == "Project:Local Project:Set File")	  setCSTFile();
 	else if (action == "Project:Versions:Information")		  showInformation();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
-	else if (action == "Project:Versions:Get")			      getChanges();
+	else if (action == "Project:Versions:Checkout")			  getChanges();
 	//else if (action == "Model:Sources:Add Terminal")	      addTerminal();
 	//else if (action == "ElmerFEM:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
