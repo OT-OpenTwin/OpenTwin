@@ -77,8 +77,8 @@ namespace ot {
 		const std::string& propertyTip(void) const { return m_tip; };
 
 		void setPropertyFlags(PropertyFlags _flags) { m_flags = _flags; };
-		PropertyFlags propertyFlags(void) const { return m_flags; };
 		PropertyFlags& propertyFlags(void) { return m_flags; };
+		PropertyFlags propertyFlags(void) const { return m_flags; };
 
 		void setSpecialType(const std::string& _type) { m_specialType = _type; };
 		const std::string& specialType(void) const { return m_specialType; };

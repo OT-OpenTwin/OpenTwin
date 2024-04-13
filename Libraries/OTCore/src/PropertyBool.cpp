@@ -15,6 +15,22 @@ ot::PropertyBool::PropertyBool(const PropertyBool* _other)
 	: Property(_other), m_value(_other->m_value)
 {}
 
+ot::PropertyBool::PropertyBool(const PropertyBase& _base)
+	: Property(_base), m_value(false)
+{}
+
+ot::PropertyBool::PropertyBool(PropertyFlags _flags)
+	: Property(_flags), m_value(false)
+{}
+
+ot::PropertyBool::PropertyBool(bool _value, PropertyFlags _flags)
+	: Property(_flags), m_value(_value)
+{}
+
+ot::PropertyBool::PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags)
+	: Property(_name, _flags), m_value(_value) 
+{}
+
 ot::Property* ot::PropertyBool::createCopy(void) const {
 	return new PropertyBool(this);
 }

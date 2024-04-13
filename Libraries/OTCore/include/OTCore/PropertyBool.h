@@ -16,9 +16,10 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyBool)
 	public:
 		PropertyBool(const PropertyBool* _other);
-		PropertyBool(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(false) {};
-		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
-		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
+		PropertyBool(const PropertyBase& _base);
+		PropertyBool(PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~PropertyBool() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Bool; };

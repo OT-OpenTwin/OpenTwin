@@ -15,6 +15,10 @@ ot::PropertyDirectory::PropertyDirectory(const PropertyDirectory* _other)
 	: Property(_other), m_path(_other->m_path)
 {}
 
+ot::PropertyDirectory::PropertyDirectory(const PropertyBase& _base)
+	: Property(_base)
+{}
+
 ot::Property* ot::PropertyDirectory::createCopy(void) const {
 	return new PropertyDirectory(this);
 }

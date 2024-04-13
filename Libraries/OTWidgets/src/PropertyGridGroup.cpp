@@ -142,7 +142,7 @@ ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string
 	for (int i = 0; this->childCount(); i++) {
 		PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (p) {
-			if (p->getName() == _propertyName) return p;
+			if (p->getPropertyData().propertyName() == _propertyName) return p;
 		}
 		if (!_searchChildGroups) continue;
 		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
@@ -214,7 +214,7 @@ void ot::PropertyGridGroup::slotItemInputValueChanged(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT itemInputValueChanged(itm->getGroupName(), itm->getName());
+	Q_EMIT itemInputValueChanged(itm->getGroupName(), itm->getPropertyData().propertyName());
 }
 
 void ot::PropertyGridGroup::slotItemInputValueChanged(const std::string& _groupName, const std::string& _itemName) {
@@ -227,7 +227,7 @@ void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT itemDeleteRequested(itm->getGroupName(), itm->getName());
+	Q_EMIT itemDeleteRequested(itm->getGroupName(), itm->getPropertyData().propertyName());
 }
 
 void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName) {

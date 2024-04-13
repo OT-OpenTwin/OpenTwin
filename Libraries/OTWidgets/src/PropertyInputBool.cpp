@@ -35,11 +35,7 @@ QWidget* ot::PropertyInputBool::getQWidget(void) {
 }
 
 ot::Property* ot::PropertyInputBool::createPropertyConfiguration(void) const {
-	ot::PropertyBool* newProperty = new ot::PropertyBool;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyBool* newProperty = new ot::PropertyBool(this->data());
 	newProperty->setValue(m_checkBox->isChecked());
 
 	return newProperty;
@@ -56,8 +52,8 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 	m_checkBox->blockSignals(true);
 
 	m_checkBox->setChecked(actualProperty->value());
-	m_checkBox->setToolTip(this->propertyTip());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	m_checkBox->setToolTip(QString::fromStdString(this->data().propertyTip()));
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_checkBox->setCheckState(Qt::PartiallyChecked);
 	}
 

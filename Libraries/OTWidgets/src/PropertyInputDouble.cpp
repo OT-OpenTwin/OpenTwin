@@ -48,11 +48,7 @@ void ot::PropertyInputDouble::lclValueChanged(int) {
 }
 
 ot::Property* ot::PropertyInputDouble::createPropertyConfiguration(void) const {
-	ot::PropertyDouble* newProperty = new ot::PropertyDouble;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyDouble* newProperty = new ot::PropertyDouble(this->data());
 
 	newProperty->setMin(m_spinBox->minimum());
 	newProperty->setMax(m_spinBox->maximum());
@@ -72,10 +68,10 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 	m_spinBox->blockSignals(true);
 
 	m_spinBox->setDecimals(actualProperty->precision());
-	m_spinBox->setToolTip(this->propertyTip());
+	m_spinBox->setToolTip(QString::fromStdString(this->data().propertyTip()));
 	m_spinBox->setRange(actualProperty->min(), actualProperty->max());
 	m_spinBox->setValue(actualProperty->value());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_spinBox->setSpecialValueText("??");
 	}
 

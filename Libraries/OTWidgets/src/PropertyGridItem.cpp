@@ -18,7 +18,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::PropertyGridItem::PropertyGridItem()
-	: m_input(nullptr), m_propertyColor(Qt::white), m_flags(Property::NoFlags)
+	: m_input(nullptr), m_propertyColor(Qt::white)
 {
 	m_titleLayoutW = new QWidget;
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
@@ -44,16 +44,11 @@ ot::PropertyGridItem::~PropertyGridItem() {
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
-	m_name = _config->propertyName();
-	m_type = _config->getPropertyType();
-	m_specialType = _config->specialType();
-	m_data = _config->additionalPropertyData();
 	m_titleLabel->setText(QString::fromStdString(_config->propertyTitle()));
 	if (m_input) delete m_input;
 	m_input = PropertyInputFactory::createInput(_config);
-	m_flags = _config->propertyFlags();
 
-	m_deleteLabel->setHidden(!(m_flags & Property::IsDeletable));
+	m_deleteLabel->setHidden(!(m_input->data().propertyFlags() & Property::IsDeletable));
 
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
 
@@ -73,13 +68,7 @@ void ot::PropertyGridItem::finishSetup(void) {
 
 ot::Property* ot::PropertyGridItem::createProperty(void) const {
 	OTAssertNullptr(m_input);
-	ot::Property* prop = m_input->createPropertyConfiguration();
-
-	prop->setPropertyName(m_name);
-	prop->setSpecialType(m_specialType);
-	prop->setAdditionalPropertyData(m_data);
-	
-	return prop;
+	return m_input->createPropertyConfiguration();
 }
 
 void ot::PropertyGridItem::setTitle(const QString& _title) {
@@ -108,8 +97,14 @@ void ot::PropertyGridItem::setInput(PropertyInput* _input) {
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
 }
 
-bool ot::PropertyGridItem::isPropertyDeletable(void) const {
-	return m_flags & Property::IsDeletable;
+ot::PropertyBase ot::PropertyGridItem::getPropertyData(void) const {
+	if (m_input) return m_input->data();
+	else return PropertyBase();
+}
+
+std::string ot::PropertyGridItem::getPropertyType(void) const {
+	if (m_input) return m_input->getPropertyType();
+	else return std::string();
 }
 
 void ot::PropertyGridItem::slotValueChanged(void) {

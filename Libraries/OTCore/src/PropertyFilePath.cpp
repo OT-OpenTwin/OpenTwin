@@ -15,6 +15,10 @@ ot::PropertyFilePath::PropertyFilePath(const PropertyFilePath* _other)
 	: Property(_other), m_browseMode(_other->m_browseMode), m_filters(_other->m_filters), m_path(_other->m_path)
 {}
 
+ot::PropertyFilePath::PropertyFilePath(const PropertyBase& _base)
+	: Property(_base), m_browseMode(PropertyFilePath::ReadFile)
+{}
+
 ot::PropertyFilePath::PropertyFilePath(BrowseMode _mode, PropertyFlags _flags)
 	: Property(_flags), m_browseMode(_mode)
 {}

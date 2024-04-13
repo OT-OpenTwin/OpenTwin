@@ -16,6 +16,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyDouble)
 	public:
 		PropertyDouble(const PropertyDouble* _other);
+		PropertyDouble(const PropertyBase& _base);
 		PropertyDouble(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyDouble(double _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags = PropertyFlags::NoFlags);

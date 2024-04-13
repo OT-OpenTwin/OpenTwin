@@ -43,11 +43,7 @@ void ot::PropertyInputString::lclValueChanged(void) {
 }
 
 ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
-	ot::PropertyString* newProperty = new ot::PropertyString;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyString* newProperty = new ot::PropertyString(this->data());
 
 	newProperty->setMaxLength(m_lineEdit->maxLength());
 	newProperty->setPlaceholderText(m_lineEdit->placeholderText().toStdString());
@@ -69,10 +65,10 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 
 	m_lineEdit->setPlaceholderText(QString::fromStdString(actualProperty->placeholderText()));
 
-	if (this->propertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
+	if (this->data().propertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
 	else m_lineEdit->setText(m_text);
 
-	m_lineEdit->setToolTip(this->propertyTip());
+	m_lineEdit->setToolTip(QString::fromStdString(this->data().propertyTip()));
 
 	m_lineEdit->blockSignals(false);
 

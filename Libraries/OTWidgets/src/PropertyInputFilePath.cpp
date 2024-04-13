@@ -53,9 +53,9 @@ QWidget* ot::PropertyInputFilePath::getQWidget(void) {
 void ot::PropertyInputFilePath::slotFind(void) {
 	QString pth;
 	if (m_mode == PropertyFilePath::ReadFile) {
-		pth = QFileDialog::getOpenFileName(m_edit, this->propertyTitle(), m_edit->text(), m_filter);
+		pth = QFileDialog::getOpenFileName(m_edit, QString::fromStdString(this->data().propertyTitle()), m_edit->text(), m_filter);
 	} else {
-		pth = QFileDialog::getSaveFileName(m_edit, this->propertyTitle(), m_edit->text(), m_filter);
+		pth = QFileDialog::getSaveFileName(m_edit, QString::fromStdString(this->data().propertyTitle()), m_edit->text(), m_filter);
 	}
 	if (!pth.isEmpty() && m_edit->text() != pth) {
 		m_text = pth;
@@ -72,13 +72,10 @@ void ot::PropertyInputFilePath::slotChanged(void) {
 }
 
 ot::Property* ot::PropertyInputFilePath::createPropertyConfiguration(void) const {
-	ot::PropertyFilePath* newProperty = new ot::PropertyFilePath;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyFilePath* newProperty = new ot::PropertyFilePath(this->data());
 
-	newProperty->setPath(m_edit->text().toStdString());
+	newProperty->setBrowseMode(m_mode);
+	newProperty->setPath(m_edit->text().toStdString()); 
 
 	return newProperty;
 }
@@ -93,8 +90,10 @@ bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configur
 
 	m_edit->blockSignals(true);
 
-	m_edit->setToolTip(this->propertyTip());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	m_mode = actualProperty->browseMode();
+
+	m_edit->setToolTip(QString::fromStdString(this->data().propertyTip()));
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_edit->setText("...");
 	}
 	else {

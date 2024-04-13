@@ -48,11 +48,7 @@ void ot::PropertyInputInt::lclValueChanged(int) {
 }
 
 ot::Property* ot::PropertyInputInt::createPropertyConfiguration(void) const {
-	ot::PropertyInt* newProperty = new ot::PropertyInt;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyInt* newProperty = new ot::PropertyInt(this->data());
 
 	newProperty->setMin(m_spinBox->minimum());
 	newProperty->setMax(m_spinBox->maximum());
@@ -72,9 +68,9 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 	m_spinBox->blockSignals(true);
 
 	m_spinBox->setRange(actualProperty->min(), actualProperty->max());
-	m_spinBox->setToolTip(this->propertyTip());
+	m_spinBox->setToolTip(QString::fromStdString(this->data().propertyTip()));
 	m_spinBox->setValue(actualProperty->value());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_spinBox->setSpecialValueText("??");
 	}
 

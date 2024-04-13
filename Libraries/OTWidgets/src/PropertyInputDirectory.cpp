@@ -49,7 +49,7 @@ QWidget* ot::PropertyInputDirectory::getQWidget(void) {
 }
 
 void ot::PropertyInputDirectory::slotFind(void) {
-	QString pth = QFileDialog::getExistingDirectory(m_edit, this->propertyTitle(), m_edit->text());
+	QString pth = QFileDialog::getExistingDirectory(m_edit, QString::fromStdString(this->data().propertyTitle()), m_edit->text());
 	if (!pth.isEmpty() && m_edit->text() != pth) {
 		m_text = pth;
 		m_edit->setText(pth);
@@ -65,11 +65,8 @@ void ot::PropertyInputDirectory::slotChanged(void) {
 }
 
 ot::Property* ot::PropertyInputDirectory::createPropertyConfiguration(void) const {
-	ot::PropertyDirectory* newProperty = new ot::PropertyDirectory;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
-
+	ot::PropertyDirectory* newProperty = new ot::PropertyDirectory(this->data());
+	
 	newProperty->setPath(m_edit->text().toStdString());
 
 	return newProperty;
@@ -85,8 +82,8 @@ bool ot::PropertyInputDirectory::setupFromConfiguration(const Property* _configu
 
 	m_edit->blockSignals(true);
 
-	m_edit->setToolTip(this->propertyTip());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	m_edit->setToolTip(QString::fromStdString(this->data().propertyTip()));
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_edit->setText("...");
 	}
 	else {

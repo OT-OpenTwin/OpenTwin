@@ -11,6 +11,10 @@ ot::Property::Property(const Property* _other)
 	: PropertyBase(*_other)
 {}
 
+ot::Property::Property(const PropertyBase& _base) 
+	: PropertyBase(_base)
+{}
+
 ot::Property::Property(PropertyFlags _flags) 
 	: PropertyBase(_flags)
 {}

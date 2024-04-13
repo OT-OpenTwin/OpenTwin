@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/Property.h"
+#include "OTCore/PropertyBase.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -18,6 +18,7 @@
 namespace ot {
 
 	class Property;
+	class PropertyGridItem;
 
 	class OT_WIDGETS_API_EXPORT PropertyInput : public QObject, public QWidgetInterface {
 		Q_OBJECT
@@ -44,20 +45,14 @@ namespace ot {
 		//! @brief Setup the input from the provided configration
 		virtual bool setupFromConfiguration(const Property* _configuration);
 
-		void setPropertyFlags(Property::PropertyFlags _flags) { m_flags = m_flags; };
-		Property::PropertyFlags propertyFlags(void) const { return m_flags; };
+		const std::string& getPropertyType(void) const { return m_type; };
+
+		void setData(const PropertyBase& _data) { m_data = _data; };
+		PropertyBase& data(void) { return m_data; };
+		const PropertyBase& data(void) const { return m_data; };
 
 		void setDataHasChanged(bool _changed = true) { m_dataChanged = _changed; };
 		bool dataHasChanged(void) const { return m_dataChanged; };
-
-		void setPropertyName(const std::string& _name) { m_propertyName = _name; };
-		const std::string propertyName(void) const { return m_propertyName; };
-
-		void setPropertyTitle(const QString& _title) { m_propertyTitle =_title; };
-		const QString& propertyTitle(void) const { return m_propertyTitle; };
-
-		void setPropertyTip(const QString& _tip) { m_propertyTip = _tip; };
-		const QString& propertyTip(void) const { return m_propertyTip; };
 
 	Q_SIGNALS:
 		//! @brief Is emitted whenever the user changed a value
@@ -74,10 +69,8 @@ namespace ot {
 		void slotValueChanged(int);
 
 	private:
-		std::string m_propertyName;
-		QString m_propertyTitle;
-		QString m_propertyTip;
-		Property::PropertyFlags m_flags;
+		std::string m_type;
+		PropertyBase m_data;
 		bool m_dataChanged;
 	};
 }

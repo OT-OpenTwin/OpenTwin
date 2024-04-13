@@ -15,6 +15,10 @@ ot::PropertyString::PropertyString(const PropertyString* _other)
 	: Property(_other), m_value(_other->m_value), m_placeholderText(_other->m_placeholderText), m_maxLength(_other->m_maxLength)
 {}
 
+ot::PropertyString::PropertyString(const PropertyBase & _base)
+	: Property(_base), m_maxLength(0)
+{}
+
 ot::PropertyString::PropertyString(PropertyFlags _flags)
 	: Property(_flags), m_maxLength(0)
 {}

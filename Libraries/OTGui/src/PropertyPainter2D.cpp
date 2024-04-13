@@ -21,6 +21,12 @@ ot::PropertyPainter2D::PropertyPainter2D(const PropertyPainter2D* _other)
 	this->setPainter(_other->m_painter->createCopy());
 }
 
+ot::PropertyPainter2D::PropertyPainter2D(const PropertyBase& _base)
+	: Property(_base), m_painter(nullptr)
+{
+	m_painter = new FillPainter2D;
+}
+
 ot::PropertyPainter2D::PropertyPainter2D(PropertyFlags _flags)
 	: Property(_flags), m_painter(nullptr)
 {

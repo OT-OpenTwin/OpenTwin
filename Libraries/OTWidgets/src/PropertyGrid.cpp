@@ -86,7 +86,7 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 }
 
 void ot::PropertyGrid::addRootItem(PropertyGridItem* _item) {
-	if (_item->getName().empty()) {
+	if (_item->getPropertyData().propertyName().empty()) {
 		OT_LOG_W("Item name is empty");
 	}
 	m_tree->addTopLevelItem(_item);
@@ -121,7 +121,7 @@ ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemName) c
 	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
 		PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(m_tree->topLevelItem(i));
 		if (itm) {
-			if (itm->getName() == _itemName) return itm;
+			if (itm->getPropertyData().propertyName() == _itemName) return itm;
 		}
 		else {
 			const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
@@ -151,7 +151,7 @@ void ot::PropertyGrid::slotPropertyChanged() {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT propertyChanged(itm->getGroupName(), itm->getName());
+	Q_EMIT propertyChanged(itm->getGroupName(), itm->getPropertyData().propertyName());
 }
 
 void ot::PropertyGrid::slotPropertyChanged(const std::string& _groupName, const std::string& _itemName) {
@@ -164,7 +164,7 @@ void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT propertyDeleteRequested(itm->getGroupName(), itm->getName());
+	Q_EMIT propertyDeleteRequested(itm->getGroupName(), itm->getPropertyData().propertyName());
 }
 
 void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName) {

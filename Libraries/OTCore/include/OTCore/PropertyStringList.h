@@ -21,6 +21,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyStringList)
 	public:
 		PropertyStringList(const PropertyStringList* _other);
+		PropertyStringList(const PropertyBase& _base);
 		PropertyStringList(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyStringList(const std::string& _current, PropertyFlags _flags = PropertyFlags::NoFlags) ;
 		PropertyStringList(const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);

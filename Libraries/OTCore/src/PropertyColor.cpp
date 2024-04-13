@@ -15,6 +15,10 @@ ot::PropertyColor::PropertyColor(const PropertyColor* _other)
 	: Property(_other), m_value(_other->m_value)
 {}
 
+ot::PropertyColor::PropertyColor(const PropertyBase& _base)
+	: Property(_base)
+{}
+
 ot::Property* ot::PropertyColor::createCopy(void) const {
 	return new PropertyColor(this);
 }

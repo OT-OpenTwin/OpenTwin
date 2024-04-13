@@ -784,7 +784,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getPropertyData().propertyName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
 		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Path, JsonString(inp->getCurrentText().toStdString(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
 		styleFilesDoc.PushBack(fObj, styleFilesDoc.GetAllocator());
 	}
@@ -815,7 +815,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 
 		ColorStyleValue newValue;
-		newValue.setName(itm->getName());
+		newValue.setName(itm->getPropertyData().propertyName());
 		newValue.setPainter(inp->getButton()->getPainter()->createCopy());
 
 		JsonObject pObj;
@@ -844,7 +844,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_E("Input cast failed");
 				return false;
 			}
-			QString k = "%color:" + QString::fromStdString(inp->propertyName()) + "%";
+			QString k = "%color:" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -861,7 +861,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_E("Input cast failed");
 				return false;
 			}
-			QString k = "%file:" + QString::fromStdString(inp->propertyName()) + "%";
+			QString k = "%file:" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -878,7 +878,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_E("Input cast failed");
 				return false;
 			}
-			QString k = "%int:" + QString::fromStdString(inp->propertyName()) + "%";
+			QString k = "%int:" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -895,7 +895,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_E("Input cast failed");
 				return false;
 			}
-			QString k = "%number:" + QString::fromStdString(inp->propertyName()) + "%";
+			QString k = "%number:" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;

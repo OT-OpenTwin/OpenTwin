@@ -19,6 +19,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyString)
 	public:
 		PropertyString(const PropertyString* _other);
+		PropertyString(const PropertyBase& _base);
 		PropertyString(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);

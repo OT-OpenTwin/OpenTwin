@@ -39,11 +39,8 @@ QWidget* ot::PropertyInputColor::getQWidget(void) {
 }
 
 ot::Property* ot::PropertyInputColor::createPropertyConfiguration(void) const {
-	ot::PropertyColor* newProperty = new ot::PropertyColor;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyColor* newProperty = new ot::PropertyColor(this->data());
+
 	newProperty->setValue(m_colorBtn->otColor());
 
 	return newProperty;
@@ -60,7 +57,7 @@ bool ot::PropertyInputColor::setupFromConfiguration(const Property* _configurati
 	m_colorBtn->blockSignals(true);
 
 	m_colorBtn->setColor(actualProperty->value());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_colorBtn->replaceButtonText("...");
 	}
 

@@ -19,6 +19,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyPainter2D)
 	public:
 		PropertyPainter2D(const PropertyPainter2D* _other);
+		PropertyPainter2D(const PropertyBase& _base);
 
 		//! @brief Creates new instance.
 		//! Object creates and takes ownership of the painter.

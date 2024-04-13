@@ -13,9 +13,11 @@ static ot::PropertyFactoryRegistrar<ot::PropertyInt> propertyIntRegistrar(OT_PRO
 
 ot::PropertyInt::PropertyInt(const PropertyInt* _other) 
 	: Property(_other), m_min(_other->m_min), m_max(_other->m_max), m_value(_other->m_value)
-{
+{}
 
-}
+ot::PropertyInt::PropertyInt(const PropertyBase& _base)
+	: Property(_base), m_value(0), m_min(INT_MIN), m_max(INT_MAX)
+{}
 
 ot::PropertyInt::PropertyInt(PropertyFlags _flags) 
 	: Property(_flags), m_value(0), m_min(INT_MIN), m_max(INT_MAX)

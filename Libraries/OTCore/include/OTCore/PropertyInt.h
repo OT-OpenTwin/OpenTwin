@@ -16,6 +16,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyInt)
 	public:
 		PropertyInt(const PropertyInt* _other);
+		PropertyInt(const PropertyBase& _base);
 		PropertyInt(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags::NoFlags);

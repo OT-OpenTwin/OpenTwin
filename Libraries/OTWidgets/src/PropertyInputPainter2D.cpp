@@ -44,11 +44,7 @@ QWidget* ot::PropertyInputPainter2D::getQWidget(void) {
 }
 
 ot::Property* ot::PropertyInputPainter2D::createPropertyConfiguration(void) const {
-	ot::PropertyPainter2D* newProperty = new ot::PropertyPainter2D;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyPainter2D* newProperty = new ot::PropertyPainter2D(this->data());
 
 	const Painter2D* p = m_button->getPainter();
 	if (p) newProperty->setPainter(p->createCopy());
@@ -68,8 +64,8 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 	m_button->blockSignals(true);
 
 	m_button->setPainter(actualProperty->getPainter());
-	m_button->getButton()->setToolTip(this->propertyTip());
-	if (this->propertyFlags() & Property::HasMultipleValues) {
+	m_button->getButton()->setToolTip(QString::fromStdString(this->data().propertyTip()));
+	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_button->getButton()->setText("...");
 	}
 

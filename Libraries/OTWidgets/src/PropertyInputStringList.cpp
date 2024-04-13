@@ -39,11 +39,7 @@ QWidget* ot::PropertyInputStringList::getQWidget(void) {
 }
 
 ot::Property* ot::PropertyInputStringList::createPropertyConfiguration(void) const {
-	ot::PropertyStringList* newProperty = new ot::PropertyStringList;
-	newProperty->setPropertyName(this->propertyName());
-	newProperty->setPropertyTitle(this->propertyTitle().toStdString());
-	newProperty->setPropertyTip(this->propertyTip().toStdString());
-	newProperty->setPropertyFlags(this->propertyFlags());
+	ot::PropertyStringList* newProperty = new ot::PropertyStringList(this->data());
 
 	std::list<std::string> lst;
 	for (const QAction* a : m_comboButton->menu()->actions()) {
@@ -71,7 +67,7 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 	m_comboButton->blockSignals(true);
 
 	m_comboButton->setItems(lst);
-	if (this->propertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
+	if (this->data().propertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
 	else m_comboButton->setText(QString::fromStdString(actualProperty->current()));
 
 	m_comboButton->blockSignals(false);

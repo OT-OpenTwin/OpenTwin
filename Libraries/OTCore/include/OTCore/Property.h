@@ -18,6 +18,7 @@ namespace ot {
 		OT_DECL_NOCOPY(Property)
 	public:
 		Property(const Property* _other);
+		Property(const PropertyBase& _base);
 		Property(PropertyFlags _flags = PropertyFlags::NoFlags);
 		Property(const std::string& _name, PropertyFlags _flags = PropertyFlags::NoFlags);
 		virtual ~Property() {};

@@ -15,6 +15,10 @@ ot::PropertyStringList::PropertyStringList(const PropertyStringList* _other)
 	: Property(_other), m_current(_other->m_current), m_list(_other->m_list)
 {}
 
+ot::PropertyStringList::PropertyStringList(const PropertyBase & _base)
+	: Property(_base)
+{}
+
 ot::PropertyStringList::PropertyStringList(PropertyFlags _flags)
 	: Property(_flags) 
 {}

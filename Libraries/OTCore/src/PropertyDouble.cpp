@@ -15,8 +15,12 @@ ot::PropertyDouble::PropertyDouble(const PropertyDouble* _other)
 	: Property(_other), m_value(_other->m_value), m_min(_other->m_min), m_max(_other->m_max), m_precision(_other->m_precision)
 {}
 
+ot::PropertyDouble::PropertyDouble(const PropertyBase & _base)
+	: Property(_base), m_value(0.), m_min(DBL_MIN), m_max(DBL_MAX), m_precision(2)
+{}
+
 ot::PropertyDouble::PropertyDouble(PropertyFlags _flags)
-	: Property(_flags), m_value(false), m_min(DBL_MIN), m_max(DBL_MAX), m_precision(2)
+	: Property(_flags), m_value(0.), m_min(DBL_MIN), m_max(DBL_MAX), m_precision(2)
 {}
 
 ot::PropertyDouble::PropertyDouble(double _value, PropertyFlags _flags )
