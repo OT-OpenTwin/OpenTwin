@@ -60,8 +60,10 @@ ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 }
 
 void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
-	this->blockSignals(true);
 	this->clear();
+
+	this->blockSignals(true);
+	m_tree->blockSignals(true);
 
 	for (const Property* itm : _config.defaultGroup()->properties()) {
 		PropertyGridItem* newItm = new PropertyGridItem;
@@ -82,6 +84,8 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 			m_tree->topLevelItem(i)->setExpanded(true);
 		}
 	}
+
+	m_tree->blockSignals(false);
 	this->blockSignals(false);
 }
 
@@ -142,7 +146,11 @@ ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _groupName, 
 }
 
 void ot::PropertyGrid::clear(void) {
+	this->blockSignals(true);
+	m_tree->blockSignals(true);
 	m_tree->clear();
+	m_tree->blockSignals(false);
+	this->blockSignals(false);
 }
 
 void ot::PropertyGrid::slotPropertyChanged() {

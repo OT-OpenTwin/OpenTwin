@@ -763,8 +763,8 @@ void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _config
 	ot::JsonDocument dataDoc;
 	dataDoc.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
 	dataDoc.AddMember("ContainerID", this->getEntityContainerID(), dataDoc.GetAllocator());
-	dataDoc.AddMember("ValueName", ot::JsonString(this->getValueName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
-	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
+	//dataDoc.AddMember("ValueName", ot::JsonString(this->getValueName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	//dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
 
 	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
 	newProp->setSpecialType("EntityList");
@@ -788,10 +788,11 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 	ot::JsonDocument dataDoc;
 	dataDoc.fromJson(actualProperty->additionalPropertyData());
 
-	this->setValueName(ot::json::getString(dataDoc, "ValueName"));
+	//this->setValueName(ot::json::getString(dataDoc, "ValueName"));
+	this->setValueName(actualProperty->current());
 	this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
 	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
-	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+	//this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
 }
 
 void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
