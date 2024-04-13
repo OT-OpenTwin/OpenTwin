@@ -11,6 +11,10 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyStringList> propertyStringListRegistrar(OT_PROPERTY_TYPE_StringList);
 
+ot::PropertyStringList::PropertyStringList(const PropertyStringList* _other) 
+	: Property(_other), m_current(_other->m_current), m_list(_other->m_list)
+{}
+
 ot::PropertyStringList::PropertyStringList(PropertyFlags _flags)
 	: Property(_flags) 
 {}
@@ -44,13 +48,7 @@ ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::
 }
 
 ot::Property* ot::PropertyStringList::createCopy(void) const {
-	ot::PropertyStringList* newProp = new ot::PropertyStringList;
-	newProp->setFromOther(this);
-
-	newProp->setCurrent(this->current());
-	newProp->setList(this->list());
-
-	return newProp;
+	return new PropertyStringList(this);
 }
 
 void ot::PropertyStringList::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

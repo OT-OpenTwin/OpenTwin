@@ -11,14 +11,12 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyColor> propertyColorRegistrar(OT_PROPERTY_TYPE_Color);
 
+ot::PropertyColor::PropertyColor(const PropertyColor* _other) 
+	: Property(_other), m_value(_other->m_value)
+{}
 
 ot::Property* ot::PropertyColor::createCopy(void) const {
-	ot::PropertyColor* newProp = new ot::PropertyColor;
-	newProp->setFromOther(this);
-
-	newProp->setValue(this->value());
-
-	return newProp;
+	return new PropertyColor(this);
 }
 
 void ot::PropertyColor::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

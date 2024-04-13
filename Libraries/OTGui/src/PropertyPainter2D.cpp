@@ -14,6 +14,13 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyPainter2D> propertyPainter2DRegistrar(OT_PROPERTY_TYPE_Painter2D);
 
+ot::PropertyPainter2D::PropertyPainter2D(const PropertyPainter2D* _other)
+	: Property(_other), m_painter(nullptr)
+{
+	OTAssertNullptr(_other->m_painter);
+	this->setPainter(_other->m_painter->createCopy());
+}
+
 ot::PropertyPainter2D::PropertyPainter2D(PropertyFlags _flags)
 	: Property(_flags), m_painter(nullptr)
 {
@@ -52,12 +59,7 @@ ot::PropertyPainter2D::~PropertyPainter2D() {
 }
 
 ot::Property* ot::PropertyPainter2D::createCopy(void) const {
-	ot::PropertyPainter2D* newProp = new ot::PropertyPainter2D;
-	newProp->setFromOther(this);
-
-	newProp->setPainter(this->getPainter()->createCopy());
-
-	return newProp;
+	return new PropertyPainter2D(this);
 }
 
 void ot::PropertyPainter2D::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
@@ -79,6 +81,6 @@ void ot::PropertyPainter2D::setPropertyData(const ot::ConstJsonObject& _object) 
 void ot::PropertyPainter2D::setPainter(Painter2D* _painter) {
 	if (m_painter == _painter) return;
 	OTAssertNullptr(_painter);
-	delete m_painter;
+	if (m_painter) delete m_painter;
 	m_painter = _painter;
 }

@@ -15,6 +15,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT PropertyInt : public Property {
 		OT_DECL_NOCOPY(PropertyInt)
 	public:
+		PropertyInt(const PropertyInt* _other);
 		PropertyInt(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags::NoFlags);

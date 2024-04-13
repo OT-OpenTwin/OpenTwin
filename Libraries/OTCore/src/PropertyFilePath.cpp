@@ -11,6 +11,10 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyFilePath> propertyFilePathRegistrar(OT_PROPERTY_TYPE_FilePath);
 
+ot::PropertyFilePath::PropertyFilePath(const PropertyFilePath* _other) 
+	: Property(_other), m_browseMode(_other->m_browseMode), m_filters(_other->m_filters), m_path(_other->m_path)
+{}
+
 ot::PropertyFilePath::PropertyFilePath(BrowseMode _mode, PropertyFlags _flags)
 	: Property(_flags), m_browseMode(_mode)
 {}
@@ -28,14 +32,7 @@ void ot::PropertyFilePath::addFilter(const FilterInfo& _info) {
 }
 
 ot::Property* ot::PropertyFilePath::createCopy(void) const {
-	ot::PropertyFilePath* newProp = new ot::PropertyFilePath;
-	newProp->setFromOther(this);
-
-	newProp->setPath(this->path());
-	newProp->setBrowseMode(this->browseMode());
-	newProp->setFilters(this->filters());
-
-	return newProp;
+	return new ot::PropertyFilePath(this);
 }
 
 void ot::PropertyFilePath::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

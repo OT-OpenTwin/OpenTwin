@@ -11,6 +11,10 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyDouble> propertyDoubleRegistrar(OT_PROPERTY_TYPE_Double);
 
+ot::PropertyDouble::PropertyDouble(const PropertyDouble* _other) 
+	: Property(_other), m_value(_other->m_value), m_min(_other->m_min), m_max(_other->m_max), m_precision(_other->m_precision)
+{}
+
 ot::PropertyDouble::PropertyDouble(PropertyFlags _flags)
 	: Property(_flags), m_value(false), m_min(DBL_MIN), m_max(DBL_MAX), m_precision(2)
 {}
@@ -24,15 +28,7 @@ ot::PropertyDouble::PropertyDouble(const std::string& _name, double _value, Prop
 {}
 
 ot::Property* ot::PropertyDouble::createCopy(void) const {
-	ot::PropertyDouble* newProp = new ot::PropertyDouble;
-	newProp->setFromOther(this);
-
-	newProp->setValue(this->value());
-	newProp->setMin(this->min());
-	newProp->setMax(this->max());
-	newProp->setPrecision(this->precision());
-
-	return newProp;
+	return new PropertyDouble(this);
 }
 
 void ot::PropertyDouble::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

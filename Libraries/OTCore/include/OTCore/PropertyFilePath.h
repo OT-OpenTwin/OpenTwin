@@ -28,6 +28,7 @@ namespace ot {
 			std::string text;
 		};
 
+		PropertyFilePath(const PropertyFilePath* _other);
 		PropertyFilePath(BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyFilePath(const std::string& _path, BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyFilePath(const std::string& _name, const std::string& _path, BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags::NoFlags);

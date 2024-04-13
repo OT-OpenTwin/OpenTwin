@@ -15,6 +15,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT PropertyDouble : public Property {
 		OT_DECL_NOCOPY(PropertyDouble)
 	public:
+		PropertyDouble(const PropertyDouble* _other);
 		PropertyDouble(PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyDouble(double _value, PropertyFlags _flags = PropertyFlags::NoFlags);
 		PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags = PropertyFlags::NoFlags);

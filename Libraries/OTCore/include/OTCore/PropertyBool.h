@@ -15,6 +15,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT PropertyBool : public Property {
 		OT_DECL_NOCOPY(PropertyBool)
 	public:
+		PropertyBool(const PropertyBool* _other);
 		PropertyBool(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(false) {};
 		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
 		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};

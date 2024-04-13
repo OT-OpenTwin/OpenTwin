@@ -18,6 +18,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyPainter2D : public Property {
 		OT_DECL_NOCOPY(PropertyPainter2D)
 	public:
+		PropertyPainter2D(const PropertyPainter2D* _other);
+
 		//! @brief Creates new instance.
 		//! Object creates and takes ownership of the painter.
 		PropertyPainter2D(PropertyFlags _flags = PropertyFlags::NoFlags);

@@ -38,6 +38,7 @@
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Property.cpp" />
+    <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />
     <ClCompile Include="src\PropertyColor.cpp" />
     <ClCompile Include="src\PropertyDirectory.cpp" />
@@ -98,6 +99,7 @@
     <ClInclude Include="include\OTCore\Point2D.h" />
     <ClInclude Include="include\OTCore\Point3D.h" />
     <ClInclude Include="include\OTCore\Property.h" />
+    <ClInclude Include="include\OTCore\PropertyBase.h" />
     <ClInclude Include="include\OTCore\PropertyBool.h" />
     <ClInclude Include="include\OTCore\PropertyColor.h" />
     <ClInclude Include="include\OTCore\PropertyDirectory.h" />

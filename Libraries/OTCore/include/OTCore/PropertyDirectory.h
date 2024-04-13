@@ -18,6 +18,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT PropertyDirectory : public Property {
 		OT_DECL_NOCOPY(PropertyDirectory)
 	public:
+		PropertyDirectory(const PropertyDirectory* _other);
 		PropertyDirectory(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
 		PropertyDirectory(const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_path(_path) {};
 		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_path(_path) {};

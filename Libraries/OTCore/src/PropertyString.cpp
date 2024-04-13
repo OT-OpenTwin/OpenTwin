@@ -11,6 +11,10 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyString> propertyStringRegistrar(OT_PROPERTY_TYPE_String);
 
+ot::PropertyString::PropertyString(const PropertyString* _other) 
+	: Property(_other), m_value(_other->m_value), m_placeholderText(_other->m_placeholderText), m_maxLength(_other->m_maxLength)
+{}
+
 ot::PropertyString::PropertyString(PropertyFlags _flags)
 	: Property(_flags), m_maxLength(0)
 {}
@@ -24,14 +28,7 @@ ot::PropertyString::PropertyString(const std::string& _name, const std::string& 
 {}
 
 ot::Property* ot::PropertyString::createCopy(void) const {
-	ot::PropertyString* newProp = new ot::PropertyString;
-	newProp->setFromOther(this);
-
-	newProp->setValue(this->value());
-	newProp->setPlaceholderText(this->placeholderText());
-	newProp->setMaxLength(this->maxLength());
-
-	return newProp;
+	return new PropertyString(this);
 }
 
 void ot::PropertyString::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

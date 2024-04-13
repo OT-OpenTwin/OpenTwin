@@ -11,14 +11,12 @@
 
 static ot::PropertyFactoryRegistrar<ot::PropertyDirectory> propertyDirectoryRegistrar(OT_PROPERTY_TYPE_Directory);
 
+ot::PropertyDirectory::PropertyDirectory(const PropertyDirectory* _other) 
+	: Property(_other), m_path(_other->m_path)
+{}
 
 ot::Property* ot::PropertyDirectory::createCopy(void) const {
-	ot::PropertyDirectory* newProp = new ot::PropertyDirectory;
-	newProp->setFromOther(this);
-
-	newProp->setPath(this->path());
-
-	return newProp;
+	return new PropertyDirectory(this);
 }
 
 void ot::PropertyDirectory::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

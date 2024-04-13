@@ -16,6 +16,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT PropertyColor : public Property {
 		OT_DECL_NOCOPY(PropertyColor)
 	public:
+		PropertyColor(const PropertyColor* _other);
 		PropertyColor(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
 		PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
 		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
