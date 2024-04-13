@@ -76,13 +76,8 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 		newGroup->setupFromConfig(group);
 		this->addGroup(newGroup);
 		newGroup->finishSetup();
-	}
-
-	// Expand root groups
-	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
-		if (m_tree->topLevelItem(i)->childCount() > 0) {
-			m_tree->topLevelItem(i)->setExpanded(true);
-		}
+		newGroup->setExpanded(true);
+		newGroup->updateStateIcon();
 	}
 
 	m_tree->blockSignals(false);
