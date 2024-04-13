@@ -68,10 +68,12 @@ private Q_SLOTS:
 	void slotGenerate(void);
 	void slotApplyAsCurrent(void);
 	void slotExport(void);
+	void slotImportBase(void);
+	void slotBaseChanged(void);
+	void slotExportBase(void);
 
 private:
-	QByteArray m_sheetBase;
-
+	QString m_lastBaseFile;
 	QWidget* m_root;
 	ot::PropertyGrid* m_propertyGrid;
 	ot::TabWidget* m_editorTab;
@@ -93,6 +95,7 @@ private:
 	std::map<std::string, ot::PropertyInt*> m_integer;
 	std::map<std::string, ot::PropertyDouble*> m_double;
 
+	void selectStyleSheetBase(void);
 	void initializeStyleSheetBase(void);
 	void cleanUpData(void);
 	void initializeBrightStyleValues(void);

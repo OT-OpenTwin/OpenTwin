@@ -47,6 +47,7 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qaction.h>
 #include <QtWidgets/qsplitter.h>
+#include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qfiledialog.h>
 
 #define CSE_GROUP_General "General"
@@ -140,7 +141,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	m_editor = new ot::TextEditor;
 	m_editor->setReadOnly(true);
 	m_baseEditor = new ot::TextEditor;
-	m_baseEditor->setReadOnly(true);
+	m_baseEditor->setReadOnly(false);
 
 	m_editorTab = new TabWidget;
 	m_editorTab->addTab(m_baseEditor, CSE_TAB_Base);
@@ -153,7 +154,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	rLay->addWidget(btnApply);
 
 	// Setup controls
-
+	
 	// Setup layouts
 	rootSplitter->addWidget(m_propertyGrid->getQWidget());
 	rootSplitter->addWidget(rLayW);
@@ -168,8 +169,25 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	_rootMenu->addSeparator();
 	QAction* actionApplyAsCurrent = _rootMenu->addAction("Apply As current");
 	QAction* actionExport = _rootMenu->addAction("Export");
+	_rootMenu->addSeparator();
+	QAction* actionImportBase = _rootMenu->addAction("Import Style Sheet Base");
+	QAction* actionExportBase = _rootMenu->addAction("Export Style Sheet Base");
 
 	// Initialize data
+	{
+		auto settings = otoolkit::api::getGlobalInterface()->createSettingsInstance();
+		m_lastBaseFile = settings.get()->value("ColorStlyeEditor.LastBaseExport", QString()).toString();
+		if (m_lastBaseFile.isEmpty()) {
+			QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
+			if (!arr.isEmpty()) {
+				m_lastBaseFile = QString::fromStdString(arr.toStdString()) + "/Tools/OToolkit/data/StyleSheetBase.otssb";
+			}
+			else {
+				this->selectStyleSheetBase();
+			}
+		}
+	}
+
 	try {
 		this->initializeBrightStyleValues();
 		this->initializeStyleSheetBase();
@@ -197,7 +215,11 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	this->connect(btnApply, &QPushButton::clicked, this, &ColorStyleEditor::slotApplyAsCurrent);
 	this->connect(actionApplyAsCurrent, &QAction::triggered, this, &ColorStyleEditor::slotApplyAsCurrent);
 	this->connect(actionExport, &QAction::triggered, this, &ColorStyleEditor::slotExport);
-
+	this->connect(actionImportBase, &QAction::triggered, this, &ColorStyleEditor::slotImportBase);
+	this->connect(actionExportBase, &QAction::triggered, this, &ColorStyleEditor::slotExportBase);
+	this->connect(m_baseEditor, &TextEditor::saveRequested, this, &ColorStyleEditor::slotExportBase);
+	this->connect(m_baseEditor, &TextEditor::textChanged, this, &ColorStyleEditor::slotBaseChanged);
+	
 	return rootSplitter;
 }
 
@@ -398,10 +420,53 @@ void ColorStyleEditor::slotExport(void) {
 	OT_LOG_I("Color style exported \"" + fileName.toStdString() + "\"");
 }
 
+void ColorStyleEditor::slotImportBase(void) {
+	this->selectStyleSheetBase();
+	this->initializeStyleSheetBase();
+}
+
+void ColorStyleEditor::slotExportBase(void) {
+	auto settings = otoolkit::api::getGlobalInterface()->createSettingsInstance();
+	if (m_lastBaseFile.isEmpty()) {
+		m_lastBaseFile = QFileDialog::getSaveFileName(m_baseEditor, "Export Style Sheet Base", m_lastBaseFile, "OpenTwin Style Sheet Base (*.otssb)");
+	}
+	
+	if (m_lastBaseFile.isEmpty()) return;
+
+	QFile file(m_lastBaseFile);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		OT_LOG_E("Failed to open file for writing. File: \"" + m_lastBaseFile.toStdString() + "\"");
+		return;
+	}
+
+	QString txt = m_baseEditor->toPlainText();
+	file.write(QByteArray::fromStdString(txt.toStdString()));
+	file.close();
+
+	settings.get()->setValue("ColorStlyeEditor.LastBaseExport", m_lastBaseFile);
+	m_editorTab->setTabText(0, "Base");
+	OT_LOG_I("StyleSheet Base exported to: \"" + m_lastBaseFile.toStdString() + "\"");
+}
+
+void ColorStyleEditor::slotBaseChanged(void) {
+	m_editorTab->setTabText(0, "Base*");
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
+void ColorStyleEditor::selectStyleSheetBase(void) {
+	m_lastBaseFile = QFileDialog::getOpenFileName(m_baseEditor, "Import Style Sheet Base", m_lastBaseFile, "OpenTwin Style Sheet Base (*.otssb)");
+	if (!m_lastBaseFile.isEmpty()) {
+		otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->setValue("ColorStlyeEditor.LastBaseExport", m_lastBaseFile);
+	}
+}
+
 void ColorStyleEditor::initializeStyleSheetBase(void) {
-	QFile templateFile(":/data/StyleSheetBase.otssb");
+	if (m_lastBaseFile.isEmpty()) {
+		OT_LOG_E("No style sheet base file selected");
+		return;
+	}
+	QFile templateFile(m_lastBaseFile);
 	if (!templateFile.exists()) {
 		OT_LOG_E("Style sheet base file does not exist");
 		return;
@@ -410,15 +475,15 @@ void ColorStyleEditor::initializeStyleSheetBase(void) {
 		OT_LOG_E("Failed to open style sheet base file for reading");
 		return;
 	}
-	m_sheetBase = templateFile.readAll();
+	QByteArray sheetBase = templateFile.readAll();
 	templateFile.close();
 
-	if (m_sheetBase.isEmpty()) {
+	if (sheetBase.isEmpty()) {
 		OT_LOG_E("Style sheet base file is empty");
 		return;
 	}
 
-	m_baseEditor->setPlainText(QString::fromStdString(m_sheetBase.toStdString()));
+	m_baseEditor->setPlainText(QString::fromStdString(sheetBase.toStdString()));
 }
 
 void ColorStyleEditor::cleanUpData(void) {
@@ -612,7 +677,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 
 void ColorStyleEditor::parseStyleSheetBaseFile(void) {
 	// Create copy of the default sheet base file
-	std::string otssb = m_sheetBase.toStdString();
+	std::string otssb = m_baseEditor->toPlainText().toStdString();
 
 	// Split the file into lines
 	std::list<std::string> lst;
@@ -904,7 +969,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 	}
 
-	QString base = QString::fromStdString(m_sheetBase.toStdString());
+	QString base = m_baseEditor->toPlainText();
 	for (const auto& it : replacementMap) {
 		base.replace(it.first, it.second);
 	}
