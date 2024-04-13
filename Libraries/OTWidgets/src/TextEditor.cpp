@@ -4,14 +4,20 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"
+#include "OTWidgets/PushButton.h"
+#include "OTWidgets/TextEditorSearchPopup.h"
 
 // Qt header
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 #include <QtGui/qtextdocument.h>
 #include <QtGui/qtextlist.h>
+#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qshortcut.h>
+#include <QtWidgets/qscrollbar.h>
 
 /*
 
@@ -89,7 +95,9 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 
 // ###################################################################################################################################
 
-ot::TextEditor::TextEditor(QWidget* _parent) : PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false) {
+ot::TextEditor::TextEditor(QWidget* _parent)
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr)
+{
 
 	m_lineNumberArea = new TextEditorLineNumberArea(this);
 
@@ -100,14 +108,19 @@ ot::TextEditor::TextEditor(QWidget* _parent) : PlainTextEdit(_parent), m_syntaxH
 	QFontMetrics fm(f);
 	this->setTabStopDistance(4);
 
-	m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
-	m_saveShortcut->setContext(Qt::WidgetShortcut);
+	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
+	QShortcut* findShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
+	saveShortcut->setContext(Qt::WidgetShortcut);
+	findShortcut->setContext(Qt::WidgetShortcut);
 
 	connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
 	connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
 	connect(this, &TextEditor::cursorPositionChanged, this, &TextEditor::slotHighlightCurrentLine);
 	connect(this, &TextEditor::textChanged, this, &TextEditor::slotTextChanged);
-	connect(m_saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
+	connect(saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
+	connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
 }
 
 ot::TextEditor::~TextEditor() {
@@ -233,4 +246,28 @@ void ot::TextEditor::slotSaveRequested(void) {
 
 void ot::TextEditor::slotTextChanged(void) {
 	m_contentChanged = true;
+}
+
+void ot::TextEditor::slotFindRequested(void) {
+	if (!m_searchPopup) {
+		m_searchPopup = new TextEditorSearchPopup(this);
+		QPoint p = this->mapToGlobal(this->rect().topRight());
+		p.setX(p.x() - m_searchPopup->width());
+		if (this->verticalScrollBar()->isVisible()) {
+			p.setX(p.x() - this->verticalScrollBar()->width());
+		}
+		m_searchPopup->move(p);
+		m_searchPopup->setVisible(true);
+
+		this->installEventFilter(m_searchPopup);
+
+		this->connect(m_searchPopup, &TextEditorSearchPopup::popupClosing, this, &TextEditor::slotFindClosing);
+	}
+	
+	m_searchPopup->focusInput();
+}
+
+void ot::TextEditor::slotFindClosing(void) {
+	this->removeEventFilter(m_searchPopup);
+	m_searchPopup = nullptr;
 }

@@ -21,7 +21,8 @@ class QSyntaxHighlighter;
 
 namespace ot {
 	class TextEditor;
-
+	class TextEditorSearchPopup;
+	
 	class OT_WIDGETS_API_EXPORT TextEditorLineNumberArea : public QWidget {
 	public:
 		TextEditorLineNumberArea(TextEditor* _editor);
@@ -79,14 +80,17 @@ namespace ot {
 		void slotUpdateLineNumberArea(const QRect & _rect, int _dy);
 		void slotSaveRequested(void);
 		void slotTextChanged(void);
+		void slotFindRequested(void);
+		void slotFindClosing(void);
 
 	private:
+		TextEditorSearchPopup* m_searchPopup;
+
 		bool m_contentChanged;
 		std::string m_textEditorName;
 		ot::UID								m_displayedTextEntityID = 0;
 		ot::UID								m_displayedTextEntityVersion = 0;
 
-		QShortcut* m_saveShortcut;
 		TextEditorLineNumberArea*			m_lineNumberArea;
 		QSyntaxHighlighter *				m_syntaxHighlighter;
 	};

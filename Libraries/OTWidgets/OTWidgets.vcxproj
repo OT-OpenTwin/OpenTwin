@@ -102,7 +102,26 @@
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
-    <ClCompile Include="src\TextEditor.cpp" />
+    <ClCompile Include="src\TextEditor.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
+    <ClCompile Include="src\TextEditorSearchPopup.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="src\TextEditorView.cpp" />
     <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
@@ -130,6 +149,7 @@
     <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.hpp" />
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
+    <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />

@@ -217,9 +217,6 @@
     <ClCompile Include="src\TabWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextEditor.cpp">
-      <Filter>src\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\TreeWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
@@ -245,6 +242,12 @@
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\Label.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditor.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditorSearchPopup.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
@@ -557,6 +560,9 @@
       <Filter>include\Properties</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Label.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
