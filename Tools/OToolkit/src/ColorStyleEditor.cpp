@@ -195,7 +195,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 		this->initializePropertyGrid();
 		this->slotGenerate();
 		if (!m_editor->toPlainText().isEmpty()) {
-			//this->slotApplyAsCurrent();
+			m_editorTab->setCurrentIndex(1);
 		}
 	}
 	catch (const std::exception& _e) {
@@ -373,8 +373,6 @@ void ColorStyleEditor::slotGenerate(void) {
 	std::string gen;
 	if (!this->generateFile(gen)) return;
 	m_editor->setPlainText(QString::fromStdString(gen));
-
-	m_editorTab->setCurrentIndex(1);
 	OT_LOG_I("Success");
 }
 
