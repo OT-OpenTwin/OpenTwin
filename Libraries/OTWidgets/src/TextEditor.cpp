@@ -115,9 +115,9 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	QShortcut* findShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
 	QShortcut* duplicateShortcut = new QShortcut(QKeySequence("Ctrl+D"), this);
-	saveShortcut->setContext(Qt::WidgetShortcut);
-	findShortcut->setContext(Qt::WidgetShortcut);
-	duplicateShortcut->setContext(Qt::WidgetShortcut);
+	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	findShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	duplicateShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
 	connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
@@ -320,6 +320,7 @@ void ot::TextEditor::slotFindRequested(void) {
 		this->connect(m_searchPopup, &TextEditorSearchPopup::popupClosing, this, &TextEditor::slotFindClosing);
 	}
 	
+	m_searchPopup->setIndex(this->textCursor().position());
 	m_searchPopup->focusInput();
 }
 

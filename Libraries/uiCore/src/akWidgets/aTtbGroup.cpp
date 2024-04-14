@@ -42,6 +42,7 @@ ak::aTtbGroup::aTtbGroup(
 	assert(m_group != nullptr); // Nullptr provided
 	assert(_messenger != nullptr); // Nullptr provided
 	m_text = _text;
+	m_group->setObjectName("OT_TTBGroup");
 }
 
 ak::aTtbGroup::~aTtbGroup() {

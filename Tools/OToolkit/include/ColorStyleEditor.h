@@ -71,7 +71,7 @@ private Q_SLOTS:
 	void slotExport(void);
 	void slotImportBase(void);
 	void slotBaseChanged(void);
-	void slotExportBase(void);
+	bool slotExportBase(void);
 
 private:
 	QString m_lastBaseFile;

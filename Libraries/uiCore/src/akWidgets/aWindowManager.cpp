@@ -77,6 +77,7 @@ m_timerShowMainWindow(nullptr)
 	m_tabToolBar = new tt::TabToolbar();
 	m_tabToolBar->setVisible(false);
 	m_tabToolBar->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
+	m_tabToolBar->setObjectName("OT_TTB");
 	m_window->addToolBar(m_tabToolBar);
 
 	// Connect tab Toolbar tab signals

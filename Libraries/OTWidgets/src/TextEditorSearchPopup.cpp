@@ -58,7 +58,7 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 }
 
 void ot::TextEditorSearchPopup::focusInput(void) {
-	m_search->setFocus();
+	m_search->setFocus(Qt::ActiveWindowFocusReason);
 }
 
 bool ot::TextEditorSearchPopup::eventFilter(QObject* _watched, QEvent* _event) {

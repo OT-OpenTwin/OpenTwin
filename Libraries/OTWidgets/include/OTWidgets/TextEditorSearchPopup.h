@@ -32,6 +32,8 @@ namespace ot {
 
 		virtual void closeEvent(QCloseEvent* _event) override;
 
+		void setIndex(int _ix) { m_ix = _ix; };
+
 	Q_SIGNALS:
 		void popupClosing(void);
 

@@ -36,6 +36,7 @@ m_page(_page)
 	assert(m_page != nullptr); // Nullptr provided
 	assert(_messenger != nullptr); // Nullptr { throw ak::Exception("Is nullptr", "Check messenger"); }
 	m_text = _text;
+	m_page->setObjectName("OT_TTBPage");
 }
 
 ak::aTtbPage::~aTtbPage() {

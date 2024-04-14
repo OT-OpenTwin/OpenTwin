@@ -23,8 +23,9 @@ protected:
 		
 		TreeWidget::mousePressEvent(_event);
 		
-		if (index.isValid() && last_state == isExpanded(index))
-			setExpanded(index, !last_state);
+		if (index.isValid() && last_state == isExpanded(index) && this->itemFromIndex(index) && this->itemFromIndex(index)->childCount() > 0) {
+			this->setExpanded(index, !last_state);
+		}
 			
 	}
 
@@ -86,7 +87,9 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 		newGroup->setupFromConfig(group);
 		this->addGroup(newGroup);
 		newGroup->finishSetup();
-		newGroup->setExpanded(true);
+		if (newGroup->childCount() > 0) {
+			newGroup->setExpanded(true);
+		}
 		newGroup->updateStateIcon();
 	}
 
