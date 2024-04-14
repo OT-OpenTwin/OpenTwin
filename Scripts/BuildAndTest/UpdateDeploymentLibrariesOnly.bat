@@ -86,6 +86,9 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitSimulatorService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll"
 
+ECHO Delete color styles
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\*.otcsf"
+
 ECHO Delete Admin Panel 
 
 RMDIR /Q /S "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
@@ -158,6 +161,13 @@ REM ====================================================================
 ECHO Copy Tools
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\x64\Release\OToolkitAPI.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\x64\Release\OToolkit.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+
+REM ====================================================================
+REM  Copy Color Styles
+REM ====================================================================
+
+ECHO Copy ColorStyles
+COPY "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles\*.otcsf" "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles"
 
 REM ====================================================================
 REM  Copy Admin Panel
