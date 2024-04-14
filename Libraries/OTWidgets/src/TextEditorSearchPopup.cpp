@@ -15,6 +15,7 @@
 #include <QtGui/qtextdocument.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qshortcut.h>
+#include <QtWidgets/qscrollbar.h>
 
 ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	: m_editor(_editor), m_search(nullptr), m_ix(0)
@@ -24,14 +25,17 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	this->setObjectName("OT_TextEditSearchPopup");
 	this->setWindowFlag(Qt::FramelessWindowHint);
 	this->setWindowFlag(Qt::WindowStaysOnTopHint);
+	this->setWindowFlag(Qt::Tool);
 	this->setFrameShape(QFrame::StyledPanel);
 	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->setFocusPolicy(Qt::ClickFocus);
 
 	// Create layouts and controls
 	QHBoxLayout* centralLayout = new QHBoxLayout(this);
 	centralLayout->setContentsMargins(1, 1, 1, 1);
 
 	m_search = new ot::LineEdit(this);
+	m_search->setFocusPolicy(Qt::ClickFocus);
 	m_search->setObjectName("OT_TextEditSearchPopupSearchInput");
 	PushButton* btnFind = new PushButton("Find", this);
 	btnFind->setObjectName("OT_TextEditSearchPopupFindButton");
@@ -47,6 +51,12 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	btnFind->installEventFilter(this);
 	btnClose->installEventFilter(this);
 
+	QWidget* w = m_editor;
+	while (w) {
+		w->installEventFilter(this);
+		w = w->parentWidget();
+	}
+
 	// Setup view
 	this->setFixedWidth(350);
 
@@ -58,7 +68,8 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 }
 
 void ot::TextEditorSearchPopup::focusInput(void) {
-	m_search->setFocus(Qt::ActiveWindowFocusReason);
+	m_search->activateWindow();
+	m_search->setFocus(Qt::OtherFocusReason);
 }
 
 bool ot::TextEditorSearchPopup::eventFilter(QObject* _watched, QEvent* _event) {
@@ -71,6 +82,15 @@ bool ot::TextEditorSearchPopup::eventFilter(QObject* _watched, QEvent* _event) {
 			}
 		}
 	}
+	else if (_event->type() == QEvent::Move) {
+		this->updatePosition();
+	}
+	else if (_event->type() == QEvent::Hide && _watched == m_editor) {
+		this->hide();
+	}
+	else if (_event->type() == QEvent::Show && _watched == m_editor) {
+		this->show();
+	}
 	return QFrame::eventFilter(_watched, _event);
 }
 
@@ -79,9 +99,22 @@ void ot::TextEditorSearchPopup::closeEvent(QCloseEvent* _event) {
 	QWidget::closeEvent(_event);
 }
 
+void ot::TextEditorSearchPopup::updatePosition(bool _forceUpdate) {
+	QPoint p = m_editor->mapToGlobal(m_editor->rect().topRight());
+	if (p == m_lastTR && !_forceUpdate) return;
+	m_lastTR = p;
+
+	p.setX(p.x() - this->width());
+	if (m_editor->verticalScrollBar()->isVisible()) {
+		p.setX(p.x() - m_editor->verticalScrollBar()->width());
+	}
+	this->move(p);
+}
+
 void ot::TextEditorSearchPopup::slotTextChanged(void) {
-	m_ix = 0;
+	int ix = m_ix;
 	this->slotFindNext();
+	m_ix = ix;
 }
 
 void ot::TextEditorSearchPopup::slotFindNext(void) {

@@ -85,7 +85,7 @@ namespace ot {
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void resizeEvent(QResizeEvent * _event) override;
 		virtual void wheelEvent(QWheelEvent* _event) override;
-
+		
 	private Q_SLOTS:
 		void slotUpdateLineNumberAreaWidth(int _newBlockCount);
 		void slotHighlightCurrentLine();
@@ -98,7 +98,7 @@ namespace ot {
 
 	private:
 		TextEditorSearchPopup* m_searchPopup;
-
+		
 		bool m_contentChanged;
 		std::string m_textEditorName;
 		int m_tabSpaces;

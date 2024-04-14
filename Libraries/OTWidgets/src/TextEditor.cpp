@@ -322,14 +322,8 @@ void ot::TextEditor::slotTextChanged(void) {
 void ot::TextEditor::slotFindRequested(void) {
 	if (!m_searchPopup) {
 		m_searchPopup = new TextEditorSearchPopup(this);
-		QPoint p = this->mapToGlobal(this->rect().topRight());
-		p.setX(p.x() - m_searchPopup->width());
-		if (this->verticalScrollBar()->isVisible()) {
-			p.setX(p.x() - this->verticalScrollBar()->width());
-		}
-		m_searchPopup->move(p);
+		m_searchPopup->updatePosition(true);
 		m_searchPopup->setVisible(true);
-
 		this->installEventFilter(m_searchPopup);
 
 		this->connect(m_searchPopup, &TextEditorSearchPopup::popupClosing, this, &TextEditor::slotFindClosing);
@@ -342,6 +336,7 @@ void ot::TextEditor::slotFindRequested(void) {
 void ot::TextEditor::slotFindClosing(void) {
 	this->removeEventFilter(m_searchPopup);
 	m_searchPopup = nullptr;
+	this->setFocus();
 }
 
 void ot::TextEditor::slotDuplicateLine(void) {

@@ -34,6 +34,8 @@ namespace ot {
 
 		void setIndex(int _ix) { m_ix = _ix; };
 
+		void updatePosition(bool _forceUpdate = false);
+
 	Q_SIGNALS:
 		void popupClosing(void);
 
@@ -44,6 +46,7 @@ namespace ot {
 
 	private:
 		int m_ix;
+		QPoint m_lastTR;
 		TextEditor* m_editor;
 		LineEdit* m_search;
 	};
