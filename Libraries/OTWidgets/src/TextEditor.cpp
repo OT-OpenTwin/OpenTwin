@@ -229,12 +229,27 @@ void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
 	else if (_event->key() == Qt::Key_Home) {
 		QTextCursor cursor = this->textCursor();
 		int col = cursor.columnNumber();
+		int p = cursor.position();
 		cursor.movePosition(QTextCursor::StartOfLine);
+		// Skip leading spaces and tabs
 		while (this->document()->characterAt(cursor.position()) == QChar(' ') || this->document()->characterAt(cursor.position()) == QChar('\t')) {
 			cursor.setPosition(cursor.position() + 1);
 		}
+		// If the position did not change move to start of line
 		if (col == cursor.columnNumber()) {
 			cursor.movePosition(QTextCursor::StartOfLine);
+		}
+		// Check if the shift modifier is pressed
+		if (_event->modifiers() & Qt::ShiftModifier) {
+			int np = cursor.position();
+			if (p != np) {
+				cursor = this->textCursor();
+			}
+			while (p != np) {
+				this->keyPressEvent(new QKeyEvent(QEvent::KeyPress, (p < np ? Qt::Key_Right : Qt::Key_Left), Qt::ShiftModifier, _event->text(), _event->isAutoRepeat(), _event->count()));
+				cursor = this->textCursor();
+				p = cursor.position();
+			}
 		}
 		this->setTextCursor(cursor);
 	}
