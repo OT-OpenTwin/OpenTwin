@@ -96,7 +96,8 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 // ###################################################################################################################################
 
 ot::TextEditor::TextEditor(QWidget* _parent)
-	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), m_tabSpaces(4), m_newLineSamePrefix(false)
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), 
+	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false)
 {
 	this->setObjectName("OT_TextEditor");
 
@@ -113,8 +114,10 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	QShortcut* findShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
+	QShortcut* duplicateShortcut = new QShortcut(QKeySequence("Ctrl+D"), this);
 	saveShortcut->setContext(Qt::WidgetShortcut);
 	findShortcut->setContext(Qt::WidgetShortcut);
+	duplicateShortcut->setContext(Qt::WidgetShortcut);
 
 	connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
 	connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
@@ -122,6 +125,7 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	connect(this, &TextEditor::textChanged, this, &TextEditor::slotTextChanged);
 	connect(saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
 	connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
+	connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::slotDuplicateLine);
 }
 
 ot::TextEditor::~TextEditor() {
@@ -222,6 +226,18 @@ void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
 
 		this->insertPlainText("\n" + prefix);
 	}
+	else if (_event->key() == Qt::Key_Home) {
+		QTextCursor cursor = this->textCursor();
+		int col = cursor.columnNumber();
+		cursor.movePosition(QTextCursor::StartOfLine);
+		while (this->document()->characterAt(cursor.position()) == QChar(' ') || this->document()->characterAt(cursor.position()) == QChar('\t')) {
+			cursor.setPosition(cursor.position() + 1);
+		}
+		if (col == cursor.columnNumber()) {
+			cursor.movePosition(QTextCursor::StartOfLine);
+		}
+		this->setTextCursor(cursor);
+	}
 	else {
 		QPlainTextEdit::keyPressEvent(_event);
 	}
@@ -232,6 +248,22 @@ void ot::TextEditor::resizeEvent(QResizeEvent * _event) {
 
 	QRect cr = contentsRect();
 	m_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+}
+
+void ot::TextEditor::wheelEvent(QWheelEvent* _event) {
+	if (_event->modifiers() & Qt::ControlModifier) {
+		int delta = _event->angleDelta().y();
+		if (delta > 0) {
+			zoomIn();
+		}
+		else {
+			zoomOut();
+		}
+		_event->accept();
+	}
+	else {
+		QPlainTextEdit::wheelEvent(_event);
+	}
 }
 
 void ot::TextEditor::slotUpdateLineNumberAreaWidth(int _newBlockCount) {
@@ -294,4 +326,16 @@ void ot::TextEditor::slotFindRequested(void) {
 void ot::TextEditor::slotFindClosing(void) {
 	this->removeEventFilter(m_searchPopup);
 	m_searchPopup = nullptr;
+}
+
+void ot::TextEditor::slotDuplicateLine(void) {
+	if (!m_enableDuplicateLineShortcut) return;
+	QTextCursor cursor = this->textCursor();
+	int column = cursor.columnNumber();
+	cursor.select(QTextCursor::LineUnderCursor);
+	QString txt = cursor.selectedText();
+	cursor.clearSelection();
+	cursor.movePosition(QTextCursor::EndOfLine);
+	this->setTextCursor(cursor);
+	this->insertPlainText("\n" + txt);
 }

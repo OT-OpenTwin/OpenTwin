@@ -143,6 +143,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	m_baseEditor = new ot::TextEditor;
 	m_baseEditor->setReadOnly(false);
 	m_baseEditor->setNewLineWithSamePrefix(true);
+	m_baseEditor->setDuplicateLineShortcutEnabled(true);
 
 	m_editorTab = new TabWidget;
 	m_editorTab->addTab(m_baseEditor, CSE_TAB_Base);
@@ -206,6 +207,11 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 		OT_LOG_E("Unknown error");
 	}
 	
+	QShortcut* generateAndApplyTree = new QShortcut(QKeySequence("Ctrl+Shift+B"), m_propertyGrid, this, &ColorStyleEditor::slotGenerateAndApply);
+	QShortcut* generateAndApplyEdit = new QShortcut(QKeySequence("Ctrl+Shift+B"), m_baseEditor, this, &ColorStyleEditor::slotGenerateAndApply);
+	generateAndApplyTree->setContext(Qt::WidgetWithChildrenShortcut);
+	generateAndApplyEdit->setContext(Qt::WidgetWithChildrenShortcut);
+
 	// Connect signals
 	this->connect(actionImportConfig, &QAction::triggered, this, &ColorStyleEditor::slotImportConfig);
 	this->connect(actionExportConfig, &QAction::triggered, this, &ColorStyleEditor::slotExportConfig);
@@ -374,7 +380,7 @@ void ColorStyleEditor::slotGenerate(void) {
 	std::string gen;
 	if (!this->generateFile(gen)) return;
 	m_editor->setPlainText(QString::fromStdString(gen));
-	OT_LOG_I("Success");
+	OT_LOG_I("Color Style generated");
 }
 
 void ColorStyleEditor::slotApplyAsCurrent(void) {
@@ -385,6 +391,11 @@ void ColorStyleEditor::slotApplyAsCurrent(void) {
 	}
 
 	ot::GlobalColorStyle::instance().addStyle(QByteArray::fromStdString(tmp), true, true);
+}
+
+void ColorStyleEditor::slotGenerateAndApply(void) {
+	this->slotGenerate();
+	this->slotApplyAsCurrent();
 }
 
 void ColorStyleEditor::slotExport(void) {

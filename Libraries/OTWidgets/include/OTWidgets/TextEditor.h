@@ -75,13 +75,16 @@ namespace ot {
 		void setNewLineWithSamePrefix(bool _enabled) { m_newLineSamePrefix = _enabled; };
 		bool newLineWithSamePrefix(void) const { return m_newLineSamePrefix; };
 
+		void setDuplicateLineShortcutEnabled(bool _enabled) { m_enableDuplicateLineShortcut = _enabled; };
+		bool isDuplicateLineShortcutEnabled(void) const { return m_enableDuplicateLineShortcut; };
+
 	Q_SIGNALS:							
 		void saveRequested(void);
 
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
-
 		virtual void resizeEvent(QResizeEvent * _event) override;
+		virtual void wheelEvent(QWheelEvent* _event) override;
 
 	private Q_SLOTS:
 		void slotUpdateLineNumberAreaWidth(int _newBlockCount);
@@ -91,6 +94,7 @@ namespace ot {
 		void slotTextChanged(void);
 		void slotFindRequested(void);
 		void slotFindClosing(void);
+		void slotDuplicateLine(void);
 
 	private:
 		TextEditorSearchPopup* m_searchPopup;
@@ -99,6 +103,7 @@ namespace ot {
 		std::string m_textEditorName;
 		int m_tabSpaces;
 		bool m_newLineSamePrefix;
+		bool m_enableDuplicateLineShortcut;
 
 		ot::UID								m_displayedTextEntityID = 0;
 		ot::UID								m_displayedTextEntityVersion = 0;

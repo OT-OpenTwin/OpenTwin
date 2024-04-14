@@ -67,6 +67,7 @@ private Q_SLOTS:
 	void slotBlue(void);
 	void slotGenerate(void);
 	void slotApplyAsCurrent(void);
+	void slotGenerateAndApply(void);
 	void slotExport(void);
 	void slotImportBase(void);
 	void slotBaseChanged(void);
