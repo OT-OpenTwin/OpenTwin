@@ -12,13 +12,13 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
-#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qframe.h>
 
 namespace ot {
 
 	class Painter2D;
 
-	class OT_WIDGETS_API_EXPORT Painter2DPreview : public QWidget, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Painter2DPreview : public QFrame, public QWidgetInterface {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Painter2DPreview)
 	public:

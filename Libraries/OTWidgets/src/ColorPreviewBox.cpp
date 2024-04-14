@@ -11,10 +11,12 @@
 #include <QtGui/qpainter.h>
 
 ot::ColorPreviewBox::ColorPreviewBox(const ot::Color& _color, QWidget* _parent) : QFrame(_parent), m_color(OTQtConverter::toQt(_color)) {
+	this->setObjectName("OT_ColorPreviewBox");
 	this->setFixedSize(16, 16);
 }
 
 ot::ColorPreviewBox::ColorPreviewBox(const QColor& _color, QWidget* _parent) : QFrame(_parent), m_color(_color) {
+	this->setObjectName("OT_ColorPreviewBox");
 	this->setFixedSize(16, 16);
 }
 
@@ -33,7 +35,12 @@ void ot::ColorPreviewBox::setColor(const QColor& _color) {
 
 void ot::ColorPreviewBox::paintEvent(QPaintEvent* _event) {
 	Q_UNUSED(_event);
-	QPainter painter(this);
-	painter.fillRect(this->rect(), m_color);
+	
 	QFrame::paintEvent(_event);
+
+	QRect r = this->rect();
+	r.setTopLeft(r.topLeft() + QPoint(1, 1));
+	r.setBottomRight(r.bottomRight() - QPoint(1, 1));
+	QPainter painter(this);
+	painter.fillRect(r, m_color);
 }

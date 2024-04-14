@@ -32,14 +32,19 @@ ot::Painter2DPreview::~Painter2DPreview() {
 void ot::Painter2DPreview::setFromPainter(const Painter2D* _painter) {
 	OTAssertNullptr(_painter);
 	m_brush = Painter2DFactory::brushFromPainter2D(_painter);
+	this->update();
 }
 
 void ot::Painter2DPreview::paintEvent(QPaintEvent* _event) {
 	Q_UNUSED(_event);
+
+	QFrame::paintEvent(_event);
+
 	if (!this->width() || !this->height()) return;
+
 	QRect r;
-	int mi = std::min(this->rect().width(), this->rect().height());
 	if (m_maintainAspectRatio) {
+		int mi = std::min(this->rect().width(), this->rect().height());
 		r = QRect(
 			QPoint(
 				(this->rect().topLeft().x() + (this->rect().width() / 2)) - (mi / 2), 
@@ -63,5 +68,5 @@ void ot::Painter2DPreview::paintEvent(QPaintEvent* _event) {
 }
 
 void ot::Painter2DPreview::slotGlobalStyleChanged(const ColorStyle& _style) {
-	this->repaint();
+	this->update();
 }

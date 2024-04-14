@@ -49,7 +49,6 @@ void ot::Painter2DEditButton::setPainter(Painter2D* _painter) {
 	if (m_painter) delete m_painter;
 	m_painter = _painter;
 	m_preview->setFromPainter(m_painter);
-	m_preview->repaint();
 	this->updateText();
 }
 
@@ -58,6 +57,7 @@ void ot::Painter2DEditButton::setPainter(const Painter2D* _painter) {
 	OTAssertNullptr(_painter);
 	if (m_painter) delete m_painter;
 	m_painter = _painter->createCopy();
+	m_preview->setFromPainter(m_painter);
 	this->updateText();
 }
 
@@ -68,7 +68,6 @@ void ot::Painter2DEditButton::slotClicked(void) {
 		m_painter = dia.createPainter();
 		m_preview->setFromPainter(m_painter);
 		this->updateText();
-		m_preview->repaint();
 		Q_EMIT painter2DChanged();
 	}
 }
