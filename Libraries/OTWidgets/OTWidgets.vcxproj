@@ -101,6 +101,7 @@
     <ClCompile Include="src\PushButton.cpp" />
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
+    <ClCompile Include="src\Splitter.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -150,6 +151,7 @@
     <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.hpp" />
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
+    <QtMoc Include="include\OTWidgets\Splitter.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />

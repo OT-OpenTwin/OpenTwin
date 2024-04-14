@@ -19,13 +19,13 @@
 
 class QLabel;
 class QWidget;
-class QSplitter;
 class QGridLayout;
 class QVBoxLayout;
 class QTreeWidgetItem;
 
 namespace ot {
 
+	class Splitter;
 	class GraphicsItemCfg;
 	class TreeWidgetFilter;
 	class GraphicsItemPreview;
@@ -73,7 +73,7 @@ namespace ot {
 		bool                  m_repaintPreviewRequired;
 
 		QSize                 m_previewSize;
-		QSplitter* m_splitter;
+		Splitter* m_splitter;
 		TreeWidgetFilter* m_navigation;
 
 		std::list<PreviewBox> m_previews;

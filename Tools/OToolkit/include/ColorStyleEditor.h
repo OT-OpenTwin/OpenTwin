@@ -19,7 +19,6 @@
 
 class QLabel;
 class QWidget;
-class QSplitter;
 class QHBoxLayout;
 class QVBoxLayout;
 
@@ -60,8 +59,6 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private Q_SLOTS:
-	void slotImportConfig(void);
-	void slotExportConfig(void);
 	void slotBright(void);
 	void slotDark(void);
 	void slotBlue(void);
@@ -84,12 +81,16 @@ private:
 
 	ot::PropertyString* m_nameProp;
 	ot::PropertyGroup* m_styleFilesGroup;
+	ot::PropertyGroup* m_styleIntGroup;
+	ot::PropertyGroup* m_styleDoubleGroup;
 	ot::PropertyGroup* m_styleValuesGroup;
 	ot::PropertyGroup* m_intGroup;
 	ot::PropertyGroup* m_doubleGroup;
 	ot::PropertyGroup* m_colorsGroup;
 	ot::PropertyGroup* m_fileGroup;
 	std::map<std::string, ot::PropertyString*> m_styleFiles;
+	std::map<std::string, ot::PropertyInt*> m_styleInts;
+	std::map<std::string, ot::PropertyDouble*> m_styleDoubles;
 	std::map<std::string, ot::PropertyPainter2D*> m_styleValues;
 	std::map<std::string, ot::PropertyPainter2D*> m_colors;
 	std::map<std::string, ot::PropertyString*> m_files;

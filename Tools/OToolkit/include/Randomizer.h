@@ -21,7 +21,6 @@
 class QLabel;
 class QWidget;
 class QSpinBox;
-class QSplitter;
 class QGroupBox;
 class QCheckBox;
 class QLineEdit;

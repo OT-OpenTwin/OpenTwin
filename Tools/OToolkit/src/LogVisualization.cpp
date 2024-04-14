@@ -10,6 +10,7 @@
 // OT header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTWidgets/Splitter.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
@@ -17,7 +18,6 @@
 #include <QtCore/qjsondocument.h>
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
-#include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/qtablewidget.h>
@@ -113,7 +113,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	QSplitter* splitter = new QSplitter;
+	ot::Splitter* splitter = new ot::Splitter;
 	splitter->setOrientation(Qt::Orientation::Vertical);
 
 	QLabel* messageFilterL = new QLabel("Message contains:");

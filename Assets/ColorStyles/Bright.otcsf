@@ -1,5 +1,7 @@
 name:Bright
 files:[{"Name":"Property Group Collapsed","Path":"/properties/ArrowBlueRight.png"},{"Name":"Property Group Expanded","Path":"/properties/ArrowGreenDown.png"},{"Name":"Property Item Delete","Path":"/properties/Delete.png"}]
+integers:[{"Name":"Splitter Handle Width","Value":2}]
+doubles:[]
 values:[{"Name":"Controls Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Border Color","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.6600000262260437,"g":0.6600000262260437,"b":0.6600000262260437,"a":1.0}}},{"Name":"Controls Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Hover Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Selected Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":1.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Title Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.8299999833106995,"g":0.8299999833106995,"b":0.8299999833106995,"a":1.0}}},{"Name":"Title Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Window Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.8299999833106995,"g":0.8299999833106995,"b":0.8299999833106995,"a":1.0}}},{"Name":"Window Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}}]
 sheet:
 /* This file used the "QDarkStyleSheet/qdarkstyle/qss/_style.scss" as a template. */
@@ -62,30 +64,27 @@ QMainWindow {
 }
 
 QMainWindow::separator {
-    background-color: rgba(255,255,255,255);
-    border: 0px solid transparent;
+    background-color: rgba(168,168,168,255);
     spacing: 0px;
     padding: 2px;
 }
 
-QMainWindow::separator:hover {
+QMainWindow::separator:hover:!pressed {
     background-color: rgba(0,0,255,255);
-    color: rgba(255,255,255,255);
 }
 
 QMainWindow::separator:pressed {
     background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
 }
 
 QMainWindow::separator:horizontal {
-    width: 5px;
+    width: 2;
     margin-top: 2px;
     margin-bottom: 2px;
 }
 
 QMainWindow::separator:vertical {
-    height: 5px;
+    height: 2;
     margin-left: 2px;
     margin-right: 2px;
 }
@@ -1967,25 +1966,23 @@ QSplitter {
 
 QSplitter::handle {
     background-color: rgba(168,168,168,255);
-    border: 1px solid transparent;
-    border-radius: 6;
-    spacing: 0px;
+    border: 1px solid rgba(0,0,0,255);
+    border-radius: 2;
+    border: none;
+    spacing: 1px;
     padding: 1px;
-    margin: 0px;
 }
 
-QSplitter::handle:hover {
+QSplitter::handle:hover:!pressed {
     background-color: rgba(0,0,255,255);
+    border: 1px solid rgba(0,0,0,255);
+    border-radius: 2;
 }
 
-QSplitter::handle:horizontal {
-    width: 5px;
-    /*image: url('%root%/icons/line_vertical.png');*/
-}
-
-QSplitter::handle:vertical {
-    height: 5px;
-    /*image: url('%root%/icons/line_horizontal.png');*/
+QSplitter::handle:pressed {
+    background-color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,255,0,255);
+    border-radius: 2;
 }
 
 /* ##################################################################################### */
@@ -2151,6 +2148,20 @@ QAbstractView:selected {
 
 #OT_TTB {
     border: 1px solid transparent;
+}
+
+#OT_TTB QTabBar::tab::first,
+#OT_TTB QTabBar::tab::only-one {
+    background-color: rgba(170,210,255,255);
+    color: rgba(0,0,0,255);
+    border-bottom: 1px solid rgba(0,0,0,255);
+    border-top-left-radius: 10;
+    border-top-right-radius: 10;
+}
+
+#OT_TTB QTabBar::tab::first:selected,
+#OT_TTB QTabBar::tab::only-one:selected {
+    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 rgba(170,210,255,255), stop: 0.5 rgba(170,210,255,255), stop: 1 rgba(255,255,255,255));
 }
 
 #OT_TTBGroup {

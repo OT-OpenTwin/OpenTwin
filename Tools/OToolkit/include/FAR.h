@@ -18,7 +18,6 @@
 
 class QLabel;
 class QWidget;
-class QSplitter;
 class QGroupBox;
 class QCheckBox;
 class QLineEdit;
@@ -28,6 +27,8 @@ class QHBoxLayout;
 class QGridLayout;
 class QPlainTextEdit;
 class QPushButton;
+
+namespace ot { class Splitter; }
 
 class FARMatch {
 public:
@@ -249,7 +250,7 @@ private:
 
 	void saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);
 
-	QSplitter* m_centralSplitter;
+	ot::Splitter* m_centralSplitter;
 
 	QWidget* m_leftGridW;
 	QGridLayout* m_leftGrid;

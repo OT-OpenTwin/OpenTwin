@@ -64,6 +64,18 @@ namespace ot {
 		void setFiles(const std::map<std::string, QString>& _files) { m_files = _files; };
 		const std::map<std::string, QString>& getFiles(void) const { return m_files; };
 
+		void addInteger(const std::string& _name, int _value, bool _replace = false);
+		bool hasInteger(const std::string& _name) const;
+		int getInteger(const std::string& _name) const;
+		void setIntegers(const std::map<std::string, int>& _integers) { m_int = _integers; };
+		const std::map<std::string, int>& getIntegers(void) const { return m_int; };
+
+		void addDouble(const std::string& _name, double _value, bool _replace = false);
+		bool hasDouble(const std::string& _name) const;
+		double getDouble(const std::string& _name) const;
+		void setDoubles(const std::map<std::string, double>& _doubles) { m_double = _doubles; };
+		const std::map<std::string, double>& getDoubles(void) const { return m_double; };
+
 		bool setupFromFile(QByteArray _data);
 
 	private:
@@ -71,6 +83,8 @@ namespace ot {
 		QString m_styleSheet;
 		std::map<std::string, ColorStyleValue> m_values;
 		std::map<std::string, QString> m_files;
+		std::map<std::string, int> m_int;
+		std::map<std::string, double> m_double;
 	};
 
 }

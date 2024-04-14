@@ -11,6 +11,7 @@
 // OT header
 #include "OTCommunication/Msg.h"
 #include "OTCore/OTAssert.h"
+#include "OTWidgets/Splitter.h"
 
 // Qt header
 #include <QtCore/qjsondocument.h>
@@ -18,7 +19,6 @@
 #include <QtCore/qjsonarray.h>
 #include <QtCore/qjsondocument.h>
 #include <QtWidgets/qlayout.h>
-#include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qgroupbox.h>
@@ -391,7 +391,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
-	m_splitter = new QSplitter;
+	m_splitter = new ot::Splitter;
 	m_splitter->setObjectName("OToolkit_Terminal_MainSplitter");
 
 	m_leftLayoutW = new QWidget;
@@ -403,7 +403,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	m_rightLayoutW = new QWidget;
 	m_rightLayout = new QVBoxLayout(m_rightLayoutW);
 
-	m_rightSplitter = new QSplitter;
+	m_rightSplitter = new ot::Splitter;
 
 	m_receiverBox = new QGroupBox("Configuration");
 	m_receiverLayout = new QGridLayout;

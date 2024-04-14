@@ -24,6 +24,7 @@
 #include "OTGui/PropertyPainter2D.h"
 #include "OTCore/PropertyStringList.h"
 #include "OTWidgets/SpinBox.h"
+#include "OTWidgets/Splitter.h"
 #include "OTWidgets/TabWidget.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
@@ -46,12 +47,13 @@
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qaction.h>
-#include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qfiledialog.h>
 
 #define CSE_GROUP_General "General"
 #define CSE_GROUP_StyleFiles "Style Files"
+#define CSE_GROUP_StyleInt "Style Integer Numbers"
+#define CSE_GROUP_StyleDouble "Style Decimal Numbers"
 #define CSE_GROUP_StyleValues "Style Values"
 #define CSE_GROUP_Int "Integer Numbers"
 #define CSE_GROUP_Double "Decimal Numbers"
@@ -84,11 +86,16 @@
 #define CSE_COLOR_WindowBackground "Window Background"
 #define CSE_COLOR_TitleBackground "Title Background"
 #define CSE_COLOR_TitleForeground "Title Foreground"
+#define CSE_COLOR_TTBFirstTabBackground "TabToolBar First Tab Background"
+#define CSE_COLOR_TTBFirstTabForeground "TabToolBar First Tab Foreground"
 
 #define CSE_FILE_LogInBackgroundImage "Log In Background Image"
 
-#define CSE_NUMBER_BorderRadius_1 "Border Radius 1"
-#define CSE_NUMBER_BorderRadius_2 "Border Radius 2"
+#define CSE_INT_SplitterHandleWidth "Splitter Handle Width"
+#define CSE_INT_SplitterBorderRadius "Splitter Border Radius"
+
+#define CSE_NUMBER_BorderRadius_Big "Border Radius Big"
+#define CSE_NUMBER_BorderRadius_Small "Border Radius Small"
 #define CSE_NUMBER_OpacityTooltip "Opacity ToolTip"
 
 ColorStyleEditor::ColorStyleEditor() {
@@ -110,7 +117,7 @@ ColorStyleEditor::~ColorStyleEditor() {
 
 QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	// Create layouts
-	QSplitter* rootSplitter = new QSplitter;
+	ot::Splitter* rootSplitter = new ot::Splitter;
 	m_root = rootSplitter;
 	QWidget* rLayW = new QWidget;
 	QVBoxLayout* rLay = new QVBoxLayout(rLayW);
@@ -124,15 +131,16 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	PropertyGroup* generalGroup = new PropertyGroup(CSE_GROUP_General);
 	m_nameProp = new PropertyString(CSE_Name, std::string());
 	generalGroup->addProperty(m_nameProp);
-
 	m_styleFilesGroup = new PropertyGroup(CSE_GROUP_StyleFiles);
+	m_styleIntGroup = new PropertyGroup(CSE_GROUP_StyleInt);
+	m_styleDoubleGroup = new PropertyGroup(CSE_GROUP_StyleDouble);
 	m_styleValuesGroup = new PropertyGroup(CSE_GROUP_StyleValues);
 	m_intGroup = new PropertyGroup(CSE_GROUP_Int);
 	m_doubleGroup = new PropertyGroup(CSE_GROUP_Double);
 	m_colorsGroup = new PropertyGroup(CSE_GROUP_StyleSheetColors);
 	m_fileGroup = new PropertyGroup(CSE_GROUP_StyleSheetFiles);
 
-	m_propertyGridConfig.setRootGroups({ generalGroup, m_styleFilesGroup, m_styleValuesGroup, m_intGroup, m_doubleGroup, m_colorsGroup, m_fileGroup });
+	m_propertyGridConfig.setRootGroups({ generalGroup, m_styleFilesGroup, m_styleIntGroup, m_styleDoubleGroup, m_styleValuesGroup, m_intGroup, m_doubleGroup, m_colorsGroup, m_fileGroup });
 
 	m_editor = new ot::TextEditor;
 	m_editor->setReadOnly(true);
@@ -158,15 +166,12 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	rootSplitter->addWidget(rLayW);
 
 	// Create menu
-	QAction* actionImportConfig = _rootMenu->addAction("Save Configuration");
-	QAction* actionExportConfig = _rootMenu->addAction("Load Configuration");
-	_rootMenu->addSeparator();
 	QAction* actionBright = _rootMenu->addAction("Set Bright");
 	QAction* actionDark = _rootMenu->addAction("Set Dark");
 	QAction* actionBlue = _rootMenu->addAction("Set Blue");
 	_rootMenu->addSeparator();
 	QAction* actionApplyAsCurrent = _rootMenu->addAction("Apply As current");
-	QAction* actionExport = _rootMenu->addAction("Export");
+	QAction* actionExport = _rootMenu->addAction("Export Color Style");
 	_rootMenu->addSeparator();
 	QAction* actionImportBase = _rootMenu->addAction("Import Style Sheet Base");
 	QAction* actionExportBase = _rootMenu->addAction("Export Style Sheet Base");
@@ -206,8 +211,6 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	generateAndApplyEdit->setContext(Qt::WidgetWithChildrenShortcut);
 
 	// Connect signals
-	this->connect(actionImportConfig, &QAction::triggered, this, &ColorStyleEditor::slotImportConfig);
-	this->connect(actionExportConfig, &QAction::triggered, this, &ColorStyleEditor::slotExportConfig);
 	this->connect(actionBright, &QAction::triggered, this, &ColorStyleEditor::slotBright);
 	this->connect(actionDark, &QAction::triggered, this, &ColorStyleEditor::slotDark);
 	this->connect(actionBlue, &QAction::triggered, this, &ColorStyleEditor::slotBlue);
@@ -232,124 +235,6 @@ bool ColorStyleEditor::prepareToolShutdown(QSettings& _settings) {
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
-
-void ColorStyleEditor::slotImportConfig(void) {
-	// Select file
-	QString fileName = QFileDialog::getOpenFileName(
-		m_root,
-		"Load Configuration", 
-		otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->value("ColorStlyeEditor.LastConfig").toString(),
-		"Color Style Editor Configuration File (*.otcsc)"
-	);
-
-	if (fileName.isEmpty()) return;
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly)) {
-		OT_LOG_E("Failed to open file for reading");
-		return;
-	}
-
-	// Read file
-	QByteArray data(file.readAll());
-	file.close();
-
-
-	// Parse data
-	using namespace ot;
-	JsonDocument doc;
-	std::string dataC = data.toStdString();
-
-	if (!doc.fromJson(dataC)) {
-		OT_LOG_E("Failed to parse configuration");
-		return;
-	}
-
-	// Clean old data
-	this->cleanUpData();
-
-	// Import data
-	try {
-		ConstJsonArray stylesArr = json::getArray(doc, "Styles");
-		for (JsonSizeType i = 0; i < stylesArr.Size(); i++) {
-			ConstJsonObject stylesObj = json::getObject(stylesArr, i);
-
-		}
-
-		ConstJsonArray colorArr = json::getArray(doc, "Colors");
-
-		ConstJsonArray fileArr = json::getArray(doc, "Files");
-
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
-	}
-	catch (...) {
-		OT_LOG_E("Unknown error");
-	}
-	
-}
-
-void ColorStyleEditor::slotExportConfig(void) {
-	QString fileName = QFileDialog::getSaveFileName(
-		m_root,
-		"Save Configuration",
-		otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->value("ColorStlyeEditor.LastConfig").toString(),
-		"Color Style Editor Configuration File (*.otcsc)"
-	);
-
-	if (fileName.isEmpty()) return;
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly)) {
-		OT_LOG_E("Failed to open file for writing");
-		return;
-	}
-
-	using namespace ot;
-	JsonDocument doc;
-	JsonArray stylesArr;
-	JsonArray colorsArr;
-	JsonArray filesArr;
-
-	doc.AddMember("Name", JsonString(m_nameProp->value(), doc.GetAllocator()), doc.GetAllocator());
-
-	JsonArray styleFileArr;
-	for (const auto& it : m_styleFiles) {
-		JsonObject styleFileObj;
-		styleFileObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(it.first, doc.GetAllocator()), doc.GetAllocator());
-		styleFileObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Path, JsonString(it.second->value(), doc.GetAllocator()), doc.GetAllocator());
-		styleFileArr.PushBack(styleFileObj, doc.GetAllocator());
-	}
-	doc.AddMember("StyleFiles", styleFileArr, doc.GetAllocator());
-
-	JsonArray styleArr;
-	for (const auto& it : m_styleValues) {
-		JsonObject styleObj;
-		it.second->addToJsonObject(styleObj, doc.GetAllocator());
-		styleArr.PushBack(styleObj, doc.GetAllocator());
-	}
-	doc.AddMember("Styles", styleArr, doc.GetAllocator());
-
-	JsonArray colorArr;
-	for (const auto& it : m_colors) {
-		JsonObject colorObj;
-		it.second->addToJsonObject(colorObj, doc.GetAllocator());
-		styleArr.PushBack(colorObj, doc.GetAllocator());
-	}
-	doc.AddMember("Colors", colorArr, doc.GetAllocator());
-
-	JsonArray fileArr;
-	for (const auto& it : m_styleValues) {
-		JsonObject fileObj;
-		it.second->addToJsonObject(fileObj, doc.GetAllocator());
-		fileArr.PushBack(fileObj, doc.GetAllocator());
-	}
-	doc.AddMember("Files", fileArr, doc.GetAllocator());
-
-	file.write(QByteArray::fromStdString(doc.toJson()));
-	file.close();
-
-	otoolkit::api::getGlobalInterface()->createSettingsInstance().get()->setValue("ColorStlyeEditor.LastConfig", fileName);
-}
 
 void ColorStyleEditor::slotBright(void) {
 	this->initializeBrightStyleValues();
@@ -497,6 +382,8 @@ void ColorStyleEditor::initializeStyleSheetBase(void) {
 
 void ColorStyleEditor::cleanUpData(void) {
 	m_styleFiles.clear();
+	m_styleInts.clear();
+	m_styleDoubles.clear();
 	m_styleValues.clear();
 	m_colors.clear();
 	m_files.clear();
@@ -516,6 +403,9 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
 	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
 
+	// Initialize default style integers
+	m_styleInts.insert_or_assign(OT_COLORSTYLE_INT_SplitterHandleWidth, new PropertyInt(2));
+
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
@@ -551,125 +441,26 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
+	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(170, 210, 255))));
+	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
 
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
+	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(10.));
+	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Small, new PropertyDouble(6.));
 	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+
+	m_integer.insert_or_assign(CSE_INT_SplitterHandleWidth, new PropertyInt(2));
+	m_integer.insert_or_assign(CSE_INT_SplitterBorderRadius, new PropertyInt(2));
 
 	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
 }
 
 void ColorStyleEditor::initializeDarkStyleValues(void) {
-	using namespace ot;
-	// Clean up data
-	this->cleanUpData();
-
-	m_nameProp->setValue(OT_COLORSTYLE_NAME_Dark);
-
-	// Initialize default style files
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
-
-	// Initialize default style values
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color::Silver)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-
-	// Initialize default colors
-	m_colors.insert_or_assign(CSE_COLOR_BorderColor, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(Color::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
-
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
-	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
-
-	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
+	OT_LOG_E("Not implemented yet");
 }
 
 void ColorStyleEditor::initializeBlueStyleValues(void) {
-	using namespace ot;
-	// Clean up data
-	this->cleanUpData();
-
-	m_nameProp->setValue(OT_COLORSTYLE_NAME_Blue);
-
-	// Initialize default style files
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
-
-	// Initialize default style values
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-
-	// Initialize default colors
-	m_colors.insert_or_assign(CSE_COLOR_BorderColor, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(Color::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
-
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_1, new PropertyDouble(10.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_2, new PropertyDouble(6.));
-	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
-
-	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
+	OT_LOG_E("Not implemented yet");
 }
 
 void ColorStyleEditor::parseStyleSheetBaseFile(void) {
@@ -773,6 +564,22 @@ void ColorStyleEditor::initializePropertyGrid(void) {
 		m_styleFilesGroup->addProperty(it.second);
 	}
 
+	// Style integers
+	m_styleIntGroup->clear();
+	for (const auto& it : m_styleInts) {
+		it.second->setPropertyName(it.first);
+		it.second->setPropertyTitle(it.first);
+		m_styleIntGroup->addProperty(it.second);
+	}
+
+	// Style doubles
+	m_styleDoubleGroup->clear();
+	for (const auto& it : m_styleDoubles) {
+		it.second->setPropertyName(it.first);
+		it.second->setPropertyTitle(it.first);
+		m_styleDoubleGroup->addProperty(it.second);
+	}
+
 	// Style values
 	m_styleValuesGroup->clear();
 	for (const auto& it : m_styleValues) {
@@ -858,6 +665,60 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		while (ix != std::string::npos) {
 			cStyleFiles.erase(ix);
 			ix = cStyleFiles.find('\n');
+		}
+	}
+
+	// Get style integers
+	JsonDocument styleIntDoc(rapidjson::kArrayType);
+	const PropertyGridGroup* gStyleInts = m_propertyGrid->findGroup(CSE_GROUP_StyleInt);
+	OTAssertNullptr(gStyleInts);
+	for (const PropertyGridItem* itm : gStyleInts->childProperties()) {
+		const PropertyInputInt* inp = dynamic_cast<const PropertyInputInt*>(itm->getInput());
+		if (!inp) {
+			OT_LOG_E("Input cast failed");
+			return false;
+		}
+
+		JsonObject fObj;
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getPropertyData().propertyName(), styleIntDoc.GetAllocator()), styleIntDoc.GetAllocator());
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Value, inp->getValue(), styleIntDoc.GetAllocator());
+		styleIntDoc.PushBack(fObj, styleIntDoc.GetAllocator());
+	}
+	std::string cStyleInts = styleIntDoc.toJson();
+
+	// Clean up new line if exists
+	{
+		size_t ix = cStyleInts.find('\n');
+		while (ix != std::string::npos) {
+			cStyleInts.erase(ix);
+			ix = cStyleInts.find('\n');
+		}
+	}
+
+	// Get style doubles
+	JsonDocument styleDoubleDoc(rapidjson::kArrayType);
+	const PropertyGridGroup* gStyleDoubles = m_propertyGrid->findGroup(CSE_GROUP_StyleDouble);
+	OTAssertNullptr(gStyleDoubles);
+	for (const PropertyGridItem* itm : gStyleDoubles->childProperties()) {
+		const PropertyInputDouble* inp = dynamic_cast<const PropertyInputDouble*>(itm->getInput());
+		if (!inp) {
+			OT_LOG_E("Input cast failed");
+			return false;
+		}
+
+		JsonObject fObj;
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getPropertyData().propertyName(), styleDoubleDoc.GetAllocator()), styleDoubleDoc.GetAllocator());
+		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Value, inp->getValue(), styleDoubleDoc.GetAllocator());
+		styleDoubleDoc.PushBack(fObj, styleDoubleDoc.GetAllocator());
+	}
+	std::string cStyleDoubles = styleDoubleDoc.toJson();
+
+	// Clean up new line if exists
+	{
+		size_t ix = cStyleDoubles.find('\n');
+		while (ix != std::string::npos) {
+			cStyleDoubles.erase(ix);
+			ix = cStyleDoubles.find('\n');
 		}
 	}
 
@@ -973,6 +834,8 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 
 	_result = OT_COLORSTYLE_FILE_KEY_Name + cName + "\n" +
 		OT_COLORSTYLE_FILE_KEY_Files + cStyleFiles + "\n" +
+		OT_COLORSTYLE_FILE_KEY_Integers + cStyleInts + "\n" +
+		OT_COLORSTYLE_FILE_KEY_Doubles + cStyleDoubles + "\n" +
 		OT_COLORSTYLE_FILE_KEY_Values + cStyleValue + "\n" +
 		OT_COLORSTYLE_FILE_KEY_StyleSheet "\n";
 	_result.append(base.toStdString());

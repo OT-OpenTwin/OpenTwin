@@ -22,7 +22,6 @@
 class Terminal;
 class JSONEditor;
 
-class QSplitter;
 class QWidget;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -34,6 +33,8 @@ class QLabel;
 class QPushButton;
 class QProgressBar;
 class QShortcut;
+
+namespace ot { class Splitter; }
 
 class TerminalCollectionItem : public QTreeWidgetItem {
 public:
@@ -223,7 +224,7 @@ private:
 
 	// Layouts
 
-	QSplitter *			m_splitter;
+	ot::Splitter*		m_splitter;
 
 	QWidget *			m_leftLayoutW;
 	QVBoxLayout *		m_leftLayout;
@@ -235,7 +236,7 @@ private:
 
 	QWidget *			m_rightLayoutW;
 	QVBoxLayout *		m_rightLayout;
-	QSplitter *			m_rightSplitter;
+	ot::Splitter*		m_rightSplitter;
 	
 	QGroupBox *			m_receiverBox;
 	QGridLayout *		m_receiverLayout;

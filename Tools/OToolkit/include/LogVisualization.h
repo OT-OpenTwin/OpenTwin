@@ -16,7 +16,6 @@
 #include <QtCore/qlist.h>
 #include <QtWidgets/qdialog.h>
 
-class QSplitter;
 class QWidget;
 class QVBoxLayout;
 class QHBoxLayout;

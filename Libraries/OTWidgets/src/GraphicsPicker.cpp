@@ -8,6 +8,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
+#include "OTWidgets/Splitter.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -37,7 +38,7 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation)
 	: m_navigation(nullptr), m_splitter(nullptr), m_repaintPreviewRequired(false), m_previewSize(48, 48)
 {
 	// Create controls
-	m_splitter = new QSplitter(_orientation);
+	m_splitter = new Splitter(_orientation);
 
 	m_navigation = new ot::TreeWidgetFilter;
 	m_navigation->treeWidget()->setHeaderHidden(true);

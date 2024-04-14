@@ -15,7 +15,6 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qspinbox.h>
 #include <QtWidgets/qtooltip.h>
-#include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qcheckbox.h>
 #include <QtWidgets/qlineedit.h>
@@ -29,7 +28,6 @@
 
 class QLabel;
 class QWidget;
-class QSplitter;
 class QGroupBox;
 class QCheckBox;
 class QLineEdit;

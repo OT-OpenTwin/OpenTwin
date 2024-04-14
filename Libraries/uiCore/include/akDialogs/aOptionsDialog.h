@@ -29,9 +29,10 @@ class QWidget;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
-class QSplitter;
 class QScrollArea;
 class QListWidgetItem;
+
+namespace ot { class Splitter; }
 
 namespace ak {
 
@@ -144,7 +145,7 @@ namespace ak {
 
 		QWidget *						m_dummy;
 
-		QSplitter *						m_splitter;
+		ot::Splitter*					m_splitter;
 
 		aTreeWidget *					m_navigation;
 		QScrollArea *					m_settingsArea;

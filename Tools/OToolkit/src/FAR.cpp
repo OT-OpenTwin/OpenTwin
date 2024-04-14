@@ -7,6 +7,9 @@
 #include "FAR.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 
+// OpenTwin header
+#include "OTWidgets/Splitter.h"
+
 // Qt header
 #include <QtCore/qdir.h>
 #include <QtCore/qfile.h>
@@ -17,7 +20,6 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qcheckbox.h>
-#include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qtabwidget.h>
 #include <QtWidgets/qpushbutton.h>
@@ -469,7 +471,7 @@ QString FAR::toolName(void) const {
 }
 
 QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
-	m_centralSplitter = new QSplitter;
+	m_centralSplitter = new ot::Splitter;
 	// Filter
 
 	m_leftGridW = new QWidget;

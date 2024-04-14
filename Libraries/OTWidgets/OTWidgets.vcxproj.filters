@@ -250,6 +250,9 @@
     <ClCompile Include="src\TextEditorSearchPopup.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\Splitter.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -563,6 +566,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Splitter.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

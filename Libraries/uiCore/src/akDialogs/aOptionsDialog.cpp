@@ -27,9 +27,11 @@
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aColorEditButtonWidget.h>
 
+// OpenTwin header
+#include "OTWidgets/Splitter.h"
+
 // Qt header
 #include <qlayout.h>
-#include <qsplitter.h>
 #include <qscrollarea.h>
 #include <qfiledialog.h>
 
@@ -54,7 +56,7 @@ ak::aOptionsDialog::aOptionsDialog(optionsDialogStyle _style, QWidget * _parentW
 	m_settingsAreaLayout = new QVBoxLayout(m_settingsAreaLayoutW);
 
 	// Create controls
-	m_splitter = new QSplitter(Qt::Orientation::Horizontal);
+	m_splitter = new ot::Splitter(Qt::Orientation::Horizontal);
 
 	m_navigation = new aTreeWidget;
 	m_navigation->setFilterVisible(true);
