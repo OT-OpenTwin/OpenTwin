@@ -28,6 +28,16 @@ protected:
 			
 	}
 
+	virtual void showEvent(QShowEvent* _event) {
+		this->setColumnWidth(0, this->width() / 2);
+		TreeWidget::showEvent(_event);
+	}
+
+	virtual void resizeEvent(QResizeEvent* _event) {
+		this->setColumnWidth(0, this->width() / 2);
+		TreeWidget::resizeEvent(_event);
+	}
+
 	virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override {
 		TreeWidget::drawRow(_painter, _options, _index);
 	}

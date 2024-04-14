@@ -24,7 +24,7 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	this->setObjectName("OT_TextEditSearchPopup");
 	this->setWindowFlag(Qt::FramelessWindowHint);
 	this->setWindowFlag(Qt::WindowStaysOnTopHint);
-	this->setFrameShape(QFrame::Panel);
+	this->setFrameShape(QFrame::StyledPanel);
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
 	// Create layouts and controls
@@ -32,8 +32,11 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	centralLayout->setContentsMargins(1, 1, 1, 1);
 
 	m_search = new ot::LineEdit(this);
+	m_search->setObjectName("OT_TextEditSearchPopupSearchInput");
 	PushButton* btnFind = new PushButton("Find", this);
+	btnFind->setObjectName("OT_TextEditSearchPopupFindButton");
 	PushButton* btnClose = new PushButton("Close", this);
+	btnClose->setObjectName("OT_TextEditSearchPopupCloseButton");
 
 	centralLayout->addWidget(m_search, 1);
 	centralLayout->addWidget(btnFind);

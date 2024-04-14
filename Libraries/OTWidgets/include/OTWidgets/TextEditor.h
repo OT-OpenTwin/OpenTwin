@@ -68,10 +68,16 @@ namespace ot {
 		QSyntaxHighlighter * syntaxHighlighter(void) { return m_syntaxHighlighter; }
 
 		bool requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion);
+
+		void setTabSpaces(int _spaces) { m_tabSpaces = _spaces; };
+		int tabSpaces(void) const { return m_tabSpaces; };
+
 	Q_SIGNALS:							
 		void saveRequested(void);
 
 	protected:
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+
 		virtual void resizeEvent(QResizeEvent * _event) override;
 
 	private Q_SLOTS:
@@ -88,6 +94,8 @@ namespace ot {
 
 		bool m_contentChanged;
 		std::string m_textEditorName;
+		int m_tabSpaces;
+
 		ot::UID								m_displayedTextEntityID = 0;
 		ot::UID								m_displayedTextEntityVersion = 0;
 

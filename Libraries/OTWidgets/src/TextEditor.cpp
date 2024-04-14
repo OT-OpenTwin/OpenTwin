@@ -96,7 +96,7 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 // ###################################################################################################################################
 
 ot::TextEditor::TextEditor(QWidget* _parent)
-	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr)
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), m_tabSpaces(4)
 {
 
 	m_lineNumberArea = new TextEditorLineNumberArea(this);
@@ -201,6 +201,18 @@ bool ot::TextEditor::requiresRefreshing(ot::UID displayedTextEntityID, ot::UID d
 	m_displayedTextEntityID = displayedTextEntityID;
 	m_displayedTextEntityVersion = displayedTextEntityVersion;
 	return refreshingNeeded;
+}
+
+void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
+	if (_event->key() == Qt::Key_Tab && m_tabSpaces > 0) {
+		QTextCursor cursor = this->textCursor();
+		int l = m_tabSpaces - (cursor.columnNumber() % m_tabSpaces);
+		if (l == 0) l = m_tabSpaces;
+		this->insertPlainText(QString(l, ' '));
+	}
+	else {
+		QPlainTextEdit::keyPressEvent(_event);
+	}
 }
 
 void ot::TextEditor::resizeEvent(QResizeEvent * _event) {
