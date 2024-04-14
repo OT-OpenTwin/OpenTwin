@@ -96,8 +96,9 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 // ###################################################################################################################################
 
 ot::TextEditor::TextEditor(QWidget* _parent)
-	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), m_tabSpaces(4)
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), m_tabSpaces(4), m_newLineSamePrefix(false)
 {
+	this->setObjectName("OT_TextEditor");
 
 	m_lineNumberArea = new TextEditorLineNumberArea(this);
 
@@ -209,6 +210,17 @@ void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
 		int l = m_tabSpaces - (cursor.columnNumber() % m_tabSpaces);
 		if (l == 0) l = m_tabSpaces;
 		this->insertPlainText(QString(l, ' '));
+	}
+	else if ((_event->key() == Qt::Key_Return) && m_newLineSamePrefix) {
+		QTextCursor cursor = this->textCursor();
+		QString prefix;
+		cursor.movePosition(QTextCursor::StartOfLine);
+		while (this->document()->characterAt(cursor.position()) == QChar(' ') || this->document()->characterAt(cursor.position()) == QChar('\t')) {
+			prefix.append(this->document()->characterAt(cursor.position()));
+			cursor.setPosition(cursor.position() + 1);
+		}
+
+		this->insertPlainText("\n" + prefix);
 	}
 	else {
 		QPlainTextEdit::keyPressEvent(_event);

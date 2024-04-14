@@ -72,6 +72,9 @@ namespace ot {
 		void setTabSpaces(int _spaces) { m_tabSpaces = _spaces; };
 		int tabSpaces(void) const { return m_tabSpaces; };
 
+		void setNewLineWithSamePrefix(bool _enabled) { m_newLineSamePrefix = _enabled; };
+		bool newLineWithSamePrefix(void) const { return m_newLineSamePrefix; };
+
 	Q_SIGNALS:							
 		void saveRequested(void);
 
@@ -95,6 +98,7 @@ namespace ot {
 		bool m_contentChanged;
 		std::string m_textEditorName;
 		int m_tabSpaces;
+		bool m_newLineSamePrefix;
 
 		ot::UID								m_displayedTextEntityID = 0;
 		ot::UID								m_displayedTextEntityVersion = 0;

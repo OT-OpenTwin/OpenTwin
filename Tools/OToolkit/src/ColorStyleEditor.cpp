@@ -142,6 +142,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	m_editor->setReadOnly(true);
 	m_baseEditor = new ot::TextEditor;
 	m_baseEditor->setReadOnly(false);
+	m_baseEditor->setNewLineWithSamePrefix(true);
 
 	m_editorTab = new TabWidget;
 	m_editorTab->addTab(m_baseEditor, CSE_TAB_Base);
