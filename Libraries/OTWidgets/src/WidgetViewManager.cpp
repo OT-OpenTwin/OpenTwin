@@ -54,6 +54,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 	if (!m_dockManager) {
 		m_dockManager = new ads::CDockManager;
 		m_dockManager->setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, false);
+		m_dockManager->setConfigFlag(ads::CDockManager::DisableTabTextEliding, true);
 	}
 
 	m_dockToggleRoot = new QAction("Windows");
