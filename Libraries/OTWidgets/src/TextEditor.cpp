@@ -226,7 +226,7 @@ void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
 
 		this->insertPlainText("\n" + prefix);
 	}
-	else if (_event->key() == Qt::Key_Home) {
+	else if (_event->key() == Qt::Key_Home && !(_event->modifiers() & Qt::ControlModifier)) {
 		QTextCursor cursor = this->textCursor();
 		int col = cursor.columnNumber();
 		int p = cursor.position();
