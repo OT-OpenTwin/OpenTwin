@@ -2168,3 +2168,8 @@ QAbstractView:selected {
     border-right: 1px solid rgba(0,0,0,255);
     margin-bottom: 5px;
 }
+
+/* ##################################################################################### */
+
+/* Qt Advanced Docking System */
+

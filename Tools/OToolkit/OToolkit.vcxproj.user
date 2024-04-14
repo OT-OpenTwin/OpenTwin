@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLD);$(OT_GUI_ROOT)\$(OT_DLLD);$(OT_WIDGETS_ROOT)\$(OT_DLLD);$(OT_OTOOLKITAPI_ROOT)\$(OT_DLLD);$(QT_ADS_ROOT)\x64\bin\$(Configuration);$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLD);$(OT_GUI_ROOT)\$(OT_DLLD);$(OT_WIDGETS_ROOT)\$(OT_DLLD);$(OT_OTOOLKITAPI_ROOT)\$(OT_DLLD);$(QT_ADS_ROOT)\lib;$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8080" "unused" "unused"</LocalDebuggerCommandArguments>
@@ -25,15 +25,15 @@
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8094" "127.0.0.1:8095" "unused"</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-03-21T15:34:27.1737031Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T23:15:56.2856761Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-03-21T15:34:26.9591557Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T23:15:56.1584031Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2024-03-21T15:34:26.8345175Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T23:15:56.0161066Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-03-21T15:34:27.2840096Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T23:15:56.3953073Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

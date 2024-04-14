@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);$(QT_ADS_ROOT)\x64\bin\$(Configuration);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);$(QT_ADS_ROOT)\lib;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>
@@ -27,15 +27,15 @@
     <LocalDebuggerCommandArguments />
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-03-21T15:28:44.6365089Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T21:40:32.7271563Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-03-21T15:28:44.5313254Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T21:40:32.5229726Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-03-21T15:28:44.8222027Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T21:40:33.0019769Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-03-21T15:28:44.3750488Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-04-14T21:40:32.1759219Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>
