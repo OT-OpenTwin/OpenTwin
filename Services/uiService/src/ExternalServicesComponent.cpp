@@ -574,7 +574,7 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 			ot::JsonDocument newDataDoc;
 			dataDoc.fromJson(prop->additionalPropertyData());
 			newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
-			newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
+			newDataDoc.AddMember("ContainerID", 0, newDataDoc.GetAllocator());
 			newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
 			prop->setAdditionalPropertyData(newDataDoc.toJson());
 		}

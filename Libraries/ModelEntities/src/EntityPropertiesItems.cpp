@@ -726,7 +726,7 @@ void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _config
 	if (root != nullptr)
 	{
 		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
-		if (container != nullptr)
+		if (container == nullptr)
 		{
 			container = findContainerFromName(root, getEntityContainerName());
 		}
@@ -811,7 +811,7 @@ void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, En
 	if (root != nullptr)
 	{
 		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
-		if (container != nullptr)
+		if (container == nullptr)
 		{
 			container = findContainerFromName(root, getEntityContainerName());
 		}
