@@ -71,6 +71,7 @@
 #include "tinyexpr.h"
 
 #include "EntityBlock.h"
+#include "OTGui/KeySequence.h"
 #include "OTGui/NavigationTreeItem.h"
 
 extern MicroserviceNotifier *globalNotifier;
@@ -397,7 +398,7 @@ void Model::setupUIControls()
 
 	//addMenuAction("Model", "Database", "Save", "ProjectSave");
 
-	addMenuAction("Model", "Geometry", "Info", "Info", modelRead, "Information", "Default", "Ctrl+I");
+	addMenuAction("Model", "Geometry", "Info", "Info", modelRead, "Information", "Default", ot::KeySequence(ot::Key_Control, ot::Key_I));
 
 	addMenuAction("Model", "Material", "Create Material", "Create Material", modelWrite, "AddMaterial");
 	addMenuAction("Model", "Material", "Show By Material", "Show By Material", modelRead, "ShowByMaterial");
@@ -405,9 +406,9 @@ void Model::setupUIControls()
 	
 	addMenuAction("Model", "Parameters", "Create Parameter", "Create Parameter", modelRead, "CreateParameter");
 
-	addMenuAction("Model", "Edit", "Undo", "Undo", modelWrite, "Undo", "Default", "Ctrl+Z");
-	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", "Ctrl+Y");
-	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", "Del");
+	addMenuAction("Model", "Edit", "Undo", "Undo", modelWrite, "Undo", "Default", ot::KeySequence(ot::Key_Control, ot::Key_Z));
+	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::KeySequence(ot::Key_Control, ot::Key_Y));
+	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::KeySequence(ot::Key_Delete));
 	
 	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Result1DVisible", "Default");
 
