@@ -32,6 +32,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/PropertyStringList.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/SimpleFactory.h"
 #include "OTCore/GenericDataStructMatrix.h"
@@ -565,7 +566,19 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 		
 		ot::PropertyGridCfg cfg;
 		ot::PropertyGroup* cfgGroup = new ot::PropertyGroup(_groupName);
-		cfgGroup->addProperty(itm->createProperty());
+		ot::Property* prop = itm->createProperty();
+
+		// For the EntityList property we remove the value id since we dont know the id of the entity
+		if (prop->getPropertyType() == OT_PROPERTY_TYPE_StringList && prop->specialType() == "EntityList" && !prop->additionalPropertyData().empty()) {
+			ot::JsonDocument dataDoc;
+			ot::JsonDocument newDataDoc;
+			dataDoc.fromJson(prop->additionalPropertyData());
+			newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
+			newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
+			newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
+			prop->setAdditionalPropertyData(newDataDoc.toJson());
+		}
+		cfgGroup->addProperty(prop);
 		cfg.addRootGroup(cfgGroup);
 
 		// Get the currently selected model entities. We first get all visible entities only.
