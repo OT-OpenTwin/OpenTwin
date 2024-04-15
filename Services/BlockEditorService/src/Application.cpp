@@ -274,7 +274,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuPage("Test");
 	_ui->addMenuGroup("Test", "Test");
-	_ui->addMenuButton("Test", "Test", "Test", "Test", ot::ui::lockType::tlModelWrite | ot::ui::tlViewRead | ot::ui::tlViewWrite, "Execute");
+	_ui->addMenuButton("Test", "Test", "Test", "Test", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Execute");
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }

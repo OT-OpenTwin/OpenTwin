@@ -93,11 +93,11 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	application->getEntityCache()->prefetchEntities(brepEntityInfo);
 
 	// We have some valid shapes, start the healing operation
-	ot::Flags<ot::ui::lockType> lockFlags;
-	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlNavigationWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlProperties);
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockNavigationWrite);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockProperties);
 
 	application->uiComponent()->lockUI(lockFlags);
 	application->uiComponent()->setProgressInformation("Heal shapes", false);

@@ -164,8 +164,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	const std::string pageName = "Data Processing";
 	const std::string groupName = "Pipeline Handling";
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);

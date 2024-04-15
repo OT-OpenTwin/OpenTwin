@@ -80,8 +80,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("ElmerFEM", "Solver");
 	_ui->addMenuGroup("ElmerFEM", "Sources");
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	//_ui->addMenuButton("Model", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default");
 	_ui->addMenuButton("ElmerFEM", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");

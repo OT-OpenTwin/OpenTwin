@@ -80,8 +80,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("GetDP", "Solver");
 	_ui->addMenuGroup("GetDP", "Sources");
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	//_ui->addMenuButton("Model", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default");
 	_ui->addMenuButton("GetDP", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");

@@ -112,8 +112,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Mesh", "Tet Mesh");
 	_ui->addMenuGroup("Mesh", "Import / Export");
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_ui->addMenuButton("Mesh", "Tet Mesh", "Create Tet Mesh", "Create Tet Mesh", modelWrite, "AddAllObjects", "Default");
 	_ui->addMenuButton("Mesh", "Tet Mesh", "Update Tet Mesh", "Update Tet Mesh", modelWrite, "UpdateMesh", "Default");

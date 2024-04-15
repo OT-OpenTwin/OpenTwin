@@ -332,7 +332,7 @@ void Model::addMenuSubgroup(const std::string &menu, const std::string &group, c
 	}
 }
 
-void Model::addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
+void Model::addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, buttonName))
 	{
@@ -341,7 +341,7 @@ void Model::addMenuAction(const std::string &menu, const std::string &group, con
 	}
 }
 
-void Model::addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
+void Model::addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, buttonName))
 	{
@@ -350,7 +350,7 @@ void Model::addMenuAction(const std::string &menu, const std::string &group, con
 	}
 }
 
-void Model::addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::Flags<ot::ui::lockType> &flags)
+void Model::addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags)
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, boxName))
 	{
@@ -359,7 +359,7 @@ void Model::addMenuCheckBox(const std::string &menu, const std::string &group, c
 	}
 }
 
-void Model::addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::Flags<ot::ui::lockType> &flags)
+void Model::addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags)
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, editName))
 	{
@@ -375,11 +375,11 @@ void Model::setupUIControls()
 	assert(getNotifier() != nullptr);
 	if (getNotifier() == nullptr) return;
 
-	ot::Flags<ot::ui::lockType> modelRead;
-	modelRead.setFlag(ot::ui::lockType::tlModelRead);
+	ot::LockTypeFlags modelRead;
+	modelRead.setFlag(ot::LockModelRead);
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite;
+	modelWrite.setFlag(ot::LockModelWrite);
 
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
@@ -397,7 +397,7 @@ void Model::setupUIControls()
 
 	//addMenuAction("Model", "Database", "Save", "ProjectSave");
 
-	addMenuAction("Model", "Geometry", "Info", "Info", modelRead, "Information", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_I));
+	addMenuAction("Model", "Geometry", "Info", "Info", modelRead, "Information", "Default", "Ctrl+I");
 
 	addMenuAction("Model", "Material", "Create Material", "Create Material", modelWrite, "AddMaterial");
 	addMenuAction("Model", "Material", "Show By Material", "Show By Material", modelRead, "ShowByMaterial");
@@ -405,9 +405,9 @@ void Model::setupUIControls()
 	
 	addMenuAction("Model", "Parameters", "Create Parameter", "Create Parameter", modelRead, "CreateParameter");
 
-	addMenuAction("Model", "Edit", "Undo", "Undo", modelWrite, "Undo", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_Z));
-	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_Y));
-	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::ui::keySequenceToString(ot::ui::Key_Delete));
+	addMenuAction("Model", "Edit", "Undo", "Undo", modelWrite, "Undo", "Default", "Ctrl+Z");
+	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", "Ctrl+Y");
+	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", "Del");
 	
 	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Result1DVisible", "Default");
 

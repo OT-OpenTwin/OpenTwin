@@ -45,7 +45,7 @@ public:
 
 	ak::UID addNiceLineEdit(ak::UID _creator, ak::UID _container, const QString & _title, const QString & _initialState);
 
-	void addDefaultControlsToLockManager(LockManager * _lockManger, ot::Flags<ot::ui::lockType>& _flags);
+	void addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypeFlags& _flags);
 
 private:
 

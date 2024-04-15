@@ -100,7 +100,7 @@ namespace ot {
 				const std::string &			_groupName,
 				const std::string &			_buttonName,
 				const std::string &			_text,
-				const Flags<ui::lockType> &	_lockTypes,
+				const LockTypeFlags &		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
 				const std::string &			_keySequence = std::string(""),
@@ -108,7 +108,7 @@ namespace ot {
 			);
 			void addMenuButton(
 				ot::MenuButtonDescription&		_menuButtonDescription,
-				const Flags<ui::lockType> &	_lockTypes,
+				const LockTypeFlags&		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
 				const std::string &			_keySequence = std::string(""),
@@ -132,7 +132,7 @@ namespace ot {
 				const std::string &			_subgroupName,
 				const std::string &			_buttonName,
 				const std::string &			_text,
-				const Flags<ui::lockType> &	_lockTypes,
+				const LockTypeFlags&		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
 				const std::string &			_keySequence = std::string(""),
@@ -151,7 +151,7 @@ namespace ot {
 				const std::string &			_checkboxName,
 				const std::string &			_checkboxText,
 				bool						_isChecked,
-				const Flags<ui::lockType> &	_lockTypes
+				const LockTypeFlags&		_lockTypes
 			);
 
 			//! @brief Will add a new CheckBox in the specified menu sub group at the UI
@@ -168,7 +168,7 @@ namespace ot {
 				const std::string &			_checkboxName,
 				const std::string &			_checkboxText,
 				bool						_isChecked,
-				const Flags<ui::lockType> &	_lockTypes
+				const LockTypeFlags&		_lockTypes
 			);
 
 			//! @brief Will add a new LineEdit in the specified menu group at the UI
@@ -183,7 +183,7 @@ namespace ot {
 				const std::string &			_lineEditName,
 				const std::string &			_labelText,
 				const std::string &			_initialText,
-				const Flags<ui::lockType> &	_lockTypes
+				const LockTypeFlags&	_lockTypes
 			);
 
 			//! @brief Will add a new LineEdit in the specified menu group at the UI
@@ -200,7 +200,7 @@ namespace ot {
 				const std::string &			_lineEditName,
 				const std::string &			_labelText,
 				const std::string &			_initialText,
-				const Flags<ui::lockType> &	_lockTypes
+				const LockTypeFlags&	_lockTypes
 			);
 
 			void activateMenuPage(
@@ -289,13 +289,13 @@ namespace ot {
 			//! @brief Will lock the UI Elements that belong to the provided lock type
 			//! @param _lockTypes The lock type Groups to lock in the UI
 			void lockUI(
-				const Flags<ui::lockType> &		_lockTypes
+				const LockTypeFlags&		_lockTypes
 			) const;
 
 			//! @brief Will unlock the UI Elements that belong to the provided lock type
 			//! @param _lockTypes The lock type Groups to unlock in the UI
 			void unlockUI(
-				const Flags<ui::lockType> &		_lockTypes
+				const LockTypeFlags&		_lockTypes
 			) const;
 
 			//! @brief Will set the progress bar text. This also turns on the progress bar visibility.

@@ -120,11 +120,11 @@ gp_Trsf Transformations::setTransform(EntityGeometry *geomEntity, TopoDS_Shape &
 void Transformations::transformEntities(const std::string &selectionInfo, std::map<std::string, std::string> &options)
 {
 	// Lock the user interface
-	ot::Flags<ot::ui::lockType> lockFlags;
-	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlNavigationWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlProperties);
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockNavigationWrite);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockProperties);
 
 	uiComponent->lockUI(lockFlags);
 

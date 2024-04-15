@@ -82,7 +82,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::object::setObjectUniqueName(m_view.gUserInterface_aSettings, "View:UI:Settings");
 	
 	// Create lock flags
-	ot::Flags<ot::ui::lockType> lockFlags(ot::ui::tlAll);
+	ot::LockTypeFlags lockFlags(ot::LockAll);
 	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aImport);
 	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aGroup);
 	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aSettings);
@@ -164,7 +164,7 @@ ak::UID ToolBar::addNiceLineEdit(ak::UID _creator, ak::UID _container, const QSt
 	return obj;
 }
 
-void ToolBar::addDefaultControlsToLockManager(LockManager * _lockManger, ot::Flags<ot::ui::lockType>& _flags) {
+void ToolBar::addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypeFlags& _flags) {
 	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aSettings, _flags);
 	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aImport, _flags);
 	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aGroup, _flags);

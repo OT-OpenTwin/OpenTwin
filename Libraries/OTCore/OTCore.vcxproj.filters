@@ -189,9 +189,6 @@
     <ClInclude Include="include\OTCore\Flags.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\FlagsHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\FolderNames.h">
       <Filter>include</Filter>
     </ClInclude>

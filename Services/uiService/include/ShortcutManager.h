@@ -1,6 +1,7 @@
 #pragma once
 
 // openTwin header
+#include "OTGui/GuiTypes.h"
 #include "OTCommunication/UiTypes.h"
 
 // uiCore header
@@ -63,7 +64,7 @@ public:
 
 	// Getter
 
-	static Qt::Key keyFromOpenTwin(ot::ui::keyType _key);
+	static Qt::Key keyFromOpenTwin(ot::BasicKey _key);
 
 	bool isEnabled(void) const { return m_isEnabled; }
 

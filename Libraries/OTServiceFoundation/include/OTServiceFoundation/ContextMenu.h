@@ -170,8 +170,8 @@ namespace ot {
 		std::string						m_text;
 		std::string						m_icon;
 		ContextMenuItemRole				m_role;
-		ot::Flags<itemFlag>				m_flags;
-		ot::Flags<itemCheckedState>		m_checkState;
+		itemFlags						m_flags;
+		itemCheckedStateFlags			m_checkState;
 		ContextMenuItem() = delete;
 	};
 

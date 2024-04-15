@@ -120,8 +120,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup(pageName, groupNameMonitor);
 	_ui->addMenuGroup(pageName, groupNameSignal);
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_buttonCreateSolver.SetDescription(pageName, groupNameSolver, "Create Solver");
 	_buttonRunSolver.SetDescription(pageName, groupNameSolver, "Run Solver");
@@ -477,11 +476,11 @@ void Application::runSolver(void)
 void Application::SolverThread(std::list<std::string> solverRunList)
 {
 	// Lock the UI
-	ot::Flags<ot::ui::lockType> lockFlags;
-	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlNavigationWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlProperties);
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockNavigationWrite);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockProperties);
 
 	m_uiComponent->lockUI(lockFlags);
 	

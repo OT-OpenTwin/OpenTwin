@@ -38,11 +38,11 @@ void ot::ModalCommandBase::setupUI(void)
 	// Add the specific commands
 	application->enableMessageQueuing(application->uiComponent()->serviceName(), true);
 
-	ot::Flags<ot::ui::lockType> modelRead;
-	modelRead.setFlag(ot::ui::lockType::tlModelRead);
+	LockTypeFlags modelRead;
+	modelRead.setFlag(LockModelRead);
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	LockTypeFlags modelWrite;
+	modelWrite.setFlag(LockModelWrite);
 
 	std::string mainTab = initializeAndCreateUI(modelRead, modelWrite);
 
@@ -72,25 +72,25 @@ void ot::ModalCommandBase::addMenuSubgroup(const std::string &menu, const std::s
 	uiSubGroupMap[menu + ":" + group + ":" + subgroup] = true;
 }
 
-void ot::ModalCommandBase::addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder)
+void ot::ModalCommandBase::addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, LockTypeFlags& flags, const std::string &iconName, const std::string &iconFolder)
 {
 	application->uiComponent()->addMenuButton(menu, group, buttonName, text, flags, iconName, iconFolder);
 	uiActionMap[menu + ":" + group + ":" + buttonName] = true;
 }
 
-void ot::ModalCommandBase::addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder)
+void ot::ModalCommandBase::addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, LockTypeFlags& flags, const std::string &iconName, const std::string &iconFolder)
 {
 	application->uiComponent()->addMenuButton(menu, group, subgroup, buttonName, text, flags, iconName, iconFolder);
 	uiActionMap[menu + ":" + group + ":" + subgroup + ":" + buttonName] = true;
 }
 
-void ot::ModalCommandBase::addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::Flags<ot::ui::lockType> &flags)
+void ot::ModalCommandBase::addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, LockTypeFlags& flags)
 {
 	application->uiComponent()->addMenuCheckbox(menu, group, subgroup, boxName, boxText, checked, flags);
 	uiActionMap[menu + ":" + group + ":" + subgroup + ":" + boxName] = true;
 }
 
-void ot::ModalCommandBase::addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::Flags<ot::ui::lockType> &flags)
+void ot::ModalCommandBase::addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, LockTypeFlags& flags)
 {
 	application->uiComponent()->addMenuLineEdit(menu, group, subgroup, editName, editLabel, editText, flags);
 	uiActionMap[menu + ":" + group + ":" + subgroup + ":" + editName] = true;

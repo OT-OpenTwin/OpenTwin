@@ -164,8 +164,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Project", "Local Project");
 	_ui->addMenuGroup("Project", "Versions");
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_ui->addMenuButton("Project", "Local Project", "Import", "Import", modelWrite, "Import", "Default");
 	_ui->addMenuButton("Project", "Local Project", "Set File", "Set File", modelWrite, "ProjectSaveAs", "Default");

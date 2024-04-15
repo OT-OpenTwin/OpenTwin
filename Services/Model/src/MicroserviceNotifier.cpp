@@ -77,12 +77,12 @@ void MicroserviceNotifier::addMenuSubGroup(const std::string &pageName, const st
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
+void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
 {
 	addMenuPushButton(pageName, groupName, "", buttonName, text, flags, iconName, iconFolder, keySequence);
 }
 
-void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &buttonName, const std::string &text, ot::Flags<ot::ui::lockType> &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence) {
+void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence) {
 	ot::JsonDocument inDoc;
 
 	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_AddMenuButton, inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -94,7 +94,7 @@ void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const 
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(text, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconName, ot::JsonString(iconName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, ot::JsonString(iconFolder, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::ui::toList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 	if (!keySequence.empty()) {
 		inDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, ot::JsonString(keySequence, inDoc.GetAllocator()), inDoc.GetAllocator());
 	}
@@ -103,7 +103,7 @@ void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const 
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::Flags<ot::ui::lockType> &flags)
+void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuCheckbox);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -113,13 +113,13 @@ void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const st
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(boxText.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, checked, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::ui::toList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::Flags<ot::ui::lockType> &flags)
+void MicroserviceNotifier::addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuLineEdit);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -129,7 +129,7 @@ void MicroserviceNotifier::addMenuLineEdit(const std::string &pageName, const st
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(editText.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, rapidjson::Value(editLabel.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::ui::toList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);

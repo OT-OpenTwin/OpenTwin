@@ -18,10 +18,10 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetFlag);
-
 namespace ot {
 
-	typedef ot::Flags<ot::WidgetFlag> WidgetFlags;
+	typedef Flags<WidgetFlag> WidgetFlags;
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetFlag);

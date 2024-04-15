@@ -1093,7 +1093,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 	try {
 		OT_LOG_D("Open project requested (Project name = \"" + projectName + ")");
 
-		m_lockManager->lock(app, ot::ui::tlAll);
+		m_lockManager->lock(app, ot::LockAll);
 
 		StudioSuiteConnectorAPI::openProject();
 
@@ -1224,7 +1224,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		do
 		{
 			if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
-				m_lockManager->unlock(AppBase::instance(), ot::ui::tlAll);
+				m_lockManager->unlock(AppBase::instance(), ot::LockAll);
 				throw std::exception("Failed to send http request to Session Service");
 			}
 			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
@@ -1235,7 +1235,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 				std::this_thread::sleep_for(1s);
 			}
 			else {
-				m_lockManager->unlock(AppBase::instance(), ot::ui::tlAll);
+				m_lockManager->unlock(AppBase::instance(), ot::LockAll);
 				OT_LOG_E("Invalid Session Service response: " + response);
 				throw std::exception(("Invalid Session Service response: " + response).c_str());
 			}
@@ -1252,13 +1252,13 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 			throw std::exception("Failed to send http request");
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			m_lockManager->unlock(AppBase::instance(), ot::ui::tlAll);
+			m_lockManager->unlock(AppBase::instance(), ot::LockAll);
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			m_lockManager->unlock(AppBase::instance(), ot::ui::tlAll);
+			m_lockManager->unlock(AppBase::instance(), ot::LockAll);
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
@@ -1290,7 +1290,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
 #endif // OT_USE_GSS
 
-		m_lockManager->unlock(AppBase::instance(), ot::ui::tlAll);
+		m_lockManager->unlock(AppBase::instance(), ot::LockAll);
 
 		OT_LOG_D("Open project completed");
 	}
@@ -1714,20 +1714,20 @@ void ExternalServicesComponent::setProgressValue(int percentage)
 
 void ExternalServicesComponent::lockGui(void)
 {
-	ot::Flags<ot::ui::lockType> lockFlags;
-	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockModelRead);
 
 	m_lockManager->lock(nullptr, lockFlags);
 }
 
 void ExternalServicesComponent::unlockGui(void)
 {
-	ot::Flags<ot::ui::lockType> lockFlags;
-	lockFlags.setFlag(ot::ui::lockType::tlModelWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlViewWrite);
-	lockFlags.setFlag(ot::ui::lockType::tlModelRead);
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockModelRead);
 
 	m_lockManager->unlock(nullptr, lockFlags);
 }
@@ -1966,7 +1966,7 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 	rapidjson::Value prefetchID = _document[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
 	rapidjson::Value prefetchVersion = _document[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
 
-	ot::Flags<ot::ui::lockType> lockFlags(ot::ui::tlAll);
+	ot::LockTypeFlags lockFlags(ot::LockAll);
 	m_lockManager->lock(nullptr, lockFlags);
 
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
@@ -2570,11 +2570,11 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 	}
 	ot::ServiceBase* senderService = getService(serviceId);
 	
-	ot::Flags<ot::ui::lockType> flags = (ot::ui::lockType::tlAll);
+	ot::LockTypeFlags flags = (ot::LockAll);
 
 	if (_document.HasMember(OT_ACTION_PARAM_ElementLockTypes)) {
-		flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-		flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external push buttons
+		flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+		flags.setFlag(ot::LockAll);	// Add the all flag to all external push buttons
 	}
 
 	ak::UID parentUID;
@@ -2633,8 +2633,8 @@ std::string ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _
 	std::string boxText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 	bool checked = _document[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
+	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	flags.setFlag(ot::LockAll);	// Add the all flag to all external checkboxes
 
 	ot::ServiceBase* service = getService(serviceId);
 
@@ -2681,8 +2681,8 @@ std::string ExternalServicesComponent::handleAddMenuLineEdit(ot::JsonDocument& _
 	std::string editText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 	std::string editLabel = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	flags.setFlag(ot::ui::lockType::tlAll);	// Add the all flag to all external checkboxes
+	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	flags.setFlag(ot::LockAll);	// Add the all flag to all external checkboxes
 
 	ot::ServiceBase* service = getService(serviceId);
 	
@@ -3635,7 +3635,7 @@ std::string ExternalServicesComponent::handleCreateRubberband(ot::JsonDocument& 
 
 std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	m_lockManager->lock(getService(serviceId), flags);
 
 	return "";
@@ -3643,7 +3643,7 @@ std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
 
 std::string ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	auto flags = ot::ui::toLockType(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	m_lockManager->unlock(getService(serviceId), flags);
 
 	return "";

@@ -639,11 +639,11 @@ bool AppBase::createNewProjectInDatabase(
 
 void AppBase::lockSelectionAndModification(bool flag)
 {
-	ot::Flags<ot::ui::lockType> lockFlags;
-	lockFlags.setFlag(ot::ui::tlModelWrite);
-	lockFlags.setFlag(ot::ui::tlModelRead);
-	lockFlags.setFlag(ot::ui::tlViewWrite);
-	lockFlags.setFlag(ot::ui::tlNavigationWrite);
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockModelRead);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockNavigationWrite);
 
 	if (flag)
 	{
@@ -660,7 +660,7 @@ void AppBase::lockSelectionAndModification(bool flag)
 
 void AppBase::lockUI(bool flag)
 {
-	ot::Flags<ot::ui::lockType> lockFlags(ot::ui::tlAll);
+	ot::LockTypeFlags lockFlags(ot::LockAll);
 
 	if (flag)
 	{
@@ -1503,13 +1503,13 @@ void AppBase::createUi(void) {
 			// Add default items to lock manager
 			auto lockManager = m_ExternalServicesComponent->lockManager();
 
-			ot::Flags<ot::ui::lockType> f{ ot::ui::lockType::tlAll };
-			f.setFlag(ot::ui::lockType::tlProperties);
+			ot::LockTypeFlags f{ ot::LockAll };
+			f.setFlag(ot::LockProperties);
 			lockManager->uiElementCreated(this, m_propertyGrid, f);
 
-			f.removeFlag(ot::ui::lockType::tlProperties);
-			f.setFlag(ot::ui::lockType::tlNavigationAll);
-			f.setFlag(ot::ui::lockType::tlNavigationWrite);
+			f.removeFlag(ot::LockProperties);
+			f.setFlag(ot::LockNavigationAll);
+			f.setFlag(ot::LockNavigationWrite);
 			lockManager->uiElementCreated(this, m_projectNavigation, f);
 
 			// Update status

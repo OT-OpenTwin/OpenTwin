@@ -59,40 +59,40 @@ public:
 
 	//! @brief Will create a new entry for this 
 	//! This function will be called from the controls manager automatically if the lock manager was set
-	void uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, const ot::Flags<ot::ui::lockType> & _typeFlags);
-	void uiElementCreated(ot::ServiceBase * _service, ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType> & _typeFlags);
-	void uiElementCreated(ot::ServiceBase * _service, ot::PropertyGrid* _propertyGrid, const ot::Flags<ot::ui::lockType> & _typeFlags);
+	void uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, const ot::LockTypeFlags & _typeFlags);
+	void uiElementCreated(ot::ServiceBase * _service, ak::aTreeWidget* _tree, const ot::LockTypeFlags & _typeFlags);
+	void uiElementCreated(ot::ServiceBase * _service, ot::PropertyGrid* _propertyGrid, const ot::LockTypeFlags & _typeFlags);
 
 	//! @brief Will remove all the stored information about the UI element
 	//! This function will be called from the controls manager automatically if the lock manager was set
 	void uiElementDestroyed(ak::UID _uid);
 
-	void lock(ot::ServiceBase * _service, ot::ui::lockType _type);
-	void lock(ot::ServiceBase * _service, const ot::Flags<ot::ui::lockType> & _typeFlags);
+	void lock(ot::ServiceBase * _service, ot::LockTypeFlag _type);
+	void lock(ot::ServiceBase * _service, const ot::LockTypeFlags & _typeFlags);
 
 	void unlock(ot::ServiceBase * _service);
-	void unlock(ot::ServiceBase * _service, ot::ui::lockType _type);
-	void unlock(ot::ServiceBase * _service, const ot::Flags<ot::ui::lockType> & _typeFlags);
+	void unlock(ot::ServiceBase * _service, ot::LockTypeFlag _type);
+	void unlock(ot::ServiceBase * _service, const ot::LockTypeFlags & _typeFlags);
 
 	void disable(ot::ServiceBase * _service, ak::UID _element);
 	void enable(ot::ServiceBase * _service, ak::UID _element, bool _resetCounter = false);
 
 	void cleanService(ot::ServiceBase * _service, bool _reenableElement = true, bool _eraseUiElement = false);
 
-	int lockLevel(ot::ui::lockType _type);
+	int lockLevel(ot::LockTypeFlag _type);
 
 private:
 
-	std::map<ot::ui::lockType, int> * generateDefaultLockMap(void) const;
+	std::map<ot::LockTypeFlag, int> * generateDefaultLockMap(void) const;
 	LockManagerElement * uiElement(ak::UID _uid);
-	std::map<ot::ui::lockType, int> * serviceLockLevel(ot::ServiceBase * _service);
+	std::map<ot::LockTypeFlag, int> * serviceLockLevel(ot::ServiceBase * _service);
 	std::map<ak::UID, int> * serviceEnabledLevel(ot::ServiceBase * _service);
 	
 	AppBase *														m_owner;
 	LockManagerElement* m_tree;
 	LockManagerElement* m_prop;
 
-	std::map<ot::ServiceBase *, std::map<ot::ui::lockType, int> *>	m_serviceToUiLockLevel;		// Contains a overview of sender to UI elements lock levels
+	std::map<ot::ServiceBase *, std::map<ot::LockTypeFlag, int> *>	m_serviceToUiLockLevel;		// Contains a overview of sender to UI elements lock levels
 
 	std::map<ot::ServiceBase *, std::map<ak::UID, int> *>	m_serviceToUiEnabledLevel;		// Contains all enbaled levels for every UI element related to a service
 
@@ -104,15 +104,15 @@ private:
 
 class LockManagerElement {
 public:
-	LockManagerElement(ak::UID _uid, const ot::Flags<ot::ui::lockType> & _flags);
-	LockManagerElement(ak::aTreeWidget* _tree, const ot::Flags<ot::ui::lockType> & _flags);
-	LockManagerElement(ot::PropertyGrid* _prop, const ot::Flags<ot::ui::lockType> & _flags);
+	LockManagerElement(ak::UID _uid, const ot::LockTypeFlags & _flags);
+	LockManagerElement(ak::aTreeWidget* _tree, const ot::LockTypeFlags & _flags);
+	LockManagerElement(ot::PropertyGrid* _prop, const ot::LockTypeFlags & _flags);
 
 	void enable(int _value);
 	void disable(int _value);
 
-	void lock(int _value, ot::ui::lockType _lockType);
-	void unlock(int _value, ot::ui::lockType _lockType);
+	void lock(int _value, ot::LockTypeFlag _lockType);
+	void unlock(int _value, ot::LockTypeFlag _lockType);
 
 
 private:
@@ -120,7 +120,7 @@ private:
 	ak::aTreeWidget* m_tree;
 	ot::PropertyGrid* m_prop;
 	ak::UID							m_uid;
-	ot::Flags<ot::ui::lockType>		m_lockTypes;
+	ot::LockTypeFlags		m_lockTypes;
 	int								m_disabledCount;
 	int								m_lockCount;
 

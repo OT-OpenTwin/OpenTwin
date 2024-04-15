@@ -79,12 +79,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Model", "Sources");
 	_ui->addMenuGroup("PHREEC", "Solver");
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite;
+	modelWrite.setFlag(ot::LockModelWrite);
 
-	_ui->addMenuButton("Model", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default", ot::ui::keySequenceToString(ot::ui::Key_Control, ot::ui::Key_T));
+	_ui->addMenuButton("Model", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default", "Ctrl+T");
 	_ui->addMenuButton("PHREEC", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("PHREEC", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default", ot::ui::keySequenceToString(ot::ui::Key_F6));
+	_ui->addMenuButton("PHREEC", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default", "F6");
 	
 	modelSelectionChangedNotification();
 

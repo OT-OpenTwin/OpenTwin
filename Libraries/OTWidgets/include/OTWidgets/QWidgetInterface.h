@@ -22,7 +22,7 @@ namespace ot {
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) = 0;
 
-		void setOTWidgetFlags(const WidgetFlags& _flags) { if (m_widgetFlags.update(_flags)) { this->otWidgetFlagsChanged(m_widgetFlags); }; };
+		void setOTWidgetFlags(const WidgetFlags& _flags);
 		const WidgetFlags& otWidgetFlags(void) const { return m_widgetFlags; };
 		virtual void otWidgetFlagsChanged(const WidgetFlags& _flags) {};
 

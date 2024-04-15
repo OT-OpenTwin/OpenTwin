@@ -9,6 +9,12 @@
 // Qt header
 #include <QtWidgets/qwidget.h>
 
+void ot::QWidgetInterface::setOTWidgetFlags(const WidgetFlags& _flags) {
+	if (m_widgetFlags == _flags) return;
+	m_widgetFlags = _flags;
+	this->otWidgetFlagsChanged(m_widgetFlags);
+}
+
 void ot::QWidgetInterface::centerOnParent(const QWidget* _parentWidget) {
 	const QSize parentSize = _parentWidget->size();
 	const QPoint parentCenter = _parentWidget->pos() + QPoint(parentSize.width() / 2, parentSize.height() / 2);

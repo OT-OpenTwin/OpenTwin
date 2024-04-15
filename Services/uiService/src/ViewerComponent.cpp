@@ -288,10 +288,10 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 			//NOTE, add actual icon path
 			ViewerUIDtype btnUid = AppBase::instance()->getToolBar()->addToolButton(AppBase::instance()->getViewerUID(), menuGroupID, iconName.c_str(), "Default", buttonName.c_str(), this);
 			AppBase::instance()->controlsManager()->uiElementCreated(this, btnUid, true);
-			ot::Flags<ot::ui::lockType> flags;
-			flags.setFlag(ot::ui::tlAll);
-			//flags.setFlag(ot::ui::tlViewWrite);
-			flags.setFlag(ot::ui::tlViewRead);
+			ot::LockTypeFlags flags;
+			flags.setFlag(ot::LockAll);
+			//flags.setFlag(ot::LockViewWrite);
+			flags.setFlag(ot::LockViewRead);
 			AppBase::instance()->lockManager()->uiElementCreated(this, btnUid, flags);
 
 			if (_contextMenu.hasItems()) {

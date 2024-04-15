@@ -175,3 +175,142 @@ ot::GradientSpread ot::stringToGradientSpread(const std::string& _spread) {
 		throw std::exception("Unknown gradient spread");
 	}
 }
+
+ot::BasicKey ot::toBasicKey(const std::string& _key) {
+	if (_key == toString(Key_A)) return Key_A;
+	else if (_key == toString(Key_B)) return Key_B;
+	else if (_key == toString(Key_C)) return Key_C;
+	else if (_key == toString(Key_D)) return Key_D;
+	else if (_key == toString(Key_E)) return Key_E;
+	else if (_key == toString(Key_F)) return Key_F;
+	else if (_key == toString(Key_G)) return Key_G;
+	else if (_key == toString(Key_H)) return Key_H;
+	else if (_key == toString(Key_I)) return Key_I;
+	else if (_key == toString(Key_J)) return Key_J;
+	else if (_key == toString(Key_K)) return Key_K;
+	else if (_key == toString(Key_L)) return Key_L;
+	else if (_key == toString(Key_M)) return Key_M;
+	else if (_key == toString(Key_N)) return Key_N;
+	else if (_key == toString(Key_O)) return Key_O;
+	else if (_key == toString(Key_P)) return Key_P;
+	else if (_key == toString(Key_Q)) return Key_Q;
+	else if (_key == toString(Key_R)) return Key_R;
+	else if (_key == toString(Key_S)) return Key_S;
+	else if (_key == toString(Key_T)) return Key_T;
+	else if (_key == toString(Key_U)) return Key_U;
+	else if (_key == toString(Key_V)) return Key_V;
+	else if (_key == toString(Key_W)) return Key_W;
+	else if (_key == toString(Key_X)) return Key_X;
+	else if (_key == toString(Key_Y)) return Key_Y;
+	else if (_key == toString(Key_Z)) return Key_Z;
+	else if (_key == toString(Key_1)) return Key_1;
+	else if (_key == toString(Key_2)) return Key_2;
+	else if (_key == toString(Key_3)) return Key_3;
+	else if (_key == toString(Key_4)) return Key_4;
+	else if (_key == toString(Key_5)) return Key_5;
+	else if (_key == toString(Key_6)) return Key_6;
+	else if (_key == toString(Key_7)) return Key_7;
+	else if (_key == toString(Key_8)) return Key_8;
+	else if (_key == toString(Key_9)) return Key_9;
+	else if (_key == toString(Key_0)) return Key_0;
+	else if (_key == toString(Key_Alt)) return Key_Alt;
+	else if (_key == toString(Key_Shift)) return Key_Shift;
+	else if (_key == toString(Key_Control)) return Key_Control;
+	else if (_key == toString(Key_CapsLock)) return Key_CapsLock;
+	else if (_key == toString(Key_Tab)) return Key_Tab;
+	else if (_key == toString(Key_Return)) return Key_Return;
+	else if (_key == toString(Key_Space)) return Key_A;
+	else if (_key == toString(Key_Backspace)) return Key_A;
+	else if (_key == toString(Key_Delete)) return Key_A;
+	else if (_key == toString(Key_Up)) return Key_Up;
+	else if (_key == toString(Key_Down)) return Key_Down;
+	else if (_key == toString(Key_Left)) return Key_Left;
+	else if (_key == toString(Key_Right)) return Key_Right;
+	else if (_key == toString(Key_F1)) return Key_F1;
+	else if (_key == toString(Key_F2)) return Key_F2;
+	else if (_key == toString(Key_F3)) return Key_F3;
+	else if (_key == toString(Key_F4)) return Key_F4;
+	else if (_key == toString(Key_F5)) return Key_F5;
+	else if (_key == toString(Key_F6)) return Key_F6;
+	else if (_key == toString(Key_F7)) return Key_F7;
+	else if (_key == toString(Key_F8)) return Key_F8;
+	else if (_key == toString(Key_F9)) return Key_F9;
+	else if (_key == toString(Key_F10)) return Key_F10;
+	else if (_key == toString(Key_F11)) return Key_F11;
+	else if (_key == toString(Key_F12)) return Key_F12;
+	else {
+		OT_LOG_E("Unknown basic key \"" + _key + "\"");
+		return Key_A;
+	}
+}
+
+
+std::string ot::toString(BasicKey _key) {
+	switch (_key)
+	{
+	case ot::Key_A: return "A";
+	case ot::Key_B: return "B";
+	case ot::Key_C: return "C";
+	case ot::Key_D: return "D";
+	case ot::Key_E: return "E";
+	case ot::Key_F: return "F";
+	case ot::Key_G: return "G";
+	case ot::Key_H: return "H";
+	case ot::Key_I: return "I";
+	case ot::Key_J: return "J";
+	case ot::Key_K: return "K";
+	case ot::Key_L: return "L";
+	case ot::Key_M: return "M";
+	case ot::Key_N: return "N";
+	case ot::Key_O: return "O";
+	case ot::Key_P: return "P";
+	case ot::Key_Q: return "Q";
+	case ot::Key_R: return "R";
+	case ot::Key_S: return "S";
+	case ot::Key_T: return "T";
+	case ot::Key_U: return "U";
+	case ot::Key_V: return "V";
+	case ot::Key_W: return "W";
+	case ot::Key_X: return "X";
+	case ot::Key_Y: return "Y";
+	case ot::Key_Z: return "Z";
+	case ot::Key_1: return "1";
+	case ot::Key_2: return "2";
+	case ot::Key_3: return "3";
+	case ot::Key_4: return "4";
+	case ot::Key_5: return "5";
+	case ot::Key_6: return "6";
+	case ot::Key_7: return "7";
+	case ot::Key_8: return "8";
+	case ot::Key_9: return "9";
+	case ot::Key_0: return "0";
+	case ot::Key_Alt: return "Alt";
+	case ot::Key_Shift: return "Shift";
+	case ot::Key_Control: return "Ctrl";
+	case ot::Key_CapsLock: return "CapsLock";
+	case ot::Key_Tab: return "Tab";
+	case ot::Key_Return: return "Return";
+	case ot::Key_Space: return "Space";
+	case ot::Key_Backspace: return "Backspace";
+	case ot::Key_Delete: return "Del";
+	case ot::Key_Up: return "Up";
+	case ot::Key_Down: return "Down";
+	case ot::Key_Left: return "Left";
+	case ot::Key_Right: return "Right";
+	case ot::Key_F1: return "F1";
+	case ot::Key_F2: return "F2";
+	case ot::Key_F3: return "F3";
+	case ot::Key_F4: return "F4";
+	case ot::Key_F5: return "F5";
+	case ot::Key_F6: return "F6";
+	case ot::Key_F7: return "F7";
+	case ot::Key_F8: return "F8";
+	case ot::Key_F9: return "F9";
+	case ot::Key_F10: return "F10";
+	case ot::Key_F11: return "F11";
+	case ot::Key_F12: return "F12";
+	default:
+		OT_LOG_E("Unknown basic key (" + std::to_string((int)_key) + ")");
+		return "A";
+	}
+}

@@ -106,8 +106,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuGroup("Mesh", "Cartesian Mesh");
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_ui->addMenuButton("Mesh", "Cartesian Mesh", "Create Cartesian Mesh", "Create Cartesian Mesh", modelWrite, "AddAllObjects", "Default");
 	_ui->addMenuButton("Mesh", "Cartesian Mesh", "Update Cartesian Mesh", "Update Cartesian Mesh", modelWrite, "UpdateMesh", "Default");

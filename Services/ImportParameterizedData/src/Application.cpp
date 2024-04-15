@@ -111,8 +111,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingState);
 	_ui->addMenuGroup(pageName, groupNameParameterizedDataCreation);
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_buttonImportCSV.SetDescription(pageName, groupNameImport, "Import File");
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");

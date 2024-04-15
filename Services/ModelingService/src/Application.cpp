@@ -224,10 +224,10 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	ot::Flags<ot::ui::lockType> lockTypes;
-	lockTypes.setFlag(ot::ui::lockType::tlModelWrite);
-	lockTypes.setFlag(ot::ui::lockType::tlViewWrite);
-	lockTypes.setFlag(ot::ui::lockType::tlModelRead);
+	ot::LockTypeFlags lockTypes;
+	lockTypes.setFlag(ot::LockModelWrite);
+	lockTypes.setFlag(ot::LockViewWrite);
+	lockTypes.setFlag(ot::LockModelRead);
 
 	_ui->addMenuPage("Modeling");
 	_ui->addMenuGroup("Modeling", "Import");

@@ -96,7 +96,7 @@ void ot::components::UiComponent::addMenuButton(
 	const std::string &			_groupName,
 	const std::string &			_buttonName,
 	const std::string &			_text,
-	const Flags<ui::lockType> &	_lockTypes,
+	const LockTypeFlags&		_lockTypes,
 	const std::string &			_iconName,
 	const std::string &			_iconFolder,
 	const std::string &			_keySequence,
@@ -112,7 +112,7 @@ void ot::components::UiComponent::addMenuButton(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_text, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconName, JsonString(_iconName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, JsonString(_iconFolder, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 		if (!_keySequence.empty()) {
@@ -129,7 +129,7 @@ void ot::components::UiComponent::addMenuButton(
 	}
 }
 
-void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButtonDescription,  const Flags<ui::lockType>& _lockTypes, const std::string & _iconName, const std::string & _iconFolder, const std::string & _keySequence, const ContextMenu & _contextMenu)
+void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButtonDescription,  const LockTypeFlags& _lockTypes, const std::string & _iconName, const std::string & _iconFolder, const std::string & _keySequence, const ContextMenu & _contextMenu)
 {
 	addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetSubgroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
 }
@@ -140,7 +140,7 @@ void ot::components::UiComponent::addMenuButton(
 	const std::string &			_subgroupName,
 	const std::string &			_buttonName,
 	const std::string &			_text,
-	const Flags<ui::lockType> &	_lockTypes,
+	const LockTypeFlags&		_lockTypes,
 	const std::string &			_iconName,
 	const std::string &			_iconFolder,
 	const std::string &			_keySequence,
@@ -157,7 +157,7 @@ void ot::components::UiComponent::addMenuButton(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_text, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconName, JsonString(_iconName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, JsonString(_iconFolder, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 		if (!_keySequence.empty()) {
@@ -180,7 +180,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 	const std::string &			_checkboxName,
 	const std::string &			_checkboxText,
 	bool						_isChecked,
-	const Flags<ui::lockType> &	_lockTypes
+	const LockTypeFlags&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _checkboxName))
 	{
@@ -191,7 +191,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_checkboxName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_checkboxText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 		m_application->sendMessage(true, m_serviceName, cmdDoc);
@@ -208,7 +208,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 	const std::string &			_checkboxName,
 	const std::string &			_checkboxText,
 	bool						_isChecked,
-	const Flags<ui::lockType> &	_lockTypes
+	const LockTypeFlags&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _checkboxName))
 	{
@@ -220,7 +220,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_checkboxName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_checkboxText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 		m_application->sendMessage(true, m_serviceName, cmdDoc);
@@ -236,7 +236,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 	const std::string &			_lineEditName,
 	const std::string &			_labelText,
 	const std::string &			_initialText,
-	const Flags<ui::lockType> &	_lockTypes
+	const LockTypeFlags&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _lineEditName))
 	{
@@ -247,7 +247,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_lineEditName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_initialText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, JsonString(_labelText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 		m_application->sendMessage(true, m_serviceName, cmdDoc);
@@ -264,7 +264,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 	const std::string &			_lineEditName,
 	const std::string &			_labelText,
 	const std::string &			_initialText,
-	const Flags<ui::lockType> &	_lockTypes
+	const LockTypeFlags&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _lineEditName))
 	{
@@ -276,7 +276,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_lineEditName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_initialText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, JsonString(_labelText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 		m_application->sendMessage(true, m_serviceName, cmdDoc);
@@ -419,22 +419,22 @@ void ot::components::UiComponent::setCheckboxValues(
 }
 
 void ot::components::UiComponent::lockUI(
-	const Flags<ui::lockType> &		_lockTypes
+	const LockTypeFlags&		_lockTypes
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Lock, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ot::ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 	m_application->sendMessage(true, m_serviceName, cmdDoc);
 }
 
 void ot::components::UiComponent::unlockUI(
-	const Flags<ui::lockType> &		_lockTypes
+	const LockTypeFlags&		_lockTypes
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Unlock, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(ot::ui::toList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
 
 	m_application->sendMessage(true, m_serviceName, cmdDoc);
